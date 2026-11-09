@@ -183,6 +183,7 @@ export const ms: Messages = {
     "Bahasa teks aplikasi dan arah tulisan. Biarkan pada bahasa sistem untuk mengikut peranti.",
   "settings.languageLabel": "Bahasa aplikasi",
   "settings.languageSystem": "Bahasa sistem",
+  "settings.searchEngine": "Enjin carian",
 
   "favorites.title": "Kegemaran",
   "favorites.note":
@@ -330,7 +331,6 @@ export const ms: Messages = {
   "paywall.subtitle": "Buka pembantu AI, mod incognito dan had penggunaan.",
   "paywall.close": "Tutup paywall",
   "paywall.locked": "Ciri Pro",
-  "paywall.lockedHint": "Ini memerlukan OpenMedia Pro. Ketik untuk melihat pelan.",
   "paywall.lifetime": "Sepanjang hayat",
   "paywall.yearly": "Tahunan",
   "paywall.monthly": "Bulanan",

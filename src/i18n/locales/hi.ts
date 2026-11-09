@@ -183,6 +183,7 @@ export const hi: Messages = {
     "ऐप के लिखावट की भाषा, और वह किस दिशा में लिखी जाती है। इसे सिस्टम की भाषा पर छोड़ दें ताकि डिवाइस के अनुसार बदले।",
   "settings.languageLabel": "ऐप की भाषा",
   "settings.languageSystem": "सिस्टम की भाषा",
+  "settings.searchEngine": "सर्च इंजन",
 
   "favorites.title": "पसंदीदा",
   "favorites.note":
@@ -329,7 +330,6 @@ export const hi: Messages = {
   "paywall.subtitle": "AI सहायक, इन्कोग्निटो मोड और उपयोग सीमाएँ अनलॉक करें।",
   "paywall.close": "पेमेंट वॉल बंद करें",
   "paywall.locked": "Pro सुविधा",
-  "paywall.lockedHint": "इसके लिए OpenMedia Pro चाहिए। प्लान देखने के लिए टैप करें।",
   "paywall.lifetime": "आजीवन",
   "paywall.yearly": "वार्षिक",
   "paywall.monthly": "मासिक",

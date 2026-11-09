@@ -2,7 +2,7 @@ import { useApp } from "../../app/store";
 import { useT } from "../../i18n/useT";
 import { QUICK_ACCESS_LIMIT } from "../../shared/favorites";
 import { FavoritesEditor } from "./FavoritesSection";
-import { SiteCard } from "./RecipesSection";
+import { SiteCard } from "./RecipesScreen";
 import { LockedSection } from "./ui";
 
 /**

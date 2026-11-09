@@ -74,6 +74,7 @@ pub fn run() {
             commands::reset_onboarding,
             commands::set_theme,
             commands::set_locale,
+            commands::set_search_engine,
             commands::refresh_icons,
             commands::get_icons,
             commands::open_site,

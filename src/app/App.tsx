@@ -9,7 +9,7 @@ import { UsageGuard } from "../features/stats/UsageGuard";
 import { WebLayer } from "../features/web/WebLayer";
 import { useApplyTheme } from "../shared/theme";
 import { hideSplash, hideSplashWhen, pageShowing } from "./splash";
-import { selectLocale, selectPage, useApp } from "./store";
+import { selectLocale, selectPage, selectSettingsOpen, useApp } from "./store";
 import { useHitRegions } from "./useHitRegions";
 import { useAndroidBack } from "../features/back/useAndroidBack";
 import { useBackHandler } from "../features/back/useBackHandler";
@@ -22,10 +22,14 @@ import { useEntitlementStore } from "../features/paywall/store";
 const loadSettings = () => import("../features/settings/SettingsScreen");
 const loadStats = () => import("../features/stats/StatsSheet");
 const loadOnboarding = () => import("../features/onboarding/Onboarding");
+const loadRecipes = () => import("../features/settings/RecipesScreen");
 const SettingsScreen = lazy(() =>
   loadSettings().then((module) => ({ default: module.SettingsScreen })),
 );
 const StatsSheet = lazy(() => loadStats().then((module) => ({ default: module.StatsSheet })));
+const RecipesScreen = lazy(() =>
+  loadRecipes().then((module) => ({ default: module.RecipesScreen })),
+);
 const Onboarding = lazy(() => loadOnboarding().then((module) => ({ default: module.Onboarding })));
 
 function firstPageShowing(): boolean {
@@ -38,6 +42,7 @@ export function App() {
   const loadSecondary = useApp((s) => s.loadSecondary);
   const error = useApp((s) => s.error);
   const sheet = useApp((s) => s.sheet);
+  const settingsOpen = useApp(selectSettingsOpen);
   const onboardingOpen = useApp((s) => s.onboardingOpen);
   const reportError = useApp((s) => s.reportError);
   const closeSheet = useApp((s) => s.closeSheet);
@@ -90,12 +95,13 @@ export function App() {
       <AssistantDock />
       <HistorySheet />
       <Suspense fallback={null}>
-        {(idle || sheet === "settings") && <SettingsScreen />}
+        {(idle || settingsOpen) && <SettingsScreen />}
+        {(idle || sheet === "recipes") && <RecipesScreen />}
         {(idle || sheet === "stats") && <StatsSheet />}
         {onboardingOpen && <Onboarding />}
         {sheet === "paywall" && <PaywallSheet />}
       </Suspense>
-      {error && sheet !== "settings" && (
+      {error && !settingsOpen && (
         <button
           type="button"
           data-hit=""

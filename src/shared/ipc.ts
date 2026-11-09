@@ -4,6 +4,10 @@ import { listen, type UnlistenFn } from "@tauri-apps/api/event";
 
 export type Theme = "system" | "light" | "dark";
 
+/** The engine the command bar searches with; the address of each is in `searchEngines.ts`. */
+export type SearchEngine =
+  "duckDuckGo" | "google" | "bing" | "brave" | "ecosia" | "startpage" | "yahoo";
+
 export interface Favorite {
   id: string;
   name: string;
@@ -32,6 +36,7 @@ export interface AppState {
   aiPreview: boolean;
   /** The language the user picked, as a BCP 47 tag; null follows the device's language. */
   locale: string | null;
+  searchEngine: SearchEngine;
 }
 
 /** The page Rust already started loading at launch; the shell takes it over. */
@@ -148,6 +153,7 @@ export const library = {
   setTheme: (theme: Theme) => command("set_theme", { theme }),
   /** Remembers the language the user picked; null puts the app back on the device's language. */
   setLocale: (locale: string | null) => command("set_locale", { locale }),
+  setSearchEngine: (engine: SearchEngine) => command("set_search_engine", { engine }),
   /** Persists the choice and reloads the open page under it; see `set_ad_block` in Rust. */
   setAdBlock: (enabled: boolean) => command("set_ad_block", { enabled }),
   /** The recipes with their toggles, from the normal choices or the incognito ones. */

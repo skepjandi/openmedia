@@ -178,6 +178,7 @@ export const zhHant: Messages = {
     "App 文字使用的語言，以及書寫方向。維持「跟隨系統語言」就會配合裝置設定。",
   "settings.languageLabel": "App 語言",
   "settings.languageSystem": "系統語言",
+  "settings.searchEngine": "搜尋引擎",
 
   "favorites.title": "我的最愛",
   "favorites.note":
@@ -315,7 +316,6 @@ export const zhHant: Messages = {
   "paywall.subtitle": "解鎖 AI 助理、無痕模式和用量限制。",
   "paywall.close": "關閉付費牆",
   "paywall.locked": "Pro 功能",
-  "paywall.lockedHint": "此功能需要 OpenMedia Pro。點按查看方案。",
   "paywall.lifetime": "永久",
   "paywall.yearly": "年繳",
   "paywall.monthly": "月繳",

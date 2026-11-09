@@ -1,4 +1,5 @@
-import type { AiState } from "../../shared/ipc";
+import type { AiState, SearchEngine } from "../../shared/ipc";
+import { searchUrl } from "../../shared/searchEngines";
 import { normalizeWebUrl } from "../../shared/url";
 
 export const MAX_REQUEST_LENGTH = 400;
@@ -24,6 +25,8 @@ export interface RouteContext {
   /** Whether the Pro entitlement is active. The assistant is the only Pro route. */
   pro: boolean;
   mode: InputMode;
+  /** The engine a `search` route uses. */
+  searchEngine: SearchEngine;
 }
 
 /** True when an active provider exists and has a key. */
@@ -33,11 +36,6 @@ export function providerReady(ai: AiState | null): boolean {
 }
 
 const isSitePage = (url: string | null): boolean => url !== null && /^https?:\/\//i.test(url);
-
-/** The web search a `search` route opens. */
-export function searchUrl(query: string): string {
-  return `https://duckduckgo.com/?q=${encodeURIComponent(query.trim())}`;
-}
 
 // Text that starts like a request to change a page ("hide the suggested videos") goes to the
 // assistant in auto mode; anything else is a web search. English only: in other languages, pick
@@ -70,12 +68,12 @@ export function routeInput(text: string, context: RouteContext): Route {
     case "link":
       return url ? { kind: "address", url } : { kind: "notLink" };
     case "search":
-      return { kind: "search", url: searchUrl(trimmed) };
+      return { kind: "search", url: searchUrl(trimmed, context.searchEngine) };
     case "chat":
       return assistantRoute(trimmed, context);
     case "auto":
       if (url) return { kind: "address", url };
       if (REQUEST_START.test(trimmed)) return assistantRoute(trimmed, context);
-      return { kind: "search", url: searchUrl(trimmed) };
+      return { kind: "search", url: searchUrl(trimmed, context.searchEngine) };
   }
 }

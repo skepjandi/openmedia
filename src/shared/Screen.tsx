@@ -1,34 +1,53 @@
 import { useRef, type ReactNode } from "react";
 import { useEdgeSwipeBack } from "../features/back/useEdgeSwipeBack";
-import { CloseIcon } from "./icons";
+import { BackIcon, CloseIcon } from "./icons";
 
 interface ScreenProps {
   title: string;
   subtitle?: string;
   closeLabel: string;
   onClose: () => void;
+  /** A page opened from another page: the button is a back arrow before the title, not a close cross. */
+  back?: boolean;
   children: ReactNode;
 }
 
 /** A full-screen page: a large title over a scrolling body, so nothing from the site shows through. */
-export function Screen({ title, subtitle, closeLabel, onClose, children }: ScreenProps) {
+export function Screen({
+  title,
+  subtitle,
+  closeLabel,
+  onClose,
+  back = false,
+  children,
+}: ScreenProps) {
   const root = useRef<HTMLDivElement>(null);
   useEdgeSwipeBack(root, onClose);
+  const button = (
+    <button
+      type="button"
+      aria-label={closeLabel}
+      onClick={onClose}
+      className="grid size-10 shrink-0 place-items-center rounded-full bg-paper/[0.08] text-paper/80 active:bg-paper/[0.16]"
+    >
+      {back ? (
+        <span className="rtl:-scale-x-100">
+          <BackIcon />
+        </span>
+      ) : (
+        <CloseIcon />
+      )}
+    </button>
+  );
   return (
     <div ref={root} data-hit="" className="screen fixed inset-0 z-50 flex flex-col bg-ink">
-      <header className="flex items-end justify-between gap-4 border-b border-hair px-5 pt-[calc(var(--safe-top)+16px)] pb-4">
-        <div className="min-w-0">
+      <header className="flex items-end gap-4 border-b border-hair px-5 pt-[calc(var(--safe-top)+16px)] pb-4">
+        {back && button}
+        <div className="min-w-0 flex-1">
           <h1 className="text-[2rem] leading-none font-semibold tracking-tight">{title}</h1>
           {subtitle && <p className="mt-2 truncate text-sm text-paper/55">{subtitle}</p>}
         </div>
-        <button
-          type="button"
-          aria-label={closeLabel}
-          onClick={onClose}
-          className="grid size-10 shrink-0 place-items-center rounded-full bg-paper/[0.08] text-paper/80 active:bg-paper/[0.16]"
-        >
-          <CloseIcon />
-        </button>
+        {!back && button}
       </header>
       <div className="flex-1 overflow-y-auto overscroll-contain px-4 pt-6 pb-[calc(var(--safe-bottom)+40px)]">
         {children}

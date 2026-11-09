@@ -178,6 +178,7 @@ export const th: Messages = {
     "ภาษาของข้อความในแอป และทิศทางการเขียน เว้นไว้ที่ภาษาระบบเพื่อให้ตามอุปกรณ์",
   "settings.languageLabel": "ภาษาของแอป",
   "settings.languageSystem": "ภาษาระบบ",
+  "settings.searchEngine": "เครื่องมือค้นหา",
 
   "favorites.title": "รายการโปรด",
   "favorites.note":
@@ -319,7 +320,6 @@ export const th: Messages = {
   "paywall.subtitle": "ปลดล็อกผู้ช่วย AI โหมดไม่ระบุตัวตน และขีดจำกัดการใช้งาน",
   "paywall.close": "ปิดหน้าชำระเงิน",
   "paywall.locked": "ฟีเจอร์ Pro",
-  "paywall.lockedHint": "ต้องใช้ OpenMedia Pro แตะเพื่อดูแพ็กเกจ",
   "paywall.lifetime": "ตลอดชีวิต",
   "paywall.yearly": "รายปี",
   "paywall.monthly": "รายเดือน",

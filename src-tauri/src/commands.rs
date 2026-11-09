@@ -25,7 +25,7 @@ use crate::boot::{Boot, Startup};
 use crate::entitlement::Entitlement;
 use crate::error::{Error, Result};
 use crate::incognito::Incognito;
-use crate::library::{Favorite, FavoriteInput, Library, Mode, Theme};
+use crate::library::{Favorite, FavoriteInput, Library, Mode, SearchEngine, Theme};
 use crate::recipes::Recipes;
 use crate::secrets::SecretStore;
 use crate::sites::{self, SiteSettings};
@@ -154,6 +154,12 @@ pub fn set_theme(library: State<'_, Library>, theme: Theme) -> Result<()> {
 #[tauri::command]
 pub fn set_locale(library: State<'_, Library>, locale: Option<String>) -> Result<()> {
     library.set_locale(locale)
+}
+
+/// Remembers which search engine the command bar uses for text that is not an address.
+#[tauri::command]
+pub fn set_search_engine(library: State<'_, Library>, engine: SearchEngine) -> Result<()> {
+    library.set_search_engine(engine)
 }
 
 /// Reads the local favicon cache without making a network request.

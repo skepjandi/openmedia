@@ -183,6 +183,7 @@ export const vi: Messages = {
     "Ngôn ngữ của chữ trong ứng dụng, và chiều viết. Để theo ngôn ngữ hệ thống để bám theo máy.",
   "settings.languageLabel": "Ngôn ngữ ứng dụng",
   "settings.languageSystem": "Ngôn ngữ hệ thống",
+  "settings.searchEngine": "Công cụ tìm kiếm",
 
   "favorites.title": "Yêu thích",
   "favorites.note":
@@ -329,7 +330,6 @@ export const vi: Messages = {
   "paywall.subtitle": "Mở khóa trợ lý AI, chế độ ẩn danh và giới hạn sử dụng.",
   "paywall.close": "Đóng màn hình thanh toán",
   "paywall.locked": "Tính năng Pro",
-  "paywall.lockedHint": "Cần OpenMedia Pro. Chạm để xem các gói.",
   "paywall.lifetime": "Trọn đời",
   "paywall.yearly": "Hằng năm",
   "paywall.monthly": "Hằng tháng",

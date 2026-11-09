@@ -187,6 +187,7 @@ export const ro: Messages = {
     "Limba textelor din aplicație și direcția în care sunt scrise. Lasă limba sistemului pentru a urma dispozitivul.",
   "settings.languageLabel": "Limba aplicației",
   "settings.languageSystem": "Limba sistemului",
+  "settings.searchEngine": "Motor de căutare",
 
   "favorites.title": "Favorite",
   "favorites.note":
@@ -336,7 +337,6 @@ export const ro: Messages = {
   "paywall.subtitle": "Deblochează asistentul AI, modul incognito și limitele de utilizare.",
   "paywall.close": "Închide paywall-ul",
   "paywall.locked": "Funcție Pro",
-  "paywall.lockedHint": "Are nevoie de OpenMedia Pro. Atinge pentru a vedea planurile.",
   "paywall.lifetime": "Pe viață",
   "paywall.yearly": "Anual",
   "paywall.monthly": "Lunar",

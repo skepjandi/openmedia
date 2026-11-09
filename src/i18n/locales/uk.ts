@@ -188,6 +188,7 @@ export const uk: Messages = {
     "Мова тексту застосунку та напрям письма. Залиште системну, щоб йти за пристроєм.",
   "settings.languageLabel": "Мова застосунку",
   "settings.languageSystem": "Системна мова",
+  "settings.searchEngine": "Пошукова система",
 
   "favorites.title": "Обране",
   "favorites.note":
@@ -333,7 +334,6 @@ export const uk: Messages = {
   "paywall.subtitle": "Розблокуйте ШІ-асистента, режим інкогніто та ліміти використання.",
   "paywall.close": "Закрити екран оплати",
   "paywall.locked": "Функція Pro",
-  "paywall.lockedHint": "Потрібен OpenMedia Pro. Натисніть, щоб побачити тарифи.",
   "paywall.lifetime": "Назавжди",
   "paywall.yearly": "Річний",
   "paywall.monthly": "Місячний",

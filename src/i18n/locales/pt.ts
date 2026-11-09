@@ -189,6 +189,7 @@ export const pt: Messages = {
     "O idioma do texto do app e a direção em que ele é escrito. Deixe em idioma do sistema para acompanhar o dispositivo.",
   "settings.languageLabel": "Idioma do app",
   "settings.languageSystem": "Idioma do sistema",
+  "settings.searchEngine": "Mecanismo de pesquisa",
 
   "favorites.title": "Favoritos",
   "favorites.note":
@@ -336,7 +337,6 @@ export const pt: Messages = {
   "paywall.subtitle": "Desbloqueie o assistente de IA, o modo incógnito e os limites de uso.",
   "paywall.close": "Fechar paywall",
   "paywall.locked": "Recurso Pro",
-  "paywall.lockedHint": "Isto precisa do OpenMedia Pro. Toque para ver os planos.",
   "paywall.lifetime": "Vitalício",
   "paywall.yearly": "Anual",
   "paywall.monthly": "Mensal",

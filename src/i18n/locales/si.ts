@@ -184,6 +184,7 @@ export const si: Messages = {
     "ඇප් එකේ ලියුණු භාෂාව සහ එය ලියන දිශාව. උපේකරණයට අනුගමනය වීමට පද්ධතියේ භාෂාවෙන් තබන්න.",
   "settings.languageLabel": "ඇප් භාෂාව",
   "settings.languageSystem": "පද්ධතියේ භාෂාව",
+  "settings.searchEngine": "සෙවුම් යන්ත්‍රය",
 
   "favorites.title": "ආදරණීය",
   "favorites.note":
@@ -332,7 +333,6 @@ export const si: Messages = {
   "paywall.subtitle": "AI සහායක, අනාධික මුද්ද සහ භාවිත සීමා අගුළු ඇරිය.",
   "paywall.close": "ගෙවීම් බිත්තිය වසන්න",
   "paywall.locked": "Pro විශේෂතාවය",
-  "paywall.lockedHint": "මේකට OpenMedia Pro අවශ්‍යයි. සැලසුම් බැලීමට තට්ටු කරන්න.",
   "paywall.lifetime": "ජීවිත කාලයකට",
   "paywall.yearly": "වාර්ෂික",
   "paywall.monthly": "මාසික",

@@ -189,6 +189,7 @@ export const en = {
     "The language of the app's text, and the direction it is written in. Leave it on the system language to follow the device.",
   "settings.languageLabel": "App language",
   "settings.languageSystem": "System language",
+  "settings.searchEngine": "Search engine",
 
   "favorites.title": "Favorites",
   "favorites.note":
@@ -329,7 +330,6 @@ export const en = {
   "paywall.subtitle": "Unlock the AI assistant, incognito mode and usage limits.",
   "paywall.close": "Close paywall",
   "paywall.locked": "Pro feature",
-  "paywall.lockedHint": "This needs OpenMedia Pro. Tap to see the plans.",
   "paywall.lifetime": "Lifetime",
   "paywall.yearly": "Yearly",
   "paywall.monthly": "Monthly",

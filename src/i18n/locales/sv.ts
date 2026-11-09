@@ -185,6 +185,7 @@ export const sv: Messages = {
     "Språket för appens text och den riktning det skrivs i. Låt det vara systemspråk för att följa enheten.",
   "settings.languageLabel": "Appspråk",
   "settings.languageSystem": "Systemspråk",
+  "settings.searchEngine": "Sökmotor",
 
   "favorites.title": "Favoriter",
   "favorites.note":
@@ -332,7 +333,6 @@ export const sv: Messages = {
   "paywall.subtitle": "Lås upp AI-assistenten, inkognitoläge och användningsgränser.",
   "paywall.close": "Stäng betalväggen",
   "paywall.locked": "Pro-funktion",
-  "paywall.lockedHint": "Det här kräver OpenMedia Pro. Tryck för att se planerna.",
   "paywall.lifetime": "Livstid",
   "paywall.yearly": "Årsplan",
   "paywall.monthly": "Månadsplan",

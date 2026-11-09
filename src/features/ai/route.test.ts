@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { providerReady, routeInput, searchUrl, type RouteContext } from "./route";
+import { providerReady, routeInput, type RouteContext } from "./route";
+import { searchUrl } from "../../shared/searchEngines";
 import type { AiState } from "../../shared/ipc";
 
 const provider = (hasKey: boolean) => ({
@@ -17,6 +18,7 @@ const context = (overrides: Partial<RouteContext> = {}): RouteContext => ({
   pageUrl: page,
   pro: true,
   mode: "auto",
+  searchEngine: "duckDuckGo",
   ...overrides,
 });
 
@@ -80,8 +82,20 @@ describe("routeInput", () => {
       });
     });
 
+    it("searches with the engine the user picked", () => {
+      expect(routeInput("cats", context({ mode: "search", searchEngine: "google" }))).toEqual({
+        kind: "search",
+        url: "https://www.google.com/search?q=cats",
+      });
+      expect(routeInput("cats", context({ searchEngine: "yahoo" }))).toEqual({
+        kind: "search",
+        url: "https://search.yahoo.com/search?p=cats",
+      });
+    });
+
     it("encodes the query so it cannot add parameters", () => {
       expect(searchUrl("a&b=c#d")).toBe("https://duckduckgo.com/?q=a%26b%3Dc%23d");
+      expect(searchUrl("a&b=c#d", "brave")).toBe("https://search.brave.com/search?q=a%26b%3Dc%23d");
     });
   });
 

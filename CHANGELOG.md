@@ -8,6 +8,14 @@ All notable changes to OpenMedia are documented here.
 
 ## 2026-11-09
 
+### feat(settings): Recipes page, search engine setting; fix(shell): paywall and picker dismissal
+
+**Problem:** closing the paywall opened from Settings also closed Settings; the language list had no close button and could not be dragged down; the Pro hint in the AI section was a plain outlined pill; the command bar always searched DuckDuckGo.
+
+**Change:** Recipes moved from a collapsed Settings section to its own page, opened from a row in Settings (`RecipesSection` is now `RecipesScreen`). Pages opened from Settings (Recipes, paywall) return to Settings on close; Settings stays mounted underneath (`sheetParent`, `selectSettingsOpen`). The list sheet (`Picker`) has a close button and drags down to dismiss. The AI section shows a Pro card (lock, title, subtitle, chevron) instead of "This needs OpenMedia Pro. Tap to see the plans." (`paywall.lockedHint` removed). In the command bar, Chat is grayed out with a lock for free users and opens the paywall. New Settings > Browsing > Search engine (DuckDuckGo, Google, Bing, Brave Search, Ecosia, Startpage, Yahoo), stored as `searchEngine` in `library.json`; one new string `settings.searchEngine` in all 29 locales.
+
+**Verified:** `tsc`, ESLint, 285 frontend tests (new: sheet return, per-engine search URLs), the Rust library tests (new: search engine default and persistence). **Not verified:** rendering, the drag-to-dismiss gesture and the Chat lock in the running app; native-speaker review of "Search engine" in the 28 non-English languages.
+
 ### fix(shell): label the paywall retry button "Retry"; keep ESLint out of `.worktrees/`
 
 **Problem:** when offerings failed to load, the paywall showed "Something went wrong. Try again." twice: as the error line and as the retry button's own label. `yarn lint` also parsed every file under `.worktrees/` and failed with an ambiguous `tsconfigRootDir` once a second worktree existed.

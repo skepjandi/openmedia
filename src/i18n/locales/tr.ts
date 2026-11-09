@@ -186,6 +186,7 @@ export const tr: Messages = {
     "Uygulama metninin dili ve yazım yönü. Cihazı takip etmek için sistem dilinde bırakın.",
   "settings.languageLabel": "Uygulama dili",
   "settings.languageSystem": "Sistem dili",
+  "settings.searchEngine": "Arama motoru",
 
   "favorites.title": "Favoriler",
   "favorites.note":
@@ -334,7 +335,6 @@ export const tr: Messages = {
   "paywall.subtitle": "Yapay zekâ asistanını, gizli modu ve kullanım sınırlarını aç.",
   "paywall.close": "Ödeme duvarını kapat",
   "paywall.locked": "Pro özelliği",
-  "paywall.lockedHint": "Bu için OpenMedia Pro gerekiyor. Planları görmek için dokun.",
   "paywall.lifetime": "Ömür boyu",
   "paywall.yearly": "Yıllık",
   "paywall.monthly": "Aylık",

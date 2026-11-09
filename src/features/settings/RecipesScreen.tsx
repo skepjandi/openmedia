@@ -3,31 +3,72 @@ import { useApp } from "../../app/store";
 import type { MessageKey } from "../../i18n/messages";
 import { useT } from "../../i18n/useT";
 import { useIconForUrl } from "../../shared/siteIcons";
-import { DownIcon, StarIcon } from "../../shared/icons";
+import { DownIcon, ForwardIcon, StarIcon } from "../../shared/icons";
 import type { OptionGroup, SiteSettings } from "../../shared/ipc";
 import { SiteTile } from "../../shared/SiteTile";
+import { Screen } from "../../shared/Screen";
 import { MarginSlider } from "./MarginSlider";
 import { Switch } from "./Switch";
-import { Group, GroupLabel, Section, quietButton } from "./ui";
+import { Group, GroupLabel, quietButton } from "./ui";
 
 const GROUPS: { group: OptionGroup; title: MessageKey }[] = [
   { group: "annoyance", title: "recipes.annoyances" },
   { group: "content", title: "recipes.content" },
 ];
 
-/** Ready-made tweaks for popular sites. The page reloads when a switch changes. */
-export function RecipesSection() {
+/** The row in Settings that opens the Recipes page. */
+export function RecipesLink() {
   const sites = useApp((s) => s.sites);
+  const openSheet = useApp((s) => s.openSheet);
   const t = useT();
+  const total = sites.reduce((sum, site) => sum + site.options.length, 0);
+  const hidden = sites.reduce(
+    (sum, site) => sum + site.options.filter((option) => option.enabled).length,
+    0,
+  );
 
   return (
-    <Section title={t("recipes.title")} defaultOpen={false} note={t("recipes.note")}>
+    <Group>
+      <button
+        type="button"
+        onClick={() => openSheet("recipes")}
+        className="flex w-full items-center gap-3 px-4 py-3.5 text-start active:bg-paper/[0.05]"
+      >
+        <span className="min-w-0 flex-1">
+          <span className="block text-base font-medium">{t("recipes.title")}</span>
+          {total > 0 && (
+            <span className="block text-sm text-paper/55">
+              {hidden === 0
+                ? t("recipes.nothingHidden")
+                : t("recipes.hiddenCount", { count: hidden, total })}
+            </span>
+          )}
+        </span>
+        <span aria-hidden="true" className="text-paper/50 rtl:-scale-x-100">
+          <ForwardIcon />
+        </span>
+      </button>
+    </Group>
+  );
+}
+
+/** Ready-made tweaks for popular sites, on a page of their own. The page reloads when a switch changes. */
+export function RecipesScreen() {
+  const open = useApp((s) => s.sheet === "recipes");
+  const closeSheet = useApp((s) => s.closeSheet);
+  const sites = useApp((s) => s.sites);
+  const t = useT();
+  if (!open) return null;
+
+  return (
+    <Screen title={t("recipes.title")} closeLabel={t("common.back")} onClose={closeSheet} back>
+      <p className="px-1 pb-4 text-[13px] leading-snug text-paper/50">{t("recipes.note")}</p>
       <div className="flex flex-col gap-3">
         {sites.map((site) => (
           <SiteCard key={site.recipeId} site={site} />
         ))}
       </div>
-    </Section>
+    </Screen>
   );
 }
 

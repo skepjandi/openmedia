@@ -185,6 +185,7 @@ export const ja: Messages = {
     "アプリの表示言語と、書かれる方向の設定です。システム言語のままだと端末の設定に従います。",
   "settings.languageLabel": "アプリの言語",
   "settings.languageSystem": "システムの言語",
+  "settings.searchEngine": "検索エンジン",
 
   "favorites.title": "お気に入り",
   "favorites.note":
@@ -331,7 +332,6 @@ export const ja: Messages = {
   "paywall.subtitle": "AI アシスタント、秘密モード、使用量の制限を解除します。",
   "paywall.close": "ペイウォールを閉じる",
   "paywall.locked": "Pro 機能",
-  "paywall.lockedHint": "これには OpenMedia Pro が必要です。タップしてプランを見てください。",
   "paywall.lifetime": "買い切り",
   "paywall.yearly": "年払い",
   "paywall.monthly": "月払い",

@@ -188,6 +188,7 @@ export const cs: Messages = {
     "Jazyk textů v aplikaci a směr, kterým se píší. Ponechte systémový jazyk, aby aplikace následovala zařízení.",
   "settings.languageLabel": "Jazyk aplikace",
   "settings.languageSystem": "Systémový jazyk",
+  "settings.searchEngine": "Vyhledávač",
 
   "favorites.title": "Oblíbené",
   "favorites.note":
@@ -335,7 +336,6 @@ export const cs: Messages = {
   "paywall.subtitle": "Odemkněte AI asistenta, režim inkognito a limity používání.",
   "paywall.close": "Zavřít platební stěnu",
   "paywall.locked": "Funkce Pro",
-  "paywall.lockedHint": "Tohle potřebuje OpenMedia Pro. Klepnutím zobrazíte plány.",
   "paywall.lifetime": "Doživotní",
   "paywall.yearly": "Roční",
   "paywall.monthly": "Měsíční",

@@ -27,6 +27,7 @@ import {
   type AppState,
   type Favorite,
   type FavoriteInput,
+  type SearchEngine,
   type SiteSettings,
   type SiteViewState,
   type Theme,
@@ -45,7 +46,23 @@ import {
   useIconCache,
 } from "../shared/siteIcons";
 
-export type Sheet = "none" | "assistant" | "history" | "stats" | "settings" | "paywall";
+export type Sheet = "none" | "assistant" | "history" | "stats" | "settings" | "recipes" | "paywall";
+
+/** Pages that open on top of Settings. Closing one returns to Settings, which stays mounted beneath it. */
+const SETTINGS_CHILDREN: readonly Sheet[] = ["recipes", "paywall"];
+const isSettingsChild = (sheet: Sheet): boolean => SETTINGS_CHILDREN.includes(sheet);
+
+type SheetState = Pick<AppStore, "sheet" | "sheetParent">;
+
+/** Whether Settings is on screen, either itself or under one of its child pages. */
+export const selectSettingsOpen = (store: SheetState): boolean =>
+  store.sheet === "settings" || (isSettingsChild(store.sheet) && store.sheetParent === "settings");
+
+/** What showing `next` changes: a child page opened from Settings remembers Settings as its parent. */
+const showSheet = (current: SheetState, next: Sheet): SheetState => ({
+  sheet: next,
+  sheetParent: selectSettingsOpen(current) && isSettingsChild(next) ? "settings" : "none",
+});
 
 /** What the web layer must do natively next; `nonce` makes a repeat of the same action distinct. */
 export type SessionAction = { nonce: number } & (
@@ -69,6 +86,8 @@ export interface AppStore {
   state: AppState | null;
   error: string | null;
   sheet: Sheet;
+  /** Where closing a child page of Settings returns to; `none` for every other sheet. */
+  sheetParent: "none" | "settings";
   onboardingOpen: boolean;
   sessions: Session[];
   activeId: string | null;
@@ -116,6 +135,8 @@ export interface AppStore {
   setTheme: (theme: Theme) => Promise<void>;
   /** Picks the language the app is in; null puts it back on the device's language. */
   setLocale: (locale: string | null) => Promise<void>;
+  /** Picks the engine the command bar searches with. */
+  setSearchEngine: (engine: SearchEngine) => Promise<void>;
   setAdBlock: (enabled: boolean) => Promise<void>;
   loadSites: () => Promise<void>;
   setSiteOption: (recipeId: string, optionId: string, enabled: boolean) => Promise<void>;
@@ -193,7 +214,7 @@ export const selectLocale = (store: AppStore): Locale =>
 /** The message for something that went wrong, in the language the app is in. */
 export function appError(error: unknown): string {
   if (isProRequired(error)) {
-    useApp.setState({ sheet: "paywall" });
+    useApp.getState().openSheet("paywall");
     return "";
   }
   return describeError(error, createTranslator(selectLocale(useApp.getState())));
@@ -300,7 +321,7 @@ export const useApp = create<AppStore>((set, get) => {
     if (!isProRequired(error)) return false;
     dropJob(pendingJobId(get().assistant));
     dispatch({ type: "reset", keepText: true });
-    set({ sheet: "paywall" });
+    get().openSheet("paywall");
     return true;
   };
   /** Rust holds a job (and the page shows its preview) until it is rejected; failures are harmless. */
@@ -335,6 +356,7 @@ export const useApp = create<AppStore>((set, get) => {
     state: null,
     error: null,
     sheet: "none",
+    sheetParent: "none",
     onboardingOpen: false,
     sessions: [],
     activeId: null,
@@ -377,9 +399,13 @@ export const useApp = create<AppStore>((set, get) => {
 
     openSheet: (sheet) => {
       const isPro = useEntitlementStore.getState().status === "pro";
-      set({ sheet: !isPro && sheet === "stats" ? "paywall" : sheet });
+      set((current) => showSheet(current, !isPro && sheet === "stats" ? "paywall" : sheet));
     },
-    closeSheet: () => set({ sheet: "none" }),
+    closeSheet: () =>
+      set((current) => ({
+        sheet: isSettingsChild(current.sheet) ? current.sheetParent : "none",
+        sheetParent: "none",
+      })),
 
     resetGuide: async () => {
       try {
@@ -533,6 +559,22 @@ export const useApp = create<AppStore>((set, get) => {
           state:
             current.state && previous !== undefined
               ? { ...current.state, locale: previous }
+              : current.state,
+          error: appError(error),
+        }));
+      }
+    },
+
+    setSearchEngine: async (engine) => {
+      const previous = get().state?.searchEngine;
+      set((current) => ({ state: current.state && { ...current.state, searchEngine: engine } }));
+      try {
+        await library.setSearchEngine(engine);
+      } catch (error) {
+        set((current) => ({
+          state:
+            current.state && previous !== undefined
+              ? { ...current.state, searchEngine: previous }
               : current.state,
           error: appError(error),
         }));
@@ -719,7 +761,7 @@ export const useApp = create<AppStore>((set, get) => {
 
     enterIncognito: async () => {
       if (useEntitlementStore.getState().status !== "pro") {
-        set({ sheet: "paywall" });
+        get().openSheet("paywall");
         return;
       }
       if (get().incognito.busy) return;
@@ -755,7 +797,7 @@ export const useApp = create<AppStore>((set, get) => {
 
     unlockIncognito: async () => {
       if (useEntitlementStore.getState().status !== "pro") {
-        set({ sheet: "paywall" });
+        get().openSheet("paywall");
         return false;
       }
       try {

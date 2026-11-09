@@ -182,6 +182,7 @@ export const id: Messages = {
     "Bahasa teks aplikasi, dan arah penulisannya. Biarkan mengikuti bahasa sistem agar sesuai perangkat.",
   "settings.languageLabel": "Bahasa aplikasi",
   "settings.languageSystem": "Bahasa sistem",
+  "settings.searchEngine": "Mesin telusur",
 
   "favorites.title": "Favorit",
   "favorites.note":
@@ -329,7 +330,6 @@ export const id: Messages = {
   "paywall.subtitle": "Buka asisten AI, mode incognito, dan batas penggunaan.",
   "paywall.close": "Tutup paywall",
   "paywall.locked": "Fitur Pro",
-  "paywall.lockedHint": "Ini butuh OpenMedia Pro. Ketuk untuk melihat paket.",
   "paywall.lifetime": "Seumur hidup",
   "paywall.yearly": "Tahunan",
   "paywall.monthly": "Bulanan",

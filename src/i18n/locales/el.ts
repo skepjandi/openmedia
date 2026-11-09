@@ -190,6 +190,7 @@ export const el: Messages = {
     "Η γλώσσα του κειμένου της εφαρμογής και η κατεύθυνση στην οποία γράφεται. Αφήστε τη στη γλώσσα του συστήματος για να ακολουθεί τη συσκευή.",
   "settings.languageLabel": "Γλώσσα εφαρμογής",
   "settings.languageSystem": "Γλώσσα συστήματος",
+  "settings.searchEngine": "Μηχανή αναζήτησης",
 
   "favorites.title": "Αγαπημένα",
   "favorites.note":
@@ -340,7 +341,6 @@ export const el: Messages = {
   "paywall.subtitle": "Ξεκλειδώστε τον AI βοηθό, την αόρατη λειτουργία και τα όρια χρήσης.",
   "paywall.close": "Κλείσιμο τοίχου πληρωμής",
   "paywall.locked": "Δυνατότητα Pro",
-  "paywall.lockedHint": "Χρειάζεται το OpenMedia Pro. Πατήστε για να δείτε τα πλάνα.",
   "paywall.lifetime": "Εφ' όρου ζωής",
   "paywall.yearly": "Ετήσιο",
   "paywall.monthly": "Μηνιαίο",

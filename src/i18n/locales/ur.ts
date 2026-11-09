@@ -188,6 +188,7 @@ export const ur: Messages = {
     "ایپ کے متن کی زبان اور وہ بھی جو اس میں لکھا جاتا ہے۔ اسے سسٹم کی زبان پر چھوڑیں تاکہ ڈیوائس کے مطابق ہو۔",
   "settings.languageLabel": "ایپ کی زبان",
   "settings.languageSystem": "سسٹم کی زبان",
+  "settings.searchEngine": "سرچ انجن",
 
   "favorites.title": "پسندیدہ",
   "favorites.note":
@@ -331,7 +332,6 @@ export const ur: Messages = {
   "paywall.subtitle": "AI معاون، انکوگنیٹو موڈ اور استعمال کی حدود کھولیں۔",
   "paywall.close": "ادائیگی کی دیوار بند کریں",
   "paywall.locked": "Pro خصوصیت",
-  "paywall.lockedHint": "اس کے لیے OpenMedia Pro درکار ہے۔ منصوبے دیکھنے کے لیے چھوئیں۔",
   "paywall.lifetime": "لائم فائٹ",
   "paywall.yearly": "سالانہ",
   "paywall.monthly": "ماہانہ",

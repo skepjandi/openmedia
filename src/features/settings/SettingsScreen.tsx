@@ -1,21 +1,22 @@
 import { useState } from "react";
-import { useApp } from "../../app/store";
+import { selectSettingsOpen, useApp } from "../../app/store";
 import { LOCALES_BY_NAME } from "../../i18n/locales";
 import type { MessageKey } from "../../i18n/messages";
 import { useT } from "../../i18n/useT";
 import { Screen } from "../../shared/Screen";
-import type { Theme } from "../../shared/ipc";
+import type { SearchEngine, Theme } from "../../shared/ipc";
+import { DEFAULT_SEARCH_ENGINE, SEARCH_ENGINES } from "../../shared/searchEngines";
 import { AiSection } from "./AiSection";
 import { FavoritesSection } from "./FavoritesSection";
 import { IncognitoFavoritesSection, IncognitoRecipesSection } from "./IncognitoSections";
 import { MarginSlider } from "./MarginSlider";
-import { RecipesSection } from "./RecipesSection";
+import { RecipesLink } from "./RecipesScreen";
 import { Switch } from "./Switch";
 import { Picker } from "./Picker";
 import { Group, Section, primaryButton, quietButton } from "./ui";
 
 export function SettingsScreen() {
-  const open = useApp((s) => s.sheet === "settings");
+  const open = useApp(selectSettingsOpen);
   const closeSheet = useApp((s) => s.closeSheet);
   const t = useT();
   if (!open) return null;
@@ -26,7 +27,7 @@ export function SettingsScreen() {
         <AppearanceSection />
         <LanguageSection />
         <BrowsingSection />
-        <RecipesSection />
+        <RecipesLink />
         <FavoritesSection />
         <IncognitoFavoritesSection />
         <IncognitoRecipesSection />
@@ -103,9 +104,11 @@ function LanguageSection() {
 function BrowsingSection() {
   const adBlock = useApp((s) => s.state?.adBlock ?? true);
   const backButton = useApp((s) => s.state?.backButton ?? false);
+  const searchEngine = useApp((s) => s.state?.searchEngine ?? DEFAULT_SEARCH_ENGINE);
   const margin = useApp((s) => s.state?.bottomMargin ?? 0);
   const setAdBlock = useApp((s) => s.setAdBlock);
   const setBackButton = useApp((s) => s.setBackButton);
+  const setSearchEngine = useApp((s) => s.setSearchEngine);
   const setBottomMargin = useApp((s) => s.setBottomMargin);
   const t = useT();
 
@@ -123,6 +126,15 @@ function BrowsingSection() {
           checked={backButton}
           onChange={(on) => void setBackButton(on)}
         />
+        <div className="flex flex-col gap-2 px-4 py-3.5">
+          <div className="text-xs text-paper/60">{t("settings.searchEngine")}</div>
+          <Picker
+            label={t("settings.searchEngine")}
+            value={searchEngine}
+            options={SEARCH_ENGINES.map((engine) => ({ value: engine.id, label: engine.name }))}
+            onChange={(next) => void setSearchEngine(next as SearchEngine)}
+          />
+        </div>
         <div className="flex flex-col gap-2 px-4 py-3.5">
           <div>
             <div className="text-base">{t("settings.bottomMargin")}</div>

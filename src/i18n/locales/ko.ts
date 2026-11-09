@@ -184,6 +184,7 @@ export const ko: Messages = {
     "앱에 표시되는 문구의 언어와 글쓰기 방향입니다. 시스템 언어로 두면 기기를 따라갑니다.",
   "settings.languageLabel": "앱 언어",
   "settings.languageSystem": "시스템 언어",
+  "settings.searchEngine": "검색 엔진",
 
   "favorites.title": "즐겨찾기",
   "favorites.note":
@@ -329,7 +330,6 @@ export const ko: Messages = {
   "paywall.subtitle": "AI 어시스턴트, 시크릿 모드, 사용량 제한을 잠금 해제하세요.",
   "paywall.close": "페이월 닫기",
   "paywall.locked": "Pro 기능",
-  "paywall.lockedHint": "OpenMedia Pro가 필요합니다. 탭하여 요금제를 확인하세요.",
   "paywall.lifetime": "일회 구매",
   "paywall.yearly": "연간",
   "paywall.monthly": "월간",

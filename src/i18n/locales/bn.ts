@@ -182,6 +182,7 @@ export const bn: Messages = {
     "অ্যাপের লেখার ভাষা এবং লেখার দিক। ডিভাইসের সঙ্গে মানাতে সিস্টেমের ভাষায় রাখুন।",
   "settings.languageLabel": "অ্যাপের ভাষা",
   "settings.languageSystem": "সিস্টেমের ভাষা",
+  "settings.searchEngine": "সার্চ ইঞ্জিন",
 
   "favorites.title": "পছন্দের তালিকা",
   "favorites.note":
@@ -328,7 +329,6 @@ export const bn: Messages = {
   "paywall.subtitle": "AI সহকারী, ইনকোগনিটো মোড এবং ব্যবহারের সীমা চালু করুন।",
   "paywall.close": "পেওয়াল বন্ধ করুন",
   "paywall.locked": "Pro ফিচার",
-  "paywall.lockedHint": "এর জন্য OpenMedia Pro লাগবে। প্ল্যান দেখতে ট্যাপ করুন।",
   "paywall.lifetime": "আজীবন",
   "paywall.yearly": "বার্ষিক",
   "paywall.monthly": "মাসিক",

@@ -189,6 +189,7 @@ export const ta: Messages = {
     "செயலியின் உரையின் மொழி, அது எழுதப்படும் திசை. சாதனத்தின் மொழியில் வைத்திருந்தால், சாதனத்தைப் பின்பற்றும்.",
   "settings.languageLabel": "செயலி மொழி",
   "settings.languageSystem": "அமைப்பு மொழி",
+  "settings.searchEngine": "தேடுபொறி",
 
   "favorites.title": "பிடித்துக்கொள்ளவிடைகள்",
   "favorites.note":
@@ -338,7 +339,6 @@ export const ta: Messages = {
   "paywall.subtitle": "AI உதவியாளர், அழுகுமறை முறை மற்றும் பயன்பாட்டு வரம்புகளைத் திற.",
   "paywall.close": "கட்டணத் திரையை மூடு",
   "paywall.locked": "Pro அம்சம்",
-  "paywall.lockedHint": "இதற்கு OpenMedia Pro தேவை. திட்டங்களைக் காண தொடு.",
   "paywall.lifetime": "வாழ்நாள்",
   "paywall.yearly": "ஆண்டுக்கு",
   "paywall.monthly": "மாதந்திரம்",

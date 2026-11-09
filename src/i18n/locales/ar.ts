@@ -182,6 +182,7 @@ export const ar: Messages = {
   "settings.languageNote": "لغة نص التطبيق واتجاه كتابتها. اتركها على لغة النظام لتتبع الجهاز.",
   "settings.languageLabel": "لغة التطبيق",
   "settings.languageSystem": "لغة النظام",
+  "settings.searchEngine": "محرك البحث",
 
   "favorites.title": "المفضلة",
   "favorites.note":
@@ -323,7 +324,6 @@ export const ar: Messages = {
   "paywall.subtitle": "افتح المساعد الذكي ووضع التصفح الخفي وحدود الاستخدام.",
   "paywall.close": "إغلاق صفحة الدفع",
   "paywall.locked": "ميزة Pro",
-  "paywall.lockedHint": "هذه تحتاج OpenMedia Pro. اضغط لعرض الخطط.",
   "paywall.lifetime": "مدى الحياة",
   "paywall.yearly": "سنوي",
   "paywall.monthly": "شهري",

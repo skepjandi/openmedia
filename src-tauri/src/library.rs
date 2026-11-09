@@ -43,6 +43,21 @@ pub enum Theme {
     Dark,
 }
 
+/// The search engine the command bar uses for text that is not an address. The shell owns the
+/// address of each one; Rust only remembers which was picked.
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub enum SearchEngine {
+    #[default]
+    DuckDuckGo,
+    Google,
+    Bing,
+    Brave,
+    Ecosia,
+    Startpage,
+    Yahoo,
+}
+
 /// Which set of favorites and recipe choices is in play. Incognito is the second, separate set
 /// the user switches to; nothing in it shows in the normal one, or the other way round.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -95,6 +110,8 @@ pub struct AppState {
     pub ai_preview: bool,
     /// The language the user picked, as a BCP 47 tag. `None` follows the device's language.
     pub locale: Option<String>,
+    /// The engine the command bar searches with.
+    pub search_engine: SearchEngine,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -147,6 +164,9 @@ struct LibraryData {
     /// The shell owns the list of languages, so an unknown tag is kept but never used.
     #[serde(default)]
     locale: Option<String>,
+    /// DuckDuckGo until the user picks another.
+    #[serde(default)]
+    search_engine: SearchEngine,
 }
 
 /// The user's favorites, page, theme and provider settings, persisted as one JSON file. Holds no
@@ -205,6 +225,7 @@ impl Library {
             back_button: data.back_button,
             ai_preview: data.ai_preview,
             locale: data.locale.clone(),
+            search_engine: data.search_engine,
         })
     }
 
@@ -212,6 +233,12 @@ impl Library {
     pub fn set_locale(&self, locale: Option<String>) -> Result<()> {
         let mut data = self.lock()?;
         data.locale = locale;
+        self.save(&data)
+    }
+
+    pub fn set_search_engine(&self, engine: SearchEngine) -> Result<()> {
+        let mut data = self.lock()?;
+        data.search_engine = engine;
         self.save(&data)
     }
 
@@ -612,6 +639,7 @@ fn default_data() -> LibraryData {
         history: Vec::new(),
         ai: AiSettings::default(),
         locale: None,
+        search_engine: SearchEngine::DuckDuckGo,
         incognito_site_options: OptionChoices::new(),
         incognito_favorites: Vec::new(),
     }
@@ -898,6 +926,20 @@ mod tests {
         assert_eq!(reload(&dir).state().unwrap().locale.as_deref(), Some("si"));
         library.set_locale(None).unwrap();
         assert_eq!(reload(&dir).state().unwrap().locale, None);
+    }
+
+    #[test]
+    fn the_search_engine_defaults_to_duckduckgo_and_the_choice_persists() {
+        let (dir, library) = library();
+        assert_eq!(
+            library.state().unwrap().search_engine,
+            SearchEngine::DuckDuckGo
+        );
+        library.set_search_engine(SearchEngine::Brave).unwrap();
+        assert_eq!(
+            reload(&dir).state().unwrap().search_engine,
+            SearchEngine::Brave
+        );
     }
 
     #[test]

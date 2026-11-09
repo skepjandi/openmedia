@@ -187,6 +187,7 @@ export const nl: Messages = {
     "De taal van de tekst in de app en de richting waarin die wordt geschreven. Laat dit op de systeemtaal staan om het apparaat te volgen.",
   "settings.languageLabel": "App-taal",
   "settings.languageSystem": "Systeemtaal",
+  "settings.searchEngine": "Zoekmachine",
 
   "favorites.title": "Favorieten",
   "favorites.note":
@@ -334,7 +335,6 @@ export const nl: Messages = {
   "paywall.subtitle": "Ontgrendel de AI-assistent, incognitomodus en gebruikslimieten.",
   "paywall.close": "Betaalmuur sluiten",
   "paywall.locked": "Pro-functie",
-  "paywall.lockedHint": "Dit heeft OpenMedia Pro nodig. Tik om de plannen te zien.",
   "paywall.lifetime": "Levenslang",
   "paywall.yearly": "Jaarlijks",
   "paywall.monthly": "Maandelijks",

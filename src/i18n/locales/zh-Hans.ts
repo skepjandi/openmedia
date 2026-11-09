@@ -177,6 +177,7 @@ export const zhHans: Messages = {
   "settings.languageNote": "应用文字的语言以及书写方向。保持“跟随系统语言”即可随设备变化。",
   "settings.languageLabel": "应用语言",
   "settings.languageSystem": "跟随系统语言",
+  "settings.searchEngine": "搜索引擎",
 
   "favorites.title": "收藏",
   "favorites.note":
@@ -313,7 +314,6 @@ export const zhHans: Messages = {
   "paywall.subtitle": "解锁 AI 助手、无痕模式和用量限制。",
   "paywall.close": "关闭付费墙",
   "paywall.locked": "Pro 功能",
-  "paywall.lockedHint": "此功能需要 OpenMedia Pro。点按查看套餐。",
   "paywall.lifetime": "永久",
   "paywall.yearly": "年付",
   "paywall.monthly": "月付",

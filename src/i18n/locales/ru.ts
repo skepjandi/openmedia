@@ -188,6 +188,7 @@ export const ru: Messages = {
     "Язык текста приложения и направление письма. Оставьте системный, чтобы следовать устройству.",
   "settings.languageLabel": "Язык приложения",
   "settings.languageSystem": "Системный язык",
+  "settings.searchEngine": "Поисковая система",
 
   "favorites.title": "Избранное",
   "favorites.note":
@@ -333,7 +334,6 @@ export const ru: Messages = {
   "paywall.subtitle": "Разблокируйте ИИ-помощника, режим инкогнито и лимиты использования.",
   "paywall.close": "Закрыть экран оплаты",
   "paywall.locked": "Функция Pro",
-  "paywall.lockedHint": "Нужен OpenMedia Pro. Нажмите, чтобы посмотреть тарифы.",
   "paywall.lifetime": "Навсегда",
   "paywall.yearly": "Годовой",
   "paywall.monthly": "Месячный",

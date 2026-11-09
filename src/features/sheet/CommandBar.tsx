@@ -9,12 +9,14 @@ import {
   BackIcon,
   CloseIcon,
   ForwardIcon,
+  LockIcon,
   ReloadIcon,
   StarIcon,
 } from "../../shared/icons";
 import { AssistantPanel } from "../ai/AssistantPanel";
 import { INPUT_MODES, MAX_REQUEST_LENGTH, routeInput, type InputMode } from "../ai/route";
 import { useEntitlementStore } from "../paywall/store";
+import { DEFAULT_SEARCH_ENGINE } from "../../shared/searchEngines";
 
 const NO_FAVORITES: Favorite[] = [];
 
@@ -26,6 +28,7 @@ export function CommandBar() {
   const openAddress = useApp((s) => s.openAddress);
   const openSearch = useApp((s) => s.openSearch);
   const isPro = useEntitlementStore((s) => s.status === "pro");
+  const searchEngine = useApp((s) => s.state?.searchEngine ?? DEFAULT_SEARCH_ENGINE);
   const favorites = useApp((s) => s.state?.favorites) ?? NO_FAVORITES;
   const saveFavorites = useApp((s) => s.saveFavorites);
   const aiState = useApp((s) => s.aiState);
@@ -47,7 +50,13 @@ export function CommandBar() {
 
   const submit = (event: FormEvent) => {
     event.preventDefault();
-    const route = routeInput(text, { ai: aiState, pageUrl: page?.url ?? null, pro: isPro, mode });
+    const route = routeInput(text, {
+      ai: aiState,
+      pageUrl: page?.url ?? null,
+      pro: isPro,
+      mode,
+      searchEngine,
+    });
     switch (route.kind) {
       case "empty":
         setNotice(null);
@@ -152,25 +161,32 @@ export function CommandBar() {
               aria-label={t("commandBar.modeLabel")}
               className="mt-2 flex gap-1 px-1"
             >
-              {INPUT_MODES.map((option) => (
-                <button
-                  key={option}
-                  type="button"
-                  role="radio"
-                  aria-checked={mode === option}
-                  data-testid={`commandBar.mode.${option}`}
-                  onClick={() => {
-                    setMode(option);
-                    setNotice(null);
-                    setBlocked(false);
-                  }}
-                  className={`flex-1 rounded-full px-3 py-1.5 text-sm font-medium ${
-                    mode === option ? "bg-accent text-on-accent" : "text-paper/70 bg-paper/[0.06]"
-                  }`}
-                >
-                  {t(`commandBar.mode.${option}`)}
-                </button>
-              ))}
+              {INPUT_MODES.map((option) => {
+                // Chat is the assistant: without Pro it stays grayed out and opens the plans.
+                const locked = option === "chat" && !isPro;
+                return (
+                  <button
+                    key={option}
+                    type="button"
+                    role="radio"
+                    aria-checked={mode === option}
+                    aria-disabled={locked}
+                    data-testid={`commandBar.mode.${option}`}
+                    onClick={() => {
+                      setNotice(null);
+                      setBlocked(false);
+                      if (locked) openSheet("paywall");
+                      else setMode(option);
+                    }}
+                    className={`flex flex-1 items-center justify-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-medium ${
+                      mode === option ? "bg-accent text-on-accent" : "text-paper/70 bg-paper/[0.06]"
+                    } ${locked ? "opacity-45" : ""}`}
+                  >
+                    {t(`commandBar.mode.${option}`)}
+                    {locked && <LockIcon size={12} />}
+                  </button>
+                );
+              })}
             </div>
 
             <p className="min-h-4 px-2 pt-1 text-xs leading-snug text-paper/55">

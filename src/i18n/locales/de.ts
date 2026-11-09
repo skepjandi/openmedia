@@ -181,6 +181,7 @@ export const de: Messages = {
     "Die Sprache der App-Texte und die Richtung, in der sie geschrieben werden. Bleibe auf der Systemsprache, um die Einstellung deines Geräts zu übernehmen.",
   "settings.languageLabel": "App-Sprache",
   "settings.languageSystem": "Systemsprache",
+  "settings.searchEngine": "Suchmaschine",
 
   "favorites.title": "Favoriten",
   "favorites.note":
@@ -339,7 +340,6 @@ export const de: Messages = {
   "paywall.subtitle": "Freischalten: KI-Assistent, Inkognito-Modus und Nutzungslimits.",
   "paywall.close": "Bezahlwand schließen",
   "paywall.locked": "Pro-Funktion",
-  "paywall.lockedHint": "Das braucht OpenMedia Pro. Tippe für die Pläne.",
   "paywall.lifetime": "Lebenslang",
   "paywall.yearly": "Jährlich",
   "paywall.monthly": "Monatlich",
