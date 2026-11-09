@@ -133,6 +133,20 @@ pub enum ColorScheme {
     Dark,
 }
 
+/// How the page's size changes. Rust-only and desktop-only: the menu's zoom items raise it.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub enum ZoomAction {
+    In,
+    Out,
+    Reset,
+}
+
+#[derive(Debug, Clone, Copy, Deserialize)]
+pub struct ZoomRequest {
+    pub action: ZoomAction,
+}
+
 #[derive(Debug, Clone, Deserialize)]
 pub struct SetColorSchemeRequest {
     pub scheme: ColorScheme,

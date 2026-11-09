@@ -1,7 +1,7 @@
 {
   "$schema": "../gen/schemas/desktop-schema.json",
   "identifier": "default",
-  "description": "Capability for the shell (main webview). Site views never receive a capability.",
-  "windows": ["main"],
+  "description": "Capability for the shell (main webview). Site views never receive a capability: on desktop they are child webviews of the main window, so this names the webview, not the window.",
+  "webviews": ["main"],
   "permissions": ["core:default", "siteview:default"]
 }

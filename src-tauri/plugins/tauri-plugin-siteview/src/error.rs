@@ -30,8 +30,29 @@ pub enum Error {
     #[error(transparent)]
     PluginInvoke(#[from] tauri::plugin::mobile::PluginInvokeError),
     #[cfg(desktop)]
-    #[error("site views are not implemented on desktop yet")]
-    DesktopUnsupported,
+    #[error("{0} is not available on desktop yet")]
+    DesktopUnsupported(&'static str),
+    #[cfg(target_os = "macos")]
+    #[error("the main window is not open")]
+    MainWindowMissing,
+    #[cfg(target_os = "macos")]
+    #[error("this Mac has no password or Touch ID to check with")]
+    OwnerCheckUnavailable,
+    #[cfg(target_os = "macos")]
+    #[error("notifications need the app to run from its .app bundle")]
+    NotBundled,
+    #[cfg(target_os = "macos")]
+    #[error("no such site view")]
+    UnknownSession,
+    #[cfg(target_os = "macos")]
+    #[error("the page did not answer in time")]
+    PageTimeout,
+    #[cfg(target_os = "macos")]
+    #[error("the site view failed: {0}")]
+    Webview(#[from] tauri::Error),
+    #[cfg(target_os = "macos")]
+    #[error("could not start the page state poller: {0}")]
+    Poller(#[from] std::io::Error),
 }
 
 impl Serialize for Error {

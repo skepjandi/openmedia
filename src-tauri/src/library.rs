@@ -12,7 +12,7 @@ use uuid::Uuid;
 use crate::ai::{AiSettings, MAX_PROVIDERS, ProviderConfig, ProviderInput};
 use crate::error::{Error, Result};
 use crate::recipes::OptionChoices;
-use crate::site::site_of_host;
+use tauri_plugin_siteview::site::site_of_host;
 
 const FORMAT_VERSION: u32 = 4;
 const MAX_HISTORY: usize = 100;

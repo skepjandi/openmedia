@@ -1,31 +1,32 @@
 # Platform Support
 
-> **Status: Partially implemented.** Native iOS (Swift) and Android (Kotlin) site-view plugins exist. iOS behavior has simulator evidence; Android debug startup and one onboarding tap were verified on one emulator, but broader Android behavior and a signed store build remain unverified. Desktop site views are deferred.
+> **Status: Partially implemented.** Native iOS (Swift) and Android (Kotlin) site-view plugins exist. iOS behavior has simulator evidence; Android debug startup and one onboarding tap were verified on one emulator, but broader Android behavior and a signed store build remain unverified. macOS site views exist (debug builds were run on one Mac, see [The macOS site view](#the-macos-site-view)); Windows and Linux site views are not implemented.
 
 ## The core constraint
 
 Tauri's multi-webview API (`Window::add_child`) is gated behind the `unstable` Cargo feature and **desktop-only**; upstream tracks mobile support in [#11794](https://github.com/tauri-apps/tauri/issues/11794) and [#11528](https://github.com/tauri-apps/tauri/issues/11528), both open. A mobile app has one Tauri webview, and navigating it to a site would destroy the shell. So:
 
 - **Mobile (iOS and Android):** each uses an in-repository native site-view plugin (`tauri-plugin-siteview`), positioned by the shell. The implementation exists on both platforms; iOS is the verified platform.
-- **Desktop — deferred:** the plugin returns `DesktopUnsupported`; a child-webview implementation does not exist.
+- **macOS:** a Tauri child webview per session, beside the shell (`src-tauri/plugins/tauri-plugin-siteview/src/macos/`). See [The macOS site view](#the-macos-site-view).
+- **Windows and Linux — not implemented:** the plugin returns `DesktopUnsupported`.
 
-The shell talks to the shared site-view API (`open`, `set_rect`, `navigate`, …); the native iOS and Android plugins implement it. Desktop support remains deferred ([Architecture](./architecture.md#components)).
+The shell talks to the shared site-view API (`open`, `set_rect`, `navigate`, …); the native iOS and Android plugins implement it. Windows and Linux remain unimplemented ([Architecture](./architecture.md#components)).
 
 ## Matrix
 
 | Capability | macOS | Windows | Linux | iOS | Android |
 |------------|-------|---------|-------|-----|---------|
 | Webview engine | WKWebView | WebView2 | WebKitGTK | WKWebView | Android System WebView |
-| Site view mechanism | Not implemented | Not implemented | Not implemented | Native plugin | Native plugin |
-| Document-start injection | Not implemented | Not implemented | Not implemented | `WKUserScript` | `addDocumentStartJavaScript` if supported, else `onPageStarted` (late) |
-| Isolated profiles | Not implemented | Not implemented | Not implemented | `WKWebsiteDataStore(forIdentifier:)` (iOS 17+; simulator-verified) | Requires `MULTI_PROFILE`; implemented, device support unverified |
-| Page → Core channel | Not implemented | Not implemented | Not implemented | Native message handler | AndroidX web message listener |
+| Site view mechanism | Tauri child webview | Not implemented | Not implemented | Native plugin | Native plugin |
+| Document-start injection | `initialization_script` | Not implemented | Not implemented | `WKUserScript` | `addDocumentStartJavaScript` if supported, else `onPageStarted` (late) |
+| Isolated profiles | `WKWebsiteDataStore(forIdentifier:)` (macOS 14+; not exercised) | Not implemented | Not implemented | `WKWebsiteDataStore(forIdentifier:)` (iOS 17+; simulator-verified) | Requires `MULTI_PROFILE`; implemented, device support unverified |
+| Page → Core channel | None yet (no page script uses the bridge) | Not implemented | Not implemented | Native message handler | AndroidX web message listener |
 | Secret store | Not implemented | Not implemented | Not implemented | Keychain | Keystore-backed plugin (device behavior unverified) |
-| Ad and tracker blocking | Not built | Not built | Not built | `WKContentRuleList` from bundled lists ([Ad Blocking](./ad-blocking.md)) | Request interception (`shouldInterceptRequest`) over the same rule JSON ([Ad Blocking](./ad-blocking.md)) |
+| Ad and tracker blocking | `WKContentRuleList`, the iOS lists | Not built | Not built | `WKContentRuleList` from bundled lists ([Ad Blocking](./ad-blocking.md)) | Request interception (`shouldInterceptRequest`) over the same rule JSON ([Ad Blocking](./ad-blocking.md)) |
 | Distribution / updates | Not built | Not built | Not built | App Store | Google Play |
 | Priority | 3 | 4 | 4 | **1** | **1** |
 
-iOS and Android first. macOS next (same engine as iOS, fastest desktop path), then Windows/Linux after the engine and format settle; Linux WebKitGTK is the most likely to need per-site workarounds.
+iOS and Android first. macOS followed (same engine as iOS, fastest desktop path); Windows/Linux wait for the engine and format to settle; Linux WebKitGTK is the most likely to need per-site workarounds.
 
 ## Verified results
 
@@ -100,7 +101,7 @@ A single black or white frame at the moment a new page is revealed remained afte
 
 **Usage controls (iOS):** daily blocking is a native blur shield attached to each affected session. It stops loading, persistently suspends media playback, blocks navigation and touch interaction, and preserves deferred recipe reloads until the session is unblocked. The Rust-only plugin method adds no webview capability. Native Swift compilation and standalone domain checks are automated; physical-device behavior remains unverified.
 
-**Incognito (iOS):** the biometric check is a Rust-only plugin method (`authenticate` in `SiteViewPlugin.swift`) on `LocalAuthentication`. `.deviceOwnerAuthentication` tries Face ID or Touch ID first and lets the system offer the passcode after failures or when nothing is enrolled; a device with neither fails closed. The Swift code compiles for `aarch64-apple-ios-sim` and the shell flow was exercised in a browser with a mocked `invoke`; the real Face ID prompt has not been run on a simulator or device. Desktop and Android return an unsupported error.
+**Incognito (iOS):** the biometric check is a Rust-only plugin method (`authenticate` in `SiteViewPlugin.swift`) on `LocalAuthentication`. `.deviceOwnerAuthentication` tries Face ID or Touch ID first and lets the system offer the passcode after failures or when nothing is enrolled; a device with neither fails closed. The Swift code compiles for `aarch64-apple-ios-sim` and the shell flow was exercised in a browser with a mocked `invoke`; the real Face ID prompt has not been run on a simulator or device. Android returns an unsupported error; macOS has its own check, see [The macOS site view](#the-macos-site-view).
 
 **Decisions that follow:**
 
@@ -171,6 +172,68 @@ Fallback if the native-plugin approach fails: navigate the main webview to the s
 - **Secrets.** Android has no `keyring` backend, so the plugin's Kotlin side keeps a key in the Android Keystore (AES-GCM) and writes only the ciphertext to the app's preferences, which the app's backup rules exclude. Rust reaches it through a Rust-only plugin command, so no webview can ask for a key.
 
 **Build verification.** `yarn tauri android build --aab --ci` produced `src-tauri/gen/android/app/build/outputs/bundle/universalRelease/app-universal-release.aab` (25 MB), with release Rust libraries for all four Android ABIs and compiled Kotlin plugins. The AAB is unsigned because no upload key was configured; `jarsigner -verify` reported it unsigned. Release signing reads the ignored `src-tauri/gen/android/keystore.properties` (`keyAlias`, `password`, `storeFile`) when present. **Emulator smoke:** `yarn tauri android dev "Medium_Phone"` installed and launched `surf.openmedia` on `emulator-5554` (`sdk_gphone64_arm64`); its main activity remained foreground and tapping onboarding's Next control advanced to step 2. This verifies startup and one shell hit target only, not broader Android behavior or physical devices. See [Store Builds](./store-builds.md). Never commit the keystore properties file.
+
+## The macOS site view
+
+`src-tauri/plugins/tauri-plugin-siteview/src/macos/` implements the shared site-view API with Tauri child webviews (`Window::add_child`, which needs Tauri's `unstable` feature and is desktop-only).
+
+**Layout.** A child webview is always above the shell, and a transparent shell needs a private macOS API (an App Store blocker), so the shell lays itself out *around* the page instead of floating over it. `get_state` reports `desktop: true`; the shell then keeps a rail beside the page for the floating button (on its edge) and the optional back button (on the other edge), and shortens the page for docked panels (`[data-dock]`: the assistant dock, the error banner, the usage warning), see `src/features/web/desktopLayout.ts`. Every other shell overlay (command bar, Settings, History, Usage, the fan, onboarding, the limit screen) is a `[data-hit]` region that reaches into the page; `layout::is_covered` sees that and hides the page view while it is open, so on desktop the page is not visible behind those overlays. The keyboard follows: while the page is hidden the shell has it (a hidden web view would keep every key press, and Escape would never arrive). The shell reports rectangles in its own coordinates; the plugin places the page relative to the shell's content area (its web view reaches under the title bar, so its `safeAreaInsets` are added). The window opens at 1100 x 760 and cannot shrink below 560 x 480, so the rails never squeeze the page to nothing.
+
+**Gestures and shortcuts.**
+
+| Input | What it does | Where |
+|-------|--------------|-------|
+| Two-finger swipe, in a page | Back and forward through the page's history | `WKWebView.allowsBackForwardNavigationGestures`, set when a view is built |
+| Pinch, or two-finger double-tap, in a page | Zoom, as in Safari | `WKWebView.allowsMagnification` |
+| Two-finger swipe, on an app screen (Settings, History, Usage) | Closes it (Back) | `useTrackpadSwipeBack`: wheel events, because the shell has no swipe event; right-to-left locales swipe the other way |
+| Cmd `[`, Cmd `]`, Cmd R | Back, forward, reload the page | Navigate menu (`src/desktop_menu.rs`) |
+| Cmd L, Cmd Y, Cmd `,` | Open the address bar, History, Settings | Navigate menu, sent to the shell as `menu:sheet` |
+| Cmd `=`, Cmd `-`, Cmd 0 | Zoom in, out, actual size (a reset also drops a pinch) | Page menu, `WKWebView.pageZoom`, 0.3 to 5 |
+| Escape | Closes the sheet or the fan, as Back does on mobile | `useDesktopInput` |
+
+The page view takes key presses before the shell sees them, which is why the shortcuts are native menu items. The menu labels are English; they are not translated like the shell is.
+
+**State.** Tauri has no navigation-state API. A poll thread (400 ms) reads URL, title, loading, back and forward from each session's `WKWebView` (`native.rs`) and emits `siteview:state` when something changed, the same event and payload as mobile. `painted` is true once a load has finished or 1.5 s have passed. Single-page navigations are caught by the poll, not by a load event.
+
+**Sessions and profiles.** One child webview per session, all but the active one hidden. Each gets its own label (`site-<session>-<n>`) and a data store per profile (`data_store_identifier`), which is why the bundle requires macOS 14.
+
+**Page script.** The recipe script is the webview's `initialization_script` (main frame, document start). A webview cannot swap it, so changing a site option rebuilds the visible page at its current address (its back/forward history is lost) and hidden sessions when next shown.
+
+**Ad blocking.** The same WebKit rule lists as iOS, attached to the webview's `WKUserContentController`. Lists already in WebKit's store attach as soon as the lookup answers; missing ones are compiled in the background. The first request of a page opened right after the lists change may go out unblocked.
+
+**Downloads.** A download link saves to the Downloads folder (WebKit picks a free file name) and the file is selected in Finder when it is complete.
+
+**Favicons.** Fetched from the site itself with `ureq` (the page's HTML for `<link rel="...icon">`, then `/apple-touch-icon.png` and `/favicon.ico`), staying inside the page's registrable domain, at most 400 kB each, decoded with the `image` crate (PNG, ICO, JPEG, GIF, WebP) and redrawn as a 96 px PNG `data:` URL. Nothing goes to an icon service.
+
+**Owner check.** `LAContext` with `deviceOwnerAuthentication`: Touch ID or Apple Watch, with the account password as the system's own fallback. A Mac with neither a password nor Touch ID fails closed (`OwnerCheckUnavailable`). Rust-only, like on iOS, so no webview can raise or answer it. This is what lets incognito be entered.
+
+**Notifications.** `UNUserNotificationCenter`, with the session id as the request identifier; tapping one reports the session as `siteview:notification-tap`. The center only exists for an app running from its `.app` bundle, so a development binary (`yarn dev:desktop`) returns `NotBundled`, and macOS only accepts requests from a properly signed app (see below).
+
+**Navigation.** Only `http`, `https` and `about:` load; other schemes are refused. Tauri's navigation callback carries no frame information, so desktop cannot pin the main frame to its domain the way mobile does: a link in the page may leave the site, and the session's `scope` follows the page's registrable domain. This is deliberate for now: pinning would also send OAuth redirects (Google, Apple sign-in) out of the session. `target=_blank` and `window.open` are handled: a link inside the scope loads in place, one outside it opens in the default browser (so a sign-in that works through a popup and `window.opener` will not complete).
+
+**User agent.** Safari's, without which Google refuses to sign in from an embedded view.
+
+**Not on macOS.** A page-to-Core bridge (nothing uses it yet), `siteview:closed` when a web process dies and `siteview:memory` (Tauri exposes neither), JavaScript `alert`, `confirm` and `prompt` (wry has no handler, so WebKit ignores them), and the native in-app popup browser mobile uses for off-site links.
+
+**Isolation.** Tauri injects `window.__TAURI_INTERNALS__` into every webview, so a page can see it, but every command is refused: the page is a remote origin and the only capability (`capabilities/default.json`) names the `main` webview, not the window. Page calls to `get_state`, `plugin:siteview|reload` and `plugin:event|listen` were rejected ("not allowed on window main, webview site-..."); a raw `ipc://` request was rejected for lack of an invoke key.
+
+**Verified.** Debug builds on one Mac (macOS 26, Apple Silicon), with a local fixture server and a temporary scripted driver (removed afterwards), by window screenshots and the shell's own state readout:
+
+- Pages load, and the rails, floating button and page line up under the title bar. `siteview:state` reports title, URL, `loading`, `painted` and `scope`.
+- `navigate`, then the Back menu item, leaves back disabled and forward enabled with no new request; Forward returns. Reload makes a new request. Zoom In twice changed `devicePixelRatio` from 2 to 2.42 and Actual Size restored 2. A second session opens and `activate` returns to the first.
+- Open Address, Settings and the Escape key: the menu items open the sheets, Escape closes them (after the keyboard-focus fix; before it Escape went to the hidden page view). Opening a sheet hides the page and closing it shows it.
+- `setColorScheme("light")` flips `prefers-color-scheme`. Toggling a site option rebuilds the page at the same address with ad blocking still attached; a `fetch` to `www.google-analytics.com` (in the bundled lists) was blocked while one to `example.com` was not.
+- Both gesture flags read back `true` from the `WKWebView`. A download of a 2048-byte attachment arrived in the Downloads folder.
+- Favicons: `github.com` and `wikipedia.org` returned icons (17 and 2 kB as `data:` URLs); `example.com` has none and returned nothing.
+- The user agent carries `Version/` and `Safari/`, and page-side IPC calls are refused, as above.
+- A debug `.app` bundle launches with the notification delegate installed and `notify` returns `Ok`.
+
+**Not verified.**
+
+- Real trackpad gestures: the two-finger swipe and the pinch were never performed by a finger, only the settings that enable them were read back. The Settings swipe's wheel logic is unit-tested, not driven.
+- Notifications: `usernotificationsd` rejected the debug bundle ("Entitlement `com.apple.private.usernotifications.bundle-identifiers` required"), because it is ad-hoc signed. No banner was seen and no tap was tried; a Developer ID or App Store signed build is needed to check.
+- Touch ID: the prompt was never raised.
+- macOS 14 and 15, Intel, a release build, two profiles with separate cookies, Google sign-in, `target=_blank` routing, resize and multiple displays beyond a resize by hand, a page covered by an overlay and a docked panel at once, video and fullscreen, and Windows and Linux (the plugin there still returns `DesktopUnsupported`; `cargo clippy --target x86_64-pc-windows-msvc` passes for the plugin).
 
 ## Known platform constraints
 

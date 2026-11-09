@@ -85,6 +85,8 @@ export interface IncognitoState {
 
 export interface AppStore {
   state: AppState | null;
+  /** Desktop: the page sits beside the shell's controls and steps aside for its overlays. */
+  desktop: boolean;
   error: string | null;
   sheet: Sheet;
   /** Where closing a child page of Settings returns to; `none` for every other sheet. */
@@ -368,6 +370,7 @@ export const useApp = create<AppStore>((set, get) => {
 
   return {
     state: null,
+    desktop: false,
     error: null,
     sheet: "none",
     sheetParent: "none",
@@ -384,9 +387,9 @@ export const useApp = create<AppStore>((set, get) => {
 
     load: async () => {
       try {
-        const { bootSession, ...state } = await library.getState();
+        const { bootSession, desktop, ...state } = await library.getState();
         void siteView.setColorScheme(state.theme).catch(() => {});
-        set({ state, onboardingOpen: !state.onboarded });
+        set({ state, desktop, onboardingOpen: !state.onboarded });
         applyIcons();
         if (bootSession) {
           startSession(

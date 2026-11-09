@@ -23,7 +23,7 @@ All in `src-tauri/src/ai/`; the orchestration that strings them together (prepar
 | `snapshot.rs` | `SNAPSHOT_SCRIPT` (JS expression, `snapshot.js`), `parse_snapshot(&str) -> Result<Snapshot>`, `Snapshot::to_text()`, `count_script(&[String])`, `preview_script(css)`, `clear_preview_script()` |
 | `redact.rs` | `redact(&mut Snapshot)`, `scrub_text`, `scrub_path`, `MAX_SNAPSHOT_BYTES` (40 KB) |
 | `prompt.rs` | `build(&PromptInput) -> Prompt { system, user, version }`, `estimate_tokens`, `payload_preview`, `selector_rules()`, `site_section(host)`, `RepairNote`, `RuleFailure` |
-| `patch.rs` | `Patch`, `patch_schema()`, `parse_patch(json, recipe)`, `apply_patch(base, domain, patch)`, `preview_css(patch)`, `option_css(recipe, option_id)`, `option_id_for` (the registrable domain comes from `site.rs`, the Public Suffix List matcher) |
+| `patch.rs` | `Patch`, `patch_schema()`, `parse_patch(json, recipe)`, `apply_patch(base, domain, patch)`, `preview_css(patch)`, `option_css(recipe, option_id)`, `option_id_for` (the registrable domain comes from `tauri-plugin-siteview/src/site.rs`, the Public Suffix List matcher) |
 | `provider.rs`, `anthropic.rs`, `openai.rs` | `provider::complete(config, key, prompt, schema) -> Result<String>` (the model's patch JSON text) |
 
 ### Redaction

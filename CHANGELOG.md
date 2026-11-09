@@ -18,6 +18,22 @@ All notable changes to OpenMedia are documented here.
 
 **Verified:** `tsc`, ESLint, Prettier, frontend tests (new: `searchVisit.test.ts`). **Not verified:** the button over each sheet on a device, and the history recording against real search-result redirects (Google and DuckDuckGo link through their own redirect pages); no test drives `WebLayer`.
 
+### feat(siteview): site views on macOS, with Mac trackpad gestures and shortcuts
+
+**Problem:** the macOS app opened with "site views are not implemented on desktop yet" and showed no page.
+
+**Change:** `tauri-plugin-siteview` has a macOS implementation (`src/macos/`): one Tauri child webview per session with a data store per profile, the recipe script as its document-start script, the iOS ad-blocking rule lists, state events (`siteview:state`) read from the `WKWebView`, back/forward/reload/navigate, `evaluate` for the assistant, downloads (saved to Downloads and revealed in Finder), favicon fetching, the owner check (`LAContext`, so incognito works) and local notifications (`UNUserNotificationCenter`).
+
+**Mac input:** a two-finger swipe goes back and forward in a page and pinch or two-finger double-tap zooms (`WKWebView` gestures); a two-finger swipe closes Settings, History and Usage; a Navigate menu (Cmd `[`, `]`, R, L, Y, `,`) and a Page menu (Cmd `=`, `-`, 0) carry the shortcuts, because the page view takes key presses before the shell does; Escape closes sheets. Keyboard focus moves to the shell while an overlay hides the page.
+
+**Layout:** a child webview sits above the shell and a transparent shell needs a private macOS API, so on desktop the shell lays out around the page: a rail for the floating button (and the back button on the other edge), docked panels shorten the page, and any other overlay hides it (`get_state` now returns `desktop`). The window opens at 1100 x 760 with a 560 x 480 minimum.
+
+**Also:** `site.rs` (Public Suffix List matcher) moved into the plugin, which needs it for `scope`. The capability names the `main` webview instead of the window, so site views are in no capability. The macOS bundle requires 14.0, the first version with per-profile data stores.
+
+**Not on macOS:** domain pinning (Tauri's navigation callback has no frame information, and pinning would break OAuth redirects), a page-to-Core bridge, `siteview:closed` and `siteview:memory`, JavaScript `alert`/`confirm`/`prompt`. Windows and Linux still return `DesktopUnsupported`.
+
+**Verified:** debug builds run on one Mac (macOS 26, Apple Silicon) with a fixture server: load, state events, back/forward and reload through the menu, zoom, address and settings shortcuts, Escape, session switch, overlay hiding, light/dark, script swap, ad-block rule, download, favicons, user agent, refusal of page-side IPC calls, and the gesture flags read back (see [platform support](docs/wiki/platform-support.md#the-macos-site-view)); `cargo fmt --check`, `clippy -D warnings`, `cargo test`, `ts:check`, `lint`, `format:check` and `test`. **Not verified:** a finger on the trackpad (swipe, pinch), notifications (the system refused the ad-hoc signed debug bundle), the Touch ID prompt, macOS 14/15, Intel, a release or signed build, two profiles with separate cookies, Google sign-in, `target=_blank`, and the iOS and Android builds: `cargo check --target aarch64-apple-ios-sim` stops in the Swift package build here (no Swift file was touched; whether it fails on `main` too was not checked), so the edit to `mobile.rs` (event names moved to `events.rs`) was not compiled.
+
 ### fix(settings): call the shared bottom margin "Global bottom margin"
 
 **Change:** the Browsing slider's title (`settings.bottomMargin`) now reads "Global bottom margin" in every language, to set it apart from the per-site margin on each recipe card.

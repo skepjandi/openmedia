@@ -1,6 +1,6 @@
 # Roadmap
 
-> **Status: iOS implementation verified on simulators; Android implementation exists but device behavior and store release remain unverified; desktop site views are deferred.** The shell includes favorites, History, Usage, 18 bundled site recipes, and an AI assistant with redacted preview and explicit acceptance. See [Platform Support](./platform-support.md) for evidence and limits.
+> **Status: iOS implementation verified on simulators; Android implementation exists but device behavior and store release remain unverified; macOS site views exist and were run by hand on one Mac; Windows and Linux site views are not implemented.** The shell includes favorites, History, Usage, 18 bundled site recipes, and an AI assistant with redacted preview and explicit acceptance. See [Platform Support](./platform-support.md) for evidence and limits.
 
 ## Goal
 
@@ -188,6 +188,7 @@ All without a backend.
 | 2026-11-08 | Settings sections use closed-by-default native disclosures | Keeps long recipe, favorites and provider lists out of the initial screen | — |
 | 2026-11-08 | The command bar uses the active BYOK provider rather than a hardcoded disconnected message | Existing assistant implementation reused, with redacted preview, validation and explicit acceptance; keys remain in Rust | — |
 | 2026-11-08 | Paywall: AI, incognito and usage need a Pro entitlement; opening links, favorites, history, bundled recipes and ad blocking stay free. Lifetime $18.99, yearly $10, monthly $2 with a 14-day trial. Purchases and restore go through RevenueCat via an in-repo `tauri-plugin-billing` (StoreKit 2 on iOS, Play Billing on Android); the gate is enforced in Rust | User asked for monetization with no login. RevenueCat has no Tauri SDK, so the plugin wraps `purchases-ios` and `purchases-android`. Restore Purchases recovers the entitlement on a new device through the store account. This amends invariant 1: RevenueCat is the only third-party network destination besides user-chosen sites and providers | Desktop distribution needs a billing path; the store policy on gating a BYOK feature changes; RevenueCat is replaced |
+| 2026-11-09 | macOS site views are Tauri child webviews placed beside the shell, not under it | A child webview is always above the shell and a transparent shell needs a private macOS API, which the App Store rejects. So the shell keeps a rail for the floating buttons, shortens the page for docked panels and the plugin hides the page while an overlay covers it. S1 is answered for macOS; Windows and Linux are still open | Tauri adds webview z-ordering with hit-test pass-through, or a transparent shell without private API |
 
 ## Open questions
 

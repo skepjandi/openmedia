@@ -30,6 +30,9 @@ pub struct Startup {
     #[serde(flatten)]
     pub state: AppState,
     pub boot_session: Option<BootSession>,
+    /// The page is a child webview beside the shell, not a native layer under it; see
+    /// `tauri-plugin-siteview/src/macos`.
+    pub desktop: bool,
 }
 
 /// The ad-blocking warning an open produced, if any: the page opened, but unblocked.

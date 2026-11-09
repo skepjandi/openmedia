@@ -6,6 +6,7 @@ import { BackIcon } from "../../shared/icons";
 import { siteView } from "../../shared/ipc";
 import { useInsets, useViewport } from "../../shared/viewport";
 import { EDGE_MARGIN, snapToEdge, type Point } from "../fab/geometry";
+import { backEdgeFor } from "../web/desktopLayout";
 import { loadBackPosition, saveBackPosition, type BackPosition } from "./position";
 import { hasBackHandler, runBackHandler, subscribeBackHandlers } from "./backStack";
 import { useLimitBlock } from "../stats/UsageGuard";
@@ -23,12 +24,15 @@ interface Drag {
  * Optional floating back button (Settings, off by default), always on screen while enabled, above
  * every sheet. Tap: the same as the system Back: dismiss the newest thing on screen (a sheet, the
  * fan, a list, a guide step), and with nothing on screen go back in the page. Dimmed when a tap
- * would do nothing. Drag: move, then snap to the nearer edge.
+ * would do nothing. Drag: move, then snap to the nearer edge. On desktop it stays in its own rail,
+ * opposite the floating button.
  */
 export function BackButton() {
   const enabled = useApp((s) => s.state?.backButton ?? false);
   const canGoBack = useApp((s) => selectPage(s)?.canGoBack ?? false);
   const onboardingOpen = useApp((s) => s.onboardingOpen);
+  const desktop = useApp((s) => s.desktop);
+  const fabEdge = useApp((s) => s.fabEdge);
   const reportError = useApp((s) => s.reportError);
   const hasHandler = useSyncExternalStore(subscribeBackHandlers, hasBackHandler);
   const { blocked } = useLimitBlock();
@@ -44,8 +48,8 @@ export function BackButton() {
   const canAct = hasHandler || (canGoBack && !blocked && !onboardingOpen);
 
   const half = SIZE / 2;
-  const restingX =
-    position.edge === "left" ? EDGE_MARGIN + half : viewport.width - EDGE_MARGIN - half;
+  const edge = desktop ? backEdgeFor(fabEdge) : position.edge;
+  const restingX = edge === "left" ? EDGE_MARGIN + half : viewport.width - EDGE_MARGIN - half;
   const minY = insets.top + EDGE_MARGIN + half;
   const maxY = viewport.height - insets.bottom - EDGE_MARGIN - half;
   const restingY = Math.min(Math.max(position.yRatio * viewport.height, minY), maxY);
@@ -62,7 +66,7 @@ export function BackButton() {
 
   const onPointerMove = (event: PointerEvent<HTMLButtonElement>) => {
     const active = drag.current;
-    if (!active || active.pointerId !== event.pointerId) return;
+    if (desktop || !active || active.pointerId !== event.pointerId) return;
     const distance = Math.hypot(event.clientX - active.start.x, event.clientY - active.start.y);
     if (!active.moved && distance < DRAG_THRESHOLD) return;
     active.moved = true;

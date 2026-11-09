@@ -6,7 +6,8 @@
 
 use std::{collections::HashSet, sync::LazyLock};
 
-const RULES: &str = include_str!("../../shared/public-suffix/resources/public_suffix_rules.txt");
+const RULES: &str =
+    include_str!("../../../../shared/public-suffix/resources/public_suffix_rules.txt");
 const MAX_LABEL_CHARS: usize = 63;
 
 struct Rules {
@@ -109,7 +110,8 @@ mod tests {
 
     fn check(path: &str) {
         let text =
-            std::fs::read_to_string(format!("{}/../{path}", env!("CARGO_MANIFEST_DIR"))).unwrap();
+            std::fs::read_to_string(format!("{}/../../../{path}", env!("CARGO_MANIFEST_DIR")))
+                .unwrap();
         let vectors: Vec<(String, Option<String>)> = serde_json::from_str(&text).unwrap();
         assert!(!vectors.is_empty());
         for (host, expected) in vectors {

@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/logo.svg" alt="OpenMedia logo" height="120">
+  <img src="assets/logo.svg" alt="OpenMedia logo" height="220">
 </p>
 
 <h1 align="center">OpenMedia</h1>
@@ -26,7 +26,7 @@ OpenMedia is an open-source mobile browser built with Tauri, Rust, React, and Ty
 
 ## Status
 
-iOS is the verified platform. Android Kotlin site-view and billing code and an Android bundle build path exist, but Android device/emulator behavior and a signed Play release are not verified. Desktop site views are deferred. See [platform support](docs/wiki/platform-support.md).
+iOS is the verified platform. Android Kotlin site-view and billing code and an Android bundle build path exist, but Android device/emulator behavior and a signed Play release are not verified. macOS has site views (a child webview beside the shell, with trackpad gestures and shortcuts, run by hand on one Mac in debug builds); Windows and Linux do not. See [platform support](docs/wiki/platform-support.md).
 
 ## Build and contribute
 
@@ -36,7 +36,7 @@ Install Node.js 22+, Yarn 1.x, Rust, and the platform toolchain, then:
 yarn install
 yarn dev:ios        # iOS simulator or device (set APPLE_DEVELOPMENT_TEAM for a device)
 yarn dev:android    # Android emulator or device
-yarn build macos    # OpenMedia.app (site views are not implemented on desktop yet)
+yarn build macos    # OpenMedia.app (macOS 14 or later; Windows and Linux have no site views yet)
 yarn verify         # the full local check: web and Rust (CI runs only lint, format and tests)
 ```
 
