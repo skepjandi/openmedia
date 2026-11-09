@@ -227,7 +227,7 @@ export const cs: Messages = {
 
   "recipes.title": "Recepty",
   "recipes.note":
-    "Recepty pro oblíbené weby. Výzvy k instalaci a vyskakovací okna, které blokují stránku, jsou ve výchozím stavu skryté; Reels, Shorts a návrhy se zobrazují, dokud je neskryjete. Při změně přepínače se stránka znovu načte. Hvězdičkou u receptu přidáte jeho web do oblíbených.",
+    "Recepty pro oblíbené weby. Výzvy k instalaci a vyskakovací okna, které blokují stránku, jsou ve výchozím stavu skryté; Reels, Shorts a návrhy se zobrazují, dokud je neskryjete. Hvězdičkou u receptu přidáte jeho web do oblíbených.",
   "recipes.annoyances": "Rušivé prvky · ve výchozím stavu skryté",
   "recipes.content": "Obsah · zobrazený, dokud ho neskryjete",
   "recipes.groupAnnoyance": "Rušivý prvek",

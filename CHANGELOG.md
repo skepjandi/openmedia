@@ -18,6 +18,24 @@ All notable changes to OpenMedia are documented here.
 
 **PR:** n/a
 
+### fix(recipes): the recipes work on the Mac, with more toggles
+
+**Problem:** the bundled recipes were written against an iPhone user agent. The Mac app sends Safari's desktop user agent, and sites answer that with another DOM (`ytd-*` instead of `ytm-*` on YouTube, a sidebar and chat column on Twitch, a different TikTok layout), so on the Mac most rules matched nothing: with every option on, the old YouTube recipe hid 0 of its 17 rules on the home page.
+
+**Change:** every recipe that differs now carries desktop rules beside the mobile ones under the same option. Checked in the running Mac app with every option on (each rule's match count against its computed `display`): YouTube, Reddit, Twitch and TikTok hide everything they match; Pinterest, LinkedIn, Snapchat, Instagram and Threads were checked logged out; Facebook and X could not be reached past the login page, so their desktop rules come from the markup those sites serve and are marked as such in each recipe's notes. New toggles: YouTube (Premium prompts, More from YouTube, end-screen cards, live chat, merch, Create and voice search, notification bell), Reddit (Games, Recent, custom feeds, Resources, right sidebar, chat, image posts, crossposts), Twitch (Prime and Bits, featured carousel, left sidebar, stream information), TikTok (LIVE and Explore, sidebar footer, For You feed, captions), X (right column, trends, Who to follow, counts, messages drawer, Jobs and Lists, verified badges), Facebook (sponsored posts, right and left column, Watch and Marketplace tabs), Instagram (Highlights, verified badges, footer), LinkedIn (feed sidebars, messaging pop-up, promoted posts, Premium prompts, Google One Tap), Pinterest and Snapchat (Google One Tap, parents banner). The YouTube and Twitch home pages are `www.`; an iPhone is sent to `m.` from there. The fixture test now lists every rule that matches nothing instead of stopping at the first.
+
+**Mobile:** the same recipes were run in the iOS Simulator (iPhone user agent, WKWebView) with the new build: the mobile rules still match and hide (Reddit, YouTube `m.`, Twitch `m.`, Facebook `m.`, Threads, Snapchat, Pinterest), and the new Google One Tap rule hides the prompt on Pinterest. Added for phones: YouTube's Subscriptions and You tabs, Reddit's Join buttons.
+
+**Verified:** `cargo test` (workspace), clippy, `yarn check:web`, and the Mac app run end to end (options saved, rules hidden) for YouTube, Reddit, Twitch and TikTok. **Not verified:** a signed-in Facebook, X, Instagram feed or LinkedIn feed; a real device.
+
+### feat(siteview): a switch in Settings applies to the open page at once
+
+**Problem:** changing a site option rebuilt the page's web view on the Mac and reloaded it on the phone, so the page lost its scroll position and history for a change of one stylesheet.
+
+**Change:** `set_document_start_script` now swaps the document-start script for the pages each view loads next and runs the new script on the page showing now, after removing the old `style[data-openmedia]` (iOS and Android evaluate it in the page; macOS swaps its own `WKUserScript` among the ones Tauri adds, and rebuilds the view only if it cannot find it). The Settings text no longer says the page reloads.
+
+**Verified:** macOS in the running app and the iOS Simulator (a variable set on the page survived the toggle, the rules showed or hid at once, and a reload afterwards used the new script); the Kotlin compiles (`compileDebugKotlin`). **Not verified:** Android at runtime; frames inside the page keep the old script until they load again.
+
 ### fix(siteview): sign-in popups open inside the app on macOS
 
 **What:** A page's `window.open` to another domain (Google sign-in) or a `target=_blank` link out of the session's domain opened the Mac's default browser, so the sign-in could never report back to the page.

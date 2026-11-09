@@ -221,7 +221,7 @@ export const vi: Messages = {
 
   "recipes.title": "Công thức",
   "recipes.note":
-    "Công thức cho các trang phổ biến. Các bảng nhắc cài ứng dụng và pop-up chặn trang mặc định bị ẩn; Reels, Shorts và gợi ý vẫn hiện cho tới khi bạn ẩn chúng. Trang tải lại khi bạn đổi công tắc. Đánh dấu sao một công thức để thêm trang đó vào yêu thích.",
+    "Công thức cho các trang phổ biến. Các bảng nhắc cài ứng dụng và pop-up chặn trang mặc định bị ẩn; Reels, Shorts và gợi ý vẫn hiện cho tới khi bạn ẩn chúng. Đánh dấu sao một công thức để thêm trang đó vào yêu thích.",
   "recipes.annoyances": "Phiền nhiễu · ẩn mặc định",
   "recipes.content": "Nội dung · hiện cho tới khi bạn ẩn",
   "recipes.groupAnnoyance": "Phiền nhiễu",

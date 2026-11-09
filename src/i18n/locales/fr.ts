@@ -229,7 +229,7 @@ export const fr: Messages = {
 
   "recipes.title": "Recettes",
   "recipes.note":
-    "Des recettes prêtes à l’emploi pour les sites populaires. Les invites d’installation et les fenêtres contextuelles qui bloquent la page sont masquées par défaut ; Reels, Shorts et les suggestions restent visibles jusqu’à ce que vous les masquiez. La page se recharge lorsque vous changez un interrupteur. Mettez une recette en favori pour ajouter son site à vos favoris.",
+    "Des recettes prêtes à l’emploi pour les sites populaires. Les invites d’installation et les fenêtres contextuelles qui bloquent la page sont masquées par défaut ; Reels, Shorts et les suggestions restent visibles jusqu’à ce que vous les masquiez. Mettez une recette en favori pour ajouter son site à vos favoris.",
   "recipes.annoyances": "Éléments gênants · masqués par défaut",
   "recipes.content": "Contenu · visible jusqu’à ce que vous le masquiez",
   "recipes.groupAnnoyance": "Élément gênant",

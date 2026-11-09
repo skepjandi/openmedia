@@ -222,7 +222,7 @@ export const ms: Messages = {
 
   "recipes.title": "Resipi",
   "recipes.note":
-    "Resipi untuk laman popular. undangan memasang aplikasi dan pop-up yang menyekat halaman disembunyikan secara lalai; Reels, Shorts dan cadangan ditunjukkan sehingga anda menyembunyikannya. Halaman dimuat semula apabila anda menukar suis. Tandakan bintang pada resipi untuk menambahkan laman itu ke kegemaran.",
+    "Resipi untuk laman popular. undangan memasang aplikasi dan pop-up yang menyekat halaman disembunyikan secara lalai; Reels, Shorts dan cadangan ditunjukkan sehingga anda menyembunyikannya. Tandakan bintang pada resipi untuk menambahkan laman itu ke kegemaran.",
   "recipes.annoyances": "Gangguan · disembunyikan secara lalai",
   "recipes.content": "Kandungan · ditunjukkan sehingga anda menyembunyikannya",
   "recipes.groupAnnoyance": "Gangguan",

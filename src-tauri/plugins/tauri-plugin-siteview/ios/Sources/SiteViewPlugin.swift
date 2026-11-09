@@ -516,20 +516,20 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
     }
   }
 
-  /// Swaps the document-start script on every live session. The visible one reloads under it; a
-  /// hidden one reloads when it is shown again. With no session there is nothing to change; the
-  /// next `open` carries the script.
+  /// Swaps the document-start script on every live session, for the pages each loads next, and
+  /// runs it on the page each shows now, so a switch changed in Settings shows at once and the
+  /// page keeps its place. Frames inside the page pick the new script up when they next load.
+  /// With no session there is nothing to change; the next `open` carries the script.
   @objc public func setDocumentStartScript(_ invoke: Invoke) throws {
     let args = try invoke.parseArgs(SetDocumentStartScriptArgs.self)
+    let live =
+      "document.querySelectorAll('style[data-openmedia]').forEach(function(s){s.remove()});"
+      + (args.script ?? "")
     DispatchQueue.main.async {
       for session in self.sessions.values {
         let controller = session.view.configuration.userContentController
         self.installUserScripts(on: controller, recipe: args.script)
-        if session.id == self.activeId && !session.blocked {
-          session.view.reload()
-        } else {
-          session.needsReload = true
-        }
+        session.view.evaluateJavaScript(live)
       }
       invoke.resolve()
     }

@@ -226,7 +226,7 @@ export const en = {
 
   "recipes.title": "Recipes",
   "recipes.note":
-    "Ready-made recipes for popular sites. Install prompts and pop-ups that block the page are hidden by default; Reels, Shorts and suggestions are shown until you hide them. The page reloads when you change a switch. Star a recipe to add its site to your favorites.",
+    "Ready-made recipes for popular sites. Install prompts and pop-ups that block the page are hidden by default; Reels, Shorts and suggestions are shown until you hide them. Star a recipe to add its site to your favorites.",
   "recipes.annoyances": "Annoyances · hidden by default",
   "recipes.content": "Content · shown until you hide it",
   "recipes.groupAnnoyance": "Annoyance",

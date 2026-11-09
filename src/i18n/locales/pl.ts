@@ -225,7 +225,7 @@ export const pl: Messages = {
 
   "recipes.title": "Przepisy",
   "recipes.note":
-    "Przepisy dla popularnych witryn. Monity o instalację i wyskakujące okna zasłaniające stronę są domyślnie ukryte; Reels, Shorts i sugestie są widoczne, dopóki ich nie ukryjesz. Strona wczytuje się ponownie po zmianie przełącznika. Oznacz przepis gwiazdką, aby dodać jego witrynę do ulubionych.",
+    "Przepisy dla popularnych witryn. Monity o instalację i wyskakujące okna zasłaniające stronę są domyślnie ukryte; Reels, Shorts i sugestie są widoczne, dopóki ich nie ukryjesz. Oznacz przepis gwiazdką, aby dodać jego witrynę do ulubionych.",
   "recipes.annoyances": "Uciążliwości · domyślnie ukryte",
   "recipes.content": "Treści · widoczne, dopóki ich nie ukryjesz",
   "recipes.groupAnnoyance": "Uciążliwość",

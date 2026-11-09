@@ -117,6 +117,13 @@
       "description": "Posts that were shared from another community.",
       "group": "content",
       "default": false
+    },
+    {
+      "id": "join-buttons",
+      "label": "Hide Join buttons",
+      "description": "The Join button on each post and community header.",
+      "group": "content",
+      "default": false
     }
   ],
   "rules": [
@@ -365,11 +372,20 @@
       "target": {
         "css": "article:has(> shreddit-post[post-type=\"crosspost\"]) + hr"
       }
+    },
+    {
+      "id": "join-button-elements",
+      "label": "Join buttons",
+      "type": "hide",
+      "option": "join-buttons",
+      "target": {
+        "css": "shreddit-join-button"
+      }
     }
   ],
   "meta": {
     "homepage": "https://www.reddit.com/",
-    "lastVerified": "2026-11-07",
-    "notes": "Reddit serves iPhone user agents the shreddit web-component site on www.reddit.com (m., i. and bare reddit.com redirect there; old.reddit.com redirects to a login page when logged out). The DOM is chosen by user agent, not viewport. LIVE (logged out): open-app-button (#open-app-header-cta is the link, #xpromo-small-header the wrapper; no banner under the header was found), app-sheet (after about 28 s of scrolling a feed, div#configured-xpromo-mweb3x_feeds_blocking_xpromo_lo_page_fade appears under shreddit-app and body gets class rpl-scroll-lock; the experiment suffix changes, so only the id prefix is matched), ad-posts and ad-slots (shreddit-ad-post, each followed by an hr), advertise rows, video-articles (7 of 7 on a feed), community-cards (on /explore/), related-and-answers and comment-tree (on a post page; comments stayed after hiding the first). The old selector configured-xpromo-modal is only a template host and hiding it did nothing; .configured-xpromo also matches the 18+ gate on /r/nsfw/ (div#configured-xpromo-bypassable_xpromo_nsfw_bypassable), which must stay. unlock-scroll needs body.rpl-scroll-lock in the selector: the page sets .rpl-scroll-lock{overflow:hidden!important} on body, which beats a plain html, body rule on specificity (measured with wheel scrolling; with html set to auto the viewport scrolls). Not verified: google-one-tap's wrapper #credential_picker_container (the iframe was seen once, intermittent), ad-slots other than shreddit-comments-page-ad (SOURCE: Reddit UI Enhancer userscript dumps 2026-09/10), the menu rows' <li> hiding (links counted, rows not applied), the cookie banner (reddit-cookie-banner, SOURCE only; no consent banner appeared in a Sri Lanka session), the Chat button. CSS cannot reach the search overlay (shadow root of reddit-search-small) or rewrite the applink.reddit.com links that feed posts carry after the first navigation. There is no option for the sign-up sheet that appears when logged out and tapping Join, vote or comment: it carries the log-in link, so hiding it would remove the only way in from that sheet."
+    "lastVerified": "2026-11-10",
+    "notes": "Reddit serves iPhone user agents the shreddit web-component site on www.reddit.com (m., i. and bare reddit.com redirect there; old.reddit.com redirects to a login page when logged out). The DOM is chosen by user agent, not viewport. LIVE (logged out): open-app-button (#open-app-header-cta is the link, #xpromo-small-header the wrapper; no banner under the header was found), app-sheet (after about 28 s of scrolling a feed, div#configured-xpromo-mweb3x_feeds_blocking_xpromo_lo_page_fade appears under shreddit-app and body gets class rpl-scroll-lock; the experiment suffix changes, so only the id prefix is matched), ad-posts and ad-slots (shreddit-ad-post, each followed by an hr), advertise rows, video-articles (7 of 7 on a feed), community-cards (on /explore/), related-and-answers and comment-tree (on a post page; comments stayed after hiding the first). The old selector configured-xpromo-modal is only a template host and hiding it did nothing; .configured-xpromo also matches the 18+ gate on /r/nsfw/ (div#configured-xpromo-bypassable_xpromo_nsfw_bypassable), which must stay. unlock-scroll needs body.rpl-scroll-lock in the selector: the page sets .rpl-scroll-lock{overflow:hidden!important} on body, which beats a plain html, body rule on specificity (measured with wheel scrolling; with html set to auto the viewport scrolls). Not verified: google-one-tap's wrapper #credential_picker_container (the iframe was seen once, intermittent), ad-slots other than shreddit-comments-page-ad (SOURCE: Reddit UI Enhancer userscript dumps 2026-09/10), the menu rows' <li> hiding (links counted, rows not applied), the cookie banner (reddit-cookie-banner, SOURCE only; no consent banner appeared in a Sri Lanka session), the Chat button. CSS cannot reach the search overlay (shadow root of reddit-search-small) or rewrite the applink.reddit.com links that feed posts carry after the first navigation. There is no option for the sign-up sheet that appears when logged out and tapping Join, vote or comment: it carries the log-in link, so hiding it would remove the only way in from that sheet. DESKTOP (macOS Safari UA, signed in, live in the app, 2026-11-10): www.reddit.com serves the same shreddit components as on iPhone, so the feed rules need no twin; the desktop page adds a left sidebar and a right sidebar. Matched and hidden with every option on: advertise-button, right-rail-promotion, right-sidebar-container, chat-button, image-articles, image-dividers, crosspost-articles, crosspost-dividers. The left sidebar sections are matched by the name prefix of the faceplate-loader before them (the suffix is hashed): reddit-pro-section, games-card, recent-list, custom-feeds-section, communities-section and resources-section matched on the first load; the sidebar loads lazily and did not finish on later loads in a hidden window, so desktop-left-nav.html transcribes the child order seen then."
   }
 }

@@ -438,15 +438,18 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
     }
 
     /**
-     * Swaps the document-start script on every live session. The visible one reloads under it; a
-     * hidden one reloads when it is shown again.
+     * Swaps the document-start script on every live session, for the pages each loads next, and
+     * runs it on the page each shows now, so a switch changed in Settings shows at once and the
+     * page keeps its place. Frames inside the page pick the new script up when they next load.
      */
     @Command
     fun setDocumentStartScript(invoke: Invoke) {
         val args = invoke.parseArgs(SetDocumentStartScriptArgs::class.java)
+        val live = "document.querySelectorAll('style[data-openmedia]').forEach(function(s){s.remove()});" +
+            (args.script ?: "")
         for (session in sessions.values) {
             installScripts(session, args.script)
-            reloadUnder(session)
+            session.view.evaluateJavascript(live, null)
         }
         invoke.resolve()
     }

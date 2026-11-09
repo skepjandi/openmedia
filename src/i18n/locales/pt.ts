@@ -227,7 +227,7 @@ export const pt: Messages = {
 
   "recipes.title": "Receitas",
   "recipes.note":
-    "Receitas para sites populares. Os prompts de instalação e os pop-ups que bloqueiam a página ficam ocultos por padrão; Reels, Shorts e as sugestões aparecem até você ocultá-los. A página é recarregada quando você muda um interruptor. Marque uma receita com uma estrela para adicionar o site aos seus favoritos.",
+    "Receitas para sites populares. Os prompts de instalação e os pop-ups que bloqueiam a página ficam ocultos por padrão; Reels, Shorts e as sugestões aparecem até você ocultá-los. Marque uma receita com uma estrela para adicionar o site aos seus favoritos.",
   "recipes.annoyances": "Irritações · ocultas por padrão",
   "recipes.content": "Conteúdo · aparece até você ocultá-lo",
   "recipes.groupAnnoyance": "Irritação",

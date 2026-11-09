@@ -14,7 +14,25 @@ Evidence tags used everywhere:
 
 ## How options and defaults work
 
-See [Recipe Format: Options](./recipe-format.md#options-user-facing-toggles). In short: Settings → Recipes shows one switch per option; ON means hidden. **Annoyances** (install prompts, pop-ups that block the page, scroll locks, ad slots) default ON; **content** (Reels, Shorts, Stories, suggestions, feeds) defaults OFF. A test enforces the policy for every bundled recipe. Changing a switch recompiles the script and reloads the page. The user's choices are stored as overrides, so a release can change a default without migrating anyone who never touched the switch.
+See [Recipe Format: Options](./recipe-format.md#options-user-facing-toggles). In short: Settings → Recipes shows one switch per option; ON means hidden. **Annoyances** (install prompts, pop-ups that block the page, scroll locks, ad slots) default ON; **content** (Reels, Shorts, Stories, suggestions, feeds) defaults OFF. A test enforces the policy for every bundled recipe. Changing a switch recompiles the script and applies it to the page at once, without a reload. The user's choices are stored as overrides, so a release can change a default without migrating anyone who never touched the switch.
+
+## Desktop and mobile are different pages
+
+A site picks its DOM from the user agent, not from the viewport. The Mac app sends Safari's desktop user agent, so `www.youtube.com` serves `ytd-*` elements where an iPhone gets `m.youtube.com` and `ytm-*`, Twitch serves the full site with a sidebar and a chat column, and TikTok serves a left sidebar and a full-size player. The mobile selectors above match nothing there. Every recipe that differs carries both: the desktop rules sit beside the mobile ones under the same option (a `-desktop` suffix or a name of their own), so the switch in Settings is one switch on both platforms and the family that is absent matches nothing.
+
+Desktop was checked on 2026-11-10 in the running Mac app, with every option on, comparing each rule's match count with its computed `display`:
+
+| Site | Checked | Not reachable (hand-written fixture, `INFERRED`) |
+|------|---------|--------------------------------------------------|
+| YouTube | signed in: home, watch, search | end-screen cards, live chat, shopping shelves, playlist cards, Shorts items outside the home feed |
+| Reddit | signed in: home, post | none (the lazy left sidebar is transcribed in `desktop-left-nav.html`) |
+| Twitch | logged out: home, channel | none |
+| TikTok | logged out: For You | profile pages (bot-check page on a direct load) |
+| Instagram | logged out: public profile | the signed-in feed |
+| Threads, Snapchat, Pinterest, LinkedIn | logged out home | LinkedIn's signed-in feed |
+| Facebook, X | login page only | every desktop rule |
+
+When you add a desktop rule, capture its fixture from the real page rather than writing one by hand where you can: the structure with text and personal attributes removed, the ancestors the selector needs, and the `data-keep` marks. A hand-written fixture is allowed for a rule that the page cannot show you, and the recipe's `meta.notes` must say which rules those are.
 
 ## Rules for writing a selector (for the in-app assistant)
 

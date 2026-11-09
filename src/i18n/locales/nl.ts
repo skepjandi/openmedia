@@ -225,7 +225,7 @@ export const nl: Messages = {
 
   "recipes.title": "Recepten",
   "recipes.note":
-    "Recepten voor populaire sites. Installatiemeldingen en pop-ups die de pagina blokkeren, zijn standaard verborgen; Reels, Shorts en suggesties worden getoond tot je ze verbergt. De pagina wordt opnieuw geladen als je een schakelaar wijzigt. Markeer een recept met een ster om de site aan je favorieten toe te voegen.",
+    "Recepten voor populaire sites. Installatiemeldingen en pop-ups die de pagina blokkeren, zijn standaard verborgen; Reels, Shorts en suggesties worden getoond tot je ze verbergt. Markeer een recept met een ster om de site aan je favorieten toe te voegen.",
   "recipes.annoyances": "Hinderlijke dingen · standaard verborgen",
   "recipes.content": "Inhoud · getoond tot je het verbergt",
   "recipes.groupAnnoyance": "Hinder",

@@ -213,7 +213,7 @@ export const zhHans: Messages = {
 
   "recipes.title": "配方",
   "recipes.note":
-    "为热门网站准备好的配方。默认会隐藏安装提示和遮挡页面的弹窗；Reels、Shorts 和推荐内容会一直显示，直到你把它们隐藏。切换开关后页面会重新加载。给配方加星标即可把它的网站加入收藏。",
+    "为热门网站准备好的配方。默认会隐藏安装提示和遮挡页面的弹窗；Reels、Shorts 和推荐内容会一直显示，直到你把它们隐藏。给配方加星标即可把它的网站加入收藏。",
   "recipes.annoyances": "干扰项 · 默认隐藏",
   "recipes.content": "内容 · 隐藏前一直显示",
   "recipes.groupAnnoyance": "干扰项",

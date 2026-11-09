@@ -4,11 +4,12 @@
 use std::{sync::mpsc, time::Duration};
 
 use block2::RcBlock;
-use objc2::{MainThreadMarker, msg_send, runtime::Bool};
+use objc2::{MainThreadMarker, MainThreadOnly, msg_send, rc::Retained, runtime::Bool};
 use objc2_foundation::{NSArray, NSEdgeInsets, NSError, NSString};
 use objc2_local_authentication::{LAContext, LAPolicy};
 use objc2_web_kit::{
-    WKContentRuleList, WKContentRuleListStore, WKUserContentController, WKWebView,
+    WKContentRuleList, WKContentRuleListStore, WKUserContentController, WKUserScript,
+    WKUserScriptInjectionTime, WKWebView,
 };
 use tauri::{Runtime, Webview};
 
@@ -115,6 +116,46 @@ pub fn zoom<R: Runtime>(webview: &Webview<R>, action: ZoomAction) -> Result<()> 
         view.setPageZoom(zoomed(view.pageZoom(), action));
         if action == ZoomAction::Reset {
             view.setMagnification(1.0);
+        }
+    })
+}
+
+/// Swaps the document-start script `old` for `new` among the web view's user scripts, keeping the
+/// others (Tauri adds its own beside ours). `old` empty means no script was installed yet. Says
+/// whether the swap happened: false when `old` is not among the scripts, which the caller answers
+/// by rebuilding the view.
+pub fn replace_user_script<R: Runtime>(webview: &Webview<R>, old: &str, new: &str) -> Result<bool> {
+    let (old, new) = (old.to_owned(), new.to_owned());
+    with_view(webview, move |view| {
+        let Some(mtm) = MainThreadMarker::new() else {
+            return false;
+        };
+        // SAFETY: user-script bookkeeping on the main thread; every script that is removed is
+        // added again unless it is the one being replaced.
+        unsafe {
+            let controller = view.configuration().userContentController();
+            let kept: Vec<Retained<WKUserScript>> = controller
+                .userScripts()
+                .iter()
+                .filter(|script| script.source().to_string() != old)
+                .collect();
+            if !old.is_empty() && kept.len() == controller.userScripts().len() {
+                return false;
+            }
+            controller.removeAllUserScripts();
+            for script in &kept {
+                controller.addUserScript(script);
+            }
+            if !new.is_empty() {
+                let script = WKUserScript::initWithSource_injectionTime_forMainFrameOnly(
+                    WKUserScript::alloc(mtm),
+                    &NSString::from_str(&new),
+                    WKUserScriptInjectionTime::AtDocumentStart,
+                    true,
+                );
+                controller.addUserScript(&script);
+            }
+            true
         }
     })
 }

@@ -688,20 +688,42 @@ impl<R: Runtime> Siteview<R> {
         Ok(favicon::fetch(&parse_web_url(&request.url)?))
     }
 
-    /// Replaces the script injected at document start. A web view cannot swap its start scripts,
-    /// so the visible page is rebuilt at its address, and hidden ones when next shown.
+    /// Replaces the script injected at document start. Every view gets the new script for the
+    /// pages it loads next and runs it on the page it shows now, so a switch changed in Settings
+    /// shows at once and the page keeps its place. A view whose user scripts cannot be swapped is
+    /// rebuilt at its address instead (the visible one now, a hidden one when next shown).
     pub fn set_document_start_script(&self, request: SetDocumentStartScriptRequest) -> Result<()> {
-        let active = {
+        let script = request.script;
+        let (previous, views, active) = {
             let mut state = self.inner.state();
-            state.document_start_script = request.script;
-            for session in state.sessions.values_mut() {
+            let previous = std::mem::replace(&mut state.document_start_script, script.clone());
+            let views: Vec<(String, Webview<R>)> = state
+                .sessions
+                .iter()
+                .map(|(id, session)| (id.clone(), session.webview.clone()))
+                .collect();
+            (previous, views, state.active.clone())
+        };
+        let live = format!(
+            "document.querySelectorAll('style[data-openmedia]').forEach(function(s){{s.remove()}});{script}"
+        );
+        let mut rebuild_active = false;
+        for (id, webview) in views {
+            let swapped =
+                native::replace_user_script(&webview, &previous, &script).unwrap_or(false);
+            if swapped {
+                let _ = webview.eval(&live);
+                continue;
+            }
+            if active.as_deref() == Some(id.as_str()) {
+                rebuild_active = true;
+            } else if let Some(session) = self.inner.state().sessions.get_mut(&id) {
                 session.stale = true;
             }
-            state.active.clone()
-        };
+        }
         match active {
-            Some(session) => self.inner.rebuild(&session),
-            None => Ok(()),
+            Some(session) if rebuild_active => self.inner.rebuild(&session),
+            _ => Ok(()),
         }
     }
 

@@ -224,7 +224,7 @@ export const tr: Messages = {
 
   "recipes.title": "Tarifler",
   "recipes.note":
-    "Popüler siteler için hazır tarifler. Kurulum istemleri ve sayfayı engelleyen açılır pencereler varsayılan olarak gizlidir; Reels, Shorts ve öneriler siz gizlemedikçe gösterilir. Bir anahtarı değiştirdiğinizde sayfa yeniden yüklenir. Bir tarifi yıldızlayarak sitesini favorilerinize ekleyin.",
+    "Popüler siteler için hazır tarifler. Kurulum istemleri ve sayfayı engelleyen açılır pencereler varsayılan olarak gizlidir; Reels, Shorts ve öneriler siz gizlemedikçe gösterilir. Bir tarifi yıldızlayarak sitesini favorilerinize ekleyin.",
   "recipes.annoyances": "Rahatsız ediciler · varsayılan olarak gizli",
   "recipes.content": "İçerik · siz gizlemedikçe gösterilir",
   "recipes.groupAnnoyance": "Rahatsız edici",

@@ -223,7 +223,7 @@ export const sv: Messages = {
 
   "recipes.title": "Recept",
   "recipes.note":
-    "Recept för populära webbplatser. Installationsuppmaningar och popup-fönster som blockerar sidan döljs som standard; Reels, Shorts och förslag visas tills du döljer dem. Sidan laddas om när du ändrar en omkopplare. Stjärnmärk ett recept för att lägga till dess webbplats bland dina favoriter.",
+    "Recept för populära webbplatser. Installationsuppmaningar och popup-fönster som blockerar sidan döljs som standard; Reels, Shorts och förslag visas tills du döljer dem. Stjärnmärk ett recept för att lägga till dess webbplats bland dina favoriter.",
   "recipes.annoyances": "Störande inslag · dolda som standard",
   "recipes.content": "Innehåll · visas tills du döljer det",
   "recipes.groupAnnoyance": "Störande inslag",

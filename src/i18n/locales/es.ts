@@ -227,7 +227,7 @@ export const es: Messages = {
 
   "recipes.title": "Recetas",
   "recipes.note":
-    "Recetas listas para usar de sitios populares. Los avisos de instalación y los pop-ups que bloquean la página están ocultos de forma predeterminada; Reels, Shorts y las sugerencias se muestran hasta que los ocultes. La página se recarga cuando cambias un interruptor. Marca una receta con una estrella para añadir su sitio a tus favoritos.",
+    "Recetas listas para usar de sitios populares. Los avisos de instalación y los pop-ups que bloquean la página están ocultos de forma predeterminada; Reels, Shorts y las sugerencias se muestran hasta que los ocultes. Marca una receta con una estrella para añadir su sitio a tus favoritos.",
   "recipes.annoyances": "Molestias · ocultas de forma predeterminada",
   "recipes.content": "Contenido · se muestra hasta que lo ocultes",
   "recipes.groupAnnoyance": "Molestia",

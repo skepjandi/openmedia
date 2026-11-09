@@ -285,7 +285,7 @@ mod tests {
         let added = with_site_favorite(&recipes, &favorites, "youtube.default", true).unwrap();
         assert_eq!(
             urls(&added),
-            ["https://example.com/", "https://m.youtube.com/"]
+            ["https://example.com/", "https://www.youtube.com/"]
         );
         assert_eq!(added[1].name, "YouTube");
 

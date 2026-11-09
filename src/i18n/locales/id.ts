@@ -220,7 +220,7 @@ export const id: Messages = {
 
   "recipes.title": "Resep",
   "recipes.note":
-    "Resep untuk situs populer. Ajakan memasang aplikasi dan pop-up yang menutupi halaman disembunyikan secara bawaan; Reels, Shorts, dan saran tetap ditampilkan sampai Anda menyembunyikannya. Halaman dimuat ulang saat Anda mengubah sakelar. Beri bintang pada resep untuk menambahkan situsnya ke favorit.",
+    "Resep untuk situs populer. Ajakan memasang aplikasi dan pop-up yang menutupi halaman disembunyikan secara bawaan; Reels, Shorts, dan saran tetap ditampilkan sampai Anda menyembunyikannya. Beri bintang pada resep untuk menambahkan situsnya ke favorit.",
   "recipes.annoyances": "Gangguan · disembunyikan secara bawaan",
   "recipes.content": "Konten · ditampilkan sampai Anda menyembunyikannya",
   "recipes.groupAnnoyance": "Gangguan",

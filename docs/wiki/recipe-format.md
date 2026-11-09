@@ -185,6 +185,7 @@ What the Rust code accepts today, validated with `deny_unknown_fields` so anythi
 - Limits that matter when writing selectors: the 300-character, 19-comma and 2-`:has(` limits apply to the whole `css` string of one rule, so an option with many selectors uses several rules.
 - Bundled today (18): `instagram`, `facebook`, `twitter`, `reddit`, `youtube`, `threads`, `telegram`, `douyin`, `messenger`, `discord`, `kuaishou`, `linkedin`, `whatsapp`, `snapchat`, `pinterest`, `weibo`, `tiktok` and `twitch`, each `<site>.default`. [Site Playbooks](./site-playbooks.md) records what each selector matched, how it was checked, and what CSS cannot do. Each recipe's `meta.notes` carries the same evidence next to the data.
 - Fixture rules: every rule matches something in its site's fixtures, and nothing a fixture marks `data-keep` (or an ancestor of it) may be hidden by a `hide` rule. Mark the login link, the feed container, the player and similar with `data-keep` when you add a fixture.
+- Desktop and mobile: a site serves a different DOM to a desktop user agent (the Mac app) and to an iPhone one, so a recipe lists the rules for both under the same option and the family that is absent matches nothing; see [Site Playbooks](./site-playbooks.md#desktop-and-mobile-are-different-pages). Fixtures for desktop pages are named `desktop-*.html`. The fixture test reports every rule that matches nothing at once, not only the first.
 
 ## Inspirations
 

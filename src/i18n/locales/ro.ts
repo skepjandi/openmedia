@@ -225,7 +225,7 @@ export const ro: Messages = {
 
   "recipes.title": "Rețete",
   "recipes.note":
-    "Rețete gata făcute pentru site-uri populare. Mesajele de instalare și ferestrele pop-up care blochează pagina sunt ascunse implicit; Reels, Shorts și sugestiile sunt afișate până când le ascunzi. Pagina se reîncarcă atunci când schimbi un comutator. Marchează o rețetă cu stea pentru a adăuga site-ul ei la favorite.",
+    "Rețete gata făcute pentru site-uri populare. Mesajele de instalare și ferestrele pop-up care blochează pagina sunt ascunse implicit; Reels, Shorts și sugestiile sunt afișate până când le ascunzi. Marchează o rețetă cu stea pentru a adăuga site-ul ei la favorite.",
   "recipes.annoyances": "Elemente deranjante · ascunse implicit",
   "recipes.content": "Conținut · afișat până îl ascunzi",
   "recipes.groupAnnoyance": "Deranjant",

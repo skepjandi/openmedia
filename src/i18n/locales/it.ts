@@ -229,7 +229,7 @@ export const it: Messages = {
 
   "recipes.title": "Ricette",
   "recipes.note":
-    "Ricette per siti popolari. Gli inviti all’installazione e i pop-up che bloccano la pagina sono nascosti per impostazione predefinita; Reels, Shorts e i suggerimenti restano visibili finché non li nascondi. La pagina si ricarica quando cambi un interruttore. Metti una ricetta tra i preferiti con la stella per aggiungere il sito ai tuoi preferiti.",
+    "Ricette per siti popolari. Gli inviti all’installazione e i pop-up che bloccano la pagina sono nascosti per impostazione predefinita; Reels, Shorts e i suggerimenti restano visibili finché non li nascondi. Metti una ricetta tra i preferiti con la stella per aggiungere il sito ai tuoi preferiti.",
   "recipes.annoyances": "Fastidi · nascosti per impostazione predefinita",
   "recipes.content": "Contenuti · mostrati finché non li nascondi",
   "recipes.groupAnnoyance": "Fastidio",

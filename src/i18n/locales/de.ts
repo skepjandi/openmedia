@@ -220,7 +220,7 @@ export const de: Messages = {
 
   "recipes.title": "Rezepte",
   "recipes.note":
-    "Fertige Rezepte für beliebte Websites. Installationshinweise und Pop-ups, die die Seite blockieren, werden standardmäßig ausgeblendet; Reels, Shorts und Vorschläge werden angezeigt, bis du sie ausblendest. Die Seite wird neu geladen, wenn du einen Schalter änderst. Markiere ein Rezept mit einem Stern, um die Website deinen Favoriten hinzuzufügen.",
+    "Fertige Rezepte für beliebte Websites. Installationshinweise und Pop-ups, die die Seite blockieren, werden standardmäßig ausgeblendet; Reels, Shorts und Vorschläge werden angezeigt, bis du sie ausblendest. Markiere ein Rezept mit einem Stern, um die Website deinen Favoriten hinzuzufügen.",
   "recipes.annoyances": "Störungen · standardmäßig ausgeblendet",
   "recipes.content": "Inhalte · angezeigt, bis du sie ausblendest",
   "recipes.groupAnnoyance": "Störung",

@@ -214,7 +214,7 @@ export const zhHant: Messages = {
 
   "recipes.title": "配方",
   "recipes.note":
-    "為常見網站準備好的配方。安裝提示與擋住頁面的彈出視窗預設會隱藏；Reels、Shorts 與相關內容會一直顯示，直到你把它們隱藏。切換開關後頁面會重新載入。替配方加上星號即可把它的網站加入我的最愛。",
+    "為常見網站準備好的配方。安裝提示與擋住頁面的彈出視窗預設會隱藏；Reels、Shorts 與相關內容會一直顯示，直到你把它們隱藏。替配方加上星號即可把它的網站加入我的最愛。",
   "recipes.annoyances": "惱人的元素 · 預設隱藏",
   "recipes.content": "內容 · 隱藏前都會顯示",
   "recipes.groupAnnoyance": "惱人的元素",

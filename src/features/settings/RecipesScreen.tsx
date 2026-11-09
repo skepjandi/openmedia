@@ -52,7 +52,7 @@ export function RecipesLink() {
   );
 }
 
-/** Ready-made tweaks for popular sites, on a page of their own. The page reloads when a switch changes. */
+/** Ready-made tweaks for popular sites, on a page of their own. */
 export function RecipesScreen() {
   const open = useApp((s) => s.sheet === "recipes");
   const closeSheet = useApp((s) => s.closeSheet);
