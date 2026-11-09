@@ -8,6 +8,12 @@ All notable changes to OpenMedia are documented here.
 
 ## 2026-11-09
 
+### fix(android): avoid WebView calls from request threads
+
+**Change:** Android runs `shouldInterceptRequest` off the UI thread. Cache the current page URL in volatile session state so request filtering does not call `WebView.url` from a worker thread.
+
+**Verified:** `yarn tauri android dev "Medium_Phone"` built, installed and launched on `sdk_gphone64_arm64`; the app remained foreground with no new Android runtime exceptions. Broader Android behavior and physical devices remain unverified.
+
 ### fix(release): align Apple build numbers with Android
 
 **Change:** Set iOS and macOS `CFBundleVersion` to `1000` for marketing version `0.1.0`, matching Android's version code. Increment both Apple build numbers for each subsequent upload.
