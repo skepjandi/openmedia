@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "reddit.default",
   "name": "Reddit",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "origin": "bundled",
   "match": ["https://*.reddit.com/*"],
   "options": [
@@ -30,7 +30,7 @@
     {
       "id": "advertise-links",
       "label": "Hide Advertise and Reddit Pro",
-      "description": "The Advertise on Reddit and Reddit Pro rows in the account menu.",
+      "description": "The Advertise button, the Reddit Pro section in the sidebar and the same rows in the account menu.",
       "group": "annoyance",
       "default": true
     },
@@ -59,6 +59,62 @@
       "id": "comments",
       "label": "Hide comments",
       "description": "The comment thread on post pages.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "games",
+      "label": "Hide Games on Reddit",
+      "description": "The Games on Reddit card in the sidebar.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "sidebar-recent",
+      "label": "Hide recent communities",
+      "description": "The Recent list in the left sidebar.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "sidebar-custom-feeds",
+      "label": "Hide custom feeds and communities lists",
+      "description": "The Custom Feeds and Communities sections in the left sidebar.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "sidebar-resources",
+      "label": "Hide Resources and the footer",
+      "description": "The About, Help, Blog and Terms links at the bottom of the left sidebar.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "right-sidebar",
+      "label": "Hide the right sidebar",
+      "description": "Community info, rules, recent posts and installed apps beside a post or feed.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "chat",
+      "label": "Hide chat",
+      "description": "The chat button in the top bar.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "image-posts",
+      "label": "Hide image and gallery posts",
+      "description": "Posts that are a picture or a gallery in feeds.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "crossposts",
+      "label": "Hide crossposts",
+      "description": "Posts that were shared from another community.",
       "group": "content",
       "default": false
     }
@@ -182,6 +238,132 @@
       "option": "comments",
       "target": {
         "css": "div[id^=\"comment-tree-content-anchor\"]"
+      }
+    },
+    {
+      "id": "advertise-button",
+      "label": "Advertise on Reddit button in the top bar",
+      "type": "hide",
+      "option": "advertise-links",
+      "target": {
+        "css": "#advertise-button"
+      }
+    },
+    {
+      "id": "reddit-pro-section",
+      "label": "Reddit Pro sidebar section",
+      "type": "hide",
+      "option": "advertise-links",
+      "target": {
+        "css": "faceplate-loader[name^=\"LeftNavBusinessToolsSection\"] + faceplate-expandable-section-helper, hr:has(+ faceplate-loader[name^=\"LeftNavBusinessToolsSection\"])"
+      }
+    },
+    {
+      "id": "right-rail-promotion",
+      "label": "Promotion in the right rail",
+      "type": "hide",
+      "option": "ads",
+      "target": {
+        "css": "aside[aria-label=\"Promotion\"]"
+      }
+    },
+    {
+      "id": "games-card",
+      "label": "Games on Reddit",
+      "type": "hide",
+      "option": "games",
+      "target": {
+        "css": "faceplate-tracker[noun=\"games_drawer\"], hr:has(+ faceplate-loader[name^=\"LeftNavGamesSection\"])"
+      }
+    },
+    {
+      "id": "recent-list",
+      "label": "Recent communities",
+      "type": "hide",
+      "option": "sidebar-recent",
+      "target": {
+        "css": "#recent-communities-section, hr:has(+ faceplate-loader[name^=\"LeftNavRecentSection\"])"
+      }
+    },
+    {
+      "id": "custom-feeds-section",
+      "label": "Custom feeds",
+      "type": "hide",
+      "option": "sidebar-custom-feeds",
+      "target": {
+        "css": "faceplate-loader[name^=\"LeftNavMultiredditsSection\"] ~ faceplate-expandable-section-helper:has(faceplate-partial)"
+      }
+    },
+    {
+      "id": "communities-section",
+      "label": "Communities",
+      "type": "hide",
+      "option": "sidebar-custom-feeds",
+      "target": {
+        "css": "faceplate-loader[name^=\"LeftNavCommunitiesSection\"] + faceplate-expandable-section-helper"
+      }
+    },
+    {
+      "id": "resources-section",
+      "label": "Resources and the footer",
+      "type": "hide",
+      "option": "sidebar-resources",
+      "target": {
+        "css": "faceplate-loader[name^=\"LeftNavResourcesSection\"] ~ *, hr:has(+ faceplate-loader[name^=\"LeftNavResourcesSection\"])"
+      }
+    },
+    {
+      "id": "right-sidebar-container",
+      "label": "Right sidebar",
+      "type": "hide",
+      "option": "right-sidebar",
+      "target": {
+        "css": "#right-sidebar-container"
+      }
+    },
+    {
+      "id": "chat-button",
+      "label": "Chat button",
+      "type": "hide",
+      "option": "chat",
+      "target": {
+        "css": "#header-action-item-chat-button"
+      }
+    },
+    {
+      "id": "image-articles",
+      "label": "Image and gallery posts",
+      "type": "hide",
+      "option": "image-posts",
+      "target": {
+        "css": "article:has(> shreddit-post[post-type=\"image\"]), article:has(> shreddit-post[post-type=\"gallery\"])"
+      }
+    },
+    {
+      "id": "image-dividers",
+      "label": "Dividers after image posts",
+      "type": "hide",
+      "option": "image-posts",
+      "target": {
+        "css": "article:has(> shreddit-post[post-type=\"image\"]) + hr, article:has(> shreddit-post[post-type=\"gallery\"]) + hr"
+      }
+    },
+    {
+      "id": "crosspost-articles",
+      "label": "Crossposts",
+      "type": "hide",
+      "option": "crossposts",
+      "target": {
+        "css": "article:has(> shreddit-post[post-type=\"crosspost\"])"
+      }
+    },
+    {
+      "id": "crosspost-dividers",
+      "label": "Dividers after crossposts",
+      "type": "hide",
+      "option": "crossposts",
+      "target": {
+        "css": "article:has(> shreddit-post[post-type=\"crosspost\"]) + hr"
       }
     }
   ],

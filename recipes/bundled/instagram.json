@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "instagram.default",
   "name": "Instagram",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "origin": "bundled",
   "match": ["https://*.instagram.com/*"],
   "options": [
@@ -29,8 +29,8 @@
     },
     {
       "id": "stories",
-      "label": "Hide Stories",
-      "description": "The row of Stories at the top of the home feed.",
+      "label": "Hide Stories and Highlights",
+      "description": "The Stories tray in the feed and the Highlights row on profiles.",
       "group": "content",
       "default": false
     },
@@ -45,6 +45,20 @@
       "id": "feed-posts",
       "label": "Hide all posts",
       "description": "Every post, in the feed and when you open one. Stories and the tab bar stay.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "verified-badges",
+      "label": "Hide verified badges",
+      "description": "The blue tick next to account names.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "footer",
+      "label": "Hide the footer links",
+      "description": "The About, Help, Privacy and Terms links at the bottom of the page.",
       "group": "content",
       "default": false
     }
@@ -156,6 +170,33 @@
       "option": "feed-posts",
       "target": {
         "css": "main article"
+      }
+    },
+    {
+      "id": "profile-highlights",
+      "label": "Highlights row on profiles",
+      "type": "hide",
+      "option": "stories",
+      "target": {
+        "css": "div[role=\"presentation\"]:has(a[href*=\"highlight\"])"
+      }
+    },
+    {
+      "id": "verified-ticks",
+      "label": "Verified badges",
+      "type": "hide",
+      "option": "verified-badges",
+      "target": {
+        "css": "svg[aria-label=\"Verified\"]"
+      }
+    },
+    {
+      "id": "page-footer",
+      "label": "Footer links",
+      "type": "hide",
+      "option": "footer",
+      "target": {
+        "css": "footer"
       }
     }
   ],

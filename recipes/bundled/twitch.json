@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "twitch.default",
   "name": "Twitch",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "origin": "bundled",
   "match": ["https://*.twitch.tv/*"],
   "options": [
@@ -17,6 +17,13 @@
       "id": "ad-overlays",
       "label": "Hide display ad overlay on streams",
       "description": "The display-ad slot layered over the live player. Video ads that play inside the stream itself cannot be hidden.",
+      "group": "annoyance",
+      "default": true
+    },
+    {
+      "id": "prime-offers",
+      "label": "Hide Prime and Bits buttons",
+      "description": "The Prime offers and Get Bits buttons in the top bar.",
       "group": "annoyance",
       "default": true
     },
@@ -45,6 +52,27 @@
       "id": "subscribe",
       "label": "Hide Subscribe button",
       "description": "The Subscribe button on channel pages and profiles; Follow stays.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "featured",
+      "label": "Hide the featured streams carousel",
+      "description": "The big carousel at the top of the home page.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "side-nav",
+      "label": "Hide the left sidebar",
+      "description": "The followed and recommended channels list beside every page.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "stream-info",
+      "label": "Hide stream information",
+      "description": "The title, tags and about section under the player.",
       "group": "content",
       "default": false
     }
@@ -121,10 +149,82 @@
       "target": {
         "css": "button[aria-label=\"Subscribe\"]"
       }
+    },
+    {
+      "id": "signup-desktop",
+      "label": "Sign Up button and the join banner",
+      "type": "hide",
+      "option": "app-nags",
+      "target": {
+        "css": "[data-a-target=\"signup-button\"], #twilight-sticky-footer-root"
+      }
+    },
+    {
+      "id": "display-ad-desktop",
+      "label": "Advertisement blocks",
+      "type": "hide",
+      "option": "ad-overlays",
+      "target": {
+        "css": "div[aria-label=\"Advertisement\"], .stream-display-ad__wrapper"
+      }
+    },
+    {
+      "id": "prime-button",
+      "label": "Prime offers button",
+      "type": "hide",
+      "option": "prime-offers",
+      "target": {
+        "css": "button[aria-label=\"Prime offers\"], [data-a-target=\"top-nav-get-bits-button\"]"
+      }
+    },
+    {
+      "id": "featured-carousel",
+      "label": "Featured streams carousel",
+      "type": "hide",
+      "option": "featured",
+      "target": {
+        "css": ".front-page-carousel"
+      }
+    },
+    {
+      "id": "side-nav-bar",
+      "label": "Left sidebar",
+      "type": "hide",
+      "option": "side-nav",
+      "target": {
+        "css": "#side-nav"
+      }
+    },
+    {
+      "id": "chat-column",
+      "label": "Chat column",
+      "type": "hide",
+      "option": "chat",
+      "target": {
+        "css": ".channel-root__right-column"
+      }
+    },
+    {
+      "id": "subscribe-desktop",
+      "label": "Subscribe and gift buttons",
+      "type": "hide",
+      "option": "subscribe",
+      "target": {
+        "css": "[data-a-target=\"subscribe-button\"], [data-a-target=\"gift-button\"]"
+      }
+    },
+    {
+      "id": "stream-information",
+      "label": "Stream information under the player",
+      "type": "hide",
+      "option": "stream-info",
+      "target": {
+        "css": "#live-channel-stream-information"
+      }
     }
   ],
   "meta": {
-    "homepage": "https://m.twitch.tv/",
+    "homepage": "https://www.twitch.tv/",
     "lastVerified": "2026-11-08",
     "notes": "LIVE (headless Chromium, iPhone UA 390x844, logged out, 2026-11-08): https://m.twitch.tv/ nav a[href*=tt_medium=mweb]=1 (Open App, top-bar), nav > div:has(> a[...]) > button=1 (Sign Up), 'Categories we think you'll like' row matched by div:has(> div > h2 > a[href=\"/directory\"])=1, collection rows div:has(> div > h2 > a[href^=\"/directory/collection/\"])=4 at top of Home (more rows lazy-load and the list is virtualised), [aria-label^=\"Tag, \"]=108 on Home (buttons and links; also on /directory/all and category pages). https://m.twitch.tv/pathofexile (live channel, waited ~35 s, no timed prompt seen): [data-a-target=chat-scroller]=1, button[aria-label=Subscribe]=1, [data-test-selector=sda-wrapper]=1 (the slot existed but was empty, so the overlay is not seen rendering; harmless best-effort). Subscribe=1 also on /pathofexile/videos. Video pre-roll ads in the player (VOD /videos/<id> showed 'Ad 1 of 2' with a Learn More button) run inside the player and are deliberately NOT hidden. Not found logged out: cookie banner, notification prompt, drops/Prime promo tiles, marketplace/AI modules, floating action buttons (no rules written). /activity is only an 'Open App for Activity' page and /directory/following a log-in prompt: left alone, they are the page's content. Fixtures hand-distilled from the observed DOM. NOT verified: logged-in views, other regions' consent dialogs, clips and schedule tabs, desktop www.twitch.tv layout (recipe also matches it), whether sda-wrapper ever carries a visible ad."
   }

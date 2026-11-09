@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "youtube.default",
   "name": "YouTube",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "origin": "bundled",
   "match": ["https://*.youtube.com/*"],
   "options": [
@@ -24,6 +24,13 @@
       "id": "ads",
       "label": "Hide ad slots",
       "description": "Companion and promoted ad blocks that remain after network blocking.",
+      "group": "annoyance",
+      "default": true
+    },
+    {
+      "id": "premium-upsell",
+      "label": "Hide YouTube Premium prompts",
+      "description": "The Premium banner on the home page and the Premium rows in the sidebar.",
       "group": "annoyance",
       "default": true
     },
@@ -66,6 +73,48 @@
       "id": "playlists",
       "label": "Hide Mixes and playlists in lists",
       "description": "Mix and playlist cards in search and suggestions.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "sidebar-more",
+      "label": "Hide More from YouTube",
+      "description": "The sidebar section with Premium, Music, Kids and the footer links.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "end-cards",
+      "label": "Hide end-screen suggestions",
+      "description": "The video thumbnails that cover the player near the end and when paused.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "live-chat",
+      "label": "Hide live chat",
+      "description": "The chat box beside live streams and premieres.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "shopping",
+      "label": "Hide merch, tickets and info boxes",
+      "description": "Merch and ticket shelves and the fact-check boxes under a video.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "topbar-buttons",
+      "label": "Hide Create and voice search",
+      "description": "The Create button and the microphone beside the search box.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "notifications",
+      "label": "Hide the notification bell",
+      "description": "The bell and its unread count in the top bar.",
       "group": "content",
       "default": false
     }
@@ -222,6 +271,240 @@
       "option": "playlists",
       "target": {
         "css": "ytm-compact-radio-renderer"
+      }
+    },
+    {
+      "id": "promo-banners-desktop",
+      "label": "Premium and promo banners",
+      "type": "hide",
+      "option": "promos",
+      "target": {
+        "css": "ytd-statement-banner-renderer, ytd-banner-promo-renderer, ytd-mealbar-promo-renderer, ytd-brand-video-singleton-renderer, ytd-brand-video-shelf-renderer, ytd-primetime-promo-renderer"
+      }
+    },
+    {
+      "id": "premium-guide-entry",
+      "label": "Premium rows in the sidebar",
+      "type": "hide",
+      "option": "premium-upsell",
+      "target": {
+        "css": "ytd-guide-entry-renderer:has(a[href*=\"premium\"]), ytd-mini-guide-entry-renderer:has(a[href*=\"premium\"])"
+      }
+    },
+    {
+      "id": "premium-buttons",
+      "label": "Get Premium buttons",
+      "type": "hide",
+      "option": "premium-upsell",
+      "target": {
+        "css": "ytd-button-renderer:has(a[href*=\"premium\"]), ytd-statement-banner-renderer"
+      }
+    },
+    {
+      "id": "ad-slots-desktop",
+      "label": "Ad slots in feeds and next to the player",
+      "type": "hide",
+      "option": "ads",
+      "target": {
+        "css": "ytd-ad-slot-renderer, ytd-in-feed-ad-layout-renderer, ytd-display-ad-renderer, ytd-promoted-sparkles-web-renderer, ytd-promoted-video-renderer, ytd-compact-promoted-video-renderer, ytd-action-companion-ad-renderer"
+      }
+    },
+    {
+      "id": "ad-containers-desktop",
+      "label": "Masthead and player ad containers",
+      "type": "hide",
+      "option": "ads",
+      "target": {
+        "css": "#masthead-ad, #player-ads, ytd-companion-slot-renderer, ytd-engagement-panel-section-list-renderer[target-id=\"engagement-panel-ads\"], ytd-search-pyv-renderer"
+      }
+    },
+    {
+      "id": "ad-feed-tiles",
+      "label": "Feed tiles that only hold an ad",
+      "type": "hide",
+      "option": "ads",
+      "target": {
+        "css": "ytd-rich-item-renderer:has(ytd-ad-slot-renderer), ytd-rich-section-renderer:has(ytd-statement-banner-renderer)"
+      }
+    },
+    {
+      "id": "shorts-guide-entry",
+      "label": "Shorts in the sidebar",
+      "type": "hide",
+      "option": "shorts",
+      "target": {
+        "css": "ytd-guide-entry-renderer:has(a[title=\"Shorts\"]), ytd-mini-guide-entry-renderer:has(a[title=\"Shorts\"])"
+      }
+    },
+    {
+      "id": "shorts-desktop-shelves",
+      "label": "Shorts shelves in the home feed",
+      "type": "hide",
+      "option": "shorts",
+      "target": {
+        "css": "ytd-rich-section-renderer:has(ytd-rich-shelf-renderer[is-shorts]), ytd-rich-shelf-renderer[is-shorts], ytd-reel-shelf-renderer"
+      }
+    },
+    {
+      "id": "shorts-desktop-feed-items",
+      "label": "Shorts among the home feed videos",
+      "type": "hide",
+      "option": "shorts",
+      "target": {
+        "css": "ytd-rich-item-renderer:has(a[href^=\"/shorts/\"])"
+      }
+    },
+    {
+      "id": "home-feed-desktop",
+      "label": "Home page videos",
+      "type": "hide",
+      "option": "home-feed",
+      "target": {
+        "css": "ytd-browse[page-subtype=\"home\"] ytd-rich-grid-renderer > #contents"
+      }
+    },
+    {
+      "id": "home-chips-desktop",
+      "label": "Topic chips above the feed",
+      "type": "hide",
+      "option": "home-chips",
+      "target": {
+        "css": "ytd-feed-filter-chip-bar-renderer"
+      }
+    },
+    {
+      "id": "comments-desktop",
+      "label": "Comments under a video",
+      "type": "hide",
+      "option": "comments",
+      "target": {
+        "css": "ytd-comments#comments, ytd-comments-entry-point-header-renderer"
+      }
+    },
+    {
+      "id": "related-desktop",
+      "label": "Up next column",
+      "type": "hide",
+      "option": "related",
+      "target": {
+        "css": "ytd-watch-next-secondary-results-renderer"
+      }
+    },
+    {
+      "id": "playlist-cards-desktop",
+      "label": "Playlists and Mixes in lists",
+      "type": "hide",
+      "option": "playlists",
+      "target": {
+        "css": "ytd-playlist-renderer, ytd-compact-playlist-renderer, ytd-compact-radio-renderer, ytd-radio-renderer, ytd-grid-playlist-renderer"
+      }
+    },
+    {
+      "id": "mix-lockups",
+      "label": "Mixes shown as video cards",
+      "type": "hide",
+      "option": "playlists",
+      "target": {
+        "css": "yt-lockup-view-model:has(a[href*=\"list=RD\"])"
+      }
+    },
+    {
+      "id": "sidebar-more-section",
+      "label": "More from YouTube sidebar section",
+      "type": "hide",
+      "option": "sidebar-more",
+      "target": {
+        "css": "ytd-guide-section-renderer:has(a[href=\"/premium\"]), ytd-guide-renderer #footer"
+      }
+    },
+    {
+      "id": "end-cards-overlay",
+      "label": "End-screen cards over the player",
+      "type": "hide",
+      "option": "end-cards",
+      "target": {
+        "css": ".ytp-ce-element, .ytp-ce-covering-overlay, .ytp-endscreen-content, .ytp-pause-overlay, .ytp-suggestion-set"
+      }
+    },
+    {
+      "id": "live-chat-frame",
+      "label": "Live chat",
+      "type": "hide",
+      "option": "live-chat",
+      "target": {
+        "css": "ytd-live-chat-frame"
+      }
+    },
+    {
+      "id": "shopping-shelves",
+      "label": "Merch, ticket and product shelves",
+      "type": "hide",
+      "option": "shopping",
+      "target": {
+        "css": "ytd-merch-shelf-renderer, ytd-ticket-shelf-renderer, ytd-product-list-renderer, ytd-donation-shelf-renderer"
+      }
+    },
+    {
+      "id": "info-panels",
+      "label": "Information boxes under a video",
+      "type": "hide",
+      "option": "shopping",
+      "target": {
+        "css": "ytd-info-panel-container-renderer, #clarify-box"
+      }
+    },
+    {
+      "id": "create-button",
+      "label": "Create button",
+      "type": "hide",
+      "option": "topbar-buttons",
+      "target": {
+        "css": "ytd-masthead #buttons > ytd-button-renderer:has(button[aria-label=\"Create\"])"
+      }
+    },
+    {
+      "id": "voice-search",
+      "label": "Voice search button",
+      "type": "hide",
+      "option": "topbar-buttons",
+      "target": {
+        "css": "#voice-search-button"
+      }
+    },
+    {
+      "id": "notification-bell",
+      "label": "Notification bell",
+      "type": "hide",
+      "option": "notifications",
+      "target": {
+        "css": "ytd-notification-topbar-button-renderer"
+      }
+    },
+    {
+      "id": "shorts-search-items",
+      "label": "Shorts among search results",
+      "type": "hide",
+      "option": "shorts",
+      "target": {
+        "css": "ytd-video-renderer:has(a[href^=\"/shorts/\"])"
+      }
+    },
+    {
+      "id": "shorts-related-items",
+      "label": "Shorts among related videos",
+      "type": "hide",
+      "option": "shorts",
+      "target": {
+        "css": "ytd-compact-video-renderer:has(a[href^=\"/shorts/\"])"
+      }
+    },
+    {
+      "id": "shorts-grid-items",
+      "label": "Shorts in channel video grids",
+      "type": "hide",
+      "option": "shorts",
+      "target": {
+        "css": "ytd-grid-video-renderer:has(a[href^=\"/shorts/\"])"
       }
     }
   ],

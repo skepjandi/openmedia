@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "facebook.default",
   "name": "Facebook",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "origin": "bundled",
   "match": ["https://*.facebook.com/*"],
   "options": [
@@ -21,6 +21,13 @@
       "default": true
     },
     {
+      "id": "sponsored",
+      "label": "Hide sponsored posts",
+      "description": "Posts in the feed that are ads, and the ads beside it.",
+      "group": "annoyance",
+      "default": true
+    },
+    {
       "id": "reels",
       "label": "Hide Reels",
       "description": "The Reels tab on profiles and the Reels chip and thumbnails in Watch.",
@@ -31,6 +38,27 @@
       "id": "stories",
       "label": "Hide Stories",
       "description": "The Stories row.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "right-rail",
+      "label": "Hide the right column",
+      "description": "Contacts, birthdays and the sponsored boxes beside the feed.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "left-rail",
+      "label": "Hide the left column",
+      "description": "The shortcuts and menu beside the feed.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "video-tabs",
+      "label": "Hide Watch, Marketplace and Gaming",
+      "description": "Those tabs in the top navigation.",
       "group": "content",
       "default": false
     }
@@ -109,6 +137,78 @@
       "option": "stories",
       "target": {
         "css": "div[aria-label=\"Stories\"]"
+      }
+    },
+    {
+      "id": "sponsored-feed-posts",
+      "label": "Sponsored posts in the feed",
+      "type": "hide",
+      "option": "sponsored",
+      "target": {
+        "css": "[data-pagelet^=\"FeedUnit\"]:has(a[href*=\"/ads/about\"])"
+      }
+    },
+    {
+      "id": "sponsored-right-rail",
+      "label": "Sponsored boxes in the right column",
+      "type": "hide",
+      "option": "sponsored",
+      "target": {
+        "css": "[data-pagelet=\"RightRail\"] > div:has(a[href*=\"/ads/about\"])"
+      }
+    },
+    {
+      "id": "stories-pagelet",
+      "label": "Stories row",
+      "type": "hide",
+      "option": "stories",
+      "target": {
+        "css": "[data-pagelet=\"Stories\"]"
+      }
+    },
+    {
+      "id": "reels-feed-posts",
+      "label": "Reels in the feed",
+      "type": "hide",
+      "option": "reels",
+      "target": {
+        "css": "[data-pagelet^=\"FeedUnit\"]:has(a[href*=\"/reel/\"])"
+      }
+    },
+    {
+      "id": "reels-nav-link",
+      "label": "Reels in the navigation",
+      "type": "hide",
+      "option": "reels",
+      "target": {
+        "css": "a[href*=\"facebook.com/reel/\"], a[aria-label=\"Reels\"][role=\"link\"]"
+      }
+    },
+    {
+      "id": "right-column",
+      "label": "Right column",
+      "type": "hide",
+      "option": "right-rail",
+      "target": {
+        "css": "[data-pagelet=\"RightRail\"]"
+      }
+    },
+    {
+      "id": "left-column",
+      "label": "Left column",
+      "type": "hide",
+      "option": "left-rail",
+      "target": {
+        "css": "[data-pagelet=\"LeftRail\"]"
+      }
+    },
+    {
+      "id": "video-tab-links",
+      "label": "Watch, Marketplace and Gaming tabs",
+      "type": "hide",
+      "option": "video-tabs",
+      "target": {
+        "css": "div[role=\"banner\"] a[aria-label=\"Watch\"], div[role=\"banner\"] a[aria-label=\"Video\"], div[role=\"banner\"] a[aria-label=\"Marketplace\"], div[role=\"banner\"] a[aria-label=\"Gaming\"]"
       }
     }
   ],

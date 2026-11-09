@@ -301,6 +301,7 @@ mod tests {
 
     #[test]
     fn every_bundled_rule_matches_something_in_its_dom_fixtures() {
+        let mut unmatched = Vec::new();
         for recipe in bundled().unwrap() {
             let pages = fixture_pages(&recipe);
             for rule in &recipe.rules {
@@ -309,14 +310,16 @@ mod tests {
                 let matched = pages
                     .iter()
                     .any(|page| page.select(&selector).next().is_some());
-                assert!(
-                    matched,
-                    "{}: rule {} matches nothing in its fixtures",
-                    recipe.id,
-                    rule.id()
-                );
+                if !matched {
+                    unmatched.push(format!("{}: {}", recipe.id, rule.id()));
+                }
             }
         }
+        assert!(
+            unmatched.is_empty(),
+            "rules that match nothing in their fixtures:\n{}",
+            unmatched.join("\n")
+        );
     }
 
     const TOGGLED: &str = r#"{"schema":1,"id":"t.default","name":"T","version":"1.0.0","origin":"bundled","match":["https://t.example/*"],

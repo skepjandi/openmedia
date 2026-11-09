@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "twitter.default",
   "name": "X (Twitter)",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "origin": "bundled",
   "match": ["https://*.x.com/*", "https://*.twitter.com/*"],
   "options": [
@@ -38,6 +38,55 @@
       "id": "explore-tab",
       "label": "Hide the Explore tab",
       "description": "Removes Explore, and with it Trending, from the bottom bar.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "right-column",
+      "label": "Hide the right column",
+      "description": "Search, trends, Who to follow and the footer links beside the timeline.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "trends",
+      "label": "Hide trends",
+      "description": "What's happening and the trending lists.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "who-to-follow",
+      "label": "Hide Who to follow",
+      "description": "The account suggestions beside the timeline.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "counts",
+      "label": "Hide reply, repost and like counts",
+      "description": "The numbers under each post. The buttons stay.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "messages-drawer",
+      "label": "Hide the messages drawer",
+      "description": "The Messages box fixed to the bottom right.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "nav-extras",
+      "label": "Hide Jobs, Communities and Lists",
+      "description": "Those entries in the left navigation.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "verified-badges",
+      "label": "Hide verified badges",
+      "description": "The tick next to account names.",
       "group": "content",
       "default": false
     }
@@ -131,6 +180,87 @@
       "option": "explore-tab",
       "target": {
         "css": "a[data-testid=\"AppTabBar_Explore_Link\"]"
+      }
+    },
+    {
+      "id": "premium-card",
+      "label": "Subscribe to Premium card",
+      "type": "hide",
+      "option": "premium-upsells",
+      "target": {
+        "css": "aside[aria-label=\"Subscribe to Premium\"], aside:has(a[href=\"/i/premium_sign_up\"])"
+      }
+    },
+    {
+      "id": "right-column-desktop",
+      "label": "Right column",
+      "type": "hide",
+      "option": "right-column",
+      "target": {
+        "css": "[data-testid=\"sidebarColumn\"]"
+      }
+    },
+    {
+      "id": "trends-section",
+      "label": "Trending lists",
+      "type": "hide",
+      "option": "trends",
+      "target": {
+        "css": "[data-testid=\"sidebarColumn\"] section:has([data-testid=\"trend\"]), [aria-label=\"Timeline: Trending now\"]"
+      }
+    },
+    {
+      "id": "who-to-follow-card",
+      "label": "Who to follow",
+      "type": "hide",
+      "option": "who-to-follow",
+      "target": {
+        "css": "aside[aria-label=\"Who to follow\"], [data-testid=\"sidebarColumn\"] aside:has([data-testid=\"UserCell\"])"
+      }
+    },
+    {
+      "id": "counts-reply-repost",
+      "label": "Reply and repost counts",
+      "type": "hide",
+      "option": "counts",
+      "target": {
+        "css": "[data-testid=\"reply\"] [data-testid=\"app-text-transition-container\"], [data-testid=\"retweet\"] [data-testid=\"app-text-transition-container\"], [data-testid=\"unretweet\"] [data-testid=\"app-text-transition-container\"]"
+      }
+    },
+    {
+      "id": "counts-like-views",
+      "label": "Like counts",
+      "type": "hide",
+      "option": "counts",
+      "target": {
+        "css": "[data-testid=\"like\"] [data-testid=\"app-text-transition-container\"], [data-testid=\"unlike\"] [data-testid=\"app-text-transition-container\"]"
+      }
+    },
+    {
+      "id": "dm-drawer",
+      "label": "Messages drawer",
+      "type": "hide",
+      "option": "messages-drawer",
+      "target": {
+        "css": "[data-testid=\"DMDrawer\"]"
+      }
+    },
+    {
+      "id": "nav-jobs-lists",
+      "label": "Jobs, Communities and Lists in the navigation",
+      "type": "hide",
+      "option": "nav-extras",
+      "target": {
+        "css": "nav a[href=\"/jobs\"], nav a[href$=\"/communities\"], nav a[href$=\"/lists\"]"
+      }
+    },
+    {
+      "id": "verified-ticks",
+      "label": "Verified badges",
+      "type": "hide",
+      "option": "verified-badges",
+      "target": {
+        "css": "[data-testid=\"icon-verified\"]"
       }
     }
   ],

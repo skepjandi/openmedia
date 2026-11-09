@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "snapchat.default",
   "name": "Snapchat",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "origin": "bundled",
   "match": ["https://*.snapchat.com/*"],
   "options": [
@@ -59,6 +59,13 @@
       "id": "footer",
       "label": "Hide footer links",
       "description": "The footer bar with Privacy, Terms, Funny Videos and Explore Topics links, and the Funny Videos strip.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "parents-banner",
+      "label": "Hide the parents banner",
+      "description": "The Family Center banner on the home page.",
       "group": "content",
       "default": false
     }
@@ -215,6 +222,24 @@
       "option": "footer",
       "target": {
         "css": "div[class*=\"Footer_entertainmentBar\"]"
+      }
+    },
+    {
+      "id": "home-desktop-slides",
+      "label": "Feature slides on the home page",
+      "type": "hide",
+      "option": "home-promo",
+      "target": {
+        "css": "[data-testid=\"home-desktop\"] [data-testid^=\"video-slide-\"], [data-testid=\"home-chat-now\"]"
+      }
+    },
+    {
+      "id": "home-parents",
+      "label": "Parents banner",
+      "type": "hide",
+      "option": "parents-banner",
+      "target": {
+        "css": "[data-testid=\"home-parents-banner\"]"
       }
     }
   ],

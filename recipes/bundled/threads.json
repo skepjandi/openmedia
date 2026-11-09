@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "threads.default",
   "name": "Threads",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "origin": "bundled",
   "match": ["https://*.threads.com/*", "https://*.threads.net/*"],
   "options": [
@@ -63,6 +63,15 @@
       "option": "related-threads",
       "target": {
         "css": "div:has(> [data-pagelet^=\"threads_logged_out_related_posts\"])"
+      }
+    },
+    {
+      "id": "login-dialog",
+      "label": "Join Threads dialog on desktop (the log in link stays in the header)",
+      "type": "hide",
+      "option": "login-wall",
+      "target": {
+        "css": "div[role=\"dialog\"]:has(i[aria-label=\"Instagram\"]):not(:has(a[href*=\"applink.threads.com\"]))"
       }
     }
   ],

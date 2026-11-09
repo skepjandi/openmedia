@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "linkedin.default",
   "name": "LinkedIn",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "origin": "bundled",
   "match": ["https://*.linkedin.com/*"],
   "options": [
@@ -24,6 +24,20 @@
       "id": "join-banners",
       "label": "Hide \"join LinkedIn\" banners",
       "description": "The \"view full profile\" and \"join now\" banners, the \"explore top content\" card and the \"find a referral\" card shown to logged-out visitors.",
+      "group": "annoyance",
+      "default": true
+    },
+    {
+      "id": "promoted",
+      "label": "Hide promoted posts and ads",
+      "description": "Ads in the feed and the ad banner at the top.",
+      "group": "annoyance",
+      "default": true
+    },
+    {
+      "id": "premium-upsell",
+      "label": "Hide Premium prompts",
+      "description": "The Try Premium links and cards.",
       "group": "annoyance",
       "default": true
     },
@@ -59,6 +73,20 @@
       "id": "promo-sections",
       "label": "Hide promo sections and footer",
       "description": "Marketing blocks on the home page (top content, software tools, games, directory) and the page footer.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "feed-sidebar",
+      "label": "Hide the feed sidebars",
+      "description": "LinkedIn News and the profile card beside your feed.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "messaging-overlay",
+      "label": "Hide the messaging pop-up",
+      "description": "The Messaging box fixed to the bottom right.",
       "group": "content",
       "default": false
     }
@@ -188,6 +216,51 @@
       "option": "promo-sections",
       "target": {
         "css": "footer.li-footer"
+      }
+    },
+    {
+      "id": "feed-aside",
+      "label": "Feed sidebars",
+      "type": "hide",
+      "option": "feed-sidebar",
+      "target": {
+        "css": ".scaffold-layout__aside, .scaffold-layout__sidebar"
+      }
+    },
+    {
+      "id": "messaging-bubble",
+      "label": "Messaging pop-up",
+      "type": "hide",
+      "option": "messaging-overlay",
+      "target": {
+        "css": ".msg-overlay-container"
+      }
+    },
+    {
+      "id": "ad-banners",
+      "label": "Ad banners",
+      "type": "hide",
+      "option": "promoted",
+      "target": {
+        "css": ".ad-banner-container, .ad-banner, .feed-shared-update-v2:has(.update-components-actor__sub-description a[href*=\"/ad\"])"
+      }
+    },
+    {
+      "id": "premium-links",
+      "label": "Premium links and cards",
+      "type": "hide",
+      "option": "premium-upsell",
+      "target": {
+        "css": ".premium-upsell-link, .premium-upsell-card, a[href*=\"/premium/products\"]"
+      }
+    },
+    {
+      "id": "google-one-tap",
+      "label": "Google One Tap prompt",
+      "type": "hide",
+      "option": "signin-popup",
+      "target": {
+        "css": "#credential_picker_container"
       }
     }
   ],

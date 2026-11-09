@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "tiktok.default",
   "name": "TikTok",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "origin": "bundled",
   "match": ["https://*.tiktok.com/*"],
   "options": [
@@ -38,6 +38,34 @@
       "id": "counters",
       "label": "Hide like, comment and view counts",
       "description": "Like, comment and share numbers, view counts on thumbnails, and follower, following and likes totals on profiles.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "sidebar-nav",
+      "label": "Hide LIVE, Explore and Short dramas",
+      "description": "These entries in the left sidebar. For You, Following, Upload and Profile stay.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "sidebar-footer",
+      "label": "Hide the sidebar footer",
+      "description": "The Company, Programme and Terms links under the sidebar.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "for-you-feed",
+      "label": "Hide the For You feed",
+      "description": "The endless video feed on the home page.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "captions",
+      "label": "Hide captions and hashtags",
+      "description": "The description text over and beside each video.",
       "group": "content",
       "default": false
     }
@@ -221,6 +249,51 @@
       "option": "counters",
       "target": {
         "css": "[data-e2e=\"video-views\"], [data-e2e=\"video-likes\"]"
+      }
+    },
+    {
+      "id": "nav-live",
+      "label": "LIVE in the sidebar",
+      "type": "hide",
+      "option": "sidebar-nav",
+      "target": {
+        "css": "[data-e2e=\"nav-live\"], button[aria-label=\"LIVE\"]"
+      }
+    },
+    {
+      "id": "nav-explore-shortdrama",
+      "label": "Explore and Short dramas in the sidebar",
+      "type": "hide",
+      "option": "sidebar-nav",
+      "target": {
+        "css": "[data-e2e=\"nav-explore\"], a[href^=\"/shortdrama\"], button[aria-label=\"Explore\"], button[aria-label=\"Short dramas\"]"
+      }
+    },
+    {
+      "id": "sidebar-footer-links",
+      "label": "Footer links in the sidebar",
+      "type": "hide",
+      "option": "sidebar-footer",
+      "target": {
+        "css": "div[class*=\"DivFooterContainer\"]"
+      }
+    },
+    {
+      "id": "for-you-list",
+      "label": "Videos in the For You feed",
+      "type": "hide",
+      "option": "for-you-feed",
+      "target": {
+        "css": "#main-content-homepage_hot"
+      }
+    },
+    {
+      "id": "video-captions",
+      "label": "Video captions",
+      "type": "hide",
+      "option": "captions",
+      "target": {
+        "css": "[data-e2e=\"video-desc\"], [data-e2e=\"browse-video-desc\"]"
       }
     }
   ],
