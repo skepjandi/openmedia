@@ -158,9 +158,10 @@ fn spawn_poller<R: Runtime>(inner: Weak<Inner<R>>) -> Result<()> {
 }
 
 /// Only web pages are shown: every other scheme (`mailto:`, `tel:`, app store links) is refused,
-/// as on mobile. `about:` covers blank and `srcdoc` frames.
+/// as on mobile. `about:` covers blank and `srcdoc` frames. The popup-close address is refused
+/// too, so a page that is not a popup cannot load it.
 fn allows_navigation(url: &Url) -> bool {
-    matches!(url.scheme(), "http" | "https" | "about")
+    url.as_str() != POPUP_CLOSE_URL && matches!(url.scheme(), "http" | "https" | "about")
 }
 
 fn scope_contains(scope: &str, host: &str) -> bool {
@@ -180,7 +181,9 @@ fn open_in_browser(url: &Url) {
 
 /// WebKit does not tell the app when a page calls `window.close()`, which is how a sign-in popup
 /// ends. The script turns that call into a navigation to this address, which the popup refuses
-/// and closes itself on.
+/// and closes itself on. A popup is built on its opener's web view configuration and so shares the
+/// opener's user content controller: wry skips a popup's own initialization scripts, and the script
+/// reaches it only through the one the site view was built with.
 const POPUP_CLOSE_URL: &str = "https://openmedia.invalid/__close_popup__";
 const POPUP_CLOSE_SCRIPT: &str = "(function(){var c=function(){location.href='https://openmedia.invalid/__close_popup__'};try{Object.defineProperty(window,'close',{value:c,configurable:true,writable:true})}catch(e){window.close=c}})();";
 static POPUPS: AtomicU64 = AtomicU64::new(0);
@@ -199,7 +202,6 @@ fn open_popup<R: Runtime>(
         WebviewWindowBuilder::new(app, &label, WebviewUrl::External(blank))
             .window_features(features)
             .user_agent(SAFARI_USER_AGENT)
-            .initialization_script(POPUP_CLOSE_SCRIPT)
             .on_document_title_changed(|window, title| {
                 let _ = window.set_title(&title);
             })
@@ -350,6 +352,7 @@ impl<R: Runtime> Inner<R> {
                     }
                 }
             });
+        builder = builder.initialization_script(POPUP_CLOSE_SCRIPT);
         if !script.is_empty() {
             builder = builder.initialization_script(script);
         }
@@ -805,6 +808,7 @@ mod tests {
             "file:///etc/passwd",
             "tauri://localhost/",
             "itms-apps://apps.apple.com/",
+            POPUP_CLOSE_URL,
         ] {
             assert!(
                 !allows_navigation(&Url::parse(refused).unwrap()),

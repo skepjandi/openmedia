@@ -8,6 +8,16 @@ All notable changes to OpenMedia are documented here.
 
 ## 2026-11-10
 
+### fix(siteview): sign-in popups close when the sign-in finishes on macOS
+
+**What:** The in-app sign-in popup stayed open after the sign-in was done, because the page's `window.close()` did nothing.
+
+**Change:** The script that turns `window.close()` into a navigation the popup closes on was given to the popup as its own initialization script, but a popup shares its opener's user content controller and wry skips a popup's own scripts, so it never ran. It is now injected with every site view's scripts, which the popup inherits. The address it navigates to is refused in site views too, so a page that is not a popup stays where it is.
+
+**Verified:** debug build against a local fixture (a page that opens a cross-host popup, which posts to `window.opener` and calls `window.close()`): the popup window closed about 1.4 s after it appeared and the opener received the message; on the previous code the popup stayed open after the page had finished. Unit test for the refused address. **Not verified:** a real Google or Apple sign-in on the Mac; popups that lose `window.opener` to a Cross-Origin-Opener-Policy.
+
+**PR:** n/a
+
 ### fix(siteview): sign-in popups open inside the app on macOS
 
 **What:** A page's `window.open` to another domain (Google sign-in) or a `target=_blank` link out of the session's domain opened the Mac's default browser, so the sign-in could never report back to the page.
