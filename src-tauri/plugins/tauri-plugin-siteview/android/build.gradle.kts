@@ -39,5 +39,5 @@ dependencies {
     implementation("androidx.browser:browser:1.9.0")
     implementation(project(":tauri-android"))
     testImplementation("junit:junit:4.13.2")
-    testImplementation("org.json:json:20250107")
+    testImplementation("org.json:json:20260814")
 }
