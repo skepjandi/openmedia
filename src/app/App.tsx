@@ -50,7 +50,6 @@ export function App() {
   const theme = useApp((s) => s.state?.theme ?? "system");
   const locale = useApp(selectLocale);
   const incognito = useApp((s) => s.incognito.active);
-  const desktop = useApp((s) => s.desktop);
   const t = useT();
   const [idle, setIdle] = useState(false);
   useApplyTheme(theme);
@@ -75,10 +74,6 @@ export function App() {
   useEffect(() => {
     document.documentElement.dataset.incognito = String(incognito);
   }, [incognito]);
-
-  useEffect(() => {
-    document.documentElement.dataset.desktop = String(desktop);
-  }, [desktop]);
 
   useEffect(() => startUsageTracking(), []);
 
@@ -112,7 +107,6 @@ export function App() {
         <button
           type="button"
           data-hit=""
-          data-dock="bottom"
           onClick={() => reportError(null)}
           className="glass fixed inset-x-3 bottom-[calc(var(--safe-bottom)+12px)] z-20 rounded-2xl px-4 py-3 text-start text-sm text-accent"
         >

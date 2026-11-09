@@ -49,7 +49,6 @@ function TimeCheck({ host }: { host: string }) {
   return (
     <div
       data-hit=""
-      data-dock="top"
       role="status"
       className="usage-warning glass fixed inset-x-3 top-[calc(var(--safe-top)+12px)] z-30 rounded-2xl p-4"
     >

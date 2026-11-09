@@ -80,6 +80,11 @@ pub fn content_insets<R: Runtime>(webview: &Webview<R>) -> Result<(f64, f64, f64
     })
 }
 
+/// Prepares the shell's web view (see `shell.rs`); run it again after each page view is added.
+pub fn prepare_shell<R: Runtime>(shell: &Webview<R>) -> Result<()> {
+    with_view(shell, super::shell::prepare)
+}
+
 /// Turns on the trackpad gestures a Mac browser has: a two-finger swipe goes back and forward
 /// through the page's history, and pinching or double-tapping with two fingers zooms.
 pub fn enable_gestures<R: Runtime>(webview: &Webview<R>) -> Result<()> {

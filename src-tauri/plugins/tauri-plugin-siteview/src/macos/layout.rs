@@ -1,26 +1,19 @@
-//! Where the page sits in the window and when the shell covers it.
+//! Where the page sits in the window and when the shell has taken the keyboard.
 //!
-//! On desktop the page is a child webview above the shell, so shell controls cannot float over it
-//! as they do on mobile. The shell keeps its permanent controls beside the page and reports its
-//! interactive regions here; a region that reaches into the page is an overlay, and the page steps
-//! aside (is hidden) while it is open.
+//! The shell is a transparent layer above the page (see `shell.rs`), so overlays such as the
+//! command bar, Settings and the fan draw over the page, as on mobile. What the plugin still has
+//! to know is whether one of them is open: the keyboard belongs to it then, not to the page.
 
 use crate::Rect;
 
-/// How far, per axis, a region must reach into the page to count as covering it. Regions carry a
-/// few pixels of padding around their element, so a control standing next to the page brushes it
-/// without covering it.
-const COVER_DEPTH: f64 = 24.0;
+/// A region this share of the page, in both directions, is an overlay rather than a control.
+const OVERLAY_SHARE: f64 = 0.6;
 
-fn overlap(a_start: f64, a_len: f64, b_start: f64, b_len: f64) -> f64 {
-    (a_start + a_len).min(b_start + b_len) - a_start.max(b_start)
-}
-
-/// True when any region reaches deep enough into `page` to hide part of it.
-pub fn is_covered(page: &Rect, regions: &[Rect]) -> bool {
+/// True when any region spans most of `page`: a sheet, the command bar or the fan's backdrop.
+/// The floating button, the back button and a docked panel are too small to count.
+pub fn overlay_open(page: &Rect, regions: &[Rect]) -> bool {
     regions.iter().any(|region| {
-        overlap(page.x, page.width, region.x, region.width) >= COVER_DEPTH.min(page.width)
-            && overlap(page.y, page.height, region.y, region.height) >= COVER_DEPTH.min(page.height)
+        region.width >= page.width * OVERLAY_SHARE && region.height >= page.height * OVERLAY_SHARE
     })
 }
 
@@ -42,9 +35,9 @@ mod tests {
     use super::*;
 
     const PAGE: Rect = Rect {
-        x: 84.0,
+        x: 0.0,
         y: 0.0,
-        width: 716.0,
+        width: 800.0,
         height: 600.0,
     };
 
@@ -58,44 +51,24 @@ mod tests {
     }
 
     #[test]
-    fn a_full_screen_overlay_covers_the_page() {
-        assert!(is_covered(&PAGE, &[region(0.0, 0.0, 800.0, 600.0)]));
+    fn a_full_screen_overlay_is_open() {
+        assert!(overlay_open(&PAGE, &[region(0.0, 0.0, 800.0, 600.0)]));
     }
 
     #[test]
-    fn a_control_in_the_rail_does_not_cover_the_page() {
-        // The floating button, 64 wide with 8 of padding on each side, ends 4 short of the page.
-        assert!(!is_covered(&PAGE, &[region(2.0, 300.0, 80.0, 80.0)]));
-        // Padding that brushes the page by a few pixels is still not a cover.
-        assert!(!is_covered(&PAGE, &[region(10.0, 300.0, 80.0, 80.0)]));
+    fn the_floating_button_and_a_docked_panel_are_not_overlays() {
+        assert!(!overlay_open(&PAGE, &[region(720.0, 300.0, 80.0, 80.0)]));
+        assert!(!overlay_open(&PAGE, &[region(12.0, 520.0, 776.0, 76.0)]));
     }
 
     #[test]
-    fn a_dock_the_page_made_room_for_does_not_cover_it() {
-        // The shell shortens the page to 520 when a 60 high dock sits at the bottom.
-        let page = Rect {
-            height: 520.0,
-            ..PAGE
-        };
-        assert!(!is_covered(&page, &[region(4.0, 524.0, 792.0, 76.0)]));
-        assert!(is_covered(&PAGE, &[region(4.0, 524.0, 792.0, 76.0)]));
+    fn a_tall_but_narrow_panel_is_not_an_overlay() {
+        assert!(!overlay_open(&PAGE, &[region(0.0, 0.0, 200.0, 600.0)]));
     }
 
     #[test]
-    fn a_panel_over_part_of_the_page_covers_it() {
-        assert!(is_covered(&PAGE, &[region(100.0, 20.0, 600.0, 120.0)]));
-    }
-
-    #[test]
-    fn no_regions_cover_nothing() {
-        assert!(!is_covered(&PAGE, &[]));
-    }
-
-    #[test]
-    fn a_page_smaller_than_the_depth_is_covered_by_an_overlay_over_all_of_it() {
-        let sliver = region(0.0, 0.0, 10.0, 10.0);
-        assert!(is_covered(&sliver, &[region(0.0, 0.0, 100.0, 100.0)]));
-        assert!(!is_covered(&sliver, &[region(5.0, 5.0, 100.0, 100.0)]));
+    fn no_regions_is_no_overlay() {
+        assert!(!overlay_open(&PAGE, &[]));
     }
 
     #[test]

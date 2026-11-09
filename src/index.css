@@ -59,12 +59,6 @@ input {
   font-variant-ligatures: none;
 }
 
-/* Desktop: the page is a view above the shell, and the shell fills the window behind it. */
-:root[data-desktop="true"],
-:root[data-desktop="true"] body {
-  background: var(--color-ink);
-}
-
 .glass {
   background: var(--glass);
   -webkit-backdrop-filter: blur(18px) saturate(1.3);

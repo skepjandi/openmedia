@@ -1,10 +1,9 @@
 //! Site views on macOS: one Tauri child webview per session, stacked above the shell.
 //!
-//! The shell is the window's own webview. The page cannot be drawn under it, as on mobile (a
-//! transparent webview needs a private macOS API), so the shell lays itself out around the page
-//! and reports the rectangle the page takes (`set_rect`). A shell overlay that reaches into that
-//! rectangle is reported through `set_interactive_regions`, and the page steps aside while it is
-//! open; see [`layout`].
+//! The shell is the window's own webview, kept above the page views and transparent, as on
+//! mobile: it reports the rectangle the page takes (`set_rect`) and the regions where it wants
+//! clicks (`set_interactive_regions`); everywhere else a click goes to the page below. See
+//! [`shell`] for how that is done.
 //!
 //! Tauri's webview API has no navigation state, so a poll thread reads it from the `WKWebView`
 //! (see [`native`]) and reports changes as `siteview:state`, the same event mobile sends.
@@ -15,6 +14,7 @@ mod favicon;
 mod layout;
 mod native;
 mod notify;
+mod shell;
 
 use std::{
     collections::HashMap,
@@ -312,21 +312,20 @@ impl<R: Runtime> Inner<R> {
     /// Puts every view where it belongs: the active one visible unless the shell covers it or the
     /// session is closed for the day, the rest hidden.
     fn sync_views(&self) {
-        let (rect, views) = {
+        let (rect, overlay, views) = {
             let state = self.state();
             let rect = state.rect.and_then(layout::usable);
-            let covered = rect.is_some_and(|rect| layout::is_covered(&rect, &state.regions));
+            let overlay = rect.is_some_and(|rect| layout::overlay_open(&rect, &state.regions));
             let views: Vec<(Webview<R>, bool)> = state
                 .sessions
                 .iter()
                 .map(|(id, session)| {
-                    let shown = state.active.as_deref() == Some(id.as_str())
-                        && !covered
-                        && !state.blocked.contains(id);
+                    let shown =
+                        state.active.as_deref() == Some(id.as_str()) && !state.blocked.contains(id);
                     (session.webview.clone(), shown)
                 })
                 .collect();
-            (rect, views)
+            (rect, overlay, views)
         };
         // Asked of the main thread, so never while the state lock is held.
         let bounds = rect.and_then(|rect| self.page_bounds(Some(rect)).ok());
@@ -343,16 +342,16 @@ impl<R: Runtime> Inner<R> {
                 webview.hide()
             };
         }
-        let focus = views.iter().find(|(_, shown)| *shown).map_or_else(
-            || MAIN_WINDOW.to_owned(),
-            |(webview, _)| webview.label().to_owned(),
-        );
+        let page = views.iter().find(|(_, shown)| *shown);
+        let focus = match page {
+            Some((webview, _)) if !overlay => webview.label().to_owned(),
+            _ => MAIN_WINDOW.to_owned(),
+        };
         self.focus(&focus);
     }
 
-    /// Gives the keyboard to the page showing, or to the shell while an overlay covers the page:
-    /// a hidden web view would otherwise keep every key press, and Escape would never reach the
-    /// shell.
+    /// Gives the keyboard to the page showing, or to the shell while an overlay is open: the page
+    /// would otherwise keep every key press, and Escape would never reach the shell.
     fn focus(&self, label: &str) {
         let mut focused = self.focused.lock().unwrap_or_else(PoisonError::into_inner);
         if focused.as_deref() == Some(label) {
@@ -362,6 +361,13 @@ impl<R: Runtime> Inner<R> {
             let _ = webview.set_focus();
         }
         *focused = Some(label.to_owned());
+    }
+
+    /// Keeps the shell above the page views; a view added later would otherwise cover it.
+    fn raise_shell(&self) {
+        if let Some(shell) = self.app.get_webview(MAIN_WINDOW) {
+            let _ = native::prepare_shell(&shell);
+        }
     }
 
     fn attach_rule_lists(&self, webview: &Webview<R>) {
@@ -412,6 +418,7 @@ impl<R: Runtime> Inner<R> {
             }
         }
         let _ = old.close();
+        self.raise_shell();
         self.attach_rule_lists(&webview);
         self.sync_views();
         Ok(())
@@ -527,6 +534,7 @@ impl<R: Runtime> Siteview<R> {
             );
             state.active = Some(request.session);
         }
+        inner.raise_shell();
         inner.attach_rule_lists(&webview);
         inner.sync_views();
         Ok(())
@@ -573,6 +581,7 @@ impl<R: Runtime> Siteview<R> {
     }
 
     pub fn set_interactive_regions(&self, request: SetInteractiveRegionsRequest) -> Result<()> {
+        shell::set_regions(request.regions.clone());
         self.inner.state().regions = request.regions;
         self.inner.sync_views();
         Ok(())

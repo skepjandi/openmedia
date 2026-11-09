@@ -3,7 +3,6 @@ import { library, siteView, type SiteViewState } from "../../shared/ipc";
 import { appError, selectPage, useApp } from "../../app/store";
 import { pageShowing } from "../../app/splash";
 import { useT } from "../../i18n/useT";
-import { railsFor, useDockReserve } from "./desktopLayout";
 import { usePageMargin } from "./usePageMargin";
 import { readRect, useSiteViewRect } from "./useSiteViewRect";
 import { observeTitle, quickFavoriteOf, type Watch } from "./unreadWatch";
@@ -40,12 +39,6 @@ export function WebLayer() {
   const [listening, setListening] = useState(false);
 
   const bottomMargin = usePageMargin();
-  const desktop = useApp((s) => s.desktop);
-  const fabEdge = useApp((s) => s.fabEdge);
-  const backButton = useApp((s) => s.state?.backButton ?? false);
-  const rails = railsFor(desktop, fabEdge, backButton);
-  const docks = useDockReserve(desktop);
-  const pageBottom = Math.max(bottomMargin, docks.bottom);
 
   useSiteViewRect(slot);
 
@@ -135,13 +128,8 @@ export function WebLayer() {
       )}
       <div
         ref={slot}
-        className="pointer-events-none fixed"
-        style={{
-          left: rails.left,
-          right: rails.right,
-          top: `calc(var(--safe-top) + ${docks.top}px)`,
-          bottom: pageBottom,
-        }}
+        className="pointer-events-none fixed inset-x-0 top-[var(--safe-top)]"
+        style={{ bottom: bottomMargin }}
       >
         {opening && (
           <div role="status" className="absolute inset-0 grid place-items-center">
@@ -155,7 +143,7 @@ export function WebLayer() {
       </div>
       <div
         aria-hidden="true"
-        style={{ height: pageBottom }}
+        style={{ height: bottomMargin }}
         className="fixed inset-x-0 bottom-0 bg-ink"
       />
       <div className="fixed inset-x-0 top-0 h-[var(--safe-top)] bg-ink" />
