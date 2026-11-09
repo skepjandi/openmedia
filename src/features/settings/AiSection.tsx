@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { appError, useApp } from "../../app/store";
 import type { Translate } from "../../i18n/translate";
 import { useT } from "../../i18n/useT";
-import { ForwardIcon, LockIcon, PlusIcon } from "../../shared/icons";
+import { ForwardIcon, ProIcon, PlusIcon } from "../../shared/icons";
 import { ai, type AiState, type Provider, type ProviderKind } from "../../shared/ipc";
 import { Picker } from "./Picker";
 import { PRESETS } from "./presets";
@@ -95,7 +95,7 @@ export function AiSection() {
           className="mb-3 flex w-full items-center gap-3 rounded-2xl border border-hair bg-paper/[0.04] px-4 py-3.5 text-start active:bg-paper/[0.08]"
         >
           <span className="pro-badge grid size-9 shrink-0 place-items-center rounded-full">
-            <LockIcon size={16} />
+            <ProIcon size={16} />
           </span>
           <span className="min-w-0 flex-1">
             <span className="block text-base font-medium">{t("paywall.title")}</span>

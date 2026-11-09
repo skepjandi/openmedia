@@ -8,6 +8,14 @@ All notable changes to OpenMedia are documented here.
 
 ## 2026-11-09
 
+### fix(shell): a crown for Pro, a fingerprint for biometric checks
+
+**Problem:** the same padlock marked what the paywall unlocks (Usage, Incognito, Chat, the extra favorites slots, the AI card) and what asks for Face ID, Touch ID or the passcode (the locked incognito sections in Settings), so the two could not be told apart.
+
+**Change:** `LockIcon` is gone. `ProIcon` (a crown) marks every paywall gate; `BiometricIcon` (a fingerprint) marks the locked incognito sections. The Incognito fan button shows the crown without Pro, and a fingerprint badge once Pro is active, because entering then asks for the check. See [UI Design](docs/wiki/ui-design.md).
+
+**Verified:** `tsc`, ESLint, Prettier, frontend tests; both icons rendered in a standalone SVG and read as a crown and a fingerprint. **Not verified:** how they read at 12 px in the fan and in Settings on a device.
+
 ### feat(shell): floating back button always visible and closes sheets; history records sites opened from a search
 
 **Problem:** the optional floating back button disappeared when Settings or any sheet was open, and only went back in the page. Sites opened from search results were never in History, because only typed addresses were recorded.

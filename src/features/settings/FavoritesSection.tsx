@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useApp } from "../../app/store";
 import { useT } from "../../i18n/useT";
 import { FREE_QUICK_ACCESS_LIMIT, QUICK_ACCESS_LIMIT } from "../../shared/favorites";
-import { DownIcon, LockIcon, PlusIcon, UpIcon } from "../../shared/icons";
+import { DownIcon, ProIcon, PlusIcon, UpIcon } from "../../shared/icons";
 import type { Favorite, FavoriteInput } from "../../shared/ipc";
 import { SiteTile } from "../../shared/SiteTile";
 import { normalizeWebUrl } from "../../shared/url";
@@ -141,7 +141,7 @@ export function FavoritesEditor({ favorites, save, emptyText }: EditorListProps)
           className="mt-5 flex w-full items-center justify-between px-1 pt-1 pb-2 text-start text-[13px] font-medium text-paper/60"
         >
           <span className="flex items-center gap-2">
-            <LockIcon size={14} />
+            <ProIcon size={14} />
             {t("favorites.moreLocked")}
           </span>
           <span aria-hidden="true" className="text-paper/45">
@@ -169,7 +169,7 @@ export function FavoritesEditor({ favorites, save, emptyText }: EditorListProps)
             className="flex items-center gap-2 px-1 py-1 text-sm font-medium text-accent"
           >
             <PlusIcon /> {t("favorites.add")}
-            {!isPro && favorites.length >= limit && <LockIcon size={14} />}
+            {!isPro && favorites.length >= limit && <ProIcon size={14} />}
           </button>
         )}
       </div>
@@ -201,7 +201,7 @@ function LockedFavoriteRow({
           <SiteTile name={favorite.name} icon={favorite.icon} />
         ) : (
           <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-paper/[0.08]">
-            <LockIcon size={16} />
+            <ProIcon size={16} />
           </span>
         )}
         <span className="min-w-0 flex-1">
@@ -212,7 +212,7 @@ function LockedFavoriteRow({
         </span>
       </span>
       <span className="pro-badge grid size-6 shrink-0 place-items-center rounded-full">
-        <LockIcon size={12} />
+        <ProIcon size={12} />
       </span>
     </button>
   );

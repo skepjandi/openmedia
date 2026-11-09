@@ -1,5 +1,5 @@
 import { useEffect, useState, type ReactNode } from "react";
-import { LockIcon } from "../../shared/icons";
+import { BiometricIcon } from "../../shared/icons";
 
 export const field =
   "w-full min-w-0 rounded-xl border border-hair bg-paper/[0.05] px-3 py-2.5 text-base text-paper outline-none placeholder:text-paper/35 focus:border-accent";
@@ -115,7 +115,7 @@ export function LockedSection({
         className="flex w-full cursor-pointer items-center justify-between px-1 py-2 text-start text-sm font-semibold text-paper disabled:opacity-60"
       >
         <span className="flex items-center gap-2">
-          {!open && <LockIcon />}
+          {!open && <BiometricIcon />}
           {title}
         </span>
         <span aria-hidden="true" className={`text-paper/45 ${open ? "rotate-180" : ""}`}>

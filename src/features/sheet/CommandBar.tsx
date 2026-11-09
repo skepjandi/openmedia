@@ -9,7 +9,7 @@ import {
   BackIcon,
   CloseIcon,
   ForwardIcon,
-  LockIcon,
+  ProIcon,
   ReloadIcon,
   StarIcon,
 } from "../../shared/icons";
@@ -183,7 +183,7 @@ export function CommandBar() {
                     } ${locked ? "opacity-45" : ""}`}
                   >
                     {t(`commandBar.mode.${option}`)}
-                    {locked && <LockIcon size={12} />}
+                    {locked && <ProIcon size={12} />}
                   </button>
                 );
               })}

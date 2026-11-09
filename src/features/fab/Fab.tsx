@@ -27,7 +27,14 @@ import {
   type GestureState,
 } from "./gesture";
 import { loadPosition, savePosition, type FabPosition } from "./position";
-import { HistoryIcon, IncognitoIcon, LockIcon, SlidersIcon, StatsIcon } from "../../shared/icons";
+import {
+  BiometricIcon,
+  HistoryIcon,
+  IncognitoIcon,
+  ProIcon,
+  SlidersIcon,
+  StatsIcon,
+} from "../../shared/icons";
 import { useBackHandler } from "../back/useBackHandler";
 import logoMark from "../../assets/logo-mark.svg";
 import { useEntitlementStore } from "../paywall/store";
@@ -239,7 +246,7 @@ export function Fab() {
           ) : favorite ? (
             monogram(favorite.name)
           ) : (
-            <LockIcon />
+            <ProIcon />
           )}
           {favorite && (
             <span
@@ -254,7 +261,7 @@ export function Fab() {
           )}
           {locked && favorite && (
             <span className="pro-badge absolute -end-1.5 -top-1.5 z-10 grid size-5 place-items-center rounded-full">
-              <LockIcon size={12} />
+              <ProIcon size={12} />
             </span>
           )}
           {unread[index] > 0 && <UnreadBadge count={unread[index]} />}
@@ -305,7 +312,7 @@ export function Fab() {
         <StatsIcon />
         {!isPro && (
           <span className="pro-badge absolute -end-1.5 -top-1.5 z-10 grid size-5 place-items-center rounded-full">
-            <LockIcon size={12} />
+            <ProIcon size={12} />
           </span>
         )}
       </button>
@@ -334,10 +341,16 @@ export function Fab() {
         } ${incognito.active ? "" : "text-white"} ${incognito.busy ? "animate-pulse" : ""}`}
       >
         <IncognitoIcon active={incognito.active} />
-        {!isPro && (
+        {!isPro ? (
           <span className="pro-badge absolute -end-1.5 -top-1.5 z-10 grid size-5 place-items-center rounded-full">
-            <LockIcon size={12} />
+            <ProIcon size={12} />
           </span>
+        ) : (
+          !incognito.active && (
+            <span className="absolute -end-1.5 -top-1.5 z-10 grid size-5 place-items-center rounded-full border border-white/70 bg-black/80 text-white">
+              <BiometricIcon size={12} />
+            </span>
+          )
         )}
         {incognito.active && (
           <span
