@@ -168,7 +168,7 @@ export const cs: Messages = {
   "settings.adBlock": "Blokovat reklamy a sledovače",
   "settings.backButton": "Plovoucí tlačítko Zpět",
   "settings.backButtonNote": "Zobrazí se vždy, když je na stránce kam se vrátit.",
-  "settings.bottomMargin": "Spodní okraj",
+  "settings.bottomMargin": "Globální spodní okraj",
   "settings.bottomMarginNote":
     "Udržuje spodní část každé stránky volnou, pro nabídky, které se vysouvají zpod okraje obrazovky.",
   "settings.bottomMarginLabel": "Spodní okraj pro všechny weby",

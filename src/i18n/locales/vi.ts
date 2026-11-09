@@ -163,7 +163,7 @@ export const vi: Messages = {
   "settings.adBlock": "Chặn quảng cáo và trình theo dõi",
   "settings.backButton": "Nút quay lại nổi",
   "settings.backButtonNote": "Hiện khi trang có nơi để quay lại.",
-  "settings.bottomMargin": "Lề dưới",
+  "settings.bottomMargin": "Lề dưới chung",
   "settings.bottomMarginNote":
     "Giữ phần dưới mọi trang trống, cho các menu trượt xuống dưới mép màn hình.",
   "settings.bottomMarginLabel": "Lề dưới cho mọi trang",

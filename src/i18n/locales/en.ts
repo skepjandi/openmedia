@@ -169,7 +169,7 @@ export const en = {
   "settings.adBlock": "Block ads and trackers",
   "settings.backButton": "Floating back button",
   "settings.backButtonNote": "Shown whenever the page has somewhere to go back to.",
-  "settings.bottomMargin": "Bottom margin",
+  "settings.bottomMargin": "Global bottom margin",
   "settings.bottomMarginNote":
     "Keeps the bottom of every page clear, for menus that slide under the screen edge.",
   "settings.bottomMarginLabel": "Bottom margin for all sites",

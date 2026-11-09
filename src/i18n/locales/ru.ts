@@ -168,7 +168,7 @@ export const ru: Messages = {
   "settings.adBlock": "Блокировать рекламу и трекеры",
   "settings.backButton": "Плавающая кнопка «Назад»",
   "settings.backButtonNote": "Показывается, когда странице есть куда вернуться.",
-  "settings.bottomMargin": "Нижнее поле",
+  "settings.bottomMargin": "Общее нижнее поле",
   "settings.bottomMarginNote":
     "Оставляет низ каждой страницы свободным — для меню, которые уезжают под край экрана.",
   "settings.bottomMarginLabel": "Нижнее поле для всех сайтов",

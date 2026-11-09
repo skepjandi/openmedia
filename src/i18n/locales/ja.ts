@@ -165,7 +165,7 @@ export const ja: Messages = {
   "settings.adBlock": "広告とトラッカーをブロック",
   "settings.backButton": "フローティング戻るボタン",
   "settings.backButtonNote": "戻れるページがあるときに表示されます。",
-  "settings.bottomMargin": "下余白",
+  "settings.bottomMargin": "共通の下余白",
   "settings.bottomMarginNote":
     "画面下端に潜り込むメニューでもできるよう、各ページの下側を空けておきます。",
   "settings.bottomMarginLabel": "すべてのサイトの下余白",

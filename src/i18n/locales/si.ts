@@ -164,7 +164,7 @@ export const si: Messages = {
   "settings.adBlock": "දැනුම්දීම් සහ ලකුණු අවලංගු කරන්න",
   "settings.backButton": "පාවෙනි ආපසු බොත්තක්",
   "settings.backButtonNote": "පිටුවට ආපසු යාමට තැනක් ඇති විට පෙන්වනු ලැබේ.",
-  "settings.bottomMargin": "පහළ දුරස්ථය",
+  "settings.bottomMargin": "සර්වත්‍ර පහළ දුරස්ථය",
   "settings.bottomMarginNote":
     "තිරයේ පහළ දෙළුණට යටතින් ගලා එන මෙනු සඳහා සෑම පිටුවකම පහළ කොටස හිස්ව තබයි.",
   "settings.bottomMarginLabel": "සියලුම අඩවි සඳහා පහළ දුරස්ථය",

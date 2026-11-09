@@ -162,7 +162,7 @@ export const id: Messages = {
   "settings.adBlock": "Blokir iklan dan pelacak",
   "settings.backButton": "Tombol kembali mengambang",
   "settings.backButtonNote": "Muncul saat halaman punya tempat untuk kembali.",
-  "settings.bottomMargin": "Margin bawah",
+  "settings.bottomMargin": "Margin bawah global",
   "settings.bottomMarginNote":
     "Menjaga bagian bawah setiap halaman tetap kosong, untuk menu yang meluncur ke bawah tepi layar.",
   "settings.bottomMarginLabel": "Margin bawah untuk semua situs",

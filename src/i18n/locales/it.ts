@@ -171,7 +171,7 @@ export const it: Messages = {
   "settings.backButton": "Pulsante Indietro fluttuante",
   "settings.backButtonNote":
     "Mostrato ogni volta che la pagina ha una schermata precedente da cui tornare.",
-  "settings.bottomMargin": "Margine inferiore",
+  "settings.bottomMargin": "Margine inferiore globale",
   "settings.bottomMarginNote":
     "Mantiene libera la parte inferiore di ogni pagina, per i menu che scorrono sotto il bordo dello schermo.",
   "settings.bottomMarginLabel": "Margine inferiore per tutti i siti",

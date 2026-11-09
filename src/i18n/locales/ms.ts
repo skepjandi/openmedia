@@ -163,7 +163,7 @@ export const ms: Messages = {
   "settings.adBlock": "Blokir iklan dan penjejak",
   "settings.backButton": "Butang kembali terapung",
   "settings.backButtonNote": "Dipaparkan apabila halaman ada tempat untuk kembali.",
-  "settings.bottomMargin": "Margin bawah",
+  "settings.bottomMargin": "Margin bawah global",
   "settings.bottomMarginNote":
     "Menjaga bahagian bawah setiap halaman kosong, untuk menu yang meluncur ke bawah tepi skrin.",
   "settings.bottomMarginLabel": "Margin bawah untuk semua laman",

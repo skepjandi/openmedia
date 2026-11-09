@@ -170,7 +170,7 @@ export const fr: Messages = {
   "settings.adBlock": "Bloquer les publicités et les traceurs",
   "settings.backButton": "Bouton de retour flottant",
   "settings.backButtonNote": "Affiché chaque fois que la page peut revenir en arrière.",
-  "settings.bottomMargin": "Marge inférieure",
+  "settings.bottomMargin": "Marge inférieure globale",
   "settings.bottomMarginNote":
     "Garde le bas de chaque page dégagé, pour les menus qui glissent sous le bord de l’écran.",
   "settings.bottomMarginLabel": "Marge inférieure pour tous les sites",

@@ -163,7 +163,7 @@ export const ar: Messages = {
   "settings.adBlock": "حجب الإعلانات وأدوات التتبع",
   "settings.backButton": "زر رجوع عائم",
   "settings.backButtonNote": "يظهر كلما كان في الصفحة ما يمكن الرجوع إليه.",
-  "settings.bottomMargin": "الهامش السفلي",
+  "settings.bottomMargin": "الهامش السفلي العام",
   "settings.bottomMarginNote": "يُبقي أسفل كل صفحة خاليًا، للقوائم التي تنزلق أسفل حافة الشاشة.",
   "settings.bottomMarginLabel": "الهامش السفلي لكل المواقع",
   "settings.data": "البيانات والمساعدة",

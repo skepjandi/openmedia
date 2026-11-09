@@ -8,6 +8,12 @@ All notable changes to OpenMedia are documented here.
 
 ## 2026-11-09
 
+### fix(settings): call the shared bottom margin "Global bottom margin"
+
+**Change:** the Browsing slider's title (`settings.bottomMargin`) now reads "Global bottom margin" in every language, to set it apart from the per-site margin on each recipe card.
+
+**Verified:** catalog tests, `tsc`, ESLint, Prettier. **Not verified:** native-speaker review of the 28 non-English strings; rendering.
+
 ### feat(paywall): free users get four quick-access slots; slots 5 and 6 and More favorites need Pro
 
 **Problem:** every user had six quick-access slots and an unlimited favorites list.

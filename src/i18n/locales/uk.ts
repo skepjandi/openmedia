@@ -168,7 +168,7 @@ export const uk: Messages = {
   "settings.adBlock": "Блокувати рекламу та трекери",
   "settings.backButton": "Плаваюча кнопка «Назад»",
   "settings.backButtonNote": "Показується, коли сторінці є куди повернутися.",
-  "settings.bottomMargin": "Нижнє поле",
+  "settings.bottomMargin": "Загальне нижнє поле",
   "settings.bottomMarginNote":
     "Залишає низ кожної сторінки вільним — для меню, що заїжджають за край екрана.",
   "settings.bottomMarginLabel": "Нижнє поле для всіх сайтів",

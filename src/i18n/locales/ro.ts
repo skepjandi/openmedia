@@ -167,7 +167,7 @@ export const ro: Messages = {
   "settings.adBlock": "Blochează reclamele și trackerele",
   "settings.backButton": "Buton Înapoi plutitor",
   "settings.backButtonNote": "Apare ori de câte ori pagina are unde să se întoarcă.",
-  "settings.bottomMargin": "Margine inferioară",
+  "settings.bottomMargin": "Margine inferioară globală",
   "settings.bottomMarginNote":
     "Lasă liberă partea de jos a fiecărei pagini, pentru meniurile care glisează sub marginea ecranului.",
   "settings.bottomMarginLabel": "Margine inferioară pentru toate site-urile",

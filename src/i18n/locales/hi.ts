@@ -163,7 +163,7 @@ export const hi: Messages = {
   "settings.adBlock": "विज्ञापन और ट्रैकर ब्लॉक करें",
   "settings.backButton": "तैरता वापसी बटन",
   "settings.backButtonNote": "तब दिखता है जब पृष्ठ में वापस जाने की जगह हो।",
-  "settings.bottomMargin": "निचली मार्जिन",
+  "settings.bottomMargin": "वैश्विक निचली मार्जिन",
   "settings.bottomMarginNote":
     "हर पृष्ठ का निचला हिस्सा खाली रखता है, ताकि स्क्रीन के किनारे के नीचे खिसकने वाले मेनू दिख सकें।",
   "settings.bottomMarginLabel": "सभी साइटों के लिए निचली मार्जिन",

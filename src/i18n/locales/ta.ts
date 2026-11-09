@@ -169,7 +169,7 @@ export const ta: Messages = {
   "settings.adBlock": "விளம்பரங்களையும் டிராக்கர்களையும் தடு",
   "settings.backButton": "மிதவை பின்செல் பொத்தான்",
   "settings.backButtonNote": "பக்கத்தில் பின்செல்ல வேண்டிய இடம் இருக்கும் போதெல்லாம் காட்டப்படும்.",
-  "settings.bottomMargin": "கீழ் விளிச்சை",
+  "settings.bottomMargin": "உலகளாவிய கீழ் விளிச்சை",
   "settings.bottomMarginNote":
     "திரையின் கீழ் விளிச்சைக்குள் செல்லும் பட்டிகளுக்காக, ஒவ்வொரு பக்கத்தின் கீழ்ப்பகுதியும் காலியாக வைக்கப்படுகிறது.",
   "settings.bottomMarginLabel": "அனைத்துத் தளங்களுக்கான கீழ் விளிச்சை",

@@ -161,7 +161,7 @@ export const de: Messages = {
   "settings.adBlock": "Werbung und Tracker blockieren",
   "settings.backButton": "Schwebende Zurück-Taste",
   "settings.backButtonNote": "Wird immer dann angezeigt, wenn du auf der Seite zurückgehen kannst.",
-  "settings.bottomMargin": "Unterer Rand",
+  "settings.bottomMargin": "Globaler unterer Rand",
   "settings.bottomMarginNote":
     "Hält den unteren Bereich jeder Seite frei, etwa für Menüs, die unter den Bildschirmrand gleiten.",
   "settings.bottomMarginLabel": "Unterer Rand für alle Websites",

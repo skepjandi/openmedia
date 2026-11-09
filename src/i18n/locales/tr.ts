@@ -166,7 +166,7 @@ export const tr: Messages = {
   "settings.adBlock": "Reklamları ve izleyicileri engelle",
   "settings.backButton": "Yüzen geri düğmesi",
   "settings.backButtonNote": "Sayfanın geri dönülecek bir yeri olduğunda görünür.",
-  "settings.bottomMargin": "Alt kenar boşluğu",
+  "settings.bottomMargin": "Genel alt kenar boşluğu",
   "settings.bottomMarginNote":
     "Ekran kenarının altına kayan menüler için her sayfanın altını boş bırakır.",
   "settings.bottomMarginLabel": "Tüm siteler için alt kenar boşluğu",

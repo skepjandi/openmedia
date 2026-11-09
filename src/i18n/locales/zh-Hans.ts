@@ -159,7 +159,7 @@ export const zhHans: Messages = {
   "settings.adBlock": "屏蔽广告和跟踪器",
   "settings.backButton": "悬浮返回按钮",
   "settings.backButtonNote": "只要页面有地方可以返回，就会显示。",
-  "settings.bottomMargin": "底部边距",
+  "settings.bottomMargin": "全局底部边距",
   "settings.bottomMarginNote": "为每个页面底部留出空白，方便那些滑到屏幕边缘下方的菜单。",
   "settings.bottomMarginLabel": "所有网站的底部边距",
   "settings.data": "数据与帮助",

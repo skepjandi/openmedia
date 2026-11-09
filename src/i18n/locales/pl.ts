@@ -167,7 +167,7 @@ export const pl: Messages = {
   "settings.adBlock": "Blokuj reklamy i skrypty śledzące",
   "settings.backButton": "Pływający przycisk wstecz",
   "settings.backButtonNote": "Widoczny zawsze, gdy strona ma dokąd się cofnąć.",
-  "settings.bottomMargin": "Dolny margines",
+  "settings.bottomMargin": "Globalny dolny margines",
   "settings.bottomMarginNote":
     "Zostawia wolne dół każdej strony, dla menu wysuwanych spod krawędzi ekranu.",
   "settings.bottomMarginLabel": "Dolny margines dla wszystkich witryn",

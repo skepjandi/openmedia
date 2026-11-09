@@ -162,7 +162,7 @@ export const bn: Messages = {
   "settings.adBlock": "বিজ্ঞাপন ও ট্র্যাকার ব্লক করুন",
   "settings.backButton": "ভাসমান ব্যাক বোতাম",
   "settings.backButtonNote": "পেজে ফিরে যাওয়ার কোনো জায়গা থাকলে এটি দেখা যায়।",
-  "settings.bottomMargin": "নিচের মার্জিন",
+  "settings.bottomMargin": "গ্লোবাল নিচের মার্জিন",
   "settings.bottomMarginNote":
     "স্ক্রিনের নিচের দিকে সরে যাওয়া মেনুর জন্য প্রতিটি পেজের নিচে ফাঁকা রাখে।",
   "settings.bottomMarginLabel": "সব সাইটের নিচের মার্জিন",

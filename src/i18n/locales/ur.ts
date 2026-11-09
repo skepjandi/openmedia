@@ -167,7 +167,7 @@ export const ur: Messages = {
   "settings.adBlock": "اشتہارات اور ٹریکرز روکیں",
   "settings.backButton": "تیرتا واپسی بٹن",
   "settings.backButtonNote": "ہر اُس وقت دکھایا جاتا ہے جب صفحے کو واپس جانے کی جگہ ہو۔",
-  "settings.bottomMargin": "نیچے کا مارجن",
+  "settings.bottomMargin": "عمومی نیچے کا مارجن",
   "settings.bottomMarginNote":
     "ہر صفحے کا نچلا حصہ خالی رکھتا ہے، اُن مینوں کے لیے جو اسکرین کے کنارے کے نیچے سرگلیتے ہیں۔",
   "settings.bottomMarginLabel": "تمام سائٹس کے لیے نیچے کا مارجن",

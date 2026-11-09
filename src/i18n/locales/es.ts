@@ -169,7 +169,7 @@ export const es: Messages = {
   "settings.adBlock": "Bloquear anuncios y rastreadores",
   "settings.backButton": "Botón de retroceso flotante",
   "settings.backButtonNote": "Se muestra cuando la página tiene a dónde volver.",
-  "settings.bottomMargin": "Margen inferior",
+  "settings.bottomMargin": "Margen inferior global",
   "settings.bottomMarginNote":
     "Mantiene despejado el fondo de cada página, para los menús que se deslizan bajo el borde de la pantalla.",
   "settings.bottomMarginLabel": "Margen inferior para todos los sitios",

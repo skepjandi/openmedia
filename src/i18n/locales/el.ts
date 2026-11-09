@@ -170,7 +170,7 @@ export const el: Messages = {
   "settings.adBlock": "Αποκλοπή διαφημίσεων και trackers",
   "settings.backButton": "Πλωτό κουμπί πίσω",
   "settings.backButtonNote": "Εμφανίζεται όποτε η σελίδα έχει κάτι να επιστρέψει.",
-  "settings.bottomMargin": "Κάτω περιθώριο",
+  "settings.bottomMargin": "Καθολικό κάτω περιθώριο",
   "settings.bottomMarginNote":
     "Κρατάει κενό το κάτω μέρος κάθε σελίδας, για μενού που γλιστρούν κάτω από την άκρη της οθόνης.",
   "settings.bottomMarginLabel": "Κάτω περιθώριο για όλους τους ιστότοπους",

@@ -165,7 +165,7 @@ export const sv: Messages = {
   "settings.adBlock": "Blockera annonser och spårare",
   "settings.backButton": "Flytande bakåtknapp",
   "settings.backButtonNote": "Visas så snart sidan har något att gå tillbaka till.",
-  "settings.bottomMargin": "Nedre marginal",
+  "settings.bottomMargin": "Global nedre marginal",
   "settings.bottomMarginNote":
     "Håller nederkanten av varje sida fri, för menyer som glider in under skärmkanten.",
   "settings.bottomMarginLabel": "Nedre marginal för alla webbplatser",
