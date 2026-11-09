@@ -29,14 +29,16 @@ keychain=${MAS_KEYCHAIN:+--keychain $MAS_KEYCHAIN}
 
 profile_plist="$work/profile.plist"
 security cms -D -i "$MAS_PROFILE" > "$profile_plist"
-app_id=$(plutil -extract Entitlements.com.apple.application-identifier raw "$profile_plist")
-team_id=$(plutil -extract Entitlements.com.apple.developer.team-identifier raw "$profile_plist")
+# PlistBuddy, because plutil reads the dots in these key names as key-path separators.
+plist() { /usr/libexec/PlistBuddy "$@"; }
+app_id=$(plist -c "Print :Entitlements:com.apple.application-identifier" "$profile_plist")
+team_id=$(plist -c "Print :Entitlements:com.apple.developer.team-identifier" "$profile_plist")
 
 # The sandbox entitlements, plus the identifiers the profile grants.
 entitlements="$work/OpenMedia.entitlements"
 cp "$root/src-tauri/macos/OpenMedia.entitlements" "$entitlements"
-plutil -insert com.apple.application-identifier -string "$app_id" "$entitlements"
-plutil -insert com.apple.developer.team-identifier -string "$team_id" "$entitlements"
+plist -c "Add :com.apple.application-identifier string $app_id" "$entitlements"
+plist -c "Add :com.apple.developer.team-identifier string $team_id" "$entitlements"
 
 signed="$work/OpenMedia.app"
 cp -R "$app" "$signed"
