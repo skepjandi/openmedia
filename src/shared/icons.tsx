@@ -120,8 +120,22 @@ export const ProIcon = ({ size }: { size?: number }) => (
   </Icon>
 );
 
-/** Biometric: a fingerprint. Marks what asks for Face ID, Touch ID or the passcode. */
-export const BiometricIcon = ({ size }: { size?: number }) => (
+/** Face ID: the corner brackets, eyes, nose and smile of Apple's glyph. */
+export const FaceIdIcon = ({ size }: { size?: number }) => (
+  <Icon size={size}>
+    <path d="M8 3H6a3 3 0 0 0-3 3v2" />
+    <path d="M16 3h2a3 3 0 0 1 3 3v2" />
+    <path d="M8 21H6a3 3 0 0 1-3-3v-2" />
+    <path d="M16 21h2a3 3 0 0 0 3-3v-2" />
+    <path d="M9 9.5v1.5" />
+    <path d="M15 9.5v1.5" />
+    <path d="M12 9.5v3.5h-1" />
+    <path d="M9 16c.8.9 1.8 1.4 3 1.4s2.2-.5 3-1.4" />
+  </Icon>
+);
+
+/** Touch ID or another fingerprint check. */
+export const FingerprintIcon = ({ size }: { size?: number }) => (
   <Icon size={size}>
     <path d="M12 10a2 2 0 0 0-2 2c0 1.02-.1 2.51-.26 4" />
     <path d="M14 13.12c0 2.38 0 6.38-1 8.88" />

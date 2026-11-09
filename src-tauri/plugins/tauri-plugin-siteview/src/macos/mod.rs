@@ -705,6 +705,11 @@ impl<R: Runtime> Siteview<R> {
         native::authenticate(check_auth_reason(&request.reason)?)
     }
 
+    /// The Mac's biometric is Touch ID.
+    pub fn biometry_kind(&self) -> Result<BiometryKind> {
+        Ok(BiometryKind::Fingerprint)
+    }
+
     /// Runs `request.script` (an expression) in the active session's main frame and returns its
     /// value as JSON text. Rust-only: no webview can call it. The result is hostile page data.
     pub fn evaluate(&self, request: EvaluateRequest) -> Result<String> {

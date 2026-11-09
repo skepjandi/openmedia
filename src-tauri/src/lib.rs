@@ -72,6 +72,7 @@ pub fn run() {
             usage_commands::set_usage_policy,
             usage_commands::set_usage_blocked,
             incognito::unlock_incognito,
+            incognito::biometry_kind,
             incognito::enter_incognito,
             incognito::exit_incognito,
             incognito::get_incognito_favorites,

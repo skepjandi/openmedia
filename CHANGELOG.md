@@ -8,6 +8,14 @@ All notable changes to OpenMedia are documented here.
 
 ## 2026-11-09
 
+### feat(shell): Face ID icon on devices that have Face ID
+
+**Problem:** the biometric gates (the locked incognito sections, the Incognito button) always showed a fingerprint, but most iPhones use Face ID.
+
+**Change:** new Rust-only plugin method `biometryKind` (Swift: `LAContext.biometryType == .faceID`; Kotlin and the Mac report a fingerprint, since Android does not say face or finger) behind a new app command `biometry_kind` that returns `face` or `fingerprint`, raises no prompt and is free for every user. `BiometricIcon` (`features/incognito/`) draws Face ID's face glyph for `face` and the fingerprint otherwise, and shows the fingerprint until Rust answers. See [UI Design](docs/wiki/ui-design.md) and [Security](docs/wiki/security.md).
+
+**Verified:** `tsc`, ESLint, Prettier, frontend tests, `cargo fmt`, `clippy -D warnings` on the Mac, and `cargo check --target aarch64-apple-ios-sim` with `IPHONEOS_DEPLOYMENT_TARGET=17.0` (compiles the Swift); the Face ID glyph rendered in a standalone SVG. **Not verified:** on an iPhone with Face ID and one with Touch ID (the SE), the Kotlin method (no Android build), Windows and Linux.
+
 ### fix(shell): no text-selection magnifier when holding the floating button
 
 **Problem:** on iPhone, holding the floating button showed the text-selection magnifier. The shell sets `user-select: none` on the root only, and WebKit on iOS does not reliably inherit it, so the hold started a text selection.

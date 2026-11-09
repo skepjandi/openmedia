@@ -83,6 +83,10 @@ impl<R: Runtime> Siteview<R> {
         Err(Error::DesktopUnsupported("site views"))
     }
 
+    pub fn biometry_kind(&self) -> Result<BiometryKind> {
+        Ok(BiometryKind::Fingerprint)
+    }
+
     pub fn evaluate(&self, _request: EvaluateRequest) -> Result<String> {
         Err(Error::DesktopUnsupported("site views"))
     }

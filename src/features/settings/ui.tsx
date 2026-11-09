@@ -1,5 +1,5 @@
 import { useEffect, useState, type ReactNode } from "react";
-import { BiometricIcon } from "../../shared/icons";
+import { BiometricIcon } from "../incognito/BiometricIcon";
 
 export const field =
   "w-full min-w-0 rounded-xl border border-hair bg-paper/[0.05] px-3 py-2.5 text-base text-paper outline-none placeholder:text-paper/35 focus:border-accent";

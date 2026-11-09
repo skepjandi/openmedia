@@ -198,3 +198,19 @@ pub struct AuthenticateResponse {
     /// False when the person cancelled or failed the check; an unavailable check is an error.
     pub authenticated: bool,
 }
+
+/// The kind of biometric check this device offers, only so the shell can draw the right icon.
+/// iOS reports Face ID when the device has it. Touch ID, Android (which does not say whether a
+/// biometric is a face or a finger) and the Mac report a fingerprint.
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub enum BiometryKind {
+    Face,
+    #[default]
+    Fingerprint,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct BiometryResponse {
+    pub kind: BiometryKind,
+}

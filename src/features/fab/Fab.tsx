@@ -27,14 +27,8 @@ import {
   type GestureState,
 } from "./gesture";
 import { loadPosition, savePosition, type FabPosition } from "./position";
-import {
-  BiometricIcon,
-  HistoryIcon,
-  IncognitoIcon,
-  ProIcon,
-  SlidersIcon,
-  StatsIcon,
-} from "../../shared/icons";
+import { BiometricIcon } from "../incognito/BiometricIcon";
+import { HistoryIcon, IncognitoIcon, ProIcon, SlidersIcon, StatsIcon } from "../../shared/icons";
 import { useBackHandler } from "../back/useBackHandler";
 import logoMark from "../../assets/logo-mark.svg";
 import { useEntitlementStore } from "../paywall/store";

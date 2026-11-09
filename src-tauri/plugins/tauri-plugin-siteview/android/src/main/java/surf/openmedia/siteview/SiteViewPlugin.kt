@@ -522,6 +522,18 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
     }
 
     /**
+     * Which biometric this device has, for the shell's icon. Android does not say whether a
+     * biometric is a face or a finger, so this is always a fingerprint. Rust-only: no Tauri
+     * command or permission exposes it.
+     */
+    @Command
+    fun biometryKind(invoke: Invoke) {
+        val payload = JSObject()
+        payload.put("kind", "fingerprint")
+        invoke.resolve(payload)
+    }
+
+    /**
      * Runs a Rust-supplied script in the active session's main frame and resolves with its JSON
      * text. Rust-only: no Tauri command or permission exposes it.
      */

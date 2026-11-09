@@ -192,6 +192,13 @@ impl<R: Runtime> Siteview<R> {
         Ok(response.authenticated)
     }
 
+    /// Which biometric the device has, for the shell's icon. Rust-only like `authenticate`; it
+    /// reveals nothing but Face ID versus a fingerprint and raises no prompt.
+    pub fn biometry_kind(&self) -> Result<BiometryKind> {
+        let response: BiometryResponse = self.run("biometryKind", serde_json::json!({}))?;
+        Ok(response.kind)
+    }
+
     /// Evaluates `request.script` (an expression) in the active session's main frame and returns
     /// its value as JSON text. Rust-only: it is deliberately not a Tauri command and has no
     /// permission, so no webview can call it. The result is hostile page data.

@@ -14,7 +14,9 @@
 use std::sync::atomic::{AtomicBool, Ordering};
 
 use tauri::{AppHandle, Manager, State};
-use tauri_plugin_siteview::{AuthenticateRequest, SetDocumentStartScriptRequest, SiteviewExt};
+use tauri_plugin_siteview::{
+    AuthenticateRequest, BiometryKind, SetDocumentStartScriptRequest, SiteviewExt,
+};
 
 use crate::commands::current_script;
 use crate::entitlement::Entitlement;
@@ -65,6 +67,13 @@ pub fn leave_incognito(app: &AppHandle) {
         return;
     }
     let _ = switch_mode(app, false);
+}
+
+/// Which biometric this device has, only so the shell draws Face ID or a fingerprint. Free of
+/// charge and without a prompt. A failure counts as a fingerprint, the generic one.
+#[tauri::command]
+pub async fn biometry_kind(app: AppHandle) -> Result<BiometryKind> {
+    Ok(app.siteview().biometry_kind().unwrap_or_default())
 }
 
 /// Asks the device owner to prove it is them, without changing anything. Settings uses this

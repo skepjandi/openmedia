@@ -585,6 +585,15 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
     }
   }
 
+  /// Whether this device's biometric is Face ID, so the shell can draw the right icon. Touch ID,
+  /// and a device with no biometric, report a fingerprint. Raises no prompt. Rust-only: no Tauri
+  /// command or permission exposes it. `biometryType` is only valid after `canEvaluatePolicy`.
+  @objc public func biometryKind(_ invoke: Invoke) throws {
+    let context = LAContext()
+    _ = context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: nil)
+    invoke.resolve(["kind": context.biometryType == .faceID ? "face" : "fingerprint"])
+  }
+
   /// Runs a Rust-supplied script in the active session's main frame and resolves with its JSON
   /// text. Rust-only: the Rust plugin handle calls this by name; no Tauri command or permission
   /// exposes it, so neither the shell nor a site view can reach it. The script runs in
