@@ -18,6 +18,12 @@ All notable changes to OpenMedia are documented here.
 
 **Verified:** `tsc`, ESLint, Prettier, frontend tests (new: `searchVisit.test.ts`). **Not verified:** the button over each sheet on a device, and the history recording against real search-result redirects (Google and DuckDuckGo link through their own redirect pages); no test drives `WebLayer`.
 
+### fix(settings): call the shared bottom margin "Global bottom margin"
+
+**Change:** the Browsing slider's title (`settings.bottomMargin`) now reads "Global bottom margin" in every language, to set it apart from the per-site margin on each recipe card.
+
+**Verified:** catalog tests, `tsc`, ESLint, Prettier. **Not verified:** native-speaker review of the 28 non-English strings; rendering.
+
 ### feat(paywall): free users get four quick-access slots; slots 5 and 6 and More favorites need Pro
 
 **Problem:** every user had six quick-access slots and an unlimited favorites list.

@@ -160,7 +160,7 @@ export const th: Messages = {
   "settings.backButton": "ปุ่มย้อนกลับลอย",
   "settings.backButtonNote":
     "แสดงตลอดเวลา ปิดการตั้งค่าและแผ่นอื่น ๆ ก่อน แล้วจึงย้อนกลับในหน้าเว็บ",
-  "settings.bottomMargin": "ขอบล่าง",
+  "settings.bottomMargin": "ขอบล่างส่วนกลาง",
   "settings.bottomMarginNote": "เว้นพื้นที่ด้านล่างของทุกหน้าเว็บ สำหรับเมนูที่เลื่อนใต้ขอบจอ",
   "settings.bottomMarginLabel": "ขอบล่างสำหรับทุกเว็บไซต์",
   "settings.data": "ข้อมูลและความช่วยเหลือ",

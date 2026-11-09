@@ -170,7 +170,7 @@ export const es: Messages = {
   "settings.backButton": "Botón de retroceso flotante",
   "settings.backButtonNote":
     "Siempre visible. Primero cierra Ajustes y otras hojas, y después retrocede en la página.",
-  "settings.bottomMargin": "Margen inferior",
+  "settings.bottomMargin": "Margen inferior global",
   "settings.bottomMarginNote":
     "Mantiene despejado el fondo de cada página, para los menús que se deslizan bajo el borde de la pantalla.",
   "settings.bottomMarginLabel": "Margen inferior para todos los sitios",

@@ -170,7 +170,7 @@ export const en = {
   "settings.backButton": "Floating back button",
   "settings.backButtonNote":
     "Always shown. Closes Settings and other sheets first, then goes back in the page.",
-  "settings.bottomMargin": "Bottom margin",
+  "settings.bottomMargin": "Global bottom margin",
   "settings.bottomMarginNote":
     "Keeps the bottom of every page clear, for menus that slide under the screen edge.",
   "settings.bottomMarginLabel": "Bottom margin for all sites",

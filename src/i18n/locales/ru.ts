@@ -169,7 +169,7 @@ export const ru: Messages = {
   "settings.backButton": "Плавающая кнопка «Назад»",
   "settings.backButtonNote":
     "Всегда на экране. Сначала закрывает Настройки и другие панели, затем возвращает на предыдущую страницу.",
-  "settings.bottomMargin": "Нижнее поле",
+  "settings.bottomMargin": "Общее нижнее поле",
   "settings.bottomMarginNote":
     "Оставляет низ каждой страницы свободным — для меню, которые уезжают под край экрана.",
   "settings.bottomMarginLabel": "Нижнее поле для всех сайтов",

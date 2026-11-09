@@ -164,7 +164,7 @@ export const ar: Messages = {
   "settings.backButton": "زر رجوع عائم",
   "settings.backButtonNote":
     "يظهر دائمًا. يغلق الإعدادات والصفحات الأخرى أولًا، ثم يرجع في الصفحة.",
-  "settings.bottomMargin": "الهامش السفلي",
+  "settings.bottomMargin": "الهامش السفلي العام",
   "settings.bottomMarginNote": "يُبقي أسفل كل صفحة خاليًا، للقوائم التي تنزلق أسفل حافة الشاشة.",
   "settings.bottomMarginLabel": "الهامش السفلي لكل المواقع",
   "settings.data": "البيانات والمساعدة",

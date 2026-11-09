@@ -162,7 +162,7 @@ export const de: Messages = {
   "settings.backButton": "Schwebende Zurück-Taste",
   "settings.backButtonNote":
     "Immer sichtbar. Schließt zuerst die Einstellungen und andere Ansichten, danach geht es auf der Seite zurück.",
-  "settings.bottomMargin": "Unterer Rand",
+  "settings.bottomMargin": "Globaler unterer Rand",
   "settings.bottomMarginNote":
     "Hält den unteren Bereich jeder Seite frei, etwa für Menüs, die unter den Bildschirmrand gleiten.",
   "settings.bottomMarginLabel": "Unterer Rand für alle Websites",

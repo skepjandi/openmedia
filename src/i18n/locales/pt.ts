@@ -170,7 +170,7 @@ export const pt: Messages = {
   "settings.backButton": "Botão de voltar flutuante",
   "settings.backButtonNote":
     "Sempre visível. Fecha primeiro as Definições e outras folhas e depois volta na página.",
-  "settings.bottomMargin": "Margem inferior",
+  "settings.bottomMargin": "Margem inferior global",
   "settings.bottomMarginNote":
     "Mantém a parte inferior de cada página livre, para menus que deslizam sob a borda da tela.",
   "settings.bottomMarginLabel": "Margem inferior para todos os sites",

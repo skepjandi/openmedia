@@ -166,7 +166,7 @@ export const ja: Messages = {
   "settings.backButton": "フローティング戻るボタン",
   "settings.backButtonNote":
     "常に表示されます。まず設定などのシートを閉じ、その後ページを戻ります。",
-  "settings.bottomMargin": "下余白",
+  "settings.bottomMargin": "共通の下余白",
   "settings.bottomMarginNote":
     "画面下端に潜り込むメニューでもできるよう、各ページの下側を空けておきます。",
   "settings.bottomMarginLabel": "すべてのサイトの下余白",

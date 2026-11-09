@@ -164,7 +164,7 @@ export const ms: Messages = {
   "settings.backButton": "Butang kembali terapung",
   "settings.backButtonNote":
     "Sentiasa dipaparkan. Menutup Tetapan dan helaian lain dahulu, kemudian kembali dalam halaman.",
-  "settings.bottomMargin": "Margin bawah",
+  "settings.bottomMargin": "Margin bawah global",
   "settings.bottomMarginNote":
     "Menjaga bahagian bawah setiap halaman kosong, untuk menu yang meluncur ke bawah tepi skrin.",
   "settings.bottomMarginLabel": "Margin bawah untuk semua laman",

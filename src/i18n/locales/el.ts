@@ -171,7 +171,7 @@ export const el: Messages = {
   "settings.backButton": "Πλωτό κουμπί πίσω",
   "settings.backButtonNote":
     "Εμφανίζεται πάντα. Κλείνει πρώτα τις Ρυθμίσεις και άλλα φύλλα, και μετά πηγαίνει πίσω στη σελίδα.",
-  "settings.bottomMargin": "Κάτω περιθώριο",
+  "settings.bottomMargin": "Καθολικό κάτω περιθώριο",
   "settings.bottomMarginNote":
     "Κρατάει κενό το κάτω μέρος κάθε σελίδας, για μενού που γλιστρούν κάτω από την άκρη της οθόνης.",
   "settings.bottomMarginLabel": "Κάτω περιθώριο για όλους τους ιστότοπους",

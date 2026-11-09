@@ -164,7 +164,7 @@ export const hi: Messages = {
   "settings.backButton": "तैरता वापसी बटन",
   "settings.backButtonNote":
     "हमेशा दिखता है। पहले सेटिंग और दूसरी शीट बंद करता है, फिर पेज में पीछे जाता है।",
-  "settings.bottomMargin": "निचली मार्जिन",
+  "settings.bottomMargin": "वैश्विक निचली मार्जिन",
   "settings.bottomMarginNote":
     "हर पृष्ठ का निचला हिस्सा खाली रखता है, ताकि स्क्रीन के किनारे के नीचे खिसकने वाले मेनू दिख सकें।",
   "settings.bottomMarginLabel": "सभी साइटों के लिए निचली मार्जिन",

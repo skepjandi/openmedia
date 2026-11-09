@@ -159,7 +159,7 @@ export const zhHant: Messages = {
   "settings.adBlock": "阻擋廣告與追蹤程式",
   "settings.backButton": "浮動返回按鈕",
   "settings.backButtonNote": "一律顯示。先關閉設定等面板，再在頁面中返回。",
-  "settings.bottomMargin": "底部邊距",
+  "settings.bottomMargin": "全域底部邊距",
   "settings.bottomMarginNote": "為每個頁面的底部留出空間，容納滑到螢幕邊緣下方的選單。",
   "settings.bottomMarginLabel": "所有網站的底部邊距",
   "settings.data": "資料與說明",

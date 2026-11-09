@@ -164,7 +164,7 @@ export const vi: Messages = {
   "settings.backButton": "Nút quay lại nổi",
   "settings.backButtonNote":
     "Luôn hiển thị. Đóng Cài đặt và các bảng khác trước, sau đó quay lại trong trang.",
-  "settings.bottomMargin": "Lề dưới",
+  "settings.bottomMargin": "Lề dưới chung",
   "settings.bottomMarginNote":
     "Giữ phần dưới mọi trang trống, cho các menu trượt xuống dưới mép màn hình.",
   "settings.bottomMarginLabel": "Lề dưới cho mọi trang",

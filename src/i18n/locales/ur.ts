@@ -168,7 +168,7 @@ export const ur: Messages = {
   "settings.backButton": "تیرتا واپسی بٹن",
   "settings.backButtonNote":
     "ہمیشہ نظر آتا ہے۔ پہلے سیٹنگز اور دوسری شیٹس بند کرتا ہے، پھر صفحے میں پیچھے جاتا ہے۔",
-  "settings.bottomMargin": "نیچے کا مارجن",
+  "settings.bottomMargin": "عمومی نیچے کا مارجن",
   "settings.bottomMarginNote":
     "ہر صفحے کا نچلا حصہ خالی رکھتا ہے، اُن مینوں کے لیے جو اسکرین کے کنارے کے نیچے سرگلیتے ہیں۔",
   "settings.bottomMarginLabel": "تمام سائٹس کے لیے نیچے کا مارجن",

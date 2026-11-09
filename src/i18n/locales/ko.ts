@@ -165,7 +165,7 @@ export const ko: Messages = {
   "settings.backButton": "플로팅 뒤로 가기 버튼",
   "settings.backButtonNote":
     "항상 표시됩니다. 설정 등 시트를 먼저 닫고, 그다음 페이지에서 뒤로 갑니다.",
-  "settings.bottomMargin": "하단 여백",
+  "settings.bottomMargin": "전체 하단 여백",
   "settings.bottomMarginNote":
     "화면 가장자리로 미끄러지는 메뉴를 위해 모든 페이지의 아래쪽을 비워 둡니다.",
   "settings.bottomMarginLabel": "모든 사이트의 하단 여백",

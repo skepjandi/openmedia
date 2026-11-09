@@ -163,7 +163,7 @@ export const id: Messages = {
   "settings.backButton": "Tombol kembali mengambang",
   "settings.backButtonNote":
     "Selalu tampil. Menutup Pengaturan dan lembar lain lebih dulu, lalu mundur di halaman.",
-  "settings.bottomMargin": "Margin bawah",
+  "settings.bottomMargin": "Margin bawah global",
   "settings.bottomMarginNote":
     "Menjaga bagian bawah setiap halaman tetap kosong, untuk menu yang meluncur ke bawah tepi layar.",
   "settings.bottomMarginLabel": "Margin bawah untuk semua situs",

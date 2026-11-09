@@ -168,7 +168,7 @@ export const ro: Messages = {
   "settings.backButton": "Buton Înapoi plutitor",
   "settings.backButtonNote":
     "Mereu vizibil. Închide mai întâi Setările și alte panouri, apoi revine în pagină.",
-  "settings.bottomMargin": "Margine inferioară",
+  "settings.bottomMargin": "Margine inferioară globală",
   "settings.bottomMarginNote":
     "Lasă liberă partea de jos a fiecărei pagini, pentru meniurile care glisează sub marginea ecranului.",
   "settings.bottomMarginLabel": "Margine inferioară pentru toate site-urile",

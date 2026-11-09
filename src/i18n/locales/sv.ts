@@ -166,7 +166,7 @@ export const sv: Messages = {
   "settings.backButton": "Flytande bakåtknapp",
   "settings.backButtonNote":
     "Alltid synlig. Stänger först Inställningar och andra vyer, och går sedan bakåt på sidan.",
-  "settings.bottomMargin": "Nedre marginal",
+  "settings.bottomMargin": "Global nedre marginal",
   "settings.bottomMarginNote":
     "Håller nederkanten av varje sida fri, för menyer som glider in under skärmkanten.",
   "settings.bottomMarginLabel": "Nedre marginal för alla webbplatser",

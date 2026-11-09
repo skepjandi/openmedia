@@ -168,7 +168,7 @@ export const nl: Messages = {
   "settings.backButton": "Zwevende terugknop",
   "settings.backButtonNote":
     "Altijd zichtbaar. Sluit eerst Instellingen en andere schermen, en gaat daarna terug in de pagina.",
-  "settings.bottomMargin": "Ondermarge",
+  "settings.bottomMargin": "Globale ondermarge",
   "settings.bottomMarginNote":
     "Houdt de onderkant van elke pagina vrij, voor menu’s die onder de rand van het scherm schuiven.",
   "settings.bottomMarginLabel": "Ondermarge voor alle sites",

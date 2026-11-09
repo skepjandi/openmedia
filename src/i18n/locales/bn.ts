@@ -163,7 +163,7 @@ export const bn: Messages = {
   "settings.backButton": "ভাসমান ব্যাক বোতাম",
   "settings.backButtonNote":
     "সবসময় দেখা যায়। আগে সেটিংস ও অন্যান্য পাতা বন্ধ করে, তারপর পেজে পিছনে যায়।",
-  "settings.bottomMargin": "নিচের মার্জিন",
+  "settings.bottomMargin": "গ্লোবাল নিচের মার্জিন",
   "settings.bottomMarginNote":
     "স্ক্রিনের নিচের দিকে সরে যাওয়া মেনুর জন্য প্রতিটি পেজের নিচে ফাঁকা রাখে।",
   "settings.bottomMarginLabel": "সব সাইটের নিচের মার্জিন",

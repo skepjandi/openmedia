@@ -165,7 +165,7 @@ export const si: Messages = {
   "settings.backButton": "පාවෙනි ආපසු බොත්තක්",
   "settings.backButtonNote":
     "සැම විටම පෙනේ. මුලින් සැකසුම් සහ වෙනත් තිර වසා, පසුව පිටුවේ ආපසු යයි.",
-  "settings.bottomMargin": "පහළ දුරස්ථය",
+  "settings.bottomMargin": "සර්වත්‍ර පහළ දුරස්ථය",
   "settings.bottomMarginNote":
     "තිරයේ පහළ දෙළුණට යටතින් ගලා එන මෙනු සඳහා සෑම පිටුවකම පහළ කොටස හිස්ව තබයි.",
   "settings.bottomMarginLabel": "සියලුම අඩවි සඳහා පහළ දුරස්ථය",

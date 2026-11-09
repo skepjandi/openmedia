@@ -170,7 +170,7 @@ export const ta: Messages = {
   "settings.backButton": "மிதவை பின்செல் பொத்தான்",
   "settings.backButtonNote":
     "எப்போதும் தெரியும். முதலில் அமைப்புகள் போன்ற தாள்களை மூடி, பிறகு பக்கத்தில் பின்செல்லும்.",
-  "settings.bottomMargin": "கீழ் விளிச்சை",
+  "settings.bottomMargin": "உலகளாவிய கீழ் விளிச்சை",
   "settings.bottomMarginNote":
     "திரையின் கீழ் விளிச்சைக்குள் செல்லும் பட்டிகளுக்காக, ஒவ்வொரு பக்கத்தின் கீழ்ப்பகுதியும் காலியாக வைக்கப்படுகிறது.",
   "settings.bottomMarginLabel": "அனைத்துத் தளங்களுக்கான கீழ் விளிச்சை",

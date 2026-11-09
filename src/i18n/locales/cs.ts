@@ -169,7 +169,7 @@ export const cs: Messages = {
   "settings.backButton": "Plovoucí tlačítko Zpět",
   "settings.backButtonNote":
     "Vždy viditelné. Nejdřív zavře Nastavení a další panely, potom se vrátí na předchozí stránku.",
-  "settings.bottomMargin": "Spodní okraj",
+  "settings.bottomMargin": "Globální spodní okraj",
   "settings.bottomMarginNote":
     "Udržuje spodní část každé stránky volnou, pro nabídky, které se vysouvají zpod okraje obrazovky.",
   "settings.bottomMarginLabel": "Spodní okraj pro všechny weby",

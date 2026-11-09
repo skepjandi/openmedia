@@ -169,7 +169,7 @@ export const uk: Messages = {
   "settings.backButton": "Плаваюча кнопка «Назад»",
   "settings.backButtonNote":
     "Завжди на екрані. Спершу закриває Налаштування та інші панелі, потім повертає на попередню сторінку.",
-  "settings.bottomMargin": "Нижнє поле",
+  "settings.bottomMargin": "Загальне нижнє поле",
   "settings.bottomMarginNote":
     "Залишає низ кожної сторінки вільним — для меню, що заїжджають за край екрана.",
   "settings.bottomMarginLabel": "Нижнє поле для всіх сайтів",

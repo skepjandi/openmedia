@@ -171,7 +171,7 @@ export const fr: Messages = {
   "settings.backButton": "Bouton de retour flottant",
   "settings.backButtonNote":
     "Toujours visible. Elle ferme d'abord les Réglages et les autres feuilles, puis revient en arrière dans la page.",
-  "settings.bottomMargin": "Marge inférieure",
+  "settings.bottomMargin": "Marge inférieure globale",
   "settings.bottomMarginNote":
     "Garde le bas de chaque page dégagé, pour les menus qui glissent sous le bord de l’écran.",
   "settings.bottomMarginLabel": "Marge inférieure pour tous les sites",
