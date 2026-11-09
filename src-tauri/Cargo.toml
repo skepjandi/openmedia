@@ -39,7 +39,7 @@ url = "2.5.8"
 # Brave's filter engine. Only the ABP-syntax parser and the Safari content-blocking converter are
 # used; list matching happens in WebKit, not here.
 adblock = { version = "0.13.5", default-features = false, features = ["content-blocking", "embedded-domain-resolver"] }
-sha2 = "0.10"
+sha2 = "0.11"
 
 # Android has no `keyring` backend; its secrets live in the Android Keystore (see `secrets.rs`).
 [target.'cfg(not(target_os = "android"))'.dependencies]
