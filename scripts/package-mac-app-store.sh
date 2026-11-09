@@ -10,7 +10,8 @@
 #
 # The identities (certificate name or SHA-1) and the profile come from the Apple Developer account
 # (see docs/wiki/store-builds.md). Set MAS_KEYCHAIN to sign from a keychain that is not in the
-# search list. The result is src-tauri/target/release/bundle/macos/OpenMedia-MacAppStore.pkg.
+# search list, and MAS_APP to package an .app other than the one `yarn tauri build` made. The result
+# is OpenMedia-MacAppStore.pkg next to that .app (src-tauri/target/release/bundle/macos by default).
 set -eu
 
 : "${MAS_APP_IDENTITY:?set MAS_APP_IDENTITY}"
@@ -18,8 +19,8 @@ set -eu
 : "${MAS_PROFILE:?set MAS_PROFILE}"
 
 root=$(cd "$(dirname "$0")/.." && pwd)
-bundle="$root/src-tauri/target/release/bundle/macos"
-app="$bundle/OpenMedia.app"
+app=${MAS_APP:-$root/src-tauri/target/release/bundle/macos/OpenMedia.app}
+bundle=$(dirname "$app")
 work=$(mktemp -d)
 trap 'rm -rf "$work"' EXIT
 keychain=${MAS_KEYCHAIN:+--keychain $MAS_KEYCHAIN}
