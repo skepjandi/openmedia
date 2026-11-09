@@ -851,12 +851,16 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
         pageLayer?.requestLayout()
     }
 
-    private fun rectOf(args: RectArgs): RectF = RectF(
-        args.x.toFloat(),
-        args.y.toFloat(),
-        args.x.toFloat() + args.width.toFloat(),
-        args.y.toFloat() + args.height.toFloat(),
-    )
+    // Shell DOM rects are CSS pixels; Android view geometry and MotionEvent coordinates are pixels.
+    private fun rectOf(args: RectArgs): RectF {
+        val density = activity.resources.displayMetrics.density
+        return RectF(
+            args.x.toFloat() * density,
+            args.y.toFloat() * density,
+            (args.x.toFloat() + args.width.toFloat()) * density,
+            (args.y.toFloat() + args.height.toFloat()) * density,
+        )
+    }
 
     /**
      * Decides, per touch, whether the shell or the page underneath receives it. A touch inside a

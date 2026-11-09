@@ -8,11 +8,11 @@ All notable changes to OpenMedia are documented here.
 
 ## 2026-11-09
 
-### fix(android): avoid WebView calls from request threads
+### fix(android): fix WebView threading and touch routing
 
-**Change:** Android runs `shouldInterceptRequest` off the UI thread. Cache the current page URL in volatile session state so request filtering does not call `WebView.url` from a worker thread.
+**Change:** Android runs `shouldInterceptRequest` off the UI thread. Cache the current page URL in volatile session state instead of calling `WebView.url` from a worker. Convert shell DOM rectangles from CSS pixels to density-scaled Android pixels so shell hit regions match native touch coordinates.
 
-**Verified:** `yarn tauri android dev "Medium_Phone"` built, installed and launched on `sdk_gphone64_arm64`; the app remained foreground with no new Android runtime exceptions. Broader Android behavior and physical devices remain unverified.
+**Verified:** `yarn tauri android dev "Medium_Phone"` built, installed and launched on `sdk_gphone64_arm64`; tapping onboarding's Next control advanced to step 2, and the app remained foreground with no new Android runtime exceptions. Broader Android behavior and physical devices remain unverified.
 
 **PR:** [#41](https://github.com/skepjandi/openmedia/pull/41)
 
