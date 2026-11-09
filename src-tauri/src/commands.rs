@@ -42,6 +42,7 @@ pub async fn get_state(library: State<'_, Library>, boot: State<'_, Boot>) -> Re
     Ok(Startup {
         state: library.state()?,
         boot_session: boot.session(),
+        desktop: cfg!(desktop),
     })
 }
 

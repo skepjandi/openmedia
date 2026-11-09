@@ -48,6 +48,8 @@ export interface BootSession {
 /** `get_state`: the saved state plus the page opened for it, if there is one. */
 export interface Startup extends AppState {
   bootSession: BootSession | null;
+  /** The page is a view beside the shell, not a layer under it: the shell lays out around it. */
+  desktop: boolean;
 }
 
 export type OptionGroup = "annoyance" | "content";

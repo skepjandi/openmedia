@@ -1,6 +1,6 @@
 # Development Guide
 
-> **Status: Implemented, with platform verification limits.** The iOS app and checks are verified on simulators. Android has Kotlin site-view and billing implementations and an AAB build path, but device/emulator behavior and signed store builds are unverified. Desktop site views are deferred.
+> **Status: Implemented, with platform verification limits.** The iOS app and checks are verified on simulators. Android has Kotlin site-view and billing implementations and an AAB build path, but device/emulator behavior and signed store builds are unverified. macOS site views exist (debug builds, run by hand on one Mac); Windows and Linux site views are not implemented.
 
 ## Prerequisites
 
@@ -49,7 +49,7 @@ xcrun simctl install <device> src-tauri/gen/apple/build/openmedia_iOS.xcarchive/
 
 Point `lastUrl` in the app's `library.json` at a local fixture server and record the launch with `xcrun simctl io <device> recordVideo`; results are in [Platform Support](./platform-support.md#startup). The simulator archive is not an App Store release. See [Store Builds](./store-builds.md) for signed releases.
 
-Android commands are available with `yarn tauri android dev` and `yarn tauri android build --aab --ci`; see [Platform Support](./platform-support.md#the-android-site-view) for the limited build evidence. Desktop site views are not implemented.
+Android commands are available with `yarn tauri android dev` and `yarn tauri android build --aab --ci`; see [Platform Support](./platform-support.md#the-android-site-view) for the limited build evidence. `yarn dev:desktop` runs the macOS app with site views (macOS 14 or later); Windows and Linux have none yet.
 
 ## Conventions
 
@@ -59,7 +59,7 @@ Android commands are available with `yarn tauri android dev` and `yarn tauri and
 - Bundled recipe changes require fixture updates in `recipes/fixtures/<site>/`.
 - Fixtures are scrubbed of personal data before commit; raw captures go in the gitignored `captures/`.
 - Bundled filter lists in `blocklists/` are refreshed only with `scripts/update-blocklists.sh` and shipped with a release; the app never downloads them. Run `cargo test ad_block` after a refresh ([Ad Blocking](./ad-blocking.md#updating-the-lists)).
-- The Public Suffix List (which hosts belong to one site) lives once, in `shared/public-suffix/resources/public_suffix_rules.txt`, with the official test vectors and `app-vectors.json` beside it. Refresh it with `yarn suffix:update` (it also regenerates the iOS plugin's `PublicSuffixRules.swift`; `yarn suffix:check` fails when that file is stale). Then run `yarn verify`, `yarn test:swift` and `yarn test:android`: all four matchers (`site.rs`, `site.ts`, `PublicSuffix.kt`, `PublicSuffix.swift`) must pass the same vectors. Add a case to `app-vectors.json`, never to a single platform's tests.
+- The Public Suffix List (which hosts belong to one site) lives once, in `shared/public-suffix/resources/public_suffix_rules.txt`, with the official test vectors and `app-vectors.json` beside it. Refresh it with `yarn suffix:update` (it also regenerates the iOS plugin's `PublicSuffixRules.swift`; `yarn suffix:check` fails when that file is stale). Then run `yarn verify`, `yarn test:swift` and `yarn test:android`: all four matchers (`tauri-plugin-siteview/src/site.rs`, `site.ts`, `PublicSuffix.kt`, `PublicSuffix.swift`) must pass the same vectors. Add a case to `app-vectors.json`, never to a single platform's tests.
 
 ## Troubleshooting
 

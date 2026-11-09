@@ -2,13 +2,14 @@ mod ad_block;
 mod ai;
 mod boot;
 mod commands;
+#[cfg(target_os = "macos")]
+mod desktop_menu;
 mod entitlement;
 mod error;
 mod incognito;
 mod library;
 mod recipes;
 mod secrets;
-mod site;
 mod sites;
 mod usage;
 mod usage_commands;
@@ -18,10 +19,15 @@ use tauri::Manager;
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 #[allow(clippy::expect_used, reason = "a failed startup is unrecoverable")]
 pub fn run() {
-    tauri::Builder::default()
+    let builder = tauri::Builder::default()
         .plugin(tauri_plugin_siteview::init())
-        .plugin(tauri_plugin_billing::init())
+        .plugin(tauri_plugin_billing::init());
+    #[cfg(target_os = "macos")]
+    let builder = builder.on_menu_event(desktop_menu::handle);
+    builder
         .setup(|app| {
+            #[cfg(target_os = "macos")]
+            desktop_menu::install(app.handle())?;
             let data_dir = app.path().app_data_dir()?;
             let library = library::Library::load(data_dir.join("library.json"))?;
             let ad_block_enabled = library.ad_block_enabled()?;

@@ -1,6 +1,6 @@
 # Architecture
 
-> **Status: Partially implemented.** The React shell, Rust core, iOS and Android native site-view plugins, bundled recipes, BYOK assistant, and local usage controls exist. iOS has simulator verification; Android device/emulator behavior is unverified. Desktop site views, profile selection, and parts of the planned runtime remain unimplemented. See the component pages for exact boundaries.
+> **Status: Partially implemented.** The React shell, Rust core, iOS and Android native site-view plugins, bundled recipes, BYOK assistant, and local usage controls exist. iOS has simulator verification; Android device/emulator behavior is unverified. macOS has site views (debug builds run on one Mac); Windows and Linux site views, profile selection, and parts of the planned runtime remain unimplemented. See the component pages for exact boundaries.
 
 ## Overview
 
@@ -41,9 +41,9 @@ flowchart LR
 
 ## Components
 
-### SiteView (Rust API, native iOS/Android implementations)
+### SiteView (Rust API; native iOS/Android and macOS child-webview implementations)
 
-The Rust API is shared; Swift on iOS and Kotlin on Android provide the native web views. Desktop currently returns `DesktopUnsupported`.
+The Rust API is shared; Swift on iOS and Kotlin on Android provide the native web views, and macOS uses Tauri child webviews. Windows and Linux currently return `DesktopUnsupported`.
 
 | Operation | Purpose |
 |-----------|---------|
@@ -55,7 +55,8 @@ The Rust API is shared; Swift on iOS and Kotlin on Android provide the native we
 | `request_snapshot(opts)` | Ask the engine for a pruned, redacted DOM snapshot |
 | `events` | Stream: navigation, title, load state, match reports, picker results |
 
-- **Desktop** (macOS/Windows/Linux): site views are deferred; no child-webview implementation exists.
+- **macOS:** a Tauri child webview per session, beside the shell rather than under it; see [The macOS site view](./platform-support.md#the-macos-site-view).
+- **Windows and Linux:** no site view; the plugin returns `DesktopUnsupported`.
 - **Mobile** (iOS/Android): the in-repository Tauri plugin hosts a native `WKWebView` / Android `WebView` and exposes the shared API. See [Platform Support](./platform-support.md).
 
 ### Recipe store (Rust)

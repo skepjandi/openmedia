@@ -5,21 +5,28 @@ use tauri::{
 
 mod commands;
 mod error;
+#[cfg(any(mobile, target_os = "macos"))]
+mod events;
 mod models;
+pub mod site;
 pub mod validate;
 
-#[cfg(desktop)]
+#[cfg(all(desktop, not(target_os = "macos")))]
 mod desktop;
+#[cfg(target_os = "macos")]
+mod macos;
 #[cfg(mobile)]
 mod mobile;
 
 pub use error::{Error, Result};
 pub use models::*;
 
-#[cfg(desktop)]
-use desktop::Siteview;
+#[cfg(all(desktop, not(target_os = "macos")))]
+pub use desktop::Siteview;
+#[cfg(target_os = "macos")]
+pub use macos::Siteview;
 #[cfg(mobile)]
-use mobile::Siteview;
+pub use mobile::Siteview;
 
 /// The Android secret store. Android has no `keyring` backend, so the plugin's Android side
 /// keeps the key in the Android Keystore.
@@ -57,8 +64,10 @@ pub fn init<R: Runtime>() -> TauriPlugin<R> {
         .setup(|app, api| {
             #[cfg(mobile)]
             let siteview = mobile::init(app, api)?;
-            #[cfg(desktop)]
+            #[cfg(all(desktop, not(target_os = "macos")))]
             let siteview = desktop::init(app, api)?;
+            #[cfg(target_os = "macos")]
+            let siteview = macos::init(app, api)?;
             app.manage(siteview);
             Ok(())
         })

@@ -5,19 +5,15 @@ use tauri::{
     plugin::{PluginApi, PluginHandle},
 };
 
+use crate::events::{
+    BRIDGE_EVENT, CLOSED_EVENT, ERROR_EVENT, MEMORY_EVENT, NOTIFICATION_TAP_EVENT, STATE_EVENT,
+};
 use crate::models::*;
 use crate::validate::{
     check_auth_reason, check_evaluate_result, parse_bridge_body, parse_session_id,
     wrap_evaluate_script,
 };
 use crate::{Error, Result};
-
-pub const STATE_EVENT: &str = "siteview:state";
-pub const ERROR_EVENT: &str = "siteview:error";
-pub const BRIDGE_EVENT: &str = "siteview:bridge";
-pub const CLOSED_EVENT: &str = "siteview:closed";
-pub const MEMORY_EVENT: &str = "siteview:memory";
-pub const NOTIFICATION_TAP_EVENT: &str = "siteview:notification-tap";
 
 #[cfg(target_os = "ios")]
 tauri::ios_plugin_binding!(init_plugin_siteview);

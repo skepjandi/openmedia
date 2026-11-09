@@ -11,7 +11,7 @@ use crate::error::{Error, Result};
 use crate::recipes::{
     Meta, OptionGroup, Origin, Recipe, Rule, SiteOption, Target, validate_selector,
 };
-use crate::site::registrable_domain;
+use tauri_plugin_siteview::site::registrable_domain;
 
 pub const MAX_RULES: usize = 8;
 pub const MAX_LABEL_CHARS: usize = 60;

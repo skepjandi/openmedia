@@ -1,5 +1,6 @@
 import { useRef, type ReactNode } from "react";
 import { useEdgeSwipeBack } from "../features/back/useEdgeSwipeBack";
+import { useTrackpadSwipeBack } from "../features/back/useTrackpadSwipeBack";
 import { BackIcon, CloseIcon } from "./icons";
 
 interface ScreenProps {
@@ -23,6 +24,7 @@ export function Screen({
 }: ScreenProps) {
   const root = useRef<HTMLDivElement>(null);
   useEdgeSwipeBack(root, onClose);
+  useTrackpadSwipeBack(root, onClose);
   const button = (
     <button
       type="button"

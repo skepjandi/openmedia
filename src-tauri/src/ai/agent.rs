@@ -202,7 +202,7 @@ pub fn prepare<F: FnOnce(&str, &str) -> RecipeContext>(
         )));
     }
     let snapshot = snapshot_of(page)?;
-    let domain = crate::site::registrable_domain(&snapshot.host)
+    let domain = tauri_plugin_siteview::site::registrable_domain(&snapshot.host)
         .ok_or_else(|| Error::Connection(MSG_BAD_PAGE.to_owned()))?;
     let context = (input.context)(&snapshot.host, &snapshot.path);
     let job = Job {

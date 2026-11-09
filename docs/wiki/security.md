@@ -35,7 +35,7 @@ The site view loads third-party code we do not control, and our injected engine 
 
 ## The bridge
 
-**Decided for mobile: option B.** Desktop is deferred, and its choice (A or a native channel) stays open. Candidates considered:
+**Decided for mobile: option B.** On macOS no page script uses a bridge yet, so none exists; a desktop bridge (A or a native channel) stays open. The macOS site view relies on the ACL, not on a missing IPC object: see below. Candidates considered:
 
 | Option | How | Concerns |
 |--------|-----|----------|
@@ -46,6 +46,8 @@ The site view loads third-party code we do not control, and our injected engine 
 Direction: **B on mobile**, implemented in `tauri-plugin-siteview`. A native message handler (`WKScriptMessageHandler` on iOS, `addWebMessageListener` on Android) hands each message to a Rust-created `Channel`; Rust parses it with a 64 KiB cap and forwards it as the `siteview:bridge` event. The site webview is a separate native webview with no Tauri IPC. It also has a second, native-only handler, `openmediaPaint`, that a document-start script calls after the page's first frames; it carries no data and only makes the view visible, so a page that fakes it harms nothing. The no-IPC behavior is verified on the iOS simulator; Android behavior has not been verified on a device or emulator. For desktop, A is only acceptable if it can be scoped to one command with a nonce; otherwise desktop adopts a native channel too. Either way, invariant 3 holds.
 
 Tauri has reportedly had an advisory where remote-origin iframes could reach IPC without being explicitly allowed (GHSA-57fm-592m-34r7) **[not verified; look it up before relying on this]**. Pin to a patched Tauri and treat IPC scoping as a regression-test target: an integration test must prove a site view **cannot** call a non-bridge command. Today that proof is the iOS simulator check above; an automated on-device test does not exist yet.
+
+**macOS.** Tauri injects `window.__TAURI_INTERNALS__` into every webview, including the child webviews that show sites, so a page can see the IPC object. What stops it is the ACL: a site is a remote origin and the only capability (`src-tauri/capabilities/default.json`) lists the `main` webview, not the window, so a child webview is in no capability at all. On a debug build, page-side `invoke` of `get_state`, `plugin:siteview|reload` and `plugin:event|listen` was refused ("not allowed on window main, webview site-…"), and a raw `ipc://` request failed for lack of the invoke key. That was run by hand with a fixture page and is not an automated test. The Rust-only plugin methods (`set_blocked`, `evaluate`, `authenticate`) have no command and no permission on any platform.
 
 ## Key storage
 

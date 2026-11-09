@@ -9,7 +9,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::error::{Error, Result};
 use crate::library::write_atomically;
-use crate::site::{is_public_suffix, registrable_domain};
+use tauri_plugin_siteview::site::{is_public_suffix, registrable_domain};
 
 const FORMAT_VERSION: u32 = 1;
 /// Days of history kept on disk, counting today.
