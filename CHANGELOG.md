@@ -12,7 +12,9 @@ All notable changes to OpenMedia are documented here.
 
 **Change:** the app version is `1.0.0` (the App Store Connect version records are 1.0). `scripts/package-mac-app-store.sh` signs the release `.app` with the new sandbox entitlements (`src-tauri/macos/OpenMedia.entitlements`) and a Mac App Store profile and builds the installer `.pkg` Transporter takes (see the store-builds wiki). The Mac icon (`icons/icon.icns`) is now a macOS-style rounded tile with a shadow, made from the iOS icon; it was the bare mark on a transparent background.
 
-**Verified:** a signed iOS `.ipa` and Mac `.pkg` (built the same way) passed `altool --validate-app`; a signed release AAB built (with #79). **Not verified:** the sandboxed Mac app beyond launching to onboarding, and any upload or review.
+**Release command:** `yarn release` builds the iOS `.ipa`, Mac `.pkg` and Android `.aab` into `release/<version>-<build>/` and bumps the build number itself (iOS and macOS `bundleVersion`, Android `versionCode`, from `tauri.conf.json` and the latest App Store Connect build). The build number is now 1001: Google Play had already used 1000. The Mac package carries the icon as an asset catalog (`Assets.car` plus `AppIcon.icns`, `CFBundleIconName`), as Xcode ships it.
+
+**Verified:** a signed iOS `.ipa` and Mac `.pkg` (built by `yarn release`) passed `altool --validate-app`; a signed release AAB built (with #79). **Not verified:** the sandboxed Mac app beyond launching to onboarding, and any upload or review.
 
 ### feat(shell): Face ID icon on devices that have Face ID
 

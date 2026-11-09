@@ -23,7 +23,7 @@ The shell talks to the shared site-view API (`open`, `set_rect`, `navigate`, …
 | Page → Core channel | None yet (no page script uses the bridge) | Not implemented | Not implemented | Native message handler | AndroidX web message listener |
 | Secret store | Not implemented | Not implemented | Not implemented | Keychain | Keystore-backed plugin (device behavior unverified) |
 | Ad and tracker blocking | `WKContentRuleList`, the iOS lists | Not built | Not built | `WKContentRuleList` from bundled lists ([Ad Blocking](./ad-blocking.md)) | Request interception (`shouldInterceptRequest`) over the same rule JSON ([Ad Blocking](./ad-blocking.md)) |
-| Distribution / updates | Not built | Not built | Not built | App Store | Google Play |
+| Distribution / updates | Mac App Store package (validated, not uploaded) | Not built | Not built | App Store | Google Play |
 | Priority | 3 | 4 | 4 | **1** | **1** |
 
 iOS and Android first. macOS followed (same engine as iOS, fastest desktop path); Windows/Linux wait for the engine and format to settle; Linux WebKitGTK is the most likely to need per-site workarounds.

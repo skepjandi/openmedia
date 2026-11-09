@@ -72,9 +72,12 @@ Store setup (App Store Connect, Play Console, RevenueCat dashboard) is described
 
 ## Release checklist
 
-- App Store Connect: paid-apps agreement active; one subscription group with monthly ($2/month, 14-day free-trial introductory offer) and yearly ($10/year); one non-consumable lifetime product ($18.99); all attached to `pro` in RevenueCat. Suggested product IDs: `surf.openmedia.pro.monthly`, `.yearly`, `.lifetime`.
-- Play Console: same USD prices and plans, with a 14-day monthly free-trial offer; lifetime is a one-time in-app product. Add all products to the RevenueCat `pro` entitlement and configure service-account credentials in RevenueCat.
-- The paywall reads `VITE_PRIVACY_POLICY_URL` and `VITE_TERMS_URL`; both must be live HTTPS pages before purchases are enabled. They open through the app's normal site navigation. They are unset in `.env.example`.
+State as of 2026-11-10, from the App Store Connect API (read and written with an API key); Play Console and RevenueCat were not reachable from the repository.
+
+- **App Store Connect (done):** subscription group `OpenMedia Pro` with `surf.openmedia.pro.monthly` ($1.99) and `surf.openmedia.pro.yearly` ($9.99), and the non-consumable `surf.openmedia.pro.lifetime` ($18.99), all READY_TO_SUBMIT with an en-US name. The prices are Apple's nearest price points to the planned $2 and $10. The 14-day free-trial introductory offer was missing and was added to monthly in all 175 territories. The app's privacy policy URL is set. **Still open:** a review screenshot for each product, and the paid-apps agreement and tax details if not already active.
+- **Play Console (open):** the same three products (monthly with a 14-day free-trial offer; lifetime a one-time product), an upload to Internal testing, license testers.
+- **RevenueCat (open):** add the products, attach all three to the `pro` entitlement, a `default` offering (current) with packages `$rc_lifetime`, `$rc_annual`, `$rc_monthly`, the Android service-account JSON, the App Store in-app purchase key, and restore behaviour "Transfer to new App User ID". The macOS app shares the iOS `appl_` key (`OPENMEDIA_RC_KEY_MACOS` overrides it); a Mac App Store build is needed to buy on the Mac ([Store Builds](./store-builds.md#mac-app-store)).
+- The paywall reads `VITE_PRIVACY_POLICY_URL` and `VITE_TERMS_URL`; both must be live HTTPS pages before purchases are enabled (`https://openmedia.surf/privacy/` and `/terms/` answered 200 on 2026-11-10). They open through the app's normal site navigation.
 - App Privacy label: RevenueCat collects purchase history and an anonymous identifier.
 
 ## Privacy and invariants
@@ -85,7 +88,7 @@ This repository is open source, so a fork can remove the gate. The paywall is a 
 
 ## Verified results
 
-Filled in by the PR that lands this page; see the matching [CHANGELOG](../../CHANGELOG.md) entry.
+No purchase, restore or offering has been run on any platform. The Mac app starts with Pro locked (the RevenueCat SDK reached its servers and reported no offerings because none were attached yet). See the matching [CHANGELOG](../../CHANGELOG.md) entries.
 
 ## See also
 

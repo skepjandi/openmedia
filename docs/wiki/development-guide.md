@@ -38,7 +38,7 @@ yarn build android               # debug-signed arm64 APK, installable on a devi
 APPLE_DEVELOPMENT_TEAM=<team id> yarn build ios   # development-signed iOS build
 ```
 
-Release builds (`--production`) are described in [Store Builds](./store-builds.md).
+Release builds (`--production`) are described in [Store Builds](./store-builds.md). `yarn release` builds the three store packages (the iOS `.ipa` and Mac `.pkg` for Transporter, the Android `.aab` for Play) into `release/<version>-<build>/` and bumps the build number; see [One command: `yarn release`](./store-builds.md#one-command-yarn-release).
 
 To measure startup or install a simulator build:
 
