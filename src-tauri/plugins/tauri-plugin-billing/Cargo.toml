@@ -2,7 +2,7 @@
 name = "tauri-plugin-billing"
 version = "0.1.0"
 authors = ["openmedia"]
-description = "RevenueCat-backed in-app purchases for OpenMedia (iOS StoreKit 2, Android Google Play Billing)"
+description = "RevenueCat-backed in-app purchases for OpenMedia (iOS and macOS StoreKit 2, Android Google Play Billing)"
 license = "MPL-2.0"
 repository = "https://github.com/skepjandi/openmedia"
 edition = "2024"
@@ -16,6 +16,7 @@ serde_json = "1"
 thiserror = "2"
 
 [build-dependencies]
+swift-rs = { version = "1.0.7", features = ["build"] }
 tauri-plugin = { version = "2.7.2", features = ["build"] }
 
 [lints]

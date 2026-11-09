@@ -6,16 +6,20 @@ use tauri::{
 mod error;
 mod models;
 
-#[cfg(desktop)]
+#[cfg(all(desktop, not(target_os = "macos")))]
 mod desktop;
+#[cfg(target_os = "macos")]
+mod macos;
 #[cfg(mobile)]
 mod mobile;
 
 pub use error::{Error, Result};
 pub use models::*;
 
-#[cfg(desktop)]
+#[cfg(all(desktop, not(target_os = "macos")))]
 pub use desktop::Billing;
+#[cfg(target_os = "macos")]
+pub use macos::Billing;
 #[cfg(mobile)]
 pub use mobile::Billing;
 
@@ -39,8 +43,10 @@ pub fn init<R: Runtime>() -> TauriPlugin<R> {
         .setup(|app, api| {
             #[cfg(mobile)]
             let billing = mobile::init(app, api)?;
-            #[cfg(desktop)]
+            #[cfg(all(desktop, not(target_os = "macos")))]
             let billing = desktop::init(app, api)?;
+            #[cfg(target_os = "macos")]
+            let billing = macos::init(app, api)?;
             app.manage(billing);
             Ok(())
         })

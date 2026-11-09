@@ -3924,6 +3924,7 @@ version = "0.1.0"
 dependencies = [
  "serde",
  "serde_json",
+ "swift-rs",
  "tauri",
  "tauri-plugin",
  "thiserror 2.0.21",

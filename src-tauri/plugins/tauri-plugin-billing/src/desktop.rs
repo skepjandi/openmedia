@@ -13,7 +13,7 @@ pub fn init<R: Runtime, C: DeserializeOwned>(
     Ok(Billing(PhantomData))
 }
 
-/// Purchases exist on mobile only; on desktop every call fails and the entitlement stays free.
+/// Purchases exist on iOS, Android and macOS; on Windows and Linux every call fails.
 pub struct Billing<R: Runtime>(PhantomData<fn() -> R>);
 
 impl<R: Runtime> Billing<R> {

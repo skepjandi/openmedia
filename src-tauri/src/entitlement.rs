@@ -44,12 +44,16 @@ const RETRY_DELAYS: [Duration; 3] = [
 
 #[cfg(target_os = "ios")]
 const SDK_KEY: Option<&str> = option_env!("OPENMEDIA_RC_KEY_IOS");
+/// The Mac app is the same App Store app as the iPhone one, so it shares the `appl_` key unless
+/// `OPENMEDIA_RC_KEY_MACOS` gives it its own (`build.rs` resolves which).
+#[cfg(target_os = "macos")]
+const SDK_KEY: Option<&str> = option_env!("OPENMEDIA_RC_KEY_MACOS");
 #[cfg(target_os = "android")]
 const SDK_KEY: Option<&str> = option_env!("OPENMEDIA_RC_KEY_ANDROID");
-#[cfg(not(any(target_os = "ios", target_os = "android")))]
+#[cfg(not(any(target_os = "ios", target_os = "android", target_os = "macos")))]
 const SDK_KEY: Option<&str> = None;
 
-#[cfg(any(target_os = "ios", target_os = "android"))]
+#[cfg(any(target_os = "ios", target_os = "android", target_os = "macos"))]
 const DEV_OVERRIDE: Option<&str> = option_env!("OPENMEDIA_DEV_ENTITLEMENT");
 
 #[cfg(any(target_os = "ios", target_os = "android"))]
@@ -86,7 +90,7 @@ fn usable_key(raw: Option<&str>) -> Option<&str> {
 }
 
 /// `pro` or `free` forces the status, in debug builds only. A release build ignores it.
-#[cfg(any(test, target_os = "ios", target_os = "android"))]
+#[cfg(any(test, target_os = "ios", target_os = "android", target_os = "macos"))]
 fn dev_override(raw: Option<&str>, debug_build: bool) -> Option<Status> {
     if !debug_build {
         return None;
@@ -208,10 +212,12 @@ pub struct Entitlement {
 }
 
 impl Entitlement {
+    /// Pro is decided by the store on iOS, Android and macOS. Windows and Linux have no store,
+    /// so they are forced to Pro.
     pub fn from_build() -> Self {
-        #[cfg(any(target_os = "ios", target_os = "android"))]
+        #[cfg(any(target_os = "ios", target_os = "android", target_os = "macos"))]
         let forced = dev_override(DEV_OVERRIDE, cfg!(debug_assertions));
-        #[cfg(not(any(target_os = "ios", target_os = "android")))]
+        #[cfg(not(any(target_os = "ios", target_os = "android", target_os = "macos")))]
         let forced = Some(Status::Pro);
         #[cfg(any(target_os = "ios", target_os = "android"))]
         let mut entitlement = Self::new(SDK_KEY, forced);

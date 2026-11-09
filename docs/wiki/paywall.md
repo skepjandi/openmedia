@@ -1,6 +1,6 @@
 # Paywall
 
-> **Status: Implemented in source for iOS and Android.** Billing and Android host code are unbuilt; real store purchases, restore and device behavior are unverified. Desktop bypasses Pro and is out of scope.
+> **Status: Implemented in source for iOS, Android and macOS.** Billing and Android host code are unbuilt; real store purchases, restore and device behavior are unverified. The macOS Swift package builds and links, and the Mac app starts locked until the store answers; no purchase was made. Windows and Linux bypass Pro (no store).
 
 OpenMedia has no accounts and no backend of ours, so the paywall rests on two things: the store account (Apple ID, Google account) and RevenueCat, which turns store receipts into a single entitlement.
 
@@ -37,7 +37,7 @@ flowchart LR
   Gated["Gated commands\nai_*, incognito, usage"] -- "require_pro" --> App
 ```
 
-- **`tauri-plugin-billing`** (`src-tauri/plugins/tauri-plugin-billing`) wraps `purchases-ios` and `purchases-android`. RevenueCat has no Tauri SDK. Its methods (`configure`, `customerInfo`, `offerings`, `purchase`, `restore`) are Rust-only: no Tauri command, permission or capability exists for them, so neither the shell nor a site view can call the plugin. Desktop returns `Unsupported`.
+- **`tauri-plugin-billing`** (`src-tauri/plugins/tauri-plugin-billing`) wraps `purchases-ios` and `purchases-android`. RevenueCat has no Tauri SDK. Its methods (`configure`, `customerInfo`, `offerings`, `purchase`, `restore`) are Rust-only: no Tauri command, permission or capability exists for them, so neither the shell nor a site view can call the plugin. On macOS the same API is served by a Swift package linked into the app (`macos/`, see [Platform Support](./platform-support.md#the-macos-site-view)); Windows and Linux return `Unsupported`.
 - **`entitlement.rs`** owns the state (`loading`, `free`, `pro`), resolves it in the background at launch, and exposes the commands the shell uses. It is the only place Pro is decided.
 - **The gate is in Rust.** `require_pro` runs at the top of each gated command, so a UI bug cannot unlock a feature. Gated: `ai_save_provider`, `ai_set_key`, `ai_set_active`, `ai_test`, `set_ai_preview`, `ai_prepare`, `ai_send`, `ai_accept`, `unlock_incognito`, `enter_incognito`, `get_incognito_favorites`, `set_incognito_favorites`, `get_usage`, `get_usage_policies`, `set_usage_policy`, and `set_usage_blocked` when blocking. A rejected call returns the stable code `pro-required`, which the shell turns into the paywall. If Pro is lost while incognito is on, incognito is switched off.
 - **Favorites limit.** `set_favorites` and `set_site_favorite` call `require_pro` when a save would grow the list past `FREE_FAVORITE_LIMIT` (4, `library.rs`; mirrored by `FREE_QUICK_ACCESS_LIMIT` in the shell). A list already longer (the five defaults, or Pro that lapsed) can still be edited, reordered and shortened, just not extended; its entries past the fourth show grayed out and do nothing but open the paywall.
@@ -63,6 +63,7 @@ Public SDK keys are not secrets but are kept out of the repo. `src-tauri/build.r
 | Variable | Purpose |
 |---|---|
 | `OPENMEDIA_RC_KEY_IOS` | RevenueCat public key, `appl_…` |
+| `OPENMEDIA_RC_KEY_MACOS` | Optional: RevenueCat public key for the Mac app, `appl_…`; defaults to `OPENMEDIA_RC_KEY_IOS` |
 | `OPENMEDIA_RC_KEY_ANDROID` | RevenueCat public key, `goog_…` |
 | `OPENMEDIA_DEV_ENTITLEMENT` | Debug builds only: `pro` or `free` |
 | `EXPO_PUBLIC_FORCE_ENABLE_PRO_ON_SIMULATOR` | Debug only: `true` grants Pro after native code confirms iOS Simulator or Android Emulator; ignored on physical devices and release builds. |
