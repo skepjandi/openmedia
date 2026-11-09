@@ -39,7 +39,8 @@
       "bundleVersion": "1000"
     },
     "android": {
-      "minSdkVersion": 24
+      "minSdkVersion": 24,
+      "versionCode": 1000
     }
   }
 }

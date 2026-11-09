@@ -41,7 +41,7 @@ Not included yet: **Mac** (required for a Mac app: one of 1280 × 800, 1440 × 9
 
 ## Android caveat
 
-OpenMedia has no Android build yet ([README status](../../README.md#status)), so the Android sets reuse the iOS captures in a neutral device frame. Google Play expects screenshots of the Android app: replace `android/` with Android captures before submitting.
+The Android site-view implementation and build path exist, but Android has not been verified on a device or emulator. These Android artwork sets reuse iOS captures in a neutral device frame; replace them with Android app captures before submitting to Google Play.
 
 ## Regenerating
 

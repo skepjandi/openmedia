@@ -2,7 +2,7 @@
 
 > **Status: Partially implemented.** Options (user-facing toggles) are implemented; see [Options](#options-user-facing-toggles). A subset of schema v1 is built in `src-tauri/src/recipes/` (see [Implemented subset](#implemented-subset)). Everything else below is still the intended design; the Rust types become the source of truth and this page follows them.
 
-A **recipe** is a JSON document describing how to modify one site (or a set of URL patterns). Declarative on purpose: the AI emits it, Rust validates it, the engine applies it, and users can read, toggle, edit, export, and share it.
+A **recipe** is a JSON document describing how to modify one site (or a set of URL patterns). The intended workflow is for AI to propose data, Rust to validate it, and the app to apply it; user editing, export, and sharing are future flows.
 
 ## Why declarative, not scripts
 
@@ -149,13 +149,12 @@ Each rule may declare `expect`: `"match"` (should match ≥1 element on pages sa
 
 ## Forks
 
-When the user or the in-app assistant changes a bundled recipe, the result is saved as a **fork**, never as an edit of the bundled one. A fork is a recipe file `<app_data>/recipes/<id>.json` with the **same id** as the bundled recipe, `origin` `user` or `ai`, and `forkedFrom` set to the bundled version it was copied from.
+Fork persistence is implemented in Rust, but the user-facing fork workflow is not connected. `Recipes::save_fork` writes a validated customized copy under `<app_data>/recipes/<id>.json`, keyed to the bundled recipe id with `forkedFrom`; loading that file makes it replace the bundled recipe.
 
-- **Updates cannot break it.** The bundled recipes are replaced by app updates; the files in `<app_data>/recipes/` are never touched. While a fork exists it replaces the bundled recipe of that id, and the user's switches and per-site margin (keyed by id) carry over.
-- **The user can see and undo it.** Settings > Recipes marks a recipe that runs on a changed copy, says when the app's original has a different version than the one the copy started from, and offers "Restore the original" (`restore_recipe_original`), which deletes the file.
-- **Saving.** `save_recipe_fork` takes the recipe JSON, validates it like any recipe, requires the id of a bundled recipe and an origin of `user` or `ai`, stamps `forkedFrom`, writes the file atomically, and recompiles the page script. It has no caller in the shell yet: the assistant's accept step will use it.
+- **Updates:** a fork records the bundled version it came from. Automatic merging of newer bundled rules into a fork is not implemented.
+- **Rust commands:** `save_recipe_fork` and `restore_recipe_original` are registered, but no shell UI calls them. AI acceptance currently saves through `Recipes::save_made`; it does not use the fork command.
+- **UI:** editing/saving a fork and the restore-original action are not wired into Settings. The persistence functions and commands should not be mistaken for an available user flow.
 - **Damaged files.** A fork file that is unreadable, invalid, not a fork, or for a recipe that is no longer bundled is ignored at startup; the bundled recipe applies.
-- **Not built yet:** merging a newer bundled recipe into a fork. For now the user is told and chooses to keep the copy or restore the original.
 
 ## Lifecycle of a recipe
 

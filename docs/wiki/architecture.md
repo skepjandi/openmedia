@@ -1,6 +1,6 @@
 # Architecture
 
-> **Status: Partially implemented, iOS first.** The shell, native site sessions, bundled recipe subset, BYOK assistant and local usage controls exist. Desktop, Android, multiple profiles and the full runtime described below remain planned; see the roadmap and component pages for implemented boundaries.
+> **Status: Partially implemented.** The React shell, Rust core, iOS and Android native site-view plugins, bundled recipes, BYOK assistant, and local usage controls exist. iOS has simulator verification; Android device/emulator behavior is unverified. Desktop site views, profile selection, and parts of the planned runtime remain unimplemented. See the component pages for exact boundaries.
 
 ## Overview
 
@@ -41,9 +41,9 @@ flowchart LR
 
 ## Components
 
-### SiteView (Rust, two implementations)
+### SiteView (Rust API, native iOS/Android implementations)
 
-One trait, two backends. Everything above it is platform-agnostic.
+The Rust API is shared; Swift on iOS and Kotlin on Android provide the native web views. Desktop currently returns `DesktopUnsupported`.
 
 | Operation | Purpose |
 |-----------|---------|
@@ -55,8 +55,8 @@ One trait, two backends. Everything above it is platform-agnostic.
 | `request_snapshot(opts)` | Ask the engine for a pruned, redacted DOM snapshot |
 | `events` | Stream: navigation, title, load state, match reports, picker results |
 
-- **Desktop** (macOS/Windows/Linux): Tauri child webview via `Window::add_child` (needs the `unstable` Cargo feature) plus `initialization_script`.
-- **Mobile** (iOS/Android): `add_child` is not supported on mobile (upstream [tauri#11794](https://github.com/tauri-apps/tauri/issues/11794), open). An in-repo Tauri plugin hosts a native `WKWebView` / Android `WebView` and exposes the same trait. See [Platform Support](./platform-support.md).
+- **Desktop** (macOS/Windows/Linux): site views are deferred; no child-webview implementation exists.
+- **Mobile** (iOS/Android): the in-repository Tauri plugin hosts a native `WKWebView` / Android `WebView` and exposes the shared API. See [Platform Support](./platform-support.md).
 
 ### Recipe store (Rust)
 
@@ -64,15 +64,15 @@ Recipes are JSON files in the app data dir, one per recipe. Bundled recipes ship
 
 ### AI service (Rust)
 
-Provider trait with adapters for Anthropic, OpenAI, Google Gemini, OpenRouter, and any OpenAI-compatible base URL (covers local Ollama/LM Studio). Calls are made from Rust, so there is no CORS problem and the key never enters a webview. See [AI Assistant](./ai-assistant.md).
+Rust has an Anthropic adapter and an OpenAI-compatible adapter (including Gemini, OpenRouter, OpenCode Zen, Ollama, LM Studio, and compatible endpoints). Requests run in Rust, so the key never enters a webview. See [AI Assistant](./ai-assistant.md).
 
 ### Secret store (Rust)
 
-API keys go in the OS credential store: Keychain (macOS/iOS), Credential Manager (Windows), Secret Service (Linux), Android Keystore-backed storage. Behind a small in-repo trait so the backing plugin can be swapped. See [Security](./security.md).
+The in-repository `SecretStore` uses the iOS Keychain and Android Keystore-backed storage. Desktop credential stores are not implemented. See [Security](./security.md).
 
-### Engine (TypeScript, injected)
+### Recipe page script (Rust-generated)
 
-A self-contained script bundled to a single IIFE and injected at document start in every frame of every site view. Applies recipe rules, survives SPA navigation, runs the element picker, builds snapshots. See [Site Runtime](./site-runtime.md).
+Rust compiles the implemented recipe subset (`hide` and `css`) into a self-contained document-start script in `src-tauri/src/recipes/compile.rs`. It matches the page URL and injects a stylesheet. This is not a standalone TypeScript engine; SPA observers and the richer runtime described in [Site Runtime](./site-runtime.md) remain design work.
 
 ### Shell (React)
 
@@ -151,53 +151,47 @@ sequenceDiagram
 
 | Data | Location | Notes |
 |------|----------|-------|
-| Recipes (user, AI, imported) | `<app_data>/recipes/<id>.json` | Portable, exportable, no secrets |
-| Settings (selected provider, model, privacy toggles) | `<app_data>/settings.json` | No secrets |
-| API keys | OS secure store | Never in files |
-| Site cookies/storage | Per-profile webview data store | Isolated per profile |
-| Bundled recipes | Embedded in binary | Updated via app release |
+| Favorites, settings, history and provider configuration | `<app_data>/library.json` | No API keys |
+| Usage records and policies | `<app_data>/usage.json` | Local data |
+| User recipe forks | `<app_data>/recipes/` | Bundled recipes are embedded from `recipes/bundled/` |
+| API keys | OS secure storage | iOS Keychain; Android Keystore-backed plugin; never returned to the shell |
+| Site cookies/storage | Native webview profile store | Android behavior is not device-verified |
 
-No sync in v1. Export/import covers portability. Optional user-owned sync (own git repo or file location) is a later phase.
+There is no cross-device sync. Recipe export/import is not implemented yet.
 
-## Tech stack (planned defaults)
+## Current stack
 
-| Layer | Choice |
-|-------|--------|
+| Layer | Implementation |
+|-------|----------------|
 | App framework | Tauri v2 |
-| Core | Rust, `reqwest`, `serde`, `schemars`, `thiserror` |
-| Shell | React + TypeScript (strict) + Vite |
+| Shell | React 19, TypeScript, Vite, Tailwind CSS v4 |
 | State | Zustand |
-| Styling | Tailwind CSS |
-| Engine | TypeScript, bundled to one IIFE (esbuild) |
-| Tests | Vitest + Testing Library; Playwright for engine-on-fixtures; `cargo test` |
-| Package manager | yarn |
-| Releases | GitHub Releases + `tauri-plugin-updater` (desktop); App Store / Play (mobile) |
+| Core | Rust; `serde`, `reqwest`, `thiserror`, `keyring`, `adblock` |
+| Native site view and billing | In-repository Tauri plugins: Swift/iOS and Kotlin/Android |
+| Tests | Vitest and Rust tests |
+| Package manager | Yarn 1 |
 
-The recipe schema is defined once in Rust (`serde` + `schemars`), exported as JSON Schema, and TS types are generated from it. Rust owns validation because AI output arrives in Rust.
+The current dependencies are listed in `package.json` and `src-tauri/Cargo.toml`. The AI and recipe formats evolve with the implementation; this page does not describe planned crates or generated schema tooling as present.
 
-## Planned repository layout
+## Repository layout
 
-```
-src/                       Shell (React)
-  app/ features/{browser,recipes,ai,settings}/ shared/
-assets/
-  logo.svg                 Brand mark (source of truth for app icons)
-engine/                    Injected page script (TS) -> src-tauri/resources/engine.js
+```text
+src/
+  app/                  React app state and composition
+  features/             UI grouped by feature (AI, web, settings, stats, ...)
+  shared/               Shared frontend state, IPC helpers, and components
+  i18n/                 Localized UI messages
 src-tauri/
-  src/
-    site_view/{mod,desktop,mobile}.rs
-    ad_block.rs              Bundled lists -> WebKit content rule list JSON
-    recipes/{schema,store,resolve,validate}.rs
-    ai/{mod,provider,anthropic,openai,gemini,openai_compat}.rs
-    secrets/mod.rs
-    bridge.rs
-  plugins/tauri-plugin-siteview/   Swift (iOS) + Kotlin (Android) native webview host
-  capabilities/
-blocklists/                  Bundled EasyList + EasyPrivacy (updated by scripts/update-blocklists.sh)
+  src/                  Rust app, commands, recipes, AI, storage, usage
+  plugins/
+    tauri-plugin-siteview/  Swift and Kotlin native site views
+    tauri-plugin-billing/   Store billing adapters
+  gen/                  Generated Apple and Android native projects
 recipes/
-  bundled/<site>.json
-  fixtures/<site>/           Scrubbed DOM fixtures for tests
-docs/wiki/
+  bundled/              JSON recipes embedded by Rust
+blocklists/              Bundled EasyList and EasyPrivacy files
+assets/store/            Store listing artwork and source captures
+docs/wiki/               Source-controlled wiki, synced to GitHub Wiki
 ```
 
 ## See Also

@@ -6,34 +6,33 @@
 
 > Project knowledge base for contributors and AI agents. All pages are automatically synced to the [GitHub Wiki](https://github.com/skepjandi/openmedia/wiki) on every merge to `main`.
 
-**Project status: Design.** No application code exists yet. Pages marked `Status: Design` describe the intended system; the PR that implements a piece flips its banner to `Implemented` and replaces intent with fact.
+**Project status: implemented, with platform verification limits.** iOS is the verified platform; Android implementation and build support exist but are not device-verified. Desktop site views remain deferred. The wiki describes current behavior and labels unverified work.
 
-## What OpenMedia is
-
-A Tauri v2 app for desktop and mobile that loads any website in an embedded webview and lets you reshape it. Remove Instagram Reels, strip YouTube Shorts, hide any element on any site. Customizations are declarative **recipes**. Popular sites ship with bundled recipes; for any other site, an AI assistant writes the recipe from a plain-language request using an API key you provide. No backend, no accounts, no telemetry.
+OpenMedia is a Tauri v2 app for browsing websites in native web views and customizing them with user-controlled recipes. It includes bundled recipes, ad blocking, and an optional AI assistant. No OpenMedia-operated backend; purchases use RevenueCat.
 
 ## Pages
 
 | Page | Description |
 |------|-------------|
-| [Architecture](./architecture.md) | Components, data flow, tech stack, planned repository layout |
+| [Architecture](./architecture.md) | Current components, data flow, stack, and repository layout |
 | [Recipe Format](./recipe-format.md) | The declarative customization format: targets, rules, matching, versioning, trust levels |
-| [Site Runtime](./site-runtime.md) | The injected page script: injection timing, SPA navigation, picker, snapshot, health reporting |
+| [Site Runtime](./site-runtime.md) | Runtime design: injection, SPA navigation, picker, snapshots, and reporting |
 | [AI Assistant](./ai-assistant.md) | BYOK providers, snapshot redaction, structured generation, repair loop |
 | [Security](./security.md) | Threat model, invariants, IPC boundary, key storage, legal and store-policy risks |
 | [Paywall](./paywall.md) | Pro entitlement via RevenueCat: what is paid, plans, Rust-side gate, no-login restore, store setup |
-| [Platform Support](./platform-support.md) | Desktop vs iOS vs Android: what works, what needs a native plugin, open verifications |
+| [Platform Support](./platform-support.md) | iOS and Android implementation status, desktop support, and verification limits |
 | [UI Design](./ui-design.md) | The floating-button interface: tone, tokens, gestures, layering, what is and is not connected |
 | [Site Playbooks](./site-playbooks.md) | Per-site options for the default favorites, what every selector matched and how it was checked, what CSS cannot do, and the selector-writing rules for the in-app assistant |
 | [Internationalization](./i18n.md) | 29 UI languages, message catalog, plurals, right-to-left, adding a language |
 | [Ad Blocking](./ad-blocking.md) | Bundled EasyList and EasyPrivacy as WebKit content rule lists: engine choice, caching, limits |
 | [Prior Art](./prior-art.md) | SocialLite and others: what they do, what we copy, where we differ |
 | [Roadmap](./roadmap.md) | Phased build plan with exit criteria, spikes, decision log, risks |
-| [Development Guide](./development-guide.md) | Planned toolchain, commands, conventions |
+| [Development Guide](./development-guide.md) | Toolchain, commands, and conventions |
+| [Store Builds](./store-builds.md) | iOS App Store and Android Google Play build, signing, and release steps |
 
 ## Quick Start
 
-Not runnable yet. The planned commands are in the [Development Guide](./development-guide.md); Phase 1 of the [Roadmap](./roadmap.md) creates the scaffold.
+Install the prerequisites in the [Development Guide](./development-guide.md), then run `yarn install`. For mobile release builds and signing, see [Store Builds](./store-builds.md).
 
 ## AI Agent Note
 

@@ -1,6 +1,6 @@
 # Development Guide
 
-> **Status: Partially implemented.** The web and Rust checks and `yarn tauri ios dev` are verified. Android is not built (the Kotlin plugin code was removed until iOS is stable), and on desktop the shell runs but opening a site returns "site views are not implemented on desktop yet".
+> **Status: Implemented, with platform verification limits.** The iOS app and checks are verified on simulators. Android has Kotlin site-view and billing implementations and an AAB build path, but device/emulator behavior and signed store builds are unverified. Desktop site views are deferred.
 
 ## Prerequisites
 
@@ -9,8 +9,8 @@
 | Rust (stable, 1.90 or newer) + `cargo`, plus the `aarch64-apple-ios-sim` and `aarch64-apple-ios` targets | Core, iOS |
 | Node 22 or newer + yarn 1.x | Shell, tooling (CI uses 22; also ran on 26) |
 | Xcode (+ command line tools), CocoaPods, XcodeGen | iOS builds, iOS plugin (Swift) |
-| Android Studio + NDK, JDK | Android builds (not built yet) |
-| WebView2 runtime / WebKitGTK dev packages | Windows / Linux builds (deferred) |
+| Android Studio + Android SDK/NDK, JDK | Android builds (device behavior not yet verified) |
+| WebView2 runtime / WebKitGTK dev packages | Windows / Linux builds (site views deferred) |
 
 ## Commands
 
@@ -26,22 +26,22 @@ cargo test --manifest-path src-tauri/plugins/tauri-plugin-siteview/Cargo.toml
 scripts/test-domain-scope.sh   # iOS plugin's domain-pinning rules (needs only swiftc)
 ```
 
-To time startup, run the release build with the frontend embedded: `tauri ios dev` loads the Vite dev server and `--no-dev-server` leaves nothing to load. Build the simulator app and install it:
+To measure startup or install a simulator build:
 
 ```bash
 APPLE_DEVELOPMENT_TEAM=<team id> yarn tauri ios build -t aarch64-sim --archive-only --ci
 xcrun simctl install <device> src-tauri/gen/apple/build/openmedia_iOS.xcarchive/Products/Applications/OpenMedia.app
 ```
 
-Point `lastUrl` in the app's `library.json` at a local fixture server and record the launch with `xcrun simctl io <device> recordVideo`; the numbers and method are in [Platform Support](./platform-support.md#startup). Uninstall before installing a changed launch screen: the simulator keeps the old launch snapshot for an installed app.
+Point `lastUrl` in the app's `library.json` at a local fixture server and record the launch with `xcrun simctl io <device> recordVideo`; results are in [Platform Support](./platform-support.md#startup). The simulator archive is not an App Store release. See [Store Builds](./store-builds.md) for signed releases.
 
-Not built: `yarn tauri android dev` (the Android site view does not exist yet), `yarn tauri dev` (desktop site view).
+Android commands are available with `yarn tauri android dev` and `yarn tauri android build --aab --ci`; see [Platform Support](./platform-support.md#the-android-site-view) for the limited build evidence. Desktop site views are not implemented.
 
 ## Conventions
 
 - Work in a worktree under `.worktrees/` (see `AGENTS.md`).
 - Conventional-commit prefixes: `feat`, `fix`, `docs`, `refactor`, `test`, `chore`, with scope = area (`engine`, `ai`, `recipes`, `shell`, `siteview`, `secrets`, `ios`, `android`).
-- Recipe schema is defined in Rust; regenerate TS types and JSON Schema after any schema change (`yarn gen:schema`, added with the schema).
+- The recipe schema and validation live in Rust under `src-tauri/src/recipes/`; the current repository has no `yarn gen:schema` script.
 - Bundled recipe changes require fixture updates in `recipes/fixtures/<site>/`.
 - Fixtures are scrubbed of personal data before commit; raw captures go in the gitignored `captures/`.
 - Bundled filter lists in `blocklists/` are refreshed only with `scripts/update-blocklists.sh` and shipped with a release; the app never downloads them. Run `cargo test ad_block` after a refresh ([Ad Blocking](./ad-blocking.md#updating-the-lists)).

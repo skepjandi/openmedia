@@ -1,28 +1,28 @@
 # Platform Support
 
-> **Status: Partially implemented.** The iOS site view exists (`src-tauri/plugins/tauri-plugin-siteview`, Swift) and the Android one now exists too (`.../android`, Kotlin). Only the iOS checks under [Verified results](#verified-results) were run, on one simulator; the Android code has not been run on a device or an emulator, and everything else marked **verify** is still unproven. Desktop is deferred.
+> **Status: Partially implemented.** Native iOS (Swift) and Android (Kotlin) site-view plugins exist. iOS behavior has simulator evidence; Android code and an AAB build path exist, but Android device/emulator behavior and a signed store build are unverified. Desktop site views are deferred.
 
 ## The core constraint
 
 Tauri's multi-webview API (`Window::add_child`) is gated behind the `unstable` Cargo feature and **desktop-only**; upstream tracks mobile support in [#11794](https://github.com/tauri-apps/tauri/issues/11794) and [#11528](https://github.com/tauri-apps/tauri/issues/11528), both open. A mobile app has one Tauri webview, and navigating it to a site would destroy the shell. So:
 
-- **Mobile (iOS, Android) — first-class:** site view = native webview hosted by our own Tauri plugin (`tauri-plugin-siteview`; Swift today, Kotlin to come), positioned over a rectangle the shell reports. iOS first.
-- **Desktop — deferred:** site view = Tauri child webview. The plugin's desktop build returns `DesktopUnsupported` until this is built.
+- **Mobile (iOS and Android):** each uses an in-repository native site-view plugin (`tauri-plugin-siteview`), positioned by the shell. The implementation exists on both platforms; iOS is the verified platform.
+- **Desktop — deferred:** the plugin returns `DesktopUnsupported`; a child-webview implementation does not exist.
 
-The shell talks to one plugin API (`open`, `set_rect`, `navigate`, …); desktop will implement the same surface ([Architecture](./architecture.md#siteview-rust-two-implementations)).
+The shell talks to the shared site-view API (`open`, `set_rect`, `navigate`, …); the native iOS and Android plugins implement it. Desktop support remains deferred ([Architecture](./architecture.md#components)).
 
 ## Matrix
 
 | Capability | macOS | Windows | Linux | iOS | Android |
 |------------|-------|---------|-------|-----|---------|
 | Webview engine | WKWebView | WebView2 | WebKitGTK | WKWebView | Android System WebView |
-| Site view mechanism | Tauri child webview | Tauri child webview | Tauri child webview | Native plugin | Native plugin |
-| Document-start injection | `initialization_script` | `initialization_script` (also subframes) | `initialization_script` | `WKUserScript` | `addDocumentStartJavaScript` if supported, else `onPageStarted` (late) |
-| Isolated profiles | `data_store_identifier` (**verify** min OS) | `data_directory` | `data_directory` | `WKWebsiteDataStore(forIdentifier:)` (iOS 17+; **verify** fallback for older) | One global `CookieManager` per app; per-profile needs androidx.webkit multi-profile (feature-gated, **verify**) |
-| Page → Core channel | Bridge A (**verify**) | Bridge A (**verify**) | Bridge A (**verify**) | Bridge B (script message handler) | Bridge B (web message listener) |
-| Secret store | Keychain | Credential Manager | Secret Service | Keychain | Keystore-backed |
-| Ad and tracker blocking | Not built (deferred with desktop) | Not built | Not built | `WKContentRuleList` from bundled lists ([Ad Blocking](./ad-blocking.md)) | Request interception (`shouldInterceptRequest`) over the same rule JSON ([Ad Blocking](./ad-blocking.md)) |
-| Auto-update | updater plugin | updater plugin | updater plugin | App Store | Play Store |
+| Site view mechanism | Not implemented | Not implemented | Not implemented | Native plugin | Native plugin |
+| Document-start injection | Not implemented | Not implemented | Not implemented | `WKUserScript` | `addDocumentStartJavaScript` if supported, else `onPageStarted` (late) |
+| Isolated profiles | Not implemented | Not implemented | Not implemented | `WKWebsiteDataStore(forIdentifier:)` (iOS 17+; simulator-verified) | Requires `MULTI_PROFILE`; implemented, device support unverified |
+| Page → Core channel | Not implemented | Not implemented | Not implemented | Native message handler | AndroidX web message listener |
+| Secret store | Not implemented | Not implemented | Not implemented | Keychain | Keystore-backed plugin (device behavior unverified) |
+| Ad and tracker blocking | Not built | Not built | Not built | `WKContentRuleList` from bundled lists ([Ad Blocking](./ad-blocking.md)) | Request interception (`shouldInterceptRequest`) over the same rule JSON ([Ad Blocking](./ad-blocking.md)) |
+| Distribution / updates | Not built | Not built | Not built | App Store | Google Play |
 | Priority | 3 | 4 | 4 | **1** | **1** |
 
 iOS and Android first. macOS next (same engine as iOS, fastest desktop path), then Windows/Linux after the engine and format settle; Linux WebKitGTK is the most likely to need per-site workarounds.
@@ -105,7 +105,7 @@ A single black or white frame at the moment a new page is revealed remained afte
 **Decisions that follow:**
 
 - **iOS 17 is the minimum.** `forIdentifier:` is iOS 17+, and the Tauri iOS template defaults to 15, so `tauri.conf.json` sets `bundle.iOS.minimumSystemVersion` to 17.0. This resolves the roadmap's open question on older iOS versions.
-- **Android must require `WebViewFeature.MULTI_PROFILE` and `WEB_MESSAGE_LISTENER`** (decided, not built). If either is missing, `open` should fail with a message asking the user to update System WebView. A silent single-profile fallback would break the profile-isolation invariant.
+- Android requires `MULTI_PROFILE` and `WEB_MESSAGE_LISTENER` at runtime; Kotlin implements these checks and has no single-profile fallback. Device/emulator behavior remains unverified.
 
 ## Startup
 
@@ -146,7 +146,7 @@ The site view is a native view *below* the Tauri shell, so the shell's floating 
 - A transparent `TouchRouter` view sits above both. The shell reports the rectangles of its interactive elements (`[data-hit]`) with `set_interactive_regions`; a touch inside one goes to the shell, any other touch goes to the page. With no site view open, the shell gets every touch.
 - Opening the fan, the command bar or settings adds a full-screen interactive region, so the page cannot be touched underneath them.
 - **Sessions.** The plugin keeps one `WKWebView` per session (a dictionary keyed by the shell's session UUID), all stacked below the shell, all but the active one `isHidden`. `open` adds a view and shows it; `activate` shows an existing one without reloading; `close` removes one. Every session uses the same profile data store, so logins are shared. The touch router points at the active view only. A session's content rule lists are swapped on all views; hidden ones reload when next shown. A backdrop view (the app's ink or paper) sits under every page, and a new page stays invisible until it has painted. Lifetime policy lives in the shell ([UI Design](./ui-design.md#sessions)); the plugin only reports `siteview:memory` (from `UIApplication.didReceiveMemoryWarningNotification`) and `siteview:closed` (a hidden session's web content process died).
-- **Domain pinning and the popup.** `decidePolicyFor`, `createWebViewWith` and the first-load rule all go through `DomainScope.verdict` (`ios/Sources/DomainScope.swift`, pure Foundation, checked by `scripts/test-domain-scope.sh`). Outside-domain main-frame navigations are cancelled and shown in an `SFSafariViewController` presented from the top view controller.
+- **Domain pinning and the popup.** `decidePolicyFor`, `createWebViewWith` and the first-load rule go through `DomainScope.verdict` (`src-tauri/plugins/tauri-plugin-siteview/ios/Sources/DomainScope.swift`, pure Foundation, checked by `scripts/test-domain-scope.sh`). Outside-domain main-frame navigations are cancelled and shown in an `SFSafariViewController` presented from the top view controller.
 - Native gestures (iOS edge-swipe back) stay on the site view; state changes are mirrored to the shell via `siteview:state` events.
 - Tap-to-pick, AI chat, and the rule list live in the command bar and settings; the picker highlight lives in the page (engine).
 
@@ -154,7 +154,7 @@ Fallback if the native-plugin approach fails: navigate the main webview to the s
 
 ## The Android site view
 
-`src-tauri/plugins/tauri-plugin-siteview/android` (Kotlin, package `surf.openmedia.siteview`, class `SiteViewPlugin`) is the Android twin of the Swift plugin and speaks the same Rust API (`src/models.rs` is the source of truth; the JSON is camelCase, and `setBlocked`, `authenticate` and `evaluate` stay Rust-only).
+`src-tauri/plugins/tauri-plugin-siteview/android` (Kotlin, package `surf.openmedia.siteview`, class `SiteViewPlugin`) is the Android twin of the Swift plugin and speaks the same Rust API (`src-tauri/plugins/tauri-plugin-siteview/src/models.rs` is the source of truth; the JSON is camelCase, and `setBlocked`, `authenticate` and `evaluate` stay Rust-only).
 
 - **Layout.** Tauri puts the shell webview straight into the activity's content view, so the plugin adds its own `PageLayer` (a `ViewGroup`) as the first child of that content frame: the page views live in the layer, below the shell, and the layer lays them out at the rectangle the shell reports with `set_rect`. The shell is made transparent (`setBackgroundColor(Color.TRANSPARENT)`) so the page shows through it, and a backdrop in the layer holds the app's own colour until a page has painted.
 - **Touch routing.** Android has no hit-test fall-through between sibling views, so the shell webview keeps an `OnTouchListener`: a touch inside a region the shell reported goes to the shell, every other touch is copied to the page webview with its coordinates moved into the page's space and dispatched there. The page view is the target, so the shell never sees a page touch.
@@ -167,14 +167,14 @@ Fallback if the native-plugin approach fails: navigate the main webview to the s
 - **Notifications.** A local notification for a hidden session, with the session id in the intent; the tap is reported back as `siteview:notification-tap`. `POST_NOTIFICATIONS` is requested the first time one is due.
 - **Secrets.** Android has no `keyring` backend, so the plugin's Kotlin side keeps a key in the Android Keystore (AES-GCM) and writes only the ciphertext to the app's preferences, which the app's backup rules exclude. Rust reaches it through a Rust-only plugin command, so no webview can ask for a key.
 
-**Build verification.** `yarn tauri android build --aab --ci` produced `src-tauri/gen/android/app/build/outputs/bundle/universalRelease/app-universal-release.aab` (25 MB), with release Rust libraries for all four Android ABIs and compiled Kotlin plugins. The AAB is unsigned because no upload key was configured; `jarsigner -verify` reported it unsigned. Release signing reads the ignored `src-tauri/gen/android/keystore.properties` (`keyAlias`, `password`, `storeFile`) when present. The app has not been installed or run on an Android device or emulator. Never commit the keystore properties file.
+**Build verification.** `yarn tauri android build --aab --ci` produced `src-tauri/gen/android/app/build/outputs/bundle/universalRelease/app-universal-release.aab` (25 MB), with release Rust libraries for all four Android ABIs and compiled Kotlin plugins. That build was unsigned because no upload key was configured. Gradle reads ignored `src-tauri/gen/android/keystore.properties` (`keyAlias`, `password`, `storeFile`) when present. The app has not been installed or run on an Android device or emulator. See [Store Builds](./store-builds.md).
 
 ## Known platform constraints
 
 - **Android late injection.** Without document-start-script support, injection can run after page scripts. CSS-first rules flash briefly; mitigated by hiding the view until the first inject, and by feature-detecting support (most current WebViews support it).
 - **iOS WKWebView isolation.** `WKWebsiteDataStore(forIdentifier:)` requires iOS 17+. Older targets get a single shared store (one profile) unless a fallback is found.
 - **Web versions are not native apps.** Mobile web Instagram/Facebook lack features (SocialLite documents: posting, one-time-view DMs, sending video, poll stickers, some music). Our product inherits these limits; communicate them rather than promising parity.
-- **No push notifications.** Push for a third-party site needs a server relaying APNs/FCM. Out of scope by design (no backend). What exists instead: unread badges and **local** notifications for quick-access sites ([UI Design](./ui-design.md#unread-badges-and-notifications)). The page's title is read natively, so they work only while the app runs: iOS suspends it, and its web views, shortly after it is backgrounded, and a site that does not put a count in its title raises nothing. Android is not implemented.
+- **No push notifications.** Push for a third-party site needs a server relaying APNs/FCM. Out of scope by design (no backend). What exists instead: unread badges and local notifications for quick-access sites ([UI Design](./ui-design.md#unread-badges-and-notifications)). Android notification code exists but is not device-verified.
 - **Cannot modify native apps.** iOS forbids altering other apps; Android can only via Accessibility Service (SocialLite's approach). We do neither: we replace the native app with the customized web view. A shell shortcut/URL-handler experience is a possible later step.
 - **Background behavior.** A backgrounded site view may be suspended by the OS; do not rely on live observers while hidden.
 
