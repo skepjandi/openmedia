@@ -53,6 +53,19 @@ body,
   -webkit-tap-highlight-color: transparent;
 }
 
+/* WebKit on iOS does not reliably inherit `user-select: none` from the root: holding the floating
+   button then starts text selection and shows its magnifier. Say it on every element. It is in the
+   base layer so the `select-text` utility (the payload preview) and the input rule still win. */
+@layer base {
+  *,
+  *::before,
+  *::after {
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+  }
+}
+
 input {
   -webkit-user-select: text;
   user-select: text;

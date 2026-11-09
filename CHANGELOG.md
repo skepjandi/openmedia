@@ -8,6 +8,14 @@ All notable changes to OpenMedia are documented here.
 
 ## 2026-11-09
 
+### fix(shell): no text-selection magnifier when holding the floating button
+
+**Problem:** on iPhone, holding the floating button showed the text-selection magnifier. The shell sets `user-select: none` on the root only, and WebKit on iOS does not reliably inherit it, so the hold started a text selection.
+
+**Change:** `user-select: none` and `-webkit-touch-callout: none` are set on every element (`*`) in `index.css`; inputs and the payload preview keep `select-text`. The floating button also cancels the context menu.
+
+**Verified:** `tsc`, ESLint, Prettier, frontend tests. **Not verified:** on an iPhone. I could not reproduce the magnifier here, so this follows WebKit's known behavior; if it still appears, the cause is in the native shell view's text-interaction gesture, and the fix moves to `SiteViewPlugin.swift`.
+
 ### fix(shell): a crown for Pro, a fingerprint for biometric checks
 
 **Problem:** the same padlock marked what the paywall unlocks (Usage, Incognito, Chat, the extra favorites slots, the AI card) and what asks for Face ID, Touch ID or the passcode (the locked incognito sections in Settings), so the two could not be told apart.

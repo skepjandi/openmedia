@@ -397,6 +397,7 @@ export function Fab() {
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}
         onPointerCancel={onPointerCancel}
+        onContextMenu={(event) => event.preventDefault()}
         style={{
           width: FAB_SIZE,
           height: FAB_SIZE,
