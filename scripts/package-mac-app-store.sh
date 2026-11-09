@@ -45,6 +45,17 @@ cp -R "$app" "$signed"
 # HTTPS only, no custom cryptography: answers the export-compliance question at upload.
 plutil -replace ITSAppUsesNonExemptEncryption -bool false "$signed/Contents/Info.plist"
 cp "$MAS_PROFILE" "$signed/Contents/embedded.provisionprofile"
+# The app icon goes in as an asset catalog (Assets.car) with a matching .icns, which is how Xcode
+# ships it and what the App Store's tools read the icon from.
+rm -f "$signed/Contents/Resources/icon.icns"
+xcrun actool "$root/src-tauri/macos/Assets.xcassets" --compile "$signed/Contents/Resources" \
+  --platform macosx --minimum-deployment-target 14.0 --app-icon AppIcon \
+  --output-partial-info-plist "$work/icon.plist" > /dev/null
+for key in CFBundleIconFile CFBundleIconName; do
+  value=$(plist -c "Print :$key" "$work/icon.plist")
+  plist -c "Delete :$key" "$signed/Contents/Info.plist" 2> /dev/null || true
+  plist -c "Add :$key string $value" "$signed/Contents/Info.plist"
+done
 # A profile kept private (mode 600) would make the installed app unreadable to non-root users,
 # which App Store validation rejects (error 90255).
 chmod -R a+rX,u+w "$signed"

@@ -206,3 +206,6 @@ test-results/
 # Raw, unscrubbed captures of real sites (scrub, then move into recipes/fixtures/)
 /recipes/fixtures-raw/
 /captures/
+
+# Store packages from yarn release
+/release

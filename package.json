@@ -10,6 +10,7 @@
     "dev:android": "tauri android dev",
     "dev:desktop": "tauri dev",
     "build": "node scripts/build.mjs",
+    "release": "node scripts/release.mjs",
     "build:web": "yarn icons:fetch && tsc && vite build",
     "preview": "vite preview",
     "tauri": "tauri",
