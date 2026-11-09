@@ -169,7 +169,8 @@ export const fr: Messages = {
     "Le blocage des publicités utilise des listes intégrées à l’application ; si un site cesse de fonctionner, désactivez-le et la page se rechargera. Le bouton de retour se place à l’opposé du bouton principal pour les sites qui n’en ont pas. Une recette peut définir sa propre marge inférieure.",
   "settings.adBlock": "Bloquer les publicités et les traceurs",
   "settings.backButton": "Bouton de retour flottant",
-  "settings.backButtonNote": "Affiché chaque fois que la page peut revenir en arrière.",
+  "settings.backButtonNote":
+    "Toujours visible. Elle ferme d'abord les Réglages et les autres feuilles, puis revient en arrière dans la page.",
   "settings.bottomMargin": "Marge inférieure",
   "settings.bottomMarginNote":
     "Garde le bas de chaque page dégagé, pour les menus qui glissent sous le bord de l’écran.",

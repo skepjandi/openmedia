@@ -170,7 +170,7 @@ export const it: Messages = {
   "settings.adBlock": "Blocca annunci e tracker",
   "settings.backButton": "Pulsante Indietro fluttuante",
   "settings.backButtonNote":
-    "Mostrato ogni volta che la pagina ha una schermata precedente da cui tornare.",
+    "Sempre visibile. Chiude prima Impostazioni e gli altri pannelli, poi torna indietro nella pagina.",
   "settings.bottomMargin": "Margine inferiore",
   "settings.bottomMarginNote":
     "Mantiene libera la parte inferiore di ogni pagina, per i menu che scorrono sotto il bordo dello schermo.",

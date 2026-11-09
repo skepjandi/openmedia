@@ -163,7 +163,8 @@ export const ko: Messages = {
     "광고 차단은 앱에 내장된 목록을 사용합니다. 사이트가 동작하지 않으면 끄면 페이지가 새로 고쳐집니다. 뒤로 가기 버튼은 메인 버튼의 반대편에 있으며, 자체 뒤로 가기가 없는 사이트를 위한 것입니다. 레시피는 자체 하단 여백을 지정할 수 있습니다.",
   "settings.adBlock": "광고 및 추적기 차단",
   "settings.backButton": "플로팅 뒤로 가기 버튼",
-  "settings.backButtonNote": "페이지에 돌아갈 곳이 있을 때 표시됩니다.",
+  "settings.backButtonNote":
+    "항상 표시됩니다. 설정 등 시트를 먼저 닫고, 그다음 페이지에서 뒤로 갑니다.",
   "settings.bottomMargin": "하단 여백",
   "settings.bottomMarginNote":
     "화면 가장자리로 미끄러지는 메뉴를 위해 모든 페이지의 아래쪽을 비워 둡니다.",

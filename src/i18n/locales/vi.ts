@@ -162,7 +162,8 @@ export const vi: Messages = {
     "Chặn quảng cáo dùng các danh sách có sẵn trong ứng dụng; nếu một trang ngừng hoạt động, hãy tắt và trang sẽ tải lại. Nút quay lại nằm đối diện với nút chính, dành cho các trang không có nút riêng. Một công thức có thể đặt lề dưới riêng.",
   "settings.adBlock": "Chặn quảng cáo và trình theo dõi",
   "settings.backButton": "Nút quay lại nổi",
-  "settings.backButtonNote": "Hiện khi trang có nơi để quay lại.",
+  "settings.backButtonNote":
+    "Luôn hiển thị. Đóng Cài đặt và các bảng khác trước, sau đó quay lại trong trang.",
   "settings.bottomMargin": "Lề dưới",
   "settings.bottomMarginNote":
     "Giữ phần dưới mọi trang trống, cho các menu trượt xuống dưới mép màn hình.",

@@ -167,7 +167,8 @@ export const cs: Messages = {
     "Blokování reklam používá seznamy zabudované v aplikaci; pokud web přestane fungovat, vypněte je a stránka se znovu načte. Tlačítko Zpět je naproti hlavnímu tlačítku, pro weby, které žádné vlastní nemají. Recept může mít vlastní spodní okraj.",
   "settings.adBlock": "Blokovat reklamy a sledovače",
   "settings.backButton": "Plovoucí tlačítko Zpět",
-  "settings.backButtonNote": "Zobrazí se vždy, když je na stránce kam se vrátit.",
+  "settings.backButtonNote":
+    "Vždy viditelné. Nejdřív zavře Nastavení a další panely, potom se vrátí na předchozí stránku.",
   "settings.bottomMargin": "Spodní okraj",
   "settings.bottomMarginNote":
     "Udržuje spodní část každé stránky volnou, pro nabídky, které se vysouvají zpod okraje obrazovky.",

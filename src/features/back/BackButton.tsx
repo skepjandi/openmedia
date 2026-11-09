@@ -1,4 +1,4 @@
-import { useRef, useState, type PointerEvent } from "react";
+import { useRef, useState, useSyncExternalStore, type PointerEvent } from "react";
 import { selectPage, useApp } from "../../app/store";
 import { describeError } from "../../i18n/errors";
 import { useT } from "../../i18n/useT";
@@ -7,6 +7,8 @@ import { siteView } from "../../shared/ipc";
 import { useInsets, useViewport } from "../../shared/viewport";
 import { EDGE_MARGIN, snapToEdge, type Point } from "../fab/geometry";
 import { loadBackPosition, saveBackPosition, type BackPosition } from "./position";
+import { hasBackHandler, runBackHandler, subscribeBackHandlers } from "./backStack";
+import { useLimitBlock } from "../stats/UsageGuard";
 
 const SIZE = 48;
 const DRAG_THRESHOLD = 8;
@@ -18,15 +20,18 @@ interface Drag {
 }
 
 /**
- * Optional floating back button (Settings, off by default). Shown only when the page can go back.
- * Tap: go back. Drag: move, then snap to the nearer edge.
+ * Optional floating back button (Settings, off by default), always on screen while enabled, above
+ * every sheet. Tap: the same as the system Back: dismiss the newest thing on screen (a sheet, the
+ * fan, a list, a guide step), and with nothing on screen go back in the page. Dimmed when a tap
+ * would do nothing. Drag: move, then snap to the nearer edge.
  */
 export function BackButton() {
   const enabled = useApp((s) => s.state?.backButton ?? false);
   const canGoBack = useApp((s) => selectPage(s)?.canGoBack ?? false);
-  const sheet = useApp((s) => s.sheet);
   const onboardingOpen = useApp((s) => s.onboardingOpen);
   const reportError = useApp((s) => s.reportError);
+  const hasHandler = useSyncExternalStore(subscribeBackHandlers, hasBackHandler);
+  const { blocked } = useLimitBlock();
   const t = useT();
   const viewport = useViewport();
   const insets = useInsets();
@@ -34,7 +39,9 @@ export function BackButton() {
   const [dragCenter, setDragCenter] = useState<Point | null>(null);
   const drag = useRef<Drag | null>(null);
 
-  if (!enabled || !canGoBack || sheet !== "none" || onboardingOpen) return null;
+  if (!enabled) return null;
+  // The guide covers the page, so its first step has nothing behind it to go back to.
+  const canAct = hasHandler || (canGoBack && !blocked && !onboardingOpen);
 
   const half = SIZE / 2;
   const restingX =
@@ -67,7 +74,8 @@ export function BackButton() {
     if (!active || active.pointerId !== event.pointerId) return;
     drag.current = null;
     if (!active.moved) {
-      siteView.goBack().catch((error: unknown) => reportError(describeError(error, t)));
+      if (runBackHandler()) return;
+      if (canAct) siteView.goBack().catch((error: unknown) => reportError(describeError(error, t)));
       return;
     }
     const snapped = snapToEdge({ x: event.clientX, y: event.clientY }, viewport, insets);
@@ -101,7 +109,8 @@ export function BackButton() {
         height: SIZE,
         touchAction: "none",
       }}
-      className="glass fixed z-10 grid place-items-center rounded-full text-paper"
+      aria-disabled={!canAct}
+      className={`glass fixed z-[80] grid place-items-center rounded-full text-paper ${canAct ? "" : "opacity-45"}`}
     >
       <BackIcon />
     </button>

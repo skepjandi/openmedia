@@ -115,6 +115,8 @@ export interface AppStore {
   openAddress: (url: string) => void;
   /** A web search the user typed: a new session, kept out of history so queries are not listed. */
   openSearch: (url: string) => void;
+  /** A site the user reached from a search: remembered in history, without opening anything. */
+  recordVisit: (url: string) => void;
   /** A favorite: switches to its live session if there is one, otherwise opens a new one. */
   openFavorite: (url: string) => void;
   /** A history entry: switches to the live session typed with it, otherwise opens a new one. */
@@ -322,6 +324,13 @@ export const useApp = create<AppStore>((set, get) => {
   const dispatch = (event: AssistantEvent) =>
     set((current) => ({ assistant: assistantReducer(current.assistant, event) }));
 
+  /** Adds `url` to history (Rust skips it while incognito) and fetches its icon. */
+  const recordHistory = (url: string): Promise<void> =>
+    library.addHistory(url).then((history) => {
+      set((current) => ({ state: current.state && { ...current.state, history } }));
+      void fetchIcons([url]);
+    });
+
   const showProPaywall = (error: unknown): boolean => {
     if (!isProRequired(error)) return false;
     dropJob(pendingJobId(get().assistant));
@@ -436,14 +445,10 @@ export const useApp = create<AppStore>((set, get) => {
 
     openAddress: (url) => {
       startSession(url, "typed");
-      void library
-        .addHistory(url)
-        .then((history) => {
-          set((current) => ({ state: current.state && { ...current.state, history } }));
-          void fetchIcons([url]);
-        })
-        .catch((error: unknown) => set({ error: appError(error) }));
+      recordHistory(url).catch((error: unknown) => set({ error: appError(error) }));
     },
+
+    recordVisit: (url) => void recordHistory(url).catch(() => {}),
 
     openSearch: (url) => startSession(url, "typed"),
 

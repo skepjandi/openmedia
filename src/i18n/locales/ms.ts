@@ -162,7 +162,8 @@ export const ms: Messages = {
     "Pemblokiran iklan guna senarai yang dibina dalam aplikasi; jika sesebuah laman terhenti berfungsi, matikan sahaja dan halaman itu akan dimuat semula. Butang kembali terletak di seberang butang utama, untuk laman yang tiada butang sendiri. Resipi boleh menetapkan margin bawahnya sendiri.",
   "settings.adBlock": "Blokir iklan dan penjejak",
   "settings.backButton": "Butang kembali terapung",
-  "settings.backButtonNote": "Dipaparkan apabila halaman ada tempat untuk kembali.",
+  "settings.backButtonNote":
+    "Sentiasa dipaparkan. Menutup Tetapan dan helaian lain dahulu, kemudian kembali dalam halaman.",
   "settings.bottomMargin": "Margin bawah",
   "settings.bottomMarginNote":
     "Menjaga bahagian bawah setiap halaman kosong, untuk menu yang meluncur ke bawah tepi skrin.",

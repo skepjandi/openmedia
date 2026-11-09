@@ -166,7 +166,8 @@ export const pl: Messages = {
     "Blokowanie reklam korzysta z list wbudowanych w aplikację; jeśli witryna przestanie działać, wyłącz je, a strona zostanie wczytana ponownie. Przycisk wstecz znajduje się naprzeciw głównego przycisku, dla witryn, które nie mają własnego. Przepis może ustawić własny dolny margines.",
   "settings.adBlock": "Blokuj reklamy i skrypty śledzące",
   "settings.backButton": "Pływający przycisk wstecz",
-  "settings.backButtonNote": "Widoczny zawsze, gdy strona ma dokąd się cofnąć.",
+  "settings.backButtonNote":
+    "Zawsze widoczny. Najpierw zamyka Ustawienia i inne panele, a potem cofa na stronie.",
   "settings.bottomMargin": "Dolny margines",
   "settings.bottomMarginNote":
     "Zostawia wolne dół każdej strony, dla menu wysuwanych spod krawędzi ekranu.",

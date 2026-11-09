@@ -168,7 +168,8 @@ export const es: Messages = {
     "El bloqueo de anuncios usa listas integradas en la app; si un sitio deja de funcionar, desactívalo y la página se recargará. El botón de retroceso se sitúa frente al botón principal para los sitios que no tienen uno propio. Una receta puede fijar su propio margen inferior.",
   "settings.adBlock": "Bloquear anuncios y rastreadores",
   "settings.backButton": "Botón de retroceso flotante",
-  "settings.backButtonNote": "Se muestra cuando la página tiene a dónde volver.",
+  "settings.backButtonNote":
+    "Siempre visible. Primero cierra Ajustes y otras hojas, y después retrocede en la página.",
   "settings.bottomMargin": "Margen inferior",
   "settings.bottomMarginNote":
     "Mantiene despejado el fondo de cada página, para los menús que se deslizan bajo el borde de la pantalla.",

@@ -17,6 +17,7 @@ The web is the product. The screen is one full-bleed page, from under the status
 | Swipe in from the screen edge on a page | iOS: the web view's own back swipe (and forward from the opposite edge). Android: the system back gesture or Back button, which goes back in the page |
 | Swipe in from the screen edge on Settings, History, Usage or the paywall | Closes it. iOS: the shell's own swipe (`useEdgeSwipeBack`, left edge, right edge in right-to-left languages). Android: the system back gesture |
 | Back (Android button or gesture) | Dismisses the newest thing on screen first: the open fan, a sheet, an onboarding step. With nothing on screen it goes back in the page; at the first page, or with a page closed by a usage limit, it leaves the app |
+| Tap the floating back button (when enabled in Settings) | Same as Back: dismisses the newest thing on screen (a sheet such as Settings or the paywall, the fan, a list, a guide step), and with nothing on screen goes back in the page. The button stays on screen above every sheet; it is dimmed when a tap would do nothing (no page history, the guide's first step, a page closed by a usage limit). Drag it to move it to an edge |
 
 Defaults: Instagram, Facebook, Twitter, Reddit, YouTube. Each fan item shows the site's icon when known, otherwise a monogram. The command bar has back, forward, reload and a favorite star for the current page; History rows also have independent favorite stars. Browsing alone never changes favorites. The first six favorites (`QUICK_ACCESS_LIMIT`) form the quick-access menu for Pro; without Pro only the first four (`FREE_QUICK_ACCESS_LIMIT`) open, and the fan always shows two more slots grayed out with a lock (holding that favorite, or empty), which open the paywall. Settings can reorder an unlimited list for Pro.
 
@@ -75,7 +76,7 @@ The Usage button (bars icon) sits directly above History. The sheet shares the `
 
 ## History
 
-The History button sits above Settings and below Usage. It lists up to 100 typed addresses, newest first, with cached/bundled site icons and an independent favorite star. Repeated addresses move to the top. Tapping an entry follows the session rules below.
+The History button sits above Settings and below Usage. It lists up to 100 addresses, newest first, with cached/bundled site icons and an independent favorite star: addresses the user typed, and sites reached from a search (the first page a session loads after leaving a search engine's results; `leftSearchForSite`). The search itself is never listed, and neither is moving around inside the site afterwards. Repeated addresses move to the top. Tapping an entry follows the session rules below.
 
 ## Onboarding
 
@@ -121,7 +122,7 @@ Every site the user opens is a **session**: its own native web view, kept alive 
 |-------------|--------|
 | Tap a favorite | Switches to the live session on that favorite's site if there is one (no reload, scroll and form state kept); otherwise opens a new session |
 | Type an address in the command bar | Always a new session, so a favorite's session is never replaced. The address is added to history |
-| Type a search in the command bar | Opens the search engine chosen in Settings > Browsing (DuckDuckGo by default; also Google, Bing, Brave Search, Ecosia, Startpage, Yahoo) with the text as the query in a new session. Searches are not added to history. Free |
+| Type a search in the command bar | Opens the search engine chosen in Settings > Browsing (DuckDuckGo by default; also Google, Bing, Brave Search, Ecosia, Startpage, Yahoo) with the text as the query in a new session. The search is not added to history, but a site opened from its results is. Free |
 | Pick Auto, Link, Search or Chat in the command bar | Auto: an address opens, text starting with a change verb (hide, remove, block, …; English only) goes to the assistant, anything else is searched. Link: opens only addresses. Search: always searches. Chat: always the assistant. Only the assistant route is Pro: without Pro the Chat button is grayed out with a lock and opens the paywall instead of selecting; a request typed in Auto shows the paywall on submit, before any provider or page check |
 | Tap a history entry | Switches to the live session typed with exactly that address; otherwise opens a new one |
 | Tap a link to another domain, or a `target=_blank` / `window.open` to one | The session stays where it is; the page opens in a popup browser (see below) |
@@ -156,4 +157,4 @@ A hidden session whose web content process dies is dropped natively and the shel
 - The fan has no sound or haptics.
 - Closing sessions for memory is by count, idle time and the OS memory warning, not by measured memory or CPU: WebKit has no public per-page CPU or memory figure that this app could read [INFERENCE: not exhaustively checked]. See [Sessions](#sessions).
 - Usage counts foreground time only, not background audio/video. Generic path segments define sections; sites that never change their path show as one area. Native blocking prevents interaction, navigation, loads and media playback, but does not suspend arbitrary page JavaScript.
-- History stores typed addresses only, without page titles or timestamps; icons are cached separately by host. Per-entry delete is not implemented.
+- History stores addresses only (typed, or reached from a search), without page titles or timestamps; icons are cached separately by host. Per-entry delete is not implemented. Only engines listed in `searchEngines.ts` count as searches, matched by host.

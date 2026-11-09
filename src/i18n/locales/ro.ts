@@ -166,7 +166,8 @@ export const ro: Messages = {
     "Blocarea reclamelor folosește liste integrate în aplicație; dacă un site nu mai funcționează, dezactivează-o și pagina se reîncarcă. Butonul Înapoi este plasat opus butonului principal, pentru site-urile care nu au unul propriu. O rețetă își poate seta propria margine inferioară.",
   "settings.adBlock": "Blochează reclamele și trackerele",
   "settings.backButton": "Buton Înapoi plutitor",
-  "settings.backButtonNote": "Apare ori de câte ori pagina are unde să se întoarcă.",
+  "settings.backButtonNote":
+    "Mereu vizibil. Închide mai întâi Setările și alte panouri, apoi revine în pagină.",
   "settings.bottomMargin": "Margine inferioară",
   "settings.bottomMarginNote":
     "Lasă liberă partea de jos a fiecărei pagini, pentru meniurile care glisează sub marginea ecranului.",

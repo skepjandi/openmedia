@@ -161,7 +161,8 @@ export const id: Messages = {
     "Pemblokiran iklan memakai daftar yang sudah ada di dalam aplikasi; jika sebuah situs berhenti berfungsi, matikan saja dan halamannya akan dimuat ulang. Tombol kembali berada di seberang tombol utama, untuk situs yang tidak punya tombol sendiri. Resep bisa mengatur margin bawahnya sendiri.",
   "settings.adBlock": "Blokir iklan dan pelacak",
   "settings.backButton": "Tombol kembali mengambang",
-  "settings.backButtonNote": "Muncul saat halaman punya tempat untuk kembali.",
+  "settings.backButtonNote":
+    "Selalu tampil. Menutup Pengaturan dan lembar lain lebih dulu, lalu mundur di halaman.",
   "settings.bottomMargin": "Margin bawah",
   "settings.bottomMarginNote":
     "Menjaga bagian bawah setiap halaman tetap kosong, untuk menu yang meluncur ke bawah tepi layar.",

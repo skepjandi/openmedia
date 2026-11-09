@@ -158,7 +158,7 @@ export const zhHant: Messages = {
     "廣告阻擋使用 App 內建的清單；若某個網站無法運作，關閉後頁面會重新載入。返回按鈕位於主要按鈕的對面，供沒有自己返回功能的網站使用。配方可以有自己的底部邊距。",
   "settings.adBlock": "阻擋廣告與追蹤程式",
   "settings.backButton": "浮動返回按鈕",
-  "settings.backButtonNote": "只要頁面有地方可以返回，就會顯示。",
+  "settings.backButtonNote": "一律顯示。先關閉設定等面板，再在頁面中返回。",
   "settings.bottomMargin": "底部邊距",
   "settings.bottomMarginNote": "為每個頁面的底部留出空間，容納滑到螢幕邊緣下方的選單。",
   "settings.bottomMarginLabel": "所有網站的底部邊距",

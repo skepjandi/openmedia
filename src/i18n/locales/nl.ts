@@ -166,7 +166,8 @@ export const nl: Messages = {
     "Advertentieblokkering gebruikt lijsten die in de app zijn ingebouwd; als een site niet meer werkt, zet je het uit en wordt de pagina opnieuw geladen. De terugknop staat tegenover de hoofdknop, voor sites zonder eigen terugknop. Een recept kan zijn eigen ondermarge instellen.",
   "settings.adBlock": "Advertenties en trackers blokkeren",
   "settings.backButton": "Zwevende terugknop",
-  "settings.backButtonNote": "Wordt getoond zodra de pagina een vorige pagina heeft.",
+  "settings.backButtonNote":
+    "Altijd zichtbaar. Sluit eerst Instellingen en andere schermen, en gaat daarna terug in de pagina.",
   "settings.bottomMargin": "Ondermarge",
   "settings.bottomMarginNote":
     "Houdt de onderkant van elke pagina vrij, voor menu’s die onder de rand van het scherm schuiven.",

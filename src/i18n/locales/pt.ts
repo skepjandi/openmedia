@@ -168,7 +168,8 @@ export const pt: Messages = {
     "O bloqueio de anúncios usa listas incorporadas ao app; se um site parar de funcionar, desative-o e a página será recarregada. O botão de voltar fica oposto ao botão principal, para sites que não têm o próprio. Uma receita pode definir sua própria margem inferior.",
   "settings.adBlock": "Bloquear anúncios e rastreadores",
   "settings.backButton": "Botão de voltar flutuante",
-  "settings.backButtonNote": "Aparece quando a página tem para onde voltar.",
+  "settings.backButtonNote":
+    "Sempre visível. Fecha primeiro as Definições e outras folhas e depois volta na página.",
   "settings.bottomMargin": "Margem inferior",
   "settings.bottomMarginNote":
     "Mantém a parte inferior de cada página livre, para menus que deslizam sob a borda da tela.",

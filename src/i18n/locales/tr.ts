@@ -165,7 +165,8 @@ export const tr: Messages = {
     "Reklam engelleme, uygulamaya gömülü listeleri kullanır. Bir site çalışmaz hâle gelirse kapatın, sayfa yeniden yüklenir. Geri düğmesi, kendi geri düğmesi olmayan siteler için ana düğmenin karşısında durur. Bir tarif kendi alt kenar boşluğunu ayarlayabilir.",
   "settings.adBlock": "Reklamları ve izleyicileri engelle",
   "settings.backButton": "Yüzen geri düğmesi",
-  "settings.backButtonNote": "Sayfanın geri dönülecek bir yeri olduğunda görünür.",
+  "settings.backButtonNote":
+    "Her zaman görünür. Önce Ayarlar ve diğer sayfaları kapatır, sonra sayfada geri gider.",
   "settings.bottomMargin": "Alt kenar boşluğu",
   "settings.bottomMarginNote":
     "Ekran kenarının altına kayan menüler için her sayfanın altını boş bırakır.",

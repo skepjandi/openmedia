@@ -160,7 +160,8 @@ export const de: Messages = {
     "Der Werbeblocker verwendet Listen, die in der App integriert sind; wenn eine Website nicht mehr funktioniert, schalte ihn aus und die Seite wird neu geladen. Die Zurück-Taste befindet sich gegenüber der Haupttaste, für Websites ohne eigene Zurück-Schaltfläche. Ein Rezept kann einen eigenen unteren Rand festlegen.",
   "settings.adBlock": "Werbung und Tracker blockieren",
   "settings.backButton": "Schwebende Zurück-Taste",
-  "settings.backButtonNote": "Wird immer dann angezeigt, wenn du auf der Seite zurückgehen kannst.",
+  "settings.backButtonNote":
+    "Immer sichtbar. Schließt zuerst die Einstellungen und andere Ansichten, danach geht es auf der Seite zurück.",
   "settings.bottomMargin": "Unterer Rand",
   "settings.bottomMarginNote":
     "Hält den unteren Bereich jeder Seite frei, etwa für Menüs, die unter den Bildschirmrand gleiten.",

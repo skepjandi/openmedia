@@ -8,6 +8,16 @@ All notable changes to OpenMedia are documented here.
 
 ## 2026-11-09
 
+### feat(shell): floating back button always visible and closes sheets; history records sites opened from a search
+
+**Problem:** the optional floating back button disappeared when Settings or any sheet was open, and only went back in the page. Sites opened from search results were never in History, because only typed addresses were recorded.
+
+**Change:** the button is shown whenever it is enabled, above every sheet (`z-[80]`). A tap does what system Back does: it dismisses the newest thing on screen (Settings, paywall, the fan, a list, a guide step) through the back stack, and with nothing on screen goes back in the page. It is dimmed instead of hidden when a tap would do nothing. History now also records a site when a session moves from a search engine's page to a site (`leftSearchForSite`, `recordVisit`); the search itself is still never recorded, and neither is browsing inside the site afterwards. Incognito still records nothing.
+
+**Strings:** `settings.backButtonNote` is reworded in all 29 locales (it said the button shows only when the page can go back); the 28 non-English versions are mine and need a native-speaker review.
+
+**Verified:** `tsc`, ESLint, Prettier, frontend tests (new: `searchVisit.test.ts`). **Not verified:** the button over each sheet on a device, and the history recording against real search-result redirects (Google and DuckDuckGo link through their own redirect pages); no test drives `WebLayer`.
+
 ### feat(paywall): free users get four quick-access slots; slots 5 and 6 and More favorites need Pro
 
 **Problem:** every user had six quick-access slots and an unlimited favorites list.

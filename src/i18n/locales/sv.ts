@@ -164,7 +164,8 @@ export const sv: Messages = {
     "Annonsblockering använder listor som är inbyggda i appen; om en webbplats slutar fungera, stäng av den så laddas sidan om. Bakåtknappen sitter mittemot huvudknappen, för webbplatser som saknar en egen. Ett recept kan ange sin egen nedre marginal.",
   "settings.adBlock": "Blockera annonser och spårare",
   "settings.backButton": "Flytande bakåtknapp",
-  "settings.backButtonNote": "Visas så snart sidan har något att gå tillbaka till.",
+  "settings.backButtonNote":
+    "Alltid synlig. Stänger först Inställningar och andra vyer, och går sedan bakåt på sidan.",
   "settings.bottomMargin": "Nedre marginal",
   "settings.bottomMarginNote":
     "Håller nederkanten av varje sida fri, för menyer som glider in under skärmkanten.",

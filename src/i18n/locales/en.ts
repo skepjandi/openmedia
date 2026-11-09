@@ -168,7 +168,8 @@ export const en = {
     "Ad blocking uses lists built into the app; if a site stops working, turn it off and the page reloads. The back button sits opposite the main button, for sites with none of their own. A recipe can set its own bottom margin.",
   "settings.adBlock": "Block ads and trackers",
   "settings.backButton": "Floating back button",
-  "settings.backButtonNote": "Shown whenever the page has somewhere to go back to.",
+  "settings.backButtonNote":
+    "Always shown. Closes Settings and other sheets first, then goes back in the page.",
   "settings.bottomMargin": "Bottom margin",
   "settings.bottomMarginNote":
     "Keeps the bottom of every page clear, for menus that slide under the screen edge.",

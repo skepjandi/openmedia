@@ -164,7 +164,8 @@ export const ja: Messages = {
     "広告ブロックはアプリに内蔵されたリストを使います。サイトが表示されなくなった場合はオフにすると、ページが再読み込みされます。戻るボタンはメインボタンの反対側にあり、ページに元の戻る機能がないサイト向けのものです。レシピには独自の下余白を設定できます。",
   "settings.adBlock": "広告とトラッカーをブロック",
   "settings.backButton": "フローティング戻るボタン",
-  "settings.backButtonNote": "戻れるページがあるときに表示されます。",
+  "settings.backButtonNote":
+    "常に表示されます。まず設定などのシートを閉じ、その後ページを戻ります。",
   "settings.bottomMargin": "下余白",
   "settings.bottomMarginNote":
     "画面下端に潜り込むメニューでもできるよう、各ページの下側を空けておきます。",

@@ -8,6 +8,7 @@ import { readRect, useSiteViewRect } from "./useSiteViewRect";
 import { observeTitle, quickFavoriteOf, type Watch } from "./unreadWatch";
 import { usableQuickAccess } from "../../shared/favorites";
 import { useEntitlementStore } from "../paywall/store";
+import { leftSearchForSite } from "../history/searchVisit";
 
 /** How often idle and surplus hidden sessions are swept. */
 const SWEEP_MS = 60_000;
@@ -58,6 +59,8 @@ export function WebLayer() {
 
   useEffect(() => {
     const watches = new Map<string, Watch>();
+    /** The last address each session finished loading, to tell when it left a search for a site. */
+    const loadedUrls = new Map<string, string>();
     const raiseNotification = (page: SiteViewState) => {
       const { activeId, sessions, state } = useApp.getState();
       const observation = observeTitle(
@@ -84,6 +87,11 @@ export function WebLayer() {
       siteView.onState((page) => {
         setSessionState(page);
         raiseNotification(page);
+        if (!page.loading && page.url) {
+          const previous = loadedUrls.get(page.session) ?? null;
+          loadedUrls.set(page.session, page.url);
+          if (leftSearchForSite(previous, page.url)) useApp.getState().recordVisit(page.url);
+        }
         const visible = useApp.getState().activeId === page.session;
         if (visible && !page.loading && page.url && page.url !== lastSaved) {
           lastSaved = page.url;
@@ -92,6 +100,7 @@ export function WebLayer() {
       }),
       siteView.onClosed((session) => {
         watches.delete(session);
+        loadedUrls.delete(session);
         forgetSessions([session]);
       }),
       siteView.onMemoryWarning(() => trimSessions("memory")),
