@@ -73,16 +73,22 @@ describe("assistant wiring", () => {
     expect(useApp.getState().assistant.status).toBe("idle");
   });
 
-  it("keeps link navigation free while AI and Usage sheets open the paywall", () => {
+  it("keeps the command bar, links and searches free while Usage opens the paywall", () => {
     mockCommands({ add_history: () => [] });
     useEntitlementStore.setState({ status: "free", configured: true, snapshot: null });
     useApp.getState().openSheet("assistant");
-    expect(useApp.getState().sheet).toBe("paywall");
+    expect(useApp.getState().sheet).toBe("assistant");
     useApp.getState().openSheet("stats");
     expect(useApp.getState().sheet).toBe("paywall");
     useApp.getState().openAddress("https://example.com/");
     expect(useApp.getState().action).toMatchObject({ type: "open", url: "https://example.com/" });
     expect(useApp.getState().sheet).toBe("none");
+    useApp.getState().openSearch("https://duckduckgo.com/?q=cats");
+    expect(useApp.getState().action).toMatchObject({
+      type: "open",
+      url: "https://duckduckgo.com/?q=cats",
+    });
+    expect(calls("add_history")).toHaveLength(1);
   });
 
   it("accepting saves, reloads the sites and confirms", async () => {

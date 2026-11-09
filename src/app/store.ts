@@ -93,6 +93,8 @@ export interface AppStore {
   finishGuide: () => Promise<void>;
   /** An address the user typed: always a new session, and remembered in history. */
   openAddress: (url: string) => void;
+  /** A web search the user typed: a new session, kept out of history so queries are not listed. */
+  openSearch: (url: string) => void;
   /** A favorite: switches to its live session if there is one, otherwise opens a new one. */
   openFavorite: (url: string) => void;
   /** A history entry: switches to the live session typed with it, otherwise opens a new one. */
@@ -375,7 +377,7 @@ export const useApp = create<AppStore>((set, get) => {
 
     openSheet: (sheet) => {
       const isPro = useEntitlementStore.getState().status === "pro";
-      set({ sheet: !isPro && (sheet === "assistant" || sheet === "stats") ? "paywall" : sheet });
+      set({ sheet: !isPro && sheet === "stats" ? "paywall" : sheet });
     },
     closeSheet: () => set({ sheet: "none" }),
 
@@ -411,6 +413,8 @@ export const useApp = create<AppStore>((set, get) => {
         })
         .catch((error: unknown) => set({ error: appError(error) }));
     },
+
+    openSearch: (url) => startSession(url, "typed"),
 
     openFavorite: (url) => {
       const live = findFavoriteSession(get().sessions, url);

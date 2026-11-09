@@ -13,7 +13,8 @@ import {
   StarIcon,
 } from "../../shared/icons";
 import { AssistantPanel } from "../ai/AssistantPanel";
-import { MAX_REQUEST_LENGTH, routeInput } from "../ai/route";
+import { INPUT_MODES, MAX_REQUEST_LENGTH, routeInput, type InputMode } from "../ai/route";
+import { useEntitlementStore } from "../paywall/store";
 
 const NO_FAVORITES: Favorite[] = [];
 
@@ -23,6 +24,8 @@ export function CommandBar() {
   const page = useApp(selectPage);
   const closeSheet = useApp((s) => s.closeSheet);
   const openAddress = useApp((s) => s.openAddress);
+  const openSearch = useApp((s) => s.openSearch);
+  const isPro = useEntitlementStore((s) => s.status === "pro");
   const favorites = useApp((s) => s.state?.favorites) ?? NO_FAVORITES;
   const saveFavorites = useApp((s) => s.saveFavorites);
   const aiState = useApp((s) => s.aiState);
@@ -34,6 +37,7 @@ export function CommandBar() {
   const t = useT();
   const [notice, setNotice] = useState<string | null>(null);
   const [blocked, setBlocked] = useState(false);
+  const [mode, setMode] = useState<InputMode>("auto");
   // The bar's text lives in the store, so "Ask again" can hand the request back for editing.
   const text = assistant.status === "idle" ? assistant.draft : "";
 
@@ -43,7 +47,7 @@ export function CommandBar() {
 
   const submit = (event: FormEvent) => {
     event.preventDefault();
-    const route = routeInput(text, { ai: aiState, pageUrl: page?.url ?? null });
+    const route = routeInput(text, { ai: aiState, pageUrl: page?.url ?? null, pro: isPro, mode });
     switch (route.kind) {
       case "empty":
         setNotice(null);
@@ -54,6 +58,21 @@ export function CommandBar() {
         setNotice(null);
         setBlocked(false);
         openAddress(route.url);
+        return;
+      case "search":
+        editRequest("");
+        setNotice(null);
+        setBlocked(false);
+        openSearch(route.url);
+        return;
+      case "notLink":
+        setNotice(t("commandBar.notLink"));
+        setBlocked(false);
+        return;
+      case "paywall":
+        setNotice(null);
+        setBlocked(false);
+        openSheet("paywall");
         return;
       case "blocked":
         setNotice(
@@ -107,10 +126,10 @@ export function CommandBar() {
                 autoCapitalize="none"
                 autoCorrect="off"
                 spellCheck={false}
-                inputMode="url"
+                inputMode={mode === "link" ? "url" : "search"}
                 maxLength={MAX_REQUEST_LENGTH}
                 enterKeyHint="go"
-                placeholder={t("commandBar.placeholder")}
+                placeholder={t(`commandBar.placeholder.${mode}`)}
                 value={text}
                 onChange={(event) => {
                   editRequest(event.target.value);
@@ -127,6 +146,32 @@ export function CommandBar() {
                 <ArrowIcon />
               </button>
             </form>
+
+            <div
+              role="radiogroup"
+              aria-label={t("commandBar.modeLabel")}
+              className="mt-2 flex gap-1 px-1"
+            >
+              {INPUT_MODES.map((option) => (
+                <button
+                  key={option}
+                  type="button"
+                  role="radio"
+                  aria-checked={mode === option}
+                  data-testid={`commandBar.mode.${option}`}
+                  onClick={() => {
+                    setMode(option);
+                    setNotice(null);
+                    setBlocked(false);
+                  }}
+                  className={`flex-1 rounded-full px-3 py-1.5 text-sm font-medium ${
+                    mode === option ? "bg-accent text-on-accent" : "text-paper/70 bg-paper/[0.06]"
+                  }`}
+                >
+                  {t(`commandBar.mode.${option}`)}
+                </button>
+              ))}
+            </div>
 
             <p className="min-h-4 px-2 pt-1 text-xs leading-snug text-paper/55">
               {notice ?? (page?.url ? new URL(page.url).host : "")}

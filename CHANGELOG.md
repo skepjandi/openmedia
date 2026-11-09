@@ -8,6 +8,14 @@ All notable changes to OpenMedia are documented here.
 
 ## 2026-11-09
 
+### fix(paywall): keep the command bar, links and search free; paywall only the assistant
+
+**Problem:** the floating button opened the paywall for free users, so typing a link or a search was blocked along with the AI.
+
+**Change:** the command bar opens for everyone and has an Auto / Link / Search / Chat selector. Link opens addresses, Search opens a DuckDuckGo query (kept out of history), Chat is the assistant and shows the paywall to free users. Auto opens addresses, sends text that starts with a change verb to the assistant (paywalled when free) and searches everything else. The lock badge on the main button is gone; Usage and Incognito stay Pro. New strings are in all 28 locales. Rust gating is unchanged.
+
+**Limits:** Auto's request detection is an English verb list; other languages use Chat. Search is hardcoded to DuckDuckGo. Not run on a device or simulator; `ts:check`, `eslint`, `yarn test` (280/280) pass.
+
 ### fix(siteview): decide which site a host belongs to with the Public Suffix List
 
 **Cause:** "Which site is this host?" was answered by a hand-written rule (last two labels, three after a country code and a 12-word list) copied seven times: `library.rs`, `ai/patch.rs` (with a different list), `site.ts`, `fetch-site-icons.mjs`, and the Kotlin and Swift `DomainScope`. The copies disagreed, and all of them treated `alice.github.io` and `bob.github.io` as one site and `foo.com.br` as `com.br`. That reached session pinning (a session on one could navigate to the other), favorites, usage limits and recipe names.

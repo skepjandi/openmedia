@@ -8,7 +8,7 @@ OpenMedia has no accounts and no backend of ours, so the paywall rests on two th
 
 | Free, always | Pro |
 |---|---|
-| Opening any link or site, favorites, history, bundled recipes and their switches, ad and tracker blocking, Settings, theme, language | All AI features (providers, keys, test, assistant, preview, accept) |
+| Opening any link or site, web search from the command bar, favorites, history, bundled recipes and their switches, ad and tracker blocking, Settings, theme, language | All AI features (providers, keys, test, assistant, preview, accept) |
 | Deleting AI providers and keys, leaving incognito, unblocking a site, recording usage | Incognito mode |
 | | Usage: Stats, daily policies and limits, blocking an exhausted site |
 

@@ -118,6 +118,8 @@ Every site the user opens is a **session**: its own native web view, kept alive 
 |-------------|--------|
 | Tap a favorite | Switches to the live session on that favorite's site if there is one (no reload, scroll and form state kept); otherwise opens a new session |
 | Type an address in the command bar | Always a new session, so a favorite's session is never replaced. The address is added to history |
+| Type a search in the command bar | Opens DuckDuckGo with the text as the query in a new session. Searches are not added to history. Free |
+| Pick Auto, Link, Search or Chat in the command bar | Auto: an address opens, text starting with a change verb (hide, remove, block, …; English only) goes to the assistant, anything else is searched. Link: opens only addresses. Search: always searches. Chat: always the assistant. Only the assistant route is Pro: a free user sees the paywall on submit, before any provider or page check |
 | Tap a history entry | Switches to the live session typed with exactly that address; otherwise opens a new one |
 | Tap a link to another domain, or a `target=_blank` / `window.open` to one | The session stays where it is; the page opens in a popup browser (see below) |
 

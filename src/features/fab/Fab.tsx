@@ -381,14 +381,6 @@ export function Fab() {
         className={`fab fixed top-0 left-0 z-30 grid place-items-center rounded-full ${hidden ? "pointer-events-none opacity-0" : ""}`}
       >
         <img src={logoMark} alt="" draggable={false} className="fab-logo relative size-10" />
-        {!isPro && (
-          <span
-            aria-hidden="true"
-            className="pro-badge absolute -bottom-1 -end-1 z-10 grid size-6 place-items-center rounded-full"
-          >
-            <LockIcon />
-          </span>
-        )}
         {anyUnread && !fanOpen && (
           <span
             aria-hidden="true"
