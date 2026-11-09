@@ -138,7 +138,7 @@ A hidden session whose web content process dies is dropped natively and the shel
 ## Not connected yet
 
 - **Multiple profiles.** One hidden profile owns the site's cookies. Profile management is deferred.
-- **Android and desktop.** iOS first.
+- **Android and desktop.** Android implementation exists but is not device-verified; desktop site views are deferred.
 
 ## Known gaps
 

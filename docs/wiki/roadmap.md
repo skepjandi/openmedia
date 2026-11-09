@@ -1,6 +1,6 @@
 # Roadmap
 
-> **Status: iOS foundation, bundled recipes and BYOK assistant implemented; hardening continues.** The shell includes unlimited favorites, History, Usage with daily warnings/limits, collapsed Settings and 18 bundled site recipes/icons. Active providers now handle requests through redacted preview and explicit acceptance. Android and desktop site views remain deferred; physical-device interaction and authenticated provider calls remain unverified.
+> **Status: iOS implementation verified on simulators; Android implementation exists but device behavior and store release remain unverified; desktop site views are deferred.** The shell includes favorites, History, Usage, 18 bundled site recipes, and an AI assistant with redacted preview and explicit acceptance. See [Platform Support](./platform-support.md) for evidence and limits.
 
 ## Goal
 
@@ -156,11 +156,11 @@ All without a backend.
 | 2026-11-07 | Bottom margin is native (the site view rectangle), global with a per-site override resolved in Rust | CSS padding cannot move a page's own fixed bars off the screen edge | — |
 | 2026-11-07 | iOS and Android are first-class; desktop deferred | Mobile is the product. S1 (desktop child webview) moves out of the critical path | Mobile is blocked, or desktop demand appears |
 | 2026-11-07 | iOS 17 minimum | `WKWebsiteDataStore(forIdentifier:)` needs it; verified working on iOS 26.5 simulator | A non-isolated fallback is accepted |
-| 2026-11-07 | Android must refuse to open sites without `MULTI_PROFILE` and `WEB_MESSAGE_LISTENER` (decided; the code was removed with the Kotlin plugin) | A silent shared cookie jar breaks the profile-isolation invariant | Real devices in the target range lack the feature |
+| 2026-11-07 | Android requires `MULTI_PROFILE` and `WEB_MESSAGE_LISTENER`; no shared-profile fallback | A silent shared cookie jar breaks profile isolation. Kotlin now implements both checks; device verification remains open | A supported device cannot provide these features |
 | 2026-11-07 | Bridge B on mobile: native message handler delivers into a Rust-created `Channel` | Verified on iOS: the page has no Tauri IPC, and Rust receives the message | Android verification fails |
 | 2026-11-07 | Shell is one page with a floating button; no home screen, tabs, or address bar | User direction: the web is the product, controls stay out of the way | Users need several simultaneous tabs |
 | 2026-11-07 | Site view sits below a transparent shell, with a native touch router | A control drawn in the shell cannot float over a native view that sits above it | The router breaks page scrolling or pinch on a device |
-| 2026-11-07 | Single hidden profile for now; Android Kotlin code removed | Profile UI is out of scope for the new UI; the Android code assumed the old layering. Recover it from commit `591636a` | Multiple accounts per site are wanted; Android work starts |
+| 2026-11-07 | Android was deferred while the shell and single-profile UI settled | The original Kotlin implementation was removed at that point; a native Android implementation has since been restored and expanded. Device and store verification remain open | — |
 | 2026-11-07 | Fix Reddit's "use the app" prompts with a bundled recipe (hide rules), not by changing the user agent | Site knowledge belongs in data; the wiki's risk register rules out UA spoofing. The web view's user agent has no `Safari` token, which sites can use to detect an embedded view; changing that is a separate, deliberate decision | Hiding is not enough for a site, or the user asks for a Safari-like user agent |
 | 2026-11-07 | The shell opens pages only through the app's `open_site` command; the plugin's `open` is not granted to it | The recipe script is attached in Rust, so the shell cannot open a page without it | A second caller needs `open` |
 | 2026-11-07 | The accent color follows the logo (cyan `#06aff8`), replacing the warm amber chosen earlier | The user asked for the logo to be used; amber clashed with it | The brand changes |

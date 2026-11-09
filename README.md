@@ -1,62 +1,39 @@
 <p align="center">
-  <img src="assets/logo.svg" alt="OpenMedia logo" height="140">
+  <img src="assets/logo.svg" alt="OpenMedia logo" height="120">
 </p>
 
 <h1 align="center">OpenMedia</h1>
 
 <p align="center">
   Browse the real web, minus the parts you did not ask for.<br>
-  One full-screen page and one floating button. No backend.
+  Customize sites with recipes, ad blocking, and your own AI provider.
 </p>
 
 <p align="center">
   <a href="https://github.com/skepjandi/openmedia/actions/workflows/ci.yml"><img src="https://github.com/skepjandi/openmedia/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
-  <img src="https://img.shields.io/badge/platform-iOS%2017%2B-lightgrey.svg" alt="iOS 17+">
+  <img src="https://img.shields.io/badge/iOS-17%2B-lightgrey.svg" alt="iOS 17+">
   <img src="https://img.shields.io/badge/Tauri-v2-24C8DB.svg" alt="Tauri v2">
 </p>
 
----
+OpenMedia is an open-source mobile browser built with Tauri, Rust, React, and TypeScript. It loads websites directly in native web views and applies local, user-controlled recipes. No account or OpenMedia-operated backend; purchases use RevenueCat.
 
-## Why
+## Features
 
-- **The real site, not a copy.** Pages load in a native web view; you log in to the actual origin and your session stays on the device.
-- **Customization is data.** What gets hidden is a declarative recipe, so it can be read, tested against DOM fixtures, and fixed when a site changes. Reddit's "open the app" prompts are the first bundled recipe.
-- **Out of the way.** The web fills the screen. A single draggable button holds everything else.
-- **Local first.** No server of ours, no telemetry, no account. Network requests go to opened sites, your configured AI provider on request, and RevenueCat for purchases and restore ([Paywall](docs/wiki/paywall.md)).
-
-## Highlights
-
-- **Floating button:** tap to type an address, hold to fan out your favorites (Instagram, Facebook, Twitter, Reddit, YouTube by default, with their site icons) and settings, drag it to either edge. A thin progress ring hugs its edge while held.
-- **Favorites:** star the current page, a history entry or a recipe. Edit and reorder in Settings; the first six form quick access. Their pages show unread badges and raise local notifications when a count in the page title rises while you are elsewhere (only while the app is running; no push).
-- **Recipes:** bundled site icons and per-site switches for 18 sites; hide Reels, Shorts, Stories, app prompts and more. Long Settings sections start collapsed.
-- **Usage:** per-site foreground time with optional daily warnings and limits for any site. Top notices warn; exhausted sites are blurred, with interaction, navigation and media stopped until midnight or a policy change.
-- **Pull to refresh** on the page, and **light, dark or system** theme that sites can follow.
-- **Ad and tracker blocking:** EasyList and EasyPrivacy are built into the app and compiled to WebKit content rules, so ads and trackers are blocked before they load, with no list downloads. One switch in Settings.
-- **Recipes:** bundled, validated in Rust, injected at document start so removed things never flash.
-- **Profiles:** each profile has its own isolated cookie and storage store (iOS 17+).
-- **First-run guide:** four short steps, replayable from Settings.
-- **Bring your own AI key:** add providers (Anthropic, OpenAI, Gemini, OpenRouter, or a local OpenAI-compatible server) in Settings. Keys go to the iOS Keychain through Rust and never come back to the UI; "Test connection" lists the provider's models.
-  - **Where to get a key:** Settings recommends [OpenRouter](https://openrouter.ai) (free variants and paid models), [OpenCode Zen / Console](https://opencode.ai/console) (paid access from external clients; its free-tier chat models require OpenCode), and local [Ollama](https://ollama.com) / [LM Studio](https://lmstudio.ai) servers (no model API fees). See [AI Assistant](docs/wiki/ai-assistant.md).
-- **AI assistant:** use the active provider to request a change on the current page, preview the redacted payload, then accept or reject its validated recipe proposal.
-- **Pro:** AI, incognito and usage are paywalled (one-time $18.99, or $2 monthly with a 14-day trial, or $10 yearly). Opening links, favorites, history, recipes and ad blocking stay free. Restore Purchases brings Pro to another device on the same store account.
-- **Planned:** Android and desktop site views, additional runtime capabilities and sharing. See the [roadmap](docs/wiki/roadmap.md).
+- Favorites, history, themes, usage limits, and local notifications.
+- Bundled recipes and EasyList/EasyPrivacy ad and tracker blocking.
+- Optional AI recipe assistant using a provider and API key you choose.
+- Separate site web views with isolated profile storage.
 
 ## Status
 
-Early, iOS first. Android and desktop site views are not built. Physical-device interaction and authenticated requests to a real AI provider remain unverified. Shell flows use in-memory IPC fixtures for smoke checks; native Swift compilation and Rust tests cover the implementation boundaries. See [Platform Support](docs/wiki/platform-support.md#verified-results).
+iOS is the verified platform. Android Kotlin site-view and billing code and an Android bundle build path exist, but Android device/emulator behavior and a signed Play release are not verified. Desktop site views are deferred. See [platform support](docs/wiki/platform-support.md).
 
-## Stack
+## Build and contribute
 
-Tauri v2 · Rust · React 19 · TypeScript (strict) · Vite · Tailwind CSS v4 · Zustand · Vitest · a native `WKWebView` host written as an in-repo Tauri plugin (`src-tauri/plugins/tauri-plugin-siteview`).
+Install Node.js 22+, Yarn 1.x, Rust, and the platform toolchain. Run `yarn install`; use `yarn tauri ios dev` for iOS or `yarn tauri android dev` for Android. Store builds, signing, and prerequisites are in the [store build guide](docs/wiki/store-builds.md); development commands are in the [development guide](docs/wiki/development-guide.md).
 
-## Docs
-
-Everything else lives in the [wiki](docs/wiki/index.md): [architecture](docs/wiki/architecture.md), [UI design](docs/wiki/ui-design.md), [recipe format](docs/wiki/recipe-format.md), [security model](docs/wiki/security.md), [platform support](docs/wiki/platform-support.md), [prior art](docs/wiki/prior-art.md).
-
-## Contributing
-
-Read [AGENTS.md](AGENTS.md) first: wiki before code, work in a git worktree, and the architecture invariants (no backend, keys only in Rust, site views are hostile, recipes not code). Changes go through a branch and a pull request, and CI must pass.
+Read [CONTRIBUTING.md](CONTRIBUTING.md) and the [wiki](docs/wiki/index.md) before changing code. CI checks the frontend and Rust code.
 
 ## License
 
-[MPL-2.0](LICENSE). See [CONTRIBUTING.md](CONTRIBUTING.md), [SECURITY.md](SECURITY.md), and [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md).
+[MPL-2.0](LICENSE).

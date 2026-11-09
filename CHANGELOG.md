@@ -12,9 +12,15 @@ All notable changes to OpenMedia are documented here.
 
 **Change:** Android runs `shouldInterceptRequest` off the UI thread. Cache the current page URL in volatile session state instead of calling `WebView.url` from a worker. Convert shell DOM rectangles from CSS pixels to density-scaled Android pixels so shell hit regions match native touch coordinates.
 
-**Verified:** `yarn tauri android dev "Medium_Phone"` built, installed and launched on `sdk_gphone64_arm64`; tapping onboarding's Next control advanced to step 2, and the app remained foreground with no new Android runtime exceptions. Broader Android behavior and physical devices remain unverified.
+**Verified:** `yarn tauri android dev "Medium_Phone"` built, installed and launched on `sdk_gphone64_arm64`; tapping onboarding's Next control advanced to step 2, and tapping the floating control opened the Pro screen. Broader Android behavior and physical devices remain unverified.
 
 **PR:** [#41](https://github.com/skepjandi/openmedia/pull/41)
+
+### docs: simplify project docs and add store release instructions
+
+**Change:** Shorten the README, correct stale wiki status and implementation claims, add iOS App Store and Google Play build/signing instructions, declare Android's version code, add license metadata to both native plugin crates, and align checked-in iOS build metadata.
+
+**Not verified:** Signed store builds, Android runtime behavior, and store submission.
 
 ### fix(release): align Apple build numbers with Android
 

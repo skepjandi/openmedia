@@ -61,7 +61,7 @@ All requests go through Rust (`reqwest`). The webview never sees the key and nev
 
 ## Key handling
 
-- Entered once in Settings, written straight to the OS secure store via the `secrets` trait. The shell receives only a `hasKey: bool` and a masked tail.
+- Entered once in Settings and written to the OS secure store via the Rust `secrets` trait. The shell receives only a `hasKey: bool`; it never receives the key or a masked tail.
 - Read only inside the `ai` module at request time; held in a zeroizing buffer for the duration of the call.
 - Never logged, never in error strings (errors from providers are scrubbed of headers/bodies containing it), never in recipe exports or settings files.
 - "Test key" issues a minimal request and reports success/failure only.
