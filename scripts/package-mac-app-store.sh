@@ -45,6 +45,9 @@ cp -R "$app" "$signed"
 # HTTPS only, no custom cryptography: answers the export-compliance question at upload.
 plutil -replace ITSAppUsesNonExemptEncryption -bool false "$signed/Contents/Info.plist"
 cp "$MAS_PROFILE" "$signed/Contents/embedded.provisionprofile"
+# A profile kept private (mode 600) would make the installed app unreadable to non-root users,
+# which App Store validation rejects (error 90255).
+chmod -R a+rX,u+w "$signed"
 
 # shellcheck disable=SC2086
 codesign --force $keychain --sign "$MAS_APP_IDENTITY" --entitlements "$entitlements" --timestamp "$signed"
