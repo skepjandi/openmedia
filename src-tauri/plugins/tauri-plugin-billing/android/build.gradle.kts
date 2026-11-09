@@ -7,7 +7,7 @@ plugins {
 
 android {
     namespace = "surf.openmedia.billing"
-    compileSdk = 36
+    compileSdk = 37
 
     defaultConfig {
         minSdk = 24
