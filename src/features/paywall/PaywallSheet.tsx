@@ -104,7 +104,7 @@ export function PaywallSheet() {
               className="w-full rounded-full border border-hair px-4 py-3 text-sm"
               onClick={() => void loadOfferings()}
             >
-              {t("paywall.error")}
+              {t("common.retry")}
             </button>
           )}
           {!legalConfigured && (

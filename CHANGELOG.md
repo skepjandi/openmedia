@@ -8,6 +8,14 @@ All notable changes to OpenMedia are documented here.
 
 ## 2026-11-09
 
+### fix(shell): label the paywall retry button "Retry"; keep ESLint out of `.worktrees/`
+
+**Problem:** when offerings failed to load, the paywall showed "Something went wrong. Try again." twice: as the error line and as the retry button's own label. `yarn lint` also parsed every file under `.worktrees/` and failed with an ambiguous `tsconfigRootDir` once a second worktree existed.
+
+**Change:** the retry button uses `common.retry` (already translated in every locale). `eslint.config.js` ignores `.worktrees`.
+
+**Verified:** `ts:check`, `lint`, `format:check` and `test` from a worktree. **Not verified:** the paywall on a device after the change; found on the iOS simulator and Android emulator, where the store has no products.
+
 ### fix(deps): build with sha2 0.11 and merge the Dependabot updates
 
 **Change:** merged the open Dependabot PRs (Rust `sha2` 0.10 to 0.11, Android Gradle, Kotlin, AndroidX, RevenueCat 9 to 11, `org.json`, coroutines). `sha2` 0.11 digests no longer implement `LowerHex`, so `ad_block.rs` builds the 16-character source id from the first 8 digest bytes by hand; the ids are unchanged.
