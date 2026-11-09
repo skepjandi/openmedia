@@ -1,8 +1,14 @@
 import type { FavoriteInput } from "./ipc";
 import { siteOf } from "./site";
 
-/** How many favorites the floating button fans out. The rest stay in Settings. */
+/** How many favorites the floating button fans out for Pro. The rest stay in Settings. */
 export const QUICK_ACCESS_LIMIT = 6;
+
+/**
+ * How many of those slots a free user can use. Mirrors `FREE_FAVORITE_LIMIT` in `library.rs`,
+ * which also refuses to grow the favorites past it. The other slots show grayed out.
+ */
+export const FREE_QUICK_ACCESS_LIMIT = 4;
 
 /** Mirrors `MAX_FAVORITE_NAME_CHARS` in `library.rs`, which is what enforces it. */
 export const MAX_FAVORITE_NAME_CHARS = 20;
@@ -10,6 +16,31 @@ export const MAX_FAVORITE_NAME_CHARS = 20;
 /** The favorites that appear when the floating button is held: the first few, in order. */
 export function quickAccess<T>(favorites: readonly T[]): T[] {
   return favorites.slice(0, QUICK_ACCESS_LIMIT);
+}
+
+/** The quick-access favorites a user may actually open: all of them with Pro, the first few without. */
+export function usableQuickAccess<T>(favorites: readonly T[], pro: boolean): T[] {
+  return favorites.slice(0, pro ? QUICK_ACCESS_LIMIT : FREE_QUICK_ACCESS_LIMIT);
+}
+
+/** One position in the quick-access menu. A locked one needs Pro and may hold a favorite or be empty. */
+export interface QuickSlot<T> {
+  favorite: T | null;
+  locked: boolean;
+}
+
+/**
+ * The positions of the quick-access menu. Pro has one per favorite, up to six. Without Pro the
+ * first four are usable and the last two are always shown, locked, so the way up is visible.
+ */
+export function quickSlots<T>(favorites: readonly T[], pro: boolean): QuickSlot<T>[] {
+  const usable = usableQuickAccess(favorites, pro).map((favorite) => ({ favorite, locked: false }));
+  if (pro) return usable;
+  const locked = Array.from({ length: QUICK_ACCESS_LIMIT - FREE_QUICK_ACCESS_LIMIT }, (_, i) => ({
+    favorite: favorites[FREE_QUICK_ACCESS_LIMIT + i] ?? null,
+    locked: true,
+  }));
+  return [...usable, ...locked];
 }
 
 /** The host as the user reads it, without the `www.` every site adds. */

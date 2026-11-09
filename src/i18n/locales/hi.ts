@@ -192,6 +192,7 @@ export const hi: Messages = {
   "favorites.quickEmpty":
     "यहाँ अभी कुछ नहीं है। नीचे कोई पसंदीदा जोड़ें, या रेसिपी को तारांकित करें।",
   "favorites.more": "और पसंदीदा · {count}",
+  "favorites.moreLocked": "और पसंदीदा",
   "favorites.add": "पसंदीदा जोड़ें",
   "favorites.quickFull": "त्वरित पहुँच भर चुकी है, इसलिए यह “और पसंदीदा” में जोड़ दी गई है।",
   "favorites.edit": "{name} संपादित करें",

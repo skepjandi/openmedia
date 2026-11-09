@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { useApp } from "../../app/store";
 import { useT } from "../../i18n/useT";
-import { QUICK_ACCESS_LIMIT } from "../../shared/favorites";
-import { DownIcon, PlusIcon, UpIcon } from "../../shared/icons";
+import { FREE_QUICK_ACCESS_LIMIT, QUICK_ACCESS_LIMIT } from "../../shared/favorites";
+import { DownIcon, LockIcon, PlusIcon, UpIcon } from "../../shared/icons";
 import type { Favorite, FavoriteInput } from "../../shared/ipc";
 import { SiteTile } from "../../shared/SiteTile";
 import { normalizeWebUrl } from "../../shared/url";
+import { useEntitlementStore } from "../paywall/store";
 import { describeAddress } from "../history/address";
 import { MAX_FAVORITE_NAME } from "./presets";
 import { Group, GroupLabel, Section, field, primaryButton, quietButton } from "./ui";
@@ -37,13 +38,26 @@ interface EditorListProps {
   emptyText?: string;
 }
 
-/** The quick-access group, the rest, and the add button, for whichever list it is given. */
+/**
+ * The quick-access group, the rest, and the add button, for whichever list it is given. Without
+ * Pro only four slots are usable: the other two show grayed out, More favorites is locked, and
+ * adding past four opens the paywall.
+ */
 export function FavoritesEditor({ favorites, save, emptyText }: EditorListProps) {
   const problem = useApp((s) => s.error);
+  const openSheet = useApp((s) => s.openSheet);
+  const isPro = useEntitlementStore((s) => s.status === "pro");
   const [editing, setEditing] = useState<number | "new" | null>(null);
   const t = useT();
 
-  const quick = favorites.slice(0, QUICK_ACCESS_LIMIT);
+  const limit = isPro ? QUICK_ACCESS_LIMIT : FREE_QUICK_ACCESS_LIMIT;
+  const quick = favorites.slice(0, limit);
+  const lockedSlots = isPro
+    ? []
+    : Array.from(
+        { length: QUICK_ACCESS_LIMIT - FREE_QUICK_ACCESS_LIMIT },
+        (_, i) => favorites[limit + i] ?? null,
+      );
   const more = favorites.slice(QUICK_ACCESS_LIMIT);
 
   const replaceAll = (next: FavoriteInput[]) => {
@@ -84,9 +98,7 @@ export function FavoritesEditor({ favorites, save, emptyText }: EditorListProps)
 
   return (
     <>
-      <GroupLabel>
-        {t("favorites.quickAccess", { count: quick.length, limit: QUICK_ACCESS_LIMIT })}
-      </GroupLabel>
+      <GroupLabel>{t("favorites.quickAccess", { count: quick.length, limit })}</GroupLabel>
       {quick.length === 0 ? (
         <p className="rounded-2xl border border-dashed border-hair px-4 py-5 text-sm text-paper/55">
           {emptyText ?? t("favorites.quickEmpty")}
@@ -94,19 +106,48 @@ export function FavoritesEditor({ favorites, save, emptyText }: EditorListProps)
       ) : (
         <Group>{quick.map((favorite, index) => renderRow(favorite, index))}</Group>
       )}
-
-      {more.length > 0 && (
-        <details className="group/more mt-5">
-          <summary className="flex cursor-pointer list-none items-center justify-between px-1 pt-1 pb-2 text-[13px] font-medium text-paper/60">
-            <span>{t("favorites.more", { count: more.length })}</span>
-            <span aria-hidden="true" className="text-paper/45 group-open/more:rotate-180">
-              ⌄
-            </span>
-          </summary>
+      {lockedSlots.length > 0 && (
+        <div className="mt-2">
           <Group>
-            {more.map((favorite, index) => renderRow(favorite, index + QUICK_ACCESS_LIMIT))}
+            {lockedSlots.map((favorite, index) => (
+              <LockedFavoriteRow
+                key={favorite?.id ?? `locked-${index}`}
+                favorite={favorite}
+                onOpen={() => openSheet("paywall")}
+              />
+            ))}
           </Group>
-        </details>
+        </div>
+      )}
+
+      {isPro ? (
+        more.length > 0 && (
+          <details className="group/more mt-5">
+            <summary className="flex cursor-pointer list-none items-center justify-between px-1 pt-1 pb-2 text-[13px] font-medium text-paper/60">
+              <span>{t("favorites.more", { count: more.length })}</span>
+              <span aria-hidden="true" className="text-paper/45 group-open/more:rotate-180">
+                ⌄
+              </span>
+            </summary>
+            <Group>
+              {more.map((favorite, index) => renderRow(favorite, index + QUICK_ACCESS_LIMIT))}
+            </Group>
+          </details>
+        )
+      ) : (
+        <button
+          type="button"
+          onClick={() => openSheet("paywall")}
+          className="mt-5 flex w-full items-center justify-between px-1 pt-1 pb-2 text-start text-[13px] font-medium text-paper/60"
+        >
+          <span className="flex items-center gap-2">
+            <LockIcon size={14} />
+            {t("favorites.moreLocked")}
+          </span>
+          <span aria-hidden="true" className="text-paper/45">
+            ⌄
+          </span>
+        </button>
       )}
 
       <div className="mt-4">
@@ -114,7 +155,7 @@ export function FavoritesEditor({ favorites, save, emptyText }: EditorListProps)
           <div className="overflow-hidden rounded-2xl border border-hair bg-paper/[0.04]">
             <FavoriteEditor
               initial={{ name: "", url: "" }}
-              hint={favorites.length >= QUICK_ACCESS_LIMIT ? t("favorites.quickFull") : undefined}
+              hint={favorites.length >= limit ? t("favorites.quickFull") : undefined}
               onCommit={(entry) => commit("new", entry)}
               onCancel={() => setEditing(null)}
             />
@@ -122,16 +163,58 @@ export function FavoritesEditor({ favorites, save, emptyText }: EditorListProps)
         ) : (
           <button
             type="button"
-            onClick={() => setEditing("new")}
+            onClick={() =>
+              !isPro && favorites.length >= limit ? openSheet("paywall") : setEditing("new")
+            }
             className="flex items-center gap-2 px-1 py-1 text-sm font-medium text-accent"
           >
             <PlusIcon /> {t("favorites.add")}
+            {!isPro && favorites.length >= limit && <LockIcon size={14} />}
           </button>
         )}
       </div>
 
       {problem && <p className="mt-3 px-1 text-sm text-accent">{problem}</p>}
     </>
+  );
+}
+
+/** A quick-access slot that needs Pro: grayed out, and a tap opens the plans. */
+function LockedFavoriteRow({
+  favorite,
+  onOpen,
+}: {
+  favorite: Favorite | null;
+  onOpen: () => void;
+}) {
+  const t = useT();
+  const host = favorite ? describeAddress(favorite.url).host : null;
+
+  return (
+    <button
+      type="button"
+      onClick={onOpen}
+      className="flex w-full items-center gap-3 py-2.5 pe-4 ps-4 text-start active:bg-paper/[0.05]"
+    >
+      <span className="flex min-w-0 flex-1 items-center gap-3 opacity-45 grayscale">
+        {favorite ? (
+          <SiteTile name={favorite.name} icon={favorite.icon} />
+        ) : (
+          <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-paper/[0.08]">
+            <LockIcon size={16} />
+          </span>
+        )}
+        <span className="min-w-0 flex-1">
+          <span className="block truncate text-base font-medium">
+            {favorite ? favorite.name : t("paywall.title")}
+          </span>
+          {host && <span className="block truncate text-sm text-paper/55">{host}</span>}
+        </span>
+      </span>
+      <span className="pro-badge grid size-6 shrink-0 place-items-center rounded-full">
+        <LockIcon size={12} />
+      </span>
+    </button>
   );
 }
 

@@ -194,6 +194,7 @@ export const sv: Messages = {
   "favorites.quickEmpty":
     "Inget här ännu. Lägg till en favorit nedan, eller stjärnmärk ett recept.",
   "favorites.more": "Fler favoriter · {count}",
+  "favorites.moreLocked": "Fler favoriter",
   "favorites.add": "Lägg till favorit",
   "favorites.quickFull": "Snabbåtkomst är full, så den här läggs till under Fler favoriter.",
   "favorites.edit": "Redigera {name}",

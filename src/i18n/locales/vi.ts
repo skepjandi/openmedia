@@ -192,6 +192,7 @@ export const vi: Messages = {
   "favorites.quickEmpty":
     "Chưa có gì ở đây. Thêm một mục yêu thích bên dưới, hoặc đánh dấu sao một công thức.",
   "favorites.more": "Yêu thích khác · {count}",
+  "favorites.moreLocked": "Yêu thích khác",
   "favorites.add": "Thêm mục yêu thích",
   "favorites.quickFull": "Truy cập nhanh đã đầy, nên mục này được thêm vào Yêu thích khác.",
   "favorites.edit": "Sửa {name}",

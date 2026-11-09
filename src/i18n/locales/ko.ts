@@ -193,6 +193,7 @@ export const ko: Messages = {
   "favorites.quickEmpty":
     "아직 아무것도 없습니다. 아래에서 즐겨찾기를 추가하거나, 레시피에 별을 붙이세요.",
   "favorites.more": "즐겨찾기 더 보기 · {count}",
+  "favorites.moreLocked": "즐겨찾기 더 보기",
   "favorites.add": "즐겨찾기 추가",
   "favorites.quickFull": "빠른 메뉴가 가득 차 이 항목은 즐겨찾기 더 보기로 추가되었습니다.",
   "favorites.edit": "{name} 편집",

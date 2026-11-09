@@ -197,6 +197,7 @@ export const cs: Messages = {
   "favorites.quickEmpty":
     "Zatím tu nic není. Přidejte oblíbenou stránku níže, nebo označte hvězdičkou recept.",
   "favorites.more": "Další oblíbené · {count}",
+  "favorites.moreLocked": "Další oblíbené",
   "favorites.add": "Přidat oblíbenou",
   "favorites.quickFull":
     "Rychlý přístup je plný, proto se tato stránka přidá do Dalších oblíbených.",

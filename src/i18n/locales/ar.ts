@@ -190,6 +190,7 @@ export const ar: Messages = {
   "favorites.quickAccess": "وصول سريع · {count} من {limit}",
   "favorites.quickEmpty": "لا شيء هنا بعد. أضف مفضلة أدناه، أو ضع نجمة على وصفة.",
   "favorites.more": "المزيد من المفضلة · {count}",
+  "favorites.moreLocked": "المزيد من المفضلة",
   "favorites.add": "إضافة مفضلة",
   "favorites.quickFull": "الوصول السريع ممتلئ، لذا أضيفت هذه إلى المزيد من المفضلة.",
   "favorites.edit": "تعديل {name}",

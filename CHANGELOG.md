@@ -8,6 +8,14 @@ All notable changes to OpenMedia are documented here.
 
 ## 2026-11-09
 
+### feat(paywall): free users get four quick-access slots; slots 5 and 6 and More favorites need Pro
+
+**Problem:** every user had six quick-access slots and an unlimited favorites list.
+
+**Change:** without Pro the fan opens only the first four favorites and always shows two more slots grayed out with a lock (the fifth and sixth favorite, or empty), which open the paywall. In Settings, those two slots are grayed rows, "More favorites" is a locked row and "Add favorite" opens the paywall once four exist (`FavoritesEditor`, `quickSlots`, `usableQuickAccess`). Unread badges, notifications and session retention follow the four usable slots. The gate is in Rust: `set_favorites` and `set_site_favorite` return `pro-required` when a save would grow the list past four (`favorites_need_pro`); a longer list can still be edited, reordered and shortened. New string `favorites.moreLocked` in all 29 locales (the existing "More favorites" without its count).
+
+**Verified:** `tsc`, ESLint, 289 frontend tests (new: `quickSlots`, `usableQuickAccess`), Rust library tests (new: growth gate), clippy. **Not verified:** the fan and Settings rendering on a device; the Rust commands against a real free entitlement; native-speaker review of the new string. Note: the five default favorites exceed the free limit, so on a fresh install YouTube, the fifth, is a grayed slot.
+
 ### feat(settings): Recipes page, search engine setting; fix(shell): paywall and picker dismissal
 
 **Problem:** closing the paywall opened from Settings also closed Settings; the language list had no close button and could not be dragged down; the Pro hint in the AI section was a plain outlined pill; the command bar always searched DuckDuckGo.

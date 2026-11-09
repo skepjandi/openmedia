@@ -190,6 +190,7 @@ export const de: Messages = {
   "favorites.quickEmpty":
     "Noch nichts hier. Füge unten einen Favoriten hinzu oder markiere ein Rezept mit einem Stern.",
   "favorites.more": "Weitere Favoriten · {count}",
+  "favorites.moreLocked": "Weitere Favoriten",
   "favorites.add": "Favorit hinzufügen",
   "favorites.quickFull":
     "Der Schnellzugriff ist voll, daher wird dieser Favorit unter „Weitere Favoriten“ hinzugefügt.",

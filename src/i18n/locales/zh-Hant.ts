@@ -186,6 +186,7 @@ export const zhHant: Messages = {
   "favorites.quickAccess": "快速存取 · {limit} 個中的 {count} 個",
   "favorites.quickEmpty": "這裡還沒有任何項目。在下方加入我的最愛，或替配方加上星號。",
   "favorites.more": "更多我的最愛 · {count}",
+  "favorites.moreLocked": "更多我的最愛",
   "favorites.add": "加入我的最愛",
   "favorites.quickFull": "快速存取已滿，因此這個項目被加到「更多我的最愛」。",
   "favorites.edit": "編輯 {name}",

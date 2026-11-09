@@ -186,6 +186,7 @@ export const th: Messages = {
   "favorites.quickAccess": "ทางลัด · {count} จาก {limit}",
   "favorites.quickEmpty": "ยังไม่มีอะไรที่นี่ เพิ่มรายการโปรดด้านล่าง หรือกดดาวให้สูตร",
   "favorites.more": "รายการโปรดเพิ่มเติม · {count}",
+  "favorites.moreLocked": "รายการโปรดเพิ่มเติม",
   "favorites.add": "เพิ่มรายการโปรด",
   "favorites.quickFull": "ทางลัดเต็มแล้ว รายการนี้จึงถูกเพิ่มในรายการโปรดเพิ่มเติม",
   "favorites.edit": "แก้ไข {name}",

@@ -196,6 +196,7 @@ export const uk: Messages = {
   "favorites.quickAccess": "Швидкий доступ · {count} з {limit}",
   "favorites.quickEmpty": "Тут поки порожньо. Додайте обране нижче або поставте зірку рецепту.",
   "favorites.more": "Ще обране · {count}",
+  "favorites.moreLocked": "Ще обране",
   "favorites.add": "Додати до обраного",
   "favorites.quickFull": "Швидкий доступ заповнено, тож це додано до «Ще обраного».",
   "favorites.edit": "Редагувати {name}",

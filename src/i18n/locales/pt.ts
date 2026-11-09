@@ -198,6 +198,7 @@ export const pt: Messages = {
   "favorites.quickEmpty":
     "Ainda não há nada aqui. Adicione um favorito abaixo ou marque uma receita com uma estrela.",
   "favorites.more": "Mais favoritos · {count}",
+  "favorites.moreLocked": "Mais favoritos",
   "favorites.add": "Adicionar favorito",
   "favorites.quickFull": "O acesso rápido está cheio, então este foi adicionado a Mais favoritos.",
   "favorites.edit": "Editar {name}",

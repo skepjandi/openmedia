@@ -196,6 +196,7 @@ export const ur: Messages = {
   "favorites.quickAccess": "تیز رسائی · {limit} میں سے {count}",
   "favorites.quickEmpty": "یہاں ابھی کچھ نہیں۔ نیچے پسندیدہ شامل کریں، یا کسی ریسپی کو ستارہ دیں۔",
   "favorites.more": "مزید پسندیدہ · {count}",
+  "favorites.moreLocked": "مزید پسندیدہ",
   "favorites.add": "پسندیدہ شامل کریں",
   "favorites.quickFull": "تیز رسائی مکمل ہے، اس لیے یہ مزید پسندیدہ میں شامل کی گئی ہے۔",
   "favorites.edit": "{name} میں ترمیم کریں",

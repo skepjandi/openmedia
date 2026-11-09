@@ -6,6 +6,8 @@ import { useT } from "../../i18n/useT";
 import { usePageMargin } from "./usePageMargin";
 import { readRect, useSiteViewRect } from "./useSiteViewRect";
 import { observeTitle, quickFavoriteOf, type Watch } from "./unreadWatch";
+import { usableQuickAccess } from "../../shared/favorites";
+import { useEntitlementStore } from "../paywall/store";
 
 /** How often idle and surplus hidden sessions are swept. */
 const SWEEP_MS = 60_000;
@@ -66,7 +68,11 @@ export function WebLayer() {
       );
       watches.set(page.session, observation.watch);
       if (!observation.notify) return;
-      const favorite = quickFavoriteOf(sessions, state?.favorites ?? [], page.session);
+      const favorites = usableQuickAccess(
+        state?.favorites ?? [],
+        useEntitlementStore.getState().status === "pro",
+      );
+      const favorite = quickFavoriteOf(sessions, favorites, page.session);
       if (favorite) {
         void siteView
           .notify(page.session, favorite.name, translate.current("notify.newActivity"))

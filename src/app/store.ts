@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { usableQuickAccess } from "../shared/favorites";
 import {
   assistantReducer,
   initialAssistant,
@@ -203,6 +204,10 @@ const NO_FAVORITES: readonly Favorite[] = [];
 /** The favorites the floating button fans out: the incognito set while incognito, else the normal one. */
 export const selectQuickFavorites = (store: AppStore): readonly Favorite[] =>
   store.incognito.active ? store.incognito.favorites : (store.state?.favorites ?? NO_FAVORITES);
+
+/** The quick-access favorites the user may open right now: without Pro, the first four of them. */
+export const selectUsableQuickFavorites = (store: AppStore): readonly Favorite[] =>
+  usableQuickAccess(selectQuickFavorites(store), useEntitlementStore.getState().status === "pro");
 
 /** The language the device is set to, read once: it cannot change while the app runs. */
 const DEVICE_LOCALE = detectLocale();
@@ -495,7 +500,7 @@ export const useApp = create<AppStore>((set, get) => {
         activeId,
         Date.now(),
         pressure,
-        selectQuickFavorites(get()),
+        selectUsableQuickFavorites(get()),
       );
       if (doomed.length === 0) return;
       doomed.forEach((id) => void siteView.close(id).catch(() => {}));

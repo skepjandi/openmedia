@@ -8,9 +8,10 @@ OpenMedia has no accounts and no backend of ours, so the paywall rests on two th
 
 | Free, always | Pro |
 |---|---|
-| Opening any link or site, web search from the command bar, favorites, history, bundled recipes and their switches, ad and tracker blocking, Settings, theme, language | All AI features (providers, keys, test, assistant, preview, accept) |
+| Opening any link or site, web search from the command bar, up to four favorites (the first four quick-access slots), history, bundled recipes and their switches, ad and tracker blocking, Settings, theme, language | All AI features (providers, keys, test, assistant, preview, accept) |
 | Deleting AI providers and keys, leaving incognito, unblocking a site, recording usage | Incognito mode |
 | | Usage: Stats, daily policies and limits, blocking an exhausted site |
+| | Quick-access slots 5 and 6, and More favorites (a free user sees the two slots grayed out and More favorites locked) |
 
 ## Plans
 
@@ -39,6 +40,7 @@ flowchart LR
 - **`tauri-plugin-billing`** (`src-tauri/plugins/tauri-plugin-billing`) wraps `purchases-ios` and `purchases-android`. RevenueCat has no Tauri SDK. Its methods (`configure`, `customerInfo`, `offerings`, `purchase`, `restore`) are Rust-only: no Tauri command, permission or capability exists for them, so neither the shell nor a site view can call the plugin. Desktop returns `Unsupported`.
 - **`entitlement.rs`** owns the state (`loading`, `free`, `pro`), resolves it in the background at launch, and exposes the commands the shell uses. It is the only place Pro is decided.
 - **The gate is in Rust.** `require_pro` runs at the top of each gated command, so a UI bug cannot unlock a feature. Gated: `ai_save_provider`, `ai_set_key`, `ai_set_active`, `ai_test`, `set_ai_preview`, `ai_prepare`, `ai_send`, `ai_accept`, `unlock_incognito`, `enter_incognito`, `get_incognito_favorites`, `set_incognito_favorites`, `get_usage`, `get_usage_policies`, `set_usage_policy`, and `set_usage_blocked` when blocking. A rejected call returns the stable code `pro-required`, which the shell turns into the paywall. If Pro is lost while incognito is on, incognito is switched off.
+- **Favorites limit.** `set_favorites` and `set_site_favorite` call `require_pro` when a save would grow the list past `FREE_FAVORITE_LIMIT` (4, `library.rs`; mirrored by `FREE_QUICK_ACCESS_LIMIT` in the shell). A list already longer (the five defaults, or Pro that lapsed) can still be edited, reordered and shortened, just not extended; its entries past the fourth show grayed out and do nothing but open the paywall.
 - **Shell.** `src/features/paywall/` holds typed IPC wrappers, the zustand store, `PaywallSheet` and lock affordances. While entitlement is `loading`, gated actions stay blocked and open the paywall rather than risk a free access window.
 
 ## No login: how recovery works

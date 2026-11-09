@@ -192,6 +192,7 @@ export const ms: Messages = {
   "favorites.quickEmpty":
     "Belum ada apa-apa di sini. Tambah kegemaran di bawah, atau tandakan bintang pada resipi.",
   "favorites.more": "Kegemaran lain · {count}",
+  "favorites.moreLocked": "Kegemaran lain",
   "favorites.add": "Tambah kegemaran",
   "favorites.quickFull": "Akses pantas sudah penuh, jadi yang ini ditambah ke Kegemaran lain.",
   "favorites.edit": "Sunting {name}",

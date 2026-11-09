@@ -185,6 +185,7 @@ export const zhHans: Messages = {
   "favorites.quickAccess": "快捷访问 · {limit} 个中的 {count} 个",
   "favorites.quickEmpty": "这里还什么都没有。在下方添加收藏，或给配方加星标。",
   "favorites.more": "更多收藏 · {count}",
+  "favorites.moreLocked": "更多收藏",
   "favorites.add": "添加收藏",
   "favorites.quickFull": "快捷访问已满，因此这个收藏被添加到“更多收藏”。",
   "favorites.edit": "编辑 {name}",

@@ -2,7 +2,7 @@ import { useMemo, useRef, useState, type CSSProperties, type PointerEvent } from
 import { selectQuickFavorites, useApp } from "../../app/store";
 import { unreadByFavorite } from "../web/unreadWatch";
 import { useT } from "../../i18n/useT";
-import { quickAccess } from "../../shared/favorites";
+import { quickSlots, usableQuickAccess } from "../../shared/favorites";
 import { useInsets, useViewport } from "../../shared/viewport";
 import {
   FAB_SIZE,
@@ -79,12 +79,12 @@ export function Fab() {
   const holdTimer = useRef(0);
   const ignorePress = useRef(false);
 
-  const list = useMemo(() => quickAccess(favorites), [favorites]);
+  const list = useMemo(() => quickSlots(favorites, isPro), [favorites, isPro]);
   const sessions = useApp((s) => s.sessions);
   const activeId = useApp((s) => s.activeId);
   const unread = useMemo(
-    () => unreadByFavorite(sessions, favorites, activeId),
-    [sessions, favorites, activeId],
+    () => unreadByFavorite(sessions, usableQuickAccess(favorites, isPro), activeId),
+    [sessions, favorites, isPro, activeId],
   );
   const anyUnread = unread.some((count) => count > 0);
   const resting = fabCenter(position.edge, position.yRatio * viewport.height, viewport, insets);
@@ -105,7 +105,11 @@ export function Fab() {
     else if (target.kind === "stats") openSheet("stats");
     else if (target.kind === "incognito")
       void (incognito.active ? exitIncognito() : enterIncognito());
-    else if (list[target.index]) openFavorite(list[target.index].url);
+    else {
+      const slot = list[target.index];
+      if (slot?.locked) openSheet("paywall");
+      else if (slot?.favorite) openFavorite(slot.favorite.url);
+    }
   };
 
   const apply = (effect: GestureEffect) => {
@@ -203,15 +207,17 @@ export function Fab() {
         }`}
       />
 
-      {list.map((favorite, index) => (
+      {list.map(({ favorite, locked }, index) => (
         <button
-          key={favorite.id}
+          key={favorite?.id ?? `locked-${index}`}
           type="button"
           data-open={fanOpen}
           aria-label={
-            unread[index] > 0
-              ? `${t("fab.openFavorite", { name: favorite.name })}. ${t("notify.newActivity")}`
-              : t("fab.openFavorite", { name: favorite.name })
+            locked
+              ? t("paywall.title")
+              : unread[index] > 0
+                ? `${t("fab.openFavorite", { name: favorite?.name ?? "" })}. ${t("notify.newActivity")}`
+                : t("fab.openFavorite", { name: favorite?.name ?? "" })
           }
           tabIndex={fanOpen ? 0 : -1}
           onClick={() => {
@@ -226,22 +232,31 @@ export function Fab() {
           }}
           className={`fan-item fab-glass fixed z-20 grid place-items-center rounded-full text-lg font-medium text-white ${
             hover?.kind === "favorite" && hover.index === index ? "ring-2 ring-accent" : ""
-          }`}
+          } ${locked ? "brightness-75 grayscale" : ""}`}
         >
-          {favorite.icon ? (
+          {favorite?.icon ? (
             <img src={favorite.icon} alt="" draggable={false} className="size-7 rounded-md" />
-          ) : (
+          ) : favorite ? (
             monogram(favorite.name)
+          ) : (
+            <LockIcon />
           )}
-          <span
-            className={`pointer-events-none absolute top-1/2 -translate-y-1/2 text-[11px] font-medium tracking-[0.14em] whitespace-nowrap text-white uppercase [text-shadow:0_1px_6px_rgb(0_0_0/0.7)] ${
-              position.edge === "left"
-                ? "left-full ml-3 text-start rtl:text-end"
-                : "right-full mr-3 text-end rtl:text-start"
-            }`}
-          >
-            {favorite.name}
-          </span>
+          {favorite && (
+            <span
+              className={`pointer-events-none absolute top-1/2 -translate-y-1/2 text-[11px] font-medium tracking-[0.14em] whitespace-nowrap text-white uppercase [text-shadow:0_1px_6px_rgb(0_0_0/0.7)] ${
+                position.edge === "left"
+                  ? "left-full ml-3 text-start rtl:text-end"
+                  : "right-full mr-3 text-end rtl:text-start"
+              }`}
+            >
+              {favorite.name}
+            </span>
+          )}
+          {locked && favorite && (
+            <span className="pro-badge absolute -end-1.5 -top-1.5 z-10 grid size-5 place-items-center rounded-full">
+              <LockIcon size={12} />
+            </span>
+          )}
           {unread[index] > 0 && <UnreadBadge count={unread[index]} />}
         </button>
       ))}

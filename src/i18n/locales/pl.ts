@@ -195,6 +195,7 @@ export const pl: Messages = {
   "favorites.quickAccess": "Szybki dostęp · {count} z {limit}",
   "favorites.quickEmpty": "Na razie pusto. Dodaj ulubioną poniżej lub oznacz gwiazdką przepis.",
   "favorites.more": "Więcej ulubionych · {count}",
+  "favorites.moreLocked": "Więcej ulubionych",
   "favorites.add": "Dodaj ulubioną",
   "favorites.quickFull":
     "Szybki dostęp jest pełny, więc ta pozycja trafi do sekcji Więcej ulubionych.",

@@ -196,6 +196,7 @@ export const ru: Messages = {
   "favorites.quickAccess": "Быстрый доступ · {count} из {limit}",
   "favorites.quickEmpty": "Пока пусто. Добавьте избранное ниже или поставьте звезду рецепту.",
   "favorites.more": "Ещё избранное · {count}",
+  "favorites.moreLocked": "Ещё избранное",
   "favorites.add": "Добавить в избранное",
   "favorites.quickFull": "Быстрый доступ заполнен, поэтому это добавлено в «Ещё избранное».",
   "favorites.edit": "Изменить {name}",

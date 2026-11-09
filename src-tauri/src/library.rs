@@ -34,6 +34,17 @@ const DEFAULT_FAVORITES: [(&str, &str); 5] = [
     YOUTUBE_FAVORITE,
 ];
 
+/// How many favorites a free user can have; more needs Pro. Mirrors `FREE_QUICK_ACCESS_LIMIT` in
+/// the shell, which shows the Pro slots grayed out.
+pub const FREE_FAVORITE_LIMIT: usize = 4;
+
+/// True when saving `new` favorites over `current` grows the list past what a free user may have.
+/// A list already longer than the limit (Pro lapsed, or the five defaults) can still shrink, be
+/// reordered or edited; it just cannot grow.
+pub fn favorites_need_pro(current: usize, new: usize) -> bool {
+    new > FREE_FAVORITE_LIMIT && new > current
+}
+
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub enum Theme {
@@ -438,6 +449,10 @@ impl Library {
         data.icons.insert(host.to_owned(), data_url.to_owned());
         prune_icons(&mut data);
         self.save(&data)
+    }
+
+    pub fn favorite_count(&self) -> Result<usize> {
+        Ok(self.lock()?.favorites.len())
     }
 
     pub fn favorites(&self) -> Result<Vec<Favorite>> {
@@ -940,6 +955,19 @@ mod tests {
             reload(&dir).state().unwrap().search_engine,
             SearchEngine::Brave
         );
+    }
+
+    #[test]
+    fn only_growing_past_the_free_limit_needs_pro() {
+        assert!(!favorites_need_pro(0, FREE_FAVORITE_LIMIT));
+        assert!(favorites_need_pro(
+            FREE_FAVORITE_LIMIT,
+            FREE_FAVORITE_LIMIT + 1
+        ));
+        // Already over the limit: editing, reordering and removing stay free, adding does not.
+        assert!(!favorites_need_pro(8, 8));
+        assert!(!favorites_need_pro(8, 5));
+        assert!(favorites_need_pro(5, 6));
     }
 
     #[test]

@@ -196,6 +196,7 @@ export const nl: Messages = {
   "favorites.quickEmpty":
     "Hier staat nog niets. Voeg hieronder een favoriet toe, of markeer een recept met een ster.",
   "favorites.more": "Meer favorieten · {count}",
+  "favorites.moreLocked": "Meer favorieten",
   "favorites.add": "Favoriet toevoegen",
   "favorites.quickFull": "Snelle toegang is vol, dus deze wordt toegevoegd aan Meer favorieten.",
   "favorites.edit": "{name} bewerken",

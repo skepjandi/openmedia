@@ -193,6 +193,7 @@ export const si: Messages = {
   "favorites.quickEmpty":
     "මෙහි තවම කිසිවක් නැත. පහළින් ආදරණීයක් එකතු කරන්න, හෝ ක්‍රමයකට තරු ලකුණ දෙන්න.",
   "favorites.more": "තවත් ආදරණීය · {count}",
+  "favorites.moreLocked": "තවත් ආදරණීය",
   "favorites.add": "ආදරණීය එකතු කරන්න",
   "favorites.quickFull": "ඉක්මන් ප්‍රවේශය පිරිච්ච බැවිට මෙය තවත් ආදරණීය අතරතුරට එකතු කරනු ලැබේ.",
   "favorites.edit": "{name} සංස්කරණය කරන්න",

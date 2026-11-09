@@ -195,6 +195,7 @@ export const tr: Messages = {
   "favorites.quickEmpty":
     "Burada henüz bir şey yok. Aşağıya bir favori ekleyin ya da bir tarifi yıldızlayın.",
   "favorites.more": "Diğer favoriler · {count}",
+  "favorites.moreLocked": "Diğer favoriler",
   "favorites.add": "Favori ekle",
   "favorites.quickFull": "Hızlı erişim dolu, bu yüzden bu da Diğer favorilere eklendi.",
   "favorites.edit": "{name} öğesini düzenle",

@@ -191,6 +191,7 @@ export const bn: Messages = {
   "favorites.quickEmpty":
     "এখানে এখনও কিছু নেই। নিচে একটি পছন্দ যোগ করুন, অথবা রেসিপিতে তারকা চিহ্ন দিন।",
   "favorites.more": "আরও পছন্দ · {count}",
+  "favorites.moreLocked": "আরও পছন্দ",
   "favorites.add": "পছন্দ যোগ করুন",
   "favorites.quickFull": "দ্রুত অ্যাক্সেস পূর্ণ, তাই এটি আরও পছন্দের তালিকায় যোগ করা হয়েছে।",
   "favorites.edit": "{name} সম্পাদনা করুন",

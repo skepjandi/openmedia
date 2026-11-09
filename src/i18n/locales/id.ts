@@ -191,6 +191,7 @@ export const id: Messages = {
   "favorites.quickEmpty":
     "Belum ada apa-apa di sini. Tambahkan favorit di bawah, atau beri bintang pada resep.",
   "favorites.more": "Favorit lainnya · {count}",
+  "favorites.moreLocked": "Favorit lainnya",
   "favorites.add": "Tambah favorit",
   "favorites.quickFull": "Akses cepat sudah penuh, jadi yang ini ditambahkan ke Favorit lainnya.",
   "favorites.edit": "Ubah {name}",

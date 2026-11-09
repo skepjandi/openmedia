@@ -196,6 +196,7 @@ export const ro: Messages = {
   "favorites.quickEmpty":
     "Nimic aici încă. Adaugă mai jos un favorit sau marchează cu stea o rețetă.",
   "favorites.more": "Alte favorite · {count}",
+  "favorites.moreLocked": "Alte favorite",
   "favorites.add": "Adaugă favorit",
   "favorites.quickFull": "Accesul rapid este plin, așa că acesta este adăugat la Alte favorite.",
   "favorites.edit": "Editează {name}",

@@ -197,6 +197,7 @@ export const en = {
   "favorites.quickAccess": "Quick access · {count} of {limit}",
   "favorites.quickEmpty": "Nothing here yet. Add a favorite below, or star a recipe.",
   "favorites.more": "More favorites · {count}",
+  "favorites.moreLocked": "More favorites",
   "favorites.add": "Add favorite",
   "favorites.quickFull": "Quick access is full, so this one is added to More favorites.",
   "favorites.edit": "Edit {name}",
