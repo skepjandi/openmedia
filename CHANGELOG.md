@@ -8,6 +8,12 @@ All notable changes to OpenMedia are documented here.
 
 ## 2026-11-09
 
+### chore(release): version 1.0.0 and Mac App Store packaging
+
+**Change:** the app version is `1.0.0` (the App Store Connect version records are 1.0). `scripts/package-mac-app-store.sh` signs the release `.app` with the new sandbox entitlements (`src-tauri/macos/OpenMedia.entitlements`) and a Mac App Store profile and builds the installer `.pkg` Transporter takes (see the store-builds wiki).
+
+**Verified:** a signed iOS `.ipa` and Mac `.pkg` (built the same way) passed `altool --validate-app`; a signed release AAB built (with #79). **Not verified:** the sandboxed Mac app beyond launching to onboarding, and any upload or review.
+
 ### feat(shell): Face ID icon on devices that have Face ID
 
 **Problem:** the biometric gates (the locked incognito sections, the Incognito button) always showed a fingerprint, but most iPhones use Face ID.
