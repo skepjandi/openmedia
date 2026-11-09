@@ -1,6 +1,6 @@
 # Platform Support
 
-> **Status: Partially implemented.** Native iOS (Swift) and Android (Kotlin) site-view plugins exist. iOS behavior has simulator evidence; Android code and an AAB build path exist, but Android device/emulator behavior and a signed store build are unverified. Desktop site views are deferred.
+> **Status: Partially implemented.** Native iOS (Swift) and Android (Kotlin) site-view plugins exist. iOS behavior has simulator evidence; Android debug startup was verified on one emulator, but broader Android behavior and a signed store build remain unverified. Desktop site views are deferred.
 
 ## The core constraint
 
@@ -167,7 +167,7 @@ Fallback if the native-plugin approach fails: navigate the main webview to the s
 - **Notifications.** A local notification for a hidden session, with the session id in the intent; the tap is reported back as `siteview:notification-tap`. `POST_NOTIFICATIONS` is requested the first time one is due.
 - **Secrets.** Android has no `keyring` backend, so the plugin's Kotlin side keeps a key in the Android Keystore (AES-GCM) and writes only the ciphertext to the app's preferences, which the app's backup rules exclude. Rust reaches it through a Rust-only plugin command, so no webview can ask for a key.
 
-**Build verification.** `yarn tauri android build --aab --ci` produced `src-tauri/gen/android/app/build/outputs/bundle/universalRelease/app-universal-release.aab` (25 MB), with release Rust libraries for all four Android ABIs and compiled Kotlin plugins. That build was unsigned because no upload key was configured. Gradle reads ignored `src-tauri/gen/android/keystore.properties` (`keyAlias`, `password`, `storeFile`) when present. The app has not been installed or run on an Android device or emulator. See [Store Builds](./store-builds.md).
+**Build verification.** `yarn tauri android build --aab --ci` produced `src-tauri/gen/android/app/build/outputs/bundle/universalRelease/app-universal-release.aab` (25 MB), with release Rust libraries for all four Android ABIs and compiled Kotlin plugins. The AAB is unsigned because no upload key was configured; `jarsigner -verify` reported it unsigned. Release signing reads the ignored `src-tauri/gen/android/keystore.properties` (`keyAlias`, `password`, `storeFile`) when present. **Emulator smoke:** `yarn tauri android dev "Medium_Phone"` installed and launched `surf.openmedia` on `emulator-5554` (`sdk_gphone64_arm64`); its main activity remained foreground with no new Android runtime exceptions. This verifies startup only, not broader Android behavior or physical devices. See [Store Builds](./store-builds.md). Never commit the keystore properties file.
 
 ## Known platform constraints
 
