@@ -14,6 +14,8 @@ All notable changes to OpenMedia are documented here.
 
 **Verified:** `yarn tauri android dev "Medium_Phone"` built, installed and launched on `sdk_gphone64_arm64`; the app remained foreground with no new Android runtime exceptions. Broader Android behavior and physical devices remain unverified.
 
+**PR:** [#41](https://github.com/skepjandi/openmedia/pull/41)
+
 ### fix(release): align Apple build numbers with Android
 
 **Change:** Set iOS and macOS `CFBundleVersion` to `1000` for marketing version `0.1.0`, matching Android's version code. Increment both Apple build numbers for each subsequent upload.
