@@ -8,6 +8,12 @@ All notable changes to OpenMedia are documented here.
 
 ## 2026-11-09
 
+### fix(deps): build with sha2 0.11 and merge the Dependabot updates
+
+**Change:** merged the open Dependabot PRs (Rust `sha2` 0.10 to 0.11, Android Gradle, Kotlin, AndroidX, RevenueCat 9 to 11, `org.json`, coroutines). `sha2` 0.11 digests no longer implement `LowerHex`, so `ad_block.rs` builds the 16-character source id from the first 8 digest bytes by hand; the ids are unchanged.
+
+**Verified:** `cargo fmt --check`, `clippy -D warnings`, `cargo test --workspace` (Rust only). **Not verified:** the Android and iOS builds with AGP 9, Kotlin 2.4 and RevenueCat 11; CI does not build them, so run `yarn build android` before a release.
+
 ### chore(ci): reduce CI to lint, format check and tests
 
 **Change:** `ci.yml` is one Ubuntu job running `yarn lint`, `yarn format:check` and `yarn test`. The macOS Rust and Swift job, `cargo deny`, the Android build and tests, `ts:check` and `vite build` are removed from CI. Sync Wiki and Dependabot are unchanged. Docs that said CI runs everything now point to `yarn verify` as the local full check.

@@ -48,9 +48,15 @@ impl Source {
         hasher.update(CONVERTER_REVISION.as_bytes());
         hasher.update([0]);
         hasher.update(text.as_bytes());
-        let digest = format!("{:x}", hasher.finalize());
+        // The first 8 bytes, as 16 lowercase hex characters. sha2 0.11 digests no longer implement `LowerHex`.
+        let short: String = hasher
+            .finalize()
+            .iter()
+            .take(8)
+            .map(|b| format!("{b:02x}"))
+            .collect();
         Self {
-            id: format!("openmedia-{name}-{}", &digest[..16]),
+            id: format!("openmedia-{name}-{short}"),
             text,
         }
     }
