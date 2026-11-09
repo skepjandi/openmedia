@@ -6,6 +6,16 @@ All notable changes to OpenMedia are documented here.
 >
 > **Wiki**: the [GitHub Wiki](https://github.com/skepjandi/openmedia/wiki) is the public-facing main wiki — architecture, recipe format, AI pipeline, security model, roadmap. Source-controlled editing surface is `docs/wiki/` in this repo; CI (`.github/workflows/sync-wiki.yml`) mirrors it to the GitHub Wiki on every merge to `main`. New single-PR changes belong here, not as new wiki pages.
 
+## 2026-11-10
+
+### fix(siteview): sign-in popups open inside the app on macOS
+
+**What:** A page's `window.open` to another domain (Google sign-in) or a `target=_blank` link out of the session's domain opened the Mac's default browser, so the sign-in could never report back to the page.
+
+**Change:** Those requests now open a popup window inside the app (`open_popup` in `macos/mod.rs`), built on the opener's web view configuration: same data store and `window.opener`, Safari user agent, http/https only. `window.close()` in the popup closes the window (WebKit does not report it, so a script turns it into a refused navigation the popup closes on). Links within the session's domain still load in the page. If the popup cannot be built, the link falls back to the browser.
+
+**Verified:** compiles, clippy clean, plugin unit tests pass. **Not verified:** a real Google sign-in on the Mac; popup behavior at runtime.
+
 ## 2026-11-09
 
 ### chore(release): version 1.0.0 and Mac App Store packaging

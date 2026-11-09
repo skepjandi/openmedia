@@ -31,9 +31,9 @@ use std::{
 use serde::de::DeserializeOwned;
 use tauri::{
     AppHandle, Emitter, LogicalPosition, LogicalSize, Manager, Runtime, Theme, Webview, WebviewUrl,
-    Window,
+    WebviewWindow, WebviewWindowBuilder, Window,
     plugin::PluginApi,
-    webview::{DownloadEvent, NewWindowResponse, WebviewBuilder},
+    webview::{DownloadEvent, NewWindowFeatures, NewWindowResponse, WebviewBuilder},
 };
 use url::Url;
 use uuid::Uuid;
@@ -178,6 +178,49 @@ fn open_in_browser(url: &Url) {
     let _ = Command::new("open").arg(url.as_str()).spawn();
 }
 
+/// WebKit does not tell the app when a page calls `window.close()`, which is how a sign-in popup
+/// ends. The script turns that call into a navigation to this address, which the popup refuses
+/// and closes itself on.
+const POPUP_CLOSE_URL: &str = "https://openmedia.invalid/__close_popup__";
+const POPUP_CLOSE_SCRIPT: &str = "(function(){var c=function(){location.href='https://openmedia.invalid/__close_popup__'};try{Object.defineProperty(window,'close',{value:c,configurable:true,writable:true})}catch(e){window.close=c}})();";
+static POPUPS: AtomicU64 = AtomicU64::new(0);
+
+/// Builds the window for a page's `window.open`. `features` ties it to the opener's web view
+/// configuration. Must run on the main thread, where WebKit calls the new-window handler.
+fn open_popup<R: Runtime>(
+    app: &AppHandle<R>,
+    features: NewWindowFeatures,
+) -> Result<WebviewWindow<R>> {
+    let label = format!("popup-{}", POPUPS.fetch_add(1, Ordering::Relaxed));
+    let closing = app.clone();
+    let closing_label = label.clone();
+    let blank = Url::parse("about:blank").map_err(|e| Error::InvalidUrl(e.to_string()))?;
+    Ok(
+        WebviewWindowBuilder::new(app, &label, WebviewUrl::External(blank))
+            .window_features(features)
+            .user_agent(SAFARI_USER_AGENT)
+            .initialization_script(POPUP_CLOSE_SCRIPT)
+            .on_document_title_changed(|window, title| {
+                let _ = window.set_title(&title);
+            })
+            .on_navigation(move |url| {
+                if url.as_str() == POPUP_CLOSE_URL {
+                    // Closing from inside the navigation callback would re-enter the web view.
+                    let app = closing.clone();
+                    let label = closing_label.clone();
+                    let _ = closing.run_on_main_thread(move || {
+                        if let Some(window) = app.get_webview_window(&label) {
+                            let _ = window.destroy();
+                        }
+                    });
+                    return false;
+                }
+                allows_navigation(url)
+            })
+            .build()?,
+    )
+}
+
 fn scope_of(url: &str) -> Option<String> {
     let url = Url::parse(url).ok()?;
     matches!(url.scheme(), "http" | "https").then(|| url.host_str().map(site_of_host))?
@@ -283,19 +326,29 @@ impl<R: Runtime> Inner<R> {
                 }
                 true
             })
-            .on_new_window(move |url, _features| {
-                if matches!(url.scheme(), "http" | "https") {
-                    let inside = url.host_str().is_some_and(|host| {
-                        scope_contains(&scope.lock().unwrap_or_else(PoisonError::into_inner), host)
-                    });
-                    match app.get_webview(&own_label) {
-                        Some(webview) if inside => {
-                            let _ = webview.navigate(url);
-                        }
-                        _ => open_in_browser(&url),
+            .on_new_window(move |url, features| {
+                if !matches!(url.scheme(), "http" | "https") {
+                    return NewWindowResponse::Deny;
+                }
+                let inside = url.host_str().is_some_and(|host| {
+                    scope_contains(&scope.lock().unwrap_or_else(PoisonError::into_inner), host)
+                });
+                if inside {
+                    if let Some(webview) = app.get_webview(&own_label) {
+                        let _ = webview.navigate(url);
+                    }
+                    return NewWindowResponse::Deny;
+                }
+                // Sign-in (Google, Apple) and outside links open in a popup inside the app. It is
+                // built on the opener's configuration, so it shares the session's data store and
+                // keeps `window.opener`, which sign-in flows report back through.
+                match open_popup(&app, features) {
+                    Ok(window) => NewWindowResponse::Create { window },
+                    Err(_) => {
+                        open_in_browser(&url);
+                        NewWindowResponse::Deny
                     }
                 }
-                NewWindowResponse::Deny
             });
         if !script.is_empty() {
             builder = builder.initialization_script(script);
