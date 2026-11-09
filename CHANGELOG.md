@@ -8,6 +8,12 @@ All notable changes to OpenMedia are documented here.
 
 ## 2026-11-09
 
+### chore(ci): reduce CI to lint, format check and tests
+
+**Change:** `ci.yml` is one Ubuntu job running `yarn lint`, `yarn format:check` and `yarn test`. The macOS Rust and Swift job, `cargo deny`, the Android build and tests, `ts:check` and `vite build` are removed from CI. Sync Wiki and Dependabot are unchanged. Docs that said CI runs everything now point to `yarn verify` as the local full check.
+
+**Not run in CI any more:** type errors, Rust fmt/clippy/tests, Swift and Android plugin tests, dependency advisories and licenses. Run `yarn verify` before pushing.
+
 ### fix(paywall): keep the command bar, links and search free; paywall only the assistant
 
 **Problem:** the floating button opened the paywall for free users, so typing a link or a search was blocked along with the AI.

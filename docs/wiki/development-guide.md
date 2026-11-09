@@ -19,7 +19,7 @@ yarn install
 APPLE_DEVELOPMENT_TEAM=<team id> yarn dev:ios "iPhone 17 Pro Max"   # iOS simulator
 yarn dev:android                                                      # Android emulator or device
 
-yarn verify        # everything CI runs on the web and Rust sides
+yarn verify        # the full local check, web and Rust. CI runs only lint, format:check and test
 yarn check:web     # ts:check, lint, format:check, test
 yarn check:rust    # cargo fmt --all --check, clippy --workspace -D warnings, cargo test --workspace
 yarn test:swift    # iOS plugin's domain-pinning rules (needs only swiftc)

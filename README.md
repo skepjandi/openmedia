@@ -37,7 +37,7 @@ yarn install
 yarn dev:ios        # iOS simulator or device (set APPLE_DEVELOPMENT_TEAM for a device)
 yarn dev:android    # Android emulator or device
 yarn build macos    # OpenMedia.app (site views are not implemented on desktop yet)
-yarn verify         # every check CI runs on the web and Rust sides
+yarn verify         # the full local check: web and Rust (CI runs only lint, format and tests)
 ```
 
 Store builds, signing, and prerequisites are in the [store build guide](docs/wiki/store-builds.md); all development commands are in the [development guide](docs/wiki/development-guide.md).

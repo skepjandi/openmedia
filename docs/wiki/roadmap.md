@@ -56,7 +56,7 @@ Throwaway code in a `spikes/` branch/worktree (not merged to `main`); outputs ar
 Scaffold the real project and the guardrails.
 
 - Tauri v2 + React/TS/Vite + Rust core scaffold; yarn; strict TS; clippy `-D warnings`.
-- CI (`.github/workflows/ci.yml`): `ts:check`, `lint`, `format:check`, `test`, `cargo fmt/clippy/test`. Husky/lint-staged if desired.
+- CI (`.github/workflows/ci.yml`): one job running `lint`, `format:check` and `test`. Type, Rust and Android checks run locally via `yarn verify`, `yarn test:android` and `cargo deny`. Husky/lint-staged if desired.
 - `SiteView` trait + desktop implementation + iOS/Android plugin skeletons from the spike learnings (rewritten cleanly, not copy-pasted spike code).
 - The chosen bridge, with the negative-IPC integration test as a permanent regression test.
 - Shell: one full-screen page, floating draggable button (tap: command bar, hold: favorites fan and settings), settings for favorites. See [UI Design](./ui-design.md).

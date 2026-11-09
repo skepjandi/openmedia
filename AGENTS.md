@@ -51,7 +51,7 @@ yarn test                                          # Vitest (frontend + engine)
 yarn check:rust                                    # cargo fmt --all --check, clippy --workspace -D warnings, cargo test --workspace
 ```
 
-- **Never push failing checks.** CI runs the same set.
+- **Never push failing checks.** CI runs only `lint`, `format:check` and `test`; `ts:check` and the Rust checks are on you, run `yarn verify` before pushing.
 - New module → test file mirroring the source path. Rust unit tests live beside the code (`#[cfg(test)]`); integration tests in `src-tauri/tests/`.
 - **Recipe rules are tested against DOM fixtures** (`recipes/fixtures/<site>/`), not live sites. A bundled recipe without a fixture test does not ship.
 - Mock the network. LLM provider tests use recorded request/response fixtures; never call a real provider in tests and never put a real key in a fixture.
