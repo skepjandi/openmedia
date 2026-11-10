@@ -54,7 +54,7 @@ Pages opened from Settings (the Recipes page and the paywall) sit on top of it: 
 - **Favorites:** a "Quick access" group (the first six, four without Pro) and a "More favorites" group below it. Tap a row to edit its name and address or remove it; arrows reorder, and moving across the boundary moves a favorite in or out of quick access. Without Pro, slots 5 and 6 are two grayed rows with a crown, "More favorites" is a locked row, and "Add favorite" opens the paywall once four exist; all of them open the paywall. Every change saves at once, so the list never disagrees with the stars above it.
 - **Incognito favorites** and **Incognito recipes:** see [Incognito](#incognito). Always collapsed and locked until a biometric check passes. Without Pro they carry a crown and "Pro feature" instead, and open the paywall.
 - **AI assistant:** bring-your-own-key providers. See [AI Assistant](./ai-assistant.md#implemented-provider-settings).
-- **Data and help:** "Clear history" (with a confirm step) empties the searched addresses and forgets the last page, like a browser; favorites, open sessions and logins are untouched. "AI chats" shows how many chats are saved and has "Clear chats" (with a confirm step) that erases them all. "Replay" marks the first-run guide unseen and shows it again.
+- **Data and help:** "Clear" next to History (with a confirm step) empties the searched addresses and forgets the last page, like a browser; favorites, open sessions and logins are untouched. "AI chats" shows how many chats are saved and has "Clear" (with a confirm step) that erases them all. "Replay" marks the first-run guide unseen and shows it again.
 
 ## Incognito
 

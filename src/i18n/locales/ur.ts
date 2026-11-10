@@ -13,6 +13,7 @@ export const ur: Messages = {
   "common.done": "مکمل",
   "common.edit": "ترمیم",
   "common.delete": "حذف کریں",
+  "common.clear": "صاف کریں",
   "common.openSettings": "ترتیبات کھولیں",
   "common.remove": "ہٹائیں",
   "common.retry": "دوبارہ کوشش کریں",
@@ -200,14 +201,11 @@ export const ur: Messages = {
   "settings.historyEmpty": "خالی",
   "settings.historyCount":
     "{count} سائٹ | {count} سائٹ | {count} سائٹیں | {count} سائٹیں | {count} سائٹیں | {count} سائٹ",
-  "settings.clearHistory": "تاریخ صاف کریں",
-  "settings.clearHistoryCount": "{count} صاف کریں",
   "settings.chats": "AI چیٹس",
   "settings.chatsEmpty": "کوئی محفوظ نہیں",
   "settings.chatsCount": "محفوظ: {count}",
   "settings.chatsNote":
     "اپنی سائٹ اور ترکیب کے ساتھ اس ڈیوائس پر رکھی جاتی ہیں۔ پوشیدہ براؤزنگ آن ہونے پر کبھی محفوظ نہیں ہوتیں۔",
-  "settings.clearChats": "چیٹس صاف کریں",
   "settings.guide": "پہلی بار والی رہنمائی",
   "settings.guideNote": "اسے غیر دیکھا ہوا قرار دیتا ہے اور اب یہ دوبارہ دکھا دیتا ہے۔",
   "settings.replay": "دوبارہ دکھائیں",

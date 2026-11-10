@@ -187,7 +187,7 @@ function DataSection() {
                 }}
                 className={primaryButton}
               >
-                {t("settings.clearHistoryCount", { count })}
+                {t("common.clear")}
               </button>
             </div>
           ) : (
@@ -197,7 +197,7 @@ function DataSection() {
               onClick={() => setConfirming(true)}
               className={quietButton}
             >
-              {t("settings.clearHistory")}
+              {t("common.clear")}
             </button>
           )}
         </div>
@@ -253,7 +253,7 @@ function ChatHistoryRow() {
             {t("common.cancel")}
           </button>
           <button type="button" onClick={erase} className={primaryButton}>
-            {t("settings.clearHistoryCount", { count })}
+            {t("common.clear")}
           </button>
         </div>
       ) : (
@@ -263,7 +263,7 @@ function ChatHistoryRow() {
           onClick={() => setConfirming(true)}
           className={quietButton}
         >
-          {t("settings.clearChats")}
+          {t("common.clear")}
         </button>
       )}
     </div>

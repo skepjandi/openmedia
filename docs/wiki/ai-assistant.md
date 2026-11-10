@@ -173,7 +173,7 @@ the page said is carried over.
 **Buttons.** The header of the chat has *Chat history* (the chats of the site on screen, each with
 its recipe and date, and a button to delete one) and *New chat* (a blank chat for the site).
 
-**Erasing.** Settings > Data has "AI chats" with a count and a *Clear chats* button (with a
+**Erasing.** Settings > Data has "AI chats" with a count and a *Clear* button (with a
 confirm step) that deletes every saved chat. The commands are `chat_list`, `chat_save`,
 `chat_delete` and `chat_clear`; they are shell-only, like every other app command.
 
