@@ -8,7 +8,7 @@ pub use compile::{OptionChoices, page_script};
 pub use schema::{
     Meta, OptionGroup, Origin, Recipe, Rule, SiteOption, Target, current_platform_tag,
 };
-pub(crate) use selector::validate_selector;
+pub(crate) use selector::{CSS_PROPERTIES, validate_declarations, validate_selector};
 pub(crate) use share::{MARKET_PREFIX, MAX_RECIPE_BYTES, is_catalog_id, is_plain_text, is_version};
 pub use share::{RecipePreview, preview as preview_recipe};
 

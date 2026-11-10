@@ -54,7 +54,7 @@ export function classifyError(error: unknown): AssistantError {
           ? "network"
           : /nothing matched|matched nothing|no match/.test(text)
             ? "nothingMatched"
-            : /invalid|structure|unusable|refus|not understood|validat|rejected the change/.test(
+            : /invalid|expected form|structure|unusable|refus|not understood|validat|rejected the change/.test(
                   text,
                 )
               ? "invalid"

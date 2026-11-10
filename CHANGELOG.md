@@ -8,6 +8,16 @@ All notable changes to OpenMedia are documented here.
 
 ## 2026-11-10
 
+### fix(ai): accept safe CSS restyles and classify malformed answers
+
+**Problem:** The assistant only generated hide rules, so style requests such as grayscale were rejected; exhausted schema retries surfaced as an unexplained raw error.
+
+**Change:** AI rules can now use the recipe validator's existing safe CSS allowlist for restyling, through preview and save. The prompt describes the hide/restyle contract; “not in the expected form” maps to the localized invalid-answer message.
+
+**Verified:** `cargo test --lib ai::` (79 passed), `cargo fmt --all`, focused Vitest (3 passed), ESLint and Prettier on edited files.
+
+**PR:** n/a
+
 ### fix(marketplace): render recipe notes as Markdown, in a faded preview
 
 **Problem:** Official recipes ship their verification log as `notes`, one unbroken paragraph that the recipe review printed whole, pushing "Works on" and the switches below the fold.
