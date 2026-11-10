@@ -48,9 +48,6 @@
         position: relative;
         width: 100%;
         height: 100%;
-        transform-box: fill-box;
-        transform-origin: center;
-        animation: splash-float 2.4s ease-in-out 0.3s infinite;
       }
       #splash .ring {
         position: absolute;
@@ -71,15 +68,6 @@
       @keyframes splash-glow {
         to {
           opacity: 1;
-        }
-      }
-      @keyframes splash-float {
-        0%,
-        100% {
-          transform: translateY(0) scale(1);
-        }
-        50% {
-          transform: translateY(-8px) scale(1.04);
         }
       }
       @keyframes splash-ring {
@@ -105,10 +93,6 @@
         }
       }
       @media (prefers-reduced-motion: reduce) {
-        #splash svg,
-        #splash .ring {
-          animation: none;
-        }
         #splash .ring {
           display: none;
         }

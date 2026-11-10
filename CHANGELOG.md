@@ -8,6 +8,12 @@ All notable changes to OpenMedia are documented here.
 
 ## 2026-11-10
 
+### fix(app): keep the splash logo still
+
+**Problem:** When the splash's animation started, the logo jumped up and down before settling, which looked buggy.
+
+**Change:** The logo no longer floats; it stays exactly where the launch screen draws it. The glow and the expanding rings behind it still animate.
+
 ### fix(shell): keep floating back and main buttons apart
 
 **Problem:** Dragging both controls to the same edge and height let them overlap.
