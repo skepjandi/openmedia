@@ -337,6 +337,10 @@ impl Library {
         self.save(&data)
     }
 
+    pub fn theme(&self) -> Result<Theme> {
+        Ok(self.lock()?.theme)
+    }
+
     pub fn ad_block_enabled(&self) -> Result<bool> {
         Ok(self.lock()?.ad_block)
     }

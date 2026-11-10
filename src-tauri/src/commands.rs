@@ -3,8 +3,9 @@ use std::collections::BTreeMap;
 use serde::{Deserialize, Serialize};
 use tauri::{AppHandle, Emitter, Manager, State, ipc::Channel};
 use tauri_plugin_siteview::{
-    ContentRuleList, EvaluateRequest, FetchFaviconRequest, OpenRequest, Rect, SessionRequest,
-    SetContentRuleListsRequest, SetDocumentStartScriptRequest, SetRectRequest, SiteviewExt,
+    ColorScheme, ContentRuleList, EvaluateRequest, FetchFaviconRequest, OpenRequest, Rect,
+    SessionRequest, SetColorSchemeRequest, SetContentRuleListsRequest,
+    SetDocumentStartScriptRequest, SetRectRequest, SiteviewExt,
     validate::{parse_session_id, parse_web_url},
 };
 use url::Url;
@@ -245,6 +246,17 @@ pub(crate) async fn open_session(
     } else {
         Vec::new()
     };
+    // The page must load under the saved theme: the shell sets it only after it has booted, by
+    // which time a page opened at launch has already read `prefers-color-scheme` once, and sites
+    // such as Instagram keep parts of the old scheme when it flips mid-load. Platforms with no
+    // site view reject this the same way they reject the open below.
+    let _ = app.siteview().set_color_scheme(SetColorSchemeRequest {
+        scheme: match library.theme()? {
+            Theme::System => ColorScheme::System,
+            Theme::Light => ColorScheme::Light,
+            Theme::Dark => ColorScheme::Dark,
+        },
+    });
     app.siteview().open(OpenRequest {
         session,
         profile: library.profile_id()?.to_string(),

@@ -8,6 +8,16 @@ All notable changes to OpenMedia are documented here.
 
 ## 2026-11-11
 
+### fix(shell): the start page loads under the saved theme
+
+**Area:** `fix(shell)`
+
+**Problem:** in dark mode, Instagram's login page sometimes showed a white bar behind its footer text. The page opened at launch (`boot.rs`) before the shell had told the native view the theme, so it first read `prefers-color-scheme` from the system and was flipped to the saved theme mid-load, leaving parts of the page in the old scheme.
+
+**Change:** `open_session` now sets the saved theme on the site view (`set_color_scheme`) before every `open`, so no page loads under a scheme it will later lose. `Library::theme` reads it.
+
+**Verified:** not built or run: the disk was full (`No space left on device` building the Swift plugins), and the cause is inferred from the startup order, not reproduced. `cargo fmt --check` is clean.
+
 ### perf(android): read exception rules only after a block matched
 
 **Area:** `perf(android)`
