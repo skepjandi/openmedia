@@ -8,6 +8,14 @@ All notable changes to OpenMedia are documented here.
 
 ## 2026-11-11
 
+### chore(release): one release CLI with signing discovery
+
+**Area:** `chore(release)`
+
+**Problem:** Releasing meant exporting identity names, profile paths and a team ID by hand, importing `.p12` files in the right keychain, bumping versions in two files and merging a PR, then running three builds; a missing piece surfaced only partway through a build.
+
+**Change:** `yarn release` is now a CLI: `doctor` (checks with a fix per problem), `setup` (imports certificates, installs the iOS profile), `build` (the default), `bump` and `ship` (version PR, merge, build). Certificates and profiles are discovered from the login keychain and the signing folder (`scripts/lib/signing.mjs`); the version files are edited by `scripts/lib/version.mjs`. The build number 1003 used for the 1.0.1 packages is recorded. Docs: `store-builds.md#releasing-yarn-release`, `AGENTS.md#releasing`.
+
 ### chore(release): version 1.0.1
 
 **Area:** `chore(release)`

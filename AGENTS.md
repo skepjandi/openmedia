@@ -98,6 +98,16 @@ If uncertain about impact — **stop and ask**.
 - No `node_modules/`, `target/`, `.DS_Store`, `.env`, build artifacts, or signing material.
 - Branch per feature, rebase before merging.
 
+## Releasing
+
+**Use `yarn release`; never hand-run store builds or export signing variables.** Full guide: `docs/wiki/store-builds.md#releasing-yarn-release`.
+
+- `yarn release doctor` first. It lists what is missing and the exact fix. Do not guess identity names, profile paths or passwords, and never search the disk for certificate passwords.
+- `yarn release ship <patch|minor|major|x.y.z>` is the whole release: version PR from a worktree, merge, build ios/android/macos from `main`. Run it from a clean `main` checkout (the Android keystore is gitignored and only exists there). `yarn release` alone builds from the current checkout.
+- Signing material (`.p12`, profiles, `.p8`) lives in the signing folder outside the repo (`~/Documents/openmedia-signing`, or `SIGNING_DIR`), its passwords in the gitignored `.env`. Never print them, commit them, or paste them in a PR or chat.
+- The version and build numbers are edited only by `yarn release bump` (`scripts/lib/version.mjs`), which keeps `package.json` and `src-tauri/tauri.conf.json` equal.
+- After a build, tell the user the artifact paths printed by the CLI and that nothing was uploaded or validated unless `--validate` ran.
+
 ## Wiki documentation
 
 Two documentation surfaces:

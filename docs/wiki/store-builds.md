@@ -2,6 +2,8 @@
 
 > Build instructions reflect the checked-in Tauri configuration. A successful local build does not mean the app is signed, store-ready, or accepted. Android device/emulator behavior and store submission have not been verified.
 
+> **Releasing?** `yarn release doctor`, then `yarn release ship patch`. See [Releasing](#releasing-yarn-release).
+
 ## Requirements
 
 Follow [Development Guide](./development-guide.md#prerequisites) for Node/Yarn, Rust, and native toolchains. Store uploads also require accounts and signing credentials for the relevant store. Do not commit certificates, provisioning profiles, keystores, or signing properties.
@@ -11,7 +13,7 @@ Before a release, configure the RevenueCat keys and live HTTPS privacy/terms URL
 ## iOS App Store
 
 1. Set up Xcode signing for the `surf.openmedia` bundle ID with an Apple Distribution identity and App Store provisioning. `APPLE_DEVELOPMENT_TEAM` is used by the documented Tauri iOS development flow; confirm the signing team and profile in Xcode for distribution.
-2. Set the marketing version in `src-tauri/tauri.conf.json`. Increment `bundle.iOS.bundleVersion` for every upload (`yarn release` does it; see below). The version (`1.0.1`) is the top-level `version` in `tauri.conf.json`; it matches the "1.0" version records in App Store Connect.
+2. The marketing version is the top-level `version` in `src-tauri/tauri.conf.json` (kept equal to `package.json`'s by `yarn release bump`); it matches the "1.0" version records in App Store Connect. `bundle.iOS.bundleVersion` must rise for every upload; `yarn release` does it.
 3. Build an App Store Connect export (not a simulator build):
 
    ```bash
@@ -25,22 +27,66 @@ Before a release, configure the RevenueCat keys and live HTTPS privacy/terms URL
 
 The app ships `src-tauri/gen/apple/openmedia_iOS/PrivacyInfo.xcprivacy` declaring the required-reason APIs the binary links (file timestamps `C617.1`, UserDefaults `CA92.1`; found with `nm -u` on a release build). Re-check with `nm -u` and update it when a dependency changes. `Info.plist` sets `ITSAppUsesNonExemptEncryption` to `false` (HTTPS only, no custom cryptography); the account holder must confirm that answer applies before the first upload. The privacy nutrition label in App Store Connect is separate and still manual (RevenueCat's anonymous purchase data, the user-initiated AI snapshot).
 
-## One command: `yarn release`
+## Releasing: `yarn release`
 
-`yarn release [ios] [android] [macos] [--build N] [--no-bump] [--validate]` builds the store packages (all three by default) and collects them in `release/<version>-<build>/`: `ios/OpenMedia.ipa` and `macos/OpenMedia-MacAppStore.pkg` for Transporter, `android/app-universal-release.aab` for Play Console.
+One CLI does the whole release. Everything it needs is discovered, so there is nothing to export or remember.
 
-It handles the build number. Unless `--no-bump` or `--build N` is given, the number becomes one more than the largest of the iOS `bundleVersion`, macOS `bundleVersion` and Android `versionCode` in `tauri.conf.json` and, when the `ASC_*` settings are present, the largest build App Store Connect already has. It writes the new number back to `tauri.conf.json` (commit it). Google Play cannot be queried without a service account, so if Play answers "version code already used", run again with a higher `--build N`. `--validate` runs `altool --validate-app` on the `.ipa` and `.pkg`.
+```bash
+yarn release doctor            # is this machine ready? prints one fix per problem
+yarn release setup             # import certificates and profiles from the signing folder
+yarn release ship patch        # doctor -> version PR -> merge -> build all three
+yarn release                   # build all three from the current checkout
+yarn release ios macos         # build only some platforms
+```
 
-Settings come from the environment or `.env` (never commit them):
+| Command | What it does |
+|---|---|
+| `doctor [ios] [android] [macos]` | Checks version files agree, Xcode, certificates, profiles, Android keystore/SDK/NDK/Java, and the optional App Store Connect key. Each problem names its fix. Read-only. |
+| `setup` | Imports every `.p12` in the signing folder into the login keychain (needs `SIGNING_P12_PASSWORD`), installs the iOS profile for Xcode, then runs `doctor`. Safe to repeat. |
+| `build` (default) | Runs `doctor`, picks the build number, builds the platforms, and collects the packages in `release/<version>-<build>/`: `ios/OpenMedia.ipa` and `macos/OpenMedia-MacAppStore.pkg` for Transporter, `android/app-universal-release.aab` for Play Console. Flags: `--no-bump` (reuse the number in `tauri.conf.json`), `--build N`, `--validate` (`altool --validate-app` on the `.ipa` and `.pkg`). |
+| `bump <patch\|minor\|major\|x.y.z>` | Edits `package.json`, `src-tauri/tauri.conf.json` (version and all three build numbers) and adds a `CHANGELOG.md` entry. No git. |
+| `ship <patch\|minor\|major\|x.y.z> [platforms]` | The full release. Runs `doctor` first and stops before touching GitHub if the machine cannot finish. Then: a worktree `.worktrees/release-<version>` from `origin/main`, `bump`, commit, push, PR, waits for CI (`--no-wait` does an admin merge instead), squash merge, cleans up, pulls `main`, and builds from it with the number the PR recorded. Needs a clean `main` checkout and `gh auth login`. |
+
+Build numbers: one above the largest of the iOS `bundleVersion`, macOS `bundleVersion`, Android `versionCode` and, when the `ASC_*` settings are present, the latest build App Store Connect holds. `bump` and `build` write it to all three fields. Google Play cannot be queried without a service account, so if Play answers "version code already used", run again with `--build N`. A plain `build` changes `tauri.conf.json`; commit that change (or use `ship`, which commits the number in the version PR).
+
+### Signing material
+
+The release is signed with files that are never in the repo. They live in the **signing folder**, `~/Documents/openmedia-signing` unless `SIGNING_DIR` says otherwise:
+
+| File | What it is |
+|---|---|
+| `ios_dist.p12` | iOS Distribution certificate and private key (exported from Keychain Access) |
+| `mac_app.p12` | Mac App Distribution certificate and key (shows as "3rd Party Mac Developer Application: ...") |
+| `mac_inst.p12` | Mac Installer Distribution certificate and key ("3rd Party Mac Developer Installer: ...") |
+| `*.mobileprovision` | the iOS App Store profile for `surf.openmedia` |
+| `*.provisionprofile` | the Mac App Store profile for `surf.openmedia` |
+
+`yarn release` finds the identities in the login keychain and the newest unexpired App Store profile for `surf.openmedia` in that folder (and in Xcode's profile folders for iOS). If a certificate is missing from the keychain and `SIGNING_P12_PASSWORD` is set, it imports the `.p12` files itself. File names do not matter; the contents do. Only an explicit setting overrides discovery.
+
+`.env` settings (all optional except the p12 password on a fresh Mac; `.env` is gitignored, `.env.example` lists them):
 
 | Variable | Used for |
 |---|---|
-| `APPLE_TEAM_ID` | iOS export |
-| `IOS_SIGN_IDENTITY`, `IOS_PROFILE` | iOS export: the iOS Distribution certificate name and the App Store provisioning profile name (installed in Xcode) |
-| `MAS_APP_IDENTITY`, `MAS_INSTALLER_IDENTITY`, `MAS_PROFILE`, optional `MAS_KEYCHAIN` | Mac package: see [Mac App Store](#mac-app-store) |
-| `ASC_KEY_ID`, `ASC_ISSUER_ID`, `ASC_KEY_PATH` | optional: latest build lookup and `--validate` (App Store Connect API key) |
+| `SIGNING_P12_PASSWORD` | the password the `.p12` files were exported with; needed to import them on a new Mac |
+| `KEYCHAIN_PASSWORD` | the login password; lets `setup` allow codesign to use the keys without a keychain prompt. Without it, macOS asks once; choose Always Allow |
+| `SIGNING_DIR` | signing folder, if not the default |
+| `ASC_KEY_ID`, `ASC_ISSUER_ID`, `ASC_KEY_PATH` | App Store Connect API key: latest-build lookup and `--validate` |
+| `APPLE_TEAM_ID`, `IOS_SIGN_IDENTITY`, `IOS_PROFILE`, `MAS_APP_IDENTITY`, `MAS_INSTALLER_IDENTITY`, `MAS_PROFILE` | override what was discovered |
 
-The first time a signing key is used, macOS asks for the login keychain password; choose Always Allow so later runs do not stop. Android needs `src-tauri/gen/android/keystore.properties` (see [Android Google Play](#android-google-play)). Without distribution certificates in the account, the certificates and profiles can be created through the App Store Connect API (a key with the Admin role; Xcode's own cloud signing was refused for the key used so far).
+Android signs with `src-tauri/gen/android/keystore.properties` (see [Android Google Play](#android-google-play)); it lives only in the main checkout, so build from there (`ship` does).
+
+### New Mac, expired certificate, or missing file
+
+| Symptom (from `yarn release doctor`) | Do this |
+|---|---|
+| Certificate missing on a new Mac | Copy the signing folder over, put `SIGNING_P12_PASSWORD` in `.env`, run `yarn release setup` |
+| "MAC verification failed" on import | `SIGNING_P12_PASSWORD` is wrong for those files; correct `.env` or re-export the `.p12` |
+| Profile missing or expired | Developer portal > Profiles: create or renew the App Store profile for `surf.openmedia` (iOS: App Store Connect; Mac: Mac App Store Connect), download it into the signing folder, rerun `doctor` |
+| Certificate expired or lost its private key | Create a new one (Keychain Access > Certificate Assistant > Request a Certificate From a Certificate Authority, then Certificates > + in the developer portal: iOS Distribution, Mac App Distribution, Mac Installer Distribution), export each as `.p12` into the signing folder, then renew the profiles above |
+| Play: "version code already used" | `yarn release android --build <higher number>` |
+
+Without distribution certificates in the account, the certificates and profiles can be created through the App Store Connect API (a key with the Admin role).
+
 
 ## Mac App Store
 
