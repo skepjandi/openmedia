@@ -59,6 +59,16 @@ export function isFavoriteSite(favorites: readonly { url: string }[], url: strin
   return favorites.some((favorite) => siteOf(favorite.url) === site);
 }
 
+/** The recipe for the site a favorite opens, when one is installed. */
+export function recipeForFavorite<T extends { homepage: string | null }>(
+  sites: readonly T[],
+  favoriteUrl: string,
+): T | undefined {
+  const site = siteOf(favoriteUrl);
+  if (!site) return undefined;
+  return sites.find((entry) => entry.homepage !== null && siteOf(entry.homepage) === site);
+}
+
 /**
  * The favorites with this site's entry added or taken away. The other favorites keep their names,
  * notify choices and order, and the new entry goes last, so the quick-access menu does not jump

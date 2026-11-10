@@ -192,6 +192,8 @@ export const pl: Messages = {
   "settings.bottomMarginNote":
     "Zostawia wolne dół każdej strony, dla menu wysuwanych spod krawędzi ekranu.",
   "settings.bottomMarginLabel": "Dolny margines dla wszystkich witryn",
+  "settings.accessibility": "Dostępność",
+  "guides.read": "Przeczytaj przewodnik",
   "settings.data": "Dane i pomoc",
   "settings.dataNote":
     "Historia to adresy, które wyszukano, przechowywane tylko na tym urządzeniu. Jej wyczyszczenie usuwa też ostatnią stronę, więc aplikacja uruchomi się na pierwszej ulubionej. Otwarte strony, ulubione i logowania zostają.",
@@ -234,6 +236,7 @@ export const pl: Messages = {
   "favorites.add": "Dodaj ulubioną",
   "favorites.quickFull":
     "Szybki dostęp jest pełny, więc ta pozycja trafi do sekcji Więcej ulubionych.",
+  "favorites.openRecipe": "Otwórz przepis",
   "favorites.edit": "Edytuj {name}",
   "favorites.moveUp": "Przesuń {name} w górę",
   "favorites.moveDown": "Przesuń {name} w dół",

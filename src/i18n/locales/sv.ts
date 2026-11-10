@@ -192,6 +192,8 @@ export const sv: Messages = {
   "settings.bottomMarginNote":
     "Håller nederkanten av varje sida fri, för menyer som glider in under skärmkanten.",
   "settings.bottomMarginLabel": "Nedre marginal för alla webbplatser",
+  "settings.accessibility": "Tillgänglighet",
+  "guides.read": "Läs guiden",
   "settings.data": "Data och hjälp",
   "settings.dataNote":
     "Historiken består av adresserna du har sökt efter och sparas bara på den här enheten. När du rensar den glöms också den senaste sidan, så appen startar på din första favorit. Öppna sidor, favoriter och inloggningar finns kvar.",
@@ -235,6 +237,7 @@ export const sv: Messages = {
   "favorites.moreLocked": "Fler favoriter",
   "favorites.add": "Lägg till favorit",
   "favorites.quickFull": "Snabbåtkomst är full, så den här läggs till under Fler favoriter.",
+  "favorites.openRecipe": "Öppna receptet",
   "favorites.edit": "Redigera {name}",
   "favorites.moveUp": "Flytta {name} uppåt",
   "favorites.moveDown": "Flytta {name} nedåt",

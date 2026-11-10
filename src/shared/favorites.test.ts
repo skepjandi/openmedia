@@ -6,6 +6,7 @@ import {
   isFavoriteSite,
   quickAccess,
   quickSlots,
+  recipeForFavorite,
   toggleSiteFavorite,
   usableQuickAccess,
 } from "./favorites";
@@ -130,5 +131,23 @@ describe("toggleSiteFavorite", () => {
       { name: "Reddit", url: "https://www.reddit.com/" },
       { name: "YouTube", url: "https://m.youtube.com/" },
     ]);
+  });
+});
+
+describe("recipeForFavorite", () => {
+  const sites = [
+    { id: "a", homepage: "https://www.instagram.com/" },
+    { id: "b", homepage: null },
+    { id: "c", homepage: "https://alice.github.io/" },
+  ];
+
+  it("finds the recipe of the same site, whatever the subdomain", () => {
+    expect(recipeForFavorite(sites, "https://m.instagram.com/explore")?.id).toBe("a");
+  });
+
+  it("finds nothing for a site without a recipe or a recipe without a homepage", () => {
+    expect(recipeForFavorite(sites, "https://example.org/")).toBeUndefined();
+    expect(recipeForFavorite(sites, "not a url")).toBeUndefined();
+    expect(recipeForFavorite(sites, "https://bob.github.io/")).toBeUndefined();
   });
 });

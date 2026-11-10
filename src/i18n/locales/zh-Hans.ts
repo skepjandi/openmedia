@@ -178,6 +178,8 @@ export const zhHans: Messages = {
   "settings.bottomMargin": "全局底部边距",
   "settings.bottomMarginNote": "为每个页面底部留出空白，方便那些滑到屏幕边缘下方的菜单。",
   "settings.bottomMarginLabel": "所有网站的底部边距",
+  "settings.accessibility": "辅助功能",
+  "guides.read": "阅读指南",
   "settings.data": "数据与帮助",
   "settings.dataNote":
     "“历史”是你搜索过的网址，只保存在本设备上。清除历史也会忘记上一次的页面，因此应用会从你的第一个收藏开始。已打开的页面、收藏和登录状态会保留。",
@@ -217,6 +219,7 @@ export const zhHans: Messages = {
   "favorites.moreLocked": "更多收藏",
   "favorites.add": "添加收藏",
   "favorites.quickFull": "快捷访问已满，因此这个收藏被添加到“更多收藏”。",
+  "favorites.openRecipe": "打开配方",
   "favorites.edit": "编辑 {name}",
   "favorites.moveUp": "上移 {name}",
   "favorites.moveDown": "下移 {name}",

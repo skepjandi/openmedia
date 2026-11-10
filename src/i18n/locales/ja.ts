@@ -190,6 +190,8 @@ export const ja: Messages = {
   "settings.bottomMarginNote":
     "画面下端に潜り込むメニューでもできるよう、各ページの下側を空けておきます。",
   "settings.bottomMarginLabel": "すべてのサイトの下余白",
+  "settings.accessibility": "アクセシビリティ",
+  "guides.read": "ガイドを読む",
   "settings.data": "データとヘルプ",
   "settings.dataNote":
     "履歴は検索したアドレスの記録で、この端末にだけ保存されます。消去すると直前に開いたページも忘れるため、アプリは最初のお気に入りから始まります。開いているページとお気に入り、ログインは残ります。",
@@ -234,6 +236,7 @@ export const ja: Messages = {
   "favorites.add": "お気に入りを追加",
   "favorites.quickFull":
     "クイックアクセスが上限に達したため、この項目は「その他のお気に入り」に追加されました。",
+  "favorites.openRecipe": "レシピを開く",
   "favorites.edit": "{name}を編集",
   "favorites.moveUp": "{name}を上へ移動",
   "favorites.moveDown": "{name}を下へ移動",

@@ -195,6 +195,8 @@ export const uk: Messages = {
   "settings.bottomMarginNote":
     "Залишає низ кожної сторінки вільним — для меню, що заїжджають за край екрана.",
   "settings.bottomMarginLabel": "Нижнє поле для всіх сайтів",
+  "settings.accessibility": "Доступність",
+  "guides.read": "Читати посібник",
   "settings.data": "Дані та довідка",
   "settings.dataNote":
     "Історія — це адреси, які ви шукали; вони зберігаються лише на цьому пристрої. Очищення забуває й останню сторінку, тож застосунок відкриває першу обрану сторінку. Відкриті сторінки, обране та входи в акаунти залишаються.",
@@ -237,6 +239,7 @@ export const uk: Messages = {
   "favorites.moreLocked": "Ще обране",
   "favorites.add": "Додати до обраного",
   "favorites.quickFull": "Швидкий доступ заповнено, тож це додано до «Ще обраного».",
+  "favorites.openRecipe": "Відкрити рецепт",
   "favorites.edit": "Редагувати {name}",
   "favorites.moveUp": "Перемістити {name} вище",
   "favorites.moveDown": "Перемістити {name} нижче",

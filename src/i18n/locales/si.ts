@@ -189,6 +189,8 @@ export const si: Messages = {
   "settings.bottomMarginNote":
     "තිරයේ පහළ දෙළුණට යටතින් ගලා එන මෙනු සඳහා සෑම පිටුවකම පහළ කොටස හිස්ව තබයි.",
   "settings.bottomMarginLabel": "සියලුම අඩවි සඳහා පහළ දුරස්ථය",
+  "settings.accessibility": "ප්‍රවේශ්‍යතාව",
+  "guides.read": "මාර්ගෝපදේශය කියවන්න",
   "settings.data": "දත්ත සහ උදව්",
   "settings.dataNote":
     "ඉතිහාසය යනු ඔබ සෙවූ ලිපින වන අතර, ඒවා මෙම උපකරණයේ පමණක් තබා ඇත. එය මැකීමෙන් අවසන් පිටුවත් අමතක නොමැති වන අතර, ඇප් එක ඔබගේ පළමු ආදරණීයෙන් ආරම්භ වේ. විවෘත පිටු, ආදරණීය සහ පියවුම් පවතී.",
@@ -231,6 +233,7 @@ export const si: Messages = {
   "favorites.moreLocked": "තවත් ආදරණීය",
   "favorites.add": "ආදරණීය එකතු කරන්න",
   "favorites.quickFull": "ඉක්මන් ප්‍රවේශය පිරිච්ච බැවිට මෙය තවත් ආදරණීය අතරතුරට එකතු කරනු ලැබේ.",
+  "favorites.openRecipe": "වට්ටෝරුව විවෘත කරන්න",
   "favorites.edit": "{name} සංස්කරණය කරන්න",
   "favorites.moveUp": "{name} ඉහළට ගමන් කරන්න",
   "favorites.moveDown": "{name} පහළට ගමන් කරන්න",

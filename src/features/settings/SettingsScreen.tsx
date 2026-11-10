@@ -17,7 +17,7 @@ import { RecipesLink } from "./RecipesScreen";
 import { Switch } from "./Switch";
 import { UpdatesSection } from "./UpdatesSection";
 import { Picker } from "./Picker";
-import { Group, Section, primaryButton, quietButton } from "./ui";
+import { Group, GroupLabel, Section, primaryButton, quietButton } from "./ui";
 
 export function SettingsScreen() {
   const open = useApp(selectSettingsOpen);
@@ -126,12 +126,6 @@ function BrowsingSection() {
           checked={adBlock}
           onChange={(on) => void setAdBlock(on)}
         />
-        <Switch
-          label={t("settings.backButton")}
-          description={t("settings.backButtonNote")}
-          checked={backButton}
-          onChange={(on) => void setBackButton(on)}
-        />
         <div className="flex flex-col gap-2 px-4 py-3.5">
           <div className="text-xs text-paper/60">{t("settings.searchEngine")}</div>
           <Picker
@@ -141,6 +135,15 @@ function BrowsingSection() {
             onChange={(next) => void setSearchEngine(next as SearchEngine)}
           />
         </div>
+      </Group>
+      <GroupLabel>{t("settings.accessibility")}</GroupLabel>
+      <Group>
+        <Switch
+          label={t("settings.backButton")}
+          description={t("settings.backButtonNote")}
+          checked={backButton}
+          onChange={(on) => void setBackButton(on)}
+        />
         <div className="flex flex-col gap-2 px-4 py-3.5">
           <div>
             <div className="text-base">{t("settings.bottomMargin")}</div>

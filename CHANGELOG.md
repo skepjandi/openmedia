@@ -16,6 +16,14 @@ All notable changes to OpenMedia are documented here.
 
 **Verified:** `./gradlew :tauri-plugin-siteview:compileDebugKotlin` builds. **Not verified:** the speed gain (not timed), blocking on a device or emulator; `BlockingRules` has no unit test because it uses `android.net.Uri`.
 
+### feat(settings): favorites star and recipe button, Accessibility group, guide links; fix(back): the edge swipe follows the finger
+
+**Problem:** removing a favorite meant going to Recipes; an expanded favorite had no way to its recipe; the back button and bottom margin sat among the browsing options; the edge-swipe back closed a page instantly; the website's guides were not reachable from the app.
+
+**Change:** every favorite row in Settings has the filled star Recipes uses, and a tap removes it. An expanded favorite whose site has a recipe shows "Open recipe", which opens Recipes with that card expanded (`openRecipe`, `recipeFocus`, `recipeForFavorite`). Browsing gains an Accessibility group holding the floating back button and the global bottom margin. The shell's edge swipe (`useEdgeSwipeBack`) now drags the page with the finger; past 40% of the width, or on a flick, it slides off and closes, otherwise it springs back (`commitsBack`). Guide links (`GuideLink`, opens `https://openmedia.surf/guides/<slug>/` in the page view) sit in AI, Recipes and the Marketplace.
+
+**Verified:** `ts:check`, Vitest (new: `recipeForFavorite`, drag and commit rules). **Not verified:** the drag animation, star and Accessibility layout on a device or simulator; the guide pages must be live on the website (they are on the landing `guides` branch). New strings (`settings.accessibility`, `favorites.openRecipe`, `guides.read`) are machine-drafted in non-English locales.
+
 ### chore(store): Mac App Store screenshots
 
 **Area:** `chore(store)`

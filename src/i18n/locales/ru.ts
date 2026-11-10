@@ -194,6 +194,8 @@ export const ru: Messages = {
   "settings.bottomMarginNote":
     "Оставляет низ каждой страницы свободным — для меню, которые уезжают под край экрана.",
   "settings.bottomMarginLabel": "Нижнее поле для всех сайтов",
+  "settings.accessibility": "Универсальный доступ",
+  "guides.read": "Читать руководство",
   "settings.data": "Данные и помощь",
   "settings.dataNote":
     "История — это адреса, которые вы искали; они хранятся только на этом устройстве. Её очистка также забывает последнюю страницу, поэтому приложение открывает первую страницу из избранного. Открытые страницы, избранное и входы в аккаунты остаются.",
@@ -236,6 +238,7 @@ export const ru: Messages = {
   "favorites.moreLocked": "Ещё избранное",
   "favorites.add": "Добавить в избранное",
   "favorites.quickFull": "Быстрый доступ заполнен, поэтому это добавлено в «Ещё избранное».",
+  "favorites.openRecipe": "Открыть рецепт",
   "favorites.edit": "Изменить {name}",
   "favorites.moveUp": "Переместить {name} выше",
   "favorites.moveDown": "Переместить {name} ниже",

@@ -188,6 +188,8 @@ export const de: Messages = {
   "settings.bottomMarginNote":
     "Hält den unteren Bereich jeder Seite frei, etwa für Menüs, die unter den Bildschirmrand gleiten.",
   "settings.bottomMarginLabel": "Unterer Rand für alle Websites",
+  "settings.accessibility": "Barrierefreiheit",
+  "guides.read": "Anleitung lesen",
   "settings.data": "Daten und Hilfe",
   "settings.dataNote":
     "Der Verlauf enthält die Adressen, nach denen du gesucht hast, und wird nur auf diesem Gerät gespeichert. Wenn du ihn löschst, wird auch die zuletzt geöffnete Seite vergessen, sodass die App mit deinem ersten Favoriten startet. Offene Seiten, Favoriten und Anmeldungen bleiben erhalten.",
@@ -232,6 +234,7 @@ export const de: Messages = {
   "favorites.add": "Favorit hinzufügen",
   "favorites.quickFull":
     "Der Schnellzugriff ist voll, daher wird dieser Favorit unter „Weitere Favoriten“ hinzugefügt.",
+  "favorites.openRecipe": "Rezept öffnen",
   "favorites.edit": "{name} bearbeiten",
   "favorites.moveUp": "{name} nach oben verschieben",
   "favorites.moveDown": "{name} nach unten verschieben",

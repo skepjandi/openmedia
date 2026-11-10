@@ -193,6 +193,8 @@ export const cs: Messages = {
   "settings.bottomMarginNote":
     "Udržuje spodní část každé stránky volnou, pro nabídky, které se vysouvají zpod okraje obrazovky.",
   "settings.bottomMarginLabel": "Spodní okraj pro všechny weby",
+  "settings.accessibility": "Přístupnost",
+  "guides.read": "Přečíst průvodce",
   "settings.data": "Data a nápověda",
   "settings.dataNote":
     "Historie jsou adresy, které jste vyhledali, uložené jen v tomto zařízení. Její vymazání zapomene také poslední stránku, takže aplikace se spustí na vaší první oblíbené stránce. Otevřené stránky, oblíbené a přihlášení zůstanou.",
@@ -236,6 +238,7 @@ export const cs: Messages = {
   "favorites.add": "Přidat oblíbenou",
   "favorites.quickFull":
     "Rychlý přístup je plný, proto se tato stránka přidá do Dalších oblíbených.",
+  "favorites.openRecipe": "Otevřít recept",
   "favorites.edit": "Upravit {name}",
   "favorites.moveUp": "Posunout {name} nahoru",
   "favorites.moveDown": "Posunout {name} dolů",

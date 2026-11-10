@@ -197,6 +197,8 @@ export const fr: Messages = {
   "settings.bottomMarginNote":
     "Garde le bas de chaque page dégagé, pour les menus qui glissent sous le bord de l’écran.",
   "settings.bottomMarginLabel": "Marge inférieure pour tous les sites",
+  "settings.accessibility": "Accessibilité",
+  "guides.read": "Lire le guide",
   "settings.data": "Données et aide",
   "settings.dataNote":
     "L’historique contient les adresses que vous avez recherchées et reste uniquement sur cet appareil. L’effacer oublie aussi la dernière page : l’application démarre donc sur votre premier favori. Les pages ouvertes, les favoris et les connexions sont conservés.",
@@ -240,6 +242,7 @@ export const fr: Messages = {
   "favorites.moreLocked": "Autres favoris",
   "favorites.add": "Ajouter un favori",
   "favorites.quickFull": "L’accès rapide est plein : ce favori est ajouté aux autres favoris.",
+  "favorites.openRecipe": "Ouvrir la recette",
   "favorites.edit": "Modifier {name}",
   "favorites.moveUp": "Déplacer {name} vers le haut",
   "favorites.moveDown": "Déplacer {name} vers le bas",

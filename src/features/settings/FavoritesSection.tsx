@@ -1,9 +1,14 @@
 import { useState } from "react";
 import { useApp } from "../../app/store";
 import { useT } from "../../i18n/useT";
-import { FREE_QUICK_ACCESS_LIMIT, QUICK_ACCESS_LIMIT, asInput } from "../../shared/favorites";
-import { DownIcon, ProIcon, PlusIcon, UpIcon } from "../../shared/icons";
-import type { Favorite, FavoriteInput } from "../../shared/ipc";
+import {
+  FREE_QUICK_ACCESS_LIMIT,
+  QUICK_ACCESS_LIMIT,
+  asInput,
+  recipeForFavorite,
+} from "../../shared/favorites";
+import { DownIcon, ProIcon, PlusIcon, StarIcon, UpIcon } from "../../shared/icons";
+import type { Favorite, FavoriteInput, SiteSettings } from "../../shared/ipc";
 import { SiteTile } from "../../shared/SiteTile";
 import { normalizeWebUrl } from "../../shared/url";
 import { useEntitlementStore } from "../paywall/store";
@@ -20,11 +25,12 @@ import { Group, GroupLabel, Section, field, primaryButton, quietButton } from ".
 export function FavoritesSection() {
   const favorites = useApp((s) => s.state?.favorites) ?? [];
   const saveFavorites = useApp((s) => s.saveFavorites);
+  const sites = useApp((s) => s.sites);
   const t = useT();
 
   return (
     <Section title={t("favorites.title")} note={t("favorites.note", { limit: QUICK_ACCESS_LIMIT })}>
-      <FavoritesEditor favorites={favorites} save={saveFavorites} />
+      <FavoritesEditor favorites={favorites} save={saveFavorites} recipes={sites} />
     </Section>
   );
 }
@@ -35,6 +41,8 @@ interface EditorListProps {
   save: (favorites: FavoriteInput[]) => Promise<boolean>;
   /** Shown when quick access is empty; the default points at starring a recipe. */
   emptyText?: string;
+  /** The installed recipes; a favorite whose site has one gets a button that opens it. */
+  recipes?: SiteSettings[];
 }
 
 /**
@@ -42,9 +50,10 @@ interface EditorListProps {
  * Pro only four slots are usable: the other two show grayed out, More favorites is locked, and
  * adding past four opens the paywall.
  */
-export function FavoritesEditor({ favorites, save, emptyText }: EditorListProps) {
+export function FavoritesEditor({ favorites, save, emptyText, recipes }: EditorListProps) {
   const problem = useApp((s) => s.error);
   const openSheet = useApp((s) => s.openSheet);
+  const openRecipe = useApp((s) => s.openRecipe);
   const isPro = useEntitlementStore((s) => s.status === "pro");
   const [editing, setEditing] = useState<number | "new" | null>(null);
   const t = useT();
@@ -81,20 +90,24 @@ export function FavoritesEditor({ favorites, save, emptyText }: EditorListProps)
     void replaceAll(favorites.map(asInput).filter((_, at) => at !== index));
   };
 
-  const renderRow = (favorite: Favorite, index: number) => (
-    <FavoriteRow
-      key={favorite.id}
-      favorite={favorite}
-      first={index === 0}
-      last={index === favorites.length - 1}
-      editing={editing === index}
-      showNotify={index < limit}
-      onEdit={() => setEditing(editing === index ? null : index)}
-      onMove={(by) => move(index, by)}
-      onCommit={(entry) => commit(index, entry)}
-      onRemove={() => remove(index)}
-    />
-  );
+  const renderRow = (favorite: Favorite, index: number) => {
+    const recipe = recipes && recipeForFavorite(recipes, favorite.url);
+    return (
+      <FavoriteRow
+        key={favorite.id}
+        favorite={favorite}
+        first={index === 0}
+        last={index === favorites.length - 1}
+        editing={editing === index}
+        showNotify={index < limit}
+        onEdit={() => setEditing(editing === index ? null : index)}
+        onMove={(by) => move(index, by)}
+        onCommit={(entry) => commit(index, entry)}
+        onRemove={() => remove(index)}
+        onOpenRecipe={recipe ? () => openRecipe(recipe.recipeId) : undefined}
+      />
+    );
+  };
 
   return (
     <>
@@ -230,6 +243,8 @@ interface RowProps {
   onMove: (by: -1 | 1) => void;
   onCommit: (entry: FavoriteInput) => Promise<boolean>;
   onRemove: () => void;
+  /** Present when the favorite's site has an installed recipe. */
+  onOpenRecipe?: () => void;
 }
 
 function FavoriteRow({
@@ -242,6 +257,7 @@ function FavoriteRow({
   onMove,
   onCommit,
   onRemove,
+  onOpenRecipe,
 }: RowProps) {
   const { host } = describeAddress(favorite.url);
   const arrow = "grid size-10 place-items-center text-paper/65 disabled:opacity-20";
@@ -262,6 +278,15 @@ function FavoriteRow({
             <span className="block truncate text-base font-medium">{favorite.name}</span>
             <span className="block truncate text-sm text-paper/55">{host}</span>
           </span>
+        </button>
+        <button
+          type="button"
+          aria-pressed
+          aria-label={t("recipes.removeFavorite", { name: favorite.name })}
+          onClick={onRemove}
+          className="grid size-10 place-items-center text-accent"
+        >
+          <StarIcon filled />
         </button>
         <button
           type="button"
@@ -289,6 +314,7 @@ function FavoriteRow({
           onCommit={onCommit}
           onCancel={onEdit}
           onRemove={onRemove}
+          onOpenRecipe={onOpenRecipe}
         />
       )}
     </div>
@@ -302,9 +328,18 @@ interface EditorProps {
   onCommit: (entry: FavoriteInput) => Promise<boolean>;
   onCancel: () => void;
   onRemove?: () => void;
+  onOpenRecipe?: () => void;
 }
 
-function FavoriteEditor({ initial, showNotify, hint, onCommit, onCancel, onRemove }: EditorProps) {
+function FavoriteEditor({
+  initial,
+  showNotify,
+  hint,
+  onCommit,
+  onCancel,
+  onRemove,
+  onOpenRecipe,
+}: EditorProps) {
   const [name, setName] = useState(initial.name);
   const [url, setUrl] = useState(initial.url);
   const [notify, setNotify] = useState(initial.notify ?? true);
@@ -353,6 +388,11 @@ function FavoriteEditor({ initial, showNotify, hint, onCommit, onCancel, onRemov
       )}
       {(problem ?? hint) && (
         <p className={`text-sm ${problem ? "text-accent" : "text-paper/55"}`}>{problem ?? hint}</p>
+      )}
+      {onOpenRecipe && (
+        <button type="button" onClick={onOpenRecipe} className={`self-start ${quietButton}`}>
+          {t("favorites.openRecipe")}
+        </button>
       )}
       <div className="flex items-center gap-2">
         <button type="button" onClick={() => void done()} className={primaryButton}>

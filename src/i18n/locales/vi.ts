@@ -189,6 +189,8 @@ export const vi: Messages = {
   "settings.bottomMarginNote":
     "Giữ phần dưới mọi trang trống, cho các menu trượt xuống dưới mép màn hình.",
   "settings.bottomMarginLabel": "Lề dưới cho mọi trang",
+  "settings.accessibility": "Trợ năng",
+  "guides.read": "Đọc hướng dẫn",
   "settings.data": "Dữ liệu và trợ giúp",
   "settings.dataNote":
     "Lịch sử là những địa chỉ bạn đã tìm, chỉ giữ trên thiết bị này. Xóa lịch sử cũng quên trang cuối cùng, nên ứng dụng sẽ mở ở mục yêu thích đầu tiên của bạn. Các trang đang mở, mục yêu thích và đăng nhập vẫn còn.",
@@ -232,6 +234,7 @@ export const vi: Messages = {
   "favorites.moreLocked": "Yêu thích khác",
   "favorites.add": "Thêm mục yêu thích",
   "favorites.quickFull": "Truy cập nhanh đã đầy, nên mục này được thêm vào Yêu thích khác.",
+  "favorites.openRecipe": "Mở công thức",
   "favorites.edit": "Sửa {name}",
   "favorites.moveUp": "Đưa {name} lên trên",
   "favorites.moveDown": "Đưa {name} xuống dưới",

@@ -190,6 +190,8 @@ export const ms: Messages = {
   "settings.bottomMarginNote":
     "Menjaga bahagian bawah setiap halaman kosong, untuk menu yang meluncur ke bawah tepi skrin.",
   "settings.bottomMarginLabel": "Margin bawah untuk semua laman",
+  "settings.accessibility": "Kebolehcapaian",
+  "guides.read": "Baca panduan",
   "settings.data": "Data dan bantuan",
   "settings.dataNote":
     "Sejarah ialah alamat yang anda telah cari, disimpan pada peranti ini sahaja. Mengosongkannya turut melupakan halaman terakhir, jadi aplikasi bermula pada kegemaran pertama anda. Halaman yang terbuka, kegemaran dan log masuk kekal.",
@@ -233,6 +235,7 @@ export const ms: Messages = {
   "favorites.moreLocked": "Kegemaran lain",
   "favorites.add": "Tambah kegemaran",
   "favorites.quickFull": "Akses pantas sudah penuh, jadi yang ini ditambah ke Kegemaran lain.",
+  "favorites.openRecipe": "Buka resipi",
   "favorites.edit": "Sunting {name}",
   "favorites.moveUp": "Naikkan {name}",
   "favorites.moveDown": "Turunkan {name}",

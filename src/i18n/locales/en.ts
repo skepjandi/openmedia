@@ -194,6 +194,8 @@ export const en = {
   "settings.bottomMarginNote":
     "Keeps the bottom of every page clear, for menus that slide under the screen edge.",
   "settings.bottomMarginLabel": "Bottom margin for all sites",
+  "settings.accessibility": "Accessibility",
+  "guides.read": "Read the guide",
   "settings.data": "Data and help",
   "settings.dataNote":
     "History is the addresses you have searched, kept on this device only. Clearing it also forgets the last page, so the app starts on your first favorite. Open pages, favorites and logins stay.",
@@ -235,6 +237,7 @@ export const en = {
   "favorites.moreLocked": "More favorites",
   "favorites.add": "Add favorite",
   "favorites.quickFull": "Quick access is full, so this one is added to More favorites.",
+  "favorites.openRecipe": "Open recipe",
   "favorites.edit": "Edit {name}",
   "favorites.moveUp": "Move {name} up",
   "favorites.moveDown": "Move {name} down",

@@ -181,6 +181,8 @@ export const th: Messages = {
   "settings.bottomMargin": "ขอบล่างส่วนกลาง",
   "settings.bottomMarginNote": "เว้นพื้นที่ด้านล่างของทุกหน้าเว็บ สำหรับเมนูที่เลื่อนใต้ขอบจอ",
   "settings.bottomMarginLabel": "ขอบล่างสำหรับทุกเว็บไซต์",
+  "settings.accessibility": "การช่วยการเข้าถึง",
+  "guides.read": "อ่านคู่มือ",
   "settings.data": "ข้อมูลและความช่วยเหลือ",
   "settings.dataNote":
     "ประวัติคือที่อยู่ที่คุณค้นหา เก็บไว้เฉพาะบนอุปกรณ์นี้ การล้างประวัติจะลืมหน้าสุดท้ายด้วย แอปจึงเริ่มที่รายการโปรดแรกของคุณ หน้าที่เปิดอยู่ รายการโปรด และการเข้าสู่ระบบยังคงอยู่",
@@ -222,6 +224,7 @@ export const th: Messages = {
   "favorites.moreLocked": "รายการโปรดเพิ่มเติม",
   "favorites.add": "เพิ่มรายการโปรด",
   "favorites.quickFull": "ทางลัดเต็มแล้ว รายการนี้จึงถูกเพิ่มในรายการโปรดเพิ่มเติม",
+  "favorites.openRecipe": "เปิดสูตร",
   "favorites.edit": "แก้ไข {name}",
   "favorites.moveUp": "ย้าย {name} ขึ้น",
   "favorites.moveDown": "ย้าย {name} ลง",

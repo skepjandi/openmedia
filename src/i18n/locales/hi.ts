@@ -188,6 +188,8 @@ export const hi: Messages = {
   "settings.bottomMarginNote":
     "हर पृष्ठ का निचला हिस्सा खाली रखता है, ताकि स्क्रीन के किनारे के नीचे खिसकने वाले मेनू दिख सकें।",
   "settings.bottomMarginLabel": "सभी साइटों के लिए निचली मार्जिन",
+  "settings.accessibility": "एक्सेसिबिलिटी",
+  "guides.read": "गाइड पढ़ें",
   "settings.data": "डेटा और मदद",
   "settings.dataNote":
     "इतिहास वे पते हैं जिन्हें आपने खोजा है, वे सिर्फ़ इसी डिवाइस पर रहते हैं। इन्हें मिटाने पर आख़िरी पृष्ठ भी भूल जाता है, इसलिए ऐप आपकी पहली पसंदीदा से शुरू होता है। खुले पृष्ठ, पसंदीदा और लॉगिन बने रहते हैं।",
@@ -230,6 +232,7 @@ export const hi: Messages = {
   "favorites.moreLocked": "और पसंदीदा",
   "favorites.add": "पसंदीदा जोड़ें",
   "favorites.quickFull": "त्वरित पहुँच भर चुकी है, इसलिए यह “और पसंदीदा” में जोड़ दी गई है।",
+  "favorites.openRecipe": "रेसिपी खोलें",
   "favorites.edit": "{name} संपादित करें",
   "favorites.moveUp": "{name} को ऊपर ले जाएँ",
   "favorites.moveDown": "{name} को नीचे ले जाएँ",

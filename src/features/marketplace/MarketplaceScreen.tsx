@@ -14,6 +14,7 @@ import {
   setIconCache,
 } from "../../shared/siteIcons";
 import { Screen } from "../../shared/Screen";
+import { GuideLink } from "../guides/GuideLink";
 import { useEntitlementStore } from "../paywall/store";
 import { Switch } from "../settings/Switch";
 import {
@@ -125,6 +126,11 @@ function MarketplaceBody() {
 
   return (
     <Screen title={t("market.title")} closeLabel={t("common.back")} onClose={back} back>
+      {view.kind === "list" && (
+        <div className="pb-3">
+          <GuideLink slug="marketplace" />
+        </div>
+      )}
       {view.kind === "list" && (
         <ListView
           listing={listing}
