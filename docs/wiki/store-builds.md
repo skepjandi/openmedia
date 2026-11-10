@@ -11,7 +11,7 @@ Before a release, configure the RevenueCat keys and live HTTPS privacy/terms URL
 ## iOS App Store
 
 1. Set up Xcode signing for the `surf.openmedia` bundle ID with an Apple Distribution identity and App Store provisioning. `APPLE_DEVELOPMENT_TEAM` is used by the documented Tauri iOS development flow; confirm the signing team and profile in Xcode for distribution.
-2. Set the marketing version in `src-tauri/tauri.conf.json`. Increment `bundle.iOS.bundleVersion` for every upload (`yarn release` does it; see below). The version (`1.0.0`) is the top-level `version` in `tauri.conf.json`; it matches the "1.0" version records in App Store Connect.
+2. Set the marketing version in `src-tauri/tauri.conf.json`. Increment `bundle.iOS.bundleVersion` for every upload (`yarn release` does it; see below). The version (`1.0.1`) is the top-level `version` in `tauri.conf.json`; it matches the "1.0" version records in App Store Connect.
 3. Build an App Store Connect export (not a simulator build):
 
    ```bash

@@ -6,6 +6,14 @@ All notable changes to OpenMedia are documented here.
 >
 > **Wiki**: the [GitHub Wiki](https://github.com/skepjandi/openmedia/wiki) is the public-facing main wiki — architecture, recipe format, AI pipeline, security model, roadmap. Source-controlled editing surface is `docs/wiki/` in this repo; CI (`.github/workflows/sync-wiki.yml`) mirrors it to the GitHub Wiki on every merge to `main`. New single-PR changes belong here, not as new wiki pages.
 
+## 2026-11-11
+
+### chore(release): version 1.0.1
+
+**Area:** `chore(release)`
+
+**Change:** The app version is `1.0.1` in `package.json` and `src-tauri/tauri.conf.json`.
+
 ## 2026-11-10
 
 ### fix(onboarding): re-read recipes and favorites even when the install step reports an error
