@@ -18,11 +18,16 @@ import java.util.regex.Pattern
  * exceptions. An exception therefore cancels a block, which is what `ignore-previous-rules` means.
  */
 class BlockingRules {
-    private class Snapshot(
+    private class Bucket(
         val byHost: Map<String, List<Rule>>,
         val general: List<Rule>,
     ) {
         val isEmpty: Boolean get() = byHost.isEmpty() && general.isEmpty()
+    }
+
+    /** Blocking rules and exceptions are kept apart: an exception is only read once a block matched. */
+    private class Snapshot(val blocking: Bucket, val exceptions: Bucket) {
+        val isEmpty: Boolean get() = blocking.isEmpty
     }
 
     private inner class Rule(
@@ -49,26 +54,29 @@ class BlockingRules {
     }
 
     @Volatile
-    private var snapshot = Snapshot(emptyMap(), emptyList())
+    private var snapshot = EMPTY
 
     /** Reads the rule files and replaces the rules in force. A file that is missing is skipped. */
     fun load(paths: List<String>) {
-        val byHost = HashMap<String, MutableList<Rule>>()
-        val general = ArrayList<Rule>()
+        val blockHost = HashMap<String, MutableList<Rule>>()
+        val blockGeneral = ArrayList<Rule>()
+        val exceptHost = HashMap<String, MutableList<Rule>>()
+        val exceptGeneral = ArrayList<Rule>()
         for (path in paths) {
             val file = File(path)
             if (!file.isFile) continue
             val text = runCatching { file.readText() }.getOrNull() ?: continue
             for (rule in parse(text)) {
                 val host = hostOf(rule.pattern.pattern())
+                val (byHost, general) = if (rule.blocks) blockHost to blockGeneral else exceptHost to exceptGeneral
                 if (host == null) general.add(rule) else byHost.getOrPut(host) { ArrayList() }.add(rule)
             }
         }
-        snapshot = Snapshot(byHost, general)
+        snapshot = Snapshot(Bucket(blockHost, blockGeneral), Bucket(exceptHost, exceptGeneral))
     }
 
     fun clear() {
-        snapshot = Snapshot(emptyMap(), emptyList())
+        snapshot = EMPTY
     }
 
     /** True when the request must not leave the device. */
@@ -80,20 +88,15 @@ class BlockingRules {
         val resourceType = resourceTypeOf(url, isMainFrame)
         val firstParty = isFirstParty(host, topUrl)
 
-        var blocked = false
-        var excepted = false
-        for (suffix in suffixesOf(host)) {
-            val rules = current.byHost[suffix] ?: continue
-            for (rule in rules) {
-                if (!rule.matches(url, host, resourceType, firstParty)) continue
-                if (rule.blocks) blocked = true else excepted = true
+        val suffixes = suffixesOf(host)
+        fun any(bucket: Bucket): Boolean {
+            for (suffix in suffixes) {
+                val rules = bucket.byHost[suffix] ?: continue
+                if (rules.any { it.matches(url, host, resourceType, firstParty) }) return true
             }
+            return bucket.general.any { it.matches(url, host, resourceType, firstParty) }
         }
-        for (rule in current.general) {
-            if (!rule.matches(url, host, resourceType, firstParty)) continue
-            if (rule.blocks) blocked = true else excepted = true
-        }
-        return blocked && !excepted
+        return any(current.blocking) && !any(current.exceptions)
     }
 
     private fun parse(text: String): List<Rule> {
@@ -257,5 +260,6 @@ class BlockingRules {
     private companion object {
         const val HOST_PREFIX = "^[^:]+:(//)?([^/]+\\.)?"
         const val MIN_LITERAL = 4
+        val EMPTY = Snapshot(Bucket(emptyMap(), emptyList()), Bucket(emptyMap(), emptyList()))
     }
 }

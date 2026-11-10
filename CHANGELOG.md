@@ -8,6 +8,14 @@ All notable changes to OpenMedia are documented here.
 
 ## 2026-11-11
 
+### perf(android): read exception rules only after a block matched
+
+**Area:** `perf(android)`
+
+**Change:** `BlockingRules` keeps blocking rules and exceptions in separate buckets. A request is checked against the blocking rules first, stopping at the first match, and against the exceptions only when one matched. The verdict is the same as before (blocked and not excepted); unblocked requests no longer touch the exceptions and blocked ones stop scanning early.
+
+**Verified:** `./gradlew :tauri-plugin-siteview:compileDebugKotlin` builds. **Not verified:** the speed gain (not timed), blocking on a device or emulator; `BlockingRules` has no unit test because it uses `android.net.Uri`.
+
 ### chore(store): Mac App Store screenshots
 
 **Area:** `chore(store)`
