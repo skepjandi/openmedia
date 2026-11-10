@@ -36,6 +36,14 @@ All notable changes to OpenMedia are documented here.
 
 **Verified:** macOS in the running app and the iOS Simulator (a variable set on the page survived the toggle, the rules showed or hid at once, and a reload afterwards used the new script); the Kotlin compiles (`compileDebugKotlin`). **Not verified:** Android at runtime; frames inside the page keep the old script until they load again.
 
+### fix(settings): mark the Incognito sections as Pro when they are
+
+**Problem:** without Pro, "Incognito favorites" and "Incognito recipes" in Settings looked like the Pro versions (fingerprint icon, "Locked. Tap to unlock with Face ID…"), and a tap opened the paywall with no warning.
+
+**Change:** without Pro both sections show the crown, no chevron and "Pro feature" (`paywall.locked`, already translated) instead of the Face ID hint (`needsPro` on `LockedSection`). With Pro nothing changes. No new strings.
+
+**Verified:** `ts:check`, ESLint, Prettier, 300 frontend tests. **Not verified:** rendering on a device or simulator.
+
 ### fix(siteview): sign-in popups open inside the app on macOS
 
 **What:** A page's `window.open` to another domain (Google sign-in) or a `target=_blank` link out of the session's domain opened the Mac's default browser, so the sign-in could never report back to the page.

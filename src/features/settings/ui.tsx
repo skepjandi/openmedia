@@ -1,4 +1,5 @@
 import { useEffect, useState, type ReactNode } from "react";
+import { ProIcon } from "../../shared/icons";
 import { BiometricIcon } from "../incognito/BiometricIcon";
 
 export const field =
@@ -52,6 +53,8 @@ interface LockedSectionProps {
   note?: ReactNode;
   /** Says under the title why nothing shows yet. */
   lockedHint: string;
+  /** Tapping opens the paywall, not the biometric check: shows the crown and no chevron. */
+  needsPro?: boolean;
   /** Asks for the biometric check; true when it passed. */
   unlock: () => Promise<boolean>;
   /** Loads what the section shows, after the check passed and before it opens. */
@@ -69,6 +72,7 @@ export function LockedSection({
   title,
   note,
   lockedHint,
+  needsPro = false,
   unlock,
   onUnlocked,
   onLocked,
@@ -115,12 +119,20 @@ export function LockedSection({
         className="flex w-full cursor-pointer items-center justify-between px-1 py-2 text-start text-sm font-semibold text-paper disabled:opacity-60"
       >
         <span className="flex items-center gap-2">
-          {!open && <BiometricIcon />}
+          {needsPro ? (
+            <span className="pro-badge grid size-5 place-items-center rounded-full">
+              <ProIcon size={12} />
+            </span>
+          ) : (
+            !open && <BiometricIcon />
+          )}
           {title}
         </span>
-        <span aria-hidden="true" className={`text-paper/45 ${open ? "rotate-180" : ""}`}>
-          ⌄
-        </span>
+        {!needsPro && (
+          <span aria-hidden="true" className={`text-paper/45 ${open ? "rotate-180" : ""}`}>
+            ⌄
+          </span>
+        )}
       </button>
       {open ? (
         <div className="pt-3">

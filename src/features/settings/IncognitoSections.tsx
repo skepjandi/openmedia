@@ -1,6 +1,7 @@
 import { useApp } from "../../app/store";
 import { useT } from "../../i18n/useT";
 import { QUICK_ACCESS_LIMIT } from "../../shared/favorites";
+import { useEntitlementStore } from "../paywall/store";
 import { FavoritesEditor } from "./FavoritesSection";
 import { SiteCard } from "./RecipesScreen";
 import { LockedSection } from "./ui";
@@ -15,13 +16,15 @@ export function IncognitoFavoritesSection() {
   const load = useApp((s) => s.loadIncognitoFavorites);
   const forget = useApp((s) => s.forgetIncognitoFavorites);
   const save = useApp((s) => s.saveIncognitoFavorites);
+  const needsPro = useEntitlementStore((s) => s.status !== "pro");
   const t = useT();
 
   return (
     <LockedSection
       title={t("incognito.favoritesTitle")}
       note={t("incognito.favoritesNote", { limit: QUICK_ACCESS_LIMIT })}
-      lockedHint={t("incognito.locked")}
+      lockedHint={needsPro ? t("paywall.locked") : t("incognito.locked")}
+      needsPro={needsPro}
       unlock={unlock}
       onUnlocked={load}
       onLocked={forget}
@@ -41,13 +44,15 @@ export function IncognitoRecipesSection() {
   const unlock = useApp((s) => s.unlockIncognito);
   const load = useApp((s) => s.loadIncognitoSites);
   const forget = useApp((s) => s.forgetIncognitoSites);
+  const needsPro = useEntitlementStore((s) => s.status !== "pro");
   const t = useT();
 
   return (
     <LockedSection
       title={t("incognito.recipesTitle")}
       note={t("incognito.recipesNote")}
-      lockedHint={t("incognito.locked")}
+      lockedHint={needsPro ? t("paywall.locked") : t("incognito.locked")}
+      needsPro={needsPro}
       unlock={unlock}
       onUnlocked={load}
       onLocked={forget}
