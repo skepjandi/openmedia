@@ -16,11 +16,12 @@ and Google's [preview assets help](https://support.google.com/googleplay/android
 | `android/phone/`      | Phone                           | 1080 × 1920 | 8     | 9:16 or 16:9, 320 to 3840 px a side, 2 to 8 shots. 1080 px or more keeps the listing promotable   |
 | `android/tablet/`     | 7" and 10" tablet (same files)  | 1440 × 2560 | 8     | 9:16 or 16:9, 1080 to 7680 px a side, up to 8 each                                                |
 | `android/feature-graphic.png` | Feature graphic         | 1024 × 500  | 1     | Required to publish; PNG or JPEG, no alpha                                                        |
+| `macos/<size>/`       | Mac (`APP_DESKTOP`)             | 2880 × 1800, 2560 × 1600, 1440 × 900, 1280 × 800 | 8 per size | 16:10 landscape; Apple accepts any one of the four sizes; 1 to 10 per slot |
 
 Each set tells the same story in the same order: `01-browse`, `02-fan`, `03-recipes`, `04-browsing`, `05-usage`,
 `06-limits`, `07-byok`, `08-dark`.
 
-Not included yet: **Mac** (required for a Mac app: one of 1280 × 800, 1440 × 900, 2560 × 1600 or 2880 × 1800, 16:10) needs real captures of the macOS app, which could not be taken in this environment (no screen-recording access). Google Play also takes Chromebook and other large-screen sets if those platforms ship.
+Mac slot (`macos/<size>/`, `APP_DESKTOP`): 8 slides in each of 1280 × 800, 1440 × 900, 2560 × 1600 and 2880 × 1800 (16:10; Apple accepts any one, 1 to 10 shots). They are made from window captures of the macOS app in `captures/macbook-pro/` (2880 × 1800, debug build with Pro forced on, a fresh profile and synthetic usage data). The Mac App Store also takes a 1920 × 1080 app preview video, which is not made. Slide 7 shows the app's current "iOS Keychain" wording; fix the string and retake before submitting if that matters. Google Play also takes Chromebook and other large-screen sets if those platforms ship.
 
 ## Captures
 
@@ -30,6 +31,7 @@ Not included yet: **Mac** (required for a Mac app: one of 1280 × 800, 1440 × 9
 | ---------------------- | ---------------------------- | ----------- |
 | `iphone-17-pro-max/`   | iPhone 17 Pro Max, iOS 26.5  | 1320 × 2868 |
 | `ipad-pro-13-m5/`      | iPad Pro 13-inch (M5), iOS 26.5 | 2064 × 2752 |
+| `macbook-pro/`         | OpenMedia window on macOS (Apple Silicon), 1440 × 900 pt | 2880 × 1800 |
 
 - Debug build of `main` (`yarn tauri ios build --debug --target aarch64-sim`), fresh install, onboarding skipped.
 - Status bar fixed with `xcrun simctl status_bar <udid> override --time 9:41 --batteryState charged --batteryLevel 100`.

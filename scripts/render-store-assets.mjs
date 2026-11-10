@@ -63,7 +63,7 @@ const captureFile = (device, index, slug) =>
     storeDir,
     "captures",
     device,
-    `${String(index + 1).padStart(2, "0")}-${slug}.${captureExtension[slug] ?? "png"}`,
+    `${String(index + 1).padStart(2, "0")}-${slug}.${device === "macbook-pro" ? "png" : (captureExtension[slug] ?? "png")}`,
   );
 
 // width/height: exact store size. deviceWidth and top: device frame width in % of the canvas
@@ -123,6 +123,19 @@ const sets = [
     deviceWidth: 90,
     top: 30,
   },
+  // Mac App Store (APP_DESKTOP): every size is an exact 16:10 render, no scaling.
+  ...[
+    [2880, 1800],
+    [2560, 1600],
+    [1440, 900],
+    [1280, 800],
+  ].map(([width, height]) => ({
+    dir: `macos/${width}x${height}`,
+    width,
+    height,
+    capture: "macbook-pro",
+    kind: "mac",
+  })),
 ];
 
 const themes = {
@@ -176,7 +189,40 @@ function frame(kind, widthPx) {
   return { bezel, screenRadius, outerRadius: screenRadius + bezel };
 }
 
+// Mac slides use the native window captures (rounded corners and title bar included) as the
+// device. Even slides put the copy on the left and the window beside it; odd slides put the copy
+// on top and let the window bleed off the bottom edge.
+function macSlideHtml(set, slide, index) {
+  const theme = themes[slide.theme];
+  const unit = set.width / 100;
+  const u = (value) => `${(value * unit).toFixed(2)}px`;
+  const shadow = theme.shadow.replace(/(\d+(?:\.\d+)?)u/g, (_, n) => u(Number(n)));
+  const image = pathToFileURL(captureFile(set.capture, index, slide.slug)).href;
+  const side = index % 2 === 0;
+  const windowCss = side
+    ? `left: ${u(34)}; width: ${u(64)}; top: 50%; transform: translateY(-50%);`
+    : `left: ${u(8)}; width: ${u(84)}; top: ${(set.height * (slide.headline.split("|").length > 2 ? 0.4 : 0.33)).toFixed(1)}px;`;
+  const copyCss = side
+    ? `left: ${u(4)}; width: ${u(28)}; top: 50%; transform: translateY(-50%);`
+    : `left: ${u(5)}; right: ${u(5)}; top: ${u(4.6)};`;
+  const headlineSize = side ? 3.5 : 4.4;
+  return `<!doctype html><html><head><meta charset="utf-8"><style>${baseCss}
+.canvas { position: relative; width: ${set.width}px; height: ${set.height}px; overflow: hidden;
+  background: radial-gradient(60% 50% at 70% 60%, ${theme.glow}, transparent), ${theme.background}; color: ${theme.text}; }
+.copy { position: absolute; ${copyCss} }
+.eyebrow { font-size: ${u(1.05)}; letter-spacing: 0.2em; text-transform: uppercase; font-weight: 600;
+  color: ${theme.eyebrow}; margin-bottom: ${u(1.1)}; }
+h1 { font-size: ${u(headlineSize)}; font-weight: 780; line-height: 1.04; letter-spacing: -0.025em; }
+h1 em { font-style: normal; color: ${theme.accent}; }
+.window { position: absolute; ${windowCss} display: block; filter: drop-shadow(0 ${u(1.6)} ${u(2.4)} rgba(0,0,0,.45)); }
+</style></head><body><div class="canvas">
+<div class="copy"><div class="eyebrow">${escapeHtml(slide.eyebrow)}</div><h1>${headlineHtml(slide.headline)}</h1></div>
+<img class="window" src="${image}" alt="">
+</div></body></html>`;
+}
+
 function storeSlideHtml(set, slide, index) {
+  if (set.kind === "mac") return macSlideHtml(set, slide, index);
   const theme = themes[slide.theme];
   const unit = set.width / 100;
   const u = (value) => `${(value * unit).toFixed(2)}px`;

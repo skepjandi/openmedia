@@ -8,6 +8,12 @@ All notable changes to OpenMedia are documented here.
 
 ## 2026-11-11
 
+### chore(store): Mac App Store screenshots
+
+**Area:** `chore(store)`
+
+**Change:** Added the Mac slot (`assets/store/macos/`, 8 slides at each of 1280 × 800, 1440 × 900, 2560 × 1600 and 2880 × 1800) rendered by `scripts/render-store-assets.mjs` from window captures of the macOS app in `assets/store/captures/macbook-pro/`. Captures use a fresh profile and synthetic usage data. The 1920 × 1080 app preview video is not included.
+
 ### fix(release): ship waits for CI to register, documents the maintainers-only release flow
 
 **Area:** `fix(release)`
