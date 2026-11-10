@@ -3,7 +3,7 @@ import { appError, useApp } from "../../app/store";
 import { useT } from "../../i18n/useT";
 import { ProIcon } from "../../shared/icons";
 import { useEntitlementStore } from "../paywall/store";
-import { Group, primaryButton, quietButton } from "../settings/ui";
+import { Group, primaryBlockButton, quietBlockButton } from "../settings/ui";
 import { marketplace, type MarketComment } from "./ipc";
 import { MAX_COMMENT_CHARS, commentToSend, withoutBlocked } from "./logic";
 
@@ -159,7 +159,7 @@ export function CommentsSection({
             type="button"
             disabled={busy || commentToSend(text) === null}
             onClick={post}
-            className={`self-start ${primaryButton}`}
+            className={primaryBlockButton}
           >
             {t("market.comments.post")}
           </button>
@@ -178,7 +178,7 @@ export function CommentsSection({
           </span>
         </button>
       )}
-      <button type="button" onClick={onManageBlocked} className={`self-start ${quietButton}`}>
+      <button type="button" onClick={onManageBlocked} className={quietBlockButton}>
         {t("market.comments.blocked")}
       </button>
     </section>

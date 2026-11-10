@@ -8,6 +8,12 @@ All notable changes to OpenMedia are documented here.
 
 ## 2026-11-10
 
+### fix(marketplace): add button on top, loading spinners, matching bottom buttons
+
+**Area:** `fix(marketplace)`
+
+**Change:** Add/Update and Remove now sit at the top of a recipe page, equal width and height. The list and the recipe preview show a spinner while loading. The buttons at the bottom of the list and recipe pages (share, blocked commenters, report reasons, post) share one full-width size.
+
 ### fix(app): keep the splash logo still
 
 **Problem:** When the splash's animation started, the logo jumped up and down before settling, which looked buggy.

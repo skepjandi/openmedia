@@ -16,7 +16,15 @@ import {
 import { Screen } from "../../shared/Screen";
 import { useEntitlementStore } from "../paywall/store";
 import { Switch } from "../settings/Switch";
-import { Group, field, primaryButton, quietButton } from "../settings/ui";
+import {
+  Group,
+  Spinner,
+  primaryButton,
+  field,
+  primaryBlockButton,
+  quietBlockButton,
+  quietButton,
+} from "../settings/ui";
 import {
   marketplace,
   type MarketItem,
@@ -194,9 +202,7 @@ function ListView({
           </button>
         </div>
       )}
-      {!error && listing === null && (
-        <p className="px-1 text-sm text-paper/55">{t("market.loading")}</p>
-      )}
+      {!error && listing === null && <Spinner label={t("market.loading")} />}
       {listing && listing.withdrawn.length > 0 && (
         <p className="px-1 text-sm text-paper/70">
           {t("market.withdrawn", { names: listing.withdrawn.join(", ") })}
@@ -247,15 +253,11 @@ function ListView({
         </Group>
       )}
       <div className="flex flex-col gap-3">
-        <button
-          type="button"
-          onClick={onShare}
-          className={`flex items-center gap-2 self-start ${quietButton}`}
-        >
+        <button type="button" onClick={onShare} className={quietBlockButton}>
           {t("market.share")}
           {!isPro && <ProIcon size={14} />}
         </button>
-        <button type="button" onClick={onBlocked} className={`self-start ${quietButton}`}>
+        <button type="button" onClick={onBlocked} className={quietBlockButton}>
           {t("market.comments.blocked")}
         </button>
         <CountingSwitch />
@@ -469,42 +471,45 @@ function DetailView({ item, onChanged, onRated, onManageBlocked }: DetailViewPro
           <RatingText item={item} />
         </div>
       </div>
-      {preview && <RecipeReview preview={preview} />}
+      {(canAdd || item.installedVersion) && (
+        <div className="flex gap-3">
+          {canAdd && (
+            <button
+              type="button"
+              disabled={!preview || busy}
+              onClick={() => void run(() => marketplace.install(item.id))}
+              className={`flex-1 ${primaryBlockButton}`}
+            >
+              {t(item.installedVersion ? "market.update" : "market.add")}
+            </button>
+          )}
+          {item.installedVersion && (
+            <button
+              type="button"
+              disabled={busy}
+              onClick={() => void run(() => marketplace.uninstall(item.id))}
+              className={`flex-1 ${quietBlockButton}`}
+            >
+              {t("common.remove")}
+            </button>
+          )}
+        </div>
+      )}
       {error && <p className="px-1 text-sm text-paper/70">{error}</p>}
-      <div className="flex flex-wrap gap-3">
-        {canAdd && (
-          <button
-            type="button"
-            disabled={!preview || busy}
-            onClick={() => void run(() => marketplace.install(item.id))}
-            className={primaryButton}
-          >
-            {t(item.installedVersion ? "market.update" : "market.add")}
-          </button>
-        )}
-        {item.installedVersion && (
-          <button
-            type="button"
-            disabled={busy}
-            onClick={() => void run(() => marketplace.uninstall(item.id))}
-            className={quietButton}
-          >
-            {t("common.remove")}
-          </button>
-        )}
-      </div>
+      {preview === null && !error && <Spinner label={t("market.loading")} />}
+      {preview && <RecipeReview preview={preview} />}
       <div>
         <p className="px-1 pb-2 text-[13px] font-medium text-paper/60">{t("market.report")}</p>
         {reported ? (
           <p className="px-1 text-sm text-paper/70">{t("market.reported")}</p>
         ) : (
-          <div className="flex flex-wrap gap-2">
+          <div className="grid grid-cols-2 gap-2">
             {REASONS.map(({ reason, label }) => (
               <button
                 key={reason}
                 type="button"
                 onClick={() => void report(reason)}
-                className={quietButton}
+                className={quietBlockButton}
               >
                 {t(label)}
               </button>

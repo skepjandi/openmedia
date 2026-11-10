@@ -11,6 +11,23 @@ export const primaryButton =
 export const quietButton =
   "rounded-full border border-hair px-4 py-2 text-sm font-medium text-paper/85 disabled:opacity-40";
 
+/** Full-width, equal-height variants for button stacks at the bottom of a page. */
+export const quietBlockButton = `flex min-h-11 w-full items-center justify-center gap-2 ${quietButton}`;
+
+export const primaryBlockButton = `flex min-h-11 w-full items-center justify-center gap-2 ${primaryButton}`;
+
+export function Spinner({ label }: { label: string }) {
+  return (
+    <div role="status" className="flex items-center gap-3 px-1 text-sm text-paper/55">
+      <span
+        aria-hidden="true"
+        className="size-5 animate-spin rounded-full border-2 border-hair border-t-accent"
+      />
+      {label}
+    </div>
+  );
+}
+
 interface SectionProps {
   title: string;
   /** Explains the group below it, in small print. */
