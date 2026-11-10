@@ -10,6 +10,7 @@ describe("classifyError", () => {
     expect(kind("The provider is rate limiting this key. Try again shortly.")).toBe("rateLimit");
     expect(kind("Could not reach the provider.")).toBe("network");
     expect(kind("The provider's answer was not understood.")).toBe("invalid");
+    expect(kind("The model's answer was not in the expected form.")).toBe("invalid");
     expect(kind("The model returned an invalid structure.")).toBe("invalid");
     expect(kind("The provider had a problem (status 500).")).toBe("provider");
     expect(kind("The change matched nothing on the page.")).toBe("nothingMatched");

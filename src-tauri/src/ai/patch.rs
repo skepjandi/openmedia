@@ -1,16 +1,17 @@
 //! What the model may ask for, and the strict validation of its answer. The answer is untrusted
 //! text: it is parsed with unknown fields refused, every limit is checked here, and every selector
-//! goes through the same validator as any recipe. The model can only ever produce `hide` rules.
+//! and style goes through the same validators as any recipe.
 
-use std::collections::HashSet;
+use std::collections::{BTreeMap, HashSet};
+use std::fmt::Write;
 
 use serde::Deserialize;
 use serde_json::{Value, json};
 
 use crate::error::{Error, Result};
 use crate::recipes::{
-    Meta, OptionGroup, Origin, Recipe, Rule, SiteOption, Target, current_platform_tag,
-    validate_selector,
+    CSS_PROPERTIES, Meta, OptionGroup, Origin, Recipe, Rule, SiteOption, Target,
+    current_platform_tag, validate_declarations, validate_selector,
 };
 use tauri_plugin_siteview::site::registrable_domain;
 
@@ -25,6 +26,7 @@ const MAX_ID_CHARS: usize = 40;
 pub struct PatchRule {
     pub label: String,
     pub selector: String,
+    pub declarations: Option<BTreeMap<String, String>>,
 }
 
 #[derive(Debug, Clone, PartialEq)]
@@ -62,6 +64,7 @@ impl Patch {
 /// Anthropic's tool input accept alike. Limits that strict mode cannot express are checked by
 /// [`parse_patch`].
 pub fn patch_schema() -> Value {
+    let css_properties = CSS_PROPERTIES.to_vec();
     json!({
         "type": "object",
         "additionalProperties": false,
@@ -74,7 +77,7 @@ pub fn patch_schema() -> Value {
             },
             "summary": {
                 "type": "string",
-                "description": "One sentence, at most 200 characters, saying what the switch hides, and what could not be hidden."
+                "description": "One sentence, at most 200 characters, saying what the switch changes and any limits."
             },
             "optionId": {
                 "type": ["string", "null"],
@@ -82,27 +85,40 @@ pub fn patch_schema() -> Value {
             },
             "label": {
                 "type": ["string", "null"],
-                "description": "newOption only: the switch label, at most 60 characters, for example \"Hide suggested videos\". null for existingOption."
+                "description": "newOption only: an imperative switch label, at most 60 characters. null for existingOption."
             },
             "description": {
                 "type": ["string", "null"],
-                "description": "newOption only: what the switch hides, at most 160 characters. null for existingOption."
+                "description": "newOption only: what the switch changes, at most 160 characters. null for existingOption."
             },
             "group": {
                 "type": ["string", "null"],
                 "enum": ["annoyance", "content", null],
-                "description": "newOption only: annoyance for nags, banners and prompts; content for feed content the user chooses to hide. null for existingOption."
+                "description": "newOption only: annoyance for nags, banners and prompts; content for feed content. null for existingOption."
             },
             "rules": {
                 "type": ["array", "null"],
-                "description": "newOption only: 1 to 8 hide rules. null or empty for existingOption.",
+                "description": "newOption only: 1 to 8 rules. null or empty for existingOption.",
                 "items": {
                     "type": "object",
                     "additionalProperties": false,
-                    "required": ["label", "selector"],
+                    "required": ["label", "selector", "declarations"],
                     "properties": {
-                        "label": { "type": "string", "description": "What this rule hides, at most 60 characters." },
-                        "selector": { "type": "string", "description": "One CSS selector (comma list allowed) for the elements to hide: at most 300 characters, at most 2 uses of :has(, none of { } ; \\ < @." }
+                        "label": { "type": "string", "description": "What this rule changes, at most 60 characters." },
+                        "selector": { "type": "string", "description": "One CSS selector (comma list allowed): at most 300 characters, at most 2 uses of :has(, none of { } ; \\ < @." },
+                        "declarations": {
+                            "type": ["array", "null"],
+                            "description": "null to hide the selected elements; otherwise 1 or more safe CSS declaration pairs to restyle them.",
+                            "items": {
+                                "type": "object",
+                                "additionalProperties": false,
+                                "required": ["property", "value"],
+                                "properties": {
+                                    "property": { "type": "string", "enum": css_properties },
+                                    "value": { "type": "string", "description": "A safe value, at most 60 characters; no URLs or expressions." }
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -132,6 +148,15 @@ struct Raw {
 struct RawRule {
     label: String,
     selector: String,
+    #[serde(default)]
+    declarations: Option<Vec<RawDeclaration>>,
+}
+
+#[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
+struct RawDeclaration {
+    property: String,
+    value: String,
 }
 
 fn reject(why: impl AsRef<str>) -> Error {
@@ -167,8 +192,8 @@ fn plain(text: &str, what: &str, max: usize, allow_empty: bool) -> Result<String
     Ok(text.to_owned())
 }
 
-/// Selectors that would hide the whole page or its main structure, whatever the page is.
-fn hides_page_root(selector: &str) -> bool {
+/// Selectors that would hide or restyle the whole page or its main structure.
+fn targets_page_root(selector: &str) -> bool {
     selector.split(',').any(|part| {
         let part = part.trim().to_ascii_lowercase().replace('\'', "\"");
         matches!(
@@ -253,8 +278,8 @@ pub fn parse_patch(json: &str, recipe: Option<&Recipe>) -> Result<Patch> {
                 let rule_label = plain(&rule.label, "a rule label", MAX_LABEL_CHARS, false)?;
                 let selector = rule.selector.trim().to_owned();
                 validate_selector(&selector)?;
-                if hides_page_root(&selector) {
-                    return Err(reject("a rule would hide the whole page"));
+                if targets_page_root(&selector) {
+                    return Err(reject("a rule would target the whole page"));
                 }
                 if !seen_labels.insert(rule_label.to_lowercase()) {
                     return Err(reject("two rules have the same label"));
@@ -262,9 +287,26 @@ pub fn parse_patch(json: &str, recipe: Option<&Recipe>) -> Result<Patch> {
                 if !seen_selectors.insert(selector.clone()) {
                     return Err(reject("two rules have the same selector"));
                 }
+                let declarations = match rule.declarations {
+                    Some(declarations) => {
+                        let mut checked = BTreeMap::new();
+                        for declaration in declarations {
+                            if checked
+                                .insert(declaration.property, declaration.value)
+                                .is_some()
+                            {
+                                return Err(reject("a style repeats a CSS property"));
+                            }
+                        }
+                        validate_declarations(&checked)?;
+                        Some(checked)
+                    }
+                    None => None,
+                };
                 checked.push(PatchRule {
                     label: rule_label,
                     selector,
+                    declarations,
                 });
             }
             Ok(Patch::NewOption {
@@ -378,14 +420,26 @@ pub fn apply_patch(base: Option<&Recipe>, host_domain: &str, patch: &Patch) -> R
         };
         let id = unique(&format!("{option_id}-{tail}"), &rule_ids);
         rule_ids.insert(id.clone());
-        recipe.rules.push(Rule::Hide {
-            id,
-            label: rule.label.clone(),
-            option: Some(option_id.clone()),
-            target: Target {
-                css: rule.selector.clone(),
+        let rule = match &rule.declarations {
+            Some(declarations) => Rule::Css {
+                id,
+                label: rule.label.clone(),
+                option: Some(option_id.clone()),
+                target: Target {
+                    css: rule.selector.clone(),
+                },
+                declarations: declarations.clone(),
             },
-        });
+            None => Rule::Hide {
+                id,
+                label: rule.label.clone(),
+                option: Some(option_id.clone()),
+                target: Target {
+                    css: rule.selector.clone(),
+                },
+            },
+        };
+        recipe.rules.push(rule);
     }
     let json =
         serde_json::to_string(&recipe).map_err(|_| reject("the recipe could not be built"))?;
@@ -417,28 +471,52 @@ fn custom_recipe(domain: &str) -> Result<Recipe> {
     })
 }
 
-/// The css that previews a new option: each rule hides its elements, exactly like the saved one.
+/// The css that previews a new option, matching what acceptance will save.
 pub fn preview_css(patch: &Patch) -> String {
     let mut css = String::new();
     for rule in patch.rules() {
-        css.push_str(&rule.selector);
-        css.push_str("{display:none!important}\n");
+        append_rule_css(&mut css, &rule.selector, rule.declarations.as_ref());
     }
     css
 }
 
-/// The css of an existing option's hide rules, to preview turning it on.
+/// The css of an existing option's hide and style rules, to preview turning it on.
 pub fn option_css(recipe: &Recipe, option_id: &str) -> String {
     let mut css = String::new();
     for rule in &recipe.rules {
-        if let Rule::Hide { target, option, .. } = rule
-            && option.as_deref() == Some(option_id)
-        {
-            css.push_str(&target.css);
-            css.push_str("{display:none!important}\n");
+        match rule {
+            Rule::Hide { target, option, .. } if option.as_deref() == Some(option_id) => {
+                append_rule_css(&mut css, &target.css, None);
+            }
+            Rule::Css {
+                target,
+                option,
+                declarations,
+                ..
+            } if option.as_deref() == Some(option_id) => {
+                append_rule_css(&mut css, &target.css, Some(declarations));
+            }
+            _ => {}
         }
     }
     css
+}
+
+fn append_rule_css(
+    css: &mut String,
+    selector: &str,
+    declarations: Option<&BTreeMap<String, String>>,
+) {
+    css.push_str(selector);
+    css.push('{');
+    if let Some(declarations) = declarations {
+        for (property, value) in declarations {
+            let _ = write!(css, "{property}:{value}!important;");
+        }
+    } else {
+        css.push_str("display:none!important;");
+    }
+    css.push_str("}\n");
 }
 
 #[cfg(test)]
@@ -487,8 +565,48 @@ mod tests {
         assert_eq!(rules[0].selector, "div:has(> a[href^=\"/stories/\"])");
         assert_eq!(
             preview_css(&patch),
-            "div:has(> a[href^=\"/stories/\"]){display:none!important}\n"
+            "div:has(> a[href^=\"/stories/\"]){display:none!important;}\n"
         );
+    }
+
+    #[test]
+    fn restyles_are_validated_previewed_and_saved() {
+        let rules = json!([{
+            "label": "Google logo",
+            "selector": "img[alt=\"Google\"]",
+            "declarations": [{ "property": "filter", "value": "grayscale(1)" }]
+        }]);
+        let patch = parse_patch(&new_option(rules), None).unwrap();
+        let expected = "img[alt=\"Google\"]{filter:grayscale(1)!important;}\n";
+        assert_eq!(preview_css(&patch), expected);
+
+        let recipe = apply_patch(None, "google.com", &patch).unwrap();
+        assert!(matches!(
+            &recipe.rules[0],
+            Rule::Css { declarations, .. }
+                if declarations.get("filter").map(String::as_str) == Some("grayscale(1)")
+        ));
+        assert_eq!(option_css(&recipe, &recipe.options[0].id), expected);
+    }
+
+    #[test]
+    fn unsafe_styles_are_refused() {
+        for declarations in [
+            json!([{ "property": "background", "value": "red" }]),
+            json!([{ "property": "filter", "value": "url(https://evil.test/x)" }]),
+            json!([]),
+            json!([
+                { "property": "filter", "value": "grayscale(1)" },
+                { "property": "filter", "value": "none" }
+            ]),
+        ] {
+            let rules = json!([{
+                "label": "Logo",
+                "selector": "img",
+                "declarations": declarations
+            }]);
+            assert!(parse_patch(&new_option(rules), None).is_err());
+        }
     }
 
     #[test]
@@ -632,7 +750,7 @@ mod tests {
         assert_eq!(preview_css(&patch), "");
         assert!(
             option_css(&recipe, "shorts")
-                .contains("ytm-reel-shelf-renderer{display:none!important}")
+                .contains("ytm-reel-shelf-renderer{display:none!important;}")
         );
         assert!(apply_patch(Some(&recipe), "youtube.com", &patch).is_err());
     }

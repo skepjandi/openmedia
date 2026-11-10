@@ -638,7 +638,7 @@ mod tests {
             assert!(
                 page.log()
                     .iter()
-                    .any(|s| s.contains("#promo{display:none!important}"))
+                    .any(|s| s.contains("#promo{display:none!important;}"))
             );
 
             let Accepted::SaveRecipe(recipe) = accept(&agent, &page, prepared.id).unwrap() else {

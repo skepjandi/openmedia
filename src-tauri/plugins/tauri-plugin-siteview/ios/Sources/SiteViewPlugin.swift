@@ -945,6 +945,8 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
 
   private func installBackdrop() {
     guard backdrop == nil, let host = shell?.superview else { return }
+    // The web view can leave uncovered safe-area pixels; keep those on the app backdrop too.
+    host.backgroundColor = backdropColor
     let view = UIView(frame: host.bounds)
     view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
     view.backgroundColor = backdropColor

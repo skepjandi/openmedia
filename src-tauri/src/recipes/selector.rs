@@ -6,7 +6,7 @@ const MAX_SELECTOR_CHARS: usize = 300;
 const MAX_UNION: usize = 20;
 const MAX_HAS: usize = 2;
 const MAX_VALUE_CHARS: usize = 60;
-const ALLOWED_PROPERTIES: [&str; 14] = [
+pub(crate) const CSS_PROPERTIES: [&str; 14] = [
     "display",
     "visibility",
     "opacity",
@@ -75,7 +75,7 @@ pub fn validate_declarations(declarations: &BTreeMap<String, String>) -> Result<
                 .all(|c| c.is_ascii_alphanumeric() || " .,%#()-".contains(c))
             && !lowered.contains("url(")
             && !lowered.contains("expression");
-        if !ALLOWED_PROPERTIES.contains(&property.as_str()) {
+        if !CSS_PROPERTIES.contains(&property.as_str()) {
             return Err(invalid("css property", property));
         }
         if !safe_value {
