@@ -194,6 +194,8 @@ export const ur: Messages = {
   "settings.bottomMarginNote":
     "ہر صفحے کا نچلا حصہ خالی رکھتا ہے، اُن مینوں کے لیے جو اسکرین کے کنارے کے نیچے سرگلیتے ہیں۔",
   "settings.bottomMarginLabel": "تمام سائٹس کے لیے نیچے کا مارجن",
+  "settings.accessibility": "رسائی",
+  "guides.read": "گائیڈ پڑھیں",
   "settings.data": "ڈیٹا اور مدد",
   "settings.dataNote":
     "تاریخ وہ پتے ہیں جن کی آپ نے تلاش کی، اور صرف اسی ڈیوائس پر رہتے ہیں۔ انہیں صاف کرنے سے آخری صفحہ بھی بھول جاتا ہے، اس لیے ایپ آپ کی پہلی پسندیدہ سے شروع ہوتی ہے۔ کھلے ہوئے صفحات، پسندیدہ اور لاگ ان قائم رہتے ہیں۔",
@@ -236,6 +238,7 @@ export const ur: Messages = {
   "favorites.moreLocked": "مزید پسندیدہ",
   "favorites.add": "پسندیدہ شامل کریں",
   "favorites.quickFull": "تیز رسائی مکمل ہے، اس لیے یہ مزید پسندیدہ میں شامل کی گئی ہے۔",
+  "favorites.openRecipe": "ترکیب کھولیں",
   "favorites.edit": "{name} میں ترمیم کریں",
   "favorites.moveUp": "{name} کو اوپر لے جائیں",
   "favorites.moveDown": "{name} کو نیچے لے جائیں",

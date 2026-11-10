@@ -1,3 +1,4 @@
+import { GuideLink } from "../guides/GuideLink";
 import { useCallback, useEffect, useState } from "react";
 import { appError, useApp } from "../../app/store";
 import type { Translate } from "../../i18n/translate";
@@ -88,6 +89,9 @@ export function AiSection() {
   return (
     <Section title={t("ai.title")} note={t("ai.note")}>
       <p className="px-1 pb-2 text-[13px] leading-snug text-paper/60">{connectionLine(state, t)}</p>
+      <div className="pb-3">
+        <GuideLink slug="connect-ai" />
+      </div>
       {!isPro && (
         <button
           type="button"

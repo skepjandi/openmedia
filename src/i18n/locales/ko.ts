@@ -189,6 +189,8 @@ export const ko: Messages = {
   "settings.bottomMarginNote":
     "화면 가장자리로 미끄러지는 메뉴를 위해 모든 페이지의 아래쪽을 비워 둡니다.",
   "settings.bottomMarginLabel": "모든 사이트의 하단 여백",
+  "settings.accessibility": "손쉬운 사용",
+  "guides.read": "가이드 읽기",
   "settings.data": "데이터 및 도움말",
   "settings.dataNote":
     "기록은 검색한 주소 목록으로, 이 기기에만 남습니다. 지우면 마지막 페이지도 함께 잊어버려 앱이 첫 즐겨찾기부터 시작합니다. 열어 둔 페이지, 즐겨찾기, 로그인은 그대로 유지됩니다.",
@@ -231,6 +233,7 @@ export const ko: Messages = {
   "favorites.moreLocked": "즐겨찾기 더 보기",
   "favorites.add": "즐겨찾기 추가",
   "favorites.quickFull": "빠른 메뉴가 가득 차 이 항목은 즐겨찾기 더 보기로 추가되었습니다.",
+  "favorites.openRecipe": "레시피 열기",
   "favorites.edit": "{name} 편집",
   "favorites.moveUp": "{name} 위로 이동",
   "favorites.moveDown": "{name} 아래로 이동",

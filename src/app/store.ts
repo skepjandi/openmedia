@@ -103,6 +103,8 @@ export interface AppStore {
   sheet: Sheet;
   /** Where closing a child page of Settings returns to; `none` for every other sheet. */
   sheetParent: "none" | "settings";
+  /** The recipe the Recipes page opens with expanded, set when a favorite sends the user there. */
+  recipeFocus: string | null;
   onboardingOpen: boolean;
   sessions: Session[];
   activeId: string | null;
@@ -120,6 +122,8 @@ export interface AppStore {
   load: () => Promise<void>;
   openSheet: (sheet: Sheet) => void;
   closeSheet: () => void;
+  /** Opens the Recipes page with this recipe's card expanded. */
+  openRecipe: (recipeId: string) => void;
   /** Fetches what only Settings and the fan need: site options and missing icons. Runs after the first page shows. */
   loadSecondary: () => void;
   /** Marks the guide unseen again and shows it now. */
@@ -403,6 +407,7 @@ export const useApp = create<AppStore>((set, get) => {
     error: null,
     sheet: "none",
     sheetParent: "none",
+    recipeFocus: null,
     onboardingOpen: false,
     sessions: [],
     activeId: null,
@@ -451,7 +456,13 @@ export const useApp = create<AppStore>((set, get) => {
       set((current) => ({
         sheet: isSettingsChild(current.sheet) ? current.sheetParent : "none",
         sheetParent: "none",
+        recipeFocus: null,
       })),
+
+    openRecipe: (recipeId) => {
+      get().openSheet("recipes");
+      set({ recipeFocus: recipeId });
+    },
 
     resetGuide: async () => {
       try {

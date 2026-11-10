@@ -178,6 +178,8 @@ export const zhHant: Messages = {
   "settings.bottomMargin": "全域底部邊距",
   "settings.bottomMarginNote": "為每個頁面的底部留出空間，容納滑到螢幕邊緣下方的選單。",
   "settings.bottomMarginLabel": "所有網站的底部邊距",
+  "settings.accessibility": "輔助使用",
+  "guides.read": "閱讀指南",
   "settings.data": "資料與說明",
   "settings.dataNote":
     "「記錄」是你搜尋過的網址，只保存在這台裝置上。清除記錄也會忘記上一個頁面，因此 App 會從你的第一個我的最愛開始。開啟中的頁面、我的最愛與登入狀態會保留。",
@@ -218,6 +220,7 @@ export const zhHant: Messages = {
   "favorites.moreLocked": "更多我的最愛",
   "favorites.add": "加入我的最愛",
   "favorites.quickFull": "快速存取已滿，因此這個項目被加到「更多我的最愛」。",
+  "favorites.openRecipe": "開啟配方",
   "favorites.edit": "編輯 {name}",
   "favorites.moveUp": "將 {name} 上移",
   "favorites.moveDown": "將 {name} 下移",

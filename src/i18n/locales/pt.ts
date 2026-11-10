@@ -196,6 +196,8 @@ export const pt: Messages = {
   "settings.bottomMarginNote":
     "Mantém a parte inferior de cada página livre, para menus que deslizam sob a borda da tela.",
   "settings.bottomMarginLabel": "Margem inferior para todos os sites",
+  "settings.accessibility": "Acessibilidade",
+  "guides.read": "Ler o guia",
   "settings.data": "Dados e ajuda",
   "settings.dataNote":
     "O histórico são os endereços que você pesquisou e fica apenas neste dispositivo. Limpar o histórico também apaga a última página, então o app inicia no seu primeiro favorito. Páginas abertas, favoritos e logins são mantidos.",
@@ -239,6 +241,7 @@ export const pt: Messages = {
   "favorites.moreLocked": "Mais favoritos",
   "favorites.add": "Adicionar favorito",
   "favorites.quickFull": "O acesso rápido está cheio, então este foi adicionado a Mais favoritos.",
+  "favorites.openRecipe": "Abrir receita",
   "favorites.edit": "Editar {name}",
   "favorites.moveUp": "Mover {name} para cima",
   "favorites.moveDown": "Mover {name} para baixo",

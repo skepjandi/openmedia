@@ -193,6 +193,8 @@ export const tr: Messages = {
   "settings.bottomMarginNote":
     "Ekran kenarının altına kayan menüler için her sayfanın altını boş bırakır.",
   "settings.bottomMarginLabel": "Tüm siteler için alt kenar boşluğu",
+  "settings.accessibility": "Erişilebilirlik",
+  "guides.read": "Kılavuzu oku",
   "settings.data": "Veri ve yardım",
   "settings.dataNote":
     "Geçmiş, aradığınız adreslerdir ve yalnızca bu cihazda tutulur. Geçmişi temizlemek son sayfayı da unutturur, böylece uygulama ilk favorinizle açılır. Açık sayfalar, favoriler ve oturum açma bilgileri kalır.",
@@ -235,6 +237,7 @@ export const tr: Messages = {
   "favorites.moreLocked": "Diğer favoriler",
   "favorites.add": "Favori ekle",
   "favorites.quickFull": "Hızlı erişim dolu, bu yüzden bu da Diğer favorilere eklendi.",
+  "favorites.openRecipe": "Tarifi aç",
   "favorites.edit": "{name} öğesini düzenle",
   "favorites.moveUp": "{name} öğesini yukarı taşı",
   "favorites.moveDown": "{name} öğesini aşağı taşı",

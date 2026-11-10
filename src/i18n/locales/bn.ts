@@ -187,6 +187,8 @@ export const bn: Messages = {
   "settings.bottomMarginNote":
     "স্ক্রিনের নিচের দিকে সরে যাওয়া মেনুর জন্য প্রতিটি পেজের নিচে ফাঁকা রাখে।",
   "settings.bottomMarginLabel": "সব সাইটের নিচের মার্জিন",
+  "settings.accessibility": "অ্যাক্সেসিবিলিটি",
+  "guides.read": "গাইড পড়ুন",
   "settings.data": "ডেটা ও সহায়তা",
   "settings.dataNote":
     "ইতিহাসে আপনি যে ঠিকানাগুলো অনুসন্ধান করেছেন সেগুলো থাকে, যা শুধু এই ডিভাইসেই সংরক্ষিত থাকে। এটি মুছলে শেষ পেজও মুছে যায়, তাই অ্যাপ আপনার প্রথম পছন্দ থেকে শুরু হয়। খোলা পেজ, পছন্দের তালিকা ও লগইন থেকে যায়।",
@@ -229,6 +231,7 @@ export const bn: Messages = {
   "favorites.moreLocked": "আরও পছন্দ",
   "favorites.add": "পছন্দ যোগ করুন",
   "favorites.quickFull": "দ্রুত অ্যাক্সেস পূর্ণ, তাই এটি আরও পছন্দের তালিকায় যোগ করা হয়েছে।",
+  "favorites.openRecipe": "রেসিপি খুলুন",
   "favorites.edit": "{name} সম্পাদনা করুন",
   "favorites.moveUp": "{name} উপরে সরান",
   "favorites.moveDown": "{name} নিচে সরান",

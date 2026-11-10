@@ -186,6 +186,8 @@ export const ar: Messages = {
   "settings.bottomMargin": "الهامش السفلي العام",
   "settings.bottomMarginNote": "يُبقي أسفل كل صفحة خاليًا، للقوائم التي تنزلق أسفل حافة الشاشة.",
   "settings.bottomMarginLabel": "الهامش السفلي لكل المواقع",
+  "settings.accessibility": "إمكانية الوصول",
+  "guides.read": "اقرأ الدليل",
   "settings.data": "البيانات والمساعدة",
   "settings.dataNote":
     "السجل هو العناوين التي بحثت عنها، ويُحفظ على هذا الجهاز فقط. مسحه ينسى الصفحة الأخيرة أيضًا، فيبدأ التطبيق من أول موقع في مفضلتك. الصفحات المفتوحة والمفضلة وتسجيلات الدخول تبقى.",
@@ -226,6 +228,7 @@ export const ar: Messages = {
   "favorites.moreLocked": "المزيد من المفضلة",
   "favorites.add": "إضافة مفضلة",
   "favorites.quickFull": "الوصول السريع ممتلئ، لذا أضيفت هذه إلى المزيد من المفضلة.",
+  "favorites.openRecipe": "فتح الوصفة",
   "favorites.edit": "تعديل {name}",
   "favorites.moveUp": "تحريك {name} لأعلى",
   "favorites.moveDown": "تحريك {name} لأسفل",

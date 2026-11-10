@@ -193,6 +193,8 @@ export const ro: Messages = {
   "settings.bottomMarginNote":
     "Lasă liberă partea de jos a fiecărei pagini, pentru meniurile care glisează sub marginea ecranului.",
   "settings.bottomMarginLabel": "Margine inferioară pentru toate site-urile",
+  "settings.accessibility": "Accesibilitate",
+  "guides.read": "Citește ghidul",
   "settings.data": "Date și ajutor",
   "settings.dataNote":
     "Istoricul reprezintă adresele pe care le-ai căutat, păstrate doar pe acest dispozitiv. Ștergerea lui uită și ultima pagină, așa că aplicația pornește cu primul tău favorit. Paginile deschise, favoritele și autentificările rămân.",
@@ -236,6 +238,7 @@ export const ro: Messages = {
   "favorites.moreLocked": "Alte favorite",
   "favorites.add": "Adaugă favorit",
   "favorites.quickFull": "Accesul rapid este plin, așa că acesta este adăugat la Alte favorite.",
+  "favorites.openRecipe": "Deschide rețeta",
   "favorites.edit": "Editează {name}",
   "favorites.moveUp": "Mută {name} mai sus",
   "favorites.moveDown": "Mută {name} mai jos",

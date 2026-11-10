@@ -197,6 +197,8 @@ export const it: Messages = {
   "settings.bottomMarginNote":
     "Mantiene libera la parte inferiore di ogni pagina, per i menu che scorrono sotto il bordo dello schermo.",
   "settings.bottomMarginLabel": "Margine inferiore per tutti i siti",
+  "settings.accessibility": "Accessibilità",
+  "guides.read": "Leggi la guida",
   "settings.data": "Dati e assistenza",
   "settings.dataNote":
     "La cronologia è formata dagli indirizzi che hai cercato ed è conservata solo su questo dispositivo. Cancellarla dimentica anche l’ultima pagina, così l’app si apre sul primo preferito. Le pagine aperte, i preferiti e gli accessi restano.",
@@ -240,6 +242,7 @@ export const it: Messages = {
   "favorites.add": "Aggiungi preferito",
   "favorites.quickFull":
     "L’accesso rapido è pieno, quindi questo è stato aggiunto ad Altri preferiti.",
+  "favorites.openRecipe": "Apri la ricetta",
   "favorites.edit": "Modifica {name}",
   "favorites.moveUp": "Sposta {name} in alto",
   "favorites.moveDown": "Sposta {name} in basso",

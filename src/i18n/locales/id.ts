@@ -189,6 +189,8 @@ export const id: Messages = {
   "settings.bottomMarginNote":
     "Menjaga bagian bawah setiap halaman tetap kosong, untuk menu yang meluncur ke bawah tepi layar.",
   "settings.bottomMarginLabel": "Margin bawah untuk semua situs",
+  "settings.accessibility": "Aksesibilitas",
+  "guides.read": "Baca panduan",
   "settings.data": "Data dan bantuan",
   "settings.dataNote":
     "Riwayat adalah alamat yang pernah Anda cari, disimpan hanya di perangkat ini. Mengosongkannya juga melupakan halaman terakhir, jadi aplikasi mulai dari favorit pertama Anda. Halaman yang terbuka, favorit, dan login tetap ada.",
@@ -232,6 +234,7 @@ export const id: Messages = {
   "favorites.moreLocked": "Favorit lainnya",
   "favorites.add": "Tambah favorit",
   "favorites.quickFull": "Akses cepat sudah penuh, jadi yang ini ditambahkan ke Favorit lainnya.",
+  "favorites.openRecipe": "Buka resep",
   "favorites.edit": "Ubah {name}",
   "favorites.moveUp": "Naikkan {name}",
   "favorites.moveDown": "Turunkan {name}",

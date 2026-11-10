@@ -194,6 +194,8 @@ export const nl: Messages = {
   "settings.bottomMarginNote":
     "Houdt de onderkant van elke pagina vrij, voor menu’s die onder de rand van het scherm schuiven.",
   "settings.bottomMarginLabel": "Ondermarge voor alle sites",
+  "settings.accessibility": "Toegankelijkheid",
+  "guides.read": "Lees de gids",
   "settings.data": "Gegevens en hulp",
   "settings.dataNote":
     "Geschiedenis bestaat uit de adressen waarnaar je hebt gezocht, alleen op dit apparaat bewaard. Als je die wist, vergeet de app ook de laatste pagina, zodat hij start op je eerste favoriet. Geopende pagina’s, favorieten en inloggegevens blijven bewaard.",
@@ -236,6 +238,7 @@ export const nl: Messages = {
   "favorites.moreLocked": "Meer favorieten",
   "favorites.add": "Favoriet toevoegen",
   "favorites.quickFull": "Snelle toegang is vol, dus deze wordt toegevoegd aan Meer favorieten.",
+  "favorites.openRecipe": "Recept openen",
   "favorites.edit": "{name} bewerken",
   "favorites.moveUp": "{name} omhoog verplaatsen",
   "favorites.moveDown": "{name} omlaag verplaatsen",

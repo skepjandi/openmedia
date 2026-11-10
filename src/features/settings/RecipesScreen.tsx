@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useApp } from "../../app/store";
 import type { MessageKey } from "../../i18n/messages";
 import { useT } from "../../i18n/useT";
@@ -8,6 +8,7 @@ import { DownIcon, ForwardIcon, StarIcon } from "../../shared/icons";
 import type { OptionGroup, SiteSettings } from "../../shared/ipc";
 import { SiteTile } from "../../shared/SiteTile";
 import { Screen } from "../../shared/Screen";
+import { GuideLink } from "../guides/GuideLink";
 import { useMarketplaceAvailable } from "../marketplace/Links";
 import { MarginSlider } from "./MarginSlider";
 import { Switch } from "./Switch";
@@ -67,7 +68,11 @@ export function RecipesScreen() {
 
   return (
     <Screen title={t("recipes.title")} closeLabel={t("common.back")} onClose={closeSheet} back>
-      <p className="px-1 pb-4 text-[13px] leading-snug text-paper/50">{t("recipes.note")}</p>
+      <p className="px-1 pb-2 text-[13px] leading-snug text-paper/50">{t("recipes.note")}</p>
+      <div className="flex flex-col items-start pb-3">
+        <GuideLink slug="your-recipe" />
+        <GuideLink slug="change-a-site" />
+      </div>
       {sites.length === 0 && (
         <div className="flex flex-col items-start gap-3 px-1">
           <p className="text-sm text-paper/70">{t("recipes.empty")}</p>
@@ -89,7 +94,9 @@ export function RecipesScreen() {
 
 /** One recipe's card. In incognito mode it edits the incognito choices and favorites and has no margin. */
 export function SiteCard({ site, incognito = false }: { site: SiteSettings; incognito?: boolean }) {
-  const [open, setOpen] = useState(false);
+  const focused = useApp((s) => !incognito && s.recipeFocus === site.recipeId);
+  const [open, setOpen] = useState(focused);
+  const card = useRef<HTMLDivElement>(null);
   const favorites = useApp((s) => s.state?.favorites);
   const setSiteFavorite = useApp((s) => s.setSiteFavorite);
   const icon = useIconForUrl(site.homepage ?? "", favorites ?? []);
@@ -97,6 +104,9 @@ export function SiteCard({ site, incognito = false }: { site: SiteSettings; inco
   const incognitoFavorites = useApp((s) => s.incognito.favorites);
   const saveIncognitoFavorites = useApp((s) => s.saveIncognitoFavorites);
   const t = useT();
+  useEffect(() => {
+    if (focused) card.current?.scrollIntoView({ block: "start" });
+  }, [focused]);
   const starred = incognito
     ? isFavoriteSite(incognitoFavorites, site.homepage ?? "")
     : site.favorite;
@@ -107,7 +117,7 @@ export function SiteCard({ site, incognito = false }: { site: SiteSettings; inco
   };
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-hair bg-paper/[0.04]">
+    <div ref={card} className="overflow-hidden rounded-2xl border border-hair bg-paper/[0.04]">
       <div className="flex items-center">
         <button
           type="button"
