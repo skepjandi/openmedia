@@ -129,3 +129,4 @@ Architecture-level changes (new module, new rule type, new provider, new capabil
 - `.env` is gitignored; use `.env.example` for templates.
 - Fixtures captured from real sites must be scrubbed of personal content (names, handles, messages, tokens, cookies) before commit.
 - Check `git diff` before committing.
+- **The repository is public (open source).** Everything committed, every PR body, issue, changelog entry and doc is world-readable and permanent in history. Never include passwords, tokens, keys, certificate or profile contents, App Store Connect or Play service account files, or personal data (emails, home-directory usernames, private team or company names). Reference secrets by variable name only (`SIGNING_P12_PASSWORD`), never by value. Write docs and scripts so a stranger can follow them: no machine-specific paths except documented defaults, and release steps that need maintainer credentials say so.

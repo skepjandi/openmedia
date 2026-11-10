@@ -8,6 +8,12 @@ All notable changes to OpenMedia are documented here.
 
 ## 2026-11-11
 
+### fix(release): ship waits for CI to register, documents the maintainers-only release flow
+
+**Area:** `fix(release)`
+
+**Change:** `yarn release ship` polls until GitHub has registered the PR's checks before watching them (it failed on "no checks reported"). The release guide says releasing is a maintainer task needing store credentials, and `AGENTS.md` now states that the repository is public and what must never be committed or written in a PR or doc.
+
 ### chore(release): one release CLI with signing discovery
 
 **Area:** `chore(release)`

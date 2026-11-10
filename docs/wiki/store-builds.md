@@ -29,7 +29,7 @@ The app ships `src-tauri/gen/apple/openmedia_iOS/PrivacyInfo.xcprivacy` declarin
 
 ## Releasing: `yarn release`
 
-One CLI does the whole release. Everything it needs is discovered, so there is nothing to export or remember.
+One CLI does the whole release. Everything it needs is discovered, so there is nothing to export or remember. Releasing is for maintainers who hold the store accounts and signing material; contributors never need it (`yarn build` and `yarn tauri dev` build unsigned, and nothing here is required to send a PR).
 
 ```bash
 yarn release doctor            # is this machine ready? prints one fix per problem
@@ -48,6 +48,8 @@ yarn release ios macos         # build only some platforms
 | `ship <patch\|minor\|major\|x.y.z> [platforms]` | The full release. Runs `doctor` first and stops before touching GitHub if the machine cannot finish. Then: a worktree `.worktrees/release-<version>` from `origin/main`, `bump`, commit, push, PR, waits for CI (`--no-wait` does an admin merge instead), squash merge, cleans up, pulls `main`, and builds from it with the number the PR recorded. Needs a clean `main` checkout and `gh auth login`. |
 
 Build numbers: one above the largest of the iOS `bundleVersion`, macOS `bundleVersion`, Android `versionCode` and, when the `ASC_*` settings are present, the latest build App Store Connect holds. `bump` and `build` write it to all three fields. Google Play cannot be queried without a service account, so if Play answers "version code already used", run again with `--build N`. A plain `build` changes `tauri.conf.json`; commit that change (or use `ship`, which commits the number in the version PR).
+
+`ship` stops when CI fails, and nothing merges. If GitHub Actions itself is down (jobs fail within seconds with no steps run and no log), check the PR yourself and use `ship ... --no-wait`.
 
 ### Signing material
 

@@ -502,6 +502,16 @@ const git = (gitArgs, cwd = root) => {
   return result.out;
 };
 
+/** GitHub registers a PR's checks a few seconds after creation; wait for them, then for the result. */
+function waitForChecks(prUrl) {
+  for (let attempt = 0; attempt < 12; attempt++) {
+    const seen = capture("gh", ["pr", "checks", prUrl]);
+    if (!/no checks reported/i.test(`${seen.out}${seen.err}`)) break;
+    spawnSync("sleep", ["5"]);
+  }
+  run("gh", ["pr", "checks", prUrl, "--watch", "--fail-fast"]);
+}
+
 async function ship() {
   const spec = rest.find((a) => !a.startsWith("--") && !PLATFORMS.includes(a));
   if (!spec)
@@ -547,7 +557,7 @@ async function ship() {
   if (flag("--no-wait")) {
     run("gh", ["pr", "merge", prUrl, "--squash", "--admin"]);
   } else {
-    run("gh", ["pr", "checks", prUrl, "--watch", "--fail-fast"]);
+    waitForChecks(prUrl);
     run("gh", ["pr", "merge", prUrl, "--squash"]);
   }
 
