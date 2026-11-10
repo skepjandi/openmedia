@@ -14,6 +14,12 @@ All notable changes to OpenMedia are documented here.
 
 **Change:** Add/Update and Remove now sit at the top of a recipe page, equal width and height. The list and the recipe preview show a spinner while loading. The buttons at the bottom of the list and recipe pages (share, blocked commenters, report reasons, post) share one full-width size.
 
+### feat(incognito): star a recipe to add it to the incognito favorites
+
+**Area:** `feat(incognito)`
+
+**Change:** Each card in Settings > Incognito recipes now has the same star as Recipes. It adds the site to, or removes it from, the incognito favorites (and so its quick-access menu), instead of only typing one in by hand.
+
 ### fix(app): keep the splash logo still
 
 **Problem:** When the splash's animation started, the logo jumped up and down before settling, which looked buggy.

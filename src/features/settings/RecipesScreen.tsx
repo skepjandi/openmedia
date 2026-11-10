@@ -3,6 +3,7 @@ import { useApp } from "../../app/store";
 import type { MessageKey } from "../../i18n/messages";
 import { useT } from "../../i18n/useT";
 import { useIconForUrl } from "../../shared/siteIcons";
+import { isFavoriteSite, toggleSiteFavorite } from "../../shared/favorites";
 import { DownIcon, ForwardIcon, StarIcon } from "../../shared/icons";
 import type { OptionGroup, SiteSettings } from "../../shared/ipc";
 import { SiteTile } from "../../shared/SiteTile";
@@ -86,14 +87,24 @@ export function RecipesScreen() {
   );
 }
 
-/** One recipe's card. In incognito mode it edits the incognito choices and has no star or margin. */
+/** One recipe's card. In incognito mode it edits the incognito choices and favorites and has no margin. */
 export function SiteCard({ site, incognito = false }: { site: SiteSettings; incognito?: boolean }) {
   const [open, setOpen] = useState(false);
   const favorites = useApp((s) => s.state?.favorites);
   const setSiteFavorite = useApp((s) => s.setSiteFavorite);
   const icon = useIconForUrl(site.homepage ?? "", favorites ?? []);
   const hidden = site.options.filter((option) => option.enabled).length;
+  const incognitoFavorites = useApp((s) => s.incognito.favorites);
+  const saveIncognitoFavorites = useApp((s) => s.saveIncognitoFavorites);
   const t = useT();
+  const starred = incognito
+    ? isFavoriteSite(incognitoFavorites, site.homepage ?? "")
+    : site.favorite;
+  const toggleFavorite = () => {
+    if (!incognito) void setSiteFavorite(site.recipeId, !site.favorite);
+    else if (site.homepage)
+      void saveIncognitoFavorites(toggleSiteFavorite(incognitoFavorites, site.homepage));
+  };
 
   return (
     <div className="overflow-hidden rounded-2xl border border-hair bg-paper/[0.04]">
@@ -120,19 +131,19 @@ export function SiteCard({ site, incognito = false }: { site: SiteSettings; inco
             <DownIcon />
           </span>
         </button>
-        {!incognito && site.homepage && (
+        {site.homepage && (
           <button
             type="button"
-            aria-pressed={site.favorite}
-            aria-label={t(site.favorite ? "recipes.removeFavorite" : "recipes.addFavorite", {
+            aria-pressed={starred}
+            aria-label={t(starred ? "recipes.removeFavorite" : "recipes.addFavorite", {
               name: site.name,
             })}
-            onClick={() => void setSiteFavorite(site.recipeId, !site.favorite)}
+            onClick={toggleFavorite}
             className={`grid size-12 shrink-0 place-items-center active:bg-paper/[0.05] ${
-              site.favorite ? "text-accent" : "text-paper/55"
+              starred ? "text-accent" : "text-paper/55"
             }`}
           >
-            <StarIcon filled={site.favorite} />
+            <StarIcon filled={starred} />
           </button>
         )}
       </div>

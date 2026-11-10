@@ -42,8 +42,10 @@ export function IncognitoFavoritesSection() {
 export function IncognitoRecipesSection() {
   const sites = useApp((s) => s.incognitoSites);
   const unlock = useApp((s) => s.unlockIncognito);
-  const load = useApp((s) => s.loadIncognitoSites);
+  const loadSites = useApp((s) => s.loadIncognitoSites);
+  const loadFavorites = useApp((s) => s.loadIncognitoFavorites);
   const forget = useApp((s) => s.forgetIncognitoSites);
+  const load = () => Promise.all([loadSites(), loadFavorites()]).then(() => undefined);
   const needsPro = useEntitlementStore((s) => s.status !== "pro");
   const t = useT();
 
