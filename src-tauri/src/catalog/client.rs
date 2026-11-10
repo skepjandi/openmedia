@@ -345,7 +345,7 @@ impl Market {
                 .body(body);
         }
         let response = request.send().await.map_err(unreachable)?;
-        read_capped(check_status(response)?, max).await
+        read_capped(check_status(response).await?, max).await
     }
 
     fn endpoint(&self, path: &str) -> Result<Url> {
@@ -391,14 +391,81 @@ fn is_loopback(url: &Url) -> bool {
     }
 }
 
-/// Maps a status to an error written here, never to what the server said.
-fn check_status(response: Response) -> Result<Response> {
+/// Maps a status to an error written here, never to what the server said. A 400 body is only
+/// used to *choose* among messages written here.
+async fn check_status(response: Response) -> Result<Response> {
     let status = response.status();
     if status.is_success() {
-        Ok(response)
-    } else {
-        Err(status_error(status))
+        return Ok(response);
     }
+    if status == StatusCode::BAD_REQUEST {
+        let reason = match read_capped(response, 2048).await {
+            Ok(body) => bad_request_reason(&body),
+            Err(_) => None,
+        };
+        if let Some(reason) = reason {
+            return Err(Error::Catalog(reason.to_owned()));
+        }
+    }
+    Err(status_error(status))
+}
+
+/// The Worker's fixed 400 reasons, each answered with a text written here.
+fn bad_request_reason(body: &[u8]) -> Option<&'static str> {
+    let value: serde_json::Value = serde_json::from_slice(body).ok()?;
+    Some(match value.get("error")?.as_str()? {
+        "text must be 1-280 characters" => "a comment must be 1 to 280 characters",
+        "text has invalid characters" => {
+            "the comment has characters the marketplace does not allow"
+        }
+        "text must not contain links or contact details" => {
+            "the comment may not contain links, addresses or phone numbers"
+        }
+        "body must be { stars: 1-5, turnstileToken?: string }" => "a rating must be 1 to 5 stars",
+        "body is not valid JSON"
+        | "body must be empty"
+        | "body must be { text: string }"
+        | "text must be a string" => "the marketplace could not read this request",
+        "recipe.id is reserved for official recipes" => {
+            "recipe ids starting market.official. are reserved"
+        }
+        "summary must be 1-140 plain characters" => "the summary must be 1 to 140 plain characters",
+        "reason is not allowed" => "that report reason is not allowed",
+        other => return recipe_reason(other),
+    })
+}
+
+/// Recipe checks have dozens of Worker messages; each is answered by the part it concerns.
+fn recipe_reason(error: &str) -> Option<&'static str> {
+    const AREAS: [(&str, &str); 8] = [
+        (
+            "recipe.match",
+            "the recipe's match patterns were refused (https hosts only, none too broad)",
+        ),
+        (
+            "recipe.options",
+            "the recipe's options were refused (ids, labels, group or default)",
+        ),
+        (
+            "recipe.rules",
+            "a rule in the recipe was refused (selector, declarations or ids)",
+        ),
+        (
+            "recipe.meta",
+            "the recipe's author, notes or homepage were refused",
+        ),
+        ("recipe.name", "the recipe's name was refused"),
+        (
+            "recipe.tags",
+            "the recipe's tags must list mobile and/or desktop once each",
+        ),
+        ("recipe.", "the recipe's id, version or format was refused"),
+        ("body ", "the marketplace could not read this submission"),
+    ];
+    AREAS
+        .iter()
+        .find(|(prefix, _)| error.starts_with(prefix))
+        .map(|(_, text)| *text)
 }
 
 fn status_error(status: StatusCode) -> Error {
@@ -679,5 +746,23 @@ mod tests {
         assert!(matches!(error, Error::ProRequired));
         let request = server.join().unwrap();
         assert!(request.contains(PRO));
+    }
+}
+
+#[cfg(test)]
+mod bad_request_tests {
+    use super::*;
+
+    #[test]
+    fn a_400_reason_picks_a_local_text_and_unknown_ones_are_never_repeated() {
+        let known = br#"{"error":"text must not contain links or contact details"}"#;
+        assert!(bad_request_reason(known).unwrap().contains("links"));
+        assert_eq!(
+            bad_request_reason(br#"{"error":"<script>x</script>"}"#),
+            None
+        );
+        assert_eq!(bad_request_reason(b"not json"), None);
+        let rule = br#"{"error":"recipe.rules target.css may not contain comments"}"#;
+        assert!(bad_request_reason(rule).unwrap().contains("rule"));
     }
 }
