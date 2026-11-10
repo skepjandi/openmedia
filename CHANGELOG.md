@@ -8,6 +8,14 @@ All notable changes to OpenMedia are documented here.
 
 ## 2026-11-10
 
+### fix(onboarding): re-read recipes and favorites even when the install step reports an error
+
+**Area:** `fix(onboarding)`
+
+**Problem:** Recipes picked in the guide could be installed and favorited while Settings > Recipes did not list them, because the lists were only re-read when the whole apply call succeeded.
+
+**Change:** The guide re-reads recipes and favorites after the apply call whether it succeeds or fails.
+
 ### fix(marketplace): add button on top, loading spinners, matching bottom buttons
 
 **Area:** `fix(marketplace)`

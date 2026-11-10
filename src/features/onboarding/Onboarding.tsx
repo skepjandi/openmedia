@@ -217,8 +217,11 @@ function OnboardingBody() {
     setApplying(true);
     setApplyError(null);
     try {
-      const result = await onboarding.apply(selected);
-      await Promise.all([loadSites(), reloadFavorites()]);
+      const result = await onboarding.apply(selected).finally(() =>
+        // Installs and favorites are saved one by one, so even a failed apply may have changed
+        // them: the lists must be re-read either way.
+        Promise.all([loadSites(), reloadFavorites()]),
+      );
       if (result.failed.length === 0) {
         void finishGuide();
         return;
