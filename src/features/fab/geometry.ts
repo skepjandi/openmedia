@@ -49,6 +49,22 @@ const SHIFTS = [0, ...Array.from({ length: 16 }, (_, i) => [(i + 1) * 5, -(i + 1
 function clamp(value: number, min: number, max: number) {
   return Math.min(Math.max(value, min), max);
 }
+export function separateVerticalPosition(
+  y: number,
+  blockerY: number,
+  minY: number,
+  maxY: number,
+  clearance: number,
+): number {
+  if (Math.abs(y - blockerY) >= clearance) return y;
+  const candidates = [blockerY - clearance, blockerY + clearance]
+    .map((candidate) => clamp(candidate, minY, maxY))
+    .filter((candidate) => Math.abs(candidate - blockerY) >= clearance);
+  if (candidates.length === 0) return clamp(y, minY, maxY);
+  return candidates.reduce((nearest, candidate) =>
+    Math.abs(candidate - y) < Math.abs(nearest - y) ? candidate : nearest,
+  );
+}
 
 /** Resting centre of the button for an edge and a vertical position. */
 export function fabCenter(edge: Edge, y: number, viewport: Size, insets: Insets): Point {

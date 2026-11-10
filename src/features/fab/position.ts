@@ -1,6 +1,7 @@
 import type { Edge } from "./geometry";
 
 const KEY = "om.fab";
+const POSITION_EVENT = "om:fab-position";
 
 export interface FabPosition {
   edge: Edge;
@@ -25,6 +26,19 @@ export function loadPosition(): FabPosition {
   return fallback;
 }
 
+let currentPosition: FabPosition | undefined;
+
+export function getPosition() {
+  return (currentPosition ??= loadPosition());
+}
+
+export function subscribePosition(listener: () => void) {
+  window.addEventListener(POSITION_EVENT, listener);
+  return () => window.removeEventListener(POSITION_EVENT, listener);
+}
+
 export function savePosition(position: FabPosition) {
   localStorage.setItem(KEY, JSON.stringify(position));
+  currentPosition = position;
+  window.dispatchEvent(new Event(POSITION_EVENT));
 }

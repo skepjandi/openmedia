@@ -10,6 +10,7 @@ import {
   fabCenter,
   fanLayout,
   fanTargetAt,
+  separateVerticalPosition,
   snapToEdge,
   type Edge,
   type Insets,
@@ -34,6 +35,18 @@ describe("snapToEdge", () => {
     expect(fabCenter("left", bottom.y, phone, insets).y + FAB_SIZE / 2).toBeLessThanOrEqual(
       phone.height - insets.bottom,
     );
+  });
+});
+
+describe("separateVerticalPosition", () => {
+  it("moves to the nearest safe position without crossing the viewport bounds", () => {
+    expect(separateVerticalPosition(150, 150, 50, 250, 74)).toBe(76);
+    expect(separateVerticalPosition(80, 100, 50, 250, 74)).toBe(174);
+    expect(separateVerticalPosition(240, 230, 50, 250, 74)).toBe(156);
+  });
+
+  it("leaves positions outside the clearance unchanged", () => {
+    expect(separateVerticalPosition(100, 180, 50, 250, 74)).toBe(100);
   });
 });
 

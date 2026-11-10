@@ -5,7 +5,16 @@ import { useT } from "../../i18n/useT";
 import { BackIcon } from "../../shared/icons";
 import { siteView } from "../../shared/ipc";
 import { useInsets, useViewport } from "../../shared/viewport";
-import { EDGE_MARGIN, snapToEdge, type Point } from "../fab/geometry";
+import {
+  EDGE_MARGIN,
+  FAB_SIZE,
+  HOLD_SCALE,
+  fabCenter,
+  separateVerticalPosition,
+  snapToEdge,
+  type Point,
+} from "../fab/geometry";
+import { getPosition as getFabPosition, subscribePosition } from "../fab/position";
 import { loadBackPosition, saveBackPosition, type BackPosition } from "./position";
 import { hasBackHandler, runBackHandler, subscribeBackHandlers } from "./backStack";
 import { useLimitBlock } from "../stats/UsageGuard";
@@ -35,6 +44,7 @@ export function BackButton() {
   const t = useT();
   const viewport = useViewport();
   const insets = useInsets();
+  const fabPosition = useSyncExternalStore(subscribePosition, getFabPosition, getFabPosition);
   const [position, setPosition] = useState<BackPosition>(loadBackPosition);
   const [dragCenter, setDragCenter] = useState<Point | null>(null);
   const drag = useRef<Drag | null>(null);
@@ -49,7 +59,21 @@ export function BackButton() {
   const minY = insets.top + EDGE_MARGIN + half;
   const maxY = viewport.height - insets.bottom - EDGE_MARGIN - half;
   const restingY = Math.min(Math.max(position.yRatio * viewport.height, minY), maxY);
-  const center = dragCenter ?? { x: restingX, y: restingY };
+  const rawCenter = dragCenter ?? { x: restingX, y: restingY };
+  const fab = fabCenter(fabPosition.edge, fabPosition.yRatio * viewport.height, viewport, insets);
+  const center =
+    Math.abs(rawCenter.x - fab.x) < (FAB_SIZE + SIZE) / 2
+      ? {
+          ...rawCenter,
+          y: separateVerticalPosition(
+            rawCenter.y,
+            fab.y,
+            minY,
+            maxY,
+            (FAB_SIZE * HOLD_SCALE) / 2 + half + 8,
+          ),
+        }
+      : rawCenter;
 
   const onPointerDown = (event: PointerEvent<HTMLButtonElement>) => {
     event.currentTarget.setPointerCapture(event.pointerId);
