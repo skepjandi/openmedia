@@ -108,12 +108,14 @@ pub fn with_site_favorite(
         .map(|existing| FavoriteInput {
             name: existing.name.clone(),
             url: existing.url.clone(),
+            notify: existing.notify,
         })
         .collect();
     if favorite && !already {
         inputs.push(FavoriteInput {
             name: recipe.name.clone(),
             url: recipe.homepage().ok_or(Error::UnknownSite)?.to_owned(),
+            notify: true,
         });
     }
     Ok(inputs)
@@ -245,6 +247,7 @@ mod tests {
             name: name.to_owned(),
             url: url.to_owned(),
             icon: None,
+            notify: true,
         }
     }
 
@@ -310,6 +313,18 @@ mod tests {
         ];
         let removed = with_site_favorite(&recipes, &favorites, "youtube.default", false).unwrap();
         assert_eq!(urls(&removed), ["https://example.com/"]);
+    }
+
+    #[test]
+    fn starring_a_site_keeps_the_other_favorites_notify_choice() {
+        let recipes = Recipes::bundled_only();
+        let mut quiet = favorite("Mine", "https://example.com/");
+        quiet.notify = false;
+        let added = with_site_favorite(&recipes, &[quiet], "youtube.default", true).unwrap();
+        assert_eq!(
+            added.iter().map(|input| input.notify).collect::<Vec<_>>(),
+            [false, true]
+        );
     }
 
     #[test]

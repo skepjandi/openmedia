@@ -14,11 +14,15 @@ export interface Favorite {
   url: string;
   /** A small PNG data URL fetched from the site itself, when known. */
   icon?: string;
+  /** Whether a rise in the page's unread count raises a local notification. */
+  notify: boolean;
 }
 
 export interface FavoriteInput {
   name: string;
   url: string;
+  /** Left out, it is on: Rust's default, and what every new favorite gets. */
+  notify?: boolean;
 }
 
 export interface AppState {

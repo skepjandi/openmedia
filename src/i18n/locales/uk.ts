@@ -208,6 +208,7 @@ export const uk: Messages = {
   "favorites.namePlaceholder": "Назва",
   "favorites.addressPlaceholder": "example.com",
   "favorites.invalid": "Обраному потрібні назва та коректна адреса.",
+  "favorites.notify": "Сповіщати про нову активність",
 
   "fab.incognito": "Інкогніто",
   "fab.leaveIncognito": "Вийти з інкогніто",

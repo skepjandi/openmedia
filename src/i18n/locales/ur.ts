@@ -208,6 +208,7 @@ export const ur: Messages = {
   "favorites.namePlaceholder": "نام",
   "favorites.addressPlaceholder": "example.com",
   "favorites.invalid": "پسندیدہ کے لیے نام اور درست پتہ درج کریں۔",
+  "favorites.notify": "نئی سرگرمی کی اطلاع دیں",
 
   "fab.incognito": "پوشیدہ براؤزنگ",
   "fab.leaveIncognito": "پوشیدہ براؤزنگ سے نکلیں",

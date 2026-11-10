@@ -208,6 +208,7 @@ export const nl: Messages = {
   "favorites.namePlaceholder": "Naam",
   "favorites.addressPlaceholder": "example.com",
   "favorites.invalid": "Een favoriet heeft een naam en een geldig adres nodig.",
+  "favorites.notify": "Mij op de hoogte brengen van nieuwe activiteit",
 
   "fab.incognito": "Incognito",
   "fab.leaveIncognito": "Incognito verlaten",

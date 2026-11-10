@@ -211,6 +211,7 @@ export const ta: Messages = {
   "favorites.namePlaceholder": "பெயர்",
   "favorites.addressPlaceholder": "example.com",
   "favorites.invalid": "ஒரு பிடித்துக்கொள்ளவிடைக்கு ஒரு பெயரும் சரியான முகவரியும் தேவை.",
+  "favorites.notify": "புதிய செயல்பாடு பற்றி அறிவிக்கவும்",
 
   "fab.incognito": "மறைநிலை",
   "fab.leaveIncognito": "மறைநிலையிலிருந்து வெளியேறு",

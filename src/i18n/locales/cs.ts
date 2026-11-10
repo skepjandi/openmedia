@@ -210,6 +210,7 @@ export const cs: Messages = {
   "favorites.namePlaceholder": "Název",
   "favorites.addressPlaceholder": "example.com",
   "favorites.invalid": "Oblíbená stránka potřebuje název a platnou adresu.",
+  "favorites.notify": "Upozorňovat na novou aktivitu",
 
   "fab.incognito": "Anonymní režim",
   "fab.leaveIncognito": "Opustit anonymní režim",

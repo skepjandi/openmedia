@@ -33,8 +33,9 @@ When a hidden quick-access session's count rises, the shell asks the plugin for 
 - Only a rise raises one, only while the user is on another page, and at most once per session per 30 seconds (a page controls its own title).
 - Tapping a notification shows that session (`siteview:notification-tap`, `openSession`) if it is still alive.
 - iOS asks for notification permission the first time one is due. If refused, nothing is posted.
+- Each favorite has a "Notify me of new activity" switch in its Settings editor (`Favorite.notify`, on by default, so favorites saved before it existed keep notifying). Only quick-access favorites show it. Off stops the notification only: the count is still tracked and the badge still shows, so turning it back on does not replay old activity.
 
-There is no setting to turn this off in the app; iOS Settings controls it. No push: see [Platform Support](./platform-support.md).
+iOS Settings still has the master switch. No push: see [Platform Support](./platform-support.md).
 
 **Opening a site:** a small accent spinner sits in the page area until the active session first paints or finishes loading. It uses the existing native page state, stays out of the touch router, and stops on errors; switching to a ready session shows no loader. Reduced-motion mode keeps the ring still. The startup splash still covers the first load.
 

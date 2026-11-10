@@ -205,6 +205,7 @@ export const ko: Messages = {
   "favorites.namePlaceholder": "이름",
   "favorites.addressPlaceholder": "example.com",
   "favorites.invalid": "즐겨찾기에는 이름과 올바른 주소가 필요합니다.",
+  "favorites.notify": "새로운 활동 알림",
 
   "fab.incognito": "시크릿",
   "fab.leaveIncognito": "시크릿 종료",

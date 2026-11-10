@@ -44,6 +44,7 @@ describe("iconForUrl", () => {
         name: "Favorite",
         url: "https://favorite.example/",
         icon: "data:image/png;base64,BB",
+        notify: true,
       },
     ];
     expect(iconForUrl("https://www.favorite.example/page", favorites)).toBe(

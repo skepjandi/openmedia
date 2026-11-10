@@ -202,6 +202,7 @@ export const ar: Messages = {
   "favorites.namePlaceholder": "الاسم",
   "favorites.addressPlaceholder": "example.com",
   "favorites.invalid": "تحتاج المفضلة إلى اسم وعنوان صالح.",
+  "favorites.notify": "أبلغني بالنشاط الجديد",
 
   "fab.incognito": "التصفح الخفي",
   "fab.leaveIncognito": "الخروج من التصفح الخفي",

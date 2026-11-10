@@ -198,6 +198,7 @@ export const th: Messages = {
   "favorites.namePlaceholder": "ชื่อ",
   "favorites.addressPlaceholder": "example.com",
   "favorites.invalid": "รายการโปรดต้องมีชื่อและที่อยู่ที่ถูกต้อง",
+  "favorites.notify": "แจ้งเตือนเมื่อมีกิจกรรมใหม่",
 
   "fab.incognito": "ไม่ระบุตัวตน",
   "fab.leaveIncognito": "ออกจากโหมดไม่ระบุตัวตน",

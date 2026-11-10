@@ -95,12 +95,18 @@ pub struct Favorite {
     /// A small PNG `data:` URL fetched from the site itself; filled in when the state is read.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub icon: Option<String>,
+    /// Whether a rise in the page's unread count raises a local notification. On by default,
+    /// so favorites saved before the setting existed keep notifying.
+    #[serde(default = "enabled")]
+    pub notify: bool,
 }
 
 #[derive(Debug, Clone, Deserialize)]
 pub struct FavoriteInput {
     pub name: String,
     pub url: String,
+    #[serde(default = "enabled")]
+    pub notify: bool,
 }
 
 /// Everything the shell needs at startup.
@@ -617,6 +623,7 @@ fn parse(text: &str) -> Result<(LibraryData, bool)> {
                 data.favorites.push(favorite_from_input(FavoriteInput {
                     name: YOUTUBE_FAVORITE.0.to_owned(),
                     url: YOUTUBE_FAVORITE.1.to_owned(),
+                    notify: true,
                 })?);
             }
         }
@@ -639,6 +646,7 @@ fn default_data() -> LibraryData {
                 name: (*name).to_owned(),
                 url: (*url).to_owned(),
                 icon: None,
+                notify: true,
             })
             .collect(),
         last_url: None,
@@ -670,6 +678,7 @@ fn favorite_from_input(input: FavoriteInput) -> Result<Favorite> {
         name: name.to_owned(),
         url: parse_web_url(&input.url)?.to_string(),
         icon: None,
+        notify: input.notify,
     })
 }
 
@@ -701,6 +710,7 @@ mod tests {
         FavoriteInput {
             name: name.into(),
             url: url.into(),
+            notify: true,
         }
     }
 
@@ -809,6 +819,36 @@ mod tests {
     fn favorites_may_be_emptied() {
         let (_dir, library) = library();
         assert!(library.set_favorites(vec![]).unwrap().is_empty());
+    }
+
+    #[test]
+    fn a_favorites_notify_choice_survives_a_reload_and_defaults_on() {
+        let (dir, library) = library();
+        let quiet = FavoriteInput {
+            notify: false,
+            ..input("Quiet", "https://quiet.example/")
+        };
+        library
+            .set_favorites(vec![quiet, input("Loud", "https://loud.example/")])
+            .unwrap();
+        let notify: Vec<_> = reload(&dir)
+            .state()
+            .unwrap()
+            .favorites
+            .iter()
+            .map(|favorite| favorite.notify)
+            .collect();
+        assert_eq!(notify, [false, true]);
+
+        let saved_before_the_setting = r#"{"id":"67e55044-10b1-426f-9247-bb680e5fe0c8","name":"Old","url":"https://old.example/"}"#;
+        assert!(
+            serde_json::from_str::<Favorite>(saved_before_the_setting)
+                .unwrap()
+                .notify
+        );
+        let from_an_old_shell: FavoriteInput =
+            serde_json::from_str(r#"{"name":"Old","url":"https://old.example/"}"#).unwrap();
+        assert!(from_an_old_shell.notify);
     }
 
     #[test]

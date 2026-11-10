@@ -203,6 +203,7 @@ export const id: Messages = {
   "favorites.namePlaceholder": "Nama",
   "favorites.addressPlaceholder": "example.com",
   "favorites.invalid": "Favorit butuh nama dan alamat yang valid.",
+  "favorites.notify": "Beri tahu saya tentang aktivitas baru",
 
   "fab.incognito": "Penyamaran",
   "fab.leaveIncognito": "Keluar dari penyamaran",

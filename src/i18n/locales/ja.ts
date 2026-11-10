@@ -207,6 +207,7 @@ export const ja: Messages = {
   "favorites.namePlaceholder": "名前",
   "favorites.addressPlaceholder": "example.com",
   "favorites.invalid": "お気に入りには名前と有効なアドレスが必要です。",
+  "favorites.notify": "新しいアクティビティを通知",
 
   "fab.incognito": "シークレット",
   "fab.leaveIncognito": "シークレットを終了",

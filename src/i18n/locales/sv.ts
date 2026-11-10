@@ -206,6 +206,7 @@ export const sv: Messages = {
   "favorites.namePlaceholder": "Namn",
   "favorites.addressPlaceholder": "example.com",
   "favorites.invalid": "En favorit behöver ett namn och en giltig adress.",
+  "favorites.notify": "Meddela mig om ny aktivitet",
 
   "fab.incognito": "Inkognito",
   "fab.leaveIncognito": "Lämna inkognito",

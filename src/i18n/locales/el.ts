@@ -212,6 +212,7 @@ export const el: Messages = {
   "favorites.namePlaceholder": "Όνομα",
   "favorites.addressPlaceholder": "example.com",
   "favorites.invalid": "Ένα αγαπημένο χρειάζεται όνομα και έγκυρη διεύθυνση.",
+  "favorites.notify": "Ειδοποίηση για νέα δραστηριότητα",
 
   "fab.incognito": "Ανώνυμη περιήγηση",
   "fab.leaveIncognito": "Έξοδος από την ανώνυμη περιήγηση",

@@ -204,6 +204,7 @@ export const ms: Messages = {
   "favorites.namePlaceholder": "Nama",
   "favorites.addressPlaceholder": "example.com",
   "favorites.invalid": "Kegemaran memerlukan nama dan alamat yang sah.",
+  "favorites.notify": "Maklumkan saya tentang aktiviti baharu",
 
   "fab.incognito": "Inkognito",
   "fab.leaveIncognito": "Keluar dari inkognito",

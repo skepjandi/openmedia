@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useApp } from "../../app/store";
 import { useT } from "../../i18n/useT";
-import { FREE_QUICK_ACCESS_LIMIT, QUICK_ACCESS_LIMIT } from "../../shared/favorites";
+import { FREE_QUICK_ACCESS_LIMIT, QUICK_ACCESS_LIMIT, asInput } from "../../shared/favorites";
 import { DownIcon, ProIcon, PlusIcon, UpIcon } from "../../shared/icons";
 import type { Favorite, FavoriteInput } from "../../shared/ipc";
 import { SiteTile } from "../../shared/SiteTile";
@@ -9,9 +9,8 @@ import { normalizeWebUrl } from "../../shared/url";
 import { useEntitlementStore } from "../paywall/store";
 import { describeAddress } from "../history/address";
 import { MAX_FAVORITE_NAME } from "./presets";
+import { Switch } from "./Switch";
 import { Group, GroupLabel, Section, field, primaryButton, quietButton } from "./ui";
-
-const asInput = ({ name, url }: Favorite): FavoriteInput => ({ name, url });
 
 /**
  * The favorites list is as long as the user likes; the first few are the quick-access menu that
@@ -89,6 +88,7 @@ export function FavoritesEditor({ favorites, save, emptyText }: EditorListProps)
       first={index === 0}
       last={index === favorites.length - 1}
       editing={editing === index}
+      showNotify={index < limit}
       onEdit={() => setEditing(editing === index ? null : index)}
       onMove={(by) => move(index, by)}
       onCommit={(entry) => commit(index, entry)}
@@ -155,6 +155,7 @@ export function FavoritesEditor({ favorites, save, emptyText }: EditorListProps)
           <div className="overflow-hidden rounded-2xl border border-hair bg-paper/[0.04]">
             <FavoriteEditor
               initial={{ name: "", url: "" }}
+              showNotify={favorites.length < limit}
               hint={favorites.length >= limit ? t("favorites.quickFull") : undefined}
               onCommit={(entry) => commit("new", entry)}
               onCancel={() => setEditing(null)}
@@ -223,6 +224,8 @@ interface RowProps {
   first: boolean;
   last: boolean;
   editing: boolean;
+  /** Only a quick-access favorite can notify, so only its editor offers the switch. */
+  showNotify: boolean;
   onEdit: () => void;
   onMove: (by: -1 | 1) => void;
   onCommit: (entry: FavoriteInput) => Promise<boolean>;
@@ -234,6 +237,7 @@ function FavoriteRow({
   first,
   last,
   editing,
+  showNotify,
   onEdit,
   onMove,
   onCommit,
@@ -280,7 +284,8 @@ function FavoriteRow({
       </div>
       {editing && (
         <FavoriteEditor
-          initial={{ name: favorite.name, url: favorite.url }}
+          initial={{ name: favorite.name, url: favorite.url, notify: favorite.notify }}
+          showNotify={showNotify}
           onCommit={onCommit}
           onCancel={onEdit}
           onRemove={onRemove}
@@ -292,15 +297,17 @@ function FavoriteRow({
 
 interface EditorProps {
   initial: FavoriteInput;
+  showNotify: boolean;
   hint?: string;
   onCommit: (entry: FavoriteInput) => Promise<boolean>;
   onCancel: () => void;
   onRemove?: () => void;
 }
 
-function FavoriteEditor({ initial, hint, onCommit, onCancel, onRemove }: EditorProps) {
+function FavoriteEditor({ initial, showNotify, hint, onCommit, onCancel, onRemove }: EditorProps) {
   const [name, setName] = useState(initial.name);
   const [url, setUrl] = useState(initial.url);
+  const [notify, setNotify] = useState(initial.notify ?? true);
   const [problem, setProblem] = useState<string | null>(null);
   const t = useT();
 
@@ -310,7 +317,7 @@ function FavoriteEditor({ initial, hint, onCommit, onCancel, onRemove }: EditorP
       setProblem(t("favorites.invalid"));
       return;
     }
-    await onCommit({ name: name.trim(), url: address });
+    await onCommit({ name: name.trim(), url: address, notify });
   };
 
   return (
@@ -339,6 +346,11 @@ function FavoriteEditor({ initial, hint, onCommit, onCancel, onRemove }: EditorP
           setUrl(event.target.value);
         }}
       />
+      {showNotify && (
+        <div className="-mx-4">
+          <Switch label={t("favorites.notify")} checked={notify} onChange={setNotify} />
+        </div>
+      )}
       {(problem ?? hint) && (
         <p className={`text-sm ${problem ? "text-accent" : "text-paper/55"}`}>{problem ?? hint}</p>
       )}

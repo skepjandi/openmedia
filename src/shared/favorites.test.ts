@@ -98,6 +98,13 @@ describe("toggleSiteFavorite", () => {
     ]);
   });
 
+  it("keeps a favorite's notify choice when another site is starred or unstarred", () => {
+    const quiet = [{ name: "Reddit", url: "https://www.reddit.com/", notify: false }];
+    const added = toggleSiteFavorite(quiet, "https://example.com/");
+    expect(added[0].notify).toBe(false);
+    expect(toggleSiteFavorite(added, "https://example.com/")).toEqual(quiet);
+  });
+
   it("takes the site's favorite away instead of adding a second one", () => {
     expect(toggleSiteFavorite(favorites, "https://old.reddit.com/r/rust")).toEqual([
       { name: "YouTube", url: "https://m.youtube.com/" },

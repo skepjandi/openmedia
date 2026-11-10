@@ -209,6 +209,7 @@ export const en = {
   "favorites.namePlaceholder": "Name",
   "favorites.addressPlaceholder": "example.com",
   "favorites.invalid": "A favorite needs a name and a valid address.",
+  "favorites.notify": "Notify me of new activity",
 
   "fab.incognito": "Incognito",
   "fab.leaveIncognito": "Leave incognito",

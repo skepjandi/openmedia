@@ -208,6 +208,7 @@ export const ro: Messages = {
   "favorites.namePlaceholder": "Nume",
   "favorites.addressPlaceholder": "example.com",
   "favorites.invalid": "Un favorit are nevoie de un nume și de o adresă validă.",
+  "favorites.notify": "Anunță-mă despre activitate nouă",
 
   "fab.incognito": "Incognito",
   "fab.leaveIncognito": "Ieși din incognito",

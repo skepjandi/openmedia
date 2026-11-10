@@ -55,7 +55,12 @@ describe("observeTitle", () => {
   });
 });
 
-const favorite = (id: string, name: string, url: string): Favorite => ({ id, name, url });
+const favorite = (id: string, name: string, url: string): Favorite => ({
+  id,
+  name,
+  url,
+  notify: true,
+});
 
 function session(id: string, url: string, title: string | null): Session {
   const opened = newSession(id, "favorite", url, 0);

@@ -203,6 +203,7 @@ export const bn: Messages = {
   "favorites.namePlaceholder": "নাম",
   "favorites.addressPlaceholder": "example.com",
   "favorites.invalid": "পছন্দের একটি নাম ও বৈধ ঠিকানা দুটিই প্রয়োজন।",
+  "favorites.notify": "নতুন কার্যকলাপের বিজ্ঞপ্তি দিন",
 
   "fab.incognito": "ইনকগনিটো",
   "fab.leaveIncognito": "ইনকগনিটো থেকে বের হন",

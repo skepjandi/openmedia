@@ -205,6 +205,7 @@ export const si: Messages = {
   "favorites.namePlaceholder": "නම",
   "favorites.addressPlaceholder": "example.com",
   "favorites.invalid": "ආදරණීයකට නමක් සහ වලංගු ලිපිනයක් අවශ්‍යයි.",
+  "favorites.notify": "නව ක්‍රියාකාරකම් ගැන දැනුම් දෙන්න",
 
   "fab.incognito": "ගුප්ත මාදිලිය",
   "fab.leaveIncognito": "ගුප්ත මාදිලියෙන් ඉවත් වන්න",

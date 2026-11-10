@@ -197,6 +197,7 @@ export const zhHant: Messages = {
   "favorites.namePlaceholder": "名稱",
   "favorites.addressPlaceholder": "example.com",
   "favorites.invalid": "我的最愛需要名稱與有效的網址。",
+  "favorites.notify": "有新動態時通知我",
 
   "fab.incognito": "無痕模式",
   "fab.leaveIncognito": "離開無痕模式",

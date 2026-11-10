@@ -203,6 +203,7 @@ export const de: Messages = {
   "favorites.namePlaceholder": "Name",
   "favorites.addressPlaceholder": "example.com",
   "favorites.invalid": "Ein Favorit benötigt einen Namen und eine gültige Adresse.",
+  "favorites.notify": "Bei neuer Aktivität benachrichtigen",
 
   "fab.incognito": "Inkognito",
   "fab.leaveIncognito": "Inkognito verlassen",

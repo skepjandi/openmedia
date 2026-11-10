@@ -207,6 +207,7 @@ export const tr: Messages = {
   "favorites.namePlaceholder": "Ad",
   "favorites.addressPlaceholder": "example.com",
   "favorites.invalid": "Bir favori için ad ve geçerli adres gerekir.",
+  "favorites.notify": "Yeni etkinlik için bildirim gönder",
 
   "fab.incognito": "Gizli",
   "fab.leaveIncognito": "Gizli moddan çık",

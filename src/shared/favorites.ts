@@ -60,18 +60,17 @@ export function isFavoriteSite(favorites: readonly { url: string }[], url: strin
 }
 
 /**
- * The favorites with this site's entry added or taken away. The other favorites keep their names
- * and their order, and the new entry goes last, so the quick-access menu does not jump around.
+ * The favorites with this site's entry added or taken away. The other favorites keep their names,
+ * notify choices and order, and the new entry goes last, so the quick-access menu does not jump
+ * around.
  */
 export function toggleSiteFavorite(
-  favorites: readonly { name: string; url: string }[],
+  favorites: readonly FavoriteInput[],
   url: string,
 ): FavoriteInput[] {
   const site = siteOf(url);
-  if (!site) return favorites.map(({ name, url: address }) => ({ name, url: address }));
-  const kept = favorites
-    .filter((favorite) => siteOf(favorite.url) !== site)
-    .map(({ name, url: address }) => ({ name, url: address }));
+  if (!site) return favorites.map(asInput);
+  const kept = favorites.filter((favorite) => siteOf(favorite.url) !== site).map(asInput);
   if (kept.length !== favorites.length) return kept;
   let root: string;
   try {
@@ -82,6 +81,13 @@ export function toggleSiteFavorite(
   kept.push({ name: favoriteName(url), url: root });
   return kept;
 }
+
+/** What the library takes for a favorite: the id and icon are Rust's to keep. */
+export const asInput = ({ name, url, notify }: FavoriteInput): FavoriteInput => ({
+  name,
+  url,
+  notify,
+});
 
 /** The name a new favorite gets: the site's host, or the site it belongs to, short enough for the library to accept. */
 function favoriteName(url: string): string {

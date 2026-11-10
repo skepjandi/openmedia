@@ -204,6 +204,7 @@ export const hi: Messages = {
   "favorites.namePlaceholder": "नाम",
   "favorites.addressPlaceholder": "example.com",
   "favorites.invalid": "पसंदीदा के लिए नाम और सही पता चाहिए।",
+  "favorites.notify": "नई गतिविधि की सूचना दें",
 
   "fab.incognito": "गुप्त मोड",
   "fab.leaveIncognito": "गुप्त मोड से बाहर निकलें",

@@ -76,7 +76,7 @@ export function WebLayer() {
         useEntitlementStore.getState().status === "pro",
       );
       const favorite = quickFavoriteOf(sessions, favorites, page.session);
-      if (favorite) {
+      if (favorite?.notify) {
         void siteView
           .notify(page.session, favorite.name, translate.current("notify.newActivity"))
           .catch(() => {});

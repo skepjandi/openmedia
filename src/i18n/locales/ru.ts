@@ -208,6 +208,7 @@ export const ru: Messages = {
   "favorites.namePlaceholder": "Название",
   "favorites.addressPlaceholder": "example.com",
   "favorites.invalid": "У избранного должны быть название и корректный адрес.",
+  "favorites.notify": "Уведомлять о новой активности",
 
   "fab.incognito": "Инкогнито",
   "fab.leaveIncognito": "Выйти из инкогнито",

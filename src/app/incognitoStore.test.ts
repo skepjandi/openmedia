@@ -8,7 +8,7 @@ import { selectQuickFavorites, useApp } from "./store";
 import type { AppState, Favorite } from "../shared/ipc";
 import { useEntitlementStore } from "../features/paywall/store";
 
-const favorite = (name: string, url: string): Favorite => ({ id: name, name, url });
+const favorite = (name: string, url: string): Favorite => ({ id: name, name, url, notify: true });
 const normal = [favorite("Reddit", "https://www.reddit.com/")];
 const secret = [favorite("Secret", "https://secret.example/")];
 

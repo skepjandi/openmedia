@@ -8,6 +8,16 @@ All notable changes to OpenMedia are documented here.
 
 ## 2026-11-10
 
+### feat(favorites): a notify switch for each quick-access favorite
+
+**Problem:** every quick-access favorite raised a local notification when its unread count rose, and the only way to stop one site was to turn the app's notifications off in iOS Settings.
+
+**Change:** `Favorite` and `FavoriteInput` gain `notify` (Rust `library.rs`, `serde` default on, so existing `library.json` files and older callers keep notifying). The favorite's editor in Settings shows a "Notify me of new activity" switch for quick-access favorites. The watcher in `WebLayer` still tracks the count and the fan badge still shows, but raises no notification when the switch is off. The choice survives reordering, editing, and starring or unstarring other sites (`asInput`, `toggleSiteFavorite`, `with_site_favorite`). New string in all 29 languages; the non-English text is machine-drafted.
+
+**Verified:** `tsc`, ESLint, Prettier, 301 Vitest tests (new: the choice survives toggling another site), Rust fmt, clippy and tests (new: persists across reload and defaults on for old data; kept when a recipe's site is starred). **Not verified:** the switch rendering in Settings on a device or simulator, and a suppressed notification end to end (no notification was seen to fire or not fire).
+
+**PR:** n/a
+
 ### fix(siteview): sign-in popups close when the sign-in finishes on macOS
 
 **What:** The in-app sign-in popup stayed open after the sign-in was done, because the page's `window.close()` did nothing.

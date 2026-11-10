@@ -204,6 +204,7 @@ export const vi: Messages = {
   "favorites.namePlaceholder": "Tên",
   "favorites.addressPlaceholder": "example.com",
   "favorites.invalid": "Một mục yêu thích cần có tên và địa chỉ hợp lệ.",
+  "favorites.notify": "Thông báo khi có hoạt động mới",
 
   "fab.incognito": "Ẩn danh",
   "fab.leaveIncognito": "Thoát chế độ ẩn danh",
