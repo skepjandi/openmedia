@@ -166,16 +166,15 @@ fn reject(why: impl AsRef<str>) -> Error {
     ))
 }
 
-/// The model's text, without a Markdown fence if a model that cannot be forced to JSON added one.
-fn unfenced(text: &str) -> &str {
+/// The answer object inside the model's text. Models that cannot be forced to JSON wrap it in a
+/// Markdown fence, reasoning tags or a sentence, so the first `{` that starts a valid answer
+/// and ends at the last `}` wins.
+fn parse_raw(text: &str) -> Option<Raw> {
     let text = text.trim();
-    match text.strip_prefix("```") {
-        Some(rest) => {
-            let rest = rest.strip_prefix("json").unwrap_or(rest);
-            rest.trim().strip_suffix("```").unwrap_or(rest).trim()
-        }
-        None => text,
-    }
+    let end = text.rfind('}')?;
+    text.match_indices('{')
+        .take_while(|(start, _)| *start < end)
+        .find_map(|(start, _)| serde_json::from_str(&text[start..=end]).ok())
 }
 
 fn plain(text: &str, what: &str, max: usize, allow_empty: bool) -> Result<String> {
@@ -217,8 +216,7 @@ pub fn parse_patch(json: &str, recipe: Option<&Recipe>) -> Result<Patch> {
     if json.len() > MAX_ANSWER_BYTES {
         return Err(reject("it is too long"));
     }
-    let raw: Raw = serde_json::from_str(unfenced(json))
-        .map_err(|_| reject("it does not follow the schema"))?;
+    let raw = parse_raw(json).ok_or_else(|| reject("it does not follow the schema"))?;
     let summary = plain(&raw.summary, "the summary", MAX_SUMMARY_CHARS, false)?;
     let blank = |value: &Option<String>| value.as_deref().is_none_or(|v| v.trim().is_empty());
     match raw.kind.as_str() {
@@ -606,6 +604,17 @@ mod tests {
                 "declarations": declarations
             }]);
             assert!(parse_patch(&new_option(rules), None).is_err());
+        }
+    }
+
+    #[test]
+    fn an_answer_wrapped_in_prose_or_reasoning_is_tolerated() {
+        let body = new_option(one_rule("ytm-reel-shelf-renderer"));
+        for wrapped in [
+            format!("<think>hmm {{maybe}}</think>\n{body}"),
+            format!("Here is the patch:\n```json\n{body}\n```\nDone."),
+        ] {
+            assert!(parse_patch(&wrapped, None).is_ok(), "{wrapped}");
         }
     }
 
