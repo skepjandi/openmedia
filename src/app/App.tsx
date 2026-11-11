@@ -42,6 +42,11 @@ const StatsSheet = lazy(() => loadStats().then((module) => ({ default: module.St
 const RecipesScreen = lazy(() =>
   loadRecipes().then((module) => ({ default: module.RecipesScreen })),
 );
+const IncognitoRecipesScreen = lazy(() =>
+  import("../features/settings/IncognitoSections").then((module) => ({
+    default: module.IncognitoRecipesScreen,
+  })),
+);
 const Onboarding = lazy(() => loadOnboarding().then((module) => ({ default: module.Onboarding })));
 
 function firstPageShowing(): boolean {
@@ -111,6 +116,7 @@ export function App() {
       <Suspense fallback={null}>
         {(idle || settingsOpen) && <SettingsScreen />}
         {(idle || sheet === "recipes") && <RecipesScreen />}
+        {sheet === "incognito-recipes" && <IncognitoRecipesScreen />}
         {sheet === "marketplace" && <MarketplaceScreen />}
         {sheet === "share" && <ShareScreen />}
         {(idle || sheet === "stats") && <StatsSheet />}

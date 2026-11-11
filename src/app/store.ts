@@ -57,12 +57,19 @@ export type Sheet =
   | "stats"
   | "settings"
   | "recipes"
+  | "incognito-recipes"
   | "marketplace"
   | "share"
   | "paywall";
 
 /** Pages that open on top of Settings. Closing one returns to Settings, which stays mounted beneath it. */
-const SETTINGS_CHILDREN: readonly Sheet[] = ["recipes", "marketplace", "share", "paywall"];
+const SETTINGS_CHILDREN: readonly Sheet[] = [
+  "recipes",
+  "incognito-recipes",
+  "marketplace",
+  "share",
+  "paywall",
+];
 const isSettingsChild = (sheet: Sheet): boolean => SETTINGS_CHILDREN.includes(sheet);
 
 type SheetState = Pick<AppStore, "sheet" | "sheetParent">;

@@ -239,7 +239,8 @@ export const it: Messages = {
     "Qui non c’è ancora nulla. Aggiungi un preferito qui sotto oppure metti una ricetta tra i preferiti con la stella.",
   "favorites.more": "Altri preferiti · {count}",
   "favorites.moreLocked": "Altri preferiti",
-  "favorites.add": "Aggiungi preferito",
+  "favorites.custom": "Preferito personalizzato",
+  "favorites.addFromRecipes": "Aggiungi dalle ricette",
   "favorites.quickFull":
     "L’accesso rapido è pieno, quindi questo è stato aggiunto ad Altri preferiti.",
   "favorites.openRecipe": "Apri la ricetta",

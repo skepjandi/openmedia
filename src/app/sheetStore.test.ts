@@ -31,6 +31,14 @@ describe("pages opened from Settings", () => {
     useApp.getState().closeSheet();
     expect(useApp.getState().sheet).toBe("settings");
   });
+  it("returns to Settings from the Incognito Recipes page", () => {
+    useApp.getState().openSheet("settings");
+    useApp.getState().openSheet("incognito-recipes");
+    expect(useApp.getState().sheet).toBe("incognito-recipes");
+    expect(selectSettingsOpen(useApp.getState())).toBe(true);
+    useApp.getState().closeSheet();
+    expect(useApp.getState().sheet).toBe("settings");
+  });
 
   it.each(["marketplace", "share"] as const)(
     "returns to Settings from the %s page, keeping Settings mounted beneath it",

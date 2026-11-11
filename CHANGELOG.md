@@ -7,6 +7,14 @@ All notable changes to OpenMedia are documented here.
 > **Wiki**: the [GitHub Wiki](https://github.com/skepjandi/openmedia/wiki) is the public-facing main wiki — architecture, recipe format, AI pipeline, security model, roadmap. Source-controlled editing surface is `docs/wiki/` in this repo; CI (`.github/workflows/sync-wiki.yml`) mirrors it to the GitHub Wiki on every merge to `main`. New single-PR changes belong here, not as new wiki pages.
 
 ## 2026-11-11
+### feat(settings): open incognito recipes on a dedicated page
+
+**Area:** `feat(settings)`
+
+**Change:** Incognito recipes now open on a biometric-gated page. Normal and incognito favorites offer "Custom favorite" plus "Add from recipes"; recipe stars update the matching favorite set.
+
+**Verified:** 41 focused navigation and localization tests; TypeScript and changed-file formatting; browser-preview navigation and control labels. **Not verified:** native biometric unlock on a device.
+
 ### fix(siteview): keep clicked links in the embedded browser
 
 **Area:** `fix(siteview)`

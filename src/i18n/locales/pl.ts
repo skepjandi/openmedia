@@ -233,7 +233,8 @@ export const pl: Messages = {
   "favorites.quickEmpty": "Na razie pusto. Dodaj ulubioną poniżej lub oznacz gwiazdką przepis.",
   "favorites.more": "Więcej ulubionych · {count}",
   "favorites.moreLocked": "Więcej ulubionych",
-  "favorites.add": "Dodaj ulubioną",
+  "favorites.custom": "Własny ulubiony",
+  "favorites.addFromRecipes": "Dodaj z przepisów",
   "favorites.quickFull":
     "Szybki dostęp jest pełny, więc ta pozycja trafi do sekcji Więcej ulubionych.",
   "favorites.openRecipe": "Otwórz przepis",

@@ -7,7 +7,7 @@ import {
   asInput,
   recipeForFavorite,
 } from "../../shared/favorites";
-import { DownIcon, ProIcon, PlusIcon, StarIcon, UpIcon } from "../../shared/icons";
+import { DownIcon, ForwardIcon, ProIcon, PlusIcon, StarIcon, UpIcon } from "../../shared/icons";
 import type { Favorite, FavoriteInput, SiteSettings } from "../../shared/ipc";
 import { SiteTile } from "../../shared/SiteTile";
 import { normalizeWebUrl } from "../../shared/url";
@@ -30,7 +30,12 @@ export function FavoritesSection() {
 
   return (
     <Section title={t("favorites.title")} note={t("favorites.note", { limit: QUICK_ACCESS_LIMIT })}>
-      <FavoritesEditor favorites={favorites} save={saveFavorites} recipes={sites} />
+      <FavoritesEditor
+        favorites={favorites}
+        save={saveFavorites}
+        recipes={sites}
+        recipeSheet="recipes"
+      />
     </Section>
   );
 }
@@ -43,6 +48,8 @@ interface EditorListProps {
   emptyText?: string;
   /** The installed recipes; a favorite whose site has one gets a button that opens it. */
   recipes?: SiteSettings[];
+  /** Opens the matching recipe list so its stars update this favorites list. */
+  recipeSheet: "recipes" | "incognito-recipes";
 }
 
 /**
@@ -50,7 +57,13 @@ interface EditorListProps {
  * Pro only four slots are usable: the other two show grayed out, More favorites is locked, and
  * adding past four opens the paywall.
  */
-export function FavoritesEditor({ favorites, save, emptyText, recipes }: EditorListProps) {
+export function FavoritesEditor({
+  favorites,
+  save,
+  emptyText,
+  recipes,
+  recipeSheet,
+}: EditorListProps) {
   const problem = useApp((s) => s.error);
   const openSheet = useApp((s) => s.openSheet);
   const openRecipe = useApp((s) => s.openRecipe);
@@ -164,8 +177,33 @@ export function FavoritesEditor({ favorites, save, emptyText, recipes }: EditorL
       )}
 
       <div className="mt-4">
-        {editing === "new" ? (
-          <div className="overflow-hidden rounded-2xl border border-hair bg-paper/[0.04]">
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+          <button
+            type="button"
+            aria-expanded={editing === "new"}
+            onClick={() =>
+              !isPro && favorites.length >= limit
+                ? openSheet("paywall")
+                : setEditing(editing === "new" ? null : "new")
+            }
+            className="flex items-center gap-2 px-1 py-1 text-sm font-medium text-accent"
+          >
+            <PlusIcon /> {t("favorites.custom")}
+            {!isPro && favorites.length >= limit && <ProIcon size={14} />}
+          </button>
+          <button
+            type="button"
+            onClick={() => openSheet(recipeSheet)}
+            className="flex items-center gap-2 px-1 py-1 text-sm font-medium text-accent"
+          >
+            <span aria-hidden="true" className="rtl:-scale-x-100">
+              <ForwardIcon />
+            </span>
+            {t("favorites.addFromRecipes")}
+          </button>
+        </div>
+        {editing === "new" && (
+          <div className="mt-3 overflow-hidden rounded-2xl border border-hair bg-paper/[0.04]">
             <FavoriteEditor
               initial={{ name: "", url: "" }}
               showNotify={favorites.length < limit}
@@ -174,17 +212,6 @@ export function FavoritesEditor({ favorites, save, emptyText, recipes }: EditorL
               onCancel={() => setEditing(null)}
             />
           </div>
-        ) : (
-          <button
-            type="button"
-            onClick={() =>
-              !isPro && favorites.length >= limit ? openSheet("paywall") : setEditing("new")
-            }
-            className="flex items-center gap-2 px-1 py-1 text-sm font-medium text-accent"
-          >
-            <PlusIcon /> {t("favorites.add")}
-            {!isPro && favorites.length >= limit && <ProIcon size={14} />}
-          </button>
         )}
       </div>
 

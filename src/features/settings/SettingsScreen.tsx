@@ -10,7 +10,7 @@ import type { SearchEngine, Theme } from "../../shared/ipc";
 import { DEFAULT_SEARCH_ENGINE, SEARCH_ENGINES } from "../../shared/searchEngines";
 import { AiSection } from "./AiSection";
 import { FavoritesSection } from "./FavoritesSection";
-import { IncognitoFavoritesSection, IncognitoRecipesSection } from "./IncognitoSections";
+import { IncognitoFavoritesSection, IncognitoRecipesLink } from "./IncognitoSections";
 import { MarginSlider } from "./MarginSlider";
 import { MarketplaceLinks } from "../marketplace/Links";
 import { RecipesLink } from "./RecipesScreen";
@@ -21,6 +21,7 @@ import { Group, GroupLabel, Section, primaryButton, quietButton } from "./ui";
 
 export function SettingsScreen() {
   const open = useApp(selectSettingsOpen);
+  const incognitoRecipesOpen = useApp((s) => s.sheet === "incognito-recipes");
   const closeSheet = useApp((s) => s.closeSheet);
   const t = useT();
   if (!open) return null;
@@ -34,8 +35,8 @@ export function SettingsScreen() {
         <FavoritesSection />
         <RecipesLink />
         <MarketplaceLinks />
-        <IncognitoFavoritesSection />
-        <IncognitoRecipesSection />
+        <IncognitoFavoritesSection key={incognitoRecipesOpen ? "incognito-recipes" : "settings"} />
+        <IncognitoRecipesLink />
         <AiSection />
         <UpdatesSection />
         <DataSection />

@@ -233,7 +233,8 @@ export const ja: Messages = {
     "まだ何もありません。下からお気に入りを追加するか、レシピに★を付けてください。",
   "favorites.more": "その他のお気に入り · {count}",
   "favorites.moreLocked": "その他のお気に入り",
-  "favorites.add": "お気に入りを追加",
+  "favorites.custom": "カスタムお気に入り",
+  "favorites.addFromRecipes": "レシピから追加",
   "favorites.quickFull":
     "クイックアクセスが上限に達したため、この項目は「その他のお気に入り」に追加されました。",
   "favorites.openRecipe": "レシピを開く",
