@@ -426,6 +426,7 @@ interface DetailViewProps {
 
 function DetailView({ item, onChanged, onRated, onManageBlocked }: DetailViewProps) {
   const loadSites = useApp((s) => s.loadSites);
+  const setSiteFavorite = useApp((s) => s.setSiteFavorite);
   const t = useT();
   const [preview, setPreview] = useState<RecipePreview | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -456,6 +457,13 @@ function DetailView({ item, onChanged, onRated, onManageBlocked }: DetailViewPro
     }
   };
 
+  /** A first add also stars the site; an update leaves the favorites as the user set them. */
+  const install = async () => {
+    const firstAdd = !item.installedVersion;
+    await marketplace.install(item.id);
+    if (firstAdd) await setSiteFavorite(item.id, true);
+  };
+
   const report = async (reason: ReportReason) => {
     setError(null);
     try {
@@ -484,7 +492,7 @@ function DetailView({ item, onChanged, onRated, onManageBlocked }: DetailViewPro
             <button
               type="button"
               disabled={!preview || busy}
-              onClick={() => void run(() => marketplace.install(item.id))}
+              onClick={() => void run(install)}
               className={`flex-1 ${primaryBlockButton}`}
             >
               {t(item.installedVersion ? "market.update" : "market.add")}
