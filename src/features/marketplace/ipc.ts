@@ -13,6 +13,14 @@ export interface OptionPreview {
   onByDefault: boolean;
 }
 
+/** One page of a hub, as the catalog shows it before it is installed. */
+export interface HubPreviewTab {
+  label: string;
+  url: string;
+  /** The page's own host, so the user sees which site each page belongs to. */
+  host: string;
+}
+
 /** What a recipe would add, as Rust validated it: the review screen shows exactly this. */
 export interface RecipePreview {
   id: string;
@@ -25,10 +33,12 @@ export interface RecipePreview {
   rules: RulePreview[];
   /** The version already installed under this id, which adding would replace. */
   replaces: string | null;
+  /** The pages a hub recipe opens; absent or empty for an ordinary recipe. */
+  tabs?: HubPreviewTab[];
 }
 
-/** The labels a recipe can carry: platform tags come from the recipe, the origin from the server. */
-export type MarketTag = "official" | "community" | "mobile" | "desktop";
+/** Platform and origin tags are joined by the optional hub listing tag. */
+export type MarketTag = "official" | "community" | "mobile" | "desktop" | "hub";
 
 export interface MarketRating {
   /** The smoothed mean to one decimal, or null until enough people have rated. */

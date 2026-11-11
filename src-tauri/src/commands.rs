@@ -20,17 +20,20 @@ use crate::ai::{
     },
     chats::{ChatSession, Chats},
     connection::{list_models, models_request},
+    hub::{self, HubProposal, SavedHub},
     prompt::{EarlierTurn, Prompt},
-    provider, validate_key,
+    provider::{self, ModelReply, ToolDefinition, Turn},
+    validate_key,
 };
 use crate::boot::{Boot, Startup};
+use crate::catalog::{AgentSearchResult, Catalog};
 use crate::entitlement::Entitlement;
 use crate::error::{Error, Result};
 use crate::incognito::Incognito;
 use crate::library::{
     Favorite, FavoriteInput, Library, Mode, SearchEngine, Theme, favorites_need_pro,
 };
-use crate::recipes::Recipes;
+use crate::recipes::{Recipe, Recipes};
 use crate::secrets::SecretStore;
 use crate::sites::{self, SiteSettings};
 use crate::usage::{Usage, UsageReport};
@@ -683,6 +686,92 @@ pub async fn ai_accept(
 #[tauri::command]
 pub async fn ai_reject(app: AppHandle, agent: State<'_, Agent>, id: Uuid) -> Result<()> {
     agent::reject(&agent, &LivePage(&app), id);
+    Ok(())
+}
+
+/// The marketplace, as the hub builder sees it. It only reads: a search over the signed catalog
+/// and one hash-checked recipe.
+struct LiveMarket<'a> {
+    catalog: &'a Catalog,
+    recipes: &'a Recipes,
+}
+
+impl hub::Marketplace for LiveMarket<'_> {
+    async fn search(&self, query: &str) -> Result<Vec<AgentSearchResult>> {
+        self.catalog.search_for_agent(self.recipes, query).await
+    }
+
+    async fn read(&self, id: &str) -> Result<Recipe> {
+        self.catalog.read_for_agent(id).await
+    }
+}
+
+/// The provider, as the hub builder sees it. The key stays in Rust and goes only into the
+/// provider request.
+struct LiveToolModel {
+    config: ProviderConfig,
+    key: Zeroizing<String>,
+}
+
+impl hub::Model for LiveToolModel {
+    async fn complete_with_tools(
+        &self,
+        system: &str,
+        tools: &[ToolDefinition],
+        turns: &[Turn],
+    ) -> Result<ModelReply> {
+        provider::complete_with_tools(&self.config, &self.key, system, tools, turns).await
+    }
+}
+
+/// Asks the provider for a set of pages to open together as tabs. The model may only look
+/// things up with the two read-only marketplace tools, and nothing is saved: the answer comes
+/// back as a proposal the user has to accept.
+#[tauri::command]
+pub async fn ai_hub_build(
+    library: State<'_, Library>,
+    secrets: State<'_, Secrets>,
+    catalog: State<'_, Catalog>,
+    recipes: State<'_, Recipes>,
+    hubs: State<'_, hub::Hubs>,
+    entitlement: State<'_, Entitlement>,
+    request: String,
+) -> Result<HubProposal> {
+    entitlement.require_pro()?;
+    let (config, key) = active_provider(&library, &secrets)?;
+    let market = LiveMarket {
+        catalog: &catalog,
+        recipes: &recipes,
+    };
+    let model = LiveToolModel { config, key };
+    hub::build(&hubs, &market, &model, &request).await
+}
+
+/// Saves the proposed hub as a `custom.` recipe of the user's own. Installed recipes are never
+/// edited, and nothing is saved before this call.
+#[tauri::command]
+pub async fn ai_hub_accept(
+    app: AppHandle,
+    library: State<'_, Library>,
+    recipes: State<'_, Recipes>,
+    hubs: State<'_, hub::Hubs>,
+    entitlement: State<'_, Entitlement>,
+    id: Uuid,
+) -> Result<SavedHub> {
+    entitlement.require_pro()?;
+    let recipe = hub::accept(&hubs, id)?;
+    let saved = recipes.save_made(&recipe)?;
+    reload_script(&app, &library, &recipes)?;
+    Ok(SavedHub {
+        recipe_id: saved.id,
+        name: saved.name,
+    })
+}
+
+/// Forgets the proposal. Nothing was saved, so there is nothing to undo.
+#[tauri::command]
+pub async fn ai_hub_reject(hubs: State<'_, hub::Hubs>, id: Uuid) -> Result<()> {
+    hub::reject(&hubs, id);
     Ok(())
 }
 

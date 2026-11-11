@@ -6,7 +6,8 @@ mod share;
 
 pub use compile::{OptionChoices, page_script};
 pub use schema::{
-    Meta, OptionGroup, Origin, Recipe, Rule, SiteOption, Target, current_platform_tag,
+    Hub, HubTab, MAX_HUB_LABEL_CHARS, MAX_HUB_TABS, MIN_HUB_TABS, Meta, OptionGroup, Origin,
+    Recipe, Rule, SiteOption, Target, current_platform_tag,
 };
 pub(crate) use selector::{CSS_PROPERTIES, validate_declarations, validate_selector};
 pub(crate) use share::{MARKET_PREFIX, MAX_RECIPE_BYTES, is_catalog_id, is_plain_text, is_version};
@@ -449,6 +450,37 @@ mod tests {
         let script = page_script(&recipes, &OptionChoices::new()).unwrap();
         assert!(script.contains(".nag{display:none!important}"));
         assert!(!script.contains(".feed"));
+    }
+    #[test]
+    fn scoped_rules_are_serialized_only_for_their_matching_sites() {
+        let json = TOGGLED
+            .replace(
+                "\"target\":{\"css\":\".nag\"}",
+                "\"on\":[\"https://t.example/*\"],\"target\":{\"css\":\".nag\"}",
+            )
+            .replace(
+                "\"match\":[\"https://t.example/*\"]",
+                "\"match\":[\"https://t.example/*\",\"https://www.reddit.com/*\"]",
+            );
+        let recipe = Recipe::parse(&json).unwrap();
+        let script = page_script(&[recipe], &OptionChoices::new()).unwrap();
+        assert!(script.contains("t\\\\.example"));
+        assert!(script.contains("www\\\\.reddit"));
+        assert_eq!(script.matches(".nag{display:none!important}").count(), 1);
+    }
+
+    #[test]
+    fn rule_scope_must_be_a_nonempty_subset_of_recipe_matches() {
+        let json = TOGGLED.replace(
+            "\"target\":{\"css\":\".nag\"}",
+            "\"on\":[\"https://evil.example/*\"],\"target\":{\"css\":\".nag\"}",
+        );
+        assert!(Recipe::parse(&json).is_err());
+        let empty = TOGGLED.replace(
+            "\"target\":{\"css\":\".nag\"}",
+            "\"on\":[],\"target\":{\"css\":\".nag\"}",
+        );
+        assert!(Recipe::parse(&empty).is_err());
     }
 
     #[test]

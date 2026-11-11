@@ -274,12 +274,19 @@ export const vi: Messages = {
   "recipes.options": "Tùy chọn của {name}",
   "recipes.addFavorite": "Thêm {name} vào yêu thích",
   "recipes.removeFavorite": "Gỡ {name} khỏi yêu thích",
+  "recipes.hub": "Hub",
+  "recipes.hubPages": "Các trang",
+  "recipes.openHubPage": "Mở {label}",
+  "recipes.hubNote":
+    "Một hub mở nhiều trang web cùng lúc. Mỗi trang là một trang web riêng, với cookie riêng.",
   "recipes.bottomMargin": "Lề dưới",
   "recipes.sharedMargin": "Dùng lề dưới chung. Kéo thanh trượt để đặt lề riêng cho trang này.",
   "recipes.ownMargin": "Trang này có lề dưới riêng.",
   "recipes.siteMarginLabel": "Lề dưới của {name}",
   "recipes.useSharedMargin": "Dùng lề dưới chung",
   "recipes.imported": "Được thêm từ bên ngoài ứng dụng. Gỡ bỏ để trở về như trang vốn có.",
+
+  "hub.pages": "Các trang của {name}",
 
   "market.title": "Chợ công thức",
   "market.linkNote": "Công thức của người khác, được kiểm tra tự động và đăng sau 14 ngày",
@@ -296,6 +303,7 @@ export const vi: Messages = {
   "market.review.version": "Phiên bản {version}",
   "market.review.replaces": "Thay thế phiên bản {version} của bạn",
   "market.review.sites": "Hoạt động trên",
+  "market.review.pages": "Các trang",
   "market.review.options": "Công tắc",
   "market.review.rules": "Những gì nó thay đổi",
   "market.review.hides": "Ẩn",

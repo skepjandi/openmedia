@@ -62,6 +62,7 @@ pub fn run() {
             usage.retire_public_suffix_sites(&app.state::<library::Library>().favorite_hosts()?)?;
             app.manage(usage);
             app.manage(ai::agent::Agent::default());
+            app.manage(ai::hub::Hubs::default());
             app.manage(ai::chats::Chats::load(data_dir.join("chats.json"))?);
             app.manage(commands::Secrets(Box::new(secrets::KeychainStore)));
             app.manage(entitlement::Entitlement::from_build());
@@ -143,6 +144,9 @@ pub fn run() {
             commands::ai_send,
             commands::ai_accept,
             commands::ai_reject,
+            commands::ai_hub_build,
+            commands::ai_hub_accept,
+            commands::ai_hub_reject,
             commands::chat_list,
             commands::chat_save,
             commands::chat_delete,

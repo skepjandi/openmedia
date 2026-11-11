@@ -35,6 +35,27 @@ export interface Proposal {
   unmatched: number;
 }
 
+export interface HubProposalTab {
+  label: string;
+  url: string;
+  host: string;
+  sourceRecipeId: string;
+  sourceRecipeName: string;
+}
+
+export interface HubProposal {
+  id: string;
+  name: string;
+  recipeId: string;
+  summary: string;
+  tabs: HubProposalTab[];
+}
+
+export interface SavedHub {
+  recipeId: string;
+  name: string;
+}
+
 export type StepKind =
   "readPage" | "askModel" | "checkAnswer" | "previewOnPage" | "countMatches" | "repair";
 
@@ -108,6 +129,14 @@ export const assistant = {
     const channel = new Channel<ActivityStep>();
     channel.onmessage = onActivity;
     return invoke<Proposal>("ai_send", { id, onActivity: channel });
+  },
+  /** Searches the signed marketplace and returns a validated, unsaved hub proposal. */
+  buildHub: (request: string) => invoke<HubProposal>("ai_hub_build", { request }),
+  /** Saves an accepted hub; the marketplace submission remains a separate user action. */
+  acceptHub: (id: string) => invoke<SavedHub>("ai_hub_accept", { id }),
+  /** Drops the proposal without saving it. */
+  rejectHub: async (id: string): Promise<void> => {
+    await invoke("ai_hub_reject", { id });
   },
   /** Saves the proposal as a switch and removes the preview. */
   accept: async (id: string): Promise<void> => {

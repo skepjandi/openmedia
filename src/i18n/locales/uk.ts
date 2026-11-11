@@ -279,6 +279,11 @@ export const uk: Messages = {
   "recipes.options": "Налаштування {name}",
   "recipes.addFavorite": "Додати {name} до обраного",
   "recipes.removeFavorite": "Прибрати {name} з обраного",
+  "recipes.hub": "Хаб",
+  "recipes.hubPages": "Сторінки",
+  "recipes.openHubPage": "Відкрити {label}",
+  "recipes.hubNote":
+    "Хаб відкриває кілька сайтів одразу. Кожна сторінка — окремий сайт із власними cookie.",
   "recipes.bottomMargin": "Нижнє поле",
   "recipes.sharedMargin":
     "Використовує спільне поле. Посуньте повзунок, щоб дати цьому сайту власне.",
@@ -287,6 +292,8 @@ export const uk: Messages = {
   "recipes.useSharedMargin": "Використовувати спільне поле",
   "recipes.imported":
     "Додано ззовні застосунку. Приберіть його, щоб повернути сайт до попереднього вигляду.",
+
+  "hub.pages": "Сторінки: {name}",
 
   "market.title": "Магазин рецептів",
   "market.linkNote":
@@ -304,6 +311,7 @@ export const uk: Messages = {
   "market.review.version": "Версія {version}",
   "market.review.replaces": "Замінює вашу версію {version}",
   "market.review.sites": "Працює на",
+  "market.review.pages": "Сторінки",
   "market.review.options": "Перемикачі",
   "market.review.rules": "Що змінює",
   "market.review.hides": "Приховує",

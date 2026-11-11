@@ -35,6 +35,19 @@ export function RecipeReview({ preview }: { preview: RecipePreview }) {
           ))}
         </Group>
       </div>
+      {preview.tabs && preview.tabs.length > 0 && (
+        <div>
+          <GroupLabel>{t("market.review.pages")}</GroupLabel>
+          <Group>
+            {preview.tabs.map((tab) => (
+              <div key={tab.url} className="px-4 py-3">
+                <span className="block text-base">{tab.label}</span>
+                <span className="mt-0.5 block text-sm break-all text-paper/55">{tab.host}</span>
+              </div>
+            ))}
+          </Group>
+        </div>
+      )}
       {preview.options.length > 0 && (
         <div>
           <GroupLabel>{t("market.review.options")}</GroupLabel>

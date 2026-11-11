@@ -24,7 +24,7 @@ const context = (overrides: Partial<RouteContext> = {}): RouteContext => ({
 
 describe("routeInput", () => {
   it("is empty for blank text in every mode", () => {
-    for (const mode of ["auto", "link", "search", "chat"] as const) {
+    for (const mode of ["auto", "link", "search", "chat", "hub"] as const) {
       expect(routeInput("   ", context({ mode }))).toEqual({ kind: "empty" });
     }
   });
@@ -133,6 +133,24 @@ describe("routeInput", () => {
           reason: "noPage",
         });
       }
+    });
+  });
+  describe("hub", () => {
+    it("routes a hub request without a page", () => {
+      expect(routeInput("messages across sites", context({ mode: "hub", pageUrl: null }))).toEqual({
+        kind: "hub",
+        request: "messages across sites",
+      });
+    });
+
+    it("paywalls free users and requires a provider", () => {
+      expect(routeInput("make a hub", context({ mode: "hub", pro: false }))).toEqual({
+        kind: "paywall",
+      });
+      expect(routeInput("make a hub", context({ mode: "hub", ai: null, pageUrl: null }))).toEqual({
+        kind: "blocked",
+        reason: "noProvider",
+      });
     });
   });
 });

@@ -279,6 +279,11 @@ export const es: Messages = {
   "recipes.options": "Opciones de {name}",
   "recipes.addFavorite": "Añadir {name} a favoritos",
   "recipes.removeFavorite": "Quitar {name} de favoritos",
+  "recipes.hub": "Hub",
+  "recipes.hubPages": "Páginas",
+  "recipes.openHubPage": "Abrir {label}",
+  "recipes.hubNote":
+    "Un hub abre varios sitios a la vez. Cada página es un sitio propio, con sus propias cookies.",
   "recipes.bottomMargin": "Margen inferior",
   "recipes.sharedMargin":
     "Usa el margen compartido. Mueve el control deslizante para darle a este sitio un margen propio.",
@@ -287,6 +292,8 @@ export const es: Messages = {
   "recipes.useSharedMargin": "Usar el margen compartido",
   "recipes.imported":
     "Añadida desde fuera de la app. Quítala para que el sitio vuelva a ser como era.",
+
+  "hub.pages": "Páginas de {name}",
 
   "market.title": "Mercado",
   "market.linkNote":
@@ -304,6 +311,7 @@ export const es: Messages = {
   "market.review.version": "Versión {version}",
   "market.review.replaces": "Reemplaza tu versión {version}",
   "market.review.sites": "Funciona en",
+  "market.review.pages": "Páginas",
   "market.review.options": "Interruptores",
   "market.review.rules": "Qué cambia",
   "market.review.hides": "Oculta",

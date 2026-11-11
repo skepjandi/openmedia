@@ -271,6 +271,11 @@ export const id: Messages = {
   "recipes.options": "Opsi {name}",
   "recipes.addFavorite": "Tambahkan {name} ke favorit",
   "recipes.removeFavorite": "Hapus {name} dari favorit",
+  "recipes.hub": "Hub",
+  "recipes.hubPages": "Halaman",
+  "recipes.openHubPage": "Buka {label}",
+  "recipes.hubNote":
+    "Hub membuka beberapa situs sekaligus. Setiap halaman adalah situsnya sendiri, dengan cookie sendiri.",
   "recipes.bottomMargin": "Margin bawah",
   "recipes.sharedMargin":
     "Memakai margin bersama. Geser slider untuk memberi situs ini margin sendiri.",
@@ -281,6 +286,8 @@ export const id: Messages = {
     "Ditambahkan dari luar aplikasi. Keluarkan untuk mengembalikan situs seperti semula.",
   "recipes.empty": "Anda belum punya resep. Temukan resep siap pakai untuk situs populer di Pasar.",
   "recipes.openMarket": "Buka Pasar",
+
+  "hub.pages": "Halaman {name}",
 
   "market.title": "Pasar",
   "market.linkNote": "Resep dari orang lain, diperiksa otomatis dan diterbitkan 14 hari kemudian",
@@ -297,6 +304,7 @@ export const id: Messages = {
   "market.review.version": "Versi {version}",
   "market.review.replaces": "Menggantikan versi Anda {version}",
   "market.review.sites": "Berfungsi di",
+  "market.review.pages": "Halaman",
   "market.review.options": "Sakelar",
   "market.review.rules": "Yang diubah",
   "market.review.hides": "Menyembunyikan",

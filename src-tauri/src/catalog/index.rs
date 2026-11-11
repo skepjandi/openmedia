@@ -57,6 +57,8 @@ pub struct Entry {
 
 pub const TAG_OFFICIAL: &str = "official";
 pub const TAG_COMMUNITY: &str = "community";
+/// Added by the Worker to a recipe that carries a `hub`: several sites opened as tabs.
+pub const TAG_HUB: &str = "hub";
 /// Official recipes are the ones the marketplace operator publishes under this id prefix.
 pub const OFFICIAL_ID_PREFIX: &str = "market.official.";
 const MAX_HOMEPAGE_CHARS: usize = 2048;
@@ -243,7 +245,8 @@ fn check_entry(entry: &Entry) -> Result<()> {
 }
 
 /// Platform tags (at least one), no repeats, exactly one origin tag; `official` only under the
-/// official id prefix and `community` never under it, so an upload cannot wear the badge.
+/// official id prefix and `community` never under it, so an upload cannot wear the badge. `hub`
+/// is the one extra tag, for a recipe that is a hub.
 fn tags_ok(entry: &Entry) -> bool {
     let mut platforms = 0;
     let mut origins = Vec::new();
@@ -252,7 +255,7 @@ fn tags_ok(entry: &Entry) -> bool {
             return false;
         }
         match tag.as_str() {
-            "mobile" | "desktop" => platforms += 1,
+            "mobile" | "desktop" | TAG_HUB => platforms += usize::from(tag != TAG_HUB),
             TAG_OFFICIAL | TAG_COMMUNITY => origins.push(tag.as_str()),
             _ => return false,
         }
@@ -313,7 +316,10 @@ pub fn check_download(index: &Index, id: &str, bytes: &[u8]) -> Result<Recipe> {
         ));
     }
     let recipe = recipes::parse_catalog_recipe(bytes)?;
-    if recipe.id != entry.id || recipe.version != entry.version {
+    if recipe.id != entry.id
+        || recipe.version != entry.version
+        || recipe.hub.is_some() != entry.has_tag(TAG_HUB)
+    {
         return Err(Error::Catalog(
             "the recipe is not the one the catalog lists".into(),
         ));
@@ -552,6 +558,19 @@ mod tests {
         for entry in rejected {
             assert!(!accepted(entry.clone()), "{:?}", entry.tags);
         }
+    }
+    #[test]
+    fn hub_is_an_additional_catalog_tag() {
+        let (pkcs8, _) = keypair();
+        let accepted = |entry: Entry| sign(&index_with(vec![entry]), &pkcs8).is_ok();
+        assert!(accepted(tagged(
+            "market.hub",
+            &["mobile", TAG_HUB, TAG_COMMUNITY]
+        )));
+        assert!(!accepted(tagged(
+            "market.hub",
+            &["mobile", TAG_HUB, TAG_HUB, TAG_COMMUNITY]
+        )));
     }
 
     #[test]

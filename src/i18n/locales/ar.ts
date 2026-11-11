@@ -267,12 +267,19 @@ export const ar: Messages = {
   "recipes.options": "خيارات {name}",
   "recipes.addFavorite": "إضافة {name} إلى المفضلة",
   "recipes.removeFavorite": "إزالة {name} من المفضلة",
+  "recipes.hub": "مركز",
+  "recipes.hubPages": "الصفحات",
+  "recipes.openHubPage": "فتح {label}",
+  "recipes.hubNote":
+    "يفتح المركز عدة مواقع في وقت واحد. كل صفحة موقع خاص بها بملفات تعريف الارتباط الخاصة به.",
   "recipes.bottomMargin": "الهامش السفلي",
   "recipes.sharedMargin": "يستخدم الهامش المشترك. حرّك المؤشر ليمنح هذا الموقع هامشًا خاصًا به.",
   "recipes.ownMargin": "لهذا الموقع هامش خاص به.",
   "recipes.siteMarginLabel": "الهامش السفلي لـ {name}",
   "recipes.useSharedMargin": "استخدام الهامش المشترك",
   "recipes.imported": "أُضيفت من خارج التطبيق. أزلها للعودة إلى الموقع كما كان.",
+
+  "hub.pages": "صفحات {name}",
 
   "market.title": "متجر الوصفات",
   "market.linkNote": "وصفات من أشخاص آخرين، تُفحص تلقائيًا وتُنشر بعد 14 يومًا",
@@ -289,6 +296,7 @@ export const ar: Messages = {
   "market.review.version": "الإصدار {version}",
   "market.review.replaces": "تحل محل إصدارك {version}",
   "market.review.sites": "تعمل على",
+  "market.review.pages": "الصفحات",
   "market.review.options": "المفاتيح",
   "market.review.rules": "ما تغيّره",
   "market.review.hides": "تُخفي",

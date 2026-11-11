@@ -282,6 +282,11 @@ export const ta: Messages = {
   "recipes.options": "{name} விருப்பங்கள்",
   "recipes.addFavorite": "{name} ஐப் பிடித்துக்கொள்ளவிடைகளில் சேர்",
   "recipes.removeFavorite": "{name} ஐப் பிடித்துக்கொள்ளவிடைகளிலிருந்து அகற்று",
+  "recipes.hub": "ஹப்",
+  "recipes.hubPages": "பக்கங்கள்",
+  "recipes.openHubPage": "{label} திற",
+  "recipes.hubNote":
+    "ஒரு ஹப் ஒரே நேரத்தில் பல தளங்களைத் திறக்கிறது. ஒவ்வொரு பக்கமும் தனி தளம், தனது குக்கீகளுடன்.",
   "recipes.bottomMargin": "கீழ் விளிச்சை",
   "recipes.sharedMargin":
     "பகிர்ந்த கீழ் விளிச்சையைப் பயன்படுத்துகிறது. இந்தத் தளத்திற்குத் தனி விளிச்சை கொடுக்கச் ச்ளைடரை நகர்த்தவும்.",
@@ -291,6 +296,8 @@ export const ta: Messages = {
 
   "recipes.imported":
     "செயலிக்கு வெளியிலிருந்து சேர்க்கப்பட்டது. தளம் முன்பிருந்த நிலைக்குத் திரும்ப இதை அகற்று.",
+
+  "hub.pages": "{name} பக்கங்கள்",
 
   "market.title": "சந்தை",
   "market.linkNote":
@@ -308,6 +315,7 @@ export const ta: Messages = {
   "market.review.version": "பதிப்பு {version}",
   "market.review.replaces": "உன் பதிப்பு {version} ஐ மாற்றும்",
   "market.review.sites": "இவற்றில் செயல்படும்",
+  "market.review.pages": "பக்கங்கள்",
   "market.review.options": "மாற்றிகள்",
   "market.review.rules": "எதை மாற்றுகிறது",
   "market.review.hides": "மறைப்பவை",

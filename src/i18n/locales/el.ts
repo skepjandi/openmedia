@@ -282,6 +282,11 @@ export const el: Messages = {
   "recipes.options": "Επιλογές {name}",
   "recipes.addFavorite": "Προσθήκη {name} στα αγαπημένα",
   "recipes.removeFavorite": "Αφαίρεση {name} από τα αγαπημένα",
+  "recipes.hub": "Hub",
+  "recipes.hubPages": "Σελίδες",
+  "recipes.openHubPage": "Άνοιγμα {label}",
+  "recipes.hubNote":
+    "Ένα hub ανοίγει πολλά site ταυτόχρονα. Κάθε σελίδα είναι δικό της site, με δικά της cookies.",
   "recipes.bottomMargin": "Κάτω περιθώριο",
   "recipes.sharedMargin":
     "Χρησιμοποιεί το κοινό περιθώριο. Σύρετε τον ρυθμιστή για να δώσετε σε αυτό τον ιστότοπο δικό του.",
@@ -290,6 +295,8 @@ export const el: Messages = {
   "recipes.useSharedMargin": "Χρήση του κοινού περιθώριου",
   "recipes.imported":
     "Προστέθηκε από έξω από την εφαρμογή. Αφαιρέστε την για να γυρίσει ο ιστότοπος όπως ήταν.",
+
+  "hub.pages": "Σελίδες: {name}",
 
   "market.title": "Αγορά",
   "market.linkNote":
@@ -307,6 +314,7 @@ export const el: Messages = {
   "market.review.version": "Έκδοση {version}",
   "market.review.replaces": "Αντικαθιστά την έκδοσή σας {version}",
   "market.review.sites": "Λειτουργεί σε",
+  "market.review.pages": "Σελίδες",
   "market.review.options": "Διακόπτες",
   "market.review.rules": "Τι αλλάζει",
   "market.review.hides": "Κρύβει",

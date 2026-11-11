@@ -66,7 +66,7 @@ pub struct Item {
     pub summary: String,
     pub hosts: Vec<String>,
     pub featured: bool,
-    /// Platform tags plus one origin tag (`official` or `community`).
+    /// Platform and origin tags, plus `hub` when the recipe has launcher tabs.
     pub tags: Vec<String>,
     pub homepage: Option<String>,
     pub installs: Option<u64>,
@@ -75,6 +75,17 @@ pub struct Item {
     pub my_rating: Option<u8>,
     pub installed_version: Option<String>,
     pub update_available: bool,
+}
+
+/// A bounded public catalog result exposed only to the in-process assistant tool loop.
+#[derive(Debug, Clone, PartialEq, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct AgentSearchResult {
+    pub id: String,
+    pub name: String,
+    pub summary: String,
+    pub hosts: Vec<String>,
+    pub hub: bool,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize)]
@@ -134,6 +145,50 @@ impl Catalog {
             recipes.imported_version(id)
         });
         Ok(Listing { items, withdrawn })
+    }
+
+    /// Searches the signed marketplace catalog for the assistant. Results are public metadata,
+    /// capped at eight; each returned id still needs a separate hash-checked read.
+    pub async fn search_for_agent(
+        &self,
+        recipes: &Recipes,
+        query: &str,
+    ) -> Result<Vec<AgentSearchResult>> {
+        let query = query.trim();
+        if query.is_empty() || query.chars().count() > 100 {
+            return Err(Error::Catalog("search needs 1 to 100 characters".into()));
+        }
+        let index = match self.cached_index() {
+            Ok(index) => index,
+            Err(_) => self.fetch(recipes).await?.0,
+        };
+        let query = query.to_lowercase();
+        Ok(index
+            .recipes
+            .iter()
+            .filter(|entry| {
+                entry.name.to_lowercase().contains(&query)
+                    || entry.summary.to_lowercase().contains(&query)
+                    || entry
+                        .hosts
+                        .iter()
+                        .any(|host| host.to_lowercase().contains(&query))
+                    || entry.id.to_lowercase().contains(&query)
+            })
+            .take(8)
+            .map(|entry| AgentSearchResult {
+                id: entry.id.clone(),
+                name: entry.name.clone(),
+                summary: entry.summary.clone(),
+                hosts: entry.hosts.clone(),
+                hub: entry.has_tag(index::TAG_HUB),
+            })
+            .collect())
+    }
+
+    /// Reads one public recipe only after verifying its bytes against the signed catalog entry.
+    pub async fn read_for_agent(&self, id: &str) -> Result<Recipe> {
+        self.download(id).await.map(|(recipe, _)| recipe)
     }
 
     /// What installing would add, rule by rule. Downloads and verifies; saves nothing.

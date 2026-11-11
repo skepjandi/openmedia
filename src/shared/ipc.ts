@@ -68,6 +68,17 @@ export interface SiteOption {
   default: boolean;
 }
 
+/** One page of a hub: the label on its tab and the address it opens. */
+export interface HubTab {
+  label: string;
+  url: string;
+}
+
+/** A recipe that opens as several pages at once, each on a site of its own. */
+export interface Hub {
+  tabs: HubTab[];
+}
+
 export interface SiteSettings {
   recipeId: string;
   name: string;
@@ -80,6 +91,8 @@ export interface SiteSettings {
   bottomMargin: number | null;
   /** Who the recipe is from; `imported` (a pasted bundle or the marketplace) can be removed. */
   origin: "user" | "ai" | "imported";
+  /** The pages this recipe opens as tabs; null for an ordinary recipe. */
+  hub: Hub | null;
 }
 
 export type ProviderKind = "anthropic" | "openAiCompatible";

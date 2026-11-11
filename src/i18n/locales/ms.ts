@@ -273,6 +273,11 @@ export const ms: Messages = {
   "recipes.options": "Pilihan {name}",
   "recipes.addFavorite": "Tambah {name} ke kegemaran",
   "recipes.removeFavorite": "Buang {name} daripada kegemaran",
+  "recipes.hub": "Hab",
+  "recipes.hubPages": "Halaman",
+  "recipes.openHubPage": "Buka {label}",
+  "recipes.hubNote":
+    "Hab membuka beberapa laman sekali gus. Setiap halaman ialah laman sendiri, dengan cookie sendiri.",
   "recipes.bottomMargin": "Margin bawah",
   "recipes.sharedMargin":
     "Guna margin bersama. Leret peluncur untuk memberi laman ini margin sendiri.",
@@ -283,6 +288,8 @@ export const ms: Messages = {
   "recipes.empty":
     "Anda belum mempunyai resipi. Cari resipi siap pakai untuk laman popular di Pasaran.",
   "recipes.openMarket": "Buka Pasaran",
+
+  "hub.pages": "Halaman {name}",
 
   "market.title": "Pasaran",
   "market.linkNote":
@@ -300,6 +307,7 @@ export const ms: Messages = {
   "market.review.version": "Versi {version}",
   "market.review.replaces": "Menggantikan versi anda {version}",
   "market.review.sites": "Berfungsi pada",
+  "market.review.pages": "Halaman",
   "market.review.options": "Suis",
   "market.review.rules": "Apa yang diubah",
   "market.review.hides": "Menyembunyikan",

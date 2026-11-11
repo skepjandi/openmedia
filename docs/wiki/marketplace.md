@@ -13,14 +13,20 @@ Both end in the same place: a recipe with `origin: imported`, reviewed rule by r
 
 ## Tags, official and community
 
-Status: Design.
+The catalog tag contract is implemented in Rust, the Worker and the landing page; see the current allowed set and hub behavior below. Ratings, comments and Pro-gated actions retain their individual status notes.
 
-Every recipe carries tags. Allowed tag set: `mobile`, `desktop`, `official`, `community`.
+Every recipe carries platform tags; the signed catalog entry may also carry the `hub` content tag. Allowed index tag set: `mobile`, `desktop`, `official`, `community`, `hub`.
 
 - **Platform tags** (`mobile`, `desktop`; one or both) are **inside the recipe JSON** as `tags` ([Recipe Format](./recipe-format.md#top-level-fields)). They are required; the Rust validator and the Worker's validator must stay equal.
-- **The origin tag** (`official` or `community`) is **never inside a recipe**. The Worker adds it to the index entry. An index entry's `tags` are the recipe's platform tags (sorted) plus exactly one origin tag.
-- **Official** means published by us. **Community** means anything a user uploads; the origin is forced by the Worker's channel, so an upload cannot claim to be official. Community submissions with an id starting `market.official.` are rejected. A recipe's tag is a label, not a trust level: official recipes get **no** extra trust on the device. They install through the same verified path as any marketplace recipe (signature, SHA-256 pin, Rust validation, rule-by-rule review, `origin: imported`).
-- The app's Marketplace page filters on tags (Official / Community / Mobile / Desktop; chips are toggles); official recipes for the current platform come first. The landing page shows the same badges and chips.
+- **The origin tag** (`official` or `community`) is **never inside a recipe**. The Worker adds it to the index entry.
+- **The `hub` tag** is added by the Worker exactly when the recipe contains `hub` tab metadata; it supplements the recipe's platform tags and the origin tag.
+- **Official** means published by us. **Community** means anything a user uploads; the origin is forced by the Worker's channel, so an upload cannot claim to be official. Community submissions with an id starting `market.official.` are rejected. A recipe's tag is a label, not a trust level: all recipes install through the same verified path (signature, SHA-256 pin, Rust validation, rule-by-rule review, `origin: imported`).
+- The app's Marketplace page filters on origin, platform and hub tags; official recipes for the current platform come first. The landing page shows the same badges and filters.
+
+### AI marketplace tools
+
+The AI hub builder can search the app's already-verified signed catalog and read recipes by id. These are read-only operations: search returns a bounded set of public listing metadata, and recipe reads verify the signed catalog hash before returning public recipe data. A read is limited to ids surfaced by a search in that same build. This is not a new marketplace endpoint and does not publish anything; the user submits an accepted hub separately through the existing submission flow.
+
 
 ### Official mode (Worker)
 

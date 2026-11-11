@@ -275,6 +275,11 @@ export const nl: Messages = {
   "recipes.options": "Opties voor {name}",
   "recipes.addFavorite": "{name} toevoegen aan favorieten",
   "recipes.removeFavorite": "{name} verwijderen uit favorieten",
+  "recipes.hub": "Hub",
+  "recipes.hubPages": "Pagina's",
+  "recipes.openHubPage": "{label} openen",
+  "recipes.hubNote":
+    "Een hub opent meerdere sites tegelijk. Elke pagina is een eigen site, met eigen cookies.",
   "recipes.bottomMargin": "Ondermarge",
   "recipes.sharedMargin":
     "Gebruikt de gedeelde marge. Beweeg de schuifregelaar om deze site een eigen marge te geven.",
@@ -286,6 +291,8 @@ export const nl: Messages = {
   "recipes.empty":
     "Je hebt nog geen recepten. Vind kant-en-klare recepten voor populaire sites op de Marktplaats.",
   "recipes.openMarket": "Open de Marktplaats",
+
+  "hub.pages": "Pagina's van {name}",
 
   "market.title": "Marktplaats",
   "market.linkNote":
@@ -303,6 +310,7 @@ export const nl: Messages = {
   "market.review.version": "Versie {version}",
   "market.review.replaces": "Vervangt je versie {version}",
   "market.review.sites": "Werkt op",
+  "market.review.pages": "Pagina's",
   "market.review.options": "Schakelaars",
   "market.review.rules": "Wat het verandert",
   "market.review.hides": "Verbergt",

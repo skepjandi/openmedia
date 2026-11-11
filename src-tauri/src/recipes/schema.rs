@@ -12,6 +12,10 @@ const MAX_RULES: usize = 200;
 const MAX_OPTIONS: usize = 30;
 const MAX_LABEL_CHARS: usize = 60;
 const MAX_DESCRIPTION_CHARS: usize = 160;
+pub const MIN_HUB_TABS: usize = 2;
+pub const MAX_HUB_TABS: usize = 6;
+pub const MAX_HUB_LABEL_CHARS: usize = 20;
+const MAX_HUB_URL_CHARS: usize = 300;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -76,6 +80,22 @@ pub struct Target {
     pub css: String,
 }
 
+/// One page of a hub: a label for its tab and the address it opens.
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct HubTab {
+    pub label: String,
+    pub url: String,
+}
+
+/// A recipe that is also a set of pages from several sites, opened together as tabs. Each page
+/// stays its own session on its own site; the recipe's `match` patterns and rules shape them.
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct Hub {
+    pub tabs: Vec<HubTab>,
+}
+
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(tag = "type", rename_all = "camelCase", deny_unknown_fields)]
 pub enum Rule {
@@ -84,6 +104,10 @@ pub enum Rule {
         label: String,
         #[serde(default, skip_serializing_if = "Option::is_none")]
         option: Option<String>,
+        /// Narrows the rule to some of the recipe's own `match` patterns (a hub shapes each of its
+        /// sites separately); none means every page the recipe matches.
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        on: Option<Vec<String>>,
         target: Target,
     },
     Css {
@@ -91,6 +115,8 @@ pub enum Rule {
         label: String,
         #[serde(default, skip_serializing_if = "Option::is_none")]
         option: Option<String>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        on: Option<Vec<String>>,
         target: Target,
         declarations: BTreeMap<String, String>,
     },
@@ -107,6 +133,13 @@ impl Rule {
     pub fn option(&self) -> Option<&str> {
         match self {
             Self::Hide { option, .. } | Self::Css { option, .. } => option.as_deref(),
+        }
+    }
+
+    /// The `match` patterns this rule is limited to; `None` means all of the recipe's.
+    pub fn on(&self) -> Option<&[String]> {
+        match self {
+            Self::Hide { on, .. } | Self::Css { on, .. } => on.as_deref(),
         }
     }
 }
@@ -127,6 +160,9 @@ pub struct Recipe {
     pub options: Vec<SiteOption>,
     pub rules: Vec<Rule>,
     pub meta: Option<Meta>,
+    /// Present when the recipe is a hub: the pages to open as tabs.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub hub: Option<Hub>,
 }
 
 impl Recipe {
@@ -195,6 +231,7 @@ impl Recipe {
             }
         }
         self.validate_options()?;
+        self.validate_hub()?;
         self.validate_homepage()?;
         let mut seen = HashSet::new();
         for rule in &self.rules {
@@ -206,6 +243,14 @@ impl Recipe {
             {
                 return Err(Error::Recipe(format!(
                     "rule {} uses unknown option {option}",
+                    rule.id()
+                )));
+            }
+            if let Some(on) = rule.on()
+                && (on.is_empty() || on.iter().any(|pattern| !self.matches.contains(pattern)))
+            {
+                return Err(Error::Recipe(format!(
+                    "rule {} is limited to a pattern the recipe does not have",
                     rule.id()
                 )));
             }
@@ -255,6 +300,68 @@ impl Recipe {
                 self.id
             ))),
         }
+    }
+
+    /// A hub has 2 to 6 tabs, each an https page the recipe's own patterns cover, so a tab can
+    /// never send the user to a site the review screen did not show as a site of the recipe.
+    fn validate_hub(&self) -> Result<()> {
+        let Some(hub) = &self.hub else {
+            return Ok(());
+        };
+        let invalid = |reason: &str| Error::Recipe(format!("hub {}: {reason}", self.id));
+        if !(MIN_HUB_TABS..=MAX_HUB_TABS).contains(&hub.tabs.len()) {
+            return Err(invalid("a hub has 2 to 6 tabs"));
+        }
+        let mut seen = HashSet::new();
+        for tab in &hub.tabs {
+            if tab.label.trim().is_empty()
+                || tab.label.chars().count() > MAX_HUB_LABEL_CHARS
+                || tab.label.chars().any(|c| {
+                    c.is_control()
+                        || matches!(
+                            c,
+                            '\u{200B}'..='\u{200F}'
+                                | '\u{202A}'..='\u{202E}'
+                                | '\u{2066}'..='\u{2069}'
+                                | '\u{FEFF}'
+                        )
+                })
+            {
+                return Err(invalid(
+                    "a tab needs a plain-text label of up to 20 characters",
+                ));
+            }
+            let url = Url::parse(&tab.url).ok().filter(|url| {
+                tab.url.len() <= MAX_HUB_URL_CHARS
+                    && !tab.url.contains('\\')
+                    && !tab.url.chars().any(|c| {
+                        c.is_control()
+                            || matches!(
+                                c,
+                                '\u{200B}'..='\u{200F}'
+                                    | '\u{202A}'..='\u{202E}'
+                                    | '\u{2066}'..='\u{2069}'
+                                    | '\u{FEFF}'
+                            )
+                    })
+                    && url.scheme() == "https"
+                    && url.host_str().is_some()
+                    && url.username().is_empty()
+                    && url.password().is_none()
+            });
+            let Some(url) = url else {
+                return Err(invalid("a tab needs an https address without credentials"));
+            };
+            if !self.covers(&url) {
+                return Err(invalid(
+                    "a tab address is not covered by the recipe's patterns",
+                ));
+            }
+            if !seen.insert(url.to_string()) {
+                return Err(invalid("two tabs open the same address"));
+            }
+        }
+        Ok(())
     }
 
     fn validate_options(&self) -> Result<()> {

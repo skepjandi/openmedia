@@ -272,6 +272,11 @@ export const si: Messages = {
   "recipes.options": "{name} විකල්ප",
   "recipes.addFavorite": "{name} ආදරණීය අයිතිතයට එකතු කරන්න",
   "recipes.removeFavorite": "{name} ආදරණීය අයිතිතයෙන් ඉවත් කරන්න",
+  "recipes.hub": "හබ්",
+  "recipes.hubPages": "පිටු",
+  "recipes.openHubPage": "{label} විවෘත කරන්න",
+  "recipes.hubNote":
+    "හබ් එකවර බහ සටහන් විවෘත කරයි. හැම පිටුවක්ම එකම සටහනක් පරිදි එයි, එහි පුනර්ය කුකීස් සමඟ.",
   "recipes.bottomMargin": "පහළ දුරස්ථය",
   "recipes.sharedMargin":
     "මූලික දුරස්ථය භාවිතයෙන්. මෙම අඩවියට එකම දුරස්ථයක් ලබා දීමට ස්ලයිඩරය ගමන් කරන්න.",
@@ -281,6 +286,8 @@ export const si: Messages = {
 
   "recipes.imported":
     "යෙදුමෙන් පිටතින් එකතු කළ ක්‍රමයකි. අඩවිය කලින් තිබූ ලෙසට පෙරළීමට එය ඉවත් කරන්න.",
+
+  "hub.pages": "{name} පිටු",
 
   "market.title": "වෙළඳපොළ",
   "market.linkNote": "අන් අයගෙන් ලැබුණු ක්‍රම, ස්වයංක්‍රීයව පරීක්ෂා කර දින 14කින් ප්‍රකාශයට පැමිණේ",
@@ -297,6 +304,7 @@ export const si: Messages = {
   "market.review.version": "අනුවාදය {version}",
   "market.review.replaces": "ඔබගේ අනුවාදය {version} ප්‍රතිස්ථාපනය කරයි",
   "market.review.sites": "ක්‍රියා කරන අඩවි",
+  "market.review.pages": "පිටු",
   "market.review.options": "ස්විච",
   "market.review.rules": "වෙනස් කරන දේ",
   "market.review.hides": "සඟවයි",

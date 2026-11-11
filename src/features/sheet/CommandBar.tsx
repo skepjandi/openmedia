@@ -17,10 +17,15 @@ import { siteOf } from "../../shared/site";
 import { ChatPane } from "../ai/ChatPane";
 import { selectActiveChat, useChat } from "../ai/chatStore";
 import { INPUT_MODES, MAX_REQUEST_LENGTH, routeInput, type InputMode } from "../ai/route";
+import { assistant as assistantIpc, type HubProposal } from "../ai/ipc";
 import { useEntitlementStore } from "../paywall/store";
 import { DEFAULT_SEARCH_ENGINE } from "../../shared/searchEngines";
 
 const NO_FAVORITES: Favorite[] = [];
+const primary =
+  "rounded-full bg-accent px-5 py-2.5 text-sm font-semibold text-on-accent disabled:opacity-40";
+const quiet =
+  "rounded-full border border-hair px-4 py-2.5 text-sm font-medium text-paper/85 disabled:opacity-40";
 
 /** Opens from the top so the keyboard never covers it. Addresses open directly; other text is a request for the assistant. */
 export function CommandBar() {
@@ -36,8 +41,9 @@ export function CommandBar() {
   const aiState = useApp((s) => s.aiState);
   const assistant = useApp((s) => s.assistant);
   const loadAi = useApp((s) => s.loadAi);
-  const submitRequest = useApp((s) => s.submitRequest);
+  const loadSites = useApp((s) => s.loadSites);
   const openSheet = useApp((s) => s.openSheet);
+  const submitRequest = useApp((s) => s.submitRequest);
   const editRequest = useApp((s) => s.editRequest);
   const t = useT();
   const [notice, setNotice] = useState<string | null>(null);
@@ -45,9 +51,14 @@ export function CommandBar() {
   // The mode the user picked; `null` means automatic: a site that already has a chat is a chat.
   const [modeChoice, setModeChoice] = useState<InputMode | null>(null);
   // The bar's text lives in the store, so "Ask again" can hand the request back for editing.
+  const [historyOpen, setHistoryOpen] = useState(false);
   const text = assistant.status === "idle" ? assistant.draft : "";
   const assistantIdle = assistant.status === "idle";
-  const [historyOpen, setHistoryOpen] = useState(false);
+  const sites = useApp((s) => s.sites);
+  const [hubProposal, setHubProposal] = useState<HubProposal | null>(null);
+  const [hubBusy, setHubBusy] = useState(false);
+  const [hubError, setHubError] = useState<string | null>(null);
+  const [hubSaved, setHubSaved] = useState<string | null>(null);
   const activeChat = useChat(selectActiveChat);
   const savedChats = useChat((s) => s.chats);
   const loadChats = useChat((s) => s.load);
@@ -121,7 +132,51 @@ export function CommandBar() {
         setNotice(null);
         setBlocked(false);
         void submitRequest(route.request);
+        return;
+      case "hub":
+        setNotice(null);
+        setBlocked(false);
+        setHubError(null);
+        setHubSaved(null);
+        setHubProposal(null);
+        setHubBusy(true);
+        editRequest("");
+        void assistantIpc
+          .buildHub(route.request)
+          .then(setHubProposal)
+          .catch((error: unknown) => setHubError(describeError(error, t)))
+          .finally(() => setHubBusy(false));
+        return;
     }
+  };
+  const replacingHub = hubProposal
+    ? (sites.find((site) => site.recipeId === hubProposal.recipeId) ?? null)
+    : null;
+
+  const acceptHub = () => {
+    if (!hubProposal) return;
+    setHubBusy(true);
+    setHubError(null);
+    void assistantIpc
+      .acceptHub(hubProposal.id)
+      .then(async (saved) => {
+        await loadSites();
+        setHubProposal(null);
+        setHubSaved(saved.name);
+      })
+      .catch((error: unknown) => setHubError(describeError(error, t)))
+      .finally(() => setHubBusy(false));
+  };
+
+  const rejectHub = () => {
+    if (!hubProposal) return;
+    setHubBusy(true);
+    setHubError(null);
+    void assistantIpc
+      .rejectHub(hubProposal.id)
+      .then(() => setHubProposal(null))
+      .catch((error: unknown) => setHubError(describeError(error, t)))
+      .finally(() => setHubBusy(false));
   };
 
   const run = (action: () => Promise<void>) =>
@@ -173,7 +228,9 @@ export function CommandBar() {
                 inputMode={mode === "link" ? "url" : "search"}
                 maxLength={MAX_REQUEST_LENGTH}
                 enterKeyHint="go"
-                placeholder={t(`commandBar.placeholder.${mode}`)}
+                placeholder={t(
+                  mode === "hub" ? "commandBar.placeholder.chat" : `commandBar.placeholder.${mode}`,
+                )}
                 value={text}
                 onChange={(event) => {
                   editRequest(event.target.value);
@@ -184,7 +241,7 @@ export function CommandBar() {
               />
               <button
                 type="submit"
-                aria-label={t("commandBar.go")}
+                disabled={mode === "hub" && hubBusy}
                 className="grid size-11 place-items-center rounded-full bg-accent text-on-accent"
               >
                 <ArrowIcon />
@@ -197,8 +254,8 @@ export function CommandBar() {
               className="mt-2 flex gap-1 px-1"
             >
               {INPUT_MODES.map((option) => {
-                // Chat is the assistant: without Pro it stays grayed out and opens the plans.
-                const locked = option === "chat" && !isPro;
+                // Chat and Hub use the assistant; without Pro both open the plans.
+                const locked = (option === "chat" || option === "hub") && !isPro;
                 return (
                   <button
                     key={option}
@@ -217,12 +274,88 @@ export function CommandBar() {
                       mode === option ? "bg-accent text-on-accent" : "text-paper/70 bg-paper/[0.06]"
                     } ${locked ? "opacity-45" : ""}`}
                   >
-                    {t(`commandBar.mode.${option}`)}
+                    {t(option === "hub" ? "recipes.hub" : `commandBar.mode.${option}`)}
                     {locked && <ProIcon size={12} />}
                   </button>
                 );
               })}
             </div>
+            {mode === "hub" && (
+              <section className="mt-3 rounded-2xl border border-hair bg-paper/[0.03] p-3">
+                {hubBusy && (
+                  <p role="status" className="text-sm text-paper/70">
+                    {t("assistant.working")}
+                  </p>
+                )}
+                {hubProposal && (
+                  <>
+                    <h2 className="text-base font-semibold text-paper">{hubProposal.name}</h2>
+                    {hubProposal.summary && (
+                      <p className="mt-1 text-sm text-paper/70">{hubProposal.summary}</p>
+                    )}
+                    {replacingHub && (
+                      <p role="alert" className="mt-2 text-sm text-warning">
+                        {t("market.update")}: {replacingHub.name}
+                      </p>
+                    )}
+                    <ol className="mt-3 flex flex-col gap-2">
+                      {hubProposal.tabs.map((tab) => (
+                        <li
+                          key={`${tab.sourceRecipeId}:${tab.url}`}
+                          className="rounded-xl bg-paper/[0.04] px-3 py-2"
+                        >
+                          <p className="text-sm font-medium text-paper">
+                            {tab.label} · {tab.host}
+                          </p>
+                          <p className="break-all text-xs text-paper/55">{tab.url}</p>
+                          <p className="mt-1 text-xs text-paper/65">{tab.sourceRecipeName}</p>
+                        </li>
+                      ))}
+                    </ol>
+                    <p className="mt-2 text-xs leading-snug text-paper/55">
+                      {t("recipes.hubNote")}
+                    </p>
+                    <div className="mt-3 flex justify-end gap-2">
+                      <button
+                        type="button"
+                        className={quiet}
+                        disabled={hubBusy}
+                        onClick={rejectHub}
+                      >
+                        {t("assistant.reject")}
+                      </button>
+                      <button
+                        type="button"
+                        className={primary}
+                        disabled={hubBusy}
+                        onClick={acceptHub}
+                      >
+                        {t(replacingHub ? "market.update" : "assistant.accept")}
+                      </button>
+                    </div>
+                  </>
+                )}
+                {hubSaved && !hubProposal && (
+                  <div className="flex items-center justify-between gap-2">
+                    <p role="status" className="text-sm text-paper">
+                      {t("market.added")}: {hubSaved}
+                    </p>
+                    <button
+                      type="button"
+                      className={quiet}
+                      onClick={() => openSheet("marketplace")}
+                    >
+                      {t("market.share")}
+                    </button>
+                  </div>
+                )}
+                {hubError && (
+                  <p role="alert" className="mt-2 text-sm text-error">
+                    {hubError}
+                  </p>
+                )}
+              </section>
+            )}
 
             <p className="min-h-4 px-2 pt-1 text-xs leading-snug text-paper/55">
               {notice ?? (page?.url ? new URL(page.url).host : "")}

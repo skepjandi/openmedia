@@ -273,6 +273,11 @@ export const ja: Messages = {
   "recipes.options": "{name}のオプション",
   "recipes.addFavorite": "{name}をお気に入りに追加",
   "recipes.removeFavorite": "{name}をお気に入りから外す",
+  "recipes.hub": "ハブ",
+  "recipes.hubPages": "ページ",
+  "recipes.openHubPage": "{label}を開く",
+  "recipes.hubNote":
+    "ハブは複数のサイトを一度に開きます。各ページはそれぞれ独立したサイトで、Cookieも別々です。",
   "recipes.bottomMargin": "下余白",
   "recipes.sharedMargin":
     "共通の下余白を使います。スライダーを動かすと、このサイト専用の値になります。",
@@ -283,6 +288,8 @@ export const ja: Messages = {
   "recipes.empty":
     "レシピはまだありません。人気サイト向けの既成レシピがマーケットプレイスにあります。",
   "recipes.openMarket": "マーケットプレイスを開く",
+
+  "hub.pages": "{name}のページ",
 
   "market.title": "マーケットプレイス",
   "market.linkNote": "ほかの人のレシピ（自動チェックされ、14日後に公開）",
@@ -299,6 +306,7 @@ export const ja: Messages = {
   "market.review.version": "バージョン {version}",
   "market.review.replaces": "お使いのバージョン {version} を置き換えます",
   "market.review.sites": "対応サイト",
+  "market.review.pages": "ページ",
   "market.review.options": "スイッチ",
   "market.review.rules": "変更内容",
   "market.review.hides": "非表示にするもの",

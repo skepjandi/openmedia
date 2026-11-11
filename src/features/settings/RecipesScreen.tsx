@@ -4,8 +4,9 @@ import type { MessageKey } from "../../i18n/messages";
 import { useT } from "../../i18n/useT";
 import { useIconForUrl } from "../../shared/siteIcons";
 import { isFavoriteSite, toggleSiteFavorite } from "../../shared/favorites";
+import { tabHost } from "../../shared/hubs";
 import { DownIcon, ForwardIcon, StarIcon } from "../../shared/icons";
-import type { OptionGroup, SiteSettings } from "../../shared/ipc";
+import type { Hub, OptionGroup, SiteSettings } from "../../shared/ipc";
 import { SiteTile } from "../../shared/SiteTile";
 import { Screen } from "../../shared/Screen";
 import { GuideLink } from "../guides/GuideLink";
@@ -128,7 +129,14 @@ export function SiteCard({ site, incognito = false }: { site: SiteSettings; inco
         >
           <SiteTile name={site.name} icon={icon} />
           <span className="min-w-0 flex-1">
-            <span className="block truncate text-base font-medium">{site.name}</span>
+            <span className="flex items-center gap-2">
+              <span className="min-w-0 flex-1 truncate text-base font-medium">{site.name}</span>
+              {site.hub && (
+                <span className="shrink-0 rounded-full bg-accent/15 px-2 py-0.5 text-[11px] font-medium text-accent">
+                  {t("recipes.hub")}
+                </span>
+              )}
+            </span>
             <span className="block text-sm text-paper/55">
               {hidden === 0
                 ? t("recipes.nothingHidden")
@@ -166,11 +174,13 @@ function SiteOptions({ site }: { site: SiteSettings }) {
   const setSiteOption = useApp((s) => s.setSiteOption);
   const setSiteBottomMargin = useApp((s) => s.setSiteBottomMargin);
   const sharedMargin = useApp((s) => s.state?.bottomMargin ?? 0);
+  const openHubTab = useApp((s) => s.openHubTab);
   const t = useT();
 
   return (
     <div className="flex flex-col gap-5 border-t border-hair px-3 py-4">
       <ImportedNotice site={site} />
+      {site.hub && site.hub.tabs.length > 0 && <HubPages hub={site.hub} onOpen={openHubTab} />}
       <OptionGroups
         site={site}
         onToggle={(optionId, enabled) => void setSiteOption(site.recipeId, optionId, enabled)}
@@ -199,6 +209,37 @@ function SiteOptions({ site }: { site: SiteSettings }) {
           </div>
         </Group>
       </div>
+    </div>
+  );
+}
+
+/** The pages of a hub. Each one is a site of its own and opens as an ordinary page. */
+function HubPages({ hub, onOpen }: { hub: Hub; onOpen: (url: string) => void }) {
+  const t = useT();
+
+  return (
+    <div>
+      <GroupLabel>{t("recipes.hubPages")}</GroupLabel>
+      <Group>
+        {hub.tabs.map((tab) => (
+          <button
+            key={tab.url}
+            type="button"
+            aria-label={t("recipes.openHubPage", { label: tab.label })}
+            onClick={() => onOpen(tab.url)}
+            className="flex w-full items-center gap-3 px-4 py-3 text-start active:bg-paper/[0.05]"
+          >
+            <span className="min-w-0 flex-1">
+              <span className="block truncate text-base">{tab.label}</span>
+              <span className="block truncate text-sm text-paper/55">{tabHost(tab)}</span>
+            </span>
+            <span aria-hidden="true" className="text-paper/50 rtl:-scale-x-100">
+              <ForwardIcon />
+            </span>
+          </button>
+        ))}
+      </Group>
+      <p className="px-1 pt-2 text-[13px] leading-snug text-paper/50">{t("recipes.hubNote")}</p>
     </div>
   );
 }

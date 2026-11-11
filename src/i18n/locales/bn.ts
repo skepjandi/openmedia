@@ -270,6 +270,11 @@ export const bn: Messages = {
   "recipes.options": "{name} বিকল্প",
   "recipes.addFavorite": "{name} পছন্দের তালিকায় যোগ করুন",
   "recipes.removeFavorite": "{name} পছন্দের তালিকা থেকে সরান",
+  "recipes.hub": "হাব",
+  "recipes.hubPages": "পৃষ্ঠা",
+  "recipes.openHubPage": "{label} খুলুন",
+  "recipes.hubNote":
+    "একটি হাব একসাথে কয়েকটি সাইট খোলে। প্রতিটি পৃষ্ঠা নিজস্ব সাইট, নিজস্ব কুকি সহ।",
   "recipes.bottomMargin": "নিচের মার্জিন",
   "recipes.sharedMargin":
     "সাধারণ মার্জিন ব্যবহার করে। এই সাইটের নিজস্ব মার্জিন দিতে স্লাইডারটি সরান।",
@@ -277,6 +282,8 @@ export const bn: Messages = {
   "recipes.siteMarginLabel": "{name} নিচের মার্জিন",
   "recipes.useSharedMargin": "সাধারণ মার্জিন ব্যবহার করুন",
   "recipes.imported": "অ্যাপের বাইরে থেকে যোগ করা হয়েছে। সাইটটি আগের মতো করতে এটি সরান।",
+
+  "hub.pages": "{name}-এর পৃষ্ঠা",
 
   "market.title": "মার্কেটপ্লেস",
   "market.linkNote": "অন্যদের রেসিপি, স্বয়ংক্রিয়ভাবে যাচাই করা এবং ১৪ দিন পর প্রকাশিত",
@@ -293,6 +300,7 @@ export const bn: Messages = {
   "market.review.version": "সংস্করণ {version}",
   "market.review.replaces": "আপনার সংস্করণ {version} বদলে দেয়",
   "market.review.sites": "যেসব সাইটে কাজ করে",
+  "market.review.pages": "পৃষ্ঠা",
   "market.review.options": "সুইচ",
   "market.review.rules": "যা বদলায়",
   "market.review.hides": "লুকায়",

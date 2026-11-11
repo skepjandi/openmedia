@@ -279,6 +279,11 @@ export const ru: Messages = {
   "recipes.options": "Настройки {name}",
   "recipes.addFavorite": "Добавить {name} в избранное",
   "recipes.removeFavorite": "Убрать {name} из избранного",
+  "recipes.hub": "Хаб",
+  "recipes.hubPages": "Страницы",
+  "recipes.openHubPage": "Открыть {label}",
+  "recipes.hubNote":
+    "Хаб открывает несколько сайтов сразу. Каждая страница — отдельный сайт со своими cookie.",
   "recipes.bottomMargin": "Нижнее поле",
   "recipes.sharedMargin": "Использует общее поле. Сдвиньте ползунок, чтобы дать этому сайту своё.",
   "recipes.ownMargin": "У этого сайта своё нижнее поле.",
@@ -286,6 +291,8 @@ export const ru: Messages = {
   "recipes.useSharedMargin": "Использовать общее поле",
 
   "recipes.imported": "Добавлен извне приложения. Уберите его, чтобы вернуть сайт в прежний вид.",
+
+  "hub.pages": "Страницы: {name}",
 
   "market.title": "Каталог",
   "market.linkNote":
@@ -303,6 +310,7 @@ export const ru: Messages = {
   "market.review.version": "Версия {version}",
   "market.review.replaces": "Заменяет вашу версию {version}",
   "market.review.sites": "Работает на",
+  "market.review.pages": "Страницы",
   "market.review.options": "Переключатели",
   "market.review.rules": "Что меняет",
   "market.review.hides": "Скрывает",

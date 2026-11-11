@@ -137,6 +137,8 @@ export interface AppStore {
   recordVisit: (url: string) => void;
   /** A favorite: switches to its live session if there is one, otherwise opens a new one. */
   openFavorite: (url: string) => void;
+  /** A page of a hub: switches to its live session if there is one, otherwise opens a new one. */
+  openHubTab: (url: string) => void;
   /** A history entry: switches to the live session typed with it, otherwise opens a new one. */
   openHistory: (url: string) => void;
   /** Shows a live session by id, for example the one a notification was tapped for. */
@@ -340,6 +342,17 @@ export const useApp = create<AppStore>((set, get) => {
     get().trimSessions("routine");
   };
 
+  /**
+   * A page the user picked from a list: the live session on that site is reused when there is
+   * one, otherwise a new session opens. The page is a site of its own, so it keeps its own
+   * session and its own cookies.
+   */
+  const openPickedPage = (url: string) => {
+    const live = findFavoriteSession(get().sessions, url);
+    if (live) switchTo(live.id);
+    else startSession(url, "favorite");
+  };
+
   /** Incognito chats live only in memory: switching modes drops them and loads the saved ones again. */
   const resetChats = () => {
     useChat.getState().forget();
@@ -495,11 +508,9 @@ export const useApp = create<AppStore>((set, get) => {
 
     openSearch: (url) => startSession(url, "typed"),
 
-    openFavorite: (url) => {
-      const live = findFavoriteSession(get().sessions, url);
-      if (live) switchTo(live.id);
-      else startSession(url, "favorite");
-    },
+    openFavorite: (url) => openPickedPage(url),
+
+    openHubTab: (url) => openPickedPage(url),
 
     openHistory: (url) => {
       const live = findTypedSession(get().sessions, url);

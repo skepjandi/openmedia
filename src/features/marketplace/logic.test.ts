@@ -61,11 +61,11 @@ describe("tag filter", () => {
     expect(toggleTag(next, "community").has("community")).toBe(false);
   });
 
-  it("widens within origin or platform and narrows across them", () => {
-    const filter = new Set(["official", "community", "mobile"] as const);
-    expect(matchesFilter(["official", "mobile"], filter)).toBe(true);
-    expect(matchesFilter(["community", "mobile", "desktop"], filter)).toBe(true);
-    expect(matchesFilter(["official", "desktop"], filter)).toBe(false);
+  it("combines the hub type filter with platform and origin", () => {
+    const filter = new Set(["community", "mobile", "hub"] as const);
+    expect(matchesFilter(["community", "mobile", "hub"], filter)).toBe(true);
+    expect(matchesFilter(["community", "mobile"], filter)).toBe(false);
+    expect(matchesFilter(["official", "mobile", "hub"], filter)).toBe(false);
   });
 
   it("lets everything through when no chip is on", () => {
@@ -85,7 +85,7 @@ describe("tag filter", () => {
   });
 
   it("ignores tags the app does not know", () => {
-    expect(knownTags(["mobile", "beta", "official"])).toEqual(["official", "mobile"]);
+    expect(knownTags(["mobile", "beta", "official", "hub"])).toEqual(["official", "mobile", "hub"]);
   });
 });
 

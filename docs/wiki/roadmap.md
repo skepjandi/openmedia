@@ -86,6 +86,7 @@ The vertical slice, then breadth.
 
 - ~~`SecretStore` implementation per S6; key management UI (add, test, delete).~~ Done for iOS: trait plus `keyring` (v3, `apple-native`), a settings section to add, test and delete providers and keys. See [AI Assistant](./ai-assistant.md#implemented-provider-settings).
 - **Implemented:** Anthropic and OpenAI-compatible adapters (including Gemini/OpenRouter presets), bounded DOM snapshots, Rust redaction, preview-before-send, validated patches with one correction attempt, page previews, match counts with up to two repair rounds, and explicit accept/reject. See [AI Assistant](./ai-assistant.md).
+- **Implemented:** hub building from bounded read-only tools over the signed marketplace, with preview and explicit save/reject; publication stays a separate marketplace submission. See [AI Assistant](./ai-assistant.md#build-a-hub).
 - Repair of stale rules.
 - Error taxonomy in the UI; token estimate and size cap.
 - Fixture-driven tests; recorded provider fixtures; redaction property tests.
@@ -140,6 +141,7 @@ Sharing without any server (file/text) plus an automatically published marketpla
 
 | Date | Decision | Why | Revisit if |
 |------|----------|-----|-----------|
+| 2026-11-11 | Hubs are recipes with 2–6 independently opened site tabs; the AI may read the signed marketplace catalog but only the user can accept/save a proposal, and publishing is a separate action | A unified inbox would require site-specific data access, credential handling and automation that conflicts with the app's customize-only boundary. Reusing the signed catalog and ordinary site sessions provides a safe launcher without scraping or merging accounts | Users ask for a real unified inbox; revisit only with an explicit product and privacy review |
 | 2026-11-07 | Tauri v2 for desktop and mobile | User preference; one Rust core, one shell | S3/S4 fail |
 | 2026-11-07 | Site view = separate native webview loading the real site; not iframe, not proxy | Frame-blocking headers; no backend; user logs in to real origin | — |
 | 2026-11-07 | Mobile site view via in-repo native plugin (Swift/Kotlin) | `add_child` is desktop-only upstream | Upstream ships mobile multiwebview |

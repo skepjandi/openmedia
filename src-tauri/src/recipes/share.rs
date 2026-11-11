@@ -59,6 +59,8 @@ pub struct RecipePreview {
     pub notes: Option<String>,
     pub sites: Vec<String>,
     pub options: Vec<OptionPreview>,
+    /// The tabs of a hub, each with the site it opens; empty for an ordinary recipe.
+    pub tabs: Vec<TabPreview>,
     pub rules: Vec<RulePreview>,
     /// The version already installed under this id, which saving would replace.
     pub replaces: Option<String>,
@@ -70,6 +72,14 @@ pub struct OptionPreview {
     pub label: String,
     pub description: String,
     pub on_by_default: bool,
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct TabPreview {
+    pub label: String,
+    pub url: String,
+    pub host: String,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize)]
@@ -204,10 +214,17 @@ fn check_shared(recipe: &Recipe) -> Result<()> {
     let rule_labels = recipe.rules.iter().map(|rule| match rule {
         Rule::Hide { label, .. } | Rule::Css { label, .. } => label,
     });
-    let unsafe_text = option_texts.chain(rule_labels).any(|text| {
-        !is_plain_text(text, MAX_RULE_LABEL_CHARS.max(MAX_OPTION_TEXT_CHARS))
-            || text.trim().is_empty()
-    });
+    let tab_labels = recipe
+        .hub
+        .iter()
+        .flat_map(|hub| hub.tabs.iter().map(|tab| &tab.label));
+    let unsafe_text = option_texts
+        .chain(rule_labels)
+        .chain(tab_labels)
+        .any(|text| {
+            !is_plain_text(text, MAX_RULE_LABEL_CHARS.max(MAX_OPTION_TEXT_CHARS))
+                || text.trim().is_empty()
+        });
     if unsafe_text {
         return Err(Error::Recipe(format!(
             "recipe {} has text that cannot be shown safely",
@@ -300,8 +317,25 @@ pub fn preview(recipe: &Recipe, installed_version: Option<&str>) -> RecipePrevie
             })
             .collect(),
         rules: recipe.rules.iter().map(rule_preview).collect(),
+        tabs: tab_previews(recipe),
         replaces: installed_version.map(str::to_owned),
     }
+}
+
+fn tab_previews(recipe: &Recipe) -> Vec<TabPreview> {
+    recipe
+        .hub
+        .iter()
+        .flat_map(|hub| &hub.tabs)
+        .map(|tab| TabPreview {
+            label: tab.label.clone(),
+            url: tab.url.clone(),
+            host: Url::parse(&tab.url)
+                .ok()
+                .and_then(|url| url.host_str().map(str::to_owned))
+                .unwrap_or_default(),
+        })
+        .collect()
 }
 
 fn rule_preview(rule: &Rule) -> RulePreview {
@@ -353,6 +387,57 @@ mod tests {
 
     fn file(json: &str) -> Result<Recipe> {
         parse_shared(json.as_bytes(), Source::File)
+    }
+
+    fn hub_of(tabs: &str) -> String {
+        recipe_json("hub", &format!(r#", "hub": {{"tabs": [{tabs}]}}"#)).replace(
+            "https://*.example.com/*",
+            "https://www.example.com/inbox/*\", \"https://chat.example.org/*",
+        )
+    }
+
+    const TAB_A: &str = r#"{"label": "Mail", "url": "https://www.example.com/inbox/"}"#;
+    const TAB_B: &str = r#"{"label": "Chat", "url": "https://chat.example.org/"}"#;
+
+    #[test]
+    fn a_hub_of_covered_https_pages_is_accepted_and_previewed_tab_by_tab() {
+        let recipe = file(&hub_of(&format!("{TAB_A},{TAB_B}"))).unwrap();
+        let tabs = preview(&recipe, None).tabs;
+        assert_eq!(tabs.len(), 2);
+        assert_eq!(tabs[1].host, "chat.example.org");
+        assert!(
+            preview(&file(&recipe_json("calm", "")).unwrap(), None)
+                .tabs
+                .is_empty()
+        );
+    }
+
+    #[test]
+    fn a_hub_needs_two_to_six_distinct_https_tabs_the_recipe_covers() {
+        let outside = r#"{"label": "Evil", "url": "https://evil.test/"}"#;
+        let http = r#"{"label": "Chat", "url": "http://chat.example.org/"}"#;
+        let credentials = r#"{"label": "Chat", "url": "https://me:pw@chat.example.org/"}"#;
+        let backslash = r#"{"label": "Chat", "url": "https://chat.example.org\\evil"}"#;
+        let invisible_url = r#"{"label": "Chat", "url": "https://chat.example.org/\u202e"}"#;
+        let blank = r#"{"label": " ", "url": "https://chat.example.org/"}"#;
+        let long =
+            r#"{"label": "A label of more than twenty", "url": "https://chat.example.org/"}"#;
+        let invisible = "{\"label\": \"Cha\u{202E}t\", \"url\": \"https://chat.example.org/\"}";
+        for tabs in [
+            TAB_A.to_owned(),
+            format!("{TAB_A},{TAB_A}"),
+            format!("{TAB_A},{outside}"),
+            format!("{TAB_A},{http}"),
+            format!("{TAB_A},{credentials}"),
+            format!("{TAB_A},{backslash}"),
+            format!("{TAB_A},{invisible_url}"),
+            format!("{TAB_A},{blank}"),
+            format!("{TAB_A},{long}"),
+            format!("{TAB_A},{invisible}"),
+            vec![TAB_B; 7].join(","),
+        ] {
+            assert!(file(&hub_of(&tabs)).is_err(), "{tabs}");
+        }
     }
 
     #[test]

@@ -9,6 +9,7 @@ import { observeTitle, quickFavoriteOf, type Watch } from "./unreadWatch";
 import { usableQuickAccess } from "../../shared/favorites";
 import { useEntitlementStore } from "../paywall/store";
 import { leftSearchForSite } from "../history/searchVisit";
+import { HubBar } from "../hubs/HubBar";
 
 /** How often idle and surplus hidden sessions are swept. */
 const SWEEP_MS = 60_000;
@@ -127,19 +128,21 @@ export function WebLayer() {
         </div>
       )}
       <div
-        ref={slot}
-        className="pointer-events-none fixed inset-x-0 top-[var(--safe-top)]"
+        className="pointer-events-none fixed inset-x-0 top-[var(--safe-top)] flex flex-col"
         style={{ bottom: bottomMargin }}
       >
-        {opening && (
-          <div role="status" className="absolute inset-0 grid place-items-center">
-            <span
-              aria-hidden="true"
-              className="size-7 rounded-full border-2 border-paper/15 border-t-accent motion-safe:animate-spin"
-            />
-            <span className="sr-only">{t("web.loading")}</span>
-          </div>
-        )}
+        <HubBar />
+        <div ref={slot} className="relative min-h-0 flex-1">
+          {opening && (
+            <div role="status" className="absolute inset-0 grid place-items-center">
+              <span
+                aria-hidden="true"
+                className="size-7 rounded-full border-2 border-paper/15 border-t-accent motion-safe:animate-spin"
+              />
+              <span className="sr-only">{t("web.loading")}</span>
+            </div>
+          )}
+        </div>
       </div>
       <div
         aria-hidden="true"

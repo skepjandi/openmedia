@@ -283,6 +283,11 @@ export const fr: Messages = {
   "recipes.options": "Options de {name}",
   "recipes.addFavorite": "Ajouter {name} aux favoris",
   "recipes.removeFavorite": "Retirer {name} des favoris",
+  "recipes.hub": "Hub",
+  "recipes.hubPages": "Pages",
+  "recipes.openHubPage": "Ouvrir {label}",
+  "recipes.hubNote":
+    "Un hub ouvre plusieurs sites à la fois. Chaque page est un site à part entière, avec ses propres cookies.",
   "recipes.bottomMargin": "Marge inférieure",
   "recipes.sharedMargin":
     "Utilise la marge partagée. Déplacez le curseur pour donner à ce site sa propre marge.",
@@ -291,6 +296,8 @@ export const fr: Messages = {
   "recipes.useSharedMargin": "Utiliser la marge partagée",
   "recipes.imported":
     "Ajoutée depuis l’extérieur de l’app. Retirez-la pour que le site redevienne comme avant.",
+
+  "hub.pages": "Pages de {name}",
 
   "market.title": "Marché",
   "market.linkNote":
@@ -308,6 +315,7 @@ export const fr: Messages = {
   "market.review.version": "Version {version}",
   "market.review.replaces": "Remplace votre version {version}",
   "market.review.sites": "Fonctionne sur",
+  "market.review.pages": "Pages",
   "market.review.options": "Interrupteurs",
   "market.review.rules": "Ce qu’elle modifie",
   "market.review.hides": "Masque",

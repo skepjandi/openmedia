@@ -54,6 +54,7 @@ const TAG_LABELS: Record<MarketTag, MessageKey> = {
   community: "market.tag.community",
   mobile: "market.tag.mobile",
   desktop: "market.tag.desktop",
+  hub: "recipes.hub",
 };
 
 const REASONS: { reason: ReportReason; label: MessageKey }[] = [

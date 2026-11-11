@@ -9,7 +9,10 @@ use zeroize::Zeroizing;
 use super::{
     ProviderConfig,
     prompt::Prompt,
-    provider::{ApiRequest, MSG_REFUSED, MSG_STRUCTURE, failure, model_of, send, status_error},
+    provider::{
+        ApiRequest, MAX_TOOL_CALLS, MSG_REFUSED, MSG_STRUCTURE, ModelReply, ToolCall,
+        ToolDefinition, Turn, bounded_text, failure, model_of, send, status_error, text_args,
+    },
 };
 use crate::error::Result;
 
@@ -121,6 +124,165 @@ pub(super) async fn complete(
     parse_response(&body)
 }
 
+/// The request for the tools path: the tools the model may call, and the conversation so far.
+pub(super) fn build_tool_request(
+    base_url: &str,
+    config: &ProviderConfig,
+    key: &str,
+    system: &str,
+    tools: &[ToolDefinition],
+    turns: &[Turn],
+) -> Result<ApiRequest> {
+    let body = json!({
+        "model": model_of(config)?,
+        "messages": messages(system, turns),
+        "tools": tools
+            .iter()
+            .map(|tool| json!({
+                "type": "function",
+                "function": {
+                    "name": tool.name,
+                    "description": tool.description,
+                    "parameters": tool.input_schema,
+                },
+            }))
+            .collect::<Vec<_>>(),
+    });
+    Ok(ApiRequest {
+        url: format!("{base_url}/chat/completions"),
+        headers: vec![("authorization", Zeroizing::new(format!("Bearer {key}")))],
+        body,
+    })
+}
+
+/// The conversation the way chat completions want it: the system's words, the user's, the model's
+/// own turn with the tools it asked to run, and one turn per tool answer.
+fn messages(system: &str, turns: &[Turn]) -> Vec<Value> {
+    let mut messages: Vec<Value> = Vec::new();
+    if !system.trim().is_empty() {
+        messages.push(json!({ "role": "system", "content": system }));
+    }
+    for turn in turns {
+        match turn {
+            Turn::User { text } => {
+                messages.push(json!({ "role": "user", "content": text }));
+            }
+            Turn::Assistant { text, tool_calls } => {
+                let mut message = json!({
+                    "role": "assistant",
+                    "content": text.clone().filter(|text| !text.trim().is_empty()),
+                });
+                if !tool_calls.is_empty() {
+                    let calls = tool_calls
+                        .iter()
+                        .map(|call| {
+                            json!({
+                                "id": call.id,
+                                "type": "function",
+                                "function": {
+                                    "name": call.name,
+                                    "arguments": serde_json::to_string(&call.arguments)
+                                        .unwrap_or_else(|_| "{}".to_owned()),
+                                },
+                            })
+                        })
+                        .collect::<Vec<_>>();
+                    message["tool_calls"] = Value::Array(calls);
+                }
+                messages.push(message);
+            }
+            Turn::ToolResult(result) => {
+                messages.push(json!({
+                    "role": "tool",
+                    "tool_call_id": result.call_id,
+                    "name": result.name,
+                    "content": bounded_text(&result.content),
+                }));
+            }
+        }
+    }
+    messages
+}
+
+/// The model's answer: its own words, or the tools it wants to run.
+pub(super) fn parse_tool_response(body: &Value) -> Result<ModelReply> {
+    let choice = body
+        .get("choices")
+        .and_then(Value::as_array)
+        .and_then(|choices| choices.first())
+        .ok_or_else(|| failure(MSG_STRUCTURE))?;
+    let message = choice
+        .get("message")
+        .ok_or_else(|| failure(MSG_STRUCTURE))?;
+    let refusal = message
+        .get("refusal")
+        .and_then(Value::as_str)
+        .is_some_and(|text| !text.is_empty());
+    if refusal || choice.get("finish_reason").and_then(Value::as_str) == Some("content_filter") {
+        return Err(failure(MSG_REFUSED));
+    }
+    if choice.get("finish_reason").and_then(Value::as_str) == Some("length") {
+        return Err(failure(MSG_STRUCTURE));
+    }
+    let mut calls: Vec<ToolCall> = Vec::new();
+    if let Some(list) = message.get("tool_calls").and_then(Value::as_array) {
+        for call in list {
+            if calls.len() >= MAX_TOOL_CALLS {
+                return Err(failure(MSG_STRUCTURE));
+            }
+            let id = call.get("id").and_then(Value::as_str).unwrap_or_default();
+            let function = call.get("function");
+            let name = function
+                .and_then(|function| function.get("name"))
+                .and_then(Value::as_str)
+                .unwrap_or_default();
+            if id.is_empty() || name.is_empty() {
+                return Err(failure(MSG_STRUCTURE));
+            }
+            let arguments = text_args(function.and_then(|function| function.get("arguments")))?;
+            calls.push(ToolCall {
+                id: id.to_owned(),
+                name: name.to_owned(),
+                arguments,
+            });
+        }
+    }
+    if !calls.is_empty() {
+        return Ok(ModelReply::ToolCalls(calls));
+    }
+    let text = match message.get("content") {
+        Some(Value::String(text)) => text.clone(),
+        Some(Value::Array(parts)) => parts
+            .iter()
+            .filter_map(|part| part.get("text").and_then(Value::as_str))
+            .collect::<Vec<_>>()
+            .join(""),
+        _ => String::new(),
+    };
+    if text.trim().is_empty() {
+        return Err(failure(MSG_STRUCTURE));
+    }
+    Ok(ModelReply::Text(text))
+}
+
+/// Asks the model to answer with words or with tool calls. The tools are not run here.
+pub(super) async fn complete_with_tools(
+    client: &Client,
+    base_url: &str,
+    config: &ProviderConfig,
+    key: &str,
+    system: &str,
+    tools: &[ToolDefinition],
+    turns: &[Turn],
+) -> Result<ModelReply> {
+    let request = build_tool_request(base_url, config, key, system, tools, turns)?;
+    let (status, body) = send(client, &request).await?;
+    if !(200..300).contains(&status) {
+        return Err(status_error(status));
+    }
+    parse_tool_response(&body)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -128,7 +290,8 @@ mod tests {
         ProviderKind,
         patch::{parse_patch, patch_schema},
         provider::{
-            complete as complete_via_provider,
+            ToolResult, complete as complete_via_provider,
+            complete_with_tools as complete_with_tools_via_provider,
             test_server::{config, prompt, serve},
         },
     };
@@ -330,5 +493,183 @@ mod tests {
         let server = serve(vec![(200, body.to_owned())]);
         let answer = run(&server.base, "sk-key").unwrap();
         assert!(parse_patch(&answer, None).is_err());
+    }
+
+    const TOOL_CALL_ANSWER: &str = r#"{"id":"chatcmpl-2","object":"chat.completion","choices":[{"index":0,
+      "message":{"role":"assistant","content":null,"tool_calls":[{"id":"call_01","type":"function",
+      "function":{"name":"search_marketplace","arguments":"{\"query\":\"hide reels\"}"}}]},
+      "finish_reason":"tool_calls"}],"usage":{"prompt_tokens":10}}"#;
+
+    const FINAL_ANSWER: &str = r#"{"id":"chatcmpl-3","object":"chat.completion","choices":[{"index":0,
+      "message":{"role":"assistant","content":"The marketplace has a recipe for that."},
+      "finish_reason":"stop"}],"usage":{"prompt_tokens":20}}"#;
+
+    fn search_tool() -> ToolDefinition {
+        ToolDefinition {
+            name: "search_marketplace".to_owned(),
+            description: "Search the marketplace.".to_owned(),
+            input_schema: json!({
+                "type": "object",
+                "properties": { "query": { "type": "string" } },
+            }),
+        }
+    }
+
+    #[test]
+    fn the_tool_request_carries_the_tools_the_calls_and_the_answers() {
+        let config = config(
+            ProviderKind::OpenAiCompatible,
+            "https://api.openai.com/v1",
+            Some("gpt-x"),
+        );
+        let tools = [search_tool()];
+        let turns = [
+            Turn::User {
+                text: "hide the reels".to_owned(),
+            },
+            Turn::Assistant {
+                text: None,
+                tool_calls: vec![ToolCall {
+                    id: "call_01".to_owned(),
+                    name: "search_marketplace".to_owned(),
+                    arguments: json!({ "query": "hide reels" }),
+                }],
+            },
+            Turn::ToolResult(ToolResult {
+                call_id: "call_01".to_owned(),
+                name: "search_marketplace".to_owned(),
+                content: "two recipes".to_owned(),
+                is_error: false,
+            }),
+        ];
+        let request = build_tool_request(
+            "https://api.openai.com/v1",
+            &config,
+            "sk-key",
+            "SYSTEM",
+            &tools,
+            &turns,
+        )
+        .unwrap();
+        assert_eq!(request.url, "https://api.openai.com/v1/chat/completions");
+        let body = &request.body;
+        assert_eq!(body["model"], "gpt-x");
+        assert_eq!(body["tools"][0]["type"], "function");
+        assert_eq!(body["tools"][0]["function"]["name"], "search_marketplace");
+        assert_eq!(
+            body["tools"][0]["function"]["parameters"]["properties"]["query"]["type"],
+            "string"
+        );
+        assert!(body.get("response_format").is_none());
+        let messages = body["messages"].as_array().unwrap();
+        assert_eq!(messages.len(), 4);
+        assert_eq!(
+            messages[0],
+            json!({ "role": "system", "content": "SYSTEM" })
+        );
+        assert_eq!(
+            messages[1],
+            json!({ "role": "user", "content": "hide the reels" })
+        );
+        assert_eq!(messages[2]["role"], "assistant");
+        assert_eq!(messages[2]["content"], Value::Null);
+        assert_eq!(messages[2]["tool_calls"][0]["id"], "call_01");
+        assert_eq!(messages[2]["tool_calls"][0]["type"], "function");
+        assert_eq!(
+            messages[2]["tool_calls"][0]["function"]["name"],
+            "search_marketplace"
+        );
+        assert_eq!(
+            messages[2]["tool_calls"][0]["function"]["arguments"],
+            "{\"query\":\"hide reels\"}"
+        );
+        assert_eq!(messages[3]["role"], "tool");
+        assert_eq!(messages[3]["tool_call_id"], "call_01");
+        assert_eq!(messages[3]["content"], "two recipes");
+        assert!(!body.to_string().contains("sk-key"));
+    }
+
+    #[test]
+    fn a_tool_call_becomes_a_typed_call() {
+        let reply = parse_tool_response(&serde_json::from_str(TOOL_CALL_ANSWER).unwrap()).unwrap();
+        let ModelReply::ToolCalls(calls) = reply else {
+            panic!("expected tool calls");
+        };
+        assert_eq!(calls.len(), 1);
+        assert_eq!(calls[0].id, "call_01");
+        assert_eq!(calls[0].name, "search_marketplace");
+        assert_eq!(calls[0].arguments, json!({ "query": "hide reels" }));
+        let words = parse_tool_response(&serde_json::from_str(FINAL_ANSWER).unwrap()).unwrap();
+        assert_eq!(
+            words,
+            ModelReply::Text("The marketplace has a recipe for that.".to_owned())
+        );
+    }
+
+    #[test]
+    fn malformed_tool_calls_are_fixed_errors() {
+        let message = |body: Value| parse_tool_response(&body).unwrap_err().to_string();
+        for body in [
+            json!({ "choices": [{ "message": { "tool_calls": [{ "type": "function", "function": { "name": "search", "arguments": "{}" } }] } }] }),
+            json!({ "choices": [{ "message": { "tool_calls": [{ "id": "call_01", "function": { "arguments": "{}" } }] } }] }),
+            json!({ "choices": [{ "message": { "tool_calls": [{ "id": "call_01", "function": { "name": "search", "arguments": "not json" } }] } }] }),
+            json!({ "choices": [{ "message": { "tool_calls": [{ "id": "call_01", "function": { "name": "search", "arguments": "[1,2]" } }] } }] }),
+            json!({ "choices": [{ "message": { "tool_calls": [{ "id": "call_01", "function": { "name": "search" } }] } }] }),
+            json!({ "choices": [{ "message": { "content": null, "tool_calls": [] }, "finish_reason": "tool_calls" }] }),
+            json!({ "choices": [] }),
+            json!(null),
+        ] {
+            assert!(message(body).contains("not in the expected form"));
+        }
+        assert!(
+            message(json!({ "choices": [{ "message": { "content": null, "refusal": "no" } }] }))
+                .contains("declined")
+        );
+    }
+
+    #[test]
+    fn a_tool_call_and_its_answer_go_back_to_the_provider() {
+        let server = serve(vec![
+            (200, TOOL_CALL_ANSWER.to_owned()),
+            (200, FINAL_ANSWER.to_owned()),
+        ]);
+        let config = config(
+            ProviderKind::OpenAiCompatible,
+            &format!("{}/v1", server.base),
+            Some("gpt-x"),
+        );
+        let tools = [search_tool()];
+        let mut turns = vec![Turn::User {
+            text: "hide the reels".to_owned(),
+        }];
+        let reply = tauri::async_runtime::block_on(complete_with_tools_via_provider(
+            &config, "sk-key", "SYSTEM", &tools, &turns,
+        ))
+        .unwrap();
+        let ModelReply::ToolCalls(calls) = &reply else {
+            panic!("expected tool calls");
+        };
+        turns.push(reply.assistant_turn());
+        turns.push(Turn::ToolResult(ToolResult {
+            call_id: calls[0].id.clone(),
+            name: calls[0].name.clone(),
+            content: "two recipes".to_owned(),
+            is_error: false,
+        }));
+        let answer = tauri::async_runtime::block_on(complete_with_tools_via_provider(
+            &config, "sk-key", "SYSTEM", &tools, &turns,
+        ))
+        .unwrap();
+        assert_eq!(
+            answer,
+            ModelReply::Text("The marketplace has a recipe for that.".to_owned())
+        );
+        let seen = server.seen.lock().unwrap();
+        assert_eq!(seen.len(), 2);
+        assert!(seen[0].body.contains("\"tools\""));
+        assert!(seen[1].body.contains("tool_calls"));
+        assert!(seen[1].body.contains("\"role\":\"tool\""));
+        assert!(seen[1].body.contains("call_01"));
+        assert!(seen[1].body.contains("two recipes"));
     }
 }

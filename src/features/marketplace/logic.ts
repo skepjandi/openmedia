@@ -2,9 +2,16 @@ import type { MarketComment, MarketItem, MarketRating, MarketTag } from "./ipc";
 
 const ORIGIN_TAGS: readonly MarketTag[] = ["official", "community"];
 const PLATFORM_TAGS: readonly MarketTag[] = ["mobile", "desktop"];
+const HUB_TAGS: readonly MarketTag[] = ["hub"];
 
 /** The chips, in the order they are shown. */
-export const FILTER_TAGS: readonly MarketTag[] = ["official", "community", "mobile", "desktop"];
+export const FILTER_TAGS: readonly MarketTag[] = [
+  "official",
+  "community",
+  "mobile",
+  "desktop",
+  "hub",
+];
 
 export const MAX_COMMENT_CHARS = 280;
 export const STAR_COUNT = 5;
@@ -34,11 +41,11 @@ export function toggleTag(filter: ReadonlySet<MarketTag>, tag: MarketTag): Set<M
 }
 
 /**
- * Tags of one kind (origin or platform) widen the match; the two kinds narrow each other. A kind
- * with no chip on does not restrict anything.
+ * Tags of one kind (origin, platform, or content type) widen the match; kinds narrow each other.
+ * A kind with no chip on does not restrict anything.
  */
 export function matchesFilter(tags: readonly string[], filter: ReadonlySet<MarketTag>): boolean {
-  return [ORIGIN_TAGS, PLATFORM_TAGS].every((kind) => {
+  return [ORIGIN_TAGS, PLATFORM_TAGS, HUB_TAGS].every((kind) => {
     const active = kind.filter((tag) => filter.has(tag));
     return active.length === 0 || active.some((tag) => tags.includes(tag));
   });

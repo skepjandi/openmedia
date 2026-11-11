@@ -278,6 +278,11 @@ export const ur: Messages = {
   "recipes.options": "{name} کے اختیارات",
   "recipes.addFavorite": "{name} کو پسندیدہ میں شامل کریں",
   "recipes.removeFavorite": "{name} کو پسندیدہ سے ہٹائیں",
+  "recipes.hub": "ہاب",
+  "recipes.hubPages": "صفحات",
+  "recipes.openHubPage": "{label} کھولیں",
+  "recipes.hubNote":
+    "ہب ایک وقت میں کئی سائٹس کھولتا ہے۔ ہر صفحہ اپنی سائٹ ہے، اپنے کوکیز کے ساتھ۔",
   "recipes.bottomMargin": "نیچے کا مارجن",
   "recipes.sharedMargin":
     "مشترکہ مارجن استعمال ہوتا ہے۔ سلائیڈر کو ہلائیں تاکہ اس سائٹ کا اپنا مارجن ہو۔",
@@ -285,6 +290,8 @@ export const ur: Messages = {
   "recipes.siteMarginLabel": "{name} کا نیچے والا مارجن",
   "recipes.useSharedMargin": "مشترکہ مارجن استعمال کریں",
   "recipes.imported": "ایپ کے باہر سے شامل کی گئی۔ سائٹ کو پہلی حالت میں لانے کے لیے اسے ہٹائیں۔",
+
+  "hub.pages": "{name} کے صفحات",
 
   "market.title": "ریسپی بازار",
   "market.linkNote":
@@ -302,6 +309,7 @@ export const ur: Messages = {
   "market.review.version": "ورژن {version}",
   "market.review.replaces": "آپ کے ورژن {version} کی جگہ لے گی",
   "market.review.sites": "ان پر کام کرتی ہے",
+  "market.review.pages": "صفحات",
   "market.review.options": "سوئچ",
   "market.review.rules": "کیا بدلتی ہے",
   "market.review.hides": "چھپاتی ہے",

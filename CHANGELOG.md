@@ -8,6 +8,15 @@ All notable changes to OpenMedia are documented here.
 
 ## 2026-11-11
 
+### feat(ai): build and publish multi-site hubs
+
+**Area:** `feat(ai)`
+
+**Change:** Users can ask the BYOK assistant to build a tabbed launcher from signed marketplace recipes, review each site, and accept or reject it. Accepted hubs launch independent site sessions and can be submitted through the existing marketplace flow; no inbox scraping, account merging or auto-publication. The recipe schema, Worker index tag, marketplace discovery UI and landing page recognize hubs.
+
+**Verified:** Rust formatting, clippy and 349 library tests; frontend `ts:check`, formatting, ESLint (excluding the unrelated existing `scripts/render-store-assets.mjs` warning) and 381 tests across 39 files; marketplace hub-filter tests (21 passed); Worker hub tests (37 passed); landing marketplace tests (35 passed). **Not verified:** final shell UI on a device or live Worker deployment.
+
+
 ### perf(android): read exception rules only after a block matched
 
 **Area:** `perf(android)`

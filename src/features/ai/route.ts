@@ -5,14 +5,15 @@ import { normalizeWebUrl } from "../../shared/url";
 export const MAX_REQUEST_LENGTH = 400;
 
 /** What the user wants the bar to do with the text. `auto` decides from the text itself. */
-export type InputMode = "auto" | "link" | "search" | "chat";
-export const INPUT_MODES: readonly InputMode[] = ["auto", "link", "search", "chat"];
+export type InputMode = "auto" | "link" | "search" | "chat" | "hub";
+export const INPUT_MODES: readonly InputMode[] = ["auto", "link", "search", "chat", "hub"];
 
 export type Route =
   | { kind: "empty" }
   | { kind: "address"; url: string }
   | { kind: "search"; url: string }
   | { kind: "request"; request: string }
+  | { kind: "hub"; request: string }
   | { kind: "notLink" }
   | { kind: "paywall" }
   | { kind: "blocked"; reason: "noProvider" | "noPage" };
@@ -51,6 +52,13 @@ function assistantRoute(text: string, context: RouteContext): Route {
   return { kind: "request", request: text.slice(0, MAX_REQUEST_LENGTH) };
 }
 
+/** A hub request has no current-page dependency: its only context is the user's words. */
+function hubRoute(text: string, context: RouteContext): Route {
+  if (!context.pro) return { kind: "paywall" };
+  if (!providerReady(context.ai)) return { kind: "blocked", reason: "noProvider" };
+  return { kind: "hub", request: text.slice(0, MAX_REQUEST_LENGTH) };
+}
+
 /**
  * Decides what the typed text does. Links and searches are free; only the assistant is Pro.
  *
@@ -71,6 +79,8 @@ export function routeInput(text: string, context: RouteContext): Route {
       return { kind: "search", url: searchUrl(trimmed, context.searchEngine) };
     case "chat":
       return assistantRoute(trimmed, context);
+    case "hub":
+      return hubRoute(trimmed, context);
     case "auto":
       if (url) return { kind: "address", url };
       if (REQUEST_START.test(trimmed)) return assistantRoute(trimmed, context);

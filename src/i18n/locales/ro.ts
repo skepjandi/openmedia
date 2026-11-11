@@ -278,6 +278,11 @@ export const ro: Messages = {
   "recipes.options": "Opțiuni {name}",
   "recipes.addFavorite": "Adaugă {name} la favorite",
   "recipes.removeFavorite": "Elimină {name} din favorite",
+  "recipes.hub": "Hub",
+  "recipes.hubPages": "Pagini",
+  "recipes.openHubPage": "Deschide {label}",
+  "recipes.hubNote":
+    "Un hub deschide mai multe site-uri deodată. Fiecare pagină este un site propriu, cu cookie-urile proprii.",
   "recipes.bottomMargin": "Margine inferioară",
   "recipes.sharedMargin":
     "Folosește marginea comună. Mută glisorul pentru a da acestui site una proprie.",
@@ -286,6 +291,8 @@ export const ro: Messages = {
   "recipes.useSharedMargin": "Folosește marginea comună",
 
   "recipes.imported": "Adăugată din afara aplicației. Elimin-o ca să revii la cum era site-ul.",
+
+  "hub.pages": "Paginile {name}",
 
   "market.title": "Magazin",
   "market.linkNote": "Rețete de la alte persoane, verificate automat și publicate după 14 zile",
@@ -302,6 +309,7 @@ export const ro: Messages = {
   "market.review.version": "Versiunea {version}",
   "market.review.replaces": "Înlocuiește versiunea ta {version}",
   "market.review.sites": "Funcționează pe",
+  "market.review.pages": "Pagini",
   "market.review.options": "Comutatoare",
   "market.review.rules": "Ce modifică",
   "market.review.hides": "Ascunde",

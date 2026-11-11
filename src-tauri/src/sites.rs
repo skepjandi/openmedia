@@ -5,7 +5,7 @@ use url::Url;
 
 use crate::error::{Error, Result};
 use crate::library::{Favorite, FavoriteInput};
-use crate::recipes::{OptionChoices, OptionGroup, Origin, Recipes};
+use crate::recipes::{Hub, OptionChoices, OptionGroup, Origin, Recipes};
 
 /// One toggle as Settings shows it.
 #[derive(Debug, Clone, PartialEq, Serialize)]
@@ -29,6 +29,8 @@ pub struct SiteSettings {
     pub name: String,
     /// Where a favorite of this site opens; `None` means the site cannot be favorited.
     pub homepage: Option<String>,
+    /// Pages opened together by this recipe; ordinary recipes have no hub.
+    pub hub: Option<Hub>,
     pub favorite: bool,
     pub options: Vec<OptionView>,
     pub bottom_margin: Option<u32>,
@@ -67,6 +69,7 @@ pub fn site_settings(
                 recipe_id: recipe.id.clone(),
                 name: recipe.name.clone(),
                 homepage: recipe.homepage().map(str::to_owned),
+                hub: recipe.hub.clone(),
                 favorite: favorites
                     .iter()
                     .any(|favorite| is_favorite_of(recipes, &recipe.id, favorite)),
@@ -157,6 +160,28 @@ mod tests {
             assert!(!site.favorite);
             assert!(site.homepage.is_some(), "{} cannot be favorited", site.name);
         }
+    }
+    #[test]
+    fn site_settings_exposes_hub_tabs_to_the_shell() {
+        let directory = tempfile::tempdir().unwrap();
+        let recipes = Recipes::load(directory.path().join("recipes")).unwrap();
+        let hub = crate::recipes::Recipe::parse(
+            r#"{
+                "schema":1,"id":"custom.hub-messages","name":"Messages","version":"1.0.0",
+                "origin":"ai","tags":["mobile"],
+                "match":["https://*.instagram.com/*","https://*.reddit.com/*"],
+                "rules":[],
+                "hub":{"tabs":[
+                    {"label":"Instagram","url":"https://www.instagram.com/direct/inbox/"},
+                    {"label":"Reddit","url":"https://www.reddit.com/message/messages/"}
+                ]}
+            }"#,
+        )
+        .unwrap();
+        recipes.save_made(&hub).unwrap();
+        let sites = site_settings(&recipes, &OptionChoices::new(), &BTreeMap::new(), &[]);
+        assert_eq!(sites[0].hub.as_ref().unwrap().tabs.len(), 2);
+        assert_eq!(sites[0].hub.as_ref().unwrap().tabs[0].label, "Instagram");
     }
 
     #[test]

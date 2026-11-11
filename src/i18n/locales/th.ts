@@ -263,12 +263,19 @@ export const th: Messages = {
   "recipes.options": "ตัวเลือกของ {name}",
   "recipes.addFavorite": "เพิ่ม {name} ในรายการโปรด",
   "recipes.removeFavorite": "นำ {name} ออกจากรายการโปรด",
+  "recipes.hub": "ฮับ",
+  "recipes.hubPages": "หน้า",
+  "recipes.openHubPage": "เปิด {label}",
+  "recipes.hubNote":
+    "ฮับเปิดหลายเว็บไซต์พร้อมกัน แต่ละหน้าเป็นเว็บไซต์ของตัวเอง พร้อมคุกกี้ของตัวเอง",
   "recipes.bottomMargin": "ขอบล่าง",
   "recipes.sharedMargin": "ใช้ขอบล่างร่วมกัน เลื่อนแถบเพื่อกำหนดขอบของเว็บไซต์นี้เอง",
   "recipes.ownMargin": "เว็บไซต์นี้มีขอบล่างของตัวเอง",
   "recipes.siteMarginLabel": "ขอบล่างของ {name}",
   "recipes.useSharedMargin": "ใช้ขอบล่างร่วมกัน",
   "recipes.imported": "เพิ่มมาจากนอกแอป นำออกเพื่อกลับไปเป็นเหมือนเดิมของเว็บไซต์",
+
+  "hub.pages": "หน้าของ {name}",
 
   "market.title": "ตลาดสูตร",
   "market.linkNote": "สูตรจากผู้อื่น ตรวจสอบอัตโนมัติและเผยแพร่หลัง 14 วัน",
@@ -285,6 +292,7 @@ export const th: Messages = {
   "market.review.version": "เวอร์ชัน {version}",
   "market.review.replaces": "แทนที่เวอร์ชัน {version} ของคุณ",
   "market.review.sites": "ใช้ได้กับ",
+  "market.review.pages": "หน้า",
   "market.review.options": "ตัวเลือก",
   "market.review.rules": "สิ่งที่เปลี่ยน",
   "market.review.hides": "ซ่อน",

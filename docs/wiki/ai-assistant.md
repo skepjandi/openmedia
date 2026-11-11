@@ -1,8 +1,8 @@
 # AI Assistant (BYOK)
 
-> **Status: Implemented (core).** Built: provider settings, key storage and connection test; the two provider adapters, the prompt, the page snapshot with its redaction pass, and the validated patch (`src-tauri/src/ai/{snapshot,redact,prompt,patch,provider,anthropic,openai}.rs`, see [Implemented: core modules](#implemented-core-modules)); the shell flow; and the chat: saved per site and recipe, with the steps of every request ([Implemented: the chat](#implemented-the-chat)). Not built: the "include page text" setting, Gemini's native `responseSchema` adapter, and repair of stale rules.
+> **Status: Implemented.** The BYOK assistant supports page-scoped recipe changes and explicit hub generation from signed marketplace recipes. Hub generation uses read-only marketplace tools, returns a preview, and saves only on explicit acceptance. Provider adapters and hub logic live under `src-tauri/src/ai/`; Tauri command adapters live in `src-tauri/src/commands.rs`; the shell flow lives under `src/features/ai/`.
 
-The user brings their own API key. The assistant turns a plain-language request ("remove the Reels tab and suggested posts, keep stories") into a validated recipe patch for the page they are looking at. With no key configured, everything else (installed recipes, picker, manual editing) still works.
+The user brings their own API key. For a page request, the assistant proposes a validated recipe patch for the page they are looking at. For a hub request, it searches the public marketplace and proposes a multi-site launcher. With no key configured, installed recipes, the picker and manual editing still work.
 
 ## Implemented: provider settings
 
@@ -24,7 +24,16 @@ All in `src-tauri/src/ai/`; the orchestration that strings them together (prepar
 | `redact.rs` | `redact(&mut Snapshot)`, `scrub_text`, `scrub_path`, `MAX_SNAPSHOT_BYTES` (40 KB) |
 | `prompt.rs` | `build(&PromptInput) -> Prompt { system, user, version }`, `estimate_tokens`, `payload_preview`, `selector_rules()`, `site_section(host)`, `RepairNote`, `RuleFailure` |
 | `patch.rs` | `Patch`, `patch_schema()`, `parse_patch(json, recipe)`, `apply_patch(base, domain, patch)`, `preview_css(patch)`, `option_css(recipe, option_id)`, `option_id_for` (the registrable domain comes from `tauri-plugin-siteview/src/site.rs`, the Public Suffix List matcher) |
-| `provider.rs`, `anthropic.rs`, `openai.rs` | `provider::complete(config, key, prompt, schema) -> Result<String>` (the model's patch JSON text) |
+| `provider.rs`, `anthropic.rs`, `openai.rs` | `provider::complete(...)` for recipe patches and `provider::complete_with_tools(...)` for bounded tool turns |
+| `hub.rs` | `build`, `accept`, `reject`; the bounded marketplace tool loop, proposal state and validation. Tauri command adapters are in `src-tauri/src/commands.rs`. |
+
+## Build a hub
+
+The user asks in natural language for a collection of sites, for example messaging pages. On explicit action, `ai_hub_build({ request })` calls the configured BYOK provider with exactly two read-only tools: `search_marketplace(query)` and `read_marketplace(id)`. Search returns a small set of public signed-catalog matches; reads are hash-checked and limited to recipes surfaced by that build. The model cannot call arbitrary network destinations or write marketplace data.
+
+Rust validates the model's structured proposal: 2–6 tabs, safe HTTPS URLs, source recipe IDs that were actually read, and each URL covered by its source recipe. Unknown tools, unread sources, invalid URLs or malformed output are refused. The returned preview includes every tab's label, hostname and source recipe name. `ai_hub_accept({ id })` is the only operation that saves the validated recipe (`origin: ai`); `ai_hub_reject({ id })` discards it. Both build and accept are Pro-gated. Acceptance does not publish: marketplace submission remains a separate, explicit user action and follows the normal Worker validation/hold.
+
+Hub recipes launch each site in an independent ordinary session. The feature does not combine site accounts/inboxes, inspect messages, scrape pages, or automate actions. See [Recipe Format: Hub recipes](./recipe-format.md#hub-recipes).
 
 ### Redaction
 
@@ -69,7 +78,7 @@ All requests go through Rust (`reqwest`). The webview never sees the key and nev
 
 ## Privacy: what is sent
 
-The only page-derived data sent to a provider is the redacted [snapshot](./site-runtime.md#snapshot) plus the user's request. The page script filters first; Core ([`redact.rs`](#redaction)) then re-checks everything against allow-lists, because the page is hostile and its script may be buggy:
+For page requests, the only page-derived data sent to a provider is the redacted [snapshot](./site-runtime.md#snapshot) plus the user's request. The hub builder does not inspect or send a current page: it sends the user's request and bounded public marketplace listing/recipe data returned by its read-only tools. The page script filters first; Core ([`redact.rs`](#redaction)) then re-checks everything against allow-lists, because the page is hostile and its script may be buggy:
 
 - email, phone, long digit runs, URL query strings, tokens-looking strings → placeholder (`[email]`, `[phone]`, `[number]`, `[token]`);
 - drops any text that is not on a link, button, heading, summary, label or role element, and any text longer than 40 characters;

@@ -277,6 +277,11 @@ export const sv: Messages = {
   "recipes.options": "Alternativ för {name}",
   "recipes.addFavorite": "Lägg till {name} i favoriter",
   "recipes.removeFavorite": "Ta bort {name} från favoriter",
+  "recipes.hub": "Hubb",
+  "recipes.hubPages": "Sidor",
+  "recipes.openHubPage": "Öppna {label}",
+  "recipes.hubNote":
+    "En hubb öppnar flera webbplatser samtidigt. Varje sida är en egen webbplats med egna cookies.",
   "recipes.bottomMargin": "Nedre marginal",
   "recipes.sharedMargin":
     "Använder den delade marginalen. Flytta reglaget för att ge den här webbplatsen en egen.",
@@ -286,6 +291,8 @@ export const sv: Messages = {
 
   "recipes.imported":
     "Tillagt utanför appen. Ta bort det för att gå tillbaka till hur webbplatsen var.",
+
+  "hub.pages": "{name}s sidor",
 
   "market.title": "Marknadsplats",
   "market.linkNote": "Recept från andra, kontrollerade automatiskt och publicerade efter 14 dagar",
@@ -302,6 +309,7 @@ export const sv: Messages = {
   "market.review.version": "Version {version}",
   "market.review.replaces": "Ersätter din version {version}",
   "market.review.sites": "Fungerar på",
+  "market.review.pages": "Sidor",
   "market.review.options": "Reglage",
   "market.review.rules": "Vad det ändrar",
   "market.review.hides": "Döljer",

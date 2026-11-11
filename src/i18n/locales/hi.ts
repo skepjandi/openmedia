@@ -269,6 +269,10 @@ export const hi: Messages = {
   "recipes.options": "{name} विकल्प",
   "recipes.addFavorite": "{name} को पसंदीदा में जोड़ें",
   "recipes.removeFavorite": "{name} को पसंदीदा से हटाएँ",
+  "recipes.hub": "हब",
+  "recipes.hubPages": "पेज",
+  "recipes.openHubPage": "{label} खोलें",
+  "recipes.hubNote": "हब एक साथ कई साइट खोलता है। हर पेज अपनी अलग साइट है, अपने कुकीज़ के साथ।",
   "recipes.bottomMargin": "निचली मार्जिन",
   "recipes.sharedMargin":
     "साझा निचली मार्जिन का उपयोग हो रहा है। इस साइट को अलग मार्जिन देने के लिए स्लाइडर हिलाएँ।",
@@ -279,6 +283,8 @@ export const hi: Messages = {
   "recipes.empty":
     "अभी आपके पास कोई रेसिपी नहीं है। लोकप्रिय साइटों की तैयार रेसिपी मार्केटप्लेस में मिलेंगी।",
   "recipes.openMarket": "मार्केटप्लेस खोलें",
+
+  "hub.pages": "{name} के पेज",
 
   "market.title": "मार्केटप्लेस",
   "market.linkNote": "दूसरों की बनाई रेसिपी, अपने आप जाँची जाती हैं और 14 दिन बाद प्रकाशित",
@@ -295,6 +301,7 @@ export const hi: Messages = {
   "market.review.version": "संस्करण {version}",
   "market.review.replaces": "आपके संस्करण {version} की जगह लेती है",
   "market.review.sites": "इन पर काम करती है",
+  "market.review.pages": "पेज",
   "market.review.options": "स्विच",
   "market.review.rules": "यह क्या बदलती है",
   "market.review.hides": "छिपाती है",

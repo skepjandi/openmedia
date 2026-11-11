@@ -277,6 +277,11 @@ export const tr: Messages = {
   "recipes.options": "{name} seçenekleri",
   "recipes.addFavorite": "{name} öğesini favorilere ekle",
   "recipes.removeFavorite": "{name} öğesini favorilerden çıkar",
+  "recipes.hub": "Hub",
+  "recipes.hubPages": "Sayfalar",
+  "recipes.openHubPage": "{label} sayfasını aç",
+  "recipes.hubNote":
+    "Bir hub aynı anda birkaç siteyi açar. Her sayfa kendi site'ıdır ve kendi çerezleri vardır.",
   "recipes.bottomMargin": "Alt kenar boşluğu",
   "recipes.sharedMargin":
     "Paylaşılan boşluğu kullanır. Bu siteye kendi boşluğunu vermek için kaydırıcıyı hareket ettirin.",
@@ -284,6 +289,8 @@ export const tr: Messages = {
   "recipes.siteMarginLabel": "{name} alt kenar boşluğu",
   "recipes.useSharedMargin": "Paylaşılan boşluğu kullan",
   "recipes.imported": "Uygulamanın dışından eklendi. Sitenin eski haline dönmek için kaldırın.",
+
+  "hub.pages": "{name} sayfaları",
 
   "market.title": "Pazar yeri",
   "market.linkNote":
@@ -301,6 +308,7 @@ export const tr: Messages = {
   "market.review.version": "Sürüm {version}",
   "market.review.replaces": "{version} sürümünüzün yerine geçer",
   "market.review.sites": "Çalıştığı siteler",
+  "market.review.pages": "Sayfalar",
   "market.review.options": "Anahtarlar",
   "market.review.rules": "Neyi değiştirir",
   "market.review.hides": "Gizler",

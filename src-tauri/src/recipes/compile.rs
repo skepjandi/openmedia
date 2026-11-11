@@ -20,14 +20,20 @@ struct PageRecipe {
 
 /// CSS for the rules of one recipe that currently apply. Hiding is `display: none`, so the
 /// element stays in the DOM and the site's own scripts keep working.
+#[cfg(test)]
 pub fn recipe_css(recipe: &Recipe, choices: &OptionChoices) -> String {
     let saved = choices.get(&recipe.id);
+    css_of(
+        recipe
+            .rules
+            .iter()
+            .filter(|rule| recipe.rule_applies(rule, saved)),
+    )
+}
+
+fn css_of<'a>(rules: impl Iterator<Item = &'a Rule>) -> String {
     let mut css = String::new();
-    for rule in recipe
-        .rules
-        .iter()
-        .filter(|rule| recipe.rule_applies(rule, saved))
-    {
+    for rule in rules {
         let _ = match rule {
             Rule::Hide { target, .. } => writeln!(css, "{}{{display:none!important}}", target.css),
             Rule::Css {
@@ -46,24 +52,53 @@ pub fn recipe_css(recipe: &Recipe, choices: &OptionChoices) -> String {
     css
 }
 
+fn matchers_of(patterns: &[String]) -> Result<Vec<Matcher>> {
+    patterns
+        .iter()
+        .map(|pattern| Matcher::parse(pattern))
+        .collect()
+}
+
+/// The page entries of one recipe: the rules with no `on` apply wherever the recipe matches, and
+/// the rules limited to some patterns form one entry for those patterns.
+fn page_recipes(recipe: &Recipe, choices: &OptionChoices) -> Result<Vec<PageRecipe>> {
+    let saved = choices.get(&recipe.id);
+    let applying: Vec<&Rule> = recipe
+        .rules
+        .iter()
+        .filter(|rule| recipe.rule_applies(rule, saved))
+        .collect();
+    let mut scopes: Vec<Option<&[String]>> = Vec::new();
+    for rule in &applying {
+        if !scopes.contains(&rule.on()) {
+            scopes.push(rule.on());
+        }
+    }
+    if scopes.is_empty() {
+        scopes.push(None);
+    }
+    scopes
+        .into_iter()
+        .map(|scope| {
+            Ok(PageRecipe {
+                id: recipe.id.clone(),
+                matchers: matchers_of(scope.unwrap_or(&recipe.matches))?,
+                css: css_of(applying.iter().copied().filter(|rule| rule.on() == scope)),
+            })
+        })
+        .collect()
+}
+
 /// One script for every recipe, run at document start in each frame. The page matches its own
 /// location against the recipes, so a single script stays correct across navigations.
 pub fn page_script(recipes: &[Recipe], choices: &OptionChoices) -> Result<String> {
     let page: Vec<PageRecipe> = recipes
         .iter()
-        .map(|recipe| {
-            let matchers = recipe
-                .matches
-                .iter()
-                .map(|pattern| Matcher::parse(pattern))
-                .collect::<Result<Vec<_>>>()?;
-            Ok(PageRecipe {
-                id: recipe.id.clone(),
-                matchers,
-                css: recipe_css(recipe, choices),
-            })
-        })
-        .collect::<Result<_>>()?;
+        .map(|recipe| page_recipes(recipe, choices))
+        .collect::<Result<Vec<_>>>()?
+        .into_iter()
+        .flatten()
+        .collect();
     let json = serde_json::to_string(&page).map_err(|e| Error::Recipe(e.to_string()))?;
     Ok(format!(
         r#"(() => {{

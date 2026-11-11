@@ -1,6 +1,6 @@
 # Architecture
 
-> **Status: Partially implemented.** The React shell, Rust core, iOS and Android native site-view plugins, BYOK assistant, and local usage controls exist. iOS has simulator verification; Android device/emulator behavior is unverified. macOS has site views (debug builds run on one Mac); Windows and Linux site views, profile selection, and parts of the planned runtime remain unimplemented. See the component pages for exact boundaries.
+> **Status: Partially implemented.** The React shell, Rust core, iOS and Android native site-view plugins, BYOK assistant, hub builder and local usage controls exist. Hubs launch independent sessions for multiple sites; they do not merge site data. iOS has simulator verification; Android device/emulator behavior is unverified. macOS site views exist (debug builds run on one Mac); Windows and Linux site views, profile selection, and parts of the planned runtime remain unimplemented.
 
 ## Overview
 
@@ -61,11 +61,11 @@ The Rust API is shared; Swift on iOS and Kotlin on Android provide the native we
 
 ### Recipe store (Rust)
 
-Recipes are JSON files in the app data dir, one per recipe. **The app ships no bundled recipes and has no forks** (Design, 2026-11-10): the 18 site recipes live in `recipes/official/`, are validated and fixture-tested by `cargo test` but not compiled in, and are published to the marketplace as official `market.official.<site>` recipes; a fresh install has none until the user installs some (see Onboarding below). Origins are only `user`, `ai` and `imported`; the AI assistant writes a separate `custom.<domain>` recipe beside an installed one and never edits it. The store resolves "which recipes apply to this URL" and merges them into one bundle for the engine. See [Recipe Format](./recipe-format.md).
+Recipes are JSON files in the app data dir, one per recipe. **The app ships no bundled recipes and has no forks** (Design, 2026-11-10): the 18 site recipes live in `recipes/official/`, are validated and fixture-tested by `cargo test` but not compiled in, and are published to the marketplace as official `market.official.<site>` recipes; a fresh install has none until the user installs some (see Onboarding below). Origins are only `user`, `ai` and `imported`; page-specific AI changes write a separate `custom.<domain>` recipe beside an installed one, and hub proposals save as `custom.hub-<slug>`. The assistant never edits an installed recipe. Hubs store 2–6 launcher tabs, while the shell opens every tab in the ordinary independent site-session model. See [Recipe Format](./recipe-format.md).
 
 ### AI service (Rust)
 
-Rust has an Anthropic adapter and an OpenAI-compatible adapter (including Gemini, OpenRouter, OpenCode Zen, Ollama, LM Studio, and compatible endpoints). Requests run in Rust, so the key never enters a webview. See [AI Assistant](./ai-assistant.md).
+Rust has Anthropic and OpenAI-compatible adapters (including Gemini, OpenRouter, OpenCode Zen, Ollama, LM Studio, and compatible endpoints). The same BYOK configuration supports structured patch generation and bounded tool calls for the read-only marketplace hub builder. Requests run in Rust, so the key never enters a webview. See [AI Assistant](./ai-assistant.md).
 
 ### Secret store (Rust)
 
@@ -77,7 +77,7 @@ Rust compiles the implemented recipe subset (`hide` and `css`) into a self-conta
 
 ### Shell (React)
 
-One full-screen page with floating controls ([UI Design](./ui-design.md)): tap opens addresses or AI requests, hold opens favorites, Incognito, Usage, History and Settings. Current pages and history entries have favorite actions; Settings edits and reorders the list in collapsed disclosures. Incognito (`src/features/incognito`, `src-tauri/src/incognito.rs`) swaps in a second favorites set and a second set of recipe choices after a biometric check that only Rust can raise; the on/off state lives in Rust memory and is never saved. Daily per-site warnings and limits reuse foreground usage accounting (`src/features/stats`, `src-tauri/src/usage.rs`); native iOS shields enforce exhausted sessions without changing other sites. The shell owns session lifetime; native code opens, shows, closes and pins each session to its domain. AI requests run in Rust with redacted payload preview, validated proposals and explicit acceptance. Keys stay in the secure store.
+One full-screen page with floating controls ([UI Design](./ui-design.md)): tap opens addresses or AI requests, hold opens favorites, Incognito, Usage, History and Settings. Current pages and history entries have favorite actions; Settings edits and reorders the list in collapsed disclosures. Incognito (`src/features/incognito`, `src-tauri/src/incognito.rs`) swaps in a second favorites set and a second set of recipe choices after a biometric check that only Rust can raise; the on/off state lives in Rust memory and is never saved. Daily per-site warnings and limits reuse foreground usage accounting (`src/features/stats`, `src-tauri/src/usage.rs`); native iOS shields enforce exhausted sessions without changing other sites. The shell owns session lifetime; native code opens, shows, closes and pins each session to its domain. AI requests run in Rust with redacted payload preview, validated proposals and explicit acceptance. HubBar switches among tabs of an accepted hub; each opens as an ordinary site session. Keys stay in the secure store.
 
 ## Core data flows
 

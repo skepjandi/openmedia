@@ -277,12 +277,19 @@ export const en = {
   "recipes.options": "{name} options",
   "recipes.addFavorite": "Add {name} to favorites",
   "recipes.removeFavorite": "Remove {name} from favorites",
+  "recipes.hub": "Hub",
+  "recipes.hubPages": "Pages",
+  "recipes.openHubPage": "Open {label}",
+  "recipes.hubNote":
+    "A hub opens several sites at once. Each page is a site of its own, with its own cookies.",
   "recipes.bottomMargin": "Bottom margin",
   "recipes.sharedMargin": "Uses the shared margin. Move the slider to give this site its own.",
   "recipes.ownMargin": "This site has its own margin.",
   "recipes.siteMarginLabel": "{name} bottom margin",
   "recipes.useSharedMargin": "Use the shared margin",
   "recipes.imported": "Added from outside the app. Remove it to go back to how the site was.",
+
+  "hub.pages": "{name} pages",
 
   "market.title": "Marketplace",
   "market.linkNote": "Recipes from other people, checked automatically and published 14 days later",
@@ -299,6 +306,7 @@ export const en = {
   "market.review.version": "Version {version}",
   "market.review.replaces": "Replaces your version {version}",
   "market.review.sites": "Works on",
+  "market.review.pages": "Pages",
   "market.review.options": "Switches",
   "market.review.rules": "What it changes",
   "market.review.hides": "Hides",

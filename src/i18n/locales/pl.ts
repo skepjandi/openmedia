@@ -276,6 +276,11 @@ export const pl: Messages = {
   "recipes.options": "Opcje: {name}",
   "recipes.addFavorite": "Dodaj {name} do ulubionych",
   "recipes.removeFavorite": "Usuń {name} z ulubionych",
+  "recipes.hub": "Hub",
+  "recipes.hubPages": "Strony",
+  "recipes.openHubPage": "Otwórz {label}",
+  "recipes.hubNote":
+    "Hub otwiera kilka stron naraz. Każda strona to osobna witryna, z własnymi plikami cookie.",
   "recipes.bottomMargin": "Dolny margines",
   "recipes.sharedMargin": "Używa wspólnego marginesu. Przesuń suwak, aby ta witryna miała własny.",
   "recipes.ownMargin": "Ta witryna ma własny margines.",
@@ -283,6 +288,8 @@ export const pl: Messages = {
   "recipes.useSharedMargin": "Użyj wspólnego marginesu",
 
   "recipes.imported": "Dodano spoza aplikacji. Usuń go, aby wrócić do stanu witryny sprzed zmian.",
+
+  "hub.pages": "Strony: {name}",
 
   "market.title": "Sklep",
   "market.linkNote": "Przepisy od innych osób, sprawdzane automatycznie i publikowane po 14 dniach",
@@ -299,6 +306,7 @@ export const pl: Messages = {
   "market.review.version": "Wersja {version}",
   "market.review.replaces": "Zastępuje Twoją wersję {version}",
   "market.review.sites": "Działa na",
+  "market.review.pages": "Strony",
   "market.review.options": "Przełączniki",
   "market.review.rules": "Co zmienia",
   "market.review.hides": "Ukrywa",

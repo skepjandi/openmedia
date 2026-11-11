@@ -270,6 +270,11 @@ export const ko: Messages = {
   "recipes.options": "{name} 옵션",
   "recipes.addFavorite": "{name} 즐겨찾기에 추가",
   "recipes.removeFavorite": "{name} 즐겨찾기에서 제거",
+  "recipes.hub": "허브",
+  "recipes.hubPages": "페이지",
+  "recipes.openHubPage": "{label} 열기",
+  "recipes.hubNote":
+    "허브는 여러 사이트를 한 번에 엽니다. 각 페이지는 별도의 사이트이며 자체 쿠키를 사용합니다.",
   "recipes.bottomMargin": "하단 여백",
   "recipes.sharedMargin":
     "공통 여백을 사용합니다. 슬라이더를 옮기면 이 사이트만 별도의 여백을 갖게 됩니다.",
@@ -280,6 +285,8 @@ export const ko: Messages = {
   "recipes.empty":
     "아직 레시피가 없습니다. 인기 사이트용 기성 레시피를 마켓플레이스에서 찾아보세요.",
   "recipes.openMarket": "마켓플레이스 열기",
+
+  "hub.pages": "{name} 페이지",
 
   "market.title": "마켓플레이스",
   "market.linkNote": "다른 사람이 만든 레시피, 자동으로 검사하고 14일 후 공개",
@@ -296,6 +303,7 @@ export const ko: Messages = {
   "market.review.version": "버전 {version}",
   "market.review.replaces": "내 버전 {version}을(를) 대체합니다",
   "market.review.sites": "작동하는 사이트",
+  "market.review.pages": "페이지",
   "market.review.options": "스위치",
   "market.review.rules": "변경되는 내용",
   "market.review.hides": "숨기는 것",

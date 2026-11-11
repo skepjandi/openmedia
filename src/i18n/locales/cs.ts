@@ -278,12 +278,19 @@ export const cs: Messages = {
   "recipes.options": "Možnosti pro {name}",
   "recipes.addFavorite": "Přidat {name} do oblíbených",
   "recipes.removeFavorite": "Odebrat {name} z oblíbených",
+  "recipes.hub": "Hub",
+  "recipes.hubPages": "Stránky",
+  "recipes.openHubPage": "Otevřít {label}",
+  "recipes.hubNote":
+    "Hub otevře několik webů najednou. Každá stránka je vlastní web s vlastními cookies.",
   "recipes.bottomMargin": "Spodní okraj",
   "recipes.sharedMargin": "Používá sdílený okraj. Posunutím jezdce dáte tomuto webu vlastní.",
   "recipes.ownMargin": "Tento web má vlastní okraj.",
   "recipes.siteMarginLabel": "Spodní okraj webu {name}",
   "recipes.useSharedMargin": "Použít sdílený okraj",
   "recipes.imported": "Přidáno zvenčí aplikace. Odeberte ho a web bude zase vypadat jako dřív.",
+
+  "hub.pages": "Stránky: {name}",
 
   "market.title": "Tržiště",
   "market.linkNote": "Recepty od jiných lidí, kontrolované automaticky a zveřejněné po 14 dnech",
@@ -300,6 +307,7 @@ export const cs: Messages = {
   "market.review.version": "Verze {version}",
   "market.review.replaces": "Nahrazuje vaši verzi {version}",
   "market.review.sites": "Funguje na",
+  "market.review.pages": "Stránky",
   "market.review.options": "Přepínače",
   "market.review.rules": "Co mění",
   "market.review.hides": "Skrývá",
