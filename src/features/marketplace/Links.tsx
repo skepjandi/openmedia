@@ -64,8 +64,15 @@ function LinkRow({ title, note, onClick }: { title: string; note: string; onClic
 }
 
 /** Shown on a recipe that came from a pasted bundle or the marketplace: says so, and removes it. */
-export function ImportedNotice({ site }: { site: SiteSettings }): ReactNode {
+export function ImportedNotice({
+  site,
+  incognito = false,
+}: {
+  site: SiteSettings;
+  incognito?: boolean;
+}): ReactNode {
   const loadSites = useApp((s) => s.loadSites);
+  const loadIncognitoSites = useApp((s) => s.loadIncognitoSites);
   const t = useT();
   const [error, setError] = useState<string | null>(null);
 
@@ -75,6 +82,7 @@ export function ImportedNotice({ site }: { site: SiteSettings }): ReactNode {
     try {
       await sharing.removeImported(site.recipeId);
       await loadSites();
+      if (incognito) await loadIncognitoSites();
     } catch (failure) {
       setError(describeError(failure, t));
     }

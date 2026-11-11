@@ -249,6 +249,7 @@ function IncognitoSiteOptions({ site }: { site: SiteSettings }) {
 
   return (
     <div className="flex flex-col gap-5 border-t border-hair px-3 py-4">
+      <ImportedNotice site={site} incognito />
       <OptionGroups
         site={site}
         onToggle={(optionId, enabled) =>
