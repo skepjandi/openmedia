@@ -23,7 +23,15 @@ object FaviconFetcher {
     private const val MAX_DIMENSION = 4096
     private const val OUTPUT_SIZE = 96
 
-    fun fetch(page: Uri): String? {
+    fun fetch(page: Uri): String? =
+        try {
+            fetchUnchecked(page)
+        } catch (_: Throwable) {
+            // An oversized image must cost the icon, not the app.
+            null
+        }
+
+    private fun fetchUnchecked(page: Uri): String? {
         val scope = DomainScope.registrableDomain(page.host)
         val candidates = LinkedHashSet<String>()
         val html = get(page.toString(), scope)?.toString(Charsets.UTF_8)
@@ -39,8 +47,12 @@ object FaviconFetcher {
             tried += 1
             val bytes = get(url, scope) ?: continue
             if (bytes.size <= 100) continue
+            // Read the size first: a small file can expand to gigabytes when decoded.
+            val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+            BitmapFactory.decodeByteArray(bytes, 0, bytes.size, bounds)
+            if (bounds.outWidth <= 0 || bounds.outHeight <= 0) continue
+            if (bounds.outWidth > MAX_DIMENSION || bounds.outHeight > MAX_DIMENSION) continue
             val bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.size) ?: continue
-            if (bitmap.width > MAX_DIMENSION || bitmap.height > MAX_DIMENSION) continue
             val scaled = Bitmap.createScaledBitmap(bitmap, OUTPUT_SIZE, OUTPUT_SIZE, true)
             val out = ByteArrayOutputStream()
             scaled.compress(Bitmap.CompressFormat.PNG, 100, out)

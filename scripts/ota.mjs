@@ -138,16 +138,10 @@ function keygen() {
   fs.rmSync(updaterKey, { force: true });
   fs.rmSync(`${updaterKey}.pub`, { force: true });
   const password = env.TAURI_SIGNING_PRIVATE_KEY_PASSWORD ?? "";
-  run("yarn", [
-    "tauri",
-    "signer",
-    "generate",
-    "--ci",
-    "--write-keys",
-    updaterKey,
-    "--password",
-    password,
-  ]);
+  // The password is passed by environment, not on the command line (which `run` prints).
+  run("yarn", ["tauri", "signer", "generate", "--ci", "--write-keys", updaterKey], {
+    env: { TAURI_SIGNING_PRIVATE_KEY_PASSWORD: password },
+  });
   const overlay = JSON.parse(fs.readFileSync(overlayFile, "utf8"));
   overlay.plugins.updater.pubkey = fs.readFileSync(`${updaterKey}.pub`, "utf8").trim();
   fs.writeFileSync(overlayFile, `${JSON.stringify(overlay, null, 2)}\n`);
@@ -159,7 +153,18 @@ function keygen() {
     };
     // GitHub refuses an empty secret; an unset one reads as empty in a workflow, which is right.
     if (password) secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD = password;
-    for (const [name, value] of Object.entries(secrets)) gh("secret", "set", name, "--body", value);
+    // The value goes in on stdin: it would otherwise be printed with the command line and show in
+    // the process list.
+    for (const [name, value] of Object.entries(secrets)) {
+      console.log(`\n$ gh secret set ${name} --repo ${repository()}`);
+      const result = spawnSync("gh", ["secret", "set", name, "--repo", repository()], {
+        cwd: root,
+        input: value,
+        stdio: ["pipe", "inherit", "inherit"],
+        env,
+      });
+      if (result.status !== 0) fail(`gh secret set ${name} failed (exit ${result.status})`);
+    }
   }
 
   console.log(`

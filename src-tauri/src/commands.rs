@@ -3,8 +3,9 @@ use std::collections::BTreeMap;
 use serde::{Deserialize, Serialize};
 use tauri::{AppHandle, Emitter, Manager, State, ipc::Channel};
 use tauri_plugin_siteview::{
-    ContentRuleList, EvaluateRequest, FetchFaviconRequest, OpenRequest, Rect, SessionRequest,
-    SetContentRuleListsRequest, SetDocumentStartScriptRequest, SetRectRequest, SiteviewExt,
+    ColorScheme, ContentRuleList, EvaluateRequest, FetchFaviconRequest, OpenRequest, Rect,
+    SessionRequest, SetColorSchemeRequest, SetContentRuleListsRequest,
+    SetDocumentStartScriptRequest, SetRectRequest, SiteviewExt,
     validate::{parse_session_id, parse_web_url},
 };
 use url::Url;
@@ -169,6 +170,20 @@ pub fn reset_onboarding(library: State<'_, Library>) -> Result<()> {
     library.set_onboarded(false)
 }
 
+/// Opens an address from the shell's own UI (a guide, a legal page) in the system browser. The shell
+/// never navigates its own view or a site session for these. https only.
+#[tauri::command]
+pub fn open_external(app: AppHandle, url: String) -> Result<()> {
+    use tauri_plugin_opener::OpenerExt;
+    let url = parse_web_url(&url)?;
+    if url.scheme() != "https" {
+        return Err(Error::Connection("only https addresses open outside the app".into()));
+    }
+    app.opener()
+        .open_url(url.as_str(), None::<&str>)
+        .map_err(|e| Error::Connection(e.to_string()))
+}
+
 #[tauri::command]
 pub fn set_theme(library: State<'_, Library>, theme: Theme) -> Result<()> {
     library.set_theme(theme)
@@ -248,6 +263,17 @@ pub(crate) async fn open_session(
     } else {
         Vec::new()
     };
+    // The page must load under the saved theme: the shell sets it only after it has booted, by
+    // which time a page opened at launch has already read `prefers-color-scheme` once, and sites
+    // such as Instagram keep parts of the old scheme when it flips mid-load. Platforms with no
+    // site view reject this the same way they reject the open below.
+    let _ = app.siteview().set_color_scheme(SetColorSchemeRequest {
+        scheme: match library.theme()? {
+            Theme::System => ColorScheme::System,
+            Theme::Light => ColorScheme::Light,
+            Theme::Dark => ColorScheme::Dark,
+        },
+    });
     app.siteview().open(OpenRequest {
         session,
         profile: library.profile_id()?.to_string(),
@@ -482,7 +508,14 @@ pub fn ai_save_provider(
     provider: ProviderInput,
 ) -> Result<ProviderView> {
     entitlement.require_pro()?;
-    view(&secrets, library.upsert_provider(provider)?)
+    let before = provider.id.and_then(|id| library.provider(id).ok());
+    let saved = library.upsert_provider(provider)?;
+    // A stored key belongs to the endpoint it was entered for: pointing the provider elsewhere
+    // would send that key to a different host, so it has to be entered again.
+    if before.is_some_and(|before| before.base_url != saved.base_url || before.kind != saved.kind) {
+        secrets.0.delete(saved.id)?;
+    }
+    view(&secrets, saved)
 }
 
 #[tauri::command]
@@ -640,7 +673,15 @@ pub async fn ai_send(
     on_activity: Channel<Activity>,
 ) -> Result<Proposal> {
     entitlement.require_pro()?;
-    let (config, key) = active_provider(&library, &secrets)?;
+    // Send to the provider the preview named, not whichever one is active now.
+    let reviewed = agent.get(id)?.provider;
+    let config = library.provider(reviewed.id)?;
+    if config != reviewed {
+        return Err(Error::Connection(
+            "The provider changed since this request was prepared. Ask again.".to_owned(),
+        ));
+    }
+    let key = secrets.0.get(config.id)?.ok_or(Error::NoKey)?;
     agent::send(
         &agent,
         &LivePage(&app),

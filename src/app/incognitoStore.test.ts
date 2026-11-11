@@ -57,6 +57,18 @@ describe("incognito mode", () => {
     expect(names(selectQuickFavorites(useApp.getState()))).toEqual(["Reddit"]);
   });
 
+  it("drops an open assistant turn when the mode changes, so it cannot be seen in the other mode", async () => {
+    invoke.mockImplementation(async (name: string) => (name === "enter_incognito" ? secret : null));
+    await useApp.getState().enterIncognito();
+    useApp.setState({
+      assistant: { status: "idle", draft: "hide the stories from my private feed" },
+    });
+
+    await useApp.getState().exitIncognito();
+
+    expect(useApp.getState().assistant).toEqual({ status: "idle", draft: "" });
+  });
+
   it("stays in the normal set and reports the error when the check cannot run", async () => {
     invoke.mockRejectedValue("this device cannot check who is holding it");
     await useApp.getState().enterIncognito();

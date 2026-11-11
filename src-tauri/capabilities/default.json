@@ -1,7 +1,19 @@
 {
   "$schema": "../gen/schemas/desktop-schema.json",
   "identifier": "default",
-  "description": "Capability for the shell (main webview). Site views never receive a capability: on desktop they are child webviews of the main window, so this names the webview, not the window.",
+  "description": "Capability for the shell (main webview). It can listen for events but not emit them: the Rust side trusts events such as billing:snapshot. Site views never receive a capability: on desktop they are child webviews of the main window, so this names the webview, not the window.",
   "webviews": ["main"],
-  "permissions": ["core:default", "siteview:default"]
+  "permissions": [
+    "core:path:default",
+    "core:event:allow-listen",
+    "core:event:allow-unlisten",
+    "core:window:default",
+    "core:webview:default",
+    "core:app:default",
+    "core:image:default",
+    "core:resources:default",
+    "core:menu:default",
+    "core:tray:default",
+    "siteview:default"
+  ]
 }

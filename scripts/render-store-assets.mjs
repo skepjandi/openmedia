@@ -196,7 +196,6 @@ function macSlideHtml(set, slide, index) {
   const theme = themes[slide.theme];
   const unit = set.width / 100;
   const u = (value) => `${(value * unit).toFixed(2)}px`;
-  const shadow = theme.shadow.replace(/(\d+(?:\.\d+)?)u/g, (_, n) => u(Number(n)));
   const image = pathToFileURL(captureFile(set.capture, index, slide.slug)).href;
   const side = index % 2 === 0;
   const windowCss = side

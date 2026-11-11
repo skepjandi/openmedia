@@ -132,7 +132,10 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
     private var shell: WebView? = null
     private var pageLayer: PageLayer? = null
     private var backdrop: View? = null
-    private val sessions = LinkedHashMap<String, Session>()
+    // Read from the WebView's request thread (`sessionOf`), written on the UI thread.
+    private val sessions: MutableMap<String, Session> =
+        java.util.Collections.synchronizedMap(LinkedHashMap())
+    @Volatile private var loadedRulePaths: List<String>? = null
     private var activeId: String? = null
     private var events: Channel? = null
     private var interactiveRegions = emptyList<RectF>()
@@ -259,6 +262,9 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
         )
         sessions[session.id] = session
         activeId = session.id
+        // The rule lists arrive with every open; without this nothing is blocked until the user
+        // flips the setting.
+        args.contentRuleLists?.let { lists -> applyRuleLists(lists.map { it.path }) }
         events = args.onEvent ?: events
 
         applyScheme(session)
@@ -424,10 +430,17 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
      * Swaps the rule lists on every open session. The visible page reloads under them now; hidden
      * ones reload when they are next shown.
      */
+    private fun applyRuleLists(paths: List<String>) {
+        if (paths == loadedRulePaths) return
+        loadedRulePaths = paths
+        worker.execute { if (paths.isEmpty()) rules.clear() else rules.load(paths) }
+    }
+
     @Command
     fun setContentRuleLists(invoke: Invoke) {
         val args = invoke.parseArgs(SetContentRuleListsArgs::class.java)
         val paths = args.lists.map { it.path }
+        loadedRulePaths = paths
         worker.execute {
             if (paths.isEmpty()) rules.clear() else rules.load(paths)
             activity.runOnUiThread {
@@ -513,10 +526,12 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
                 }
             },
         )
-        val info = BiometricPrompt.PromptInfo.Builder()
+        val builder = BiometricPrompt.PromptInfo.Builder()
             .setTitle(args.reason)
             .setAllowedAuthenticators(authenticators)
-            .build()
+        // Without device credentials (before Android 11) the prompt needs a negative button.
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) builder.setNegativeButtonText("Cancel")
+        val info = builder.build()
         try {
             prompt.authenticate(info)
         } catch (error: Exception) {
@@ -812,6 +827,19 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
             ): WebResourceResponse? {
                 val session = sessionOf(view) ?: return null
                 if (session.blocked) return blockedResponse()
+                // `shouldOverrideUrlLoading` is not called for POST navigations, so a page could
+                // post a form to another domain inside this logged-in view.
+                if (request.isForMainFrame && request.method.equals("POST", ignoreCase = true) &&
+                    DomainScope.verdict(
+                        request.url.scheme,
+                        request.url.host,
+                        session.scope,
+                        session.settled,
+                        true,
+                    ) != DomainScope.Verdict.ALLOW
+                ) {
+                    return blockedResponse()
+                }
                 val url = request.url.toString()
                 val top = session.topUrl
                 if (!rules.blocks(url, request.isForMainFrame, top)) return null
@@ -835,7 +863,8 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
         }
     }
 
-    private fun sessionOf(view: WebView): Session? = sessions.values.firstOrNull { it.view === view }
+    private fun sessionOf(view: WebView): Session? =
+        synchronized(sessions) { sessions.values.firstOrNull { it.view === view } }
 
     private fun blockedResponse(): WebResourceResponse = WebResourceResponse(
         "text/plain",
@@ -1079,7 +1108,12 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
     // MARK: System callbacks
 
     override fun onTrimMemory(level: Int) {
-        if (level >= ComponentCallbacks2.TRIM_MEMORY_RUNNING_LOW) sendMemoryWarning()
+        // Backgrounding reports TRIM_MEMORY_UI_HIDDEN, which is not pressure: closing every hidden
+        // session each time the app is left would lose the user's pages.
+        val pressure = level in ComponentCallbacks2.TRIM_MEMORY_RUNNING_LOW..
+            ComponentCallbacks2.TRIM_MEMORY_RUNNING_CRITICAL ||
+            level >= ComponentCallbacks2.TRIM_MEMORY_MODERATE
+        if (pressure) sendMemoryWarning()
     }
 
     override fun onLowMemory() {

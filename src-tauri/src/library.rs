@@ -1,8 +1,12 @@
 use std::{
     collections::BTreeMap,
     fs,
+    io::Write,
     path::{Path, PathBuf},
-    sync::{Mutex, MutexGuard},
+    sync::{
+        Mutex, MutexGuard,
+        atomic::{AtomicU64, Ordering},
+    },
 };
 
 use serde::{Deserialize, Serialize};
@@ -335,6 +339,10 @@ impl Library {
         let mut data = self.lock()?;
         data.theme = theme;
         self.save(&data)
+    }
+
+    pub fn theme(&self) -> Result<Theme> {
+        Ok(self.lock()?.theme)
     }
 
     pub fn ad_block_enabled(&self) -> Result<bool> {
@@ -690,10 +698,22 @@ pub(crate) fn write_atomically(path: &Path, bytes: &[u8]) -> std::io::Result<()>
     if let Some(parent) = path.parent() {
         fs::create_dir_all(parent)?;
     }
-    let temp = path.with_extension("json.tmp");
-    fs::write(&temp, bytes)?;
-    fs::rename(&temp, path)
+    // A name of its own per write, so two writers of the same file never share a temp file.
+    let unique = TEMP_COUNTER.fetch_add(1, Ordering::Relaxed);
+    let temp = path.with_extension(format!("json.{}.{unique}.tmp", std::process::id()));
+    let written = (|| {
+        let mut file = fs::File::create_new(&temp)?;
+        file.write_all(bytes)?;
+        file.sync_all()?;
+        fs::rename(&temp, path)
+    })();
+    if written.is_err() {
+        let _ = fs::remove_file(&temp);
+    }
+    written
 }
+
+static TEMP_COUNTER: AtomicU64 = AtomicU64::new(0);
 
 #[cfg(test)]
 mod tests {
@@ -1380,5 +1400,28 @@ mod tests {
         assert!(library.state().unwrap().history.is_empty());
         let saved: LibraryData = serde_json::from_slice(&fs::read(path).unwrap()).unwrap();
         assert_eq!(saved.version, FORMAT_VERSION);
+    }
+    #[test]
+    fn concurrent_writes_to_one_file_never_share_a_temp_file() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("recipe.json");
+        let writers: Vec<_> = (0..16)
+            .map(|n| {
+                let path = path.clone();
+                std::thread::spawn(move || {
+                    let body = format!("{{\"n\":{n}}}").repeat(2000);
+                    write_atomically(&path, body.as_bytes()).unwrap();
+                    body
+                })
+            })
+            .collect();
+        let bodies: Vec<String> = writers.into_iter().map(|w| w.join().unwrap()).collect();
+        let stored = fs::read_to_string(&path).unwrap();
+        assert!(
+            bodies.contains(&stored),
+            "the file is exactly one writer's content"
+        );
+        let leftovers = fs::read_dir(dir.path()).unwrap().count();
+        assert_eq!(leftovers, 1, "no temp file is left behind");
     }
 }

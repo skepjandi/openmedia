@@ -59,10 +59,15 @@ pub struct State {
 impl State {
     /// A missing or unreadable file is a fresh start: nothing here is needed to use the app.
     pub fn load(path: PathBuf) -> Self {
-        let data = fs::read_to_string(&path)
-            .ok()
-            .and_then(|text| serde_json::from_str(&text).ok())
-            .unwrap_or_default();
+        let data = match fs::read_to_string(&path) {
+            Ok(text) => serde_json::from_str(&text).unwrap_or_else(|_| {
+                // Edit tokens cannot be issued again, so an unreadable file is kept aside rather
+                // than overwritten by the next save.
+                let _ = fs::rename(&path, path.with_extension("json.corrupt"));
+                Data::default()
+            }),
+            Err(_) => Data::default(),
+        };
         Self {
             path,
             data: Mutex::new(data),
@@ -299,5 +304,16 @@ mod tests {
         let state = State::load(path);
         assert_eq!(state.sequence(), 0);
         assert!(state.count_installs());
+    }
+    #[test]
+    fn an_unreadable_state_file_is_kept_aside_not_overwritten() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("catalog-state.json");
+        fs::write(&path, "{\"editTokens\": {\"market.x\": \"tok\"").unwrap();
+        let state = State::load(path.clone());
+        assert_eq!(state.edit_token("market.x"), None);
+        state.accept_sequence(3).unwrap();
+        let aside = fs::read_to_string(path.with_extension("json.corrupt")).unwrap();
+        assert!(aside.contains("tok"));
     }
 }

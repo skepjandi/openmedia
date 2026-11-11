@@ -186,6 +186,8 @@ export const library = {
   setLastUrl: (url: string) => command("set_last_url", { url }),
   completeOnboarding: () => command("complete_onboarding"),
   resetOnboarding: () => command("reset_onboarding"),
+  /** Opens an https address in the system browser; for links in the shell's own UI. */
+  openExternal: (url: string) => command("open_external", { url }),
   setTheme: (theme: Theme) => command("set_theme", { theme }),
   /** Remembers the language the user picked; null puts the app back on the device's language. */
   setLocale: (locale: string | null) => command("set_locale", { locale }),

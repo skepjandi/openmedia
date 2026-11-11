@@ -74,6 +74,8 @@
     while ((n = walker.nextNode())) {
       var p = n.parentNode && n.parentNode.localName;
       if (p === 'script' || p === 'style' || p === 'textarea' || p === 'noscript') continue;
+      // What the user is typing is never page content.
+      if (n.parentNode && n.parentNode.isContentEditable) continue;
       out += ' ' + n.nodeValue;
       if (out.length > 200) return null;
     }
@@ -118,7 +120,7 @@
       node.c = classes;
       size += classes.join('.').length + 8;
     }
-    if (TEXT_TAGS[tag] || role) {
+    if ((TEXT_TAGS[tag] || role) && !el.isContentEditable) {
       var text = shortText(el);
       if (text) add(node, 'x', text, text.length + 8);
     }

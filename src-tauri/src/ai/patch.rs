@@ -11,7 +11,7 @@ use serde_json::{Value, json};
 use crate::error::{Error, Result};
 use crate::recipes::{
     CSS_PROPERTIES, Meta, OptionGroup, Origin, Recipe, Rule, SiteOption, Target,
-    current_platform_tag, validate_declarations, validate_selector,
+    current_platform_tag, targets_page_root, validate_declarations, validate_selector,
 };
 use tauri_plugin_siteview::site::registrable_domain;
 
@@ -189,25 +189,6 @@ fn plain(text: &str, what: &str, max: usize, allow_empty: bool) -> Result<String
         return Err(reject(format!("{what} is longer than {max} characters")));
     }
     Ok(text.to_owned())
-}
-
-/// Selectors that would hide or restyle the whole page or its main structure.
-fn targets_page_root(selector: &str) -> bool {
-    selector.split(',').any(|part| {
-        let part = part.trim().to_ascii_lowercase().replace('\'', "\"");
-        matches!(
-            part.as_str(),
-            "html"
-                | "body"
-                | ":root"
-                | "*"
-                | "main"
-                | "[role=\"main\"]"
-                | "[role=main]"
-                | "html body"
-                | "body > *"
-        )
-    })
 }
 
 /// Validates the model's answer. `recipe` is the recipe the page already has, if any: an

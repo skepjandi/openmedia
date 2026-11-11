@@ -16,6 +16,88 @@ All notable changes to OpenMedia are documented here.
 
 **Verified:** Rust formatting, clippy and 349 library tests; frontend `ts:check`, formatting, ESLint (excluding the unrelated existing `scripts/render-store-assets.mjs` warning) and 381 tests across 39 files; marketplace hub-filter tests (21 passed); Worker hub tests (37 passed); landing marketplace tests (35 passed). **Not verified:** final shell UI on a device or live Worker deployment.
 
+### fix(macos): site views refuse permission prompts and bound what they report
+
+**Area:** `fix(macos)`
+
+**Problem:** with no permission handler wry grants camera/microphone requests, and a page could report a multi-megabyte title or address to the shell every 400 ms.
+
+**Change:** the site-view builder denies every permission request; titles are cut at 256 characters and addresses over 4 KiB are not reported.
+
+**Verified:** `clippy -D warnings`, `fmt`. **Not verified:** on a Mac (a normal site still loads and downloads). **Not fixed:** downloads still need no user gesture, and page-opened popups are not tracked per session.
+### fix(ai): a job stays on the page it was prepared on, and Cancel stops it
+
+**Area:** `fix(ai)`
+
+**Problem:** `LivePage` evaluated against whichever site view was active, so approving a request on site A and switching to site B previewed A's selectors on B and, when they matched nothing, read B's page and sent it to the provider; Cancel only removed the job, so a send in flight still touched the page and could make two more paid repair calls.
+
+**Change:** `prepare` names the job inside the page (a random token in the page's symbol registry); before every preview and repair read, `send` checks the token and stops with "The page changed since this request was prepared". `send` also stops after the model answers when the job was cancelled. Not fixed: the recipe scope still comes from the snapshot's host (a hostile page can misreport it on Android/macOS).
+
+**Verified:** `cargo test` (new tests: moved page, cancel during the model call), `clippy -D warnings`. **Not verified:** on a device.
+### fix(android): ad blocking follows WebKit's rules, and BlockingRules has tests
+
+**Area:** `fix(android)`
+
+**Problem:** wildcard-host rules (`||facebook.com*/impression.php`) were filed under a host that never matched, so they never fired; `if-domain`/`unless-domain` were compared with the request host although WebKit reads them against the document being browsed (every `$domain=` rule behaved backwards); the two bundled lists were merged, so an EasyList exception could cancel an EasyPrivacy block; `BlockingRules` had no tests because it used `android.net.Uri`.
+
+**Change:** a host-anchored rule is filed by host only when the host is fully captured, otherwise it is evaluated for every request; domain conditions use the top document's host (a main-frame load is its own document); each list keeps its own blocks and exceptions; URL parsing is plain string work. New `BlockingRulesTest` covers case, wildcard hosts, domain conditions and per-list exceptions.
+
+**Verified:** `./gradlew :tauri-plugin-siteview:testDebugUnitTest` (all Android unit tests pass). **Not verified:** on a device.
+### fix(shell): open the shell's own links in the system browser
+
+**Area:** `fix(shell)`
+
+**Problem:** "Read the guide" and the paywall's Privacy and Terms links opened the website in a new page session, using the app's site view, which is for the sites the user customizes.
+
+**Change:** a Rust-only `open_external` command (https only, via `tauri-plugin-opener`, no capability granted to any webview) opens them in the system browser. No other shell link opens an outside address.
+
+**Verified:** `tsc`, `cargo check`. **Not verified:** at runtime on a device.
+
+### fix(release): unique temp files, keep an unreadable marketplace state, keep secrets off the command line, restrict OTA signing
+
+**Area:** `fix(release)`
+
+**Problem:** `write_atomically` used one temp name per destination, so concurrent writers could persist the wrong content; an unreadable `catalog-state.json` was silently replaced, losing edit tokens that cannot be issued again; `yarn ota keygen --github` printed the OTA private key and the updater password in the echoed command line; the OTA workflow exposed a `contents: write` token to `yarn install` and `yarn test`, and a manual run from any branch could sign and publish.
+
+**Change:** each write gets its own exclusively created, fsynced temp file; an unparsable state file is renamed to `catalog-state.json.corrupt` before defaults are used; secrets go to `gh secret set` on stdin and the password by environment; `GH_TOKEN` is scoped to the steps that publish, and the signing jobs run only from `main` or a `v*` tag.
+
+**Verified:** `cargo test`, `clippy -D warnings` (new tests: concurrent writers, corrupt state). **Not verified:** the workflow (Actions is currently blocked by billing), `yarn ota keygen`.
+### fix(android): arm ad blocking on open, pin POST navigations, safer favicons and memory handling
+
+**Area:** `fix(android)`
+
+**Problem:** the Android plugin ignored the rule lists sent with `open`, so nothing was blocked until the user toggled the setting; `shouldOverrideUrlLoading` is not called for POST navigations, so a page could post a form to another domain inside the logged-in view; a small favicon could decode to gigabytes and kill the app; every backgrounding (`TRIM_MEMORY_UI_HIDDEN`) closed all hidden sessions; blocking rules matched case-sensitively while WebKit's `url-filter` does not; `sessions` was read from the WebView request thread while the UI thread changed it; the biometric prompt threw on Android 9/10.
+
+**Change:** `open` loads the rule lists (once per list set); `shouldInterceptRequest` refuses out-of-scope main-frame POSTs after the first load settles; favicon size is read before decoding and `fetch` catches `Throwable`; only real pressure levels report a memory warning; rules compile `CASE_INSENSITIVE`; `sessions` is a synchronized map; the pre-Android-11 prompt gets a negative button.
+
+**Verified:** `./gradlew :tauri-plugin-siteview:compileDebugKotlin` builds. **Not verified:** on a device or emulator; unit tests could not resolve `org.json` offline. **Not fixed here:** wildcard-host rules in the host index, `if-domain` semantics, per-list exceptions, `WebChromeClient` gaps (upload, dialogs, `window.open`), bridge size cap.
+### fix(ai): keep keys, previews and incognito state where they belong
+
+**Area:** `fix(ai)`
+
+**Problem:** `ai_save_provider` could repoint a provider at a new host while keeping its stored key, so any script in the shell could send the key elsewhere; `ai_send` used the currently active provider rather than the one the preview named; unsent drafts in `contenteditable` boxes were included in snapshots; the open assistant turn survived leaving incognito; the command-bar star wrote to the normal favorites while incognito; the shell webview was allowed to emit events, so it could forge `billing:snapshot` and become Pro.
+
+**Change:** changing a provider's base URL or kind deletes its key; `ai_send` resolves the provider from the prepared job and refuses if it changed; `snapshot.js` skips editable content; mode switches cancel the assistant; the star uses the active favorites set; the main capability lists the `core:*` defaults it needs and only `core:event:allow-listen`/`allow-unlisten`.
+
+**Verified:** `cargo test`, `clippy -D warnings`, `ts:check`, Vitest (new incognito/assistant test). **Not verified:** on a device; the snapshot change has no DOM test. **Not fixed here:** pinning an in-flight AI job to the session it started in (A1-01), deriving the recipe scope from native navigation (A1-03), cancelling an in-flight `ai_send` (A1-06).
+### fix(recipes): bound match patterns, refuse suffix-wide and page-wide recipes, stop writing nulls
+
+**Area:** `fix(recipes)`
+
+**Problem:** a path glob with many `*` becomes a backtracking `.*` regex in the injected page script (7 stars froze a page for 8 s); the device accepted `https://*.com/*` and selectors such as `body:not(.x)` that hide the whole page; the app serialized unset `meta` fields as `null`, which the marketplace Worker refused, so uploads always failed.
+
+**Change:** `Matcher::parse` allows at most 4 `*` in a path and lower-cases the host; a pattern that is a public suffix, or a wildcard over one or over a bare TLD, is refused. `targets_page_root` (shared with the AI patch validator) recognises `html > body`, `body:not()`, `:is(body)`, `html *` and similar; hide rules on the page root, and css rules that hide it, are refused. The `:has(` cap ignores case. `Recipe.meta` and its fields are skipped when unset. ESLint ignores nested `.worktrees`, and the unused `shadow` in `render-store-assets.mjs` is gone.
+
+**Verified:** `cargo test` (321 pass, new tests for each rule), `clippy -D warnings`. **Not verified:** on a device.
+### fix(shell): the start page loads under the saved theme
+
+**Area:** `fix(shell)`
+
+**Problem:** in dark mode, Instagram's login page sometimes showed a white bar behind its footer text. The page opened at launch (`boot.rs`) before the shell had told the native view the theme, so it first read `prefers-color-scheme` from the system and was flipped to the saved theme mid-load, leaving parts of the page in the old scheme.
+
+**Change:** `open_session` now sets the saved theme on the site view (`set_color_scheme`) before every `open`, so no page loads under a scheme it will later lose. `Library::theme` reads it.
+
+**Verified:** not built or run: the disk was full (`No space left on device` building the Swift plugins), and the cause is inferred from the startup order, not reproduced. `cargo fmt --check` is clean.
 
 ### perf(android): read exception rules only after a block matched
 

@@ -1,6 +1,5 @@
 package surf.openmedia.siteview
 
-import android.net.Uri
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
@@ -25,9 +24,15 @@ class BlockingRules {
         val isEmpty: Boolean get() = byHost.isEmpty() && general.isEmpty()
     }
 
-    /** Blocking rules and exceptions are kept apart: an exception is only read once a block matched. */
-    private class Snapshot(val blocking: Bucket, val exceptions: Bucket) {
-        val isEmpty: Boolean get() = blocking.isEmpty
+    /**
+     * One rule file. Blocking rules and exceptions are kept apart (an exception is only read once
+     * a block matched), and an exception only cancels blocks of its own file: WebKit compiles
+     * every list on its own, so `ignore-previous-rules` never reaches into another list.
+     */
+    private class ListRules(val blocking: Bucket, val exceptions: Bucket)
+
+    private class Snapshot(val lists: List<ListRules>) {
+        val isEmpty: Boolean get() = lists.all { it.blocking.isEmpty }
     }
 
     private inner class Rule(
@@ -40,15 +45,21 @@ class BlockingRules {
         val loadTypes: Set<String>?,
         val blocks: Boolean,
     ) {
-        fun matches(url: String, host: String, resourceType: String, firstParty: Boolean): Boolean {
+        fun matches(
+            url: String,
+            topHost: String,
+            resourceType: String,
+            firstParty: Boolean,
+        ): Boolean {
             if (resourceTypes != null && resourceType !in resourceTypes) return false
             if (loadTypes != null) {
                 val kind = if (firstParty) "first-party" else "third-party"
                 if (kind !in loadTypes) return false
             }
-            if (ifDomains != null && ifDomains.none { domainMatches(it, host) }) return false
-            if (unlessDomains != null && unlessDomains.any { domainMatches(it, host) }) return false
-            if (literal != null && !url.contains(literal)) return false
+            // WebKit reads these two against the document being browsed, not the request.
+            if (ifDomains != null && ifDomains.none { domainMatches(it, topHost) }) return false
+            if (unlessDomains != null && unlessDomains.any { domainMatches(it, topHost) }) return false
+            if (literal != null && !url.contains(literal, ignoreCase = true)) return false
             return pattern.matcher(url).find()
         }
     }
@@ -58,21 +69,31 @@ class BlockingRules {
 
     /** Reads the rule files and replaces the rules in force. A file that is missing is skipped. */
     fun load(paths: List<String>) {
-        val blockHost = HashMap<String, MutableList<Rule>>()
-        val blockGeneral = ArrayList<Rule>()
-        val exceptHost = HashMap<String, MutableList<Rule>>()
-        val exceptGeneral = ArrayList<Rule>()
+        val texts = ArrayList<String>()
         for (path in paths) {
             val file = File(path)
             if (!file.isFile) continue
-            val text = runCatching { file.readText() }.getOrNull() ?: continue
+            texts.add(runCatching { file.readText() }.getOrNull() ?: continue)
+        }
+        loadTexts(texts)
+    }
+
+    /** Replaces the rules in force with the given rule lists, one text per list. */
+    fun loadTexts(texts: List<String>) {
+        val lists = ArrayList<ListRules>()
+        for (text in texts) {
+            val blockHost = HashMap<String, MutableList<Rule>>()
+            val blockGeneral = ArrayList<Rule>()
+            val exceptHost = HashMap<String, MutableList<Rule>>()
+            val exceptGeneral = ArrayList<Rule>()
             for (rule in parse(text)) {
                 val host = hostOf(rule.pattern.pattern())
                 val (byHost, general) = if (rule.blocks) blockHost to blockGeneral else exceptHost to exceptGeneral
                 if (host == null) general.add(rule) else byHost.getOrPut(host) { ArrayList() }.add(rule)
             }
+            lists.add(ListRules(Bucket(blockHost, blockGeneral), Bucket(exceptHost, exceptGeneral)))
         }
-        snapshot = Snapshot(Bucket(blockHost, blockGeneral), Bucket(exceptHost, exceptGeneral))
+        snapshot = Snapshot(lists)
     }
 
     fun clear() {
@@ -83,20 +104,21 @@ class BlockingRules {
     fun blocks(url: String, isMainFrame: Boolean, topUrl: String?): Boolean {
         val current = snapshot
         if (current.isEmpty) return false
-        val uri = runCatching { Uri.parse(url) }.getOrNull() ?: return false
-        val host = uri.host?.lowercase() ?: return false
+        val host = hostOfUrl(url) ?: return false
         val resourceType = resourceTypeOf(url, isMainFrame)
         val firstParty = isFirstParty(host, topUrl)
+        // The document being browsed; a main-frame load is its own document.
+        val topHost = if (isMainFrame) host else topUrl?.let { hostOfUrl(it) } ?: host
 
         val suffixes = suffixesOf(host)
         fun any(bucket: Bucket): Boolean {
             for (suffix in suffixes) {
                 val rules = bucket.byHost[suffix] ?: continue
-                if (rules.any { it.matches(url, host, resourceType, firstParty) }) return true
+                if (rules.any { it.matches(url, topHost, resourceType, firstParty) }) return true
             }
-            return bucket.general.any { it.matches(url, host, resourceType, firstParty) }
+            return bucket.general.any { it.matches(url, topHost, resourceType, firstParty) }
         }
-        return any(current.blocking) && !any(current.exceptions)
+        return current.lists.any { any(it.blocking) && !any(it.exceptions) }
     }
 
     private fun parse(text: String): List<Rule> {
@@ -113,7 +135,7 @@ class BlockingRules {
             val trigger = obj.optJSONObject("trigger") ?: continue
             val filter = trigger.optString("url-filter")
             if (filter.isEmpty()) continue
-            val pattern = runCatching { Pattern.compile(filter) }.getOrNull() ?: continue
+            val pattern = runCatching { Pattern.compile(filter, Pattern.CASE_INSENSITIVE) }.getOrNull() ?: continue
             rules.add(
                 Rule(
                     pattern = pattern,
@@ -161,13 +183,13 @@ class BlockingRules {
     }
 
     private fun isFirstParty(host: String, topUrl: String?): Boolean {
-        val topHost = topUrl?.let { runCatching { Uri.parse(it).host }.getOrNull() } ?: return true
+        val topHost = topUrl?.let { hostOfUrl(it) } ?: return true
         return DomainScope.registrableDomain(host) == DomainScope.registrableDomain(topHost)
     }
 
     private fun resourceTypeOf(url: String, isMainFrame: Boolean): String {
         if (isMainFrame) return "document"
-        val path = runCatching { Uri.parse(url).path }.getOrNull()?.lowercase() ?: return "raw"
+        val path = pathOfUrl(url)?.lowercase() ?: return "raw"
         return when {
             path.endsWith(".css") -> "style-sheet"
             path.endsWith(".js") || path.endsWith(".mjs") -> "script"
@@ -203,7 +225,10 @@ class BlockingRules {
                 i += 2
                 continue
             }
-            if (c in "/*?()[]{}|^$+") break
+            // A path or a character class ends the host. Anything else (a wildcard, an unescaped
+            // dot, a quantifier) means the host may continue, so the rule cannot be filed by it.
+            if (c == '/' || c == '[') break
+            if (c in ".*?()]{}|^$+") return null
             host.append(c)
             i += 1
         }
@@ -257,9 +282,18 @@ class BlockingRules {
         return best
     }
 
-    private companion object {
+    internal companion object {
+        private val AUTHORITY = Regex("^[a-zA-Z][a-zA-Z0-9+.-]*://(?:[^/?#@]*@)?(\\[[^\\]]*\\]|[^/?#:]+)")
+        private val PATH = Regex("^[a-zA-Z][a-zA-Z0-9+.-]*://[^/?#]*([^?#]*)")
+
+        /** The lower-case host of a URL; plain string work, so it does not need Android's Uri. */
+        fun hostOfUrl(url: String): String? =
+            AUTHORITY.find(url)?.groupValues?.get(1)?.lowercase()?.takeIf { it.isNotEmpty() }
+
+        fun pathOfUrl(url: String): String? = PATH.find(url)?.groupValues?.get(1)
+
         const val HOST_PREFIX = "^[^:]+:(//)?([^/]+\\.)?"
         const val MIN_LITERAL = 4
-        val EMPTY = Snapshot(Bucket(emptyMap(), emptyList()), Bucket(emptyMap(), emptyList()))
+        private val EMPTY = Snapshot(emptyList())
     }
 }

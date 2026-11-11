@@ -140,7 +140,7 @@ fn is_cache_file(path: &Path) -> bool {
         .file_name()
         .and_then(|n| n.to_str())
         .unwrap_or_default();
-    name.starts_with("openmedia-") && (name.ends_with(".json") || name.ends_with(".json.tmp"))
+    name.starts_with("openmedia-") && (name.ends_with(".json") || name.ends_with(".tmp"))
 }
 
 /// Converts an ABP-syntax list to WebKit's content-blocking JSON. Network rules become `block`

@@ -355,6 +355,9 @@ export const useApp = create<AppStore>((set, get) => {
 
   /** Incognito chats live only in memory: switching modes drops them and loads the saved ones again. */
   const resetChats = () => {
+    // The open assistant turn belongs to the mode it started in: drop it before the chats go, so
+    // it cannot be seen after leaving incognito or saved into the other mode's chats.
+    get().cancelAssistant();
     useChat.getState().forget();
     void useChat.getState().load();
   };

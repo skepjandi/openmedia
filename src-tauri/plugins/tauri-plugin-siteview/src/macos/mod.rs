@@ -33,7 +33,9 @@ use tauri::{
     AppHandle, Emitter, LogicalPosition, LogicalSize, Manager, Runtime, Theme, Webview, WebviewUrl,
     WebviewWindow, WebviewWindowBuilder, Window,
     plugin::PluginApi,
-    webview::{DownloadEvent, NewWindowFeatures, NewWindowResponse, WebviewBuilder},
+    webview::{
+        DownloadEvent, NewWindowFeatures, NewWindowResponse, PermissionResponse, WebviewBuilder,
+    },
 };
 use url::Url;
 use uuid::Uuid;
@@ -48,6 +50,10 @@ use crate::validate::{
     wrap_evaluate_script,
 };
 use crate::{Error, Result};
+
+/// The longest page title, and address in bytes, the shell is told about.
+const MAX_REPORTED_TITLE_CHARS: usize = 256;
+const MAX_REPORTED_URL_BYTES: usize = 4096;
 
 const MAIN_WINDOW: &str = "main";
 /// How often each session's page state is read. Single-page sites change address without a page
@@ -311,6 +317,9 @@ impl<R: Runtime> Inner<R> {
             // the bundle requires).
             .data_store_identifier(profile.into_bytes())
             .on_navigation(allows_navigation)
+            // A site never gets the camera, the microphone or the location: wry would otherwise
+            // grant media capture when nothing handles the request.
+            .on_permission_request(|_, _| PermissionResponse::Deny)
             // WebKit picks the Downloads folder and a free file name; the file is shown in Finder
             // once it is complete, since nothing else says a download happened.
             .on_download(move |_, event| {
@@ -496,7 +505,12 @@ impl<R: Runtime> Inner<R> {
 
     /// Tells the shell about a session whose page state changed. `label` names the view the state
     /// was read from; a view that was replaced meanwhile is ignored.
-    fn report(&self, session: &str, label: &str, page: PageSnapshot) {
+    fn report(&self, session: &str, label: &str, mut page: PageSnapshot) {
+        // Title and address are the page's own words: bound them before they reach the shell.
+        page.title = page
+            .title
+            .map(|title| title.chars().take(MAX_REPORTED_TITLE_CHARS).collect());
+        page.url = page.url.filter(|url| url.len() <= MAX_REPORTED_URL_BYTES);
         let event = {
             let mut state = self.state();
             let Some(entry) = state.sessions.get_mut(session) else {

@@ -32,6 +32,31 @@ const MAX_REPAIRS: u8 = 2;
 const MSG_BAD_ANSWER: &str = "The model's answer was not in the expected form.";
 const MSG_NO_JOB: &str = "That request has expired. Ask again.";
 const MSG_BAD_PAGE: &str = "The page could not be read.";
+const MSG_PAGE_CHANGED: &str = "The page changed since this request was prepared. Ask again.";
+const MSG_CANCELLED: &str = "That request was cancelled.";
+
+/// Scripts that tie a job to the document it was prepared on. The token lives in the page's own
+/// symbol registry under a random name only this job knows, so another page (another session, or
+/// the same session after it navigated) cannot answer for it.
+const PAGE_MARK_PREFIX: &str =
+    "(function(){var k=Symbol.for('openmedia.jobs');var j=window[k]||(window[k]={});j[";
+const PAGE_CHECK_PREFIX: &str =
+    "(function(){var j=window[Symbol.for('openmedia.jobs')];return !!(j&&j[";
+
+fn mark_page(page: &impl Page, token: &str) -> Result<()> {
+    page.evaluate(format!("{PAGE_MARK_PREFIX}'{token}']=1;return 1}})()"))?;
+    Ok(())
+}
+
+/// Refuses to go on when the page the user approved is no longer the one being read or changed.
+fn ensure_same_page(page: &impl Page, token: &str) -> Result<()> {
+    let same = page.evaluate(format!("{PAGE_CHECK_PREFIX}'{token}']===1)}})()"))?;
+    if same.trim() == "true" {
+        Ok(())
+    } else {
+        Err(Error::Connection(MSG_PAGE_CHANGED.to_owned()))
+    }
+}
 
 /// Runs scripts in the page the user is looking at. Answers are hostile data.
 pub trait Page {
@@ -113,6 +138,8 @@ pub struct Job {
     pub earlier: Vec<EarlierTurn>,
     pub snapshot: Snapshot,
     pub patch: Option<Patch>,
+    /// Names this job in the page it was prepared on; see [`ensure_same_page`].
+    page_token: String,
     created: Instant,
 }
 
@@ -138,6 +165,11 @@ impl Agent {
         }
         jobs.insert(id, job);
         id
+    }
+
+    /// Whether the job still exists: rejecting it (Cancel) removes it while a send may be running.
+    fn is_live(&self, id: Uuid) -> bool {
+        self.jobs().contains_key(&id)
     }
 
     pub fn get(&self, id: Uuid) -> Result<Job> {
@@ -211,6 +243,8 @@ pub fn prepare<F: FnOnce(&str, &str) -> RecipeContext>(
     let domain = tauri_plugin_siteview::site::registrable_domain(&snapshot.host)
         .ok_or_else(|| Error::Connection(MSG_BAD_PAGE.to_owned()))?;
     let context = (input.context)(&snapshot.host, &snapshot.path);
+    let page_token = Uuid::new_v4().simple().to_string();
+    mark_page(page, &page_token)?;
     let job = Job {
         request,
         domain,
@@ -220,6 +254,7 @@ pub fn prepare<F: FnOnce(&str, &str) -> RecipeContext>(
         earlier: input.earlier,
         snapshot,
         patch: None,
+        page_token,
         created: Instant::now(),
     };
     let prompt = build_prompt(&job, &job.snapshot, None);
@@ -383,6 +418,10 @@ pub async fn send(
             }
         };
         progress(Activity::new(StepKind::AskModel, StepStatus::Done, round));
+        // Cancel while the model was thinking: stop before touching the page or paying again.
+        if !agent.is_live(id) {
+            return Err(Error::Connection(MSG_CANCELLED.to_owned()));
+        }
 
         let patch = match patch::parse_patch(&answer, job.base.as_ref()) {
             Ok(patch) => {
@@ -416,6 +455,7 @@ pub async fn send(
 
         let (rules, css) = selectors_and_css(&patch, job.base.as_ref());
         let selectors: Vec<String> = rules.iter().map(|(_, selector)| selector.clone()).collect();
+        ensure_same_page(page, &job.page_token)?;
         page.evaluate(snapshot::preview_script(&css))?;
         progress(
             Activity::new(StepKind::PreviewOnPage, StepStatus::Done, round).with_total(rules.len()),
@@ -448,6 +488,7 @@ pub async fn send(
             return Ok(proposal);
         }
 
+        ensure_same_page(page, &job.page_token)?;
         snapshot = snapshot_of(page)?;
         failures = failed;
         validation_error = None;
@@ -523,6 +564,8 @@ mod tests {
         /// Match counts per selector.
         counts: Mutex<Vec<Vec<i64>>>,
         log: Mutex<Vec<String>>,
+        /// The user switched to another page: this one no longer carries the job's token.
+        moved: std::sync::atomic::AtomicBool,
     }
 
     impl FakePage {
@@ -530,6 +573,7 @@ mod tests {
             Self {
                 counts: Mutex::new(counts),
                 log: Mutex::new(Vec::new()),
+                moved: std::sync::atomic::AtomicBool::new(false),
             }
         }
         fn log(&self) -> Vec<String> {
@@ -542,6 +586,9 @@ mod tests {
             self.log.lock().unwrap().push(script.clone());
             if script == snapshot::SNAPSHOT_SCRIPT {
                 Ok(SNAPSHOT.to_owned())
+            } else if script.starts_with(PAGE_CHECK_PREFIX) {
+                let moved = self.moved.load(std::sync::atomic::Ordering::SeqCst);
+                Ok((!moved).to_string())
             } else if script.starts_with(snapshot::COUNT_SCRIPT_PREFIX) {
                 let mut counts = self.counts.lock().unwrap();
                 Ok(serde_json::to_string(&counts.remove(0)).unwrap())
@@ -616,7 +663,11 @@ mod tests {
             let prepared = prepare(&agent, &page, input(None)).unwrap();
             assert!(prepared.payload.contains("hide the promo"));
             assert!(prepared.token_estimate > 0);
-            assert_eq!(page.log(), vec![snapshot::SNAPSHOT_SCRIPT.to_owned()]);
+            // Reading the page, then naming the job on it; nothing is previewed or changed.
+            let log = page.log();
+            assert_eq!(log.len(), 2);
+            assert_eq!(log[0], snapshot::SNAPSHOT_SCRIPT);
+            assert!(log[1].starts_with(PAGE_MARK_PREFIX));
             assert!(agent.get(prepared.id).is_ok());
         });
     }
@@ -836,6 +887,57 @@ mod tests {
             let mut empty = input(None);
             empty.request = "   ".into();
             assert!(prepare(&agent, &page, empty).is_err());
+        });
+    }
+    #[test]
+    fn a_job_refuses_to_touch_a_page_it_was_not_prepared_on() {
+        run(async {
+            let agent = Agent::default();
+            let page = FakePage::new(vec![]);
+            let prepared = prepare(&agent, &page, input(None)).unwrap();
+            // The user switched to another site while the request waited.
+            page.moved.store(true, std::sync::atomic::Ordering::SeqCst);
+            let before = page.log().len();
+            let model = FakeModel::new(&[&new_option("div")]);
+            let result = send(&agent, &page, &model, &|_| {}, prepared.id).await;
+            assert!(matches!(&result, Err(Error::Connection(m)) if m == MSG_PAGE_CHANGED));
+            // Only the page check ran: nothing was previewed, counted or read again.
+            let after = page.log();
+            assert_eq!(after.len(), before + 1);
+            assert!(after[before].starts_with(PAGE_CHECK_PREFIX));
+        });
+    }
+
+    #[test]
+    fn cancelling_while_the_model_answers_stops_before_the_page_and_further_calls() {
+        struct CancelsItself<'a> {
+            agent: &'a Agent,
+            id: Mutex<Option<Uuid>>,
+            calls: Mutex<usize>,
+        }
+        impl Model for CancelsItself<'_> {
+            async fn complete(&self, _: &Prompt, _: &Value) -> Result<String> {
+                *self.calls.lock().unwrap() += 1;
+                if let Some(id) = *self.id.lock().unwrap() {
+                    self.agent.discard(id);
+                }
+                Ok(new_option("div"))
+            }
+        }
+        run(async {
+            let agent = Agent::default();
+            let page = FakePage::new(vec![vec![0]; 3]);
+            let prepared = prepare(&agent, &page, input(None)).unwrap();
+            let model = CancelsItself {
+                agent: &agent,
+                id: Mutex::new(Some(prepared.id)),
+                calls: Mutex::new(0),
+            };
+            let before = page.log().len();
+            let result = send(&agent, &page, &model, &|_| {}, prepared.id).await;
+            assert!(matches!(&result, Err(Error::Connection(m)) if m == MSG_CANCELLED));
+            assert_eq!(*model.calls.lock().unwrap(), 1);
+            assert_eq!(page.log().len(), before);
         });
     }
 }

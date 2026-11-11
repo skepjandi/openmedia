@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 use url::Url;
 
 use super::matcher::Matcher;
-use super::selector::{validate_declarations, validate_selector};
+use super::selector::{targets_page_root, validate_declarations, validate_selector};
 use crate::error::{Error, Result};
 
 pub const SCHEMA_VERSION: u32 = 1;
@@ -41,10 +41,14 @@ pub const fn current_platform_tag() -> &'static str {
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields, rename_all = "camelCase")]
 pub struct Meta {
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub author: Option<String>,
     /// Where "add to favorites" sends the user; also what a favorite of this site opens.
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub homepage: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub last_verified: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub notes: Option<String>,
 }
 
@@ -159,6 +163,7 @@ pub struct Recipe {
     #[serde(default)]
     pub options: Vec<SiteOption>,
     pub rules: Vec<Rule>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub meta: Option<Meta>,
     /// Present when the recipe is a hub: the pages to open as tabs.
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -224,7 +229,7 @@ impl Recipe {
         }
         for pattern in &self.matches {
             let matcher = Matcher::parse(pattern)?;
-            if matcher.is_broad() {
+            if matcher.is_broad() || matcher.is_suffix_wide() {
                 return Err(Error::Recipe(format!(
                     "match pattern {pattern} is too broad"
                 )));
@@ -255,7 +260,15 @@ impl Recipe {
                 )));
             }
             match rule {
-                Rule::Hide { target, .. } => validate_selector(&target.css)?,
+                Rule::Hide { target, .. } => {
+                    validate_selector(&target.css)?;
+                    if targets_page_root(&target.css) {
+                        return Err(Error::Recipe(format!(
+                            "rule {} would hide the whole page",
+                            rule.id()
+                        )));
+                    }
+                }
                 Rule::Css {
                     target,
                     declarations,
@@ -263,6 +276,12 @@ impl Recipe {
                 } => {
                     validate_selector(&target.css)?;
                     validate_declarations(declarations)?;
+                    if targets_page_root(&target.css) && hides_content(declarations) {
+                        return Err(Error::Recipe(format!(
+                            "rule {} would hide the whole page",
+                            rule.id()
+                        )));
+                    }
                 }
             }
         }
@@ -394,4 +413,19 @@ impl Recipe {
         }
         Ok(())
     }
+}
+
+/// Whether declarations would make the elements they style disappear or stop reacting.
+fn hides_content(declarations: &BTreeMap<String, String>) -> bool {
+    let value = |property: &str| {
+        declarations
+            .get(property)
+            .map(|value| value.trim().to_ascii_lowercase())
+    };
+    value("display").as_deref() == Some("none")
+        || value("visibility").as_deref() == Some("hidden")
+        || value("opacity").as_deref() == Some("0")
+        || value("pointer-events").as_deref() == Some("none")
+        || matches!(value("height").as_deref(), Some("0" | "0px"))
+        || matches!(value("max-height").as_deref(), Some("0" | "0px"))
 }
