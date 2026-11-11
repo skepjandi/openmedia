@@ -66,6 +66,11 @@ class SetColorSchemeArgs {
 }
 
 @InvokeArg
+class SetFavoriteDomainsArgs {
+    var domains: List<String> = emptyList()
+}
+
+@InvokeArg
 class FetchFaviconArgs {
     var url: String = ""
 }

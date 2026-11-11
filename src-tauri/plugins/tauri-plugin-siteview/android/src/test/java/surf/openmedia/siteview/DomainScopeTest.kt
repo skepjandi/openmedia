@@ -50,6 +50,19 @@ class DomainScopeTest {
     }
 
     @Test
+    fun recognizesSearchEngineScopes() {
+        assertEquals("duckduckgo.com", DomainScope.searchEngineDomain("duckduckgo.com"))
+        assertEquals("google.com", DomainScope.searchEngineDomain("www.google.com"))
+        assertEquals("bing.com", DomainScope.searchEngineDomain("www.bing.com"))
+        assertEquals("brave.com", DomainScope.searchEngineDomain("search.brave.com"))
+        assertEquals("ecosia.org", DomainScope.searchEngineDomain("www.ecosia.org"))
+        assertEquals("startpage.com", DomainScope.searchEngineDomain("www.startpage.com"))
+        assertEquals("yahoo.com", DomainScope.searchEngineDomain("search.yahoo.com"))
+        assertEquals(null, DomainScope.searchEngineDomain("notgoogle.com"))
+    }
+
+
+    @Test
     fun verdictPinsTheMainFrameToItsDomain() {
         assertEquals(Verdict.ALLOW, verdict("https", "l.instagram.com", "instagram.com"))
         assertEquals(Verdict.POPUP, verdict("https", "evil.io", "instagram.com"))
@@ -61,6 +74,57 @@ class DomainScopeTest {
         assertEquals(Verdict.ALLOW, verdict("https", "x.com", "twitter.com", settled = false))
         assertEquals(Verdict.POPUP, verdict("https", "x.com", "twitter.com"))
     }
+    @Test
+    fun clickedLinksFromUnfavoritedSitesStayInAppAndFavoriteLinksPopOut() {
+        assertEquals(
+            Verdict.ALLOW,
+            verdict(
+                "https", "example.com", "google.com",
+                searchDomain = "google.com", sourceHost = "www.google.com", userGesture = true,
+            ),
+        )
+        assertTrue(
+            DomainScope.isSearchResultNavigation(
+                "https", "google.com", "www.google.com", "google.com", userGesture = true,
+            ),
+        )
+        assertEquals(
+            Verdict.POPUP,
+            verdict("https", "example.com", "google.com", searchDomain = "google.com", sourceHost = "google.com"),
+        )
+        assertEquals(
+            Verdict.ALLOW,
+            verdict("https", "final.example", "tracker.example", navigationPending = true),
+        )
+        assertEquals(
+            Verdict.ALLOW,
+            verdict("https", "www.google.com", "example.com", searchDomain = "google.com"),
+        )
+        assertEquals(
+            Verdict.ALLOW,
+            verdict("https", "other.example", "example.com", userGesture = true),
+        )
+        assertEquals(
+            Verdict.POPUP,
+            verdict("https", "other.example", "example.com", userGesture = true, sourceFavorite = true),
+        )
+        assertEquals(
+            Verdict.POPUP,
+            verdict("https", "other.example", "example.com"),
+        )
+    }
+    @Test
+    fun searchEngineFavoriteUsesExternalLinkPolicy() {
+        assertEquals(
+            Verdict.POPUP,
+            verdict(
+                "https", "example.com", "google.com",
+                searchDomain = "google.com", sourceHost = "www.google.com",
+                userGesture = true, sourceFavorite = true,
+            ),
+        )
+    }
+
 
     @Test
     fun verdictCancelsEverythingButWebAndAboutSchemes() {
@@ -76,5 +140,12 @@ class DomainScopeTest {
         scope: String,
         settled: Boolean = true,
         mainFrame: Boolean = true,
-    ) = DomainScope.verdict(scheme, host, scope, settled, mainFrame)
+        searchDomain: String? = null,
+        sourceHost: String? = null,
+        userGesture: Boolean = false,
+        sourceFavorite: Boolean = false,
+        navigationPending: Boolean = false,
+    ) = DomainScope.verdict(
+        scheme, host, scope, settled, mainFrame, searchDomain, sourceHost, userGesture, sourceFavorite, navigationPending,
+    )
 }

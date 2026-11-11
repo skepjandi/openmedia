@@ -67,6 +67,11 @@ impl<R: Runtime> Siteview<R> {
         Err(Error::DesktopUnsupported("site views"))
     }
 
+    /// Desktop targets without site views have no native navigation policy to update.
+    pub fn set_favorite_domains(&self, _request: SetFavoriteDomainsRequest) -> Result<()> {
+        Ok(())
+    }
+
     pub fn set_document_start_script(&self, _request: SetDocumentStartScriptRequest) -> Result<()> {
         Err(Error::DesktopUnsupported("site views"))
     }

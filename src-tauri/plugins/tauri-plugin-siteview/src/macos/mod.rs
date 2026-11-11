@@ -17,7 +17,7 @@ mod notify;
 mod shell;
 
 use std::{
-    collections::HashMap,
+    collections::{HashMap, HashSet},
     path::{Path, PathBuf},
     process::Command,
     sync::{
@@ -115,6 +115,7 @@ struct NewView<'a> {
 struct Inner<R: Runtime> {
     app: AppHandle<R>,
     state: Mutex<State<R>>,
+    favorite_domains: Arc<Mutex<HashSet<String>>>,
     labels: AtomicU64,
     /// The label of the web view that was last given the keyboard.
     focused: Mutex<Option<String>>,
@@ -139,6 +140,7 @@ pub fn init<R: Runtime, C: DeserializeOwned>(
             rule_lists: Vec::new(),
             blocked: Vec::new(),
         }),
+        favorite_domains: Arc::new(Mutex::new(HashSet::new())),
         labels: AtomicU64::new(0),
         focused: Mutex::new(None),
     });
@@ -308,20 +310,38 @@ impl<R: Runtime> Inner<R> {
             bounds,
         } = view;
         let app = self.app.clone();
-        let scope = Arc::clone(scope);
+        let navigation_scope = Arc::clone(scope);
+        let navigation_favorites = Arc::clone(&self.favorite_domains);
+        let popup_scope = Arc::clone(scope);
+        let popup_favorites = Arc::clone(&self.favorite_domains);
         let own_label = label.to_owned();
         let downloading = Mutex::new(None::<PathBuf>);
         let mut builder = WebviewBuilder::new(label, WebviewUrl::External(url))
             .user_agent(SAFARI_USER_AGENT)
-            // A data store per profile keeps cookies and storage apart (macOS 14 and later, which
-            // the bundle requires).
             .data_store_identifier(profile.into_bytes())
-            .on_navigation(allows_navigation)
-            // A site never gets the camera, the microphone or the location: wry would otherwise
-            // grant media capture when nothing handles the request.
+            .on_navigation(move |url| {
+                if !allows_navigation(url) {
+                    return false;
+                }
+                let Some(host) = url.host_str() else {
+                    return true;
+                };
+                let source_scope = navigation_scope
+                    .lock()
+                    .unwrap_or_else(PoisonError::into_inner)
+                    .clone();
+                let favorite = navigation_favorites
+                    .lock()
+                    .unwrap_or_else(PoisonError::into_inner)
+                    .contains(&source_scope);
+                if favorite && !scope_contains(&source_scope, host) {
+                    open_in_browser(url);
+                    false
+                } else {
+                    true
+                }
+            })
             .on_permission_request(|_, _| PermissionResponse::Deny)
-            // WebKit picks the Downloads folder and a free file name; the file is shown in Finder
-            // once it is complete, since nothing else says a download happened.
             .on_download(move |_, event| {
                 let mut pending = downloading.lock().unwrap_or_else(PoisonError::into_inner);
                 match event {
@@ -341,18 +361,23 @@ impl<R: Runtime> Inner<R> {
                 if !matches!(url.scheme(), "http" | "https") {
                     return NewWindowResponse::Deny;
                 }
-                let inside = url.host_str().is_some_and(|host| {
-                    scope_contains(&scope.lock().unwrap_or_else(PoisonError::into_inner), host)
-                });
-                if inside {
+                let source_scope = popup_scope
+                    .lock()
+                    .unwrap_or_else(PoisonError::into_inner)
+                    .clone();
+                let inside = url
+                    .host_str()
+                    .is_some_and(|host| scope_contains(&source_scope, host));
+                let favorite = popup_favorites
+                    .lock()
+                    .unwrap_or_else(PoisonError::into_inner)
+                    .contains(&source_scope);
+                if inside || !favorite {
                     if let Some(webview) = app.get_webview(&own_label) {
                         let _ = webview.navigate(url);
                     }
                     return NewWindowResponse::Deny;
                 }
-                // Sign-in (Google, Apple) and outside links open in a popup inside the app. It is
-                // built on the opener's configuration, so it shares the session's data store and
-                // keeps `window.opener`, which sign-in flows report back through.
                 match open_popup(&app, features) {
                     Ok(window) => NewWindowResponse::Create { window },
                     Err(_) => {
@@ -693,6 +718,16 @@ impl<R: Runtime> Siteview<R> {
             ColorScheme::Light => Some(Theme::Light),
             ColorScheme::Dark => Some(Theme::Dark),
         });
+        Ok(())
+    }
+
+    /// Applies the active favorite set to navigation callbacks without exposing it to site views.
+    pub fn set_favorite_domains(&self, request: SetFavoriteDomainsRequest) -> Result<()> {
+        *self
+            .inner
+            .favorite_domains
+            .lock()
+            .unwrap_or_else(PoisonError::into_inner) = request.domains.into_iter().collect();
         Ok(())
     }
 

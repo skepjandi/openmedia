@@ -8,6 +8,23 @@ All notable changes to OpenMedia are documented here.
 
 ## 2026-11-11
 
+### fix(marketplace): label hubs experimental
+
+**Area:** `fix(marketplace)`
+
+**Change:** The Marketplace hub tag and recipe badge now read “Experimental” in every supported language. Hub listings use tab labels instead of the generic “Quieter” fallback. The official Messages Hub recipe was inserted into production D1 and awaits the next scheduled publisher.
+
+**Verified:** D1 reports `market.official.messages-hub` as `held` with `release_at=0`; the locale tests passed. **Pending:** the scheduled publisher must promote it; app users need an app update for the new label.
+
+
+### feat(discovery): search, favorite, and match recipes
+
+**Area:** `feat(discovery)`
+
+**Change:** Search results and user-clicked cross-site links from non-favorited sites stay in the embedded view, including redirects. Cross-site links from favorited sites open externally. The command UI recommends up to three matching Marketplace recipes; selecting one opens its detail and review flow.
+
+**Verified:** `yarn test:swift`, Rust tests (387 passed), `yarn ts:check`, focused ESLint/Prettier, and 23 Marketplace logic tests passed. **Not verified:** native routing on devices or the Tauri-hosted command UI. Android tests could not start because generated `tauri.settings.gradle` is missing.
+
 ### feat(recipes): official Messages Hub
 
 **Area:** `feat(recipes)`

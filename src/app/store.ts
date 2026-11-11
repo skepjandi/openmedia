@@ -105,6 +105,7 @@ export interface AppStore {
   sheetParent: "none" | "settings";
   /** The recipe the Recipes page opens with expanded, set when a favorite sends the user there. */
   recipeFocus: string | null;
+  marketplaceFocus: string | null;
   onboardingOpen: boolean;
   sessions: Session[];
   activeId: string | null;
@@ -124,6 +125,9 @@ export interface AppStore {
   closeSheet: () => void;
   /** Opens the Recipes page with this recipe's card expanded. */
   openRecipe: (recipeId: string) => void;
+  /** Opens the Marketplace at one recipe's existing review flow. */
+  openMarketplaceRecipe: (recipeId: string) => void;
+  clearMarketplaceFocus: () => void;
   /** Fetches what only Settings and the fan need: site options and missing icons. Runs after the first page shows. */
   loadSecondary: () => void;
   /** Marks the guide unseen again and shows it now. */
@@ -424,6 +428,7 @@ export const useApp = create<AppStore>((set, get) => {
     sheet: "none",
     sheetParent: "none",
     recipeFocus: null,
+    marketplaceFocus: null,
     onboardingOpen: false,
     sessions: [],
     activeId: null,
@@ -466,19 +471,29 @@ export const useApp = create<AppStore>((set, get) => {
 
     openSheet: (sheet) => {
       const isPro = useEntitlementStore.getState().status === "pro";
-      set((current) => showSheet(current, !isPro && sheet === "stats" ? "paywall" : sheet));
+      set((current) => ({
+        ...showSheet(current, !isPro && sheet === "stats" ? "paywall" : sheet),
+        marketplaceFocus: null,
+      }));
     },
     closeSheet: () =>
       set((current) => ({
         sheet: isSettingsChild(current.sheet) ? current.sheetParent : "none",
         sheetParent: "none",
         recipeFocus: null,
+        marketplaceFocus: null,
       })),
 
     openRecipe: (recipeId) => {
       get().openSheet("recipes");
       set({ recipeFocus: recipeId });
     },
+    openMarketplaceRecipe: (recipeId) =>
+      set((current) => ({
+        ...showSheet(current, "marketplace"),
+        marketplaceFocus: recipeId,
+      })),
+    clearMarketplaceFocus: () => set({ marketplaceFocus: null }),
 
     resetGuide: async () => {
       try {

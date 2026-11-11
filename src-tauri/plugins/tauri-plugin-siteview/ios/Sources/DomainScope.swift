@@ -8,9 +8,13 @@ enum NavigationVerdict: Equatable {
   case cancel
 }
 
-/// A session never leaves its domain. This file holds the rule as pure functions so it can be
-/// compiled and tested without UIKit or WebKit.
+/// A clicked link from a favorite opens outside the session; other clicked links and their redirects
+/// stay in the same view. This file keeps the rule pure for checks without UIKit or WebKit.
 enum DomainScope {
+  private static let searchEngineDomains: Set<String> = [
+    "duckduckgo.com", "google.com", "bing.com", "brave.com", "ecosia.org", "startpage.com", "yahoo.com",
+  ]
+
   /// `www.instagram.com` and `m.instagram.com` both give `instagram.com`; `news.bbc.co.uk` gives
   /// `bbc.co.uk`, and `bob.github.io` stays `bob.github.io` (Public Suffix List). Hosts without a
   /// registrable part (IP addresses, `localhost`) are kept whole.
@@ -18,6 +22,12 @@ enum DomainScope {
     PublicSuffix.shared.registrableDomain(of: host)
       ?? (host.hasSuffix(".") ? String(host.dropLast()) : host).lowercased()
   }
+  static func searchEngineDomain(of host: String?) -> String? {
+    guard let host, !host.isEmpty else { return nil }
+    let domain = registrableDomain(of: host)
+    return searchEngineDomains.contains(domain) ? domain : nil
+  }
+
 
   /// True for the scope itself and any subdomain of it, never for a lookalike such as
   /// `notinstagram.com`.
@@ -27,14 +37,11 @@ enum DomainScope {
     return host == scope || host.hasSuffix("." + scope)
   }
 
-  /// Decides a navigation.
-  ///
-  /// - `settled`: false until the session's first load has finished. Until then a redirect to
-  ///   another domain (`twitter.com` to `x.com`) is the site finding its own home, so it is
-  ///   allowed and the session adopts the final domain.
-  /// - Subframes are never blocked; only the page the user sees is pinned.
+  /// Favorite-site links open outside the session. Clicked links from other sites stay in the view.
   static func verdict(
-    scheme: String?, host: String?, scope: String, settled: Bool, isMainFrame: Bool
+    scheme: String?, host: String?, scope: String, settled: Bool, isMainFrame: Bool,
+    searchDomain: String? = nil, sourceHost: String? = nil, userGesture: Bool = false,
+    sourceFavorite: Bool = false, navigationPending: Bool = false
   ) -> NavigationVerdict {
     switch scheme?.lowercased() {
     case "about":
@@ -42,9 +49,31 @@ enum DomainScope {
     case "http", "https":
       guard let host, !host.isEmpty else { return .cancel }
       if !isMainFrame || !settled || contains(scope: scope, host: host) { return .allow }
+      if navigationPending
+        || (!sourceFavorite && (
+          searchDomain.map({ contains(scope: $0, host: host) }) == true
+            || isSearchResultNavigation(
+              scheme: scheme, targetHost: host, sourceHost: sourceHost, searchDomain: searchDomain,
+              userGesture: userGesture
+            )
+            || userGesture
+        ))
+      {
+        return .allow
+      }
       return .popup
     default:
       return .cancel
     }
+  }
+
+  /// True for a user-initiated web navigation from the original search-engine page.
+  static func isSearchResultNavigation(
+    scheme: String?, targetHost: String?, sourceHost: String?, searchDomain: String?, userGesture: Bool
+  ) -> Bool {
+    guard userGesture, ["http", "https"].contains(scheme?.lowercased() ?? ""),
+      let targetHost, !targetHost.isEmpty, let sourceHost, let searchDomain
+    else { return false }
+    return contains(scope: searchDomain, host: sourceHost)
   }
 }

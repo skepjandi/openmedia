@@ -114,6 +114,10 @@ class SetColorSchemeArgs: Decodable {
   let scheme: String
 }
 
+class SetFavoriteDomainsArgs: Decodable {
+  let domains: [String]
+}
+
 class FetchFaviconArgs: Decodable {
   let url: String
 }
@@ -206,8 +210,12 @@ private final class Session {
   let id: String
   let view: WKWebView
   let initialURL: URL
-  /// The registrable domain the session may show. Fixed once the first load settles.
+  /// The registrable domain currently pinned to this session.
   var scope: String
+  /// The search engine that opened this session, if any.
+  let searchDomain: String?
+  /// True while a user-initiated outbound navigation and its redirects are loading.
+  var navigationPending = false
   /// False until the first load finishes or fails; see `DomainScope.verdict`.
   var settled = false
   /// True once the first load has committed; before that a timeout must not reveal a blank page.
@@ -230,6 +238,7 @@ private final class Session {
     self.view = view
     self.scope = scope
     self.initialURL = initialURL
+    self.searchDomain = DomainScope.searchEngineDomain(of: initialURL.host)
   }
 }
 
@@ -253,9 +262,8 @@ final class TouchRouter: UIView {
 /// shell is transparent and draws the floating controls; the shell owns layout and reports the
 /// site rectangle. Site views never receive Tauri IPC, only the write-only `openmedia` bridge.
 ///
-/// A session never leaves its domain: a main-frame navigation outside it is cancelled and shown in
-/// a popup browser (`SFSafariViewController`, which shares nothing with the profile's data store).
-/// Which sessions to keep alive is the shell's decision; this class only opens, shows and closes.
+/// Cross-domain clicks from favorite sites open in the popup browser. Search-result and other
+/// non-favorite clicks stay in this view; script-initiated cross-domain navigations use a popup.
 class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotificationCenterDelegate {
   private var shell: WKWebView?
   private var sessions: [String: Session] = [:]
@@ -263,6 +271,7 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
   private var router: TouchRouter?
   private var events: Channel?
   private var popup: SFSafariViewController?
+  private var favoriteDomains: Set<String> = []
   private var colorScheme: UIUserInterfaceStyle = .unspecified
   /// The shell's page rectangle, in shell coordinates; every session's view fills it.
   private var pageRect: CGRect?
@@ -476,6 +485,14 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
     }
   }
 
+  @objc public func setFavoriteDomains(_ invoke: Invoke) throws {
+    let args = try invoke.parseArgs(SetFavoriteDomainsArgs.self)
+    DispatchQueue.main.async {
+      self.favoriteDomains = Set(args.domains.map { DomainScope.registrableDomain(of: $0) })
+      invoke.resolve()
+    }
+  }
+
   @objc public func fetchFavicon(_ invoke: Invoke) throws {
     let args = try invoke.parseArgs(FetchFaviconArgs.self)
     guard let page = webURL(args.url) else {
@@ -668,9 +685,20 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
       return
     }
     let url = navigationAction.request.url
+    let isMainFrame = navigationAction.targetFrame?.isMainFrame ?? true
+    let sourceHost = webView.url?.host
+    let userGesture =
+      navigationAction.navigationType == .linkActivated && navigationAction.sourceFrame.isMainFrame
+    let sourceFavorite = isFavorite(sourceHost)
+    markNavigationPending(
+      session, target: url, sourceHost: sourceHost, userGesture: userGesture, sourceFavorite: sourceFavorite
+    )
     switch DomainScope.verdict(
       scheme: url?.scheme, host: url?.host, scope: session.scope, settled: session.settled,
-      isMainFrame: navigationAction.targetFrame?.isMainFrame ?? true)
+      isMainFrame: isMainFrame, searchDomain: session.searchDomain, sourceHost: sourceHost,
+      userGesture: userGesture, sourceFavorite: sourceFavorite,
+      navigationPending: session.navigationPending
+    )
     {
     case .allow:
       decisionHandler(.allow)
@@ -682,27 +710,32 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
     }
   }
 
-  /// While a session is still on its first load, a redirect may change its domain; the session
-  /// adopts wherever the first page committed.
+  /// The first load and allowed clicked cross-domain navigations adopt their committed destination.
   func webView(_ webView: WKWebView, didCommit navigation: WKNavigation!) {
     session(of: webView)?.committed = true
     scheduleReveal(webView)
-    guard let session = session(of: webView), !session.settled, let host = webView.url?.host else { return }
+    guard let session = session(of: webView), let host = webView.url?.host else { return }
     session.scope = DomainScope.registrableDomain(of: host)
   }
 
   func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
     reveal(webView)
-    session(of: webView)?.settled = true
+    if let session = session(of: webView) {
+      session.navigationPending = false
+    }
   }
 
   func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
-    session(of: webView)?.settled = true
+    if let session = session(of: webView) {
+      session.navigationPending = false
+    }
     send(ErrorEvent(message: error.localizedDescription))
   }
 
   func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
-    session(of: webView)?.settled = true
+    if let session = session(of: webView) {
+      session.navigationPending = false
+    }
     send(ErrorEvent(message: error.localizedDescription))
   }
 
@@ -737,9 +770,19 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
   ) -> WKWebView? {
     guard let session = session(of: webView), let url = navigationAction.request.url else { return nil }
     if session.blocked { return nil }
+    let sourceHost = webView.url?.host
+    let userGesture =
+      navigationAction.navigationType == .linkActivated && navigationAction.sourceFrame.isMainFrame
+    let sourceFavorite = isFavorite(sourceHost)
+    markNavigationPending(
+      session, target: url, sourceHost: sourceHost, userGesture: userGesture, sourceFavorite: sourceFavorite
+    )
     switch DomainScope.verdict(
       scheme: url.scheme, host: url.host, scope: session.scope, settled: session.settled,
-      isMainFrame: true)
+      isMainFrame: true, searchDomain: session.searchDomain, sourceHost: sourceHost,
+      userGesture: userGesture, sourceFavorite: sourceFavorite,
+      navigationPending: session.navigationPending
+    )
     {
     case .allow: webView.load(navigationAction.request)
     case .popup: presentPopup(url)
@@ -752,6 +795,25 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
 
   private func session(of view: WKWebView) -> Session? {
     sessions.values.first { $0.view === view }
+  }
+
+  private func isFavorite(_ host: String?) -> Bool {
+    guard let host else { return false }
+    return favoriteDomains.contains(DomainScope.registrableDomain(of: host))
+  }
+
+  private func markNavigationPending(
+    _ session: Session, target: URL?, sourceHost: String?, userGesture: Bool, sourceFavorite: Bool
+  ) {
+    guard userGesture, !sourceFavorite, let targetHost = target?.host else { return }
+    if !DomainScope.contains(scope: session.scope, host: targetHost)
+      || DomainScope.isSearchResultNavigation(
+        scheme: target?.scheme, targetHost: targetHost, sourceHost: sourceHost,
+        searchDomain: session.searchDomain, userGesture: userGesture
+      )
+    {
+      session.navigationPending = true
+    }
   }
 
   // MARK: Blocking

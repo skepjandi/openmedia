@@ -20,6 +20,8 @@ import { INPUT_MODES, MAX_REQUEST_LENGTH, routeInput, type InputMode } from "../
 import { assistant as assistantIpc, type HubProposal } from "../ai/ipc";
 import { useEntitlementStore } from "../paywall/store";
 import { DEFAULT_SEARCH_ENGINE } from "../../shared/searchEngines";
+import { marketplace, type MarketItem } from "../marketplace/ipc";
+import { recommendedItems } from "../marketplace/logic";
 
 const primary =
   "rounded-full bg-accent px-5 py-2.5 text-sm font-semibold text-on-accent disabled:opacity-40";
@@ -45,6 +47,7 @@ export function CommandBar() {
   const loadAi = useApp((s) => s.loadAi);
   const loadSites = useApp((s) => s.loadSites);
   const openSheet = useApp((s) => s.openSheet);
+  const openMarketplaceRecipe = useApp((s) => s.openMarketplaceRecipe);
   const submitRequest = useApp((s) => s.submitRequest);
   const editRequest = useApp((s) => s.editRequest);
   const t = useT();
@@ -61,12 +64,19 @@ export function CommandBar() {
   const [hubBusy, setHubBusy] = useState(false);
   const [hubError, setHubError] = useState<string | null>(null);
   const [hubSaved, setHubSaved] = useState<string | null>(null);
+  const [recommendationState, setRecommendationState] = useState<{
+    pageUrl: string;
+    items: MarketItem[];
+  } | null>(null);
   const activeChat = useChat(selectActiveChat);
   const savedChats = useChat((s) => s.chats);
   const loadChats = useChat((s) => s.load);
   const focusChat = useChat((s) => s.focus);
   const startNewChat = useChat((s) => s.startNew);
   const pageAddress = page?.url ?? null;
+  const pageUrl = page?.url ?? page?.openedUrl ?? null;
+  const recipeRecommendations =
+    open && pageUrl && recommendationState?.pageUrl === pageUrl ? recommendationState.items : [];
   const chatDomain = pageAddress && /^https?:\/\//i.test(pageAddress) ? siteOf(pageAddress) : null;
   // A site that already has a chat opens the bar as a chat, so the next words continue it.
   const siteHasChat =
@@ -81,6 +91,28 @@ export function CommandBar() {
   useEffect(() => {
     if (open && isPro) void loadChats();
   }, [open, isPro, loadChats]);
+
+  useEffect(() => {
+    if (!open || !pageUrl) return;
+    let current = true;
+    void marketplace
+      .status()
+      .then((status) => (status.available ? marketplace.list() : null))
+      .then((listing) => {
+        if (current) {
+          setRecommendationState({
+            pageUrl,
+            items: listing ? recommendedItems(listing.items, pageUrl) : [],
+          });
+        }
+      })
+      .catch(() => {
+        if (current) setRecommendationState({ pageUrl, items: [] });
+      });
+    return () => {
+      current = false;
+    };
+  }, [open, pageUrl]);
 
   // Reopening the bar on a site continues that site's chat, unless a request is still running.
   useEffect(() => {
@@ -185,7 +217,6 @@ export function CommandBar() {
     void action().catch((error: unknown) => setNotice(describeError(error, t)));
 
   // The live address, or the one the page was opened with until it reports its first state.
-  const pageUrl = page?.url ?? page?.openedUrl ?? null;
   const site = pageUrl ? displayHost(pageUrl) : "";
   const favorited = pageUrl ? isFavoriteSite(favorites, pageUrl) : false;
   const starLabel = t(favorited ? "commandBar.removeFavorite" : "commandBar.addFavorite", {
@@ -249,6 +280,27 @@ export function CommandBar() {
                 <ArrowIcon />
               </button>
             </form>
+            {recipeRecommendations.length > 0 && (
+              <div
+                role="group"
+                aria-label={t("recipes.title")}
+                className="mt-2 flex items-center gap-2 overflow-x-auto px-1 pb-1"
+              >
+                <span className="shrink-0 text-xs text-paper/50">{t("recipes.title")}</span>
+                {recipeRecommendations.map((item) => (
+                  <button
+                    key={item.id}
+                    type="button"
+                    aria-label={item.summary ? `${item.name}: ${item.summary}` : item.name}
+                    title={item.summary}
+                    onClick={() => openMarketplaceRecipe(item.id)}
+                    className="max-w-40 shrink-0 truncate rounded-full border border-hair px-3 py-1.5 text-sm text-paper/80"
+                  >
+                    {item.name}
+                  </button>
+                ))}
+              </div>
+            )}
 
             <div
               role="radiogroup"

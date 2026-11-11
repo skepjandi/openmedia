@@ -98,6 +98,8 @@ function MarketplaceBody() {
   );
   const isPro = useEntitlementStore((s) => s.status === "pro");
   const openSheet = useApp((s) => s.openSheet);
+  const marketplaceFocus = useApp((s) => s.marketplaceFocus);
+  const clearMarketplaceFocus = useApp((s) => s.clearMarketplaceFocus);
 
   const refresh = useCallback(
     () =>
@@ -106,33 +108,46 @@ function MarketplaceBody() {
         .then((next) => {
           setError(null);
           setListing(next);
+          if (marketplaceFocus && !next.items.some((item) => item.id === marketplaceFocus)) {
+            clearMarketplaceFocus();
+          }
           if (next.withdrawn.length > 0) void loadSites();
         })
         .catch((failure: unknown) => setError(describeError(failure, t))),
-    [loadSites, t],
+    [clearMarketplaceFocus, loadSites, marketplaceFocus, t],
   );
 
   useEffect(() => {
     void refresh();
   }, [refresh]);
 
+  const activeView: MarketView =
+    view.kind === "list" &&
+    marketplaceFocus !== null &&
+    listing?.items.some((item) => item.id === marketplaceFocus)
+      ? { kind: "detail", id: marketplaceFocus }
+      : view;
+
   const back = () => {
-    const target = backTarget(view);
+    const target = backTarget(activeView);
+    if (marketplaceFocus) clearMarketplaceFocus();
     if (target === "close") closeSheet();
     else setView(target);
   };
 
   const detailItem =
-    view.kind === "detail" ? listing?.items.find((item) => item.id === view.id) : undefined;
+    activeView.kind === "detail"
+      ? listing?.items.find((item) => item.id === activeView.id)
+      : undefined;
 
   return (
     <Screen title={t("market.title")} closeLabel={t("common.back")} onClose={back} back>
-      {view.kind === "list" && (
+      {activeView.kind === "list" && (
         <div className="pb-3">
           <GuideLink slug="marketplace" />
         </div>
       )}
-      {view.kind === "list" && (
+      {activeView.kind === "list" && (
         <ListView
           listing={listing}
           filter={filter}
@@ -149,7 +164,7 @@ function MarketplaceBody() {
           onBlocked={() => setView({ kind: "blocked" })}
         />
       )}
-      {view.kind === "detail" && detailItem && (
+      {activeView.kind === "detail" && detailItem && (
         <DetailView
           item={detailItem}
           onRated={() => void refresh()}
@@ -160,11 +175,11 @@ function MarketplaceBody() {
           }}
         />
       )}
-      {view.kind === "detail" && !detailItem && (
+      {activeView.kind === "detail" && !detailItem && (
         <p className="px-1 text-sm text-paper/55">{t("market.loading")}</p>
       )}
-      {view.kind === "submit" && <SubmitView />}
-      {view.kind === "blocked" && <BlockedView />}
+      {activeView.kind === "submit" && <SubmitView />}
+      {activeView.kind === "blocked" && <BlockedView />}
     </Screen>
   );
 }

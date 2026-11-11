@@ -57,6 +57,7 @@ fn switch_mode(app: &AppHandle, active: bool) -> Result<()> {
             .set_document_start_script(SetDocumentStartScriptRequest { script: after })?;
     }
     incognito.set_active(active);
+    crate::commands::sync_favorite_domains(app)?;
     Ok(())
 }
 
@@ -130,12 +131,15 @@ pub fn get_incognito_favorites(
 /// Replaces the incognito favorites and returns them, validated and with their icons.
 #[tauri::command(async)]
 pub fn set_incognito_favorites(
+    app: AppHandle,
     library: State<'_, Library>,
     entitlement: State<'_, Entitlement>,
     favorites: Vec<FavoriteInput>,
 ) -> Result<Vec<Favorite>> {
     entitlement.require_pro()?;
-    library.set_incognito_favorites(favorites)
+    let saved = library.set_incognito_favorites(favorites)?;
+    crate::commands::sync_favorite_domains(&app)?;
+    Ok(saved)
 }
 
 #[cfg(test)]

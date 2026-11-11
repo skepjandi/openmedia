@@ -14,10 +14,12 @@ import android.graphics.Rect
 import android.graphics.RectF
 import android.net.Uri
 import android.os.Build
+import android.os.Message
 import android.view.Gravity
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import android.webkit.WebChromeClient
 import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
 import android.webkit.WebView
@@ -57,9 +59,9 @@ import java.util.concurrent.Executors
  * The shell is transparent and draws the app's own controls; the shell owns layout and reports the
  * site rectangle. Site views never receive Tauri IPC, only the write-only `openmedia` bridge.
  *
- * A session never leaves its domain: a main-frame navigation outside it is cancelled and shown in
- * the system's browser. Which sessions to keep alive is the shell's decision; this class only
- * opens, shows and closes.
+ * Cross-domain clicks from favorite sites open in the system browser. Search-result and other
+ * non-favorite clicks stay in this view; script-initiated cross-domain navigations use a popup.
+ * Which sessions to keep alive is the shell's decision; this class only opens, shows and closes.
  *
  * This is the Android twin of `ios/Sources/SiteViewPlugin.swift`.
  */
@@ -77,6 +79,8 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
         val initialUrl: String,
         @Volatile var topUrl: String = initialUrl,
         var scope: String,
+        val searchDomain: String? = DomainScope.searchEngineDomain(Uri.parse(initialUrl).host),
+        var navigationPending: Boolean = false,
         var settled: Boolean = false,
         var painted: Boolean = false,
         var loading: Boolean = false,
@@ -137,6 +141,7 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
         java.util.Collections.synchronizedMap(LinkedHashMap())
     @Volatile private var loadedRulePaths: List<String>? = null
     private var activeId: String? = null
+    @Volatile private var favoriteDomains: Set<String> = emptySet()
     private var events: Channel? = null
     private var interactiveRegions = emptyList<RectF>()
     private var colorScheme = "system"
@@ -404,6 +409,13 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
         colorScheme = args.scheme
         for (session in sessions.values) applyScheme(session)
         backdrop?.setBackgroundColor(backdropColor())
+        invoke.resolve()
+    }
+
+    @Command
+    fun setFavoriteDomains(invoke: Invoke) {
+        val args = invoke.parseArgs(SetFavoriteDomainsArgs::class.java)
+        favoriteDomains = args.domains.map { DomainScope.registrableDomain(it) }.toSet()
         invoke.resolve()
     }
 
@@ -745,6 +757,27 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
         blockedSessions.removeAll { it == id }
     }
 
+    private fun isFavoriteHost(host: String?): Boolean =
+        host?.let { DomainScope.registrableDomain(it) in favoriteDomains } == true
+
+    private fun markNavigationPending(
+        session: Session,
+        url: Uri,
+        sourceHost: String?,
+        userGesture: Boolean,
+        sourceFavorite: Boolean,
+    ) {
+        if (!userGesture || sourceFavorite) return
+        val targetHost = url.host ?: return
+        if (!DomainScope.contains(session.scope, targetHost) ||
+            DomainScope.isSearchResultNavigation(
+                url.scheme, targetHost, sourceHost, session.searchDomain, userGesture,
+            )
+        ) {
+            session.navigationPending = true
+        }
+    }
+
     private fun isBlocked(id: String): Boolean = blockedSessions.contains(id)
 
     // MARK: WebView setup
@@ -757,6 +790,43 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
         view.setBackgroundColor(Color.TRANSPARENT)
         view.overScrollMode = View.OVER_SCROLL_NEVER
         view.isClickable = true
+        view.webChromeClient = object : WebChromeClient() {
+            override fun onCreateWindow(
+                view: WebView,
+                isDialog: Boolean,
+                isUserGesture: Boolean,
+                resultMsg: Message,
+            ): Boolean {
+                if (!isUserGesture) return false
+                val session = sessionOf(view) ?: return false
+                val transport = resultMsg.obj as? WebView.WebViewTransport ?: return false
+                val targetView = WebView(activity)
+                targetView.webViewClient = object : WebViewClient() {
+                    override fun shouldOverrideUrlLoading(
+                        view: WebView,
+                        request: WebResourceRequest,
+                    ): Boolean {
+                        if (!request.isForMainFrame) return false
+                        val url = request.url
+                        val sourceHost = Uri.parse(session.topUrl).host
+                        val sourceFavorite = isFavoriteHost(sourceHost)
+                        markNavigationPending(session, url, sourceHost, isUserGesture, sourceFavorite)
+                        if (url.host?.let { DomainScope.contains(session.scope, it) } == true) {
+                            session.view.loadUrl(url.toString())
+                        } else if (sourceFavorite) {
+                            presentPopup(url)
+                        } else {
+                            session.view.loadUrl(url.toString())
+                        }
+                        view.destroy()
+                        return true
+                    }
+                }
+                transport.webView = targetView
+                resultMsg.sendToTarget()
+                return true
+            }
+        }
         view.webViewClient = object : WebViewClient() {
             override fun shouldOverrideUrlLoading(
                 view: WebView,
@@ -765,6 +835,12 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
                 val session = sessionOf(view) ?: return true
                 if (session.blocked) return true
                 val url = request.url
+                val sourceHost = Uri.parse(session.topUrl).host
+                val userGesture = request.hasGesture()
+                val sourceFavorite = isFavoriteHost(sourceHost)
+                if (request.isForMainFrame) {
+                    markNavigationPending(session, url, sourceHost, userGesture, sourceFavorite)
+                }
                 return when (
                     DomainScope.verdict(
                         url.scheme,
@@ -772,6 +848,11 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
                         session.scope,
                         session.settled,
                         request.isForMainFrame,
+                        session.searchDomain,
+                        sourceHost,
+                        userGesture,
+                        sourceFavorite,
+                        session.navigationPending,
                     )
                 ) {
                     DomainScope.Verdict.ALLOW -> false
@@ -787,12 +868,10 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
                 val session = sessionOf(view) ?: return
                 session.topUrl = url
                 session.loading = true
-                // While the first load is still running, a redirect may change the domain; the
-                // session adopts wherever the first page settles.
-                if (!session.settled) {
-                    val host = Uri.parse(url).host
-                    if (host != null) session.scope = DomainScope.registrableDomain(host)
-                }
+                // Every allowed main-frame navigation adopts its destination; clicked redirect
+                // chains may continue crossing domains until they finish loading.
+                val host = Uri.parse(url).host
+                if (host != null) session.scope = DomainScope.registrableDomain(host)
                 injectLate(session, session.recipe)
                 sendState(session)
             }
@@ -806,6 +885,7 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
                 val session = sessionOf(view) ?: return
                 session.loading = false
                 session.settled = true
+                session.navigationPending = false
                 session.frame.isRefreshing = false
                 reveal(session)
                 sendState(session)
@@ -817,7 +897,9 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
                 error: android.webkit.WebResourceError,
             ) {
                 if (!request.isForMainFrame) return
-                sessionOf(view)?.frame?.isRefreshing = false
+                val session = sessionOf(view) ?: return
+                session.frame.isRefreshing = false
+                session.navigationPending = false
                 sendError(error.description?.toString() ?: "the page could not be loaded")
             }
 

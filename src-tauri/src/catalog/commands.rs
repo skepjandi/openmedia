@@ -236,6 +236,7 @@ pub async fn onboarding_apply(
         .onboarding_apply(&account, &recipes, &library, &recipe_ids)
         .await?;
     if !result.installed.is_empty() {
+        crate::commands::sync_favorite_domains(&app)?;
         reload_script(&app, &library, &recipes)?;
     }
     Ok(result)

@@ -152,6 +152,13 @@ impl<R: Runtime> Siteview<R> {
         )
     }
 
+    pub fn set_favorite_domains(&self, request: SetFavoriteDomainsRequest) -> Result<()> {
+        self.run(
+            "setFavoriteDomains",
+            serde_json::json!({ "domains": request.domains }),
+        )
+    }
+
     pub fn fetch_favicon(&self, request: FetchFaviconRequest) -> Result<Option<String>> {
         let response: FaviconResponse =
             self.run("fetchFavicon", serde_json::json!({ "url": request.url }))?;

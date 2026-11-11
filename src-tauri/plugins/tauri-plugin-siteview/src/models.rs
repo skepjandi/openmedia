@@ -172,6 +172,13 @@ pub struct SetBlockedRequest {
     pub blocked: bool,
 }
 
+/// Registrable domains of the active favorite set. Rust derives this from the library; site views
+/// use it only to choose where a user-initiated outbound link opens.
+#[derive(Debug, Clone, Deserialize)]
+pub struct SetFavoriteDomainsRequest {
+    pub domains: Vec<String>,
+}
+
 /// A script for the active page. Rust-only: not a Tauri command, never reachable from a webview.
 #[derive(Debug, Clone, Deserialize)]
 pub struct EvaluateRequest {

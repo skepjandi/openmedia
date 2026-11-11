@@ -1,3 +1,4 @@
+import { hostOf, registrableDomain, siteOf } from "../../shared/site";
 import type { MarketComment, MarketItem, MarketRating, MarketTag } from "./ipc";
 
 const ORIGIN_TAGS: readonly MarketTag[] = ["official", "community"];
@@ -81,6 +82,22 @@ export function visibleItems(
     .map((item, index) => ({ item, index }))
     .sort((a, b) => rank(a.item) - rank(b.item) || a.index - b.index)
     .map(({ item }) => item);
+}
+
+/** Up to three installable or updatable recipes for the page the user is browsing. */
+export function recommendedItems(items: readonly MarketItem[], pageUrl: string): MarketItem[] {
+  const pageSite = siteOf(pageUrl);
+  if (!pageSite) return [];
+  return visibleItems(items, new Set<MarketTag>())
+    .filter((item) => {
+      if (item.installedVersion && !item.updateAvailable) return false;
+      const hosts = [
+        ...item.hosts.map((host) => hostOf(`https://${host.replace(/^\*\./, "")}`)),
+        ...(item.homepage ? [hostOf(item.homepage)] : []),
+      ];
+      return hosts.some((host) => host !== undefined && registrableDomain(host) === pageSite);
+    })
+    .slice(0, 3);
 }
 
 /** `★ 4.3 (12)`, or null while nobody has rated enough for an average. */

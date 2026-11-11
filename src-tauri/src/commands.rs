@@ -5,7 +5,8 @@ use tauri::{AppHandle, Emitter, Manager, State, ipc::Channel};
 use tauri_plugin_siteview::{
     ColorScheme, ContentRuleList, EvaluateRequest, FetchFaviconRequest, OpenRequest, Rect,
     SessionRequest, SetColorSchemeRequest, SetContentRuleListsRequest,
-    SetDocumentStartScriptRequest, SetRectRequest, SiteviewExt,
+    SetDocumentStartScriptRequest, SetFavoriteDomainsRequest, SetRectRequest, SiteviewExt,
+    site::site_of_host,
     validate::{parse_session_id, parse_web_url},
 };
 use url::Url;
@@ -66,17 +67,21 @@ fn check_favorites_allowed(
 
 #[tauri::command]
 pub fn set_favorites(
+    app: AppHandle,
     library: State<'_, Library>,
     entitlement: State<'_, Entitlement>,
     favorites: Vec<FavoriteInput>,
 ) -> Result<Vec<Favorite>> {
     check_favorites_allowed(&library, &entitlement, favorites.len())?;
-    library.set_favorites(favorites)
+    let saved = library.set_favorites(favorites)?;
+    sync_favorite_domains(&app)?;
+    Ok(saved)
 }
 
 /// Adds a recipe's site to the favorites, or removes it; returns the new list.
 #[tauri::command]
 pub fn set_site_favorite(
+    app: AppHandle,
     library: State<'_, Library>,
     entitlement: State<'_, Entitlement>,
     recipes: State<'_, Recipes>,
@@ -85,7 +90,33 @@ pub fn set_site_favorite(
 ) -> Result<Vec<Favorite>> {
     let inputs = sites::with_site_favorite(&recipes, &library.favorites()?, &recipe_id, favorite)?;
     check_favorites_allowed(&library, &entitlement, inputs.len())?;
-    library.set_favorites(inputs)
+    let saved = library.set_favorites(inputs)?;
+    sync_favorite_domains(&app)?;
+    Ok(saved)
+}
+
+/// Keeps native link routing aligned with the active quick-access set. Favorite URLs were
+/// validated by `Library`; malformed persisted values fail closed rather than widening scope.
+pub(crate) fn sync_favorite_domains(app: &AppHandle) -> Result<()> {
+    let library = app.state::<Library>();
+    let incognito = app.state::<Incognito>();
+    let favorites = if incognito.is_active() {
+        library.incognito_favorites()?
+    } else {
+        library.favorites()?
+    };
+    let domains = favorites
+        .iter()
+        .map(|favorite| {
+            let invalid = || Error::Connection("a saved favorite URL is invalid".into());
+            let url = Url::parse(&favorite.url).map_err(|_| invalid())?;
+            let host = url.host_str().ok_or_else(invalid)?;
+            Ok(site_of_host(host))
+        })
+        .collect::<Result<Vec<_>>>()?;
+    app.siteview()
+        .set_favorite_domains(SetFavoriteDomainsRequest { domains })?;
+    Ok(())
 }
 
 /// Remembers the page for the next launch, except while incognito: a restart is always back in
@@ -177,7 +208,9 @@ pub fn open_external(app: AppHandle, url: String) -> Result<()> {
     use tauri_plugin_opener::OpenerExt;
     let url = parse_web_url(&url)?;
     if url.scheme() != "https" {
-        return Err(Error::Connection("only https addresses open outside the app".into()));
+        return Err(Error::Connection(
+            "only https addresses open outside the app".into(),
+        ));
     }
     app.opener()
         .open_url(url.as_str(), None::<&str>)
@@ -274,6 +307,7 @@ pub(crate) async fn open_session(
             Theme::Dark => ColorScheme::Dark,
         },
     });
+    sync_favorite_domains(app)?;
     app.siteview().open(OpenRequest {
         session,
         profile: library.profile_id()?.to_string(),

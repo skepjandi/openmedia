@@ -12,6 +12,7 @@ import {
   toggleTag,
   visibleItems,
   withoutBlocked,
+  recommendedItems,
 } from "./logic";
 
 const item = (id: string, tags: string[]): MarketItem => ({
@@ -183,5 +184,42 @@ describe("matchesSearch", () => {
     expect(visibleItems(items, filter, "discord").map((entry) => entry.id)).toEqual(["x"]);
     expect(visibleItems(items, new Set(), "lite").map((entry) => entry.id)).toEqual(["y"]);
     expect(visibleItems(items, filter, "lite")).toEqual([]);
+  });
+});
+
+describe("recommendedItems", () => {
+  it("matches registrable hosts and homepages, skipping installed recipes without updates", () => {
+    const items = [
+      { ...item("official", ["official"]), hosts: ["*.news.example.co.uk"] },
+      {
+        ...item("installed", ["official"]),
+        hosts: ["example.co.uk"],
+        installedVersion: "1.0.0",
+      },
+      {
+        ...item("update", ["community"]),
+        hosts: ["shop.example.co.uk"],
+        installedVersion: "1.0.0",
+        updateAvailable: true,
+      },
+      { ...item("lookalike", ["official"]), hosts: ["notexample.co.uk"] },
+      {
+        ...item("homepage", ["community"]),
+        homepage: "https://m.news.example.co.uk",
+      },
+      { ...item("extra", ["community"]), hosts: ["example.co.uk"] },
+    ];
+    expect(
+      recommendedItems(items, "https://forum.news.example.co.uk/read").map(({ id }) => id),
+    ).toEqual(["official", "update", "homepage"]);
+  });
+
+  it("keeps separate public-suffix tenants apart and rejects invalid page URLs", () => {
+    const items = [
+      { ...item("alice", ["official"]), hosts: ["alice.github.io"] },
+      { ...item("bob", ["official"]), hosts: ["bob.github.io"] },
+    ];
+    expect(recommendedItems(items, "https://bob.github.io")).toEqual([items[1]]);
+    expect(recommendedItems(items, "not a URL")).toEqual([]);
   });
 });

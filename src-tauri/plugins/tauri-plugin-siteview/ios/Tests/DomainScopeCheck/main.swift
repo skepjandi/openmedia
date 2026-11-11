@@ -15,9 +15,15 @@ func expect<T: Equatable>(_ actual: T, _ expected: T, _ name: String) {
 func domain(_ host: String) -> String { DomainScope.registrableDomain(of: host) }
 func contains(_ scope: String, _ host: String) -> Bool { DomainScope.contains(scope: scope, host: host) }
 func verdict(
-  _ scheme: String?, _ host: String?, scope: String, settled: Bool = true, mainFrame: Bool = true
+  _ scheme: String?, _ host: String?, scope: String, settled: Bool = true, mainFrame: Bool = true,
+  searchDomain: String? = nil, sourceHost: String? = nil, userGesture: Bool = false,
+  sourceFavorite: Bool = false, navigationPending: Bool = false
 ) -> NavigationVerdict {
-  DomainScope.verdict(scheme: scheme, host: host, scope: scope, settled: settled, isMainFrame: mainFrame)
+  DomainScope.verdict(
+    scheme: scheme, host: host, scope: scope, settled: settled, isMainFrame: mainFrame,
+    searchDomain: searchDomain, sourceHost: sourceHost, userGesture: userGesture,
+    sourceFavorite: sourceFavorite, navigationPending: navigationPending
+  )
 }
 
 expect(domain("www.instagram.com"), "instagram.com", "www prefix")
@@ -50,6 +56,65 @@ expect(verdict("about", nil, scope: "a.com"), .allow, "about:blank")
 expect(verdict("javascript", nil, scope: "a.com"), .cancel, "javascript:")
 expect(verdict("tel", nil, scope: "a.com"), .cancel, "tel:")
 expect(verdict("https", nil, scope: "a.com"), .cancel, "no host")
+
+for (host, expected) in [
+  ("duckduckgo.com", "duckduckgo.com"), ("www.google.com", "google.com"),
+  ("www.bing.com", "bing.com"), ("search.brave.com", "brave.com"),
+  ("www.ecosia.org", "ecosia.org"), ("www.startpage.com", "startpage.com"),
+  ("search.yahoo.com", "yahoo.com"),
+] {
+  expect(DomainScope.searchEngineDomain(of: host), Optional(expected), "\(host) search origin")
+}
+expect(
+  DomainScope.isSearchResultNavigation(
+    scheme: "https", targetHost: "google.com", sourceHost: "www.google.com",
+    searchDomain: "google.com", userGesture: true
+  ),
+  true,
+  "same-engine redirect starts result chain"
+)
+expect(DomainScope.searchEngineDomain(of: "notgoogle.com"), nil as String?, "not a search engine")
+expect(
+  verdict(
+    "https", "example.com", scope: "google.com", searchDomain: "google.com", sourceHost: "www.google.com",
+    userGesture: true
+  ),
+  .allow,
+  "clicked result stays in app"
+)
+expect(
+  verdict("https", "example.com", scope: "google.com", searchDomain: "google.com", sourceHost: "google.com"),
+  .popup,
+  "scripted search navigation stays pinned"
+)
+expect(
+  verdict("https", "final.example", scope: "tracker.example", navigationPending: true),
+  .allow,
+  "redirect chain from an in-app link stays in the view"
+)
+expect(
+  verdict("https", "other.example", scope: "example.com", userGesture: true),
+  .allow,
+  "clicked link from an unfavorited site stays in app"
+)
+expect(
+  verdict("https", "other.example", scope: "example.com", userGesture: true, sourceFavorite: true),
+  .popup,
+  "clicked link from favorite site opens outside"
+)
+expect(
+  verdict("https", "evil.io", scope: "example.com", searchDomain: "google.com", sourceHost: "example.com"),
+  .popup,
+  "scripted cross-site navigation stays outside"
+)
+expect(
+  verdict(
+    "https", "example.com", scope: "google.com", searchDomain: "google.com",
+    sourceHost: "www.google.com", userGesture: true, sourceFavorite: true
+  ),
+  .popup,
+  "favorited search engine uses external link policy"
+)
 
 // The vectors every platform passes: the official Public Suffix List tests and the app's own.
 // The first argument is the directory holding them (shared/public-suffix).
