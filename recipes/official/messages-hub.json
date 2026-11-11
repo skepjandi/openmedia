@@ -1,0 +1,29 @@
+{
+  "schema": 1,
+  "id": "market.official.messages-hub",
+  "name": "Messages Hub",
+  "version": "1.0.0",
+  "origin": "user",
+  "tags": ["mobile", "desktop"],
+  "match": [
+    "https://web.whatsapp.com/*",
+    "https://*.facebook.com/messages/*",
+    "https://www.instagram.com/direct/*",
+    "https://www.linkedin.com/messaging/*"
+  ],
+  "rules": [],
+  "hub": {
+    "tabs": [
+      { "label": "WhatsApp", "url": "https://web.whatsapp.com/" },
+      { "label": "Facebook", "url": "https://www.facebook.com/messages/" },
+      { "label": "Instagram", "url": "https://www.instagram.com/direct/inbox/" },
+      { "label": "LinkedIn", "url": "https://www.linkedin.com/messaging/" }
+    ]
+  },
+  "meta": {
+    "author": "OpenMedia",
+    "homepage": "https://web.whatsapp.com/",
+    "lastVerified": "2026-11-11",
+    "notes": "Direct messages only: one tab each for the WhatsApp, Facebook, Instagram and LinkedIn inboxes, each its own site session with its own login. No rules, no inbox merging, no reading of messages. The match patterns cover only the message pages, so nothing else on those sites is touched. NOT verified live: the four inbox addresses were not opened in a browser (logged-in only), so a site that redirects its inbox elsewhere on a given platform (Facebook on mobile web) is untested."
+  }
+}

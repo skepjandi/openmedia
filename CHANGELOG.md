@@ -8,6 +8,14 @@ All notable changes to OpenMedia are documented here.
 
 ## 2026-11-11
 
+### feat(recipes): official Messages Hub
+
+**Area:** `feat(recipes)`
+
+**Change:** new official hub `market.official.messages-hub` with one tab each for the WhatsApp, Facebook, Instagram and LinkedIn inboxes, matching only their message pages. No rules. The fixture-driven official-recipe tests skip rule-less hubs, and the homepage-ownership test resolves a page to its site's own recipe rather than to a hub that also covers it.
+
+**Verified:** 358 Rust library tests; the Worker's official-mode `parseRecipe` accepts the file. **Not verified:** the four inbox addresses in a logged-in browser or on a device; Facebook may redirect its inbox on mobile web.
+
 ### feat(ai): build and publish multi-site hubs
 
 **Area:** `feat(ai)`

@@ -278,8 +278,14 @@ mod tests {
     fn every_homepage_belongs_to_its_own_site() {
         let recipes = Recipes::official_installed();
         for recipe in recipes.all() {
+            // A hub opens pages that belong to other sites' recipes, so it owns no page itself.
+            if recipe.hub.is_some() {
+                continue;
+            }
             let url = Url::parse(recipe.homepage().unwrap()).unwrap();
-            assert_eq!(recipes.for_url(&url).map(|r| r.id), Some(recipe.id));
+            // A hub may also cover the page, as a launcher; the site's own recipe still owns it.
+            let owner = recipes.covering(&url).into_iter().find(|r| r.hub.is_none());
+            assert_eq!(owner.map(|r| r.id), Some(recipe.id));
         }
     }
 

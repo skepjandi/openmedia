@@ -314,6 +314,10 @@ mod tests {
     #[test]
     fn official_platform_tags_follow_the_fixtures() {
         for recipe in official_recipes() {
+            // A hub that only opens pages has no rules, so there is no page to fixture.
+            if recipe.rules.is_empty() {
+                continue;
+            }
             let names = fixture_names(site_of(&recipe));
             let mut expected = Vec::new();
             if names.iter().any(|name| name.starts_with("desktop-")) {
@@ -342,6 +346,9 @@ mod tests {
     fn no_hide_rule_touches_an_element_a_fixture_marks_data_keep_or_its_ancestors() {
         let keep = Selector::parse("[data-keep]").unwrap();
         for recipe in official_recipes() {
+            if recipe.rules.is_empty() {
+                continue;
+            }
             for page in fixture_pages(&recipe) {
                 let mut hidden = std::collections::HashSet::new();
                 for rule in &recipe.rules {
@@ -374,6 +381,9 @@ mod tests {
     fn every_official_rule_matches_something_in_its_dom_fixtures() {
         let mut unmatched = Vec::new();
         for recipe in official_recipes() {
+            if recipe.rules.is_empty() {
+                continue;
+            }
             let pages = fixture_pages(&recipe);
             for rule in &recipe.rules {
                 let (Rule::Hide { target, .. } | Rule::Css { target, .. }) = rule;
@@ -512,6 +522,9 @@ mod tests {
     #[test]
     fn annoyances_start_on_and_content_starts_off() {
         for recipe in official_recipes() {
+            if recipe.hub.is_some() && recipe.rules.is_empty() {
+                continue;
+            }
             assert!(!recipe.options.is_empty(), "{} has no options", recipe.id);
             for option in &recipe.options {
                 assert_eq!(
