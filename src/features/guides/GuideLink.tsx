@@ -1,6 +1,7 @@
-import { useApp } from "../../app/store";
+import { appError, useApp } from "../../app/store";
 import { useT } from "../../i18n/useT";
 import { ForwardIcon } from "../../shared/icons";
+import { library } from "../../shared/ipc";
 
 const GUIDES_URL = "https://openmedia.surf/guides/";
 
@@ -9,15 +10,18 @@ export type GuideSlug = "connect-ai" | "change-a-site" | "your-recipe" | "market
 
 export const guideUrl = (slug: GuideSlug): string => `${GUIDES_URL}${slug}/`;
 
-/** A quiet link that opens a guide from the website in the page view. */
+/** A quiet link that opens a guide from the website in the system browser, never in a page view. */
 export function GuideLink({ slug }: { slug: GuideSlug }) {
-  const openSearch = useApp((s) => s.openSearch);
   const t = useT();
 
   return (
     <button
       type="button"
-      onClick={() => openSearch(guideUrl(slug))}
+      onClick={() => {
+        library.openExternal(guideUrl(slug)).catch((error: unknown) => {
+          useApp.setState({ error: appError(error) });
+        });
+      }}
       className="flex items-center gap-1 px-1 py-1 text-sm font-medium text-accent"
     >
       {t("guides.read")}

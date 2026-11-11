@@ -167,6 +167,20 @@ pub fn reset_onboarding(library: State<'_, Library>) -> Result<()> {
     library.set_onboarded(false)
 }
 
+/// Opens an address from the shell's own UI (a guide, a legal page) in the system browser. The shell
+/// never navigates its own view or a site session for these. https only.
+#[tauri::command]
+pub fn open_external(app: AppHandle, url: String) -> Result<()> {
+    use tauri_plugin_opener::OpenerExt;
+    let url = parse_web_url(&url)?;
+    if url.scheme() != "https" {
+        return Err(Error::Connection("only https addresses open outside the app".into()));
+    }
+    app.opener()
+        .open_url(url.as_str(), None::<&str>)
+        .map_err(|e| Error::Connection(e.to_string()))
+}
+
 #[tauri::command]
 pub fn set_theme(library: State<'_, Library>, theme: Theme) -> Result<()> {
     library.set_theme(theme)

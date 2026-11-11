@@ -28,6 +28,7 @@ pub fn run() {
     ota::OtaAssets::install(&mut context, ota.clone());
     let builder = tauri::Builder::default()
         .manage(ota.clone())
+        .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_siteview::init())
         .plugin(tauri_plugin_billing::init());
     #[cfg(all(desktop, feature = "self-update"))]
@@ -95,6 +96,7 @@ pub fn run() {
             incognito::set_incognito_favorites,
             commands::complete_onboarding,
             commands::reset_onboarding,
+            commands::open_external,
             commands::set_theme,
             commands::set_locale,
             commands::set_search_engine,

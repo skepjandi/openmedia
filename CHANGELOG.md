@@ -8,6 +8,16 @@ All notable changes to OpenMedia are documented here.
 
 ## 2026-11-11
 
+### fix(shell): open the shell's own links in the system browser
+
+**Area:** `fix(shell)`
+
+**Problem:** "Read the guide" and the paywall's Privacy and Terms links opened the website in a new page session, using the app's site view, which is for the sites the user customizes.
+
+**Change:** a Rust-only `open_external` command (https only, via `tauri-plugin-opener`, no capability granted to any webview) opens them in the system browser. No other shell link opens an outside address.
+
+**Verified:** `tsc`, `cargo check`. **Not verified:** at runtime on a device.
+
 ### fix(release): unique temp files, keep an unreadable marketplace state, keep secrets off the command line, restrict OTA signing
 
 **Area:** `fix(release)`

@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { Screen } from "../../shared/Screen";
-import { useApp } from "../../app/store";
+import { appError, useApp } from "../../app/store";
+import { library } from "../../shared/ipc";
 import { useT } from "../../i18n/useT";
 import { legalConfigured, PRIVACY_POLICY_URL, TERMS_URL } from "./legal";
 import { useEntitlementStore } from "./store";
@@ -10,7 +11,12 @@ export function PaywallSheet() {
   const t = useT();
   const status = useEntitlementStore((state) => state.status);
   const closeSheet = useApp((state) => state.closeSheet);
-  const openAddress = useApp((state) => state.openAddress);
+  const openLegal = (url: string | null) => {
+    if (!url) return;
+    library.openExternal(url).catch((error: unknown) => {
+      useApp.setState({ error: appError(error) });
+    });
+  };
   const configured = useEntitlementStore((state) => state.configured);
   const packages = useEntitlementStore((state) => state.packages);
   const purchasing = useEntitlementStore((state) => state.purchasing);
@@ -117,11 +123,11 @@ export function PaywallSheet() {
             <div className="flex justify-center gap-5 text-sm text-paper/65">
               <button
                 type="button"
-                onClick={() => PRIVACY_POLICY_URL && openAddress(PRIVACY_POLICY_URL)}
+                onClick={() => openLegal(PRIVACY_POLICY_URL)}
               >
                 {t("paywall.privacy")}
               </button>
-              <button type="button" onClick={() => TERMS_URL && openAddress(TERMS_URL)}>
+              <button type="button" onClick={() => openLegal(TERMS_URL)}>
                 {t("paywall.terms")}
               </button>
             </div>
