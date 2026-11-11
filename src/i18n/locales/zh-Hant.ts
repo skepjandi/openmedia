@@ -259,7 +259,7 @@ export const zhHant: Messages = {
   "recipes.options": "{name} 選項",
   "recipes.addFavorite": "將 {name} 加入我的最愛",
   "recipes.removeFavorite": "從我的最愛移除 {name}",
-  "recipes.hub": "聚合頁",
+  "recipes.hub": "實驗性",
   "recipes.hubPages": "頁面",
   "recipes.openHubPage": "開啟 {label}",
   "recipes.hubNote": "聚合頁會同時開啟多個網站。每個頁面都是獨立的網站，有自己的 Cookie。",

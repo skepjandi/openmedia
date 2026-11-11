@@ -269,7 +269,7 @@ export const hi: Messages = {
   "recipes.options": "{name} विकल्प",
   "recipes.addFavorite": "{name} को पसंदीदा में जोड़ें",
   "recipes.removeFavorite": "{name} को पसंदीदा से हटाएँ",
-  "recipes.hub": "हब",
+  "recipes.hub": "प्रायोगिक",
   "recipes.hubPages": "पेज",
   "recipes.openHubPage": "{label} खोलें",
   "recipes.hubNote": "हब एक साथ कई साइट खोलता है। हर पेज अपनी अलग साइट है, अपने कुकीज़ के साथ।",

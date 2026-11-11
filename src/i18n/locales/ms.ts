@@ -273,7 +273,7 @@ export const ms: Messages = {
   "recipes.options": "Pilihan {name}",
   "recipes.addFavorite": "Tambah {name} ke kegemaran",
   "recipes.removeFavorite": "Buang {name} daripada kegemaran",
-  "recipes.hub": "Hab",
+  "recipes.hub": "Eksperimental",
   "recipes.hubPages": "Halaman",
   "recipes.openHubPage": "Buka {label}",
   "recipes.hubNote":

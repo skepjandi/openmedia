@@ -278,7 +278,7 @@ export const ur: Messages = {
   "recipes.options": "{name} کے اختیارات",
   "recipes.addFavorite": "{name} کو پسندیدہ میں شامل کریں",
   "recipes.removeFavorite": "{name} کو پسندیدہ سے ہٹائیں",
-  "recipes.hub": "ہاب",
+  "recipes.hub": "تجرباتی",
   "recipes.hubPages": "صفحات",
   "recipes.openHubPage": "{label} کھولیں",
   "recipes.hubNote":

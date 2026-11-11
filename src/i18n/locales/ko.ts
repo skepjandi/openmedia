@@ -270,7 +270,7 @@ export const ko: Messages = {
   "recipes.options": "{name} 옵션",
   "recipes.addFavorite": "{name} 즐겨찾기에 추가",
   "recipes.removeFavorite": "{name} 즐겨찾기에서 제거",
-  "recipes.hub": "허브",
+  "recipes.hub": "실험적",
   "recipes.hubPages": "페이지",
   "recipes.openHubPage": "{label} 열기",
   "recipes.hubNote":

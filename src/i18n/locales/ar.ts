@@ -267,7 +267,7 @@ export const ar: Messages = {
   "recipes.options": "خيارات {name}",
   "recipes.addFavorite": "إضافة {name} إلى المفضلة",
   "recipes.removeFavorite": "إزالة {name} من المفضلة",
-  "recipes.hub": "مركز",
+  "recipes.hub": "تجريبي",
   "recipes.hubPages": "الصفحات",
   "recipes.openHubPage": "فتح {label}",
   "recipes.hubNote":

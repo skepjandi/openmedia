@@ -86,9 +86,18 @@ function checked(site, recipe) {
   if (problems.length > 0) fail(`${site}: ${problems.join("; ")}`);
 }
 
-/** One line for the Marketplace row, made from the option labels so it cannot drift from the
- * recipe: "Hides the Open App button, promo banners, ad slots". */
+/** One line for the Marketplace row, made from the recipe's hub tabs or option labels. */
 function summaryOf(recipe) {
+  if (recipe.hub?.tabs.length) {
+    let text = "Opens ";
+    for (const { label } of recipe.hub.tabs) {
+      const next = text === "Opens " ? `${text}${label}` : `${text}, ${label}`;
+      if (next.length > MAX_SUMMARY) break;
+      text = next;
+    }
+    return text;
+  }
+
   const labels = (recipe.options ?? []).map((option) =>
     option.label.replace(/^Hide (the |all )?/i, "").replace(/\.$/, ""),
   );

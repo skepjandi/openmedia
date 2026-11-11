@@ -279,7 +279,7 @@ export const it: Messages = {
   "recipes.options": "Opzioni di {name}",
   "recipes.addFavorite": "Aggiungi {name} ai preferiti",
   "recipes.removeFavorite": "Rimuovi {name} dai preferiti",
-  "recipes.hub": "Hub",
+  "recipes.hub": "Sperimentale",
   "recipes.hubPages": "Pagine",
   "recipes.openHubPage": "Apri {label}",
   "recipes.hubNote": "Un hub apre più siti insieme. Ogni pagina è un sito a sé, con i suoi cookie.",

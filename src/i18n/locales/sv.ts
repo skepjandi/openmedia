@@ -277,7 +277,7 @@ export const sv: Messages = {
   "recipes.options": "Alternativ för {name}",
   "recipes.addFavorite": "Lägg till {name} i favoriter",
   "recipes.removeFavorite": "Ta bort {name} från favoriter",
-  "recipes.hub": "Hubb",
+  "recipes.hub": "Experimentell",
   "recipes.hubPages": "Sidor",
   "recipes.openHubPage": "Öppna {label}",
   "recipes.hubNote":

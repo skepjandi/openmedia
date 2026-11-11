@@ -274,7 +274,7 @@ export const de: Messages = {
   "recipes.options": "Optionen für {name}",
   "recipes.addFavorite": "{name} zu Favoriten hinzufügen",
   "recipes.removeFavorite": "{name} aus Favoriten entfernen",
-  "recipes.hub": "Hub",
+  "recipes.hub": "Experimentell",
   "recipes.hubPages": "Seiten",
   "recipes.openHubPage": "{label} öffnen",
   "recipes.hubNote":

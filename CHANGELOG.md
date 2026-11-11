@@ -8,6 +8,15 @@ All notable changes to OpenMedia are documented here.
 
 ## 2026-11-11
 
+### fix(marketplace): label hubs experimental
+
+**Area:** `fix(marketplace)`
+
+**Change:** The Marketplace hub tag and recipe badge now read “Experimental” in every supported language. Hub listings use tab labels instead of the generic “Quieter” fallback.
+
+**Verified:** The official Messages Hub is live in signed catalog sequence 86 with the `hub` tag and tab-derived summary. Locale tests and the official-recipe validator passed.
+
+
 ### feat(recipes): official Messages Hub
 
 **Area:** `feat(recipes)`

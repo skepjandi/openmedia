@@ -275,7 +275,7 @@ export const nl: Messages = {
   "recipes.options": "Opties voor {name}",
   "recipes.addFavorite": "{name} toevoegen aan favorieten",
   "recipes.removeFavorite": "{name} verwijderen uit favorieten",
-  "recipes.hub": "Hub",
+  "recipes.hub": "Experimenteel",
   "recipes.hubPages": "Pagina's",
   "recipes.openHubPage": "{label} openen",
   "recipes.hubNote":

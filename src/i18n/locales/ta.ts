@@ -282,7 +282,7 @@ export const ta: Messages = {
   "recipes.options": "{name} விருப்பங்கள்",
   "recipes.addFavorite": "{name} ஐப் பிடித்துக்கொள்ளவிடைகளில் சேர்",
   "recipes.removeFavorite": "{name} ஐப் பிடித்துக்கொள்ளவிடைகளிலிருந்து அகற்று",
-  "recipes.hub": "ஹப்",
+  "recipes.hub": "சோதனைக்குரிய",
   "recipes.hubPages": "பக்கங்கள்",
   "recipes.openHubPage": "{label} திற",
   "recipes.hubNote":

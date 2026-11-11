@@ -272,7 +272,7 @@ export const si: Messages = {
   "recipes.options": "{name} විකල්ප",
   "recipes.addFavorite": "{name} ආදරණීය අයිතිතයට එකතු කරන්න",
   "recipes.removeFavorite": "{name} ආදරණීය අයිතිතයෙන් ඉවත් කරන්න",
-  "recipes.hub": "හබ්",
+  "recipes.hub": "පර්යේෂණාත්මක",
   "recipes.hubPages": "පිටු",
   "recipes.openHubPage": "{label} විවෘත කරන්න",
   "recipes.hubNote":

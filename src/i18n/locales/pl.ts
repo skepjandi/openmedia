@@ -276,7 +276,7 @@ export const pl: Messages = {
   "recipes.options": "Opcje: {name}",
   "recipes.addFavorite": "Dodaj {name} do ulubionych",
   "recipes.removeFavorite": "Usuń {name} z ulubionych",
-  "recipes.hub": "Hub",
+  "recipes.hub": "Eksperymentalne",
   "recipes.hubPages": "Strony",
   "recipes.openHubPage": "Otwórz {label}",
   "recipes.hubNote":

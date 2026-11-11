@@ -273,7 +273,7 @@ export const ja: Messages = {
   "recipes.options": "{name}のオプション",
   "recipes.addFavorite": "{name}をお気に入りに追加",
   "recipes.removeFavorite": "{name}をお気に入りから外す",
-  "recipes.hub": "ハブ",
+  "recipes.hub": "実験的",
   "recipes.hubPages": "ページ",
   "recipes.openHubPage": "{label}を開く",
   "recipes.hubNote":

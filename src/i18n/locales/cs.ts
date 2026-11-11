@@ -278,7 +278,7 @@ export const cs: Messages = {
   "recipes.options": "Možnosti pro {name}",
   "recipes.addFavorite": "Přidat {name} do oblíbených",
   "recipes.removeFavorite": "Odebrat {name} z oblíbených",
-  "recipes.hub": "Hub",
+  "recipes.hub": "Experimentální",
   "recipes.hubPages": "Stránky",
   "recipes.openHubPage": "Otevřít {label}",
   "recipes.hubNote":

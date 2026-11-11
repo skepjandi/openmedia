@@ -271,7 +271,7 @@ export const id: Messages = {
   "recipes.options": "Opsi {name}",
   "recipes.addFavorite": "Tambahkan {name} ke favorit",
   "recipes.removeFavorite": "Hapus {name} dari favorit",
-  "recipes.hub": "Hub",
+  "recipes.hub": "Eksperimental",
   "recipes.hubPages": "Halaman",
   "recipes.openHubPage": "Buka {label}",
   "recipes.hubNote":

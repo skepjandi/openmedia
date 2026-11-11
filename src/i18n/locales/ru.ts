@@ -279,7 +279,7 @@ export const ru: Messages = {
   "recipes.options": "Настройки {name}",
   "recipes.addFavorite": "Добавить {name} в избранное",
   "recipes.removeFavorite": "Убрать {name} из избранного",
-  "recipes.hub": "Хаб",
+  "recipes.hub": "Экспериментальный",
   "recipes.hubPages": "Страницы",
   "recipes.openHubPage": "Открыть {label}",
   "recipes.hubNote":

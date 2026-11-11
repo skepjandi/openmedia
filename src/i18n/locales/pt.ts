@@ -281,7 +281,7 @@ export const pt: Messages = {
   "recipes.options": "Opções de {name}",
   "recipes.addFavorite": "Adicionar {name} aos favoritos",
   "recipes.removeFavorite": "Remover {name} dos favoritos",
-  "recipes.hub": "Hub",
+  "recipes.hub": "Experimental",
   "recipes.hubPages": "Páginas",
   "recipes.openHubPage": "Abrir {label}",
   "recipes.hubNote":

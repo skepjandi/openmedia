@@ -277,7 +277,7 @@ export const tr: Messages = {
   "recipes.options": "{name} seçenekleri",
   "recipes.addFavorite": "{name} öğesini favorilere ekle",
   "recipes.removeFavorite": "{name} öğesini favorilerden çıkar",
-  "recipes.hub": "Hub",
+  "recipes.hub": "Deneysel",
   "recipes.hubPages": "Sayfalar",
   "recipes.openHubPage": "{label} sayfasını aç",
   "recipes.hubNote":

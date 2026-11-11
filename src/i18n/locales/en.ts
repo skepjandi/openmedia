@@ -277,7 +277,7 @@ export const en = {
   "recipes.options": "{name} options",
   "recipes.addFavorite": "Add {name} to favorites",
   "recipes.removeFavorite": "Remove {name} from favorites",
-  "recipes.hub": "Hub",
+  "recipes.hub": "Experimental",
   "recipes.hubPages": "Pages",
   "recipes.openHubPage": "Open {label}",
   "recipes.hubNote":

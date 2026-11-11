@@ -270,7 +270,7 @@ export const bn: Messages = {
   "recipes.options": "{name} বিকল্প",
   "recipes.addFavorite": "{name} পছন্দের তালিকায় যোগ করুন",
   "recipes.removeFavorite": "{name} পছন্দের তালিকা থেকে সরান",
-  "recipes.hub": "হাব",
+  "recipes.hub": "পরীক্ষামূলক",
   "recipes.hubPages": "পৃষ্ঠা",
   "recipes.openHubPage": "{label} খুলুন",
   "recipes.hubNote":

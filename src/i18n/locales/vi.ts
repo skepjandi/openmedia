@@ -274,7 +274,7 @@ export const vi: Messages = {
   "recipes.options": "Tùy chọn của {name}",
   "recipes.addFavorite": "Thêm {name} vào yêu thích",
   "recipes.removeFavorite": "Gỡ {name} khỏi yêu thích",
-  "recipes.hub": "Hub",
+  "recipes.hub": "Thử nghiệm",
   "recipes.hubPages": "Các trang",
   "recipes.openHubPage": "Mở {label}",
   "recipes.hubNote":

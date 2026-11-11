@@ -263,7 +263,7 @@ export const th: Messages = {
   "recipes.options": "ตัวเลือกของ {name}",
   "recipes.addFavorite": "เพิ่ม {name} ในรายการโปรด",
   "recipes.removeFavorite": "นำ {name} ออกจากรายการโปรด",
-  "recipes.hub": "ฮับ",
+  "recipes.hub": "ทดลอง",
   "recipes.hubPages": "หน้า",
   "recipes.openHubPage": "เปิด {label}",
   "recipes.hubNote":

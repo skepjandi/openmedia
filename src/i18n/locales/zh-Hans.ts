@@ -258,7 +258,7 @@ export const zhHans: Messages = {
   "recipes.options": "{name} 选项",
   "recipes.addFavorite": "将 {name} 添加到收藏",
   "recipes.removeFavorite": "从收藏中移除 {name}",
-  "recipes.hub": "聚合页",
+  "recipes.hub": "实验性",
   "recipes.hubPages": "页面",
   "recipes.openHubPage": "打开 {label}",
   "recipes.hubNote": "聚合页会同时打开多个网站。每个页面都是独立的网站，拥有自己的 Cookie。",

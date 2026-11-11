@@ -278,7 +278,7 @@ export const ro: Messages = {
   "recipes.options": "Opțiuni {name}",
   "recipes.addFavorite": "Adaugă {name} la favorite",
   "recipes.removeFavorite": "Elimină {name} din favorite",
-  "recipes.hub": "Hub",
+  "recipes.hub": "Experimental",
   "recipes.hubPages": "Pagini",
   "recipes.openHubPage": "Deschide {label}",
   "recipes.hubNote":

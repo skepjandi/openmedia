@@ -282,7 +282,7 @@ export const el: Messages = {
   "recipes.options": "Επιλογές {name}",
   "recipes.addFavorite": "Προσθήκη {name} στα αγαπημένα",
   "recipes.removeFavorite": "Αφαίρεση {name} από τα αγαπημένα",
-  "recipes.hub": "Hub",
+  "recipes.hub": "Πειραματικό",
   "recipes.hubPages": "Σελίδες",
   "recipes.openHubPage": "Άνοιγμα {label}",
   "recipes.hubNote":
