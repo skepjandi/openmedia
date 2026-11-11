@@ -3,8 +3,8 @@ package surf.openmedia.siteview
 /**
  * What to do with a main-frame navigation requested by a session.
  *
- * This is the Android twin of `ios/Sources/DomainScope.swift`: a session never leaves its domain,
- * and the rule is kept in plain functions so it can be read (and tested) without a WebView.
+ * This is the Android twin of `ios/Sources/DomainScope.swift`: a session follows user-initiated
+ * navigation in its web view, then stays pinned to the destination domain.
  */
 object DomainScope {
     enum class Verdict {
@@ -34,10 +34,9 @@ object DomainScope {
     /**
      * Decides a navigation.
      *
-     * `settled` is false until the session's first load has finished. Until then a redirect to
-     * another domain (`twitter.com` to `x.com`) is the site finding its own home, so it is
-     * allowed and the session adopts the final domain. Subframes are never blocked; only the page
-     * the user sees is pinned.
+     * `settled` is false during a page's initial load or a user-initiated navigation. Until then
+     * redirects may change the domain; after it settles, automatic cross-domain navigations open
+     * in a popup. Subframes are never blocked.
      */
     @JvmStatic
     fun verdict(
@@ -46,13 +45,14 @@ object DomainScope {
         scope: String,
         settled: Boolean,
         isMainFrame: Boolean,
+        userInitiated: Boolean = false,
     ): Verdict {
         return when (scheme?.lowercase()) {
             "about" -> Verdict.ALLOW
             "http", "https" -> {
                 if (host.isNullOrEmpty()) {
                     Verdict.CANCEL
-                } else if (!isMainFrame || !settled || contains(scope, host)) {
+                } else if (!isMainFrame || !settled || userInitiated || contains(scope, host)) {
                     Verdict.ALLOW
                 } else {
                     Verdict.POPUP

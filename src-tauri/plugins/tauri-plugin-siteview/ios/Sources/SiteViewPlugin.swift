@@ -201,14 +201,14 @@ private final class WeakPaintHandler: NSObject, WKScriptMessageHandler {
   }
 }
 
-/// One open page: its native view and the domain it is pinned to.
+/// One open page: its native view and the domain it is currently pinned to.
 private final class Session {
   let id: String
   let view: WKWebView
   let initialURL: URL
-  /// The registrable domain the session may show. Fixed once the first load settles.
+  /// The registrable domain the session may show; user-initiated navigation can move it after load.
   var scope: String
-  /// False until the first load finishes or fails; see `DomainScope.verdict`.
+  /// False during the initial load and user-initiated navigation; see `DomainScope.verdict`.
   var settled = false
   /// True once the first load has committed; before that a timeout must not reveal a blank page.
   var committed = false
@@ -668,9 +668,20 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
       return
     }
     let url = navigationAction.request.url
+    let isMainFrame = navigationAction.targetFrame?.isMainFrame ?? true
+    let scheme = url?.scheme?.lowercased()
+    let hasHost = url?.host?.isEmpty == false
+    let historyNavigation = navigationAction.navigationType == .backForward
+    let historyTargetLeavesScope =
+      url?.host.map { !DomainScope.contains(scope: session.scope, host: $0) } ?? false
+    let userInitiated = isMainFrame && hasHost &&
+      (navigationAction.navigationType == .linkActivated ||
+        (historyNavigation && historyTargetLeavesScope)) &&
+      (scheme == "http" || scheme == "https")
+    if userInitiated { session.settled = false }
     switch DomainScope.verdict(
       scheme: url?.scheme, host: url?.host, scope: session.scope, settled: session.settled,
-      isMainFrame: navigationAction.targetFrame?.isMainFrame ?? true)
+      isMainFrame: isMainFrame, userInitiated: userInitiated)
     {
     case .allow:
       decisionHandler(.allow)
@@ -682,8 +693,8 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
     }
   }
 
-  /// While a session is still on its first load, a redirect may change its domain; the session
-  /// adopts wherever the first page committed.
+  /// While the initial load or a user-initiated navigation is unsettled, redirects may change the
+  /// scope; it then stays pinned to the destination domain.
   func webView(_ webView: WKWebView, didCommit navigation: WKNavigation!) {
     session(of: webView)?.committed = true
     scheduleReveal(webView)
@@ -727,8 +738,8 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
     }
   }
 
-  /// `target=_blank` and `window.open`: inside the domain the page loads in place, outside it the
-  /// popup browser takes it. Never a second native web view.
+  /// User-clicked `target=_blank` links stay in this view; scripted `window.open` to an outside
+  /// domain uses the popup browser. Never create a second native web view.
   func webView(
     _ webView: WKWebView,
     createWebViewWith configuration: WKWebViewConfiguration,
@@ -737,9 +748,13 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
   ) -> WKWebView? {
     guard let session = session(of: webView), let url = navigationAction.request.url else { return nil }
     if session.blocked { return nil }
+    let scheme = url.scheme?.lowercased()
+    let userInitiated = navigationAction.navigationType == .linkActivated &&
+      url.host?.isEmpty == false && (scheme == "http" || scheme == "https")
+    if userInitiated { session.settled = false }
     switch DomainScope.verdict(
       scheme: url.scheme, host: url.host, scope: session.scope, settled: session.settled,
-      isMainFrame: true)
+      isMainFrame: true, userInitiated: userInitiated)
     {
     case .allow: webView.load(navigationAction.request)
     case .popup: presentPopup(url)

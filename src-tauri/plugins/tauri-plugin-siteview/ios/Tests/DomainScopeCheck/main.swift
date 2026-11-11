@@ -15,9 +15,12 @@ func expect<T: Equatable>(_ actual: T, _ expected: T, _ name: String) {
 func domain(_ host: String) -> String { DomainScope.registrableDomain(of: host) }
 func contains(_ scope: String, _ host: String) -> Bool { DomainScope.contains(scope: scope, host: host) }
 func verdict(
-  _ scheme: String?, _ host: String?, scope: String, settled: Bool = true, mainFrame: Bool = true
+  _ scheme: String?, _ host: String?, scope: String, settled: Bool = true, mainFrame: Bool = true,
+  userInitiated: Bool = false
 ) -> NavigationVerdict {
-  DomainScope.verdict(scheme: scheme, host: host, scope: scope, settled: settled, isMainFrame: mainFrame)
+  DomainScope.verdict(
+    scheme: scheme, host: host, scope: scope, settled: settled, isMainFrame: mainFrame,
+    userInitiated: userInitiated)
 }
 
 expect(domain("www.instagram.com"), "instagram.com", "www prefix")
@@ -43,6 +46,7 @@ expect(contains("instagram.com", "instagram.com.evil.io"), false, "suffix trick"
 
 expect(verdict("https", "l.instagram.com", scope: "instagram.com"), .allow, "same domain")
 expect(verdict("https", "evil.io", scope: "instagram.com"), .popup, "outside domain")
+expect(verdict("https", "evil.io", scope: "instagram.com", userInitiated: true), .allow, "clicked external link stays in the web view")
 expect(verdict("https", "evil.io", scope: "instagram.com", mainFrame: false), .allow, "subframe")
 expect(verdict("https", "x.com", scope: "twitter.com", settled: false), .allow, "first-load redirect")
 expect(verdict("https", "x.com", scope: "twitter.com"), .popup, "redirect after the first load")

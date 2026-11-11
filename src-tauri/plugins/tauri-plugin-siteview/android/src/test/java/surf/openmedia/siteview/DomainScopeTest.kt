@@ -50,10 +50,22 @@ class DomainScopeTest {
     }
 
     @Test
-    fun verdictPinsTheMainFrameToItsDomain() {
+    fun verdictRoutesAutomaticCrossDomainNavigationsToPopup() {
         assertEquals(Verdict.ALLOW, verdict("https", "l.instagram.com", "instagram.com"))
         assertEquals(Verdict.POPUP, verdict("https", "evil.io", "instagram.com"))
         assertEquals(Verdict.ALLOW, verdict("https", "evil.io", "instagram.com", mainFrame = false))
+    }
+
+    @Test
+    fun verdictKeepsUserActivatedExternalLinksInTheWebView() {
+        assertEquals(
+            Verdict.ALLOW,
+            verdict("https", "result.example", "search.example", userInitiated = true),
+        )
+        assertEquals(
+            Verdict.POPUP,
+            verdict("https", "result.example", "search.example", userInitiated = false),
+        )
     }
 
     @Test
@@ -76,5 +88,6 @@ class DomainScopeTest {
         scope: String,
         settled: Boolean = true,
         mainFrame: Boolean = true,
-    ) = DomainScope.verdict(scheme, host, scope, settled, mainFrame)
+        userInitiated: Boolean = false,
+    ) = DomainScope.verdict(scheme, host, scope, settled, mainFrame, userInitiated)
 }

@@ -57,9 +57,9 @@ import java.util.concurrent.Executors
  * The shell is transparent and draws the app's own controls; the shell owns layout and reports the
  * site rectangle. Site views never receive Tauri IPC, only the write-only `openmedia` bridge.
  *
- * A session never leaves its domain: a main-frame navigation outside it is cancelled and shown in
- * the system's browser. Which sessions to keep alive is the shell's decision; this class only
- * opens, shows and closes.
+ * User-initiated links and history navigation stay in this WebView and repin the session after
+ * navigation; automatic cross-domain navigations open in the system's browser. Which sessions to
+ * keep alive is the shell's decision; this class only opens, shows and closes.
  *
  * This is the Android twin of `ios/Sources/SiteViewPlugin.swift`.
  */
@@ -78,6 +78,8 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
         @Volatile var topUrl: String = initialUrl,
         var scope: String,
         var settled: Boolean = false,
+        // Redirect allowance must not weaken the cross-domain POST guard while unsettled.
+        @Volatile var userNavigationPending: Boolean = false,
         var painted: Boolean = false,
         var loading: Boolean = false,
         var needsReload: Boolean = false,
@@ -353,12 +355,33 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
 
     @Command
     fun goBack(invoke: Invoke) {
-        onActiveSession(invoke) { it.view.goBack() }
+        onActiveSession(invoke) {
+            if (it.view.canGoBack()) {
+                prepareHistoryNavigation(it, -1)
+                it.view.goBack()
+            }
+        }
     }
 
     @Command
     fun goForward(invoke: Invoke) {
-        onActiveSession(invoke) { it.view.goForward() }
+        onActiveSession(invoke) {
+            if (it.view.canGoForward()) {
+                prepareHistoryNavigation(it, 1)
+                it.view.goForward()
+            }
+        }
+    }
+
+    private fun prepareHistoryNavigation(session: Session, offset: Int) {
+        val history = session.view.copyBackForwardList()
+        val targetIndex = history.currentIndex + offset
+        if (targetIndex < 0 || targetIndex >= history.size) return
+        val url = history.getItemAtIndex(targetIndex)?.url ?: return
+        val host = Uri.parse(url).host ?: return
+        if (DomainScope.contains(session.scope, host)) return
+        session.userNavigationPending = true
+        session.settled = false
     }
 
     @Command
@@ -765,6 +788,14 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
                 val session = sessionOf(view) ?: return true
                 if (session.blocked) return true
                 val url = request.url
+                val userInitiated = request.isForMainFrame && request.hasGesture() &&
+                    !url.host.isNullOrEmpty() &&
+                    (url.scheme.equals("http", ignoreCase = true) ||
+                        url.scheme.equals("https", ignoreCase = true))
+                if (userInitiated) {
+                    session.userNavigationPending = true
+                    session.settled = false
+                }
                 return when (
                     DomainScope.verdict(
                         url.scheme,
@@ -772,6 +803,7 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
                         session.scope,
                         session.settled,
                         request.isForMainFrame,
+                        userInitiated,
                     )
                 ) {
                     DomainScope.Verdict.ALLOW -> false
@@ -787,8 +819,8 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
                 val session = sessionOf(view) ?: return
                 session.topUrl = url
                 session.loading = true
-                // While the first load is still running, a redirect may change the domain; the
-                // session adopts wherever the first page settles.
+                // While the initial load or a user-initiated navigation is unsettled, redirects may
+                // change the scope; it then stays pinned to the destination domain.
                 if (!session.settled) {
                     val host = Uri.parse(url).host
                     if (host != null) session.scope = DomainScope.registrableDomain(host)
@@ -806,6 +838,7 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
                 val session = sessionOf(view) ?: return
                 session.loading = false
                 session.settled = true
+                session.userNavigationPending = false
                 session.frame.isRefreshing = false
                 reveal(session)
                 sendState(session)
@@ -817,7 +850,10 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
                 error: android.webkit.WebResourceError,
             ) {
                 if (!request.isForMainFrame) return
-                sessionOf(view)?.frame?.isRefreshing = false
+                val session = sessionOf(view) ?: return
+                session.settled = true
+                session.userNavigationPending = false
+                session.frame.isRefreshing = false
                 sendError(error.description?.toString() ?: "the page could not be loaded")
             }
 
@@ -829,12 +865,13 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
                 if (session.blocked) return blockedResponse()
                 // `shouldOverrideUrlLoading` is not called for POST navigations, so a page could
                 // post a form to another domain inside this logged-in view.
+                // A user-initiated navigation does not relax this guard before it settles.
                 if (request.isForMainFrame && request.method.equals("POST", ignoreCase = true) &&
                     DomainScope.verdict(
                         request.url.scheme,
                         request.url.host,
                         session.scope,
-                        session.settled,
+                        session.settled || session.userNavigationPending,
                         true,
                     ) != DomainScope.Verdict.ALLOW
                 ) {

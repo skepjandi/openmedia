@@ -7,6 +7,14 @@ All notable changes to OpenMedia are documented here.
 > **Wiki**: the [GitHub Wiki](https://github.com/skepjandi/openmedia/wiki) is the public-facing main wiki — architecture, recipe format, AI pipeline, security model, roadmap. Source-controlled editing surface is `docs/wiki/` in this repo; CI (`.github/workflows/sync-wiki.yml`) mirrors it to the GitHub Wiki on every merge to `main`. New single-PR changes belong here, not as new wiki pages.
 
 ## 2026-11-11
+### fix(siteview): keep clicked links in the embedded browser
+
+**Area:** `fix(siteview)`
+
+**Change:** User-activated HTTP(S) links in a site stay in its embedded view, including search results. Redirects follow that navigation, then the session adopts the destination domain; back/forward remains in the embedded history. Automatic cross-domain navigation still opens in the system browser. Links in the app shell continue to open in the system browser.
+
+**Verified:** Android plugin unit tests and the iOS standalone domain-scope check. **Not verified:** a device; a full Android app build (blocked by an unrelated generated TypeScript icon import).
+
 
 ### fix(marketplace): label hubs experimental
 
