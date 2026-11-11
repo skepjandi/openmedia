@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { isFavoriteSite, toggleSiteFavorite } from "../../shared/favorites";
 import { library } from "../../shared/ipc";
 import { registrableDomain } from "../../shared/site";
 import { appError, useApp } from "../../app/store";
@@ -427,6 +428,9 @@ interface DetailViewProps {
 function DetailView({ item, onChanged, onRated, onManageBlocked }: DetailViewProps) {
   const loadSites = useApp((s) => s.loadSites);
   const setSiteFavorite = useApp((s) => s.setSiteFavorite);
+  const incognitoActive = useApp((s) => s.incognito.active);
+  const incognitoFavorites = useApp((s) => s.incognito.favorites);
+  const saveIncognitoFavorites = useApp((s) => s.saveIncognitoFavorites);
   const t = useT();
   const [preview, setPreview] = useState<RecipePreview | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -457,11 +461,28 @@ function DetailView({ item, onChanged, onRated, onManageBlocked }: DetailViewPro
     }
   };
 
-  /** A first add also stars the site; an update leaves the favorites as the user set them. */
+  /**
+   * A first add also stars the site; an update leaves the favorites as the user set them. In
+   * incognito the site goes into the incognito favorites and the recipe is kept out of the
+   * normal set: its normal switches are turned off, while the incognito set starts from the
+   * recipe's defaults.
+   */
   const install = async () => {
     const firstAdd = !item.installedVersion;
     await marketplace.install(item.id);
-    if (firstAdd) await setSiteFavorite(item.id, true);
+    if (!firstAdd) return;
+    if (!incognitoActive) {
+      await setSiteFavorite(item.id, true);
+      return;
+    }
+    const sites = await library.getSites(true);
+    const site = sites.find((entry) => entry.recipeId === item.id);
+    if (site?.homepage && !isFavoriteSite(incognitoFavorites, site.homepage)) {
+      await saveIncognitoFavorites(toggleSiteFavorite(incognitoFavorites, site.homepage));
+    }
+    for (const option of site?.options ?? []) {
+      await library.setSiteOption(item.id, option.id, false, false);
+    }
   };
 
   const report = async (reason: ReportReason) => {
