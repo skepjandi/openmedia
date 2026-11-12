@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "id": "market.google-com-456a",
+  "name": "google.com",
+  "version": "1.0.0",
+  "origin": "imported",
+  "tags": [
+    "mobile"
+  ],
+  "match": [
+    "https://*.google.com/*"
+  ],
+  "rules": [
+    {
+      "id": "grayscale-the-google-logo-make-the-google-logo-grayscale",
+      "label": "Make the Google logo grayscale",
+      "type": "css",
+      "target": {
+        "css": "svg[role=\"img\"][aria-label=\"Google\"]"
+      },
+      "option": "grayscale-the-google-logo",
+      "declarations": {
+        "filter": "grayscale(1)"
+      }
+    }
+  ],
+  "options": [
+    {
+      "id": "grayscale-the-google-logo",
+      "label": "Grayscale the Google logo",
+      "description": "Applies a grayscale filter to the Google logo on the homepage.",
+      "default": true,
+      "group": "content"
+    }
+  ],
+  "meta": {
+    "summary": "google.com",
+    "homepage": "https://google.com/",
+    "notes": "Created by the in-app assistant."
+  }
+}
