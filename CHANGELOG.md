@@ -8,6 +8,12 @@ All notable changes to OpenMedia are documented here.
 
 ## 2026-11-12
 
+### chore(release): version 1.0.2
+
+**Area:** `chore(release)`
+
+**Change:** The app version is `1.0.2` (build 1004) in `package.json` and `src-tauri/tauri.conf.json`.
+
 ### fix(siteview): Android reports single-page-app route changes to the shell
 
 **Area:** `fix(siteview)`
