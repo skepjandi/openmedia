@@ -35,11 +35,15 @@ const loadOnboarding = () => import("../features/onboarding/Onboarding");
 const loadRecipes = () => import("../features/settings/RecipesScreen");
 const loadLibrary = () => import("../features/library/LibraryScreen");
 const loadShare = () => import("../features/library/ShareScreen");
+const loadShareRecipe = () => import("../features/library/ShareRecipeScreen");
 const loadIncognitoRecipes = () => import("../features/settings/IncognitoSections");
 const LibraryScreen = lazy(() =>
   loadLibrary().then((module) => ({ default: module.LibraryScreen })),
 );
 const ShareScreen = lazy(() => loadShare().then((module) => ({ default: module.ShareScreen })));
+const ShareRecipeScreen = lazy(() =>
+  loadShareRecipe().then((module) => ({ default: module.ShareRecipeScreen })),
+);
 const SettingsScreen = lazy(() =>
   loadSettings().then((module) => ({ default: module.SettingsScreen })),
 );
@@ -144,6 +148,9 @@ export function App() {
       </Suspense>
       <Suspense fallback={null}>{sheet === "library" && <LibraryScreen />}</Suspense>
       <Suspense fallback={null}>{sheet === "share" && <ShareScreen />}</Suspense>
+      <Suspense fallback={null}>
+        {sheet === "share-recipe" && <ShareRecipeScreen />}
+      </Suspense>
       <Suspense fallback={null}>{(idle || sheet === "stats") && <StatsSheet />}</Suspense>
       <Suspense fallback={null}>{onboardingOpen && <Onboarding />}</Suspense>
       {sheet === "paywall" && <PaywallSheet />}

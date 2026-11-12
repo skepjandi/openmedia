@@ -340,8 +340,10 @@ export const si: Messages = {
   "library.search": "ක්‍රම සොයන්න",
   "library.searchNone": "ඔබේ සෙවුමට ගැළපෙන ක්‍රමයක් නැත.",
 
-  "share.link": "ආනයනය, අපනයනය සහ බෙදාගැනීම",
-  "share.linkNote": "ක්‍රම පෙළක් ලෙස උපාංග අතර ගෙන යන්න, නැතහොත් එකක් GitHub හි බෙදාගන්න",
+  "share.link": "ආනයනය සහ අපනයනය",
+  "share.linkNote": "ක්‍රම උපාංග අතර පෙළ ලෙස ගෙන යන්න",
+  "shareRecipe.linkNote": "ඔබගේ ක්‍රමයක් GitHub භාවිතයෙන් සියල්ලන්ට යවන්න",
+  "shareRecipe.link": "ක්‍රමයක් බෙදාගන්න",
   "share.import": "ආනයනය",
   "share.importNote":
     "ඔබ විශ්වාස කරන අයගේ ක්‍රම පමණක් අලවන්න. කිසිවක් එකතු කිරීමට පෙර ඔබට සෑම රීතියක්ම පෙනේ.",

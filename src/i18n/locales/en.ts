@@ -343,8 +343,10 @@ export const en = {
   "library.search": "Search recipes",
   "library.searchNone": "No recipes match your search.",
 
-  "share.link": "Import, export and share",
-  "share.linkNote": "Move recipes between devices as text, or share one on GitHub",
+  "share.link": "Import and export",
+  "share.linkNote": "Move recipes between devices as text",
+  "shareRecipe.linkNote": "Send one of your recipes to everyone, using GitHub",
+  "shareRecipe.link": "Share a recipe",
   "share.import": "Import",
   "share.importNote":
     "Only paste recipes from people you trust. You see every rule before anything is added.",

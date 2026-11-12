@@ -344,8 +344,10 @@ export const cs: Messages = {
   "library.search": "Hledat recepty",
   "library.searchNone": "Hledání neodpovídá žádný recept.",
 
-  "share.link": "Import, export a sdílení",
-  "share.linkNote": "Přenášejte recepty mezi zařízeními jako text nebo jeden sdílejte na GitHubu",
+  "share.link": "Import a export",
+  "share.linkNote": "Přenášejte recepty mezi zařízeními jako text",
+  "shareRecipe.linkNote": "Pošlete jeden ze svých receptů všem přes GitHub",
+  "shareRecipe.link": "Sdílet recept",
   "share.import": "Importovat",
   "share.importNote":
     "Vkládejte jen recepty od lidí, kterým důvěřujete. Každé pravidlo uvidíte dřív, než se cokoli přidá.",

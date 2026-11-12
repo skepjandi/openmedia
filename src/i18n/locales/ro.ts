@@ -347,8 +347,10 @@ export const ro: Messages = {
   "library.search": "Caută rețete",
   "library.searchNone": "Nicio rețetă nu se potrivește căutării tale.",
 
-  "share.link": "Importă, exportă și împarte",
-  "share.linkNote": "Mută rețete între dispozitive sub formă de text sau împarte una pe GitHub",
+  "share.link": "Importă și exportă",
+  "share.linkNote": "Mută rețetele între dispozitive ca text",
+  "shareRecipe.linkNote": "Trimite una dintre rețetele tale tuturor, folosind GitHub",
+  "shareRecipe.link": "Distribuie o rețetă",
   "share.import": "Importă",
   "share.importNote":
     "Lipește doar rețete de la persoane în care ai încredere. Vezi fiecare regulă înainte de a se adăuga ceva.",

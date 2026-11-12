@@ -339,7 +339,11 @@ export function CommandBar() {
                     <p role="status" className="text-sm text-paper">
                       {t("library.added")}: {hubSaved}
                     </p>
-                    <button type="button" className={quiet} onClick={() => openSheet("share")}>
+                    <button
+                      type="button"
+                      className={quiet}
+                      onClick={() => openSheet("share-recipe")}
+                    >
                       {t("library.shareRecipe")}
                     </button>
                   </div>

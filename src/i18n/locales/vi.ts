@@ -340,9 +340,10 @@ export const vi: Messages = {
   "library.search": "Tìm công thức",
   "library.searchNone": "Không có công thức nào khớp với tìm kiếm của bạn.",
 
-  "share.link": "Nhập, xuất và chia sẻ",
-  "share.linkNote":
-    "Chuyển công thức giữa các thiết bị dưới dạng văn bản, hoặc chia sẻ một công thức trên GitHub",
+  "share.link": "Nhập và xuất",
+  "share.linkNote": "Chuyển công thức giữa các thiết bị dưới dạng văn bản",
+  "shareRecipe.linkNote": "Gửi một công thức của bạn đến mọi người qua GitHub",
+  "shareRecipe.link": "Chia sẻ công thức",
   "share.import": "Nhập",
   "share.importNote":
     "Chỉ dán công thức từ người bạn tin tưởng. Bạn xem mọi quy tắc trước khi có gì được thêm.",

@@ -349,8 +349,10 @@ export const pt: Messages = {
   "library.search": "Pesquisar receitas",
   "library.searchNone": "Nenhuma receita corresponde à sua pesquisa.",
 
-  "share.link": "Importar, exportar e compartilhar",
-  "share.linkNote": "Passe receitas entre dispositivos como texto ou compartilhe uma no GitHub",
+  "share.link": "Importar e exportar",
+  "share.linkNote": "Mova receitas entre dispositivos como texto",
+  "shareRecipe.linkNote": "Envie uma das suas receitas para todos usando o GitHub",
+  "shareRecipe.link": "Compartilhar uma receita",
   "share.import": "Importar",
   "share.importNote":
     "Cole apenas receitas de pessoas em quem você confia. Você vê todas as regras antes de qualquer coisa ser adicionada.",

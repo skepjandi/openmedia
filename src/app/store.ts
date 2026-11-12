@@ -63,6 +63,7 @@ export type Sheet =
   | "incognito-recipes"
   | "library"
   | "share"
+  | "share-recipe"
   | "paywall";
 
 /** Pages that open on top of Settings. Closing one returns to Settings, which stays mounted beneath it. */
@@ -71,6 +72,7 @@ const SETTINGS_CHILDREN: readonly Sheet[] = [
   "incognito-recipes",
   "library",
   "share",
+  "share-recipe",
   "paywall",
 ];
 const isSettingsChild = (sheet: Sheet): boolean => SETTINGS_CHILDREN.includes(sheet);

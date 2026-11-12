@@ -332,8 +332,10 @@ export const ar: Messages = {
   "library.search": "ابحث في الوصفات",
   "library.searchNone": "لا توجد وصفات تطابق بحثك.",
 
-  "share.link": "استيراد وتصدير ومشاركة",
-  "share.linkNote": "انقل الوصفات بين الأجهزة كنص، أو شاركها على GitHub",
+  "share.link": "استيراد وتصدير",
+  "share.linkNote": "انقل الوصفات بين الأجهزة كنص",
+  "shareRecipe.linkNote": "أرسل إحدى وصفاتك إلى الجميع عبر GitHub",
+  "shareRecipe.link": "شارك وصفة",
   "share.import": "استيراد",
   "share.importNote": "الصق وصفات من أشخاص تثق بهم فقط. ترى كل قاعدة قبل إضافة أي شيء.",
   "share.paste": "الصق الوصفات هنا",

@@ -343,8 +343,10 @@ export const ms: Messages = {
   "library.search": "Cari resipi",
   "library.searchNone": "Tiada resipi sepadan dengan carian anda.",
 
-  "share.link": "Import, eksport dan kongsi",
-  "share.linkNote": "Alihkan resipi antara peranti sebagai teks, atau kongsi satu resipi di GitHub",
+  "share.link": "Import dan eksport",
+  "share.linkNote": "Alihkan resipi antara peranti sebagai teks",
+  "shareRecipe.linkNote": "Hantar salah satu resipi anda kepada semua orang menggunakan GitHub",
+  "shareRecipe.link": "Kongsi resipi",
   "share.import": "Import",
   "share.importNote":
     "Tampal resipi daripada orang yang anda percayai sahaja. Anda melihat setiap peraturan sebelum apa-apa ditambah.",

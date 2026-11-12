@@ -342,9 +342,10 @@ export const id: Messages = {
   "library.search": "Cari resep",
   "library.searchNone": "Tidak ada resep yang cocok dengan pencarian Anda.",
 
-  "share.link": "Impor, ekspor, dan bagikan",
-  "share.linkNote":
-    "Pindahkan resep antarperangkat sebagai teks, atau bagikan satu resep di GitHub",
+  "share.link": "Impor dan ekspor",
+  "share.linkNote": "Pindahkan resep antar perangkat sebagai teks",
+  "shareRecipe.linkNote": "Kirim salah satu resep Anda ke semua orang lewat GitHub",
+  "shareRecipe.link": "Bagikan resep",
   "share.import": "Impor",
   "share.importNote":
     "Tempel hanya resep dari orang yang Anda percaya. Anda melihat setiap aturan sebelum apa pun ditambahkan.",

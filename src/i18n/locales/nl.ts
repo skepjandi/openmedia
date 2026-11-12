@@ -346,8 +346,10 @@ export const nl: Messages = {
   "library.search": "Recepten zoeken",
   "library.searchNone": "Geen recepten komen overeen met je zoekopdracht.",
 
-  "share.link": "Importeren, exporteren en delen",
-  "share.linkNote": "Zet recepten als tekst over tussen apparaten, of deel er een op GitHub",
+  "share.link": "Importeren en exporteren",
+  "share.linkNote": "Verplaats recepten als tekst tussen apparaten",
+  "shareRecipe.linkNote": "Stuur een van je recepten via GitHub naar iedereen",
+  "shareRecipe.link": "Deel een recept",
   "share.import": "Importeren",
   "share.importNote":
     "Plak alleen recepten van mensen die je vertrouwt. Je ziet elke regel voordat er iets wordt toegevoegd.",

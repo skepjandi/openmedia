@@ -322,8 +322,10 @@ export const zhHans: Messages = {
   "library.search": "搜索配方",
   "library.searchNone": "没有与搜索匹配的配方。",
 
-  "share.link": "导入、导出和分享",
-  "share.linkNote": "以文本形式在设备间转移配方，或在 GitHub 上分享",
+  "share.link": "导入和导出",
+  "share.linkNote": "以文本形式在设备间转移配方",
+  "shareRecipe.linkNote": "通过 GitHub 把你的一个配方发给所有人",
+  "shareRecipe.link": "分享配方",
   "share.import": "导入",
   "share.importNote": "只粘贴来自你信任的人的配方。添加任何内容之前，你都能看到每一条规则。",
   "share.paste": "在此粘贴配方",

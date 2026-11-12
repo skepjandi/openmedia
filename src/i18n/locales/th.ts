@@ -329,8 +329,10 @@ export const th: Messages = {
   "library.search": "ค้นหาสูตร",
   "library.searchNone": "ไม่มีสูตรที่ตรงกับการค้นหาของคุณ",
 
-  "share.link": "นำเข้า ส่งออก และแชร์",
-  "share.linkNote": "ย้ายสูตรระหว่างอุปกรณ์เป็นข้อความ หรือแชร์บน GitHub",
+  "share.link": "นำเข้าและส่งออก",
+  "share.linkNote": "ย้ายสูตรระหว่างอุปกรณ์เป็นข้อความ",
+  "shareRecipe.linkNote": "ส่งสูตรของคุณให้ทุกคนผ่าน GitHub",
+  "shareRecipe.link": "แชร์สูตร",
   "share.import": "นำเข้า",
   "share.importNote": "วางเฉพาะสูตรจากคนที่คุณไว้ใจ คุณจะเห็นทุกกฎก่อนที่จะมีอะไรถูกเพิ่ม",
   "share.paste": "วางสูตรที่นี่",

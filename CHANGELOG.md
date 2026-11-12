@@ -8,6 +8,13 @@ All notable changes to OpenMedia are documented here.
 
 ## 2026-11-13
 
+### feat(share): sharing a recipe has its own page, and the Recipes guide links sit in the description
+
+**Area:** `feat(share)`
+
+**Change:** *Share a recipe* is a separate row and page in Settings instead of a section under Import and export, which is now only import and export. The row appears only when the build has a share address. The "Create a recipe" and "Customize a site" guide links are inline at the end of the Recipes description.
+
+
 ### fix(shell): the site no longer flashes when a page opens from Settings on a cold launch
 
 **Area:** `fix(shell)`

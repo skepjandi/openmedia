@@ -1,16 +1,28 @@
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { useApp } from "../../app/store";
 import { describeError } from "../../i18n/errors";
 import { useT } from "../../i18n/useT";
 import { ForwardIcon } from "../../shared/icons";
 import type { SiteSettings } from "../../shared/ipc";
 import { Group } from "../settings/ui";
-import { sharing } from "./ipc";
+import { share, sharing } from "./ipc";
 
-/** The rows in Settings that open the recipe library and Import, export and share. */
+/** The rows in Settings that open the recipe library, import and export, and sharing a recipe. */
 export function LibraryLinks() {
   const openSheet = useApp((s) => s.openSheet);
   const t = useT();
+  const [canShare, setCanShare] = useState(false);
+
+  useEffect(() => {
+    let current = true;
+    share
+      .available()
+      .then((value) => current && setCanShare(value))
+      .catch(() => current && setCanShare(false));
+    return () => {
+      current = false;
+    };
+  }, []);
 
   return (
     <Group>
@@ -24,6 +36,13 @@ export function LibraryLinks() {
         note={t("share.linkNote")}
         onClick={() => openSheet("share")}
       />
+      {canShare && (
+        <LinkRow
+          title={t("shareRecipe.link")}
+          note={t("shareRecipe.linkNote")}
+          onClick={() => openSheet("share-recipe")}
+        />
+      )}
     </Group>
   );
 }

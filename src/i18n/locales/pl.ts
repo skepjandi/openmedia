@@ -345,9 +345,10 @@ export const pl: Messages = {
   "library.search": "Szukaj przepisów",
   "library.searchNone": "Żaden przepis nie pasuje do wyszukiwania.",
 
-  "share.link": "Importuj, eksportuj i udostępniaj",
-  "share.linkNote":
-    "Przenoś przepisy między urządzeniami jako tekst albo udostępnij jeden na GitHub",
+  "share.link": "Import i eksport",
+  "share.linkNote": "Przenoś przepisy między urządzeniami jako tekst",
+  "shareRecipe.linkNote": "Wyślij jeden ze swoich przepisów wszystkim przez GitHub",
+  "shareRecipe.link": "Udostępnij przepis",
   "share.import": "Importuj",
   "share.importNote":
     "Wklejaj tylko przepisy od osób, którym ufasz. Każdą regułę zobaczysz, zanim cokolwiek zostanie dodane.",

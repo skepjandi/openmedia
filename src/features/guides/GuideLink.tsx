@@ -15,9 +15,12 @@ export const guideUrl = (slug: GuideSlug): string => `${GUIDES_URL}${slug}/`;
 export function GuideLink({
   slug,
   labelKey = "guides.read",
+  inline = false,
 }: {
   slug: GuideSlug;
   labelKey?: MessageKey;
+  /** Sits in the middle of a paragraph instead of on a line of its own. */
+  inline?: boolean;
 }) {
   const t = useT();
 
@@ -29,7 +32,11 @@ export function GuideLink({
           useApp.setState({ error: appError(error) });
         });
       }}
-      className="flex items-center gap-1 px-1 py-1 text-sm font-medium text-accent"
+      className={
+        inline
+          ? "inline-flex items-center gap-0.5 font-medium text-accent"
+          : "flex items-center gap-1 px-1 py-1 text-sm font-medium text-accent"
+      }
     >
       {t(labelKey)}
       <span aria-hidden="true" className="rtl:-scale-x-100">
