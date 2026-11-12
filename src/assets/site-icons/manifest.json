@@ -1,125 +1,132 @@
 {
   "sites": {
-    "discord.default": {
+    "market.official.discord": {
       "file": "discord.png",
       "source": "https://discord.com/assets/favicon.ico",
       "domains": ["discord.com"],
       "bytes": 5463,
       "sha256": "b555cc814bea9dc1fd27c4858fa2d90c30690e2605d95db923de0a70bdcf5d9e"
     },
-    "douyin.default": {
+    "market.official.douyin": {
       "file": "douyin.png",
       "source": "https://lf1-cdn-tos.bytegoofy.com/goofy/ies/douyin_web/public/favicon.ico",
       "domains": ["douyin.com"],
       "bytes": 6377,
       "sha256": "3dd446197d979d265a54a0c6361e0431042e9336aa5daa038b706f3042f835db"
     },
-    "facebook.default": {
+    "market.official.facebook": {
       "file": "facebook.png",
       "source": "https://z-m-static.xx.fbcdn.net/rsrc.php/y4/r/M6oWJ5INQpg.webp",
       "domains": ["facebook.com"],
       "bytes": 3477,
       "sha256": "2371b6592fc6ceffa48c414498b63fa86378dc5284c1f1923c0cc9b6e9aae33c"
     },
-    "instagram.default": {
+    "market.official.instagram": {
       "file": "instagram.png",
       "source": "https://www.instagram.com/favicon.ico",
       "domains": ["instagram.com"],
       "bytes": 14262,
       "sha256": "5dcd1adc9b3aec2787aa4ab5d62f87761cf8aefa04c422e1cb45f556a40e01a5"
     },
-    "kuaishou.default": {
+    "market.official.kuaishou": {
       "file": "kuaishou.png",
       "source": "https://s1-11674.kwimgs.com/udata/pkg/fe/favicon.70ff1fcc.ico",
       "domains": ["kuaishou.com"],
       "bytes": 8880,
       "sha256": "2ee1def11fc87d6af1f13b04dda336cc88e27656ab181132b372560b833d2856"
     },
-    "linkedin.default": {
+    "market.official.linkedin": {
       "file": "linkedin.png",
       "source": "https://static.licdn.com/aero-v1/sc/h/al2o9zrvru7aqj8e1x2rzsrca",
       "domains": ["linkedin.com"],
       "bytes": 2768,
       "sha256": "3ffb50f4d39ba21dea5dbec07b40429b87427c38b28f70ed0588c16d5a0142ed"
     },
-    "messenger.default": {
+    "market.official.messages-hub": {
+      "file": "messages-hub.png",
+      "source": "https://static.whatsapp.net/rsrc.php/yI/r/EoOh62-jiPS.webp",
+      "domains": ["facebook.com", "instagram.com", "linkedin.com", "whatsapp.com"],
+      "bytes": 9077,
+      "sha256": "f87b001d85cc7c476e3c70638c127735ae76d6671f1fea4b53cb04e30708ab1d"
+    },
+    "market.official.messenger": {
       "file": "messenger.png",
       "source": "https://static.xx.fbcdn.net/rsrc.php/yB/r/kkzothcz4q-.webp",
       "domains": ["messenger.com"],
       "bytes": 10209,
       "sha256": "f289510e31f51755fd7e7ad8035a659452b943aca395468844a9fc30fad1f904"
     },
-    "pinterest.default": {
+    "market.official.pinterest": {
       "file": "pinterest.png",
       "source": "https://www.pinterest.com/favicon.ico",
       "domains": ["pinterest.com"],
       "bytes": 15599,
       "sha256": "bb47e753066a1d3d86a7729f033182165c18a54f4a0075c9c63b3e72b7efe7d0"
     },
-    "reddit.default": {
+    "market.official.reddit": {
       "file": "reddit.png",
       "source": "https://www.redditstatic.com/shreddit/assets/favicon/64x64.png",
       "domains": ["reddit.com"],
       "bytes": 10165,
       "sha256": "cf50172ba3d7c5efaf3ee48a2a861abb8e480fe112e1c9b6d4bc30356470421e"
     },
-    "snapchat.default": {
+    "market.official.snapchat": {
       "file": "snapchat.png",
       "source": "https://www.snapchat.com/apple-touch-icon.png",
       "domains": ["snapchat.com"],
       "bytes": 5053,
       "sha256": "d1d2634bbd271501ed03ce5b834e6dd6c4182c4dd455c8acf49bb3c6c77b30f5"
     },
-    "telegram.default": {
+    "market.official.telegram": {
       "file": "telegram.png",
       "source": "https://web.telegram.org/a/apple-touch-icon.png",
       "domains": ["t.me", "telegram.org"],
       "bytes": 4507,
       "sha256": "b9fd113fae02c1e54b6bce530bf83c66b8b3dc8f96d45d6660a45dc66be16cab"
     },
-    "threads.default": {
+    "market.official.threads": {
       "file": "threads.png",
       "source": "https://www.threads.com/apple-touch-icon.png",
       "domains": ["threads.com", "threads.net"],
       "bytes": 8298,
       "sha256": "a899572185f579dcf49f8dc7f88fe775001daeea8bdabfeb86b61b3cc2ad1eef"
     },
-    "tiktok.default": {
+    "market.official.tiktok": {
       "file": "tiktok.png",
       "source": "https://www.tiktok.com/favicon.ico",
       "domains": ["tiktok.com"],
       "bytes": 5908,
       "sha256": "630c2806758547ddf228f9abee22f90ed03d1c87b93d4a5a43c164eca1a82199"
     },
-    "twitch.default": {
+    "market.official.twitch": {
       "file": "twitch.png",
       "source": "https://assets.twitch.tv/assets/favicon-32-5c61aa63605bca4f740d.png",
       "domains": ["twitch.tv"],
       "bytes": 2624,
       "sha256": "320395f9231e003e3208b26fe024d79ad5867c175b75e7c4aa6863421f114902"
     },
-    "twitter.default": {
+    "market.official.twitter": {
       "file": "twitter.png",
       "source": "https://x.com/apple-touch-icon.png",
       "domains": ["twitter.com", "x.com"],
       "bytes": 4590,
       "sha256": "3abde96ef4488bea709e4e9221fd3d4af7f232bc89c1d92c83c57931662f73aa"
     },
-    "weibo.default": {
+    "market.official.weibo": {
       "file": "weibo.png",
       "source": "https://m.weibo.cn/favicon.ico",
       "domains": ["weibo.cn", "weibo.com"],
       "bytes": 11432,
       "sha256": "e0ac2e34ee4b5f31bf7dbdfe2894115fa0023e0323c9b99152e1ed2f6104758d"
     },
-    "whatsapp.default": {
+    "market.official.whatsapp": {
       "file": "whatsapp.png",
       "source": "https://static.whatsapp.net/rsrc.php/yI/r/EoOh62-jiPS.webp",
       "domains": ["whatsapp.com"],
       "bytes": 9077,
       "sha256": "f87b001d85cc7c476e3c70638c127735ae76d6671f1fea4b53cb04e30708ab1d"
     },
-    "youtube.default": {
+    "market.official.youtube": {
       "file": "youtube.png",
       "source": "https://m.youtube.com/static/apple-touch-icon-180x180-precomposed.png",
       "domains": ["youtube.com"],
