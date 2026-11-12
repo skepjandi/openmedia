@@ -311,6 +311,7 @@ export const hi: Messages = {
   "library.loading": "लोड हो रहा है…",
   "library.empty": "अभी कुछ भी सूचीबद्ध नहीं है।",
   "library.add": "जोड़ें",
+  "library.addIncognito": "गुप्त मोड में जोड़ें",
   "library.update": "अपडेट करें",
   "library.added": "जोड़ी गई",
   "library.by": "{author} द्वारा",

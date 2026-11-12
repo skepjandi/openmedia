@@ -319,6 +319,7 @@ export const ro: Messages = {
   "library.loading": "Se încarcă…",
   "library.empty": "Încă nu este nimic listat.",
   "library.add": "Adaugă",
+  "library.addIncognito": "Adaugă la incognito",
   "library.update": "Actualizează",
   "library.added": "Adăugată",
   "library.by": "de {author}",

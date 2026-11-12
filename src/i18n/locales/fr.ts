@@ -324,6 +324,7 @@ export const fr: Messages = {
   "library.loading": "Chargement…",
   "library.empty": "Rien n’est encore listé.",
   "library.add": "Ajouter",
+  "library.addIncognito": "Ajouter à la navigation privée",
   "library.update": "Mettre à jour",
   "library.added": "Ajoutée",
   "library.by": "par {author}",

@@ -294,6 +294,7 @@ export const zhHans: Messages = {
   "library.loading": "加载中…",
   "library.empty": "目前还没有上架内容。",
   "library.add": "添加",
+  "library.addIncognito": "添加到无痕模式",
   "library.update": "更新",
   "library.added": "已添加",
   "library.by": "作者：{author}",

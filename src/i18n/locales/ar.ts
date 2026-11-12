@@ -304,6 +304,7 @@ export const ar: Messages = {
   "library.loading": "جارٍ التحميل…",
   "library.empty": "لم يُدرج أي شيء بعد.",
   "library.add": "إضافة",
+  "library.addIncognito": "إضافة إلى التصفح الخفي",
   "library.update": "تحديث",
   "library.added": "تمت الإضافة",
   "library.by": "بواسطة {author}",

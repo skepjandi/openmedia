@@ -316,6 +316,7 @@ export const tr: Messages = {
   "library.loading": "Yükleniyor…",
   "library.empty": "Henüz listelenen bir şey yok.",
   "library.add": "Ekle",
+  "library.addIncognito": "Gizliye ekle",
   "library.update": "Güncelle",
   "library.added": "Eklendi",
   "library.by": "{author} tarafından",

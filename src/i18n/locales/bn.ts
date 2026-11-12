@@ -309,6 +309,7 @@ export const bn: Messages = {
   "library.loading": "লোড হচ্ছে…",
   "library.empty": "এখনও কিছু তালিকাভুক্ত হয়নি।",
   "library.add": "যোগ করুন",
+  "library.addIncognito": "ইনকগনিটোতে যোগ করুন",
   "library.update": "আপডেট করুন",
   "library.added": "যোগ করা হয়েছে",
   "library.by": "{author}-এর",

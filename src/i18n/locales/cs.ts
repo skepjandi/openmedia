@@ -316,6 +316,7 @@ export const cs: Messages = {
   "library.loading": "Načítání…",
   "library.empty": "Zatím nic není zveřejněno.",
   "library.add": "Přidat",
+  "library.addIncognito": "Přidat do anonymního režimu",
   "library.update": "Aktualizovat",
   "library.added": "Přidáno",
   "library.by": "od {author}",

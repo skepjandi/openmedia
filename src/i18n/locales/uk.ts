@@ -319,6 +319,7 @@ export const uk: Messages = {
   "library.loading": "Завантаження…",
   "library.empty": "Поки що нічого не опубліковано.",
   "library.add": "Додати",
+  "library.addIncognito": "Додати в інкогніто",
   "library.update": "Оновити",
   "library.added": "Додано",
   "library.by": "від {author}",

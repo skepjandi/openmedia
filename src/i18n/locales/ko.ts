@@ -313,6 +313,7 @@ export const ko: Messages = {
   "library.loading": "불러오는 중…",
   "library.empty": "아직 등록된 항목이 없습니다.",
   "library.add": "추가",
+  "library.addIncognito": "시크릿에 추가",
   "library.update": "업데이트",
   "library.added": "추가됨",
   "library.by": "작성자: {author}",

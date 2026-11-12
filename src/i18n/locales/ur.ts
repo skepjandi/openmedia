@@ -316,6 +316,7 @@ export const ur: Messages = {
   "library.loading": "لوڈ ہو رہا ہے…",
   "library.empty": "ابھی کچھ بھی فہرست میں نہیں ہے۔",
   "library.add": "شامل کریں",
+  "library.addIncognito": "پوشیدہ براؤزنگ میں شامل کریں",
   "library.update": "اپ ڈیٹ کریں",
   "library.added": "شامل ہو گئی",
   "library.by": "از {author}",

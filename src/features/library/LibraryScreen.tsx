@@ -294,8 +294,10 @@ function DetailView({ item, onChanged }: DetailViewProps) {
   const loadSites = useApp((s) => s.loadSites);
   const setSiteFavorite = useApp((s) => s.setSiteFavorite);
   const incognitoActive = useApp((s) => s.incognito.active);
-  const incognitoFavorites = useApp((s) => s.incognito.favorites);
   const saveIncognitoFavorites = useApp((s) => s.saveIncognitoFavorites);
+  const unlockIncognito = useApp((s) => s.unlockIncognito);
+  const loadIncognitoFavorites = useApp((s) => s.loadIncognitoFavorites);
+  const forgetIncognitoFavorites = useApp((s) => s.forgetIncognitoFavorites);
   const t = useT();
   const [preview, setPreview] = useState<RecipePreview | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -312,11 +314,15 @@ function DetailView({ item, onChanged }: DetailViewProps) {
     };
   }, [item.id, t]);
 
-  const run = async (action: () => Promise<void>) => {
+  /** An action that resolves false was cancelled: stay on the page. */
+  const run = async (action: () => Promise<unknown>) => {
     setBusy(true);
     setError(null);
     try {
-      await action();
+      if ((await action()) === false) {
+        setBusy(false);
+        return;
+      }
       await loadSites();
       await onChanged();
     } catch (failure) {
@@ -326,27 +332,49 @@ function DetailView({ item, onChanged }: DetailViewProps) {
   };
 
   /**
-   * A first add also stars the site; an update leaves the favorites as the user set them. In
-   * incognito the site goes into the incognito favorites and the recipe is kept out of the
-   * normal set: its normal switches are turned off, while the incognito set starts from the
-   * recipe's defaults.
+   * Puts the recipe's site in the incognito favorites. A recipe installed just now is also kept
+   * out of the normal set: its normal switches are turned off, while the incognito set starts
+   * from the recipe's defaults.
    */
+  const placeInIncognito = async (freshInstall: boolean) => {
+    const sites = await library.getSites(true);
+    const site = sites.find((entry) => entry.recipeId === item.id);
+    const favorites = useApp.getState().incognito.favorites;
+    if (site?.homepage && !isFavoriteSite(favorites, site.homepage)) {
+      await saveIncognitoFavorites(toggleSiteFavorite(favorites, site.homepage));
+    }
+    if (!freshInstall) return;
+    for (const option of site?.options ?? []) {
+      await library.setSiteOption(item.id, option.id, false, false);
+    }
+  };
+
+  /** A first add also stars the site; an update leaves the favorites as the user set them. */
   const install = async () => {
     const firstAdd = !item.installedVersion;
     await recipeLibrary.install(item.id);
     if (!firstAdd) return;
+    if (incognitoActive) await placeInIncognito(true);
+    else await setSiteFavorite(item.id, true);
+  };
+
+  /**
+   * Adds the recipe and its site to the incognito favorites and recipes without entering
+   * incognito. Asks for the biometric check first, since it reads the private favorites.
+   */
+  const addToIncognito = async (): Promise<boolean> => {
     if (!incognitoActive) {
-      await setSiteFavorite(item.id, true);
-      return;
+      if (!(await unlockIncognito())) return false;
+      await loadIncognitoFavorites();
     }
-    const sites = await library.getSites(true);
-    const site = sites.find((entry) => entry.recipeId === item.id);
-    if (site?.homepage && !isFavoriteSite(incognitoFavorites, site.homepage)) {
-      await saveIncognitoFavorites(toggleSiteFavorite(incognitoFavorites, site.homepage));
+    const freshInstall = !item.installedVersion;
+    if (freshInstall) await recipeLibrary.install(item.id);
+    try {
+      await placeInIncognito(freshInstall);
+    } finally {
+      forgetIncognitoFavorites();
     }
-    for (const option of site?.options ?? []) {
-      await library.setSiteOption(item.id, option.id, false, false);
-    }
+    return true;
   };
 
   const canAdd = !item.installedVersion || item.updateAvailable;
@@ -360,7 +388,7 @@ function DetailView({ item, onChanged }: DetailViewProps) {
           <TagBadges tags={item.tags} />
         </div>
       </div>
-      {(canAdd || item.installedVersion) && (
+      <div className="flex flex-col gap-3">
         <div className="flex gap-3">
           {canAdd && (
             <button
@@ -383,7 +411,15 @@ function DetailView({ item, onChanged }: DetailViewProps) {
             </button>
           )}
         </div>
-      )}
+        <button
+          type="button"
+          disabled={!preview || busy}
+          onClick={() => void run(addToIncognito)}
+          className={quietBlockButton}
+        >
+          {t("library.addIncognito")}
+        </button>
+      </div>
       {error && <p className="px-1 text-sm text-paper/70">{error}</p>}
       {preview === null && !error && <Spinner className="px-1" label={t("library.loading")} />}
       {preview && <RecipeReview preview={preview} />}

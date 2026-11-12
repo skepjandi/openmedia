@@ -8,6 +8,14 @@ All notable changes to OpenMedia are documented here.
 
 ## 2026-11-13
 
+### feat(library): "Add to incognito" on a recipe in the library
+
+**Area:** `feat(library)`
+
+**Change:** A recipe's page in the recipe library has an *Add to incognito* button. It asks for Face ID, Touch ID or the passcode (a crown and the paywall without Pro), then stars the recipe's site in the incognito favorites and, if the recipe was not added yet, installs it with its normal switches off so the incognito recipes start from its defaults. Cancelling the check changes nothing. Incognito does not have to be on.
+
+**Verified:** `yarn ts:check`, ESLint, Prettier, 428 frontend tests. **Not verified:** the Face ID prompt and the flow on a device or simulator.
+
 ### feat(recipes): the marketplace is gone; recipes ship in the app and are shared through GitHub
 
 **Area:** `feat(recipes)`, `feat(ai)`, `feat(share)`

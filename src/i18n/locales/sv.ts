@@ -318,6 +318,7 @@ export const sv: Messages = {
   "library.loading": "Läser in…",
   "library.empty": "Inget är listat ännu.",
   "library.add": "Lägg till",
+  "library.addIncognito": "Lägg till i inkognito",
   "library.update": "Uppdatera",
   "library.added": "Tillagt",
   "library.by": "av {author}",

@@ -318,6 +318,7 @@ export const nl: Messages = {
   "library.loading": "Laden…",
   "library.empty": "Er staat nog niets in de lijst.",
   "library.add": "Toevoegen",
+  "library.addIncognito": "Toevoegen aan incognito",
   "library.update": "Bijwerken",
   "library.added": "Toegevoegd",
   "library.by": "door {author}",

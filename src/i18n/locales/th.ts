@@ -301,6 +301,7 @@ export const th: Messages = {
   "library.loading": "กำลังโหลด…",
   "library.empty": "ยังไม่มีอะไรขึ้นรายการ",
   "library.add": "เพิ่ม",
+  "library.addIncognito": "เพิ่มในโหมดไม่ระบุตัวตน",
   "library.update": "อัปเดต",
   "library.added": "เพิ่มแล้ว",
   "library.by": "โดย {author}",

@@ -320,6 +320,7 @@ export const it: Messages = {
   "library.loading": "Caricamento…",
   "library.empty": "Non c’è ancora nulla in elenco.",
   "library.add": "Aggiungi",
+  "library.addIncognito": "Aggiungi a incognito",
   "library.update": "Aggiorna",
   "library.added": "Aggiunta",
   "library.by": "di {author}",

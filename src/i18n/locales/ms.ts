@@ -315,6 +315,7 @@ export const ms: Messages = {
   "library.loading": "Memuatkan…",
   "library.empty": "Belum ada yang disenaraikan.",
   "library.add": "Tambah",
+  "library.addIncognito": "Tambah ke inkognito",
   "library.update": "Kemas kini",
   "library.added": "Ditambah",
   "library.by": "oleh {author}",

@@ -321,6 +321,7 @@ export const pt: Messages = {
   "library.loading": "Carregando…",
   "library.empty": "Ainda não há nada listado.",
   "library.add": "Adicionar",
+  "library.addIncognito": "Adicionar ao anônimo",
   "library.update": "Atualizar",
   "library.added": "Adicionada",
   "library.by": "por {author}",

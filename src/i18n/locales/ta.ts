@@ -324,6 +324,7 @@ export const ta: Messages = {
   "library.loading": "ஏற்றுகிறது…",
   "library.empty": "இன்னும் எதுவும் பட்டியலிடப்படவில்லை.",
   "library.add": "சேர்",
+  "library.addIncognito": "மறைநிலையில் சேர்",
   "library.update": "புதுப்பி",
   "library.added": "சேர்க்கப்பட்டது",
   "library.by": "{author} மூலம்",

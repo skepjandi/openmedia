@@ -315,6 +315,7 @@ export const ja: Messages = {
   "library.loading": "読み込み中…",
   "library.empty": "まだ何も掲載されていません。",
   "library.add": "追加",
+  "library.addIncognito": "シークレットに追加",
   "library.update": "更新",
   "library.added": "追加済み",
   "library.by": "作成者：{author}",

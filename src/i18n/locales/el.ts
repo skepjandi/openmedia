@@ -323,6 +323,7 @@ export const el: Messages = {
   "library.loading": "Φόρτωση…",
   "library.empty": "Δεν έχει δημοσιευτεί τίποτα ακόμη.",
   "library.add": "Προσθήκη",
+  "library.addIncognito": "Προσθήκη στην ανώνυμη περιήγηση",
   "library.update": "Ενημέρωση",
   "library.added": "Προστέθηκε",
   "library.by": "από {author}",

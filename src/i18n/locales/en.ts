@@ -315,6 +315,7 @@ export const en = {
   "library.loading": "Loading…",
   "library.empty": "Nothing is listed yet.",
   "library.add": "Add",
+  "library.addIncognito": "Add to incognito",
   "library.update": "Update",
   "library.added": "Added",
   "library.by": "by {author}",

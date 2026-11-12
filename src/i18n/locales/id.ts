@@ -314,6 +314,7 @@ export const id: Messages = {
   "library.loading": "Memuat…",
   "library.empty": "Belum ada yang dicantumkan.",
   "library.add": "Tambah",
+  "library.addIncognito": "Tambah ke penyamaran",
   "library.update": "Perbarui",
   "library.added": "Ditambahkan",
   "library.by": "oleh {author}",

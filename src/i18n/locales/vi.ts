@@ -312,6 +312,7 @@ export const vi: Messages = {
   "library.loading": "Đang tải…",
   "library.empty": "Chưa có gì được đăng.",
   "library.add": "Thêm",
+  "library.addIncognito": "Thêm vào ẩn danh",
   "library.update": "Cập nhật",
   "library.added": "Đã thêm",
   "library.by": "bởi {author}",

@@ -319,6 +319,7 @@ export const ru: Messages = {
   "library.loading": "Загрузка…",
   "library.empty": "Пока ничего не опубликовано.",
   "library.add": "Добавить",
+  "library.addIncognito": "Добавить в инкогнито",
   "library.update": "Обновить",
   "library.added": "Добавлен",
   "library.by": "от {author}",

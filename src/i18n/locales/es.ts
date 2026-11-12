@@ -320,6 +320,7 @@ export const es: Messages = {
   "library.loading": "Cargando…",
   "library.empty": "Aún no hay nada publicado.",
   "library.add": "Añadir",
+  "library.addIncognito": "Añadir a incógnito",
   "library.update": "Actualizar",
   "library.added": "Añadida",
   "library.by": "de {author}",

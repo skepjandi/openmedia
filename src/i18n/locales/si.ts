@@ -312,6 +312,7 @@ export const si: Messages = {
   "library.loading": "පූරණය වෙමින්…",
   "library.empty": "තවම කිසිවක් ලැයිස්තුගත කර නැත.",
   "library.add": "එකතු කරන්න",
+  "library.addIncognito": "ගුප්ත මාදිලියට එකතු කරන්න",
   "library.update": "යාවත්කාලීන කරන්න",
   "library.added": "එකතු කළා",
   "library.by": "{author} විසින්",

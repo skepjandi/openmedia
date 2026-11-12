@@ -315,6 +315,7 @@ export const de: Messages = {
   "library.loading": "Wird geladen…",
   "library.empty": "Noch nichts aufgelistet.",
   "library.add": "Hinzufügen",
+  "library.addIncognito": "Zu Inkognito hinzufügen",
   "library.update": "Aktualisieren",
   "library.added": "Hinzugefügt",
   "library.by": "von {author}",

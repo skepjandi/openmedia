@@ -295,6 +295,7 @@ export const zhHant: Messages = {
   "library.loading": "載入中…",
   "library.empty": "目前還沒有上架內容。",
   "library.add": "加入",
+  "library.addIncognito": "加入無痕模式",
   "library.update": "更新",
   "library.added": "已加入",
   "library.by": "作者：{author}",
