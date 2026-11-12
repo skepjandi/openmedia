@@ -58,6 +58,18 @@ All notable changes to OpenMedia are documented here.
 **Change:** The fan has a Tabs button directly above History (Usage and Incognito move up one place). It opens a page listing every open site, the quick-access favorites and the newest history. Open sites can be switched to without a reload, closed one by one, or closed all at once except the visible one; closing never removes a favorite or a history entry, and the last open site stays. Each open site shows time to first paint, last load time, foreground time today and time since last use. The measurements live in memory (`Session.paintMs`, `loadMs`) and today's time comes from `usage.json`; nothing new is stored or sent. Per-site memory use is not shown because the web views do not expose it.
 
 **Issue:** #149
+### fix(ios): a swipe down inside a video feed no longer pulls to refresh
+
+**Area:** `fix(ios)`
+
+**Problem:** In feeds that scroll inside a container (Reels, Shorts, TikTok) the page itself stays at its top, so swiping down to the previous video could start pull to refresh and reload the page mid-feed.
+
+**Change:** The same document-start touch script as on Android reports whether each touch began inside a container scrolled away from its top; the refresh control is detached from the scroll view for that touch and restored for any other. Pull to refresh on the first item and on ordinary pages is unchanged.
+
+**Not verified:** on a device or simulator. Autoplay policy, engine cost and session reloads in #152 are still to be reproduced and measured.
+
+**Issue:** #152 (partial)
+
 ### fix(android): a swipe down inside a video feed no longer pulls to refresh
 
 **Area:** `fix(android)`

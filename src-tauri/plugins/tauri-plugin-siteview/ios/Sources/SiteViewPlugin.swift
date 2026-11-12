@@ -11,6 +11,23 @@ private let bridgeHandlerName = "openmedia"
 /// or black a new web view draws. The page reports its first frames through this native-only
 /// handler (it reaches no Tauri IPC and nothing else); a page that fakes it only shows itself.
 private let paintHandlerName = "openmediaPaint"
+/// Reports, at the start of every touch, whether it began inside a container scrolled away from its
+/// top. A feed of full-screen videos scrolls inside such a container while the page itself stays at
+/// its top, so without this a swipe down to the previous item pulls to refresh and reloads the page.
+private let scrollHandlerName = "openmediaScroll"
+private let touchScrollScript = """
+  (function () {
+    window.addEventListener('touchstart', function (event) {
+      var node = event.target;
+      var scrolled = false;
+      while (node && node.nodeType === 1) {
+        if (node.scrollTop > 0) { scrolled = true; break; }
+        node = node.parentElement;
+      }
+      try { window.webkit.messageHandlers.\(scrollHandlerName).postMessage(scrolled ? 1 : 0); } catch (error) {}
+    }, { capture: true, passive: true });
+  })();
+  """
 /// Reports the page's first contentful paint, so the page is shown when it has something to show
 /// rather than when the document merely exists. A WebKit without paint timing reports after two
 /// animation frames instead.
@@ -205,6 +222,19 @@ private final class WeakPaintHandler: NSObject, WKScriptMessageHandler {
   }
 }
 
+private final class WeakScrollHandler: NSObject, WKScriptMessageHandler {
+  weak var target: SiteViewPlugin?
+
+  init(_ target: SiteViewPlugin) {
+    self.target = target
+  }
+
+  func userContentController(_ controller: WKUserContentController, didReceive message: WKScriptMessage) {
+    guard message.frameInfo.isMainFrame, let view = message.webView else { return }
+    target?.setInnerScrolled(view, (message.body as? Int) == 1)
+  }
+}
+
 /// One open page: its native view and the domain it is currently pinned to.
 private final class Session {
   let id: String
@@ -218,6 +248,9 @@ private final class Session {
   var committed = false
   /// True once the page has been shown. Until then the shell's splash stays up.
   var painted = false
+  /// The pull-to-refresh control, detached from the scroll view while a touch began inside a
+  /// container that is scrolled away from its top.
+  var refreshControl: UIRefreshControl?
   /// A hidden session whose content rule lists changed reloads when it is shown again.
   var needsReload = false
   /// Ids of the content rule lists attached to this view, so a late compile attaches each once.
@@ -364,6 +397,7 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
 
       let session = Session(
         id: args.session, view: view, scope: DomainScope.registrableDomain(of: url.host ?? ""), initialURL: url)
+      session.refreshControl = refresh
       session.ruleListIds = Set(cached.map(\.identifier))
       self.sessions[session.id] = session
       self.activeId = session.id
@@ -1051,6 +1085,14 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
   /// one blank frame before its first, and a fade keeps that frame down to a few percent over the
   /// backdrop. Does nothing until the view is in the window: a view that is not drawing has not
   /// painted.
+  /// Detaches pull to refresh for a touch that began inside a scrolled container, and restores it
+  /// for any other touch. Ordinary pages and the first feed item keep the gesture.
+  func setInnerScrolled(_ view: WKWebView, _ scrolled: Bool) {
+    guard let session = session(of: view), let refresh = session.refreshControl else { return }
+    let target: UIRefreshControl? = scrolled ? nil : refresh
+    if view.scrollView.refreshControl !== target { view.scrollView.refreshControl = target }
+  }
+
   func reveal(_ view: WKWebView) {
     guard view.alpha == 0, view.superview != nil else { return }
     launchLogo?.removeFromSuperview()
@@ -1073,6 +1115,8 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
     controller.removeAllUserScripts()
     controller.addUserScript(
       WKUserScript(source: firstPaintScript, injectionTime: .atDocumentStart, forMainFrameOnly: true))
+    controller.addUserScript(
+      WKUserScript(source: touchScrollScript, injectionTime: .atDocumentStart, forMainFrameOnly: true))
     if let recipe, !recipe.isEmpty {
       controller.addUserScript(
         WKUserScript(source: recipe, injectionTime: .atDocumentStart, forMainFrameOnly: false))
@@ -1241,6 +1285,7 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
     ruleLists.forEach { controller.add($0) }
     controller.add(WeakMessageHandler(self), name: bridgeHandlerName)
     controller.add(WeakPaintHandler(self), name: paintHandlerName)
+    controller.add(WeakScrollHandler(self), name: scrollHandlerName)
     configuration.userContentController = controller
     return configuration
   }
@@ -1286,6 +1331,7 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
     view.configuration.userContentController.removeAllUserScripts()
     view.configuration.userContentController.removeScriptMessageHandler(forName: bridgeHandlerName)
     view.configuration.userContentController.removeScriptMessageHandler(forName: paintHandlerName)
+    view.configuration.userContentController.removeScriptMessageHandler(forName: scrollHandlerName)
     view.navigationDelegate = nil
     view.uiDelegate = nil
     view.removeFromSuperview()
