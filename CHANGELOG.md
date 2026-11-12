@@ -8,6 +8,18 @@ All notable changes to OpenMedia are documented here.
 
 ## 2026-11-13
 
+### fix(siteview): a sign-in redirect the page makes from script stays in the app
+
+**Area:** `fix(siteview)`
+
+**Cause:** a sign-in button that runs script after the tap (fetch, then `location = provider URL`) is an automatic cross-domain navigation, not a link click or `window.open`. On iOS and Android it was cancelled and sent to `SFSafariViewController` / a Custom Tab, which share no cookies with the profile, so the login finished there and the page stayed signed out.
+
+**Change:** that navigation now opens in an in-app window in the session's own data store (`openRedirectWindow` on both). When the provider sends the user back to the session's domain, the page's own view loads that address and the window closes; a return that arrives as a form post (Apple) finishes in the window and the page's view then loads where it ended up. Back closes the window. The system browser is only the fallback if the window cannot be built.
+
+**Verified:** iOS simulator (iPhone 17 Pro Max, iOS 26.5): a local fixture whose button redirects to another host from script opened no system browser, the provider and the callback both loaded, and the session's view ended on the callback with Back enabled; YouTube's Sign in showed Google's page inside the app. The Android plugin compiles. **Not verified:** Android at runtime, the form-post return, a completed login with a real provider. macOS never pinned the domain, so its redirects already stayed in the view.
+
+**PR:** n/a
+
 ### feat(share): sharing a recipe has its own page, and the Recipes guide links sit in the description
 
 **Area:** `feat(share)`
