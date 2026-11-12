@@ -33,16 +33,13 @@ const loadSettings = () => import("../features/settings/SettingsScreen");
 const loadStats = () => import("../features/stats/StatsSheet");
 const loadOnboarding = () => import("../features/onboarding/Onboarding");
 const loadRecipes = () => import("../features/settings/RecipesScreen");
+const loadLibrary = () => import("../features/library/LibraryScreen");
+const loadShare = () => import("../features/library/ShareScreen");
+const loadIncognitoRecipes = () => import("../features/settings/IncognitoSections");
 const LibraryScreen = lazy(() =>
-  import("../features/library/LibraryScreen").then((module) => ({
-    default: module.LibraryScreen,
-  })),
+  loadLibrary().then((module) => ({ default: module.LibraryScreen })),
 );
-const ShareScreen = lazy(() =>
-  import("../features/library/ShareScreen").then((module) => ({
-    default: module.ShareScreen,
-  })),
-);
+const ShareScreen = lazy(() => loadShare().then((module) => ({ default: module.ShareScreen })));
 const SettingsScreen = lazy(() =>
   loadSettings().then((module) => ({ default: module.SettingsScreen })),
 );
@@ -51,9 +48,7 @@ const RecipesScreen = lazy(() =>
   loadRecipes().then((module) => ({ default: module.RecipesScreen })),
 );
 const IncognitoRecipesScreen = lazy(() =>
-  import("../features/settings/IncognitoSections").then((module) => ({
-    default: module.IncognitoRecipesScreen,
-  })),
+  loadIncognitoRecipes().then((module) => ({ default: module.IncognitoRecipesScreen })),
 );
 const Onboarding = lazy(() => loadOnboarding().then((module) => ({ default: module.Onboarding })));
 
@@ -119,7 +114,14 @@ export function App() {
       .then(() => {
         void updates.confirm().catch(() => undefined);
         loadSecondary();
-        void Promise.all([loadSettings(), loadStats()]);
+        void Promise.all([
+          loadSettings(),
+          loadStats(),
+          loadRecipes(),
+          loadLibrary(),
+          loadShare(),
+          loadIncognitoRecipes(),
+        ]);
         setIdle(true);
       });
   }, [load, loadSecondary]);
@@ -134,16 +136,17 @@ export function App() {
       <AssistantDock />
       <HistorySheet />
       <TabsSheet />
+      {/* One boundary per screen: a page still loading must not hide Settings beneath it, or the site shows through. */}
+      <Suspense fallback={null}>{(idle || settingsOpen) && <SettingsScreen />}</Suspense>
+      <Suspense fallback={null}>{(idle || sheet === "recipes") && <RecipesScreen />}</Suspense>
       <Suspense fallback={null}>
-        {(idle || settingsOpen) && <SettingsScreen />}
-        {(idle || sheet === "recipes") && <RecipesScreen />}
         {sheet === "incognito-recipes" && <IncognitoRecipesScreen />}
-        {sheet === "library" && <LibraryScreen />}
-        {sheet === "share" && <ShareScreen />}
-        {(idle || sheet === "stats") && <StatsSheet />}
-        {onboardingOpen && <Onboarding />}
-        {sheet === "paywall" && <PaywallSheet />}
       </Suspense>
+      <Suspense fallback={null}>{sheet === "library" && <LibraryScreen />}</Suspense>
+      <Suspense fallback={null}>{sheet === "share" && <ShareScreen />}</Suspense>
+      <Suspense fallback={null}>{(idle || sheet === "stats") && <StatsSheet />}</Suspense>
+      <Suspense fallback={null}>{onboardingOpen && <Onboarding />}</Suspense>
+      {sheet === "paywall" && <PaywallSheet />}
       {error && !settingsOpen && (
         <button
           type="button"

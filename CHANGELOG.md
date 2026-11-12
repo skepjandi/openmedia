@@ -8,6 +8,16 @@ All notable changes to OpenMedia are documented here.
 
 ## 2026-11-13
 
+### fix(shell): the site no longer flashes when a page opens from Settings on a cold launch
+
+**Area:** `fix(shell)`
+
+**Cause:** Settings, the page it opens (Recipes, Library, Share, incognito recipes) and Stats shared one `Suspense` boundary. The Library, Share and incognito pages were never preloaded, so the first open on a launch suspended the whole boundary: React hid the mounted Settings too, and the transparent shell showed the site until the chunk arrived.
+
+**Change:** each lazy screen has its own boundary, so a loading page leaves Settings in place, and every lazy screen is preloaded once the first site has painted.
+
+**Verified:** `yarn ts:check`, ESLint, Prettier. **Not verified:** on a device or simulator (the flash needs a cold launch with the chunk not yet cached).
+
 ### feat(library): "Add to incognito" on a recipe in the library
 
 **Area:** `feat(library)`
