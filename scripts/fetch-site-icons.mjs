@@ -30,7 +30,7 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { promisify } from "node:util";
-import { format } from "prettier";
+import { format, resolveConfig } from "prettier";
 import { createMatcher } from "../shared/public-suffix/match.mjs";
 
 const run = promisify(execFile);
@@ -449,7 +449,10 @@ async function main() {
   await mkdir(ASSETS, { recursive: true });
   await writeFile(
     MANIFEST,
-    await format(JSON.stringify({ sites: Object.fromEntries(byId) }), { parser: "json" }),
+    await format(JSON.stringify({ sites: Object.fromEntries(byId) }), {
+      ...(await resolveConfig(MANIFEST)),
+      parser: "json",
+    }),
   );
   await writeFile(GENERATED, generatedModule(sites.filter((site) => byId.has(site.id))));
 
