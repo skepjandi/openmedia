@@ -5,9 +5,9 @@ import { useT } from "../../i18n/useT";
 import { ForwardIcon } from "../../shared/icons";
 import type { SiteSettings } from "../../shared/ipc";
 import { Group } from "../settings/ui";
-import { share, sharing } from "./ipc";
+import { recipeLibrary, share } from "./ipc";
 
-/** The rows in Settings that open the recipe library, import and export, and sharing a recipe. */
+/** The rows in Settings that open the recipe library and sharing a recipe. */
 export function LibraryLinks() {
   const openSheet = useApp((s) => s.openSheet);
   const t = useT();
@@ -30,11 +30,6 @@ export function LibraryLinks() {
         title={t("library.title")}
         note={t("library.linkNote")}
         onClick={() => openSheet("library")}
-      />
-      <LinkRow
-        title={t("share.link")}
-        note={t("share.linkNote")}
-        onClick={() => openSheet("share")}
       />
       {canShare && (
         <LinkRow
@@ -65,7 +60,7 @@ function LinkRow({ title, note, onClick }: { title: string; note: string; onClic
   );
 }
 
-/** Shown on a recipe that came from a pasted bundle: says so, and removes it. */
+/** Shown on a recipe installed from the library: says so, and removes it. */
 export function ImportedNotice({
   site,
   incognito = false,
@@ -82,7 +77,7 @@ export function ImportedNotice({
 
   const remove = async () => {
     try {
-      await sharing.removeImported(site.recipeId);
+      await recipeLibrary.uninstall(site.recipeId);
       await loadSites();
       if (incognito) await loadIncognitoSites();
     } catch (failure) {

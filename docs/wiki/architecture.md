@@ -162,7 +162,7 @@ sequenceDiagram
 | API keys | OS secure storage | iOS Keychain; Android Keystore-backed plugin; never returned to the shell |
 | Site cookies/storage | Native webview profile store | Android behavior is not device-verified |
 
-There is no cross-device sync. Recipes move between devices by export/import (`Settings > Import and export`); a recipe that should reach everyone is shared as a pull request ([Recipe Library and Sharing](./recipe-library.md)).
+There is no cross-device sync. There is no way to move a recipe between devices as text; a recipe that should reach everyone is shared as a pull request ([Recipe Library and Sharing](./recipe-library.md)).
 
 ## Current stack
 

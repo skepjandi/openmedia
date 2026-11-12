@@ -343,22 +343,8 @@ export const ja: Messages = {
   "library.search": "レシピを検索",
   "library.searchNone": "検索に一致するレシピはありません。",
 
-  "share.link": "読み込みと書き出し",
-  "share.linkNote": "レシピをテキストで別の端末に移せます",
   "shareRecipe.linkNote": "自分のレシピを GitHub でみんなに送れます",
   "shareRecipe.link": "レシピを共有",
-  "share.import": "読み込む",
-  "share.importNote":
-    "信頼できる人のレシピだけを貼り付けてください。追加する前に、すべてのルールを確認できます。",
-  "share.paste": "ここにレシピを貼り付け",
-  "share.review": "確認",
-  "share.addSelected": "選択したものを追加",
-  "share.export": "書き出す",
-  "share.exportNote":
-    "自分のレシピを、誰でも読み込めるテキストとしてコピーします。スイッチや設定は含まれません。",
-  "share.copy": "コピー",
-  "share.copied": "コピーしました",
-  "share.copyFailed": "コピーできませんでした。下のテキストを選択してコピーしてください。",
   "share.none": "自分のレシピはまだありません。",
   "share.github.title": "みんなにレシピを共有する",
   "share.github.recipe": "あなたのレシピ",

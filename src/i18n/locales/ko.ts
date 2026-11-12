@@ -341,22 +341,8 @@ export const ko: Messages = {
   "library.search": "레시피 검색",
   "library.searchNone": "검색과 일치하는 레시피가 없습니다.",
 
-  "share.link": "가져오기 및 내보내기",
-  "share.linkNote": "레시피를 텍스트로 기기 간에 옮기세요",
   "shareRecipe.linkNote": "내 레시피 하나를 GitHub로 모두에게 보내세요",
   "shareRecipe.link": "레시피 공유하기",
-  "share.import": "가져오기",
-  "share.importNote":
-    "신뢰하는 사람의 레시피만 붙여넣으세요. 무언가를 추가하기 전에 모든 규칙을 볼 수 있습니다.",
-  "share.paste": "여기에 레시피 붙여넣기",
-  "share.review": "검토",
-  "share.addSelected": "선택한 항목 추가",
-  "share.export": "내보내기",
-  "share.exportNote":
-    "내가 만든 레시피를 누구나 가져올 수 있는 텍스트로 복사합니다. 스위치와 설정은 포함되지 않습니다.",
-  "share.copy": "복사",
-  "share.copied": "복사됨",
-  "share.copyFailed": "복사할 수 없습니다. 아래 텍스트를 선택해 복사하세요.",
   "share.none": "아직 직접 만든 레시피가 없습니다.",
   "share.github.title": "모두에게 레시피 공유하기",
   "share.github.recipe": "내 레시피",

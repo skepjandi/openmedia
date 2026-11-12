@@ -343,22 +343,8 @@ export const de: Messages = {
   "library.search": "Rezepte suchen",
   "library.searchNone": "Keine Rezepte passen zu deiner Suche.",
 
-  "share.link": "Importieren und exportieren",
-  "share.linkNote": "Rezepte als Text zwischen Geräten übertragen",
   "shareRecipe.linkNote": "Schicke eines deiner Rezepte über GitHub an alle",
   "shareRecipe.link": "Ein Rezept teilen",
-  "share.import": "Importieren",
-  "share.importNote":
-    "Füge nur Rezepte von Menschen ein, denen du vertraust. Du siehst jede Regel, bevor etwas hinzugefügt wird.",
-  "share.paste": "Rezepte hier einfügen",
-  "share.review": "Prüfen",
-  "share.addSelected": "Ausgewählte hinzufügen",
-  "share.export": "Exportieren",
-  "share.exportNote":
-    "Kopiert deine eigenen Rezepte als Text, den jeder importieren kann. Deine Schalter und Einstellungen sind nicht enthalten.",
-  "share.copy": "Kopieren",
-  "share.copied": "Kopiert",
-  "share.copyFailed": "Kopieren nicht möglich. Markiere den Text unten und kopiere ihn.",
   "share.none": "Du hast noch keine eigenen Rezepte.",
   "share.github.title": "Teile dein Rezept mit allen",
   "share.github.recipe": "Dein Rezept",

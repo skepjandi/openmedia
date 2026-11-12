@@ -110,14 +110,6 @@ export const onboarding = {
   apply: (recipeIds: string[]) => invoke<OnboardingResult>("onboarding_apply", { recipeIds }),
 };
 
-export const sharing = {
-  exportRecipes: (recipeIds: string[]) => invoke<string>("export_recipes", { recipeIds }),
-  previewImport: (text: string) => invoke<RecipePreview[]>("preview_recipe_import", { text }),
-  importRecipes: (text: string, recipeIds: string[]) =>
-    command("import_recipes", { text, recipeIds }),
-  removeImported: (recipeId: string) => command("remove_imported_recipe", { recipeId }),
-};
-
 /** Sharing one of the user's recipes with the OpenMedia team. */
 export const share = {
   /** True when this build knows the Worker's address. */

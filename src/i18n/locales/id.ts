@@ -342,22 +342,8 @@ export const id: Messages = {
   "library.search": "Cari resep",
   "library.searchNone": "Tidak ada resep yang cocok dengan pencarian Anda.",
 
-  "share.link": "Impor dan ekspor",
-  "share.linkNote": "Pindahkan resep antar perangkat sebagai teks",
   "shareRecipe.linkNote": "Kirim salah satu resep Anda ke semua orang lewat GitHub",
   "shareRecipe.link": "Bagikan resep",
-  "share.import": "Impor",
-  "share.importNote":
-    "Tempel hanya resep dari orang yang Anda percaya. Anda melihat setiap aturan sebelum apa pun ditambahkan.",
-  "share.paste": "Tempel resep di sini",
-  "share.review": "Tinjau",
-  "share.addSelected": "Tambahkan yang dipilih",
-  "share.export": "Ekspor",
-  "share.exportNote":
-    "Menyalin resep buatan Anda sendiri sebagai teks yang bisa diimpor siapa saja. Sakelar dan pengaturan Anda tidak disertakan.",
-  "share.copy": "Salin",
-  "share.copied": "Tersalin",
-  "share.copyFailed": "Tidak dapat menyalin. Pilih teks di bawah lalu salin.",
   "share.none": "Anda belum punya resep buatan sendiri.",
   "share.github.title": "Bagikan resep Anda dengan semua orang",
   "share.github.recipe": "Resep Anda",

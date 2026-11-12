@@ -155,23 +155,22 @@ Each rule may declare `expect`: `"match"` (should match ≥1 element on pages sa
 |--------|--------------------|--------------|
 | `user` (picker / manual) | all, `script` only in the shape check below | Applied immediately. The official recipe files in `recipes/official/` are written with `origin: "user"`; the app sets `imported` when it installs one. |
 | `ai` | all; a `script` may do anything (no policy), but it must be one function body that cannot leave its wrapper | Shown as **preview** first (scripts are shown, not run); saved on user accept. The assistant never edits an installed recipe: it writes a separate `custom.<domain>` recipe beside it. |
-| `imported` | `hide`, `css`, and `script` rules that pass the [Script Policy](./script-policy.md) | Pasted bundles and the recipes bundled in the app ([Recipe Library](./recipe-library.md)). Rust sets the origin itself, whatever the file says, runs the full policy on every script, and shows a rule-by-rule review (with the code) before anything is saved. See [Shared recipes](#shared-recipes). |
+| `imported` | `hide`, `css`, and `script` rules that pass the [Script Policy](./script-policy.md) | The recipes bundled in the app ([Recipe Library](./recipe-library.md)), and recipes added by earlier versions. Rust sets the origin itself, whatever the file says, runs the full policy on every script, and shows a rule-by-rule review (with the code) before anything is saved. See [Shared recipes](#shared-recipes). |
 | `official` (library tag, **not an origin**) | `hide`, `css`, policy-clean `script` | **There is no `official` trust level.** Official recipes are written by the maintainers, ship inside the app and are parsed as `imported`: the same Rust validation and rule-by-rule review as a community recipe. A label does not grant trust. |
-| any + `script` | `script` | The user accepts the recipe with the code and its list of powers shown (the assistant's proposal) or the code shown in the review (bundled recipes and imports). Changing a script means a new proposal or a new version, which is reviewed again |
+| any + `script` | `script` | The user accepts the recipe with the code and its list of powers shown (the assistant's proposal) or the code shown in the review (bundled recipes). Changing a script means a new proposal or a new version, which is reviewed again |
 
 ## Shared recipes
 
-Implemented in `src-tauri/src/recipes/share.rs`. A recipe from outside the app is the sender's claim, so before the normal validation Rust:
+Implemented in `src-tauri/src/recipes/share.rs`. A recipe that arrives from outside the app (the bundled recipes, which come from pull requests) is the author's claim, so before the normal validation Rust:
 
 - requires `tags` (platform tags only, see [Tags](#tags)); there is no migration for older files;
-- ignores the file's `origin` and sets `imported` (so a file cannot claim `user` or `ai` to skip the `hide`/`css`-only restriction);
-- moves the id under `imported.` for pasted files (`instagram.default` becomes `imported.instagram.default`, so it can never replace an added library recipe or a custom one). Only the bundled recipes may use `market.` ids (a legacy prefix kept so earlier installs keep working), and only `recipes/official/` may use `market.official.` ids ([Recipe Library](./recipe-library.md#the-library));
+- ignores the file's `origin` and sets `imported` (so a file cannot claim `user` or `ai` to skip the script policy);
 - accepts ids of lowercase letters, digits, `.` and `-` up to 80 characters, and a `version` of three numbers (`1.0.0`);
 - refuses control characters and invisible direction overrides (U+200B–U+200F, U+202A–U+202E, U+2066–U+2069, U+FEFF) in the name, author, notes, option text and rule labels (notes may contain line feeds), and caps their lengths (name and author 60);
 - refuses a `meta.homepage` that the recipe's own `match` patterns do not cover, because a favorite made from a recipe opens its homepage under the recipe's name;
-- limits a bundle to 1 MiB and 20 recipes, a recipe to 256 KiB, and refuses duplicate ids.
+- limits a recipe to 256 KiB and refuses duplicate ids. Only the bundled recipes may use `market.` ids (a legacy prefix kept so earlier installs keep working), and only `recipes/official/` may use `market.official.` ids ([Recipe Library](./recipe-library.md#the-library)).
 
-A bundle is `{ "openmediaBundle": 1, "recipes": [ … ] }`. Export covers only recipes the user made, changed or imported, never switches, settings or keys, and **needs Pro** (checked in Rust only; see [Paywall](./paywall.md)). Import is free.
+There is no import or export of recipes as text.
 
 ## Validation (Rust, before anything reaches a webview)
 

@@ -1,7 +1,7 @@
 //! The recipes that ship inside the app: the maintainers' official ones (`recipes/official/`) and
 //! the community ones that were reviewed and merged (`recipes/community/`). `build.rs` embeds the
-//! files; each is parsed once, as an imported recipe, so a script in it passes the same policy as
-//! one from a file. Nothing here touches the network or the disk at run time.
+//! files; each is parsed once as a bundled recipe, so a script in it passes the same policy as
+//! any shared recipe. Nothing here touches the network or the disk at run time.
 
 use std::{collections::HashSet, sync::OnceLock};
 
