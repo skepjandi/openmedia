@@ -219,11 +219,11 @@ mod tests {
     fn a_made_recipe_beside_an_installed_one_leaves_the_installed_site_favoritable() {
         let dir = tempfile::tempdir().unwrap();
         let recipes = Recipes::load(dir.path().to_owned()).unwrap();
-        let text = r#"{"openmediaBundle":1,"recipes":[{"schema":1,"id":"yt","name":"YT","version":"1.0.0","origin":"user","tags":["mobile"],"match":["https://*.youtube.com/*"],
+        let text = r#"{"schema":1,"id":"market.yt","name":"YT","version":"1.0.0","origin":"user","tags":["mobile"],"match":["https://*.youtube.com/*"],
           "options":[{"id":"mine","label":"Mine","description":"d","group":"content","default":false}],
-          "rules":[{"id":"r","label":"l","type":"hide","option":"mine","target":{"css":"a"}}],"meta":{"homepage":"https://www.youtube.com/"}}]}"#;
+          "rules":[{"id":"r","label":"l","type":"hide","option":"mine","target":{"css":"a"}}],"meta":{"homepage":"https://www.youtube.com/"}}"#;
         recipes
-            .save_imported(text, &["imported.yt".to_owned()])
+            .save_bundled(crate::recipes::parse_bundled_recipe(text.as_bytes()).unwrap())
             .unwrap();
         let favorites = [favorite("YT", "https://www.youtube.com/")];
         let sites = site_settings(
@@ -232,8 +232,8 @@ mod tests {
             &BTreeMap::new(),
             &favorites,
         );
-        assert!(site(&sites, "imported.yt").favorite);
-        let margins = BTreeMap::from([("imported.yt".to_owned(), 30)]);
+        assert!(site(&sites, "market.yt").favorite);
+        let margins = BTreeMap::from([("market.yt".to_owned(), 30)]);
         let url = Url::parse("https://www.youtube.com/").unwrap();
         assert_eq!(bottom_margin_for(&recipes, &margins, 12, &url), 30);
     }

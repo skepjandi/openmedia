@@ -346,22 +346,8 @@ export const nl: Messages = {
   "library.search": "Recepten zoeken",
   "library.searchNone": "Geen recepten komen overeen met je zoekopdracht.",
 
-  "share.link": "Importeren en exporteren",
-  "share.linkNote": "Verplaats recepten als tekst tussen apparaten",
   "shareRecipe.linkNote": "Stuur een van je recepten via GitHub naar iedereen",
   "shareRecipe.link": "Deel een recept",
-  "share.import": "Importeren",
-  "share.importNote":
-    "Plak alleen recepten van mensen die je vertrouwt. Je ziet elke regel voordat er iets wordt toegevoegd.",
-  "share.paste": "Plak hier recepten",
-  "share.review": "Bekijken",
-  "share.addSelected": "Selectie toevoegen",
-  "share.export": "Exporteren",
-  "share.exportNote":
-    "Kopieert je eigen recepten als tekst die iedereen kan importeren. Je schakelaars en instellingen zijn niet inbegrepen.",
-  "share.copy": "Kopiëren",
-  "share.copied": "Gekopieerd",
-  "share.copyFailed": "Kopiëren is mislukt. Selecteer de tekst hieronder en kopieer die.",
   "share.none": "Je hebt nog geen eigen recepten.",
   "share.github.title": "Deel je recept met iedereen",
   "share.github.recipe": "Je recept",

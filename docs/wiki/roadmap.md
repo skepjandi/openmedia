@@ -115,7 +115,7 @@ Per site: recipe + scrubbed fixtures + fixture test + `lastVerified`. A "Recipes
 
 Sharing without any server (file/text), plus sharing a recipe with everyone as a reviewed GitHub pull request opened by a small Worker ([Recipe Library and Sharing](./recipe-library.md)). Optional sync stays server-free.
 
-- Export/import single recipes and bundles (text), rule-by-rule review on import.
+- Export/import of recipes as text (removed 2026-11-13: recipes now ship in the app and are shared as pull requests).
 - Recipe library: official and community recipes are compiled into the app; Add copies one to the user's recipes; Update when an app update brings a newer version; sharing is a pull request opened through a GitHub login, reviewed by maintainers, shipped in the next release. Replaced the 2026-11 marketplace.
 - Recipe update flow: recipe updates reach the user in app releases; the assistant's recipe is a separate `custom.<domain>` one.
 - Optional user-owned sync: sync recipe/settings folder to a user-provided git repo or file location. Never includes keys or cookies.

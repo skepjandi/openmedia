@@ -2,17 +2,16 @@
 
 > **Status: Implemented (2026-11-13); not run on a device, and the GitHub login and pull request not verified against real GitHub.** Replaces the recipe marketplace (signed Cloudflare catalog, ratings, comments, install review), which is removed. Implementation: `src-tauri/src/recipes/bundled.rs` and `share/` in the app, [`openmedia-worker`](https://github.com/skepjandi/openmedia-worker) for the GitHub login and the pull request. The remove-everything decision is in the [Roadmap](./roadmap.md#decision-log).
 
-Two ways recipes move between people:
+Recipes reach people one way:
 
-1. **Export / import** of a recipe or bundle as text. No network. Import is free; export needs Pro (client-side gate). Unchanged.
-2. **The recipe library and GitHub sharing.** Every recipe the project ships is inside the app. A user who made a recipe and wants it in the app for everyone proposes it as a **pull request** on the OpenMedia repository, through a GitHub login handled by the Worker. Maintainers review and merge it; it ships in the next release.
+1. **The recipe library and GitHub sharing.** Every recipe the project ships is inside the app. A user who made a recipe and wants it in the app for everyone proposes it as a **pull request** on the OpenMedia repository, through a GitHub login handled by the Worker. Maintainers review and merge it; it ships in the next release.
 
 Both end in the same place for the person receiving a recipe: a recipe with `origin: imported`, reviewed rule by rule before anything applies.
 
 ## The library
 
 - **Where recipes live.** `recipes/official/*.json` (maintainers; ids `market.official.<site>`) and `recipes/community/*.json` (merged pull requests; ids `market.<slug>`) are compiled into the binary by `build.rs`. The `market.` prefix is a legacy: it is kept so recipes installed by earlier versions, and the switches saved against their ids, keep working.
-- **Adding.** *Add* copies a bundled recipe into `<app_data>/recipes/` (the same files imports use) after the usual validation. A fresh install has none added; first-run onboarding offers the official recipes for the platform and the quick-access favorites made from them. *Update* appears when the bundled version is higher than the added one, which happens after an app update. Removing deletes the local copy.
+- **Adding.** *Add* copies a bundled recipe into `<app_data>/recipes/` (the same local files as the user's own recipes) after the usual validation. A fresh install has none added; first-run onboarding offers the official recipes for the platform and the quick-access favorites made from them. *Update* appears when the bundled version is higher than the added one, which happens after an app update. Removing deletes the local copy.
 - **Tags.** Platform tags (`mobile`, `desktop`) are inside the recipe. `official` / `community` come from the directory, `hub` from the recipe having hub tabs. A tag is a label, not a trust level.
 - **Parsed as imported.** Every bundled file goes through the shared-recipe path, which forces `origin: imported`, so scripts in a bundled recipe must pass the [Script Policy](./script-policy.md) exactly like an upload would have. A bundled file that fails to parse fails `cargo test`; at runtime it is skipped.
 - **No network.** The library never talks to a server. Recipes change only when the app does.

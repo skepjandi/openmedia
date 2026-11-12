@@ -343,22 +343,8 @@ export const ms: Messages = {
   "library.search": "Cari resipi",
   "library.searchNone": "Tiada resipi sepadan dengan carian anda.",
 
-  "share.link": "Import dan eksport",
-  "share.linkNote": "Alihkan resipi antara peranti sebagai teks",
   "shareRecipe.linkNote": "Hantar salah satu resipi anda kepada semua orang menggunakan GitHub",
   "shareRecipe.link": "Kongsi resipi",
-  "share.import": "Import",
-  "share.importNote":
-    "Tampal resipi daripada orang yang anda percayai sahaja. Anda melihat setiap peraturan sebelum apa-apa ditambah.",
-  "share.paste": "Tampal resipi di sini",
-  "share.review": "Semak",
-  "share.addSelected": "Tambah yang dipilih",
-  "share.export": "Eksport",
-  "share.exportNote":
-    "Menyalin resipi anda sendiri sebagai teks yang boleh diimport oleh sesiapa sahaja. Suis dan tetapan anda tidak disertakan.",
-  "share.copy": "Salin",
-  "share.copied": "Disalin",
-  "share.copyFailed": "Tidak dapat menyalin. Pilih teks di bawah dan salinnya.",
   "share.none": "Anda belum mempunyai resipi sendiri.",
   "share.github.title": "Kongsi resipi anda dengan semua orang",
   "share.github.recipe": "Resipi anda",

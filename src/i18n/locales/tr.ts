@@ -344,22 +344,8 @@ export const tr: Messages = {
   "library.search": "Tarif ara",
   "library.searchNone": "Aramanızla eşleşen tarif yok.",
 
-  "share.link": "İçe ve dışa aktarma",
-  "share.linkNote": "Tarifleri cihazlar arasında metin olarak taşıyın",
   "shareRecipe.linkNote": "Tariflerinizden birini GitHub ile herkese gönderin",
   "shareRecipe.link": "Bir tarif paylaşın",
-  "share.import": "İçe aktar",
-  "share.importNote":
-    "Yalnızca güvendiğiniz kişilerin tariflerini yapıştırın. Bir şey eklenmeden önce her kuralı görürsünüz.",
-  "share.paste": "Tarifleri buraya yapıştırın",
-  "share.review": "İncele",
-  "share.addSelected": "Seçilenleri ekle",
-  "share.export": "Dışa aktar",
-  "share.exportNote":
-    "Kendi tariflerinizi herkesin içe aktarabileceği metin olarak kopyalar. Anahtarlarınız ve ayarlarınız dahil değildir.",
-  "share.copy": "Kopyala",
-  "share.copied": "Kopyalandı",
-  "share.copyFailed": "Kopyalanamadı. Aşağıdaki metni seçip kopyalayın.",
   "share.none": "Henüz kendi tarifiniz yok.",
   "share.github.title": "Tarifini herkesle paylaş",
   "share.github.recipe": "Tarifin",

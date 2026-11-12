@@ -346,22 +346,8 @@ export const sv: Messages = {
   "library.search": "Sök recept",
   "library.searchNone": "Inga recept matchar din sökning.",
 
-  "share.link": "Importera och exportera",
-  "share.linkNote": "Flytta recept mellan enheter som text",
   "shareRecipe.linkNote": "Skicka ett av dina recept till alla via GitHub",
   "shareRecipe.link": "Dela ett recept",
-  "share.import": "Importera",
-  "share.importNote":
-    "Klistra bara in recept från personer du litar på. Du ser varje regel innan något läggs till.",
-  "share.paste": "Klistra in recept här",
-  "share.review": "Granska",
-  "share.addSelected": "Lägg till markerade",
-  "share.export": "Exportera",
-  "share.exportNote":
-    "Kopierar dina egna recept som text som vem som helst kan importera. Dina reglage och inställningar ingår inte.",
-  "share.copy": "Kopiera",
-  "share.copied": "Kopierat",
-  "share.copyFailed": "Det gick inte att kopiera. Markera texten nedan och kopiera den.",
   "share.none": "Du har inga egna recept ännu.",
   "share.github.title": "Dela ditt recept med alla",
   "share.github.recipe": "Ditt recept",

@@ -1,6 +1,6 @@
 //! The recipe library: every recipe that ships with the app (`recipes::bundled`), listed,
 //! previewed and added to the user's installed recipes. Adding copies the bundled recipe into
-//! the same local files an import uses, so nothing here needs the network. The commands are
+//! local files, so nothing here needs the network. The commands are
 //! shell-only; no site view can reach them.
 
 use serde::Serialize;
@@ -224,7 +224,7 @@ pub fn library_preview(recipes: State<'_, Recipes>, recipe_id: String) -> Result
     ))
 }
 
-/// Async so the page views are reloaded off the main thread, as for an import.
+/// Async so the page views are reloaded off the main thread.
 #[tauri::command]
 pub async fn library_install(
     app: AppHandle,

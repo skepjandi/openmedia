@@ -19,7 +19,7 @@ pub(crate) use share::{MARKET_PREFIX, MAX_RECIPE_BYTES, MAX_SUMMARY_CHARS, is_pl
 pub use share::{RecipePreview, preview as preview_recipe};
 
 use std::{
-    collections::{BTreeMap, HashSet},
+    collections::BTreeMap,
     fs,
     path::PathBuf,
     sync::{PoisonError, RwLock},
@@ -33,11 +33,11 @@ use crate::library::write_atomically;
 const MAX_MADE_BYTES: usize = 256 * 1024;
 
 /// Ids of recipes the user or the assistant made. Every other recipe is added from the bundled
-/// library (`bundled`) or imported from a file.
+/// library (`bundled`).
 const CUSTOM_PREFIX: &str = "custom.";
 
 /// The recipes in effect: the ones the user or the assistant made (`custom.`) and the ones
-/// installed or imported (`market.`, `imported.`). Files live in `dir`, so app updates never touch
+/// installed from the library (`market.`, or `imported.` from earlier versions). Files live in `dir`, so app updates never touch
 /// them. The page script is compiled on demand, because it depends on the user's toggles.
 pub struct Recipes {
     dir: PathBuf,
@@ -117,44 +117,7 @@ impl Recipes {
         Ok(saved)
     }
 
-    /// The text a user can share: any recipe on the device, as a bundle.
-    pub fn export(&self, ids: &[String]) -> Result<String> {
-        if ids.is_empty() {
-            return Err(Error::Recipe("choose at least one recipe".into()));
-        }
-        let recipes = ids
-            .iter()
-            .map(|id| self.get(id).ok_or(Error::UnknownSite))
-            .collect::<Result<Vec<_>>>()?;
-        share::export_bundle(&recipes)
-    }
-
-    /// What a pasted bundle would add, for the review screen. Nothing is saved.
-    pub fn preview_import(&self, text: &str) -> Result<Vec<RecipePreview>> {
-        Ok(share::parse_bundle(text)?
-            .iter()
-            .map(|recipe| share::preview(recipe, self.imported_version(&recipe.id).as_deref()))
-            .collect())
-    }
-
-    /// Saves the chosen recipes of a pasted bundle. The bundle is parsed and validated again, so
-    /// only what the review screen could have shown is ever saved.
-    pub fn save_imported(&self, text: &str, ids: &[String]) -> Result<Vec<Recipe>> {
-        let wanted: HashSet<&str> = ids.iter().map(String::as_str).collect();
-        let chosen: Vec<Recipe> = share::parse_bundle(text)?
-            .into_iter()
-            .filter(|recipe| wanted.contains(recipe.id.as_str()))
-            .collect();
-        if chosen.is_empty() || chosen.len() != wanted.len() {
-            return Err(Error::Recipe("choose recipes from the bundle".into()));
-        }
-        chosen
-            .into_iter()
-            .map(|recipe| self.store_imported(recipe))
-            .collect()
-    }
-
-    /// Deletes an imported recipe; its saved switches are left behind and are harmless.
+    /// Deletes an installed recipe, a library one or one an earlier version imported from text; its saved switches are left behind and are harmless.
     pub fn remove_imported(&self, id: &str) -> Result<()> {
         if self.imported_version(id).is_none() {
             return Err(Error::UnknownSite);
@@ -170,7 +133,7 @@ impl Recipes {
         Ok(())
     }
 
-    /// Saves a recipe of the bundled library. It was parsed as an imported recipe when the app
+    /// Saves a recipe of the bundled library. It was parsed as a bundled recipe when the app
     /// started; this only refuses anything that is not a `market.` recipe labelled imported.
     pub fn save_bundled(&self, recipe: Recipe) -> Result<Recipe> {
         if !recipe.id.starts_with(share::MARKET_PREFIX) || recipe.origin != Origin::Imported {
@@ -782,29 +745,31 @@ mod tests {
         assert!(recipes.all().is_empty());
     }
 
-    fn shared_bundle(id: &str, version: &str) -> String {
-        format!(
-            r#"{{"openmediaBundle":1,"recipes":[{{"schema":1,"id":"{id}","name":"example.org","version":"{version}","origin":"user","tags":["mobile"],"match":["https://*.example.org/*"],
+    fn library_recipe(id: &str, version: &str) -> Recipe {
+        parse_bundled_recipe(
+            format!(
+                r#"{{"schema":1,"id":"{id}","name":"example.org","version":"{version}","origin":"user","tags":["mobile"],"match":["https://*.example.org/*"],
               "options":[{{"id":"mine","label":"Mine","description":"d","group":"content","default":true}}],
-              "rules":[{{"id":"r","label":"l","type":"hide","option":"mine","target":{{"css":".x"}}}}]}}]}}"#
+              "rules":[{{"id":"r","label":"l","type":"hide","option":"mine","target":{{"css":".x"}}}}]}}"#
+            )
+            .as_bytes(),
         )
+        .unwrap()
     }
 
     #[test]
-    fn an_imported_recipe_applies_survives_a_restart_and_can_be_removed() {
+    fn an_installed_recipe_applies_survives_a_restart_and_can_be_removed() {
         let dir = tempfile::tempdir().unwrap();
         let folder = dir.path().join("recipes");
         let recipes = Recipes::load(folder.clone()).unwrap();
-        let text = shared_bundle("reddit.default", "1.0.0");
-        let previews = recipes.preview_import(&text).unwrap();
-        assert_eq!(previews[0].id, "imported.reddit.default");
-        assert_eq!(previews[0].replaces, None);
-        assert!(recipes.all().is_empty());
-
         let saved = recipes
-            .save_imported(&text, &["imported.reddit.default".to_owned()])
+            .save_bundled(library_recipe("market.reddit.default", "1.0.0"))
             .unwrap();
-        assert_eq!(saved[0].origin, Origin::Imported);
+        assert_eq!(saved.origin, Origin::Imported);
+        assert_eq!(
+            recipes.imported_version("market.reddit.default").as_deref(),
+            Some("1.0.0")
+        );
         assert!(
             recipes
                 .script(&OptionChoices::new())
@@ -813,65 +778,45 @@ mod tests {
         );
 
         let restarted = Recipes::load(folder.clone()).unwrap();
-        assert_eq!(
-            restarted.get("imported.reddit.default"),
-            Some(saved[0].clone())
-        );
-        let newer = shared_bundle("reddit.default", "1.1.0");
-        let preview = restarted.preview_import(&newer).unwrap();
-        assert_eq!(preview[0].replaces.as_deref(), Some("1.0.0"));
+        assert_eq!(restarted.get("market.reddit.default"), Some(saved));
 
-        restarted
-            .remove_imported("imported.reddit.default")
-            .unwrap();
-        assert!(restarted.get("imported.reddit.default").is_none());
+        restarted.remove_imported("market.reddit.default").unwrap();
+        assert!(restarted.get("market.reddit.default").is_none());
         assert!(
             Recipes::load(folder)
                 .unwrap()
-                .get("imported.reddit.default")
+                .get("market.reddit.default")
                 .is_none()
         );
-        assert!(
-            restarted
-                .remove_imported("imported.reddit.default")
-                .is_err()
-        );
+        assert!(restarted.remove_imported("market.reddit.default").is_err());
     }
 
     #[test]
-    fn saving_an_import_needs_ids_that_are_in_the_bundle() {
+    fn a_recipe_imported_by_an_earlier_version_still_loads_and_can_be_removed() {
         let dir = tempfile::tempdir().unwrap();
-        let recipes = Recipes::load(dir.path().join("recipes")).unwrap();
-        let text = shared_bundle("calm.example", "1.0.0");
-        assert!(recipes.save_imported(&text, &[]).is_err());
-        assert!(
-            recipes
-                .save_imported(&text, &["imported.other".to_owned()])
-                .is_err()
-        );
-        assert!(recipes.get("imported.other").is_none());
+        let folder = dir.path().join("recipes");
+        fs::create_dir_all(&folder).unwrap();
+        let mut legacy = library_recipe("market.calm.example", "1.0.0");
+        legacy.id = "imported.calm.example".to_owned();
+        fs::write(
+            folder.join("imported.calm.example.json"),
+            serde_json::to_vec(&legacy).unwrap(),
+        )
+        .unwrap();
+        let recipes = Recipes::load(folder.clone()).unwrap();
+        assert_eq!(recipes.get("imported.calm.example"), Some(legacy));
+        recipes.remove_imported("imported.calm.example").unwrap();
+        assert!(!folder.join("imported.calm.example.json").exists());
     }
 
     #[test]
-    fn a_recipe_on_the_device_can_be_exported_with_its_tags_and_unknown_ids_cannot() {
+    fn saving_a_library_recipe_refuses_other_ids() {
         let dir = tempfile::tempdir().unwrap();
         let recipes = Recipes::load(dir.path().join("recipes")).unwrap();
-        assert!(recipes.export(&["custom.nothing".to_owned()]).is_err());
-        assert!(recipes.export(&[]).is_err());
-        recipes
-            .save_made(&custom_recipe("custom.example.org", "user"))
-            .unwrap();
-        let text = recipes.export(&["custom.example.org".to_owned()]).unwrap();
-        assert!(text.contains(r#""tags""#));
-        let reimported = Recipes::load(dir.path().join("elsewhere")).unwrap();
-        let saved = reimported
-            .save_imported(&text, &["imported.custom.example.org".to_owned()])
-            .unwrap();
-        assert_eq!(
-            saved[0].rules,
-            recipes.get("custom.example.org").unwrap().rules
-        );
-        assert_eq!(saved[0].tags, ["mobile"]);
+        let mut other = library_recipe("market.calm", "1.0.0");
+        other.id = "imported.calm".to_owned();
+        assert!(recipes.save_bundled(other).is_err());
+        assert!(recipes.all().is_empty());
     }
 
     #[test]
@@ -881,12 +826,11 @@ mod tests {
         recipes
             .save_made(&custom_recipe("custom.example.org", "ai"))
             .unwrap();
-        let text = shared_bundle("calm.example", "1.0.0");
         recipes
-            .save_imported(&text, &["imported.calm.example".to_owned()])
+            .save_bundled(library_recipe("market.calm.example", "1.0.0"))
             .unwrap();
         let page = Url::parse("https://www.example.org/").unwrap();
         let ids: Vec<_> = recipes.covering(&page).into_iter().map(|r| r.id).collect();
-        assert_eq!(ids, ["custom.example.org", "imported.calm.example"]);
+        assert_eq!(ids, ["custom.example.org", "market.calm.example"]);
     }
 }

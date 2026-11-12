@@ -14,7 +14,6 @@ pub mod recipes;
 mod secrets;
 mod self_update;
 mod share;
-mod share_commands;
 mod sites;
 mod usage;
 mod usage_commands;
@@ -115,10 +114,6 @@ pub fn run() {
             commands::set_ad_block,
             commands::get_sites,
             commands::set_site_option,
-            share_commands::export_recipes,
-            share_commands::preview_recipe_import,
-            share_commands::import_recipes,
-            share_commands::remove_imported_recipe,
             recipe_library::library_list,
             recipe_library::library_preview,
             recipe_library::library_install,

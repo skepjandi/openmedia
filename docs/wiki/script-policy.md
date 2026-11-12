@@ -8,7 +8,7 @@
 |---|---|---|---|
 | The user's own assistant (`origin: ai`), saved after the user accepts the preview | **Any JavaScript.** Nothing is refused. The proposal shows the code and a plain list of the powers it uses (network, storage, navigation, automation…) before the user accepts | The user, looking at the preview. The scanner only *reports* | The user asked for it, on their own device and session |
 | A shared recipe in the share Worker (before the pull request) and in CI | Only scripts that pass the policy below. Anything else is rejected before a pull request is opened, and the reply names the findings | The Worker, automatically, then a maintainer | A merged script ships in the app and runs in strangers' logged-in sessions |
-| Bundled community recipe, pasted import (`origin: imported`) | The same policy, enforced in Rust when the recipe is parsed. A script that fails is refused, never run | Rust | The app does not trust a file because of where it came from |
+| Bundled community recipe (`origin: imported`) | The same policy, enforced in Rust when the recipe is parsed. A script that fails is refused, never run | Rust | The app does not trust a file because of where it came from |
 
 The policy exists to make one promise: **a script that passes cannot send data anywhere.** It has no network API, no storage or cookie API, no navigation, no dynamic code, no way to build markup, and no way to click, submit or type for the user. It can read and restyle the page it runs on, and add small widgets of its own.
 

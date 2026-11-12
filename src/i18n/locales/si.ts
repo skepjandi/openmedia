@@ -340,22 +340,8 @@ export const si: Messages = {
   "library.search": "ක්‍රම සොයන්න",
   "library.searchNone": "ඔබේ සෙවුමට ගැළපෙන ක්‍රමයක් නැත.",
 
-  "share.link": "ආනයනය සහ අපනයනය",
-  "share.linkNote": "ක්‍රම උපාංග අතර පෙළ ලෙස ගෙන යන්න",
   "shareRecipe.linkNote": "ඔබගේ ක්‍රමයක් GitHub භාවිතයෙන් සියල්ලන්ට යවන්න",
   "shareRecipe.link": "ක්‍රමයක් බෙදාගන්න",
-  "share.import": "ආනයනය",
-  "share.importNote":
-    "ඔබ විශ්වාස කරන අයගේ ක්‍රම පමණක් අලවන්න. කිසිවක් එකතු කිරීමට පෙර ඔබට සෑම රීතියක්ම පෙනේ.",
-  "share.paste": "ක්‍රම මෙහි අලවන්න",
-  "share.review": "සමාලෝචනය",
-  "share.addSelected": "තෝරාගත් ඒවා එකතු කරන්න",
-  "share.export": "අපනයනය",
-  "share.exportNote":
-    "ඔබගේ ම ක්‍රම ඕනෑම කෙනෙකුට ආනයනය කළ හැකි පාඨයක් ලෙස පිටපත් කරයි. ඔබගේ ස්විච සහ සැකසුම් ඇතුළත් නොවේ.",
-  "share.copy": "පිටපත් කරන්න",
-  "share.copied": "පිටපත් කළා",
-  "share.copyFailed": "පිටපත් කළ නොහැකි විය. පහත පාඨය තෝරා පිටපත් කරන්න.",
   "share.none": "ඔබට තවම ඔබේම ක්‍රම නැත.",
   "share.github.title": "ඔබේ ක්‍රමය සැවොම සමඟ බෙදාගන්න",
   "share.github.recipe": "ඔබේ ක්‍රමය",

@@ -340,22 +340,8 @@ export const vi: Messages = {
   "library.search": "Tìm công thức",
   "library.searchNone": "Không có công thức nào khớp với tìm kiếm của bạn.",
 
-  "share.link": "Nhập và xuất",
-  "share.linkNote": "Chuyển công thức giữa các thiết bị dưới dạng văn bản",
   "shareRecipe.linkNote": "Gửi một công thức của bạn đến mọi người qua GitHub",
   "shareRecipe.link": "Chia sẻ công thức",
-  "share.import": "Nhập",
-  "share.importNote":
-    "Chỉ dán công thức từ người bạn tin tưởng. Bạn xem mọi quy tắc trước khi có gì được thêm.",
-  "share.paste": "Dán công thức vào đây",
-  "share.review": "Xem lại",
-  "share.addSelected": "Thêm mục đã chọn",
-  "share.export": "Xuất",
-  "share.exportNote":
-    "Sao chép công thức của riêng bạn thành văn bản mà ai cũng có thể nhập. Công tắc và cài đặt của bạn không được đưa vào.",
-  "share.copy": "Sao chép",
-  "share.copied": "Đã sao chép",
-  "share.copyFailed": "Không sao chép được. Hãy chọn văn bản bên dưới rồi sao chép.",
   "share.none": "Bạn chưa có công thức riêng nào.",
   "share.github.title": "Chia sẻ công thức của bạn với mọi người",
   "share.github.recipe": "Công thức của bạn",

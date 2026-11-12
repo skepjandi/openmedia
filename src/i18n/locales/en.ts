@@ -343,22 +343,8 @@ export const en = {
   "library.search": "Search recipes",
   "library.searchNone": "No recipes match your search.",
 
-  "share.link": "Import and export",
-  "share.linkNote": "Move recipes between devices as text",
   "shareRecipe.linkNote": "Send one of your recipes to everyone, using GitHub",
   "shareRecipe.link": "Share a recipe",
-  "share.import": "Import",
-  "share.importNote":
-    "Only paste recipes from people you trust. You see every rule before anything is added.",
-  "share.paste": "Paste recipes here",
-  "share.review": "Review",
-  "share.addSelected": "Add selected",
-  "share.export": "Export",
-  "share.exportNote":
-    "Copies your own recipes as text that anyone can import. Your switches and settings are not included.",
-  "share.copy": "Copy",
-  "share.copied": "Copied",
-  "share.copyFailed": "Could not copy. Select the text below and copy it.",
   "share.none": "You have no recipes of your own yet.",
   "share.github.title": "Share your recipe with everyone",
   "share.github.recipe": "Your recipe",

@@ -20,6 +20,13 @@ All notable changes to OpenMedia are documented here.
 
 **PR:** n/a
 
+### feat(recipes): import and export of recipes as text are removed
+
+**Area:** `feat(recipes)`
+
+**Change:** Recipes no longer move as pasted text. The *Import and export* page, the three commands behind it and the Pro gate on export are gone; the recipe library and *Share a recipe* are the only ways recipes reach the app.
+
+
 ### feat(share): sharing a recipe has its own page, and the Recipes guide links sit in the description
 
 **Area:** `feat(share)`
