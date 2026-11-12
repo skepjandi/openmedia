@@ -313,6 +313,8 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
   /// True when the sign-in window carries a redirect the page made (no `window.opener`): it ends
   /// by handing the address it returns to over to the page's own view.
   private var signInReturnsToSession = false
+  /// The session whose page is loading the address the sign-in window handed back.
+  private var handoffSession: String?
   private var colorScheme: UIUserInterfaceStyle = .unspecified
   /// The shell's page rectangle, in shell coordinates; every session's view fills it.
   private var pageRect: CGRect?
@@ -776,11 +778,7 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
         // The identity provider sent the user back to the site: that page belongs in the page's
         // own view, which shares this window's cookies.
         decisionHandler(.cancel)
-        owner.settled = false
-        DispatchQueue.main.async { [weak self] in
-          owner.view.load(URLRequest(url: url))
-          self?.closeSignInWindow()
-        }
+        DispatchQueue.main.async { [weak self] in self?.handBack(url, to: owner) }
         return
       }
       decisionHandler(.allow)
@@ -840,24 +838,47 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
         let owner = signInOwner.flatMap({ sessions[$0] }),
         DomainScope.contains(scope: owner.scope, host: host)
       {
-        owner.settled = false
-        owner.view.load(URLRequest(url: url))
-        closeSignInWindow()
+        handBack(url, to: owner)
       }
       return
     }
     reveal(webView)
     session(of: webView)?.settled = true
+    finishHandoff(of: webView)
   }
 
   func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
     session(of: webView)?.settled = true
-    send(ErrorEvent(message: error.localizedDescription))
+    finishHandoff(of: webView)
+    reportFailure(error)
   }
 
   func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
     session(of: webView)?.settled = true
+    finishHandoff(of: webView)
+    reportFailure(error)
+  }
+
+  /// A navigation the app itself cancelled (a redirect handed to another view) is not a failure.
+  private func reportFailure(_ error: Error) {
+    if (error as NSError).domain == NSURLErrorDomain, (error as NSError).code == NSURLErrorCancelled { return }
     send(ErrorEvent(message: error.localizedDescription))
+  }
+
+  /// The sign-in window stays over the page until the page has loaded the address it was handed,
+  /// so the user sees the sign-in, not a blank page, while the site comes up.
+  private func handBack(_ url: URL, to owner: Session) {
+    owner.settled = false
+    handoffSession = owner.id
+    owner.view.load(URLRequest(url: url))
+    DispatchQueue.main.asyncAfter(deadline: .now() + 8) { [weak self] in
+      if self?.handoffSession == owner.id { self?.closeSignInWindow() }
+    }
+  }
+
+  private func finishHandoff(of webView: WKWebView) {
+    guard let id = handoffSession, session(of: webView)?.id == id else { return }
+    closeSignInWindow()
   }
 
   /// The page closed its sign-in window: the sign-in is done (or gave up). Take the window down.
@@ -975,6 +996,7 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
     signInWindow = nil
     signInOwner = nil
     signInReturnsToSession = false
+    handoffSession = nil
     router?.siteView = activeId.flatMap { sessions[$0]?.view }
   }
 

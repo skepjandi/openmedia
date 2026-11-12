@@ -168,6 +168,8 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
     private var signInWindow: WebView? = null
     /** The session whose page opened the sign-in window. */
     private var signInOwner: String? = null
+    /** The session whose page is loading the address the sign-in window handed back. */
+    private var handoffSession: String? = null
     private val worker = Executors.newSingleThreadExecutor()
     private var safeArea: Pair<Int, Int>? = null
     private var safeAreaScript: ScriptHandler? = null
@@ -932,6 +934,7 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
                 val session = sessionOf(view) ?: return
                 session.loading = false
                 session.settled = true
+                finishHandoff(session)
                 session.userNavigationPending = false
                 session.frame.isRefreshing = false
                 reveal(session)
@@ -952,6 +955,7 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
                 if (!request.isForMainFrame) return
                 val session = sessionOf(view) ?: return
                 session.settled = true
+                finishHandoff(session)
                 session.userNavigationPending = false
                 session.frame.isRefreshing = false
                 sendError(error.description?.toString() ?: "the page could not be loaded")
@@ -1186,8 +1190,7 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
                     if (!DomainScope.contains(session.scope, host)) return false
                     // The identity provider sent the user back to the site: that page belongs in
                     // the session's own view, which shares this window's cookies.
-                    session.view.post { session.view.loadUrl(url.toString()) }
-                    popup.post { closeSignInWindow(popup) }
+                    handBack(session, url.toString(), popup)
                     return true
                 }
                 if (!firstAddress) return false
@@ -1228,8 +1231,7 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
                 // loads where it ended up.
                 val host = Uri.parse(url).host ?: return
                 if (!DomainScope.contains(session.scope, host)) return
-                session.view.post { session.view.loadUrl(url) }
-                popup.post { closeSignInWindow(popup) }
+                handBack(session, url, popup)
             }
         }
         popup.webChromeClient = object : WebChromeClient() {
@@ -1237,6 +1239,22 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
                 if (window === signInWindow) closeSignInWindow()
             }
         }
+    }
+
+    /**
+     * The sign-in window stays over the page until the page has loaded the address it was handed,
+     * so the user sees the sign-in, not a blank page, while the site comes up.
+     */
+    private fun handBack(session: Session, url: String, popup: WebView) {
+        handoffSession = session.id
+        session.view.post { session.view.loadUrl(url) }
+        popup.postDelayed({
+            if (handoffSession == session.id) closeSignInWindow(popup)
+        }, 8000)
+    }
+
+    private fun finishHandoff(session: Session) {
+        if (handoffSession == session.id) closeSignInWindow()
     }
 
     /**
@@ -1277,6 +1295,7 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
         if (window != null && window !== view) return
         signInWindow = null
         signInOwner = null
+        handoffSession = null
         pageLayer?.removeView(view)
         view.stopLoading()
         view.destroy()
