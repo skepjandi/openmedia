@@ -16,6 +16,14 @@ All notable changes to OpenMedia are documented here.
 
 **Verified:** `yarn ts:check`, ESLint, Prettier, 428 frontend tests. **Not verified:** the Face ID prompt and the flow on a device or simulator.
 
+### fix(incognito): the first incognito session starts with Google and no recipe sites
+
+**Area:** `fix(incognito)`
+
+**Change:** Until the incognito favorites are first saved, the set is the default one: Google only, like a fresh normal set. Before, the quick-access menu was empty. An incognito set the user has emptied stays empty (`incognitoFavorites` in `library.json` is now `null` until first read or saved).
+
+**Verified:** Rust library tests. **Not verified:** on a device.
+
 ### feat(recipes): the marketplace is gone; recipes ship in the app and are shared through GitHub
 
 **Area:** `feat(recipes)`, `feat(ai)`, `feat(share)`

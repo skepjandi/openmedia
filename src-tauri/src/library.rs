@@ -169,9 +169,10 @@ struct LibraryData {
     #[serde(default)]
     incognito_site_options: OptionChoices,
     /// The quick-access set shown while incognito. Never in `AppState`; the shell asks for it
-    /// after a biometric check.
+    /// after a biometric check. `None` until first read or saved: the set then starts as the
+    /// default favorites, with no recipe sites, and an emptied set stays empty.
     #[serde(default)]
-    incognito_favorites: Vec<Favorite>,
+    incognito_favorites: Option<Vec<Favorite>>,
     #[serde(default)]
     bottom_margin: u32,
     /// Per-site bottom margins by recipe id; a site without an entry uses `bottom_margin`.
@@ -292,8 +293,15 @@ impl Library {
 
     /// The incognito quick-access set, icons filled in. Handed out only after a biometric check.
     pub fn incognito_favorites(&self) -> Result<Vec<Favorite>> {
-        let data = self.lock()?;
-        Ok(with_icons(&data, &data.incognito_favorites))
+        let mut data = self.lock()?;
+        if data.incognito_favorites.is_none() {
+            data.incognito_favorites = Some(default_favorites());
+            self.save(&data)?;
+        }
+        Ok(with_icons(
+            &data,
+            data.incognito_favorites.as_deref().unwrap_or_default(),
+        ))
     }
 
     pub fn set_incognito_favorites(&self, inputs: Vec<FavoriteInput>) -> Result<Vec<Favorite>> {
@@ -302,9 +310,12 @@ impl Library {
             .map(favorite_from_input)
             .collect::<Result<Vec<_>>>()?;
         let mut data = self.lock()?;
-        data.incognito_favorites = favorites;
+        data.incognito_favorites = Some(favorites);
         self.save(&data)?;
-        Ok(with_icons(&data, &data.incognito_favorites))
+        Ok(with_icons(
+            &data,
+            data.incognito_favorites.as_deref().unwrap_or_default(),
+        ))
     }
 
     pub fn set_last_url(&self, url: &str) -> Result<()> {
@@ -641,7 +652,7 @@ fn prune_icons(data: &mut LibraryData) {
     let favorites: Vec<String> = data
         .favorites
         .iter()
-        .chain(&data.incognito_favorites)
+        .chain(data.incognito_favorites.iter().flatten())
         .filter_map(|favorite| host_of(&favorite.url))
         .collect();
     let history: Vec<String> = data.history.iter().filter_map(|url| host_of(url)).collect();
@@ -698,20 +709,24 @@ fn parse(text: &str) -> Result<(LibraryData, bool)> {
     Ok((data, migrated))
 }
 
+fn default_favorites() -> Vec<Favorite> {
+    DEFAULT_FAVORITES
+        .iter()
+        .map(|(name, url)| Favorite {
+            id: Uuid::new_v4(),
+            name: (*name).to_owned(),
+            url: (*url).to_owned(),
+            icon: None,
+            notify: true,
+        })
+        .collect()
+}
+
 fn default_data() -> LibraryData {
     LibraryData {
         version: FORMAT_VERSION,
         profile_id: Uuid::new_v4(),
-        favorites: DEFAULT_FAVORITES
-            .iter()
-            .map(|(name, url)| Favorite {
-                id: Uuid::new_v4(),
-                name: (*name).to_owned(),
-                url: (*url).to_owned(),
-                icon: None,
-                notify: true,
-            })
-            .collect(),
+        favorites: default_favorites(),
         last_url: None,
         onboarded: false,
         theme: Theme::System,
@@ -728,7 +743,7 @@ fn default_data() -> LibraryData {
         locale: None,
         search_engine: SearchEngine::Google,
         incognito_site_options: OptionChoices::new(),
-        incognito_favorites: Vec::new(),
+        incognito_favorites: None,
     }
 }
 
@@ -1444,7 +1459,13 @@ mod tests {
         let reloaded = reload(&dir);
         assert!(reloaded.site_options(Mode::Normal).unwrap().is_empty());
         assert!(reloaded.site_options(Mode::Incognito).unwrap().is_empty());
-        assert!(reloaded.incognito_favorites().unwrap().is_empty());
+        let names: Vec<_> = reloaded
+            .incognito_favorites()
+            .unwrap()
+            .into_iter()
+            .map(|favorite| favorite.name)
+            .collect();
+        assert_eq!(names, ["Google"]);
         assert_eq!(reloaded.bottom_margin().unwrap(), 0);
     }
 
