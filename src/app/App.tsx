@@ -148,9 +148,7 @@ export function App() {
       </Suspense>
       <Suspense fallback={null}>{sheet === "library" && <LibraryScreen />}</Suspense>
       <Suspense fallback={null}>{sheet === "share" && <ShareScreen />}</Suspense>
-      <Suspense fallback={null}>
-        {sheet === "share-recipe" && <ShareRecipeScreen />}
-      </Suspense>
+      <Suspense fallback={null}>{sheet === "share-recipe" && <ShareRecipeScreen />}</Suspense>
       <Suspense fallback={null}>{(idle || sheet === "stats") && <StatsSheet />}</Suspense>
       <Suspense fallback={null}>{onboardingOpen && <Onboarding />}</Suspense>
       {sheet === "paywall" && <PaywallSheet />}
