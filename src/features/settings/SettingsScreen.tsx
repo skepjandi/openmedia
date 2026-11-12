@@ -12,7 +12,7 @@ import { AiSection } from "./AiSection";
 import { FavoritesSection } from "./FavoritesSection";
 import { IncognitoFavoritesSection, IncognitoRecipesLink } from "./IncognitoSections";
 import { MarginSlider } from "./MarginSlider";
-import { MarketplaceLinks } from "../marketplace/Links";
+import { LibraryLinks } from "../library/Links";
 import { RecipesLink } from "./RecipesScreen";
 import { Switch } from "./Switch";
 import { UpdatesSection } from "./UpdatesSection";
@@ -34,7 +34,7 @@ export function SettingsScreen() {
         <BrowsingSection />
         <FavoritesSection />
         <RecipesLink />
-        <MarketplaceLinks />
+        <LibraryLinks />
         <IncognitoFavoritesSection key={incognitoRecipesOpen ? "incognito-recipes" : "settings"} />
         <IncognitoRecipesLink />
         <AiSection />

@@ -19,6 +19,7 @@ use uuid::Uuid;
 use super::{activity::Activity, agent::Proposal};
 use crate::error::{Error, Result};
 use crate::library::write_atomically;
+use crate::recipes::script_policy;
 
 const FORMAT_VERSION: u32 = 1;
 pub const MAX_SESSIONS: usize = 60;
@@ -31,6 +32,7 @@ const MAX_NAME_CHARS: usize = 30;
 const MAX_DOMAIN_CHARS: usize = 253;
 const MAX_SHORT_CHARS: usize = 200;
 const MAX_SELECTOR_CHARS: usize = 300;
+const MAX_POWERS: usize = 50;
 
 /// How one turn ended.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -100,6 +102,14 @@ fn cut_proposal(proposal: &mut Proposal) {
     for rule in &mut proposal.rules {
         cut(&mut rule.label, MAX_SHORT_CHARS);
         cut(&mut rule.selector, MAX_SELECTOR_CHARS);
+        if let Some(code) = &mut rule.code {
+            cut(code, script_policy::MAX_CODE_BYTES);
+        }
+        rule.powers.truncate(MAX_POWERS);
+        for power in &mut rule.powers {
+            cut(&mut power.code, MAX_SHORT_CHARS);
+            cut(&mut power.message, MAX_SHORT_CHARS);
+        }
     }
 }
 
@@ -240,7 +250,7 @@ impl Chats {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::ai::agent::{ProposalKind, ProposalOption, ProposalRule};
+    use crate::ai::agent::{ProposalKind, ProposalOption, ProposalRule, ProposalRuleKind};
     use crate::recipes::OptionGroup;
 
     fn proposal() -> Proposal {
@@ -258,10 +268,15 @@ mod tests {
             },
             rules: vec![ProposalRule {
                 label: "Promo".into(),
+                kind: ProposalRuleKind::Style,
                 selector: "#promo".into(),
                 matches: 2,
+                code: None,
+                powers: Vec::new(),
             }],
             unmatched: 0,
+            runs_code: false,
+            publishable: true,
         }
     }
 
@@ -436,8 +451,10 @@ mod tests {
                             "description": "The promo box.",
                             "group": "content"
                         },
-                        "rules": [{"label": "Promo", "selector": "#promo", "matches": 2}],
-                        "unmatched": 0
+                        "rules": [{"label": "Promo", "kind": "style", "selector": "#promo", "matches": 2, "code": null, "powers": []}],
+                        "unmatched": 0,
+                        "runsCode": false,
+                        "publishable": true
                     }
                 }
             }]
@@ -447,5 +464,52 @@ mod tests {
         let (_dir, chats) = store();
         chats.save(chat).unwrap();
         assert_eq!(chats.list().unwrap().len(), 1);
+    }
+
+    #[test]
+    fn a_proposal_saved_before_script_rules_still_loads() {
+        let old = serde_json::json!({
+            "id": "1d2c3b4a-5e6f-4a7b-8c9d-0e1f2a3b4c5d",
+            "kind": "newOption",
+            "summary": "Hides the promo",
+            "recipeId": "custom.youtube.com",
+            "recipeName": "youtube.com",
+            "option": { "id": null, "label": "Hide promo", "description": "The promo box.", "group": "content" },
+            "rules": [{ "label": "Promo", "selector": "#promo", "matches": 2 }],
+            "unmatched": 0
+        });
+        let json = serde_json::json!({
+            "version": FORMAT_VERSION,
+            "sessions": [{
+                "id": "7f3e2d1c-0b9a-4c8d-9e7f-6a5b4c3d2e1f",
+                "domain": "youtube.com",
+                "recipeId": "custom.youtube.com",
+                "recipeName": "youtube.com",
+                "title": "hide the promo",
+                "createdAt": 1_700_000_000_000i64,
+                "updatedAt": 1_700_000_000_000i64,
+                "turns": [{
+                    "id": "9a8b7c6d-5e4f-4a3b-8c2d-1e0f9a8b7c6d",
+                    "request": "hide the promo",
+                    "at": 1_700_000_000_000i64,
+                    "provider": "MiniMax",
+                    "steps": [],
+                    "outcome": { "status": "accepted", "proposal": old }
+                }]
+            }]
+        });
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("chats.json");
+        fs::write(&path, json.to_string()).unwrap();
+        let chats = Chats::load(path).unwrap();
+        let listed = chats.list().unwrap();
+        assert_eq!(listed.len(), 1, "the old file is kept, not wiped");
+        let Outcome::Accepted { proposal } = &listed[0].turns[0].outcome else {
+            panic!("expected an accepted turn");
+        };
+        let rule = &proposal.rules[0];
+        assert_eq!(rule.kind, ProposalRuleKind::Style);
+        assert!(rule.code.is_none() && rule.powers.is_empty());
+        assert!(!proposal.runs_code && proposal.publishable);
     }
 }

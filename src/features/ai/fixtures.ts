@@ -24,8 +24,17 @@ export const proposal: Proposal = {
     group: "content",
   },
   rules: [
-    { label: "Related list", selector: "#related", matches: 3 },
-    { label: "End screen", selector: ".end", matches: 0 },
+    {
+      label: "Related list",
+      kind: "style",
+      selector: "#related",
+      matches: 3,
+      code: null,
+      powers: [],
+    },
+    { label: "End screen", kind: "style", selector: ".end", matches: 0, code: null, powers: [] },
   ],
   unmatched: 1,
+  runsCode: false,
+  publishable: true,
 };

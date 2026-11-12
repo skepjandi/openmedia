@@ -64,6 +64,7 @@
     "author": "OpenMedia",
     "homepage": "https://www.kuaishou.com/",
     "lastVerified": "2026-11-08",
+    "summary": "Hides app download prompts and the Top up link",
     "notes": "LIVE (iPhone 390x844 UA, logged out, 2026-11-08): https://m.kuaishou.com/ (www.kuaishou.com redirects there on mobile UA) is only a static marketing landing page: .com-download-bar=1 (fixed 65px bottom bar carousel, 3 slides), a.open-or-download-app-main=1, .cover .arrrow-wrapper=1, .open-in-browser-dialog=1 and .open-app-confirm-dialog=1 (both present but display:none until app-open attempts / WeChat), .com-header li.nav.highlight=1. No timed pop-ups appeared after 30 s. Left alone: header, hero text, ICP links. m.kuaishou.com/kuaiying/ redirects to h5.kwaiying.com (other host, not matched); /short-video/<bad id> gave a 'page not found' page. NOT verified: the feed, video, profile and live pages (www.kuaishou.com/brilliant timed out; the web app needs the app or login), desktop layout, logged-in state, comments, ads, counters. No rules target them."
   }
 }

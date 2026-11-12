@@ -112,6 +112,7 @@
     "author": "OpenMedia",
     "homepage": "https://www.douyin.com/",
     "lastVerified": "2026-11-07",
+    "summary": "Hides scroll tutorial overlay, login prompt panels, AI entry and chapter summaries, follow buttons, author and caption text",
     "notes": "Douyin serves an iPhone UA the same React app on www.douyin.com (title and feed render logged out; no captcha wall appeared, though an invisible nocaptcha iframe is present). Logged out the home page is a vertical video feed (data-e2e=slideList with data-e2e=feed-item slides, xgplayer controls) under a header with search, Log in, Get APP. LIVE counts (headless Chromium 390x844): recommend-guide-mask 1, .disturb-login-panel 3 (empty or zero-size until Douyin triggers it; that it is the login nag is INFERRED from the class name), .ai-douyin-entry 2, chapter-container 1, #chapterVideoSideCard 1, feed-follow-icon 5, video-info 2. Not verified: logged-in pages, WKWebView rendering, the real appearance of the login panels, other routes (search, user, video, live). Not hidden because it has no stable hook: the Get APP and Log in buttons in the header (hashed classes, text only); CSS cannot match text. Headless rendering showed a dark empty player, so visual effect of the hides was not confirmed."
   }
 }

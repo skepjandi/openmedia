@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useT } from "../../i18n/useT";
+import { CodeBlock, Chip } from "../../shared/CodeBlock";
 import { Group, GroupLabel } from "../settings/ui";
 import { Markdown } from "./Markdown";
 import type { RecipePreview, RulePreview } from "./ipc";
@@ -15,18 +16,24 @@ export function RecipeReview({ preview }: { preview: RecipePreview }) {
     <div className="flex flex-col gap-5">
       <div className="px-1">
         <p className="text-sm text-paper/55">
-          {t("market.review.version", { version: preview.version })}
-          {preview.author ? ` · ${t("market.by", { author: preview.author })}` : ""}
+          {t("library.review.version", { version: preview.version })}
+          {preview.author ? ` · ${t("library.by", { author: preview.author })}` : ""}
+          {preview.runsCode && (
+            <>
+              {" "}
+              <Chip>{t("library.review.runsCode")}</Chip>
+            </>
+          )}
         </p>
         {preview.replaces && (
           <p className="mt-1 text-sm text-paper/55">
-            {t("market.review.replaces", { version: preview.replaces })}
+            {t("library.review.replaces", { version: preview.replaces })}
           </p>
         )}
         {preview.notes && <Notes source={preview.notes} />}
       </div>
       <div>
-        <GroupLabel>{t("market.review.sites")}</GroupLabel>
+        <GroupLabel>{t("library.review.sites")}</GroupLabel>
         <Group>
           {preview.sites.map((site) => (
             <code key={site} className="block px-4 py-2.5 text-sm break-all text-paper/80">
@@ -37,7 +44,7 @@ export function RecipeReview({ preview }: { preview: RecipePreview }) {
       </div>
       {preview.tabs && preview.tabs.length > 0 && (
         <div>
-          <GroupLabel>{t("market.review.pages")}</GroupLabel>
+          <GroupLabel>{t("library.review.pages")}</GroupLabel>
           <Group>
             {preview.tabs.map((tab) => (
               <div key={tab.url} className="px-4 py-3">
@@ -50,7 +57,7 @@ export function RecipeReview({ preview }: { preview: RecipePreview }) {
       )}
       {preview.options.length > 0 && (
         <div>
-          <GroupLabel>{t("market.review.options")}</GroupLabel>
+          <GroupLabel>{t("library.review.options")}</GroupLabel>
           <Group>
             {preview.options.map((option) => (
               <div key={option.label} className="px-4 py-3">
@@ -64,7 +71,7 @@ export function RecipeReview({ preview }: { preview: RecipePreview }) {
         </div>
       )}
       <div>
-        <GroupLabel>{t("market.review.rules")}</GroupLabel>
+        <GroupLabel>{t("library.review.rules")}</GroupLabel>
         <Group>
           {preview.rules.map((rule) => (
             <RuleRow key={`${rule.kind}:${rule.selector}:${rule.label}`} rule={rule} />
@@ -110,13 +117,14 @@ function Notes({ source }: { source: string }) {
 
 function RuleRow({ rule }: { rule: RulePreview }) {
   const t = useT();
+  if (rule.kind === "script") return <ScriptRuleRow rule={rule} />;
   const declarations = Object.entries(rule.declarations);
 
   return (
     <div className="px-4 py-3">
       <span className="block text-base">
         <span className="text-paper/55">
-          {t(rule.kind === "hide" ? "market.review.hides" : "market.review.restyles")}
+          {t(rule.kind === "hide" ? "library.review.hides" : "library.review.restyles")}
         </span>{" "}
         {rule.label}
       </span>
@@ -128,6 +136,27 @@ function RuleRow({ rule }: { rule: RulePreview }) {
           {declarations.map(([property, value]) => `${property}: ${value}`).join("; ")}
         </code>
       )}
+    </div>
+  );
+}
+
+/** A script rule: its label, a "Runs code" chip, and the code itself, collapsed, as text. */
+function ScriptRuleRow({ rule }: { rule: RulePreview }) {
+  const t = useT();
+  return (
+    <div className="px-4 py-3">
+      <span className="flex items-baseline justify-between gap-3 text-base">
+        <span className="min-w-0">{rule.label}</span>
+        <Chip>{t("library.review.runsCode")}</Chip>
+      </span>
+      {rule.code != null && (
+        <CodeBlock
+          code={rule.code}
+          showLabel={t("library.review.showCode")}
+          hideLabel={t("library.review.hideCode")}
+        />
+      )}
+      <p className="mt-1.5 text-xs leading-snug text-paper/55">{t("library.review.codeNote")}</p>
     </div>
   );
 }

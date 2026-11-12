@@ -33,13 +33,13 @@ const loadSettings = () => import("../features/settings/SettingsScreen");
 const loadStats = () => import("../features/stats/StatsSheet");
 const loadOnboarding = () => import("../features/onboarding/Onboarding");
 const loadRecipes = () => import("../features/settings/RecipesScreen");
-const MarketplaceScreen = lazy(() =>
-  import("../features/marketplace/MarketplaceScreen").then((module) => ({
-    default: module.MarketplaceScreen,
+const LibraryScreen = lazy(() =>
+  import("../features/library/LibraryScreen").then((module) => ({
+    default: module.LibraryScreen,
   })),
 );
 const ShareScreen = lazy(() =>
-  import("../features/marketplace/ShareScreen").then((module) => ({
+  import("../features/library/ShareScreen").then((module) => ({
     default: module.ShareScreen,
   })),
 );
@@ -138,7 +138,7 @@ export function App() {
         {(idle || settingsOpen) && <SettingsScreen />}
         {(idle || sheet === "recipes") && <RecipesScreen />}
         {sheet === "incognito-recipes" && <IncognitoRecipesScreen />}
-        {sheet === "marketplace" && <MarketplaceScreen />}
+        {sheet === "library" && <LibraryScreen />}
         {sheet === "share" && <ShareScreen />}
         {(idle || sheet === "stats") && <StatsSheet />}
         {onboardingOpen && <Onboarding />}

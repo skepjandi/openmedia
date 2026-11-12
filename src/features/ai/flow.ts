@@ -59,12 +59,15 @@ export function pendingJobId(state: AssistantState): string | null {
   }
 }
 
-/** True when every rule of a new switch matched nothing, so accepting it would do nothing. */
+/**
+ * True when a new switch has only style rules and every one matched nothing, so accepting it
+ * would do nothing. A script rule is never counted, so a proposal with one is not "nothing".
+ */
 export function matchedNothing(proposal: Proposal): boolean {
   return (
     proposal.kind === "newOption" &&
     proposal.rules.length > 0 &&
-    proposal.rules.every((rule) => rule.matches <= 0)
+    proposal.rules.every((rule) => rule.kind === "style" && rule.matches <= 0)
   );
 }
 

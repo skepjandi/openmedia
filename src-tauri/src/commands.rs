@@ -27,14 +27,16 @@ use crate::ai::{
     validate_key,
 };
 use crate::boot::{Boot, Startup};
-use crate::catalog::{AgentSearchResult, Catalog};
 use crate::entitlement::Entitlement;
 use crate::error::{Error, Result};
 use crate::incognito::Incognito;
 use crate::library::{
     Favorite, FavoriteInput, Library, Mode, SearchEngine, Theme, favorites_need_pro,
 };
-use crate::recipes::{Recipe, Recipes};
+use crate::recipes::{
+    Recipe, Recipes,
+    bundled::{self, SearchHit},
+};
 use crate::secrets::SecretStore;
 use crate::sites::{self, SiteSettings};
 use crate::usage::{Usage, UsageReport};
@@ -752,20 +754,19 @@ pub async fn ai_reject(app: AppHandle, agent: State<'_, Agent>, id: Uuid) -> Res
     Ok(())
 }
 
-/// The marketplace, as the hub builder sees it. It only reads: a search over the signed catalog
-/// and one hash-checked recipe.
-struct LiveMarket<'a> {
-    catalog: &'a Catalog,
-    recipes: &'a Recipes,
-}
+/// The bundled recipe library, as the hub builder sees it. It only reads recipes that ship with
+/// this build.
+struct LiveLibrary;
 
-impl hub::Marketplace for LiveMarket<'_> {
-    async fn search(&self, query: &str) -> Result<Vec<AgentSearchResult>> {
-        self.catalog.search_for_agent(self.recipes, query).await
+impl hub::RecipeLibrary for LiveLibrary {
+    fn search(&self, query: &str) -> Result<Vec<SearchHit>> {
+        Ok(bundled::search(query))
     }
 
-    async fn read(&self, id: &str) -> Result<Recipe> {
-        self.catalog.read_for_agent(id).await
+    fn read(&self, id: &str) -> Result<Recipe> {
+        bundled::find(id)
+            .map(|bundled| bundled.recipe.clone())
+            .ok_or_else(|| Error::Library("not in the recipe library".into()))
     }
 }
 
@@ -788,26 +789,20 @@ impl hub::Model for LiveToolModel {
 }
 
 /// Asks the provider for a set of pages to open together as tabs. The model may only look
-/// things up with the two read-only marketplace tools, and nothing is saved: the answer comes
+/// things up with the two read-only recipe tools, and nothing is saved: the answer comes
 /// back as a proposal the user has to accept.
 #[tauri::command]
 pub async fn ai_hub_build(
     library: State<'_, Library>,
     secrets: State<'_, Secrets>,
-    catalog: State<'_, Catalog>,
-    recipes: State<'_, Recipes>,
     hubs: State<'_, hub::Hubs>,
     entitlement: State<'_, Entitlement>,
     request: String,
 ) -> Result<HubProposal> {
     entitlement.require_pro()?;
     let (config, key) = active_provider(&library, &secrets)?;
-    let market = LiveMarket {
-        catalog: &catalog,
-        recipes: &recipes,
-    };
     let model = LiveToolModel { config, key };
-    hub::build(&hubs, &market, &model, &request).await
+    hub::build(&hubs, &LiveLibrary, &model, &request).await
 }
 
 /// Saves the proposed hub as a `custom.` recipe of the user's own. Installed recipes are never

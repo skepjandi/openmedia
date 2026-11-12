@@ -4,7 +4,6 @@
 
 use tauri::{AppHandle, State};
 
-use crate::catalog::Catalog;
 use crate::commands::reload_script;
 use crate::entitlement::Entitlement;
 use crate::error::Result;
@@ -48,9 +47,8 @@ pub async fn remove_imported_recipe(
     app: AppHandle,
     library: State<'_, Library>,
     recipes: State<'_, Recipes>,
-    catalog: State<'_, Catalog>,
     recipe_id: String,
 ) -> Result<()> {
-    catalog.uninstall(&recipes, &recipe_id)?;
+    recipes.remove_imported(&recipe_id)?;
     reload_script(&app, &library, &recipes)
 }

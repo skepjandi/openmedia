@@ -294,7 +294,7 @@ export function CommandBar() {
                     )}
                     {replacingHub && (
                       <p role="alert" className="mt-2 text-sm text-warning">
-                        {t("market.update")}: {replacingHub.name}
+                        {t("library.update")}: {replacingHub.name}
                       </p>
                     )}
                     <ol className="mt-3 flex flex-col gap-2">
@@ -329,7 +329,7 @@ export function CommandBar() {
                         disabled={hubBusy}
                         onClick={acceptHub}
                       >
-                        {t(replacingHub ? "market.update" : "assistant.accept")}
+                        {t(replacingHub ? "library.update" : "assistant.accept")}
                       </button>
                     </div>
                   </>
@@ -337,14 +337,10 @@ export function CommandBar() {
                 {hubSaved && !hubProposal && (
                   <div className="flex items-center justify-between gap-2">
                     <p role="status" className="text-sm text-paper">
-                      {t("market.added")}: {hubSaved}
+                      {t("library.added")}: {hubSaved}
                     </p>
-                    <button
-                      type="button"
-                      className={quiet}
-                      onClick={() => openSheet("marketplace")}
-                    >
-                      {t("market.share")}
+                    <button type="button" className={quiet} onClick={() => openSheet("share")}>
+                      {t("library.shareRecipe")}
                     </button>
                   </div>
                 )}

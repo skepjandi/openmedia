@@ -4,7 +4,9 @@ use serde::{Deserialize, Serialize};
 use url::Url;
 
 use super::matcher::Matcher;
+use super::script_policy::{self, Finding, MAX_CODE_BYTES, MAX_SCRIPT_RULES, MAX_TOTAL_CODE_BYTES};
 use super::selector::{targets_page_root, validate_declarations, validate_selector};
+use super::share::is_plain_text;
 use crate::error::{Error, Result};
 
 pub const SCHEMA_VERSION: u32 = 1;
@@ -16,6 +18,8 @@ pub const MIN_HUB_TABS: usize = 2;
 pub const MAX_HUB_TABS: usize = 6;
 pub const MAX_HUB_LABEL_CHARS: usize = 20;
 const MAX_HUB_URL_CHARS: usize = 300;
+const MAX_SHOWN_FINDINGS: usize = 3;
+const MAX_FINDING_CHARS: usize = 160;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -25,8 +29,8 @@ pub enum Origin {
     Imported,
 }
 
-/// The platform tags a recipe may carry. The origin tags (`official`, `community`) are added by the
-/// marketplace to an index entry and are never part of a recipe.
+/// The platform tags a recipe may carry. The origin tags (`official`, `community`) are added by
+/// the recipe library to a listing and are never part of a recipe.
 pub const PLATFORM_TAGS: [&str; 2] = ["mobile", "desktop"];
 
 /// The tag of the platform this build runs on: macOS, Windows and Linux are `desktop`.
@@ -48,6 +52,9 @@ pub struct Meta {
     pub homepage: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub last_verified: Option<String>,
+    /// The one line the recipe library shows: plain text, 1 to 140 characters.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub summary: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub notes: Option<String>,
 }
@@ -124,26 +131,39 @@ pub enum Rule {
         target: Target,
         declarations: BTreeMap<String, String>,
     },
+    /// The body of a function that runs once on each matching page. What it may do depends on the
+    /// recipe's origin; see `script_policy`.
+    Script {
+        id: String,
+        label: String,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        option: Option<String>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        on: Option<Vec<String>>,
+        code: String,
+    },
 }
 
 impl Rule {
     pub fn id(&self) -> &str {
         match self {
-            Self::Hide { id, .. } | Self::Css { id, .. } => id,
+            Self::Hide { id, .. } | Self::Css { id, .. } | Self::Script { id, .. } => id,
         }
     }
 
     /// The toggle this rule belongs to; a rule with none always applies.
     pub fn option(&self) -> Option<&str> {
         match self {
-            Self::Hide { option, .. } | Self::Css { option, .. } => option.as_deref(),
+            Self::Hide { option, .. } | Self::Css { option, .. } | Self::Script { option, .. } => {
+                option.as_deref()
+            }
         }
     }
 
     /// The `match` patterns this rule is limited to; `None` means all of the recipe's.
     pub fn on(&self) -> Option<&[String]> {
         match self {
-            Self::Hide { on, .. } | Self::Css { on, .. } => on.as_deref(),
+            Self::Hide { on, .. } | Self::Css { on, .. } | Self::Script { on, .. } => on.as_deref(),
         }
     }
 }
@@ -238,6 +258,7 @@ impl Recipe {
         self.validate_options()?;
         self.validate_hub()?;
         self.validate_homepage()?;
+        self.validate_script_totals()?;
         let mut seen = HashSet::new();
         for rule in &self.rules {
             if !seen.insert(rule.id()) {
@@ -283,7 +304,48 @@ impl Recipe {
                         )));
                     }
                 }
+                Rule::Script { id, code, .. } => self.validate_script(id, code)?,
             }
+        }
+        Ok(())
+    }
+
+    fn validate_script(&self, id: &str, code: &str) -> Result<()> {
+        let refuse = |reason: &str| Error::Recipe(format!("script rule {id} {reason}"));
+        if code.trim().is_empty() {
+            return Err(refuse("has no code"));
+        }
+        if code.len() > MAX_CODE_BYTES {
+            return Err(refuse("is too long"));
+        }
+        if !is_script_text(code) {
+            return Err(refuse("has characters that cannot be shown safely"));
+        }
+        if self.origin == Origin::Imported {
+            let findings = script_policy::scan(code);
+            if !findings.is_empty() {
+                return Err(refuse(&format!("is refused: {}", describe(&findings))));
+            }
+        } else if let Some(finding) = script_policy::check_shape(code) {
+            return Err(refuse(&format!("is refused: {}", describe(&[finding]))));
+        }
+        Ok(())
+    }
+
+    fn validate_script_totals(&self) -> Result<()> {
+        let (count, bytes) = self
+            .rules
+            .iter()
+            .filter_map(|rule| match rule {
+                Rule::Script { code, .. } => Some(code.len()),
+                _ => None,
+            })
+            .fold((0, 0), |(count, bytes), len| (count + 1, bytes + len));
+        if count > MAX_SCRIPT_RULES || bytes > MAX_TOTAL_CODE_BYTES {
+            return Err(Error::Recipe(format!(
+                "recipe {} has too much script code",
+                self.id
+            )));
         }
         Ok(())
     }
@@ -413,6 +475,26 @@ impl Recipe {
         }
         Ok(())
     }
+}
+
+/// Script text may use tab, line feed and carriage return; no other control character, line
+/// separator, zero-width or direction-override character.
+pub(crate) fn is_script_text(code: &str) -> bool {
+    let plain = code.replace(['\t', '\n', '\r'], "");
+    is_plain_text(&plain, usize::MAX) && !plain.contains(['\u{2028}', '\u{2029}'])
+}
+
+/// At most three findings, each on its own, so a refusal stays short enough to show.
+fn describe(findings: &[Finding]) -> String {
+    let shown: Vec<String> = findings
+        .iter()
+        .take(MAX_SHOWN_FINDINGS)
+        .map(|finding| {
+            let message: String = finding.message.chars().take(MAX_FINDING_CHARS).collect();
+            format!("{} at line {}: {message}", finding.code, finding.line)
+        })
+        .collect();
+    shown.join("; ")
 }
 
 /// Whether declarations would make the elements they style disappear or stop reacting.

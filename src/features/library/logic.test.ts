@@ -1,42 +1,27 @@
 import { describe, expect, it } from "vitest";
-import type { MarketComment, MarketItem } from "./ipc";
+import type { LibraryItem } from "./ipc";
 import {
   backTarget,
-  commentToSend,
   defaultFilter,
-  formatRating,
   knownTags,
   matchesFilter,
   matchesSearch,
   platformTag,
   toggleTag,
   visibleItems,
-  withoutBlocked,
 } from "./logic";
 
-const item = (id: string, tags: string[]): MarketItem => ({
+const item = (id: string, tags: string[]): LibraryItem => ({
   id,
   name: id,
   version: "1.0.0",
   author: "a",
   summary: "",
   hosts: [],
-  featured: false,
-  installs: null,
   installedVersion: null,
   updateAvailable: false,
   tags,
   homepage: null,
-  rating: null,
-  myRating: null,
-});
-
-const comment = (id: string, commenter: string, mine = false): MarketComment => ({
-  id,
-  commenter,
-  text: "hi",
-  createdAt: 1,
-  mine,
 });
 
 describe("platformTag", () => {
@@ -72,7 +57,7 @@ describe("tag filter", () => {
     expect(matchesFilter(["community", "desktop"], new Set())).toBe(true);
   });
 
-  it("lists official recipes first and keeps the server order inside each group", () => {
+  it("lists official recipes first and keeps the list order inside each group", () => {
     const items = [
       item("c1", ["community", "mobile"]),
       item("o1", ["official", "mobile"]),
@@ -89,59 +74,15 @@ describe("tag filter", () => {
   });
 });
 
-describe("formatRating", () => {
-  it("shows the average and the count", () => {
-    expect(formatRating({ average: 4.3, count: 12 })).toBe("★ 4.3 (12)");
-    expect(formatRating({ average: 4, count: 7 })).toBe("★ 4.0 (7)");
-  });
-
-  it("shows nothing while there is no average or no rating", () => {
-    expect(formatRating(null)).toBeNull();
-    expect(formatRating({ average: null, count: 3 })).toBeNull();
-    expect(formatRating({ average: 5, count: 0 })).toBeNull();
-  });
-});
-
-describe("commentToSend", () => {
-  it("trims and accepts 1 to 280 characters", () => {
-    expect(commentToSend("  nice  ")).toBe("nice");
-    expect(commentToSend("a".repeat(280))).toHaveLength(280);
-  });
-
-  it("refuses empty and too long text", () => {
-    expect(commentToSend("   ")).toBeNull();
-    expect(commentToSend("a".repeat(281))).toBeNull();
-  });
-
-  it("counts characters, not UTF-16 units", () => {
-    expect(commentToSend("😀".repeat(280))).not.toBeNull();
-    expect(commentToSend("😀".repeat(281))).toBeNull();
-  });
-});
-
-describe("withoutBlocked", () => {
-  it("hides comments from commenters blocked a moment ago", () => {
-    const comments = [comment("1", "aaaaaaaaaa"), comment("2", "bbbbbbbbbb")];
-    expect(withoutBlocked(comments, new Set(["aaaaaaaaaa"])).map((c) => c.id)).toEqual(["2"]);
-  });
-
-  it("never hides the user's own comment", () => {
-    const own = comment("1", "aaaaaaaaaa", true);
-    expect(withoutBlocked([own], new Set(["aaaaaaaaaa"]))).toEqual([own]);
-  });
-});
-
 describe("backTarget", () => {
   it("returns every page to the list and closes from the list", () => {
     expect(backTarget({ kind: "detail", id: "x" })).toEqual({ kind: "list" });
-    expect(backTarget({ kind: "submit" })).toEqual({ kind: "list" });
-    expect(backTarget({ kind: "blocked" })).toEqual({ kind: "list" });
     expect(backTarget({ kind: "list" })).toBe("close");
   });
 });
 
 describe("matchesSearch", () => {
-  const found: MarketItem = {
+  const found: LibraryItem = {
     ...item("x", ["official", "desktop"]),
     name: "Discord Web",
     author: "OpenMedia",

@@ -1,41 +1,24 @@
-import { useEffect, useState, type ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import { useApp } from "../../app/store";
 import { describeError } from "../../i18n/errors";
 import { useT } from "../../i18n/useT";
 import { ForwardIcon } from "../../shared/icons";
 import type { SiteSettings } from "../../shared/ipc";
 import { Group } from "../settings/ui";
-import { marketplace, sharing } from "./ipc";
+import { sharing } from "./ipc";
 
-/** Whether this build has a marketplace address and keys. */
-export function useMarketplaceAvailable(): boolean {
-  const [available, setAvailable] = useState(false);
-
-  useEffect(() => {
-    void marketplace
-      .status()
-      .then((status) => setAvailable(status.available))
-      .catch(() => setAvailable(false));
-  }, []);
-
-  return available;
-}
-
-/** The rows in Settings that open the Marketplace (when this build has one) and Import and export. */
-export function MarketplaceLinks() {
+/** The rows in Settings that open the recipe library and Import, export and share. */
+export function LibraryLinks() {
   const openSheet = useApp((s) => s.openSheet);
   const t = useT();
-  const available = useMarketplaceAvailable();
 
   return (
     <Group>
-      {available && (
-        <LinkRow
-          title={t("market.title")}
-          note={t("market.linkNote")}
-          onClick={() => openSheet("marketplace")}
-        />
-      )}
+      <LinkRow
+        title={t("library.title")}
+        note={t("library.linkNote")}
+        onClick={() => openSheet("library")}
+      />
       <LinkRow
         title={t("share.link")}
         note={t("share.linkNote")}
@@ -63,7 +46,7 @@ function LinkRow({ title, note, onClick }: { title: string; note: string; onClic
   );
 }
 
-/** Shown on a recipe that came from a pasted bundle or the marketplace: says so, and removes it. */
+/** Shown on a recipe that came from a pasted bundle: says so, and removes it. */
 export function ImportedNotice({
   site,
   incognito = false,

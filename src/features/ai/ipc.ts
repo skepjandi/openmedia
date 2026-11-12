@@ -16,11 +16,25 @@ export interface PreparedRequest {
   tokenEstimate: number;
 }
 
+/** One thing a script can do that the script policy refuses. */
+export interface Power {
+  /** The policy finding code, for example `network` or `storage`. */
+  code: string;
+  message: string;
+  line: number;
+}
+
 export interface ProposalRule {
   label: string;
+  kind: "style" | "script";
+  /** Empty for a script rule. */
   selector: string;
-  /** Elements this rule hides on the page right now. */
+  /** Elements a style rule hides on the page right now; 0 for a script rule. */
   matches: number;
+  /** A script rule's code, exactly as it is saved. It does not run before the user accepts. */
+  code: string | null;
+  /** What the script does beyond the script policy; empty means it could be shared. */
+  powers: Power[];
 }
 
 export interface Proposal {
@@ -31,8 +45,12 @@ export interface Proposal {
   recipeName: string;
   option: { id: string | null; label: string; description: string; group: OptionGroup };
   rules: ProposalRule[];
-  /** Rules that matched nothing. */
+  /** Style rules that matched nothing. */
   unmatched: number;
+  /** Accepting saves a script that runs on the site's pages. */
+  runsCode: boolean;
+  /** Every script is within the script policy, so the recipe could be shared. */
+  publishable: boolean;
 }
 
 export interface HubProposalTab {
@@ -130,9 +148,9 @@ export const assistant = {
     channel.onmessage = onActivity;
     return invoke<Proposal>("ai_send", { id, onActivity: channel });
   },
-  /** Searches the signed marketplace and returns a validated, unsaved hub proposal. */
+  /** Searches the bundled recipe library and returns a validated, unsaved hub proposal. */
   buildHub: (request: string) => invoke<HubProposal>("ai_hub_build", { request }),
-  /** Saves an accepted hub; the marketplace submission remains a separate user action. */
+  /** Saves an accepted hub; sharing it remains a separate user action. */
   acceptHub: (id: string) => invoke<SavedHub>("ai_hub_accept", { id }),
   /** Drops the proposal without saving it. */
   rejectHub: async (id: string): Promise<void> => {

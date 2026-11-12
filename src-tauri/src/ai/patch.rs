@@ -11,7 +11,8 @@ use serde_json::{Value, json};
 use crate::error::{Error, Result};
 use crate::recipes::{
     CSS_PROPERTIES, Meta, OptionGroup, Origin, Recipe, Rule, SiteOption, Target,
-    current_platform_tag, targets_page_root, validate_declarations, validate_selector,
+    current_platform_tag, is_script_text, script_policy, targets_page_root, validate_declarations,
+    validate_selector,
 };
 use tauri_plugin_siteview::site::registrable_domain;
 
@@ -22,11 +23,25 @@ pub const MAX_SUMMARY_CHARS: usize = 200;
 const MAX_ANSWER_BYTES: usize = 32 * 1024;
 const MAX_ID_CHARS: usize = 40;
 
+/// One rule of a new switch: CSS for the page, or a script that runs after the user accepts.
 #[derive(Debug, Clone, PartialEq)]
-pub struct PatchRule {
-    pub label: String,
-    pub selector: String,
-    pub declarations: Option<BTreeMap<String, String>>,
+pub enum PatchRule {
+    /// Hides the selected elements, or restyles them when there are declarations.
+    Style {
+        label: String,
+        selector: String,
+        declarations: Option<BTreeMap<String, String>>,
+    },
+    /// The body of a function. Nothing restricts what it does; the user sees it before accepting.
+    Script { label: String, code: String },
+}
+
+impl PatchRule {
+    pub fn label(&self) -> &str {
+        match self {
+            Self::Style { label, .. } | Self::Script { label, .. } => label,
+        }
+    }
 }
 
 #[derive(Debug, Clone, PartialEq)]
@@ -98,17 +113,18 @@ pub fn patch_schema() -> Value {
             },
             "rules": {
                 "type": ["array", "null"],
-                "description": "newOption only: 1 to 8 rules. null or empty for existingOption.",
+                "description": "newOption only: 1 to 8 rules, at most 8 of them scripts. null or empty for existingOption.",
                 "items": {
                     "type": "object",
                     "additionalProperties": false,
-                    "required": ["label", "selector", "declarations"],
+                    "required": ["label", "selector", "declarations", "script"],
                     "properties": {
                         "label": { "type": "string", "description": "What this rule changes, at most 60 characters." },
-                        "selector": { "type": "string", "description": "One CSS selector (comma list allowed): at most 300 characters, at most 2 uses of :has(, none of { } ; \\ < @." },
+                        "selector": { "type": ["string", "null"], "description": "Style rules: one CSS selector (comma list allowed): at most 300 characters, at most 2 uses of :has(, none of { } ; \\ < @. null for a script rule." },
+                        "script": { "type": ["string", "null"], "description": "Script rules only, when CSS cannot do what the user asked: the body of a function (no wrapper, return allowed), at most 16384 bytes. null for a style rule." },
                         "declarations": {
                             "type": ["array", "null"],
-                            "description": "null to hide the selected elements; otherwise 1 or more safe CSS declaration pairs to restyle them.",
+                            "description": "Style rules: null to hide the selected elements; otherwise 1 or more safe CSS declaration pairs to restyle them. null for a script rule.",
                             "items": {
                                 "type": "object",
                                 "additionalProperties": false,
@@ -147,9 +163,12 @@ struct Raw {
 #[serde(deny_unknown_fields)]
 struct RawRule {
     label: String,
-    selector: String,
+    #[serde(default)]
+    selector: Option<String>,
     #[serde(default)]
     declarations: Option<Vec<RawDeclaration>>,
+    #[serde(default)]
+    script: Option<String>,
 }
 
 #[derive(Deserialize)]
@@ -189,6 +208,100 @@ fn plain(text: &str, what: &str, max: usize, allow_empty: bool) -> Result<String
         return Err(reject(format!("{what} is longer than {max} characters")));
     }
     Ok(text.to_owned())
+}
+
+fn checked_rule(rule: RawRule) -> Result<PatchRule> {
+    let label = plain(&rule.label, "a rule label", MAX_LABEL_CHARS, false)?;
+    let selector = rule.selector.as_deref().map(str::trim).unwrap_or_default();
+    match (selector.is_empty(), rule.script) {
+        (false, Some(_)) => Err(reject("a rule has both a selector and a script")),
+        (true, None) => Err(reject("a rule has neither a selector nor a script")),
+        (true, Some(code)) => {
+            if rule.declarations.is_some() {
+                return Err(reject("a script rule has no declarations"));
+            }
+            checked_script(label, code)
+        }
+        (false, None) => checked_style(label, selector, rule.declarations),
+    }
+}
+
+fn checked_script(label: String, code: String) -> Result<PatchRule> {
+    if code.trim().is_empty() {
+        return Err(reject("a script is empty"));
+    }
+    if code.len() > script_policy::MAX_CODE_BYTES {
+        return Err(reject("a script is too long"));
+    }
+    if !is_script_text(&code) {
+        return Err(reject(
+            "a script has characters that cannot be shown safely",
+        ));
+    }
+    if let Some(finding) = script_policy::check_shape(&code) {
+        return Err(reject(format!(
+            "a script is not one function body: {} at line {}",
+            finding.code, finding.line
+        )));
+    }
+    Ok(PatchRule::Script { label, code })
+}
+
+fn checked_style(
+    label: String,
+    selector: &str,
+    declarations: Option<Vec<RawDeclaration>>,
+) -> Result<PatchRule> {
+    validate_selector(selector)?;
+    if targets_page_root(selector) {
+        return Err(reject("a rule would target the whole page"));
+    }
+    let declarations = match declarations {
+        Some(declarations) => {
+            let mut checked = BTreeMap::new();
+            for declaration in declarations {
+                if checked
+                    .insert(declaration.property, declaration.value)
+                    .is_some()
+                {
+                    return Err(reject("a style repeats a CSS property"));
+                }
+            }
+            validate_declarations(&checked)?;
+            Some(checked)
+        }
+        None => None,
+    };
+    Ok(PatchRule::Style {
+        label,
+        selector: selector.to_owned(),
+        declarations,
+    })
+}
+
+/// The scripts of the new rules together with the ones the recipe they join already has must stay
+/// within the recipe limits, or saving would fail after the user accepted.
+fn check_script_totals(rules: &[PatchRule], recipe: Option<&Recipe>) -> Result<()> {
+    let existing = recipe
+        .filter(|recipe| is_made(recipe))
+        .into_iter()
+        .flat_map(|recipe| {
+            recipe.rules.iter().filter_map(|rule| match rule {
+                Rule::Script { code, .. } => Some(code.len()),
+                _ => None,
+            })
+        });
+    let added = rules.iter().filter_map(|rule| match rule {
+        PatchRule::Script { code, .. } => Some(code.len()),
+        PatchRule::Style { .. } => None,
+    });
+    let (count, bytes) = existing
+        .chain(added)
+        .fold((0, 0), |(count, bytes), len| (count + 1, bytes + len));
+    if count > script_policy::MAX_SCRIPT_RULES || bytes > script_policy::MAX_TOTAL_CODE_BYTES {
+        return Err(reject("the scripts are too many or too long together"));
+    }
+    Ok(())
 }
 
 /// Validates the model's answer. `recipe` is the recipe the page already has, if any: an
@@ -254,40 +367,18 @@ pub fn parse_patch(json: &str, recipe: Option<&Recipe>) -> Result<Patch> {
             let mut seen_selectors = HashSet::new();
             let mut checked = Vec::with_capacity(rules.len());
             for rule in rules {
-                let rule_label = plain(&rule.label, "a rule label", MAX_LABEL_CHARS, false)?;
-                let selector = rule.selector.trim().to_owned();
-                validate_selector(&selector)?;
-                if targets_page_root(&selector) {
-                    return Err(reject("a rule would target the whole page"));
-                }
-                if !seen_labels.insert(rule_label.to_lowercase()) {
+                let rule = checked_rule(rule)?;
+                if !seen_labels.insert(rule.label().to_lowercase()) {
                     return Err(reject("two rules have the same label"));
                 }
-                if !seen_selectors.insert(selector.clone()) {
+                if let PatchRule::Style { selector, .. } = &rule
+                    && !seen_selectors.insert(selector.clone())
+                {
                     return Err(reject("two rules have the same selector"));
                 }
-                let declarations = match rule.declarations {
-                    Some(declarations) => {
-                        let mut checked = BTreeMap::new();
-                        for declaration in declarations {
-                            if checked
-                                .insert(declaration.property, declaration.value)
-                                .is_some()
-                            {
-                                return Err(reject("a style repeats a CSS property"));
-                            }
-                        }
-                        validate_declarations(&checked)?;
-                        Some(checked)
-                    }
-                    None => None,
-                };
-                checked.push(PatchRule {
-                    label: rule_label,
-                    selector,
-                    declarations,
-                });
+                checked.push(rule);
             }
+            check_script_totals(&checked, recipe)?;
             Ok(Patch::NewOption {
                 summary,
                 label,
@@ -391,7 +482,7 @@ pub fn apply_patch(base: Option<&Recipe>, host_domain: &str, patch: &Patch) -> R
         enabled_by_default: true,
     });
     for (index, rule) in rules.iter().enumerate() {
-        let tail = slug(&rule.label, MAX_ID_CHARS);
+        let tail = slug(rule.label(), MAX_ID_CHARS);
         let tail = if tail.is_empty() {
             format!("rule-{}", index + 1)
         } else {
@@ -399,25 +490,41 @@ pub fn apply_patch(base: Option<&Recipe>, host_domain: &str, patch: &Patch) -> R
         };
         let id = unique(&format!("{option_id}-{tail}"), &rule_ids);
         rule_ids.insert(id.clone());
-        let rule = match &rule.declarations {
-            Some(declarations) => Rule::Css {
+        let option = Some(option_id.clone());
+        let rule = match rule {
+            PatchRule::Style {
+                label,
+                selector,
+                declarations: Some(declarations),
+            } => Rule::Css {
                 id,
-                label: rule.label.clone(),
-                option: Some(option_id.clone()),
+                label: label.clone(),
+                option,
                 on: None,
                 target: Target {
-                    css: rule.selector.clone(),
+                    css: selector.clone(),
                 },
                 declarations: declarations.clone(),
             },
-            None => Rule::Hide {
+            PatchRule::Style {
+                label,
+                selector,
+                declarations: None,
+            } => Rule::Hide {
                 id,
-                label: rule.label.clone(),
-                option: Some(option_id.clone()),
+                label: label.clone(),
+                option,
                 on: None,
                 target: Target {
-                    css: rule.selector.clone(),
+                    css: selector.clone(),
                 },
+            },
+            PatchRule::Script { label, code } => Rule::Script {
+                id,
+                label: label.clone(),
+                option,
+                on: None,
+                code: code.clone(),
             },
         };
         recipe.rules.push(rule);
@@ -447,17 +554,26 @@ fn custom_recipe(domain: &str) -> Result<Recipe> {
             author: None,
             homepage: Some(format!("https://{domain}/")),
             last_verified: None,
+            summary: None,
             notes: Some("Created by the in-app assistant.".to_owned()),
         }),
         hub: None,
     })
 }
 
-/// The css that previews a new option, matching what acceptance will save.
+/// The css that previews a new option, matching what acceptance will save. Script rules add
+/// nothing: they do not run before the user accepts.
 pub fn preview_css(patch: &Patch) -> String {
     let mut css = String::new();
     for rule in patch.rules() {
-        append_rule_css(&mut css, &rule.selector, rule.declarations.as_ref());
+        if let PatchRule::Style {
+            selector,
+            declarations,
+            ..
+        } = rule
+        {
+            append_rule_css(&mut css, selector, declarations.as_ref());
+        }
     }
     css
 }
@@ -544,7 +660,10 @@ mod tests {
         };
         assert_eq!(label, "Hide the stories row");
         assert_eq!(*group, OptionGroup::Content);
-        assert_eq!(rules[0].selector, "div:has(> a[href^=\"/stories/\"])");
+        assert!(matches!(
+            &rules[0],
+            PatchRule::Style { selector, .. } if selector == "div:has(> a[href^=\"/stories/\"])"
+        ));
         assert_eq!(
             preview_css(&patch),
             "div:has(> a[href^=\"/stories/\"]){display:none!important;}\n"
@@ -872,5 +991,114 @@ mod tests {
         ] {
             assert!(apply_patch(None, bad, &patch).is_err(), "{bad}");
         }
+    }
+
+    fn script_rule(label: &str, code: &str) -> Value {
+        json!({ "label": label, "selector": null, "declarations": null, "script": code })
+    }
+
+    fn style_rule(label: &str, selector: &str) -> Value {
+        json!({ "label": label, "selector": selector, "declarations": null, "script": null })
+    }
+
+    #[test]
+    fn a_script_rule_is_parsed_saved_and_never_previewed() {
+        let rules = json!([
+            script_rule("Open all", "return document.title;"),
+            style_rule("Promo", "#promo")
+        ]);
+        let patch = parse_patch(&new_option(rules), None).unwrap();
+        assert_eq!(
+            patch.rules()[0],
+            PatchRule::Script {
+                label: "Open all".into(),
+                code: "return document.title;".into()
+            }
+        );
+        assert_eq!(preview_css(&patch), "#promo{display:none!important;}\n");
+        let recipe = apply_patch(None, "example.org", &patch).unwrap();
+        let script = recipe
+            .rules
+            .iter()
+            .find_map(|rule| match rule {
+                Rule::Script {
+                    id, option, code, ..
+                } => Some((id.clone(), option.clone(), code.clone())),
+                _ => None,
+            })
+            .unwrap();
+        assert_eq!(script.0, "hide-the-stories-row-open-all");
+        assert_eq!(script.1.as_deref(), Some("hide-the-stories-row"));
+        assert_eq!(script.2, "return document.title;");
+        assert_eq!(recipe.origin, Origin::Ai);
+        let again = Recipe::parse(&serde_json::to_string(&recipe).unwrap()).unwrap();
+        assert_eq!(again, recipe);
+        assert!(option_css(&recipe, "hide-the-stories-row").contains("#promo"));
+        assert!(!option_css(&recipe, "hide-the-stories-row").contains("document.title"));
+    }
+
+    #[test]
+    fn script_rules_that_are_malformed_are_refused() {
+        let refused = |rules: Value| parse_patch(&new_option(rules), None).is_err();
+        assert!(refused(json!([script_rule(
+            "x",
+            "}); evil(); (function(){"
+        )])));
+        assert!(refused(json!([script_rule("x", "   ")])));
+        assert!(refused(json!([script_rule("x", "a\u{0}b")])));
+        assert!(refused(json!([script_rule("x", "a\u{202e}b")])));
+        assert!(refused(json!([script_rule("x", "a\u{2028}b")])));
+        assert!(refused(json!([script_rule(
+            "x",
+            &"a;".repeat(script_policy::MAX_CODE_BYTES)
+        )])));
+        let both = json!([{ "label": "x", "selector": "a.x", "declarations": null, "script": "return 1;" }]);
+        assert!(refused(both));
+        let neither =
+            json!([{ "label": "x", "selector": null, "declarations": null, "script": null }]);
+        assert!(refused(neither));
+        let with_declarations = json!([{ "label": "x", "selector": null,
+            "declarations": [{ "property": "color", "value": "red" }], "script": "return 1;" }]);
+        assert!(refused(with_declarations));
+        let unknown = json!([{ "label": "x", "selector": null, "declarations": null, "script": "return 1;", "type": "script" }]);
+        assert!(refused(unknown));
+        assert!(refused(json!([
+            script_rule("Same", "return 1;"),
+            script_rule("same", "return 2;")
+        ])));
+    }
+
+    #[test]
+    fn script_limits_are_enforced_in_total() {
+        let nine: Vec<Value> = (0..9)
+            .map(|i| script_rule(&format!("s{i}"), "return 1;"))
+            .collect();
+        assert!(parse_patch(&new_option(json!(nine)), None).is_err());
+        let eight: Vec<Value> = (0..8)
+            .map(|i| script_rule(&format!("s{i}"), "return 1;"))
+            .collect();
+        assert!(parse_patch(&new_option(json!(eight)), None).is_ok());
+        let chunk = "a;".repeat(script_policy::MAX_CODE_BYTES / 2 - 1);
+        let three: Vec<Value> = (0..3)
+            .map(|i| script_rule(&format!("s{i}"), &chunk))
+            .collect();
+        assert!(parse_patch(&new_option(json!(three)), None).is_err());
+    }
+
+    #[test]
+    fn the_schema_offers_script_rules_in_the_same_flat_shape() {
+        let item = &patch_schema()["properties"]["rules"]["items"];
+        assert_eq!(
+            item["required"],
+            json!(["label", "selector", "declarations", "script"])
+        );
+        assert_eq!(
+            item["properties"]["script"]["type"],
+            json!(["string", "null"])
+        );
+        assert_eq!(
+            item["properties"]["selector"]["type"],
+            json!(["string", "null"])
+        );
     }
 }

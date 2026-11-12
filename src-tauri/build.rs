@@ -1,8 +1,7 @@
-use std::{collections::HashMap, env, path::Path};
+use std::{collections::HashMap, env, fs, path::Path};
 
-const BUILD_KEYS: [&str; 6] = [
-    "OPENMEDIA_MARKET_URL",
-    "OPENMEDIA_CATALOG_KEYS",
+const BUILD_KEYS: [&str; 5] = [
+    "OPENMEDIA_SHARE_URL",
     "OPENMEDIA_RC_KEY_IOS",
     "OPENMEDIA_RC_KEY_MACOS",
     "OPENMEDIA_RC_KEY_ANDROID",
@@ -11,6 +10,7 @@ const BUILD_KEYS: [&str; 6] = [
 
 fn main() {
     forward_build_keys();
+    embed_recipes();
     link_swift_runtime();
     tauri_build::build()
 }
@@ -38,6 +38,44 @@ fn forward_build_keys() {
             value = value.or_else(|| read("OPENMEDIA_RC_KEY_IOS"));
         }
         println!("cargo:rustc-env={name}={}", value.unwrap_or_default());
+    }
+}
+
+/// Lists the bundled recipe files for `src/recipes/bundled.rs`: every `recipes/official/*.json`
+/// and `recipes/community/*.json`, in name order. An empty directory gives an empty list.
+fn embed_recipes() {
+    let root = Path::new(&env::var("CARGO_MANIFEST_DIR").unwrap_or_default()).join("../recipes");
+    let mut entries = String::from("pub const FILES: &[File] = &[\n");
+    for (directory, channel) in [("official", "Official"), ("community", "Community")] {
+        let dir = root.join(directory);
+        println!("cargo:rerun-if-changed={}", dir.display());
+        let mut files: Vec<_> = fs::read_dir(&dir)
+            .into_iter()
+            .flatten()
+            .flatten()
+            .map(|entry| entry.path())
+            .filter(|path| {
+                path.extension()
+                    .is_some_and(|extension| extension == "json")
+            })
+            .collect();
+        files.sort();
+        for path in files {
+            let name = path
+                .file_name()
+                .map(|name| name.to_string_lossy().into_owned())
+                .unwrap_or_default();
+            let absolute = fs::canonicalize(&path).unwrap_or(path);
+            entries.push_str(&format!(
+                "    File {{ channel: Channel::{channel}, name: {name:?}, text: include_str!({:?}) }},\n",
+                absolute.to_string_lossy()
+            ));
+        }
+    }
+    entries.push_str("];\n");
+    let out = Path::new(&env::var("OUT_DIR").unwrap_or_default()).join("bundled_recipes.rs");
+    if let Err(error) = fs::write(&out, entries) {
+        panic!("could not write {}: {error}", out.display());
     }
 }
 

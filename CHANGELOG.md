@@ -6,6 +6,17 @@ All notable changes to OpenMedia are documented here.
 >
 > **Wiki**: the [GitHub Wiki](https://github.com/skepjandi/openmedia/wiki) is the public-facing main wiki — architecture, recipe format, AI pipeline, security model, roadmap. Source-controlled editing surface is `docs/wiki/` in this repo; CI (`.github/workflows/sync-wiki.yml`) mirrors it to the GitHub Wiki on every merge to `main`. New single-PR changes belong here, not as new wiki pages.
 
+## 2026-11-13
+
+### feat(recipes): the marketplace is gone; recipes ship in the app and are shared through GitHub
+
+**Area:** `feat(recipes)`, `feat(ai)`, `feat(share)`
+
+**Change:** The recipe marketplace (signed Cloudflare catalog, ratings, comments, reports, install counts, install review) is removed. Every recipe the project ships is inside the app: the official ones in `recipes/official/` and community ones in the new `recipes/community/`. *Add* in the recipe library copies one into the user's recipes (no network); earlier installs keep their `market.` ids. To share a recipe, a person continues with GitHub in the browser and the Worker opens a pull request for the OpenMedia team; the app tells them "Your recipe will be available in the next update after review and approval." Sharing needs no Pro and sends no purchase identifier. The `script` rule is new: scripts in bundled or imported recipes must pass the default-deny policy in `docs/wiki/script-policy.md` (Rust, Worker and CI); the assistant may write any script for the user's own recipe, shown with its code and the powers it uses, and it never runs before the user accepts. `meta.summary` is new.
+
+**Not verified:** on a device or simulator; the GitHub login and pull request against real GitHub; the scanner on iOS and Android targets.
+
+
 ## 2026-11-12
 
 ### feat(onboarding): a new library starts with Google only, and Google is the default search engine

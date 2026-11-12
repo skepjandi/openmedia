@@ -61,7 +61,7 @@ export type Sheet =
   | "settings"
   | "recipes"
   | "incognito-recipes"
-  | "marketplace"
+  | "library"
   | "share"
   | "paywall";
 
@@ -69,7 +69,7 @@ export type Sheet =
 const SETTINGS_CHILDREN: readonly Sheet[] = [
   "recipes",
   "incognito-recipes",
-  "marketplace",
+  "library",
   "share",
   "paywall",
 ];

@@ -91,7 +91,7 @@ export interface SiteSettings {
   options: SiteOption[];
   /** The site's own bottom margin, or null to use the shared one. */
   bottomMargin: number | null;
-  /** Who the recipe is from; `imported` (a pasted bundle or the marketplace) can be removed. */
+  /** Who the recipe is from; `imported` (a pasted bundle or the recipe library) can be removed. */
   origin: "user" | "ai" | "imported";
   /** The pages this recipe opens as tabs; null for an ordinary recipe. */
   hub: Hub | null;

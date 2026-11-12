@@ -98,6 +98,7 @@
     "author": "OpenMedia",
     "homepage": "https://web.whatsapp.com/",
     "lastVerified": "2026-11-08",
+    "summary": "Hides app download buttons, promo sections, page footer",
     "notes": "LIVE (headless Chromium, iPhone UA 390x844, logged out, 2026-11-08): https://web.whatsapp.com/ redirects to /mobile/ which only says 'Use WhatsApp Web ... on your computer' + Share link (nothing hideable, no rules target it). https://www.whatsapp.com/ counts: header download a[href*=itunes.apple.com]=2 (one in mobile header, one in nav dropdown), article hero download=1, footer itunes links=3, section:has(web.whatsapp.com link)=1, section:has(whatsappbusiness.com link)=1, footer[data-testid=whatsapp_www_footer]=1. https://www.whatsapp.com/download: the primary iOS Download button sits in a section (not an article) so it stays visible; header/footer ones are hidden. LIVE desktop UA 1280x800 https://web.whatsapp.com/: [data-testid=download-native-client-button]=1 and -inline=1 (Download WhatsApp for Mac banner). Selectors use data-testid/href only, no hashed classes. Fixtures distilled from these pages. NOT verified: logged-in chats/Status/Channels/ads (behind phone-QR login); no cookie banner or timed pop-up appeared in ~20 s; the Mac banner's title/text card has no stable container, so only its button is hidden; other www sections (calling, privacy, groups) and faq.whatsapp.com were not given rules."
   }
 }

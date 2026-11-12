@@ -1,0 +1,1293 @@
+{
+  "version": 1,
+  "cases": [
+    {
+      "name": "empty script",
+      "code": "",
+      "ok": true
+    },
+    {
+      "name": "comments only",
+      "code": "// nothing to do\n/* still nothing */",
+      "ok": true
+    },
+    {
+      "name": "hide posts by text",
+      "code": "\nconst hideSponsored = () => {\n  document.querySelectorAll('article').forEach((post) => {\n    if (post.textContent.includes('Sponsored')) {\n      post.style.display = 'none';\n    }\n  });\n};\nhideSponsored();\nnew MutationObserver(hideSponsored).observe(document.body, { childList: true, subtree: true });\n",
+      "ok": true
+    },
+    {
+      "name": "keyboard shortcut scrolls",
+      "code": "\ndocument.addEventListener('keydown', (e) => {\n  if (e.key === 'j') window.scrollBy(0, 300);\n  if (e.key === 'k') window.scrollBy(0, -300);\n});\n",
+      "ok": true
+    },
+    {
+      "name": "badge built from created elements",
+      "code": "\nconst badge = document.createElement('div');\nbadge.className = 'openmedia-badge';\nbadge.textContent = 'Hidden: ' + document.querySelectorAll('[data-hidden]').length;\nbadge.style.position = 'fixed';\nbadge.style.bottom = '12px';\nbadge.style.right = '12px';\nbadge.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';\nbadge.style.color = '#fff';\ndocument.body.append(badge);\n",
+      "ok": true
+    },
+    {
+      "name": "pause autoplaying media",
+      "code": "\ndocument.querySelectorAll('video').forEach((video) => {\n  video.pause();\n  video.loop = false;\n  video.muted = true;\n});\n",
+      "ok": true
+    },
+    {
+      "name": "class and dataset",
+      "code": "\ndocument.querySelectorAll('li').forEach((li) => {\n  if (li.dataset.openmediaSeen) return;\n  li.dataset.openmediaSeen = '1';\n  li.classList.add('seen');\n  li.setAttribute('data-openmedia-flag', 'yes');\n  li.setAttribute('aria-hidden', 'true');\n});\n",
+      "ok": true
+    },
+    {
+      "name": "optional chaining and closest",
+      "code": "document.querySelectorAll('a').forEach((a) => a.closest('[role=\"article\"]')?.remove());",
+      "ok": true
+    },
+    {
+      "name": "destructuring from document",
+      "code": "const { body, documentElement } = document; body.classList.add('x'); documentElement.classList.add('y');",
+      "ok": true
+    },
+    {
+      "name": "array destructuring and spread",
+      "code": "const [first, ...rest] = [...document.querySelectorAll('p')]; if (first) first.remove(); rest.forEach((p) => p.remove());",
+      "ok": true
+    },
+    {
+      "name": "template literal",
+      "code": "const n = 3; const s = `${n} items`; console.log(s);",
+      "ok": true
+    },
+    {
+      "name": "regex with every allowed flag",
+      "code": "/a+/gimsuy.test('a');",
+      "ok": true
+    },
+    {
+      "name": "an early return in the function body",
+      "code": "if (!document.body) return; document.body.classList.add('x');",
+      "ok": true
+    },
+    {
+      "name": "regex literal",
+      "code": "const re = /^\\/reels\\//i; if (re.test(window.location.pathname)) document.body.classList.add('reels');",
+      "ok": true
+    },
+    {
+      "name": "for loop with a test",
+      "code": "for (let i = 0; i < 3; i++) { console.log(i); }",
+      "ok": true
+    },
+    {
+      "name": "for of and for in",
+      "code": "for (const a of document.querySelectorAll('a')) { console.log(a.href); } for (const k in [1, 2]) { console.log(k); }",
+      "ok": true
+    },
+    {
+      "name": "switch",
+      "code": "const n = 2; switch (n) { case 1: console.log('one'); break; default: console.log('many'); }",
+      "ok": true
+    },
+    {
+      "name": "try catch",
+      "code": "try { document.querySelector('x').remove(); } catch (error) { console.error(error); }",
+      "ok": true
+    },
+    {
+      "name": "catch without binding",
+      "code": "try { document.body.remove(); } catch { console.log('x'); }",
+      "ok": true
+    },
+    {
+      "name": "style literal and setProperty",
+      "code": "const el = document.body; el.style.display = 'none'; el.style.setProperty('opacity', '0.5'); el.style.setProperty('display', 'none', 'important'); el.style.removeProperty('opacity'); el.style.width = 'calc(100% - 10px)'; el.style.opacity = 0.5;",
+      "ok": true
+    },
+    {
+      "name": "timers with function arguments",
+      "code": "const tick = () => console.log('t'); setTimeout(tick, 10); setInterval(() => tick(), 1000); window.setTimeout(function () { tick(); }, 5); requestAnimationFrame(tick);",
+      "ok": true
+    },
+    {
+      "name": "observers",
+      "code": "new IntersectionObserver((entries) => entries.forEach((e) => { if (e.isIntersecting) e.target.classList.add('in'); })).observe(document.body); new ResizeObserver(() => {}).observe(document.body);",
+      "ok": true
+    },
+    {
+      "name": "location reads",
+      "code": "if (window.location.pathname.startsWith('/reels') || document.location.search.includes('x')) { console.log(window.location.href, window.location.hostname); }",
+      "ok": true
+    },
+    {
+      "name": "computed style",
+      "code": "const hidden = getComputedStyle(document.body).getPropertyValue('display') === 'none'; console.log(hidden, window.matchMedia('(min-width: 600px)').matches);",
+      "ok": true
+    },
+    {
+      "name": "array helpers",
+      "code": "const rows = Array.from(document.querySelectorAll('tr')).filter((r) => r.children.length > 1).map((r) => r.textContent.trim()).sort().slice(0, 5).join(', '); console.log(rows, Array.isArray(rows));",
+      "ok": true
+    },
+    {
+      "name": "sets and maps",
+      "code": "const seen = new Set(); const counts = new Map(); document.querySelectorAll('p').forEach((p) => { const t = p.textContent; if (seen.has(t)) p.remove(); seen.add(t); counts.set(t, (counts.get(t) || 0) + 1); });",
+      "ok": true
+    },
+    {
+      "name": "dates json math",
+      "code": "const d = new Date(); console.log(Date.now(), d.getFullYear(), JSON.stringify({ a: 1 }), JSON.parse('[1]'), Math.floor(Math.random() * 3), Number.isFinite(1), parseInt('3', 10));",
+      "ok": true
+    },
+    {
+      "name": "numeric index",
+      "code": "const items = document.querySelectorAll('li'); if (items[0]) items[0].remove(); const last = Array.from(items).at(-1); if (last) last.remove();",
+      "ok": true
+    },
+    {
+      "name": "emoji and non-latin text in strings",
+      "code": "const label = document.createElement('span'); label.textContent = '🚫 Скрыто · 已隐藏'; document.body.append(label);",
+      "ok": true
+    },
+    {
+      "name": "string statement",
+      "code": "'nothing';",
+      "ok": true
+    },
+    {
+      "name": "created element can take dynamic text and be inserted",
+      "code": "const box = document.createElement('div'); const note = document.createElement('p'); note.textContent = document.title + ' ' + window.innerWidth; box.append(note); box.append('plain text'); document.body.prepend(box);",
+      "ok": true
+    },
+    {
+      "name": "literal text on an existing element",
+      "code": "const el = document.querySelector('h1'); if (el) el.textContent = 'Videos';",
+      "ok": true
+    },
+    {
+      "name": "param shadowing a banned global is fine",
+      "code": "const run = (fetch) => fetch + 1; run(1);",
+      "ok": true
+    },
+    {
+      "name": "catch parameter shadowing",
+      "code": "try { document.body.remove(); } catch (fetch) { console.log(fetch); }",
+      "ok": true
+    },
+    {
+      "name": "named function expression binds its own name",
+      "code": "const f = function fetch() { return typeof fetch; }; f();",
+      "ok": true
+    },
+    {
+      "name": "later const is resolved by closures",
+      "code": "const first = () => second(); const second = () => 1; first();",
+      "ok": true
+    },
+    {
+      "name": "events on window",
+      "code": "window.addEventListener('scroll', () => {}, { passive: true }); window.addEventListener('resize', () => {}); document.addEventListener('visibilitychange', () => {});",
+      "ok": true
+    },
+    {
+      "name": "event handler uses this and preventDefault",
+      "code": "document.addEventListener('click', function (e) { if (e.target.closest('a[href*=\"/reels\"]')) { e.preventDefault(); e.stopPropagation(); } });",
+      "ok": true
+    },
+    {
+      "name": "promise from play is handled",
+      "code": "document.querySelectorAll('video').forEach((v) => { const p = v.play(); if (p) p.catch(() => {}); });",
+      "ok": true
+    },
+    {
+      "name": "replace and replaceAll on strings",
+      "code": "const s = 'a-b-c'.replace('-', '+').replaceAll('-', ' '); console.log(s);",
+      "ok": true
+    },
+    {
+      "name": "insert created element before an existing one",
+      "code": "const sep = document.createElement('hr'); const target = document.querySelector('main'); if (target) target.before(sep);",
+      "ok": true
+    },
+    {
+      "name": "fetch",
+      "code": "fetch('https://example.com');",
+      "codes": ["network"]
+    },
+    {
+      "name": "window.fetch",
+      "code": "window.fetch('https://example.com');",
+      "codes": ["network"]
+    },
+    {
+      "name": "fetch through an alias",
+      "code": "const f = window.fetch; f('x');",
+      "codes": ["network"]
+    },
+    {
+      "name": "fetch through destructuring",
+      "code": "const { fetch } = window; fetch('x');",
+      "codes": ["network"]
+    },
+    {
+      "name": "XMLHttpRequest",
+      "code": "const x = new XMLHttpRequest(); x.open('GET', 'https://example.com');",
+      "codes": ["network"]
+    },
+    {
+      "name": "WebSocket",
+      "code": "new WebSocket('wss://example.com');",
+      "codes": ["network"]
+    },
+    {
+      "name": "EventSource",
+      "code": "new EventSource('https://example.com');",
+      "codes": ["network"]
+    },
+    {
+      "name": "sendBeacon",
+      "code": "window.navigator.sendBeacon('https://example.com', 'x');",
+      "codes": ["credentials", "network"]
+    },
+    {
+      "name": "Image beacon",
+      "code": "const i = new Image(); i.src = 'https://example.com/?x';",
+      "codes": ["network"]
+    },
+    {
+      "name": "src assignment",
+      "code": "document.querySelector('img').src = 'https://example.com/x.png';",
+      "codes": ["network"]
+    },
+    {
+      "name": "setAttribute src",
+      "code": "document.querySelector('img').setAttribute('src', 'https://example.com/x.png');",
+      "codes": ["bad-argument"]
+    },
+    {
+      "name": "setAttribute href",
+      "code": "document.querySelector('a').setAttribute('href', 'https://example.com');",
+      "codes": ["bad-argument"]
+    },
+    {
+      "name": "setAttribute srcset",
+      "code": "document.querySelector('img').setAttribute('srcset', 'https://example.com/x 1x');",
+      "codes": ["bad-argument"]
+    },
+    {
+      "name": "setAttribute data-src for lazy loaders",
+      "code": "document.querySelector('img').setAttribute('data-src', 'https://example.com/x');",
+      "codes": ["bad-argument"]
+    },
+    {
+      "name": "setAttribute with a computed name",
+      "code": "const n = 'sr' + 'c'; document.querySelector('img').setAttribute(n, 'x');",
+      "codes": ["bad-argument"]
+    },
+    {
+      "name": "setAttribute event handler",
+      "code": "document.body.setAttribute('onclick', 'alert(1)');",
+      "codes": ["bad-argument"]
+    },
+    {
+      "name": "setAttribute style",
+      "code": "document.body.setAttribute('style', 'background:url(https://example.com)');",
+      "codes": ["bad-argument"]
+    },
+    {
+      "name": "dynamic import",
+      "code": "import('https://example.com/x.js');",
+      "codes": ["syntax-not-allowed"]
+    },
+    {
+      "name": "importScripts",
+      "code": "importScripts('x.js');",
+      "codes": ["network"]
+    },
+    {
+      "name": "Worker",
+      "code": "new Worker('x.js');",
+      "codes": ["network"]
+    },
+    {
+      "name": "window.open",
+      "code": "window.open('https://example.com');",
+      "codes": ["network"]
+    },
+    {
+      "name": "postMessage",
+      "code": "window.postMessage('x', '*');",
+      "codes": ["network"]
+    },
+    {
+      "name": "navigation by href",
+      "code": "window.location.href = 'https://example.com';",
+      "codes": ["navigation"]
+    },
+    {
+      "name": "navigation by assign",
+      "code": "window.location.assign('https://example.com');",
+      "codes": ["navigation"]
+    },
+    {
+      "name": "navigation by replace",
+      "code": "window.location.replace('https://example.com/?' + document.title);",
+      "codes": ["navigation"]
+    },
+    {
+      "name": "navigation through an alias",
+      "code": "const l = window.location; l.reload();",
+      "codes": ["navigation"]
+    },
+    {
+      "name": "navigation by bare location",
+      "code": "location = 'https://example.com';",
+      "codes": ["navigation"]
+    },
+    {
+      "name": "navigation on document",
+      "code": "document.location = 'https://example.com';",
+      "codes": ["navigation"]
+    },
+    {
+      "name": "history",
+      "code": "history.pushState(null, '', '/x');",
+      "codes": ["navigation"]
+    },
+    {
+      "name": "anchor href write",
+      "code": "document.querySelector('a').href = 'https://example.com';",
+      "codes": ["navigation"]
+    },
+    {
+      "name": "form action",
+      "code": "document.querySelector('form').action = 'https://example.com';",
+      "codes": ["network"]
+    },
+    {
+      "name": "cookie read",
+      "code": "console.log(document.cookie);",
+      "codes": ["storage"]
+    },
+    {
+      "name": "cookie write",
+      "code": "document.cookie = 'a=b';",
+      "codes": ["storage"]
+    },
+    {
+      "name": "localStorage",
+      "code": "console.log(localStorage.getItem('token'));",
+      "codes": ["storage"]
+    },
+    {
+      "name": "sessionStorage via window",
+      "code": "window.sessionStorage.setItem('a', 'b');",
+      "codes": ["storage"]
+    },
+    {
+      "name": "indexedDB",
+      "code": "console.log(indexedDB);",
+      "codes": ["storage"]
+    },
+    {
+      "name": "caches",
+      "code": "console.log(caches.keys());",
+      "codes": ["storage"]
+    },
+    {
+      "name": "password value read",
+      "code": "console.log(document.querySelector('input[type=password]').value);",
+      "codes": ["credentials"]
+    },
+    {
+      "name": "clipboard",
+      "code": "console.log(window.navigator.clipboard);",
+      "codes": ["credentials"]
+    },
+    {
+      "name": "selection",
+      "code": "console.log(window.getSelection());",
+      "codes": ["credentials"]
+    },
+    {
+      "name": "eval",
+      "code": "eval('1');",
+      "codes": ["dynamic-code"]
+    },
+    {
+      "name": "indirect eval",
+      "code": "(0, eval)('1');",
+      "codes": ["dynamic-code"]
+    },
+    {
+      "name": "Function constructor",
+      "code": "Function('return 1')();",
+      "codes": ["dynamic-code"]
+    },
+    {
+      "name": "new Function",
+      "code": "new Function('return 1')();",
+      "codes": ["dynamic-code"]
+    },
+    {
+      "name": "constructor chain",
+      "code": "[].constructor.constructor('return 1')();",
+      "codes": ["dynamic-code"]
+    },
+    {
+      "name": "constructor of an arrow",
+      "code": "(() => {}).constructor('x')();",
+      "codes": ["dynamic-code"]
+    },
+    {
+      "name": "setTimeout string",
+      "code": "setTimeout('console.log(1)', 1);",
+      "codes": ["bad-argument"]
+    },
+    {
+      "name": "setTimeout identifier that is not a known function",
+      "code": "const code = 'x'; setTimeout(code, 1);",
+      "codes": ["bad-argument"]
+    },
+    {
+      "name": "setInterval string",
+      "code": "window.setInterval('x', 1);",
+      "codes": ["bad-argument"]
+    },
+    {
+      "name": "timer saved to a variable",
+      "code": "const t = setTimeout; t(() => {}, 1);",
+      "codes": ["bad-argument"]
+    },
+    {
+      "name": "computed window access",
+      "code": "window['fe' + 'tch']('x');",
+      "codes": ["computed-access"]
+    },
+    {
+      "name": "computed access with a variable",
+      "code": "const k = 'fetch'; window[k]('x');",
+      "codes": ["computed-access"]
+    },
+    {
+      "name": "computed access with a string",
+      "code": "window['document'].body.remove();",
+      "codes": ["computed-access"]
+    },
+    {
+      "name": "computed access with an expression index",
+      "code": "const a = [1, 2]; const i = 0; console.log(a[i + 1]);",
+      "codes": ["computed-access"]
+    },
+    {
+      "name": "negative index",
+      "code": "const a = [1]; console.log(a[-1]);",
+      "codes": ["computed-access"]
+    },
+    {
+      "name": "globalThis",
+      "code": "globalThis.alert(1);",
+      "codes": ["automation", "dynamic-code"]
+    },
+    {
+      "name": "self",
+      "code": "self.document.body.remove();",
+      "codes": ["dynamic-code"]
+    },
+    {
+      "name": "top and parent",
+      "code": "top.document.body.remove(); parent.document.body.remove();",
+      "codes": ["dynamic-code"]
+    },
+    {
+      "name": "frames",
+      "code": "frames[0].document.body.remove();",
+      "codes": ["dynamic-code"]
+    },
+    {
+      "name": "Reflect",
+      "code": "Reflect.get(window, 'x');",
+      "codes": ["dynamic-code"]
+    },
+    {
+      "name": "Proxy",
+      "code": "new Proxy({}, {});",
+      "codes": ["dynamic-code"]
+    },
+    {
+      "name": "Object",
+      "code": "Object.keys(window);",
+      "codes": ["dynamic-code"]
+    },
+    {
+      "name": "Symbol",
+      "code": "Symbol('x');",
+      "codes": ["dynamic-code"]
+    },
+    {
+      "name": "Promise",
+      "code": "new Promise(() => {});",
+      "codes": ["dynamic-code"]
+    },
+    {
+      "name": "call",
+      "code": "[].map.call([], () => 1);",
+      "codes": ["dynamic-code"]
+    },
+    {
+      "name": "apply",
+      "code": "Math.max.apply(null, [1]);",
+      "codes": ["dynamic-code"]
+    },
+    {
+      "name": "bind",
+      "code": "const f = (() => 1).bind(null); f();",
+      "codes": ["dynamic-code"]
+    },
+    {
+      "name": "__proto__ read",
+      "code": "console.log([].__proto__);",
+      "codes": ["dynamic-code"]
+    },
+    {
+      "name": "__proto__ key",
+      "code": "const o = { __proto__: null };",
+      "codes": ["dynamic-code"]
+    },
+    {
+      "name": "prototype",
+      "code": "console.log(Array.prototype);",
+      "codes": ["dynamic-code"]
+    },
+    {
+      "name": "arguments",
+      "code": "const f = () => arguments; f();",
+      "codes": ["dynamic-code"]
+    },
+    {
+      "name": "defaultView",
+      "code": "console.log(document.defaultView);",
+      "codes": ["dynamic-code"]
+    },
+    {
+      "name": "contentWindow",
+      "code": "console.log(document.querySelector('iframe').contentWindow);",
+      "codes": ["dynamic-code"]
+    },
+    {
+      "name": "URL",
+      "code": "new URL('https://example.com');",
+      "codes": ["dynamic-code"]
+    },
+    {
+      "name": "Blob",
+      "code": "new Blob(['x']);",
+      "codes": ["dynamic-code"]
+    },
+    {
+      "name": "WebAssembly",
+      "code": "console.log(WebAssembly);",
+      "codes": ["dynamic-code"]
+    },
+    {
+      "name": "execCommand",
+      "code": "document.execCommand('copy');",
+      "codes": ["dynamic-code"]
+    },
+    {
+      "name": "constructor as a binding",
+      "code": "const constructor = 1;",
+      "codes": ["dynamic-code"]
+    },
+    {
+      "name": "innerHTML write",
+      "code": "document.body.innerHTML = '<img src=x onerror=alert(1)>';",
+      "codes": ["markup"]
+    },
+    {
+      "name": "outerHTML write",
+      "code": "document.body.outerHTML = '<p>x</p>';",
+      "codes": ["markup"]
+    },
+    {
+      "name": "innerHTML read",
+      "code": "console.log(document.body.innerHTML);",
+      "codes": ["markup"]
+    },
+    {
+      "name": "insertAdjacentHTML",
+      "code": "document.body.insertAdjacentHTML('beforeend', '<b>x</b>');",
+      "codes": ["markup"]
+    },
+    {
+      "name": "document.write",
+      "code": "document.write('x');",
+      "codes": ["markup"]
+    },
+    {
+      "name": "srcdoc",
+      "code": "document.querySelector('iframe').srcdoc = '<p>x</p>';",
+      "codes": ["markup"]
+    },
+    {
+      "name": "createTextNode",
+      "code": "const t = document.createTextNode('x');",
+      "codes": ["markup"]
+    },
+    {
+      "name": "DOMParser",
+      "code": "new DOMParser();",
+      "codes": ["markup"]
+    },
+    {
+      "name": "cssText",
+      "code": "document.body.style.cssText = 'background:url(https://example.com)';",
+      "codes": ["markup"]
+    },
+    {
+      "name": "styleSheets",
+      "code": "console.log(document.styleSheets);",
+      "codes": ["markup"]
+    },
+    {
+      "name": "insertRule",
+      "code": "document.styleSheets[0].insertRule('@import url(x);');",
+      "codes": ["markup"]
+    },
+    {
+      "name": "create script",
+      "code": "document.head.append(document.createElement('script'));",
+      "codes": ["bad-argument"]
+    },
+    {
+      "name": "create img",
+      "code": "document.createElement('img');",
+      "codes": ["bad-argument"]
+    },
+    {
+      "name": "create iframe",
+      "code": "document.createElement('iframe');",
+      "codes": ["bad-argument"]
+    },
+    {
+      "name": "create style",
+      "code": "document.createElement('style');",
+      "codes": ["bad-argument"]
+    },
+    {
+      "name": "create input",
+      "code": "document.createElement('input');",
+      "codes": ["bad-argument"]
+    },
+    {
+      "name": "create a link",
+      "code": "document.createElement('a');",
+      "codes": ["bad-argument"]
+    },
+    {
+      "name": "create button",
+      "code": "document.createElement('button');",
+      "codes": ["bad-argument"]
+    },
+    {
+      "name": "create with a computed tag",
+      "code": "const t = 'scr' + 'ipt'; document.createElement(t);",
+      "codes": ["bad-argument"]
+    },
+    {
+      "name": "create with a template",
+      "code": "document.createElement(`div`);",
+      "codes": ["bad-argument"]
+    },
+    {
+      "name": "style property outside the list",
+      "code": "document.body.style.background = 'red';",
+      "codes": ["bad-write"]
+    },
+    {
+      "name": "style background image",
+      "code": "document.body.style.backgroundImage = 'url(https://example.com/x)';",
+      "codes": ["bad-write"]
+    },
+    {
+      "name": "style url value",
+      "code": "document.body.style.filter = 'url(https://example.com/x)';",
+      "codes": ["bad-write"]
+    },
+    {
+      "name": "style value from the page",
+      "code": "document.body.style.width = document.title;",
+      "codes": ["bad-write"]
+    },
+    {
+      "name": "style compound assignment",
+      "code": "document.body.style.width += '1px';",
+      "codes": ["bad-write"]
+    },
+    {
+      "name": "style replaced as a whole",
+      "code": "document.body.style = 'display:none';",
+      "codes": ["bad-write"]
+    },
+    {
+      "name": "setProperty with a dynamic value",
+      "code": "document.body.style.setProperty('width', document.title);",
+      "codes": ["bad-argument"]
+    },
+    {
+      "name": "setProperty with a property outside the list",
+      "code": "document.body.style.setProperty('background-image', 'red');",
+      "codes": ["bad-argument"]
+    },
+    {
+      "name": "setProperty with a url",
+      "code": "document.body.style.setProperty('filter', 'url(x)');",
+      "codes": ["bad-argument"]
+    },
+    {
+      "name": "click",
+      "code": "document.querySelector('button').click();",
+      "codes": ["automation"]
+    },
+    {
+      "name": "form submit",
+      "code": "document.querySelector('form').submit();",
+      "codes": ["automation"]
+    },
+    {
+      "name": "requestSubmit",
+      "code": "document.querySelector('form').requestSubmit();",
+      "codes": ["automation"]
+    },
+    {
+      "name": "dispatchEvent",
+      "code": "const e = document.body; e.dispatchEvent(e);",
+      "codes": ["automation"]
+    },
+    {
+      "name": "focus",
+      "code": "document.querySelector('input').focus();",
+      "codes": ["automation"]
+    },
+    {
+      "name": "alert",
+      "code": "alert('x');",
+      "codes": ["automation"]
+    },
+    {
+      "name": "confirm",
+      "code": "window.confirm('x');",
+      "codes": ["automation"]
+    },
+    {
+      "name": "assign to a global function",
+      "code": "Math.floor = () => 1;",
+      "codes": ["bad-write"]
+    },
+    {
+      "name": "onclick property",
+      "code": "document.body.onclick = () => {};",
+      "codes": ["bad-write"]
+    },
+    {
+      "name": "onerror property",
+      "code": "window.onerror = () => {};",
+      "codes": ["bad-write"]
+    },
+    {
+      "name": "assign to a global",
+      "code": "console = {};",
+      "codes": ["bad-write"]
+    },
+    {
+      "name": "assign to document",
+      "code": "document = 1;",
+      "codes": ["bad-write"]
+    },
+    {
+      "name": "update a global",
+      "code": "window.scrollY++;",
+      "codes": ["bad-write"]
+    },
+    {
+      "name": "value write",
+      "code": "document.querySelector('input').value = 'x';",
+      "codes": ["credentials"]
+    },
+    {
+      "name": "textContent from the page on an existing element",
+      "code": "const el = document.querySelector('h1'); el.textContent = document.title;",
+      "codes": ["bad-write"]
+    },
+    {
+      "name": "textContent concatenation on an existing element",
+      "code": "document.querySelector('h1').textContent = 'a' + 'b';",
+      "codes": ["bad-write"]
+    },
+    {
+      "name": "textContent compound on an existing element",
+      "code": "document.querySelector('h1').textContent += 'x';",
+      "codes": ["bad-write"]
+    },
+    {
+      "name": "textContent with a css import",
+      "code": "document.querySelector('style').textContent = '@import url(https://example.com/x.css);';",
+      "codes": ["bad-write"]
+    },
+    {
+      "name": "textContent with a css url",
+      "code": "document.querySelector('style').textContent = 'a{background:url(x)}';",
+      "codes": ["bad-write"]
+    },
+    {
+      "name": "innerText with a css import",
+      "code": "document.querySelector('style').innerText = '@import \"https://example.com\";';",
+      "codes": ["bad-write"]
+    },
+    {
+      "name": "append a string to an existing element",
+      "code": "document.head.append('@import url(x);');",
+      "codes": ["insert-not-allowed"]
+    },
+    {
+      "name": "append a node found on the page",
+      "code": "const t = document.querySelector('p'); document.body.append(t);",
+      "codes": ["insert-not-allowed"]
+    },
+    {
+      "name": "appendChild a text node taken from the page",
+      "code": "const style = document.querySelector('style'); style.appendChild(document.body.firstChild);",
+      "codes": ["insert-not-allowed"]
+    },
+    {
+      "name": "move text out of a created element into the page",
+      "code": "const d = document.createElement('div'); d.textContent = 'x'; document.querySelector('style').append(d.firstChild);",
+      "codes": ["insert-not-allowed"]
+    },
+    {
+      "name": "insertBefore with a page node",
+      "code": "document.body.insertBefore(document.querySelector('p'), null);",
+      "codes": ["insert-not-allowed"]
+    },
+    {
+      "name": "replaceWith a string",
+      "code": "document.querySelector('p').replaceWith('x');",
+      "codes": ["insert-not-allowed"]
+    },
+    {
+      "name": "spread into append",
+      "code": "const a = [document.createElement('div')]; document.body.append(...a);",
+      "codes": ["insert-not-allowed"]
+    },
+    {
+      "name": "append reached through an alias",
+      "code": "const f = document.body.append; f(1);",
+      "codes": ["bad-argument"]
+    },
+    {
+      "name": "setAttribute through an alias",
+      "code": "const set = document.body.setAttribute; set('a', 'b');",
+      "codes": ["bad-argument"]
+    },
+    {
+      "name": "dataset write outside our prefix",
+      "code": "document.body.dataset.foo = 'x';",
+      "codes": ["bad-write"]
+    },
+    {
+      "name": "dataset write to a banned name",
+      "code": "document.body.dataset.__proto__ = 'x';",
+      "codes": ["dynamic-code"]
+    },
+    {
+      "name": "a shadowed document does not create trusted elements",
+      "code": "const document = { createElement: () => 1 }; const d = document.createElement('div'); d.textContent = window.innerWidth;",
+      "codes": ["bad-write"]
+    },
+    {
+      "name": "message listener",
+      "code": "window.addEventListener('message', () => {});",
+      "codes": ["bad-argument"]
+    },
+    {
+      "name": "submit listener",
+      "code": "document.addEventListener('submit', () => {});",
+      "codes": ["bad-argument"]
+    },
+    {
+      "name": "paste listener",
+      "code": "document.addEventListener('paste', () => {});",
+      "codes": ["bad-argument"]
+    },
+    {
+      "name": "input listener",
+      "code": "document.addEventListener('input', () => {});",
+      "codes": ["bad-argument"]
+    },
+    {
+      "name": "dynamic event name",
+      "code": "const n = 'mess' + 'age'; window.addEventListener(n, () => {});",
+      "codes": ["bad-argument"]
+    },
+    {
+      "name": "removeEventListener with a dynamic name",
+      "code": "const n = 'x'; window.removeEventListener(n, () => {});",
+      "codes": ["bad-argument"]
+    },
+    {
+      "name": "var",
+      "code": "var x = 1;",
+      "codes": ["syntax-not-allowed"]
+    },
+    {
+      "name": "function declaration",
+      "code": "function f() {}",
+      "codes": ["syntax-not-allowed"]
+    },
+    {
+      "name": "class",
+      "code": "class A {}",
+      "codes": ["syntax-not-allowed"]
+    },
+    {
+      "name": "class expression",
+      "code": "const A = class {};",
+      "codes": ["syntax-not-allowed"]
+    },
+    {
+      "name": "async arrow",
+      "code": "const f = async () => 1;",
+      "codes": ["syntax-not-allowed"]
+    },
+    {
+      "name": "generator expression",
+      "code": "const g = function* () {};",
+      "codes": ["syntax-not-allowed"]
+    },
+    {
+      "name": "while loop",
+      "code": "let i = 0; while (i < 3) { i++; }",
+      "codes": ["syntax-not-allowed"]
+    },
+    {
+      "name": "do while loop",
+      "code": "let i = 0; do { i++; } while (i < 3);",
+      "codes": ["syntax-not-allowed"]
+    },
+    {
+      "name": "for without a test",
+      "code": "for (;;) { break; }",
+      "codes": ["syntax-not-allowed"]
+    },
+    {
+      "name": "labeled statement",
+      "code": "outer: for (let i = 0; i < 2; i++) { break outer; }",
+      "codes": ["syntax-not-allowed"]
+    },
+    {
+      "name": "with statement",
+      "code": "with (document) { body.remove(); }",
+      "codes": ["syntax"]
+    },
+    {
+      "name": "debugger",
+      "code": "debugger;",
+      "codes": ["syntax-not-allowed"]
+    },
+    {
+      "name": "delete operator",
+      "code": "const o = [1]; delete o.length;",
+      "codes": ["syntax-not-allowed"]
+    },
+    {
+      "name": "bigint",
+      "code": "const n = 1n;",
+      "codes": ["syntax-not-allowed"]
+    },
+    {
+      "name": "tagged template",
+      "code": "const s = String.raw`x`;",
+      "codes": ["syntax-not-allowed"]
+    },
+    {
+      "name": "getter in an object literal",
+      "code": "const o = { get a() { return 1; } };",
+      "codes": ["syntax-not-allowed"]
+    },
+    {
+      "name": "computed key in an object literal",
+      "code": "const k = 'a'; const o = { [k]: 1 };",
+      "codes": ["computed-access"]
+    },
+    {
+      "name": "export",
+      "code": "export const a = 1;",
+      "codes": ["syntax"]
+    },
+    {
+      "name": "syntax error",
+      "code": "const = ;",
+      "codes": ["syntax"]
+    },
+    {
+      "name": "unterminated string",
+      "code": "const a = 'x;",
+      "codes": ["syntax"]
+    },
+    {
+      "name": "await outside an async function",
+      "code": "await 1;",
+      "codes": ["syntax"]
+    },
+    {
+      "name": "function declaration hides fetch",
+      "code": "function send() { fetch('x'); }",
+      "codes": ["network", "syntax-not-allowed"]
+    },
+    {
+      "name": "class hides a cookie read",
+      "code": "class A { m() { return document.cookie; } }",
+      "codes": ["storage", "syntax-not-allowed"]
+    },
+    {
+      "name": "async arrow hides fetch",
+      "code": "const f = async () => { await fetch('x'); };",
+      "codes": ["network", "syntax-not-allowed"]
+    },
+    {
+      "name": "var hides localStorage",
+      "code": "var t = localStorage.getItem('a');",
+      "codes": ["storage", "syntax-not-allowed"]
+    },
+    {
+      "name": "while hides eval",
+      "code": "let i = 0; while (i < 1) { eval('1'); i++; }",
+      "codes": ["dynamic-code", "syntax-not-allowed"]
+    },
+    {
+      "name": "label hides eval",
+      "code": "a: eval('1');",
+      "codes": ["dynamic-code", "syntax-not-allowed"]
+    },
+    {
+      "name": "a quoted name inside denied syntax",
+      "code": "var f = window['fetch'];",
+      "codes": ["network", "syntax-not-allowed"]
+    },
+    {
+      "name": "plain names inside denied syntax are not flagged",
+      "code": "function f(data, value, src) { return data + value + src; }",
+      "codes": ["syntax-not-allowed"]
+    },
+    {
+      "name": "a look-alike createElement is not the page's",
+      "code": "const o = { createElement: () => document.querySelector('p').firstChild }; document.querySelector('style').append(o.createElement('div'));",
+      "codes": ["insert-not-allowed"]
+    },
+    {
+      "name": "duplicate const declaration",
+      "code": "const a = 1; const a = 2;",
+      "codes": ["syntax"]
+    },
+    {
+      "name": "let and const clash",
+      "code": "let a = 1; const a = 2;",
+      "codes": ["syntax"]
+    },
+    {
+      "name": "duplicate arrow parameter",
+      "code": "const f = (a, a) => 1; f(1, 2);",
+      "codes": ["syntax"]
+    },
+    {
+      "name": "break outside a loop",
+      "code": "break;",
+      "codes": ["syntax"]
+    },
+    {
+      "name": "continue outside a loop",
+      "code": "continue;",
+      "codes": ["syntax"]
+    },
+    {
+      "name": "invalid regular expression",
+      "code": "/(/.test(document.title);",
+      "codes": ["syntax"]
+    },
+    {
+      "name": "assignment to a literal",
+      "code": "1 = 2;",
+      "codes": ["syntax"]
+    },
+    {
+      "name": "legacy octal literal",
+      "code": "const n = 010; console.log(n);",
+      "codes": ["syntax"]
+    },
+    {
+      "name": "let as a let name",
+      "code": "let let = 1;",
+      "codes": ["syntax"]
+    },
+    {
+      "name": "delete of a plain name",
+      "code": "const x = 1; delete x;",
+      "codes": ["syntax"]
+    },
+    {
+      "name": "a duplicate label-free switch declaration",
+      "code": "switch (1) { case 1: const a = 1; break; case 2: const a = 2; break; }",
+      "codes": ["syntax"]
+    },
+    {
+      "name": "rest parameter not last",
+      "code": "const f = (...a, b) => 1;",
+      "codes": ["syntax"]
+    },
+    {
+      "name": "octal escape in a string",
+      "code": "console.log('\\07');",
+      "codes": ["syntax"]
+    },
+    {
+      "name": "a member read of an author object",
+      "code": "const o = { a: 1 }; console.log(o.a);",
+      "codes": ["member-not-allowed"]
+    },
+    {
+      "name": "unknown global",
+      "code": "foo();",
+      "codes": ["global-not-allowed"]
+    },
+    {
+      "name": "site global",
+      "code": "window.analytics.track('x');",
+      "codes": ["member-not-allowed"]
+    },
+    {
+      "name": "navigator",
+      "code": "console.log(navigator.userAgent);",
+      "codes": ["credentials", "member-not-allowed"]
+    },
+    {
+      "name": "new of a global that is not a constructor",
+      "code": "new Math();",
+      "codes": ["bad-argument"]
+    },
+    {
+      "name": "new of String",
+      "code": "new String('x');",
+      "codes": ["bad-argument"]
+    },
+    {
+      "name": "homoglyph identifier",
+      "code": "const fеtch = 1; console.log(fеtch);",
+      "codes": ["text"]
+    },
+    {
+      "name": "unicode escape reaches fetch",
+      "code": "\\u0066etch('x');",
+      "codes": ["network"]
+    },
+    {
+      "name": "unicode escape in a member name",
+      "code": "window.\\u0066etch('x');",
+      "codes": ["network"]
+    },
+    {
+      "name": "bidi override in a comment",
+      "code": "// ‮evil\nconsole.log(1);",
+      "codes": ["text"]
+    },
+    {
+      "name": "zero width space in code",
+      "code": "console.log(1);​",
+      "codes": ["text"]
+    },
+    {
+      "name": "control character",
+      "code": "console.log(1);\u0001",
+      "codes": ["text"]
+    },
+    {
+      "name": "line separator",
+      "code": "console.log(1); console.log(2);",
+      "codes": ["text"]
+    },
+    {
+      "name": "html comment open",
+      "code": "<!-- hidden\nconsole.log(1);",
+      "codes": ["html-comment"]
+    },
+    {
+      "name": "html comment close",
+      "code": "console.log(1);\n--> x",
+      "codes": ["html-comment"]
+    },
+    {
+      "name": "closing the wrapper",
+      "code": "}); fetch('x'); (function () {",
+      "codes": ["syntax"]
+    },
+    {
+      "name": "closing the wrapper with a comment trick",
+      "code": "}); // \n(function(){",
+      "codes": ["syntax"]
+    },
+    {
+      "name": "two directives are not a way out",
+      "code": "}), (function(){",
+      "codes": ["syntax"]
+    },
+    {
+      "name": "too big",
+      "generate": {
+        "repeat": "a;",
+        "times": 9000
+      },
+      "codes": ["size"]
+    },
+    {
+      "name": "brackets nested too deep",
+      "generate": {
+        "open": "(",
+        "close": ")",
+        "times": 40,
+        "inner": "1"
+      },
+      "codes": ["nesting"]
+    },
+    {
+      "name": "catastrophic regex",
+      "code": "/(a+)+$/.test(document.title);",
+      "codes": ["regex"]
+    },
+    {
+      "name": "catastrophic regex with a star",
+      "code": "/(a*)*b/.test(document.title);",
+      "codes": ["regex"]
+    },
+    {
+      "name": "catastrophic regex with flags",
+      "code": "/(a+)+/gi.test(document.title);",
+      "codes": ["regex"]
+    },
+    {
+      "name": "regex lookbehind",
+      "code": "/(?<=a)b/.test(document.title);",
+      "codes": ["regex"]
+    },
+    {
+      "name": "regex named group",
+      "code": "/(?<n>a)/.exec(document.title);",
+      "codes": ["regex"]
+    },
+    {
+      "name": "regex flag d",
+      "code": "/a/d.test(document.title);",
+      "codes": ["regex"]
+    },
+    {
+      "name": "regex flag v",
+      "code": "/a/v.test(document.title);",
+      "codes": ["regex"]
+    }
+  ]
+}

@@ -1,10 +1,13 @@
+pub mod bundled;
 mod compile;
 mod matcher;
 mod schema;
+pub mod script_policy;
 mod selector;
 mod share;
 
 pub use compile::{OptionChoices, page_script};
+pub(crate) use schema::is_script_text;
 pub use schema::{
     Hub, HubTab, MAX_HUB_LABEL_CHARS, MAX_HUB_TABS, MIN_HUB_TABS, Meta, OptionGroup, Origin,
     Recipe, Rule, SiteOption, Target, current_platform_tag,
@@ -12,7 +15,7 @@ pub use schema::{
 pub(crate) use selector::{
     CSS_PROPERTIES, targets_page_root, validate_declarations, validate_selector,
 };
-pub(crate) use share::{MARKET_PREFIX, MAX_RECIPE_BYTES, is_catalog_id, is_plain_text, is_version};
+pub(crate) use share::{MARKET_PREFIX, MAX_RECIPE_BYTES, MAX_SUMMARY_CHARS, is_plain_text};
 pub use share::{RecipePreview, preview as preview_recipe};
 
 use std::{
@@ -29,8 +32,8 @@ use crate::library::write_atomically;
 
 const MAX_MADE_BYTES: usize = 256 * 1024;
 
-/// Ids of recipes the user or the assistant made. The app ships no recipes of its own: every
-/// other recipe is installed from the marketplace or imported from a file.
+/// Ids of recipes the user or the assistant made. Every other recipe is added from the bundled
+/// library (`bundled`) or imported from a file.
 const CUSTOM_PREFIX: &str = "custom.";
 
 /// The recipes in effect: the ones the user or the assistant made (`custom.`) and the ones
@@ -167,10 +170,9 @@ impl Recipes {
         Ok(())
     }
 
-    /// Saves a recipe downloaded from the marketplace. `catalog::check_download` must already
-    /// have tied it to the signed index; this only refuses anything that is not a `market.`
-    /// recipe labelled imported.
-    pub fn save_catalog(&self, recipe: Recipe) -> Result<Recipe> {
+    /// Saves a recipe of the bundled library. It was parsed as an imported recipe when the app
+    /// started; this only refuses anything that is not a `market.` recipe labelled imported.
+    pub fn save_bundled(&self, recipe: Recipe) -> Result<Recipe> {
         if !recipe.id.starts_with(share::MARKET_PREFIX) || recipe.origin != Origin::Imported {
             return Err(Error::UnknownSite);
         }
@@ -198,10 +200,10 @@ impl Recipes {
     }
 }
 
-/// A recipe file downloaded from the marketplace: its own claims about origin are ignored and its
-/// id must be a `market.` one.
-pub fn parse_catalog_recipe(bytes: &[u8]) -> Result<Recipe> {
-    share::parse_shared(bytes, share::Source::Catalog)
+/// A recipe as the bundled library and the share check read it: its own claims about origin are
+/// ignored, its id must be a `market.` one, and its scripts must pass the policy.
+pub fn parse_bundled_recipe(bytes: &[u8]) -> Result<Recipe> {
+    share::parse_shared(bytes, share::Source::Bundled)
 }
 
 fn parse_custom(text: &str) -> Result<Recipe> {
@@ -223,25 +225,13 @@ fn parse_custom(text: &str) -> Result<Recipe> {
     }
 }
 
-/// Test-only: the official recipe files, read the way the app reads a marketplace download.
+/// Test-only: the official recipes, as the app bundles them.
 #[cfg(test)]
 pub(crate) fn official_recipes() -> Vec<Recipe> {
-    let dir = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../recipes/official");
-    let mut files: Vec<_> = fs::read_dir(dir)
-        .unwrap()
-        .map(|entry| entry.unwrap().path())
-        .filter(|path| {
-            path.extension()
-                .is_some_and(|extension| extension == "json")
-        })
-        .collect();
-    files.sort();
-    files
+    bundled::all()
         .iter()
-        .map(|path| {
-            share::parse_shared(&fs::read(path).unwrap(), share::Source::Catalog)
-                .unwrap_or_else(|error| panic!("{}: {error}", path.display()))
-        })
+        .filter(|bundled| bundled.is_official())
+        .map(|bundled| bundled.recipe.clone())
         .collect()
 }
 
@@ -386,7 +376,9 @@ mod tests {
             }
             let pages = fixture_pages(&recipe);
             for rule in &recipe.rules {
-                let (Rule::Hide { target, .. } | Rule::Css { target, .. }) = rule;
+                let (Rule::Hide { target, .. } | Rule::Css { target, .. }) = rule else {
+                    continue;
+                };
                 let selector = Selector::parse(&target.css).unwrap();
                 let matched = pages
                     .iter()
@@ -479,6 +471,97 @@ mod tests {
         assert!(script.contains("t\\\\.example"));
         assert!(script.contains("www\\\\.reddit"));
         assert_eq!(script.matches(".nag{display:none!important}").count(), 1);
+    }
+
+    fn with_script_rules(origin: &str, codes: &[&str]) -> String {
+        let scripts: Vec<String> = codes
+            .iter()
+            .enumerate()
+            .map(|(n, code)| {
+                let code = serde_json::to_string(code).unwrap();
+                format!(r#"{{"id":"s{n}","label":"l","type":"script","code":{code}}}"#)
+            })
+            .collect();
+        let rules = format!(
+            r#""rules":[{{"id":"c1","label":"l","type":"hide","target":{{"css":".nag"}}}},{}]}}"#,
+            scripts.join(",")
+        );
+        format!(
+            r#"{{"schema":1,"id":"t.script","name":"T","version":"1.0.0","origin":"{origin}","tags":["desktop"],"match":["https://t.example/*"],{rules}"#
+        )
+    }
+
+    #[test]
+    fn script_rules_are_embedded_raw_and_indexed_per_entry() {
+        let json = with_script_rules("user", &["document.title;", "return 1;"]);
+        let recipe = Recipe::parse(&json).unwrap();
+        let script = page_script(&[recipe], &OptionChoices::new()).unwrap();
+        assert!(script.contains(
+            "const scripts = [(function(){\"use strict\";\ndocument.title;\n}),\n(function(){\"use strict\";\nreturn 1;\n})];"
+        ));
+        assert!(script.contains("\"scripts\":[0,1]"));
+        assert!(script.contains(".nag{display:none!important}"));
+        assert!(script.contains("DOMContentLoaded"));
+    }
+
+    #[test]
+    fn a_recipe_without_scripts_gets_an_empty_script_list() {
+        let recipes = vec![Recipe::parse(TOGGLED).unwrap()];
+        let script = page_script(&recipes, &OptionChoices::new()).unwrap();
+        assert!(script.contains("const scripts = []"));
+        assert!(script.contains("\"scripts\":[]"));
+    }
+
+    #[test]
+    fn script_rules_follow_their_option_toggle() {
+        let json = with_script_rules("user", &["document.title;"]).replace(
+            "\"type\":\"script\"",
+            "\"type\":\"script\",\"option\":\"opt\"",
+        );
+        let json = json.replace(
+            "\"rules\"",
+            "\"options\":[{\"id\":\"opt\",\"label\":\"O\",\"description\":\"d\",\"group\":\"content\",\"default\":false}],\"rules\"",
+        );
+        let recipe = Recipe::parse(&json).unwrap();
+        let off = page_script(std::slice::from_ref(&recipe), &OptionChoices::new()).unwrap();
+        assert!(off.contains("const scripts = []"));
+        let on = OptionChoices::from([("t.script".to_owned(), [("opt".to_owned(), true)].into())]);
+        assert!(
+            page_script(&[recipe], &on)
+                .unwrap()
+                .contains("document.title;")
+        );
+    }
+
+    #[test]
+    fn code_that_could_leave_its_wrapper_is_refused_for_every_origin() {
+        for origin in ["user", "ai", "imported"] {
+            let json = with_script_rules(origin, &["}); evil(); (function(){"]);
+            assert!(Recipe::parse(&json).is_err(), "{origin}");
+        }
+    }
+
+    #[test]
+    fn script_limits_and_hidden_characters_are_enforced_for_every_origin() {
+        let big = "a;".repeat(script_policy::MAX_CODE_BYTES);
+        let nine = ["a;"; script_policy::MAX_SCRIPT_RULES + 1];
+        let total = vec!["a;".repeat(8 * 1024); 5];
+        let total: Vec<&str> = total.iter().map(String::as_str).collect();
+        let cases: Vec<Vec<&str>> = vec![
+            vec![" \n"],
+            vec![big.as_str()],
+            nine.to_vec(),
+            total,
+            vec!["a;\u{202E}"],
+            vec!["a;\u{2028}"],
+            vec!["a;\u{0}"],
+            vec!["a;\u{200B}"],
+        ];
+        for origin in ["user", "ai", "imported"] {
+            for codes in &cases {
+                assert!(Recipe::parse(&with_script_rules(origin, codes)).is_err());
+            }
+        }
     }
 
     #[test]
@@ -622,7 +705,7 @@ mod tests {
         );
         assert!(
             Recipe::parse(&base(
-                r#"{"id":"r","label":"l","type":"script","code":"1"}"#
+                r#"{"id":"r","label":"l","type":"script","code":"1","target":{"css":"a"}}"#
             ))
             .is_err()
         );

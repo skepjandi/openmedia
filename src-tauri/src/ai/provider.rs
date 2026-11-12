@@ -56,7 +56,7 @@ pub(super) fn failure(message: &str) -> Error {
 
 /// A tool the model may ask to run. The schema is the provider's own JSON-schema dialect; the
 /// caller of the tool is the one that checks what the model sends.
-#[allow(dead_code, reason = "the marketplace agent caller uses this API")]
+#[allow(dead_code, reason = "the hub builder uses this API")]
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct ToolDefinition {
     pub name: String,
@@ -66,7 +66,7 @@ pub struct ToolDefinition {
 
 /// A tool the model asked to run. The arguments are what the model sent and are not trusted: the
 /// caller of the tool checks them against the tool's schema.
-#[allow(dead_code, reason = "the marketplace agent caller uses this API")]
+#[allow(dead_code, reason = "the hub builder uses this API")]
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct ToolCall {
     pub id: String,
@@ -75,7 +75,7 @@ pub struct ToolCall {
 }
 
 /// What a tool answered. The text is cut to a fixed length before it goes back to the provider.
-#[allow(dead_code, reason = "the marketplace agent caller uses this API")]
+#[allow(dead_code, reason = "the hub builder uses this API")]
 #[derive(Debug, Clone, PartialEq)]
 pub struct ToolResult {
     pub call_id: String,
@@ -85,7 +85,7 @@ pub struct ToolResult {
 }
 
 /// One turn of the conversation with the model.
-#[allow(dead_code, reason = "the marketplace agent caller uses this API")]
+#[allow(dead_code, reason = "the hub builder uses this API")]
 #[derive(Debug, Clone, PartialEq)]
 pub enum Turn {
     /// What the user said.
@@ -100,7 +100,7 @@ pub enum Turn {
 }
 
 /// What the model answered: words, or the tools it wants to run.
-#[allow(dead_code, reason = "the marketplace agent caller uses this API")]
+#[allow(dead_code, reason = "the hub builder uses this API")]
 #[derive(Debug, Clone, PartialEq)]
 pub enum ModelReply {
     Text(String),
@@ -109,7 +109,7 @@ pub enum ModelReply {
 
 impl ModelReply {
     /// The turn that goes back into the conversation before the tool answers.
-    #[allow(dead_code, reason = "the marketplace agent caller uses this API")]
+    #[allow(dead_code, reason = "the hub builder uses this API")]
     pub fn assistant_turn(&self) -> Turn {
         match self {
             ModelReply::Text(text) => Turn::Assistant {
@@ -178,7 +178,7 @@ fn client() -> Result<reqwest::Client> {
 /// Asks the provider to answer with words or with tool calls. The tools are not run here: the
 /// caller checks the arguments, runs the tools itself and calls this again with the answers as
 /// `Turn::ToolResult` turns, so the model sees what the tools said.
-#[allow(dead_code, reason = "the marketplace agent caller uses this API")]
+#[allow(dead_code, reason = "the hub builder uses this API")]
 pub async fn complete_with_tools(
     config: &ProviderConfig,
     key: &str,
@@ -450,15 +450,15 @@ mod tests {
     fn tool(name: &str) -> ToolDefinition {
         ToolDefinition {
             name: name.to_owned(),
-            description: "Search the marketplace.".to_owned(),
+            description: "Search the recipes.".to_owned(),
             input_schema: json!({ "type": "object", "properties": {} }),
         }
     }
 
     #[test]
     fn tool_definitions_must_be_ones_a_provider_accepts() {
-        let good = tool("search_marketplace");
-        assert!(check_tools(&[good.clone()]).is_ok());
+        let good = tool("search_recipes");
+        assert!(check_tools(std::slice::from_ref(&good)).is_ok());
         for bad in [
             ToolDefinition {
                 name: String::new(),
@@ -491,7 +491,7 @@ mod tests {
             "https://api.anthropic.com",
             Some("m"),
         );
-        let tools = [tool("search_marketplace")];
+        let tools = [tool("search_recipes")];
         let call = |config: &ProviderConfig, key: &str, tools: &[ToolDefinition]| {
             tauri::async_runtime::block_on(complete_with_tools(config, key, "SYSTEM", tools, &[]))
         };
@@ -507,7 +507,7 @@ mod tests {
         );
         let bad_tool = [ToolDefinition {
             name: "not a name".to_owned(),
-            ..tool("search_marketplace")
+            ..tool("search_recipes")
         }];
         assert_eq!(
             call(&ok, "sk-test", &bad_tool).unwrap_err().to_string(),

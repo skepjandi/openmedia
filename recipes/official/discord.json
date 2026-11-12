@@ -46,6 +46,7 @@
     "author": "OpenMedia",
     "homepage": "https://discord.com/app",
     "lastVerified": "2026-11-08",
+    "summary": "Hides download-the-app prompts and the closing app promo band",
     "notes": "**Checked** 2026-11-07 in headless Chromium with an iPhone UA at 390x844, logged out.\n\nThe recipe applies to `discord.com` and every subdomain. The only page with anything to hide is the marketing home `https://discord.com/`.\n\n- `/app` redirects to `/login`, which is just the login form: no banner, pop-up or promo.\n- `/nitro`, `/quests` and `/download` are marketing pages without these elements.\n\n## Live counts on the home page\n\n- `body:has(div.home--hero)` matched 1: the hero section is only on the home page.\n- `body:has(div.home--hero) a[href*=\"/api/downloads/distributions/\"]` matched 3: the white Download for Mac hero button, the one at the bottom of the mobile menu and the one in the closing band. The same href pattern matches 18 links on `/download`, which is why the rule is scoped to the home page.\n- `div.discord_banner` matched 1 (the 631px 'YOU CAN'T SCROLL ANYMORE, BETTER GO CHAT' band at the end of the page) and 0 on `/download`, `/nitro`, `/quests` and `/login`.\n\n## Not verified\n\n- Everything behind the login: the app UI, its pop-ups and Nitro or Quests promos.\n- The cookie consent layer: the OneTrust container `#onetrust-consent-sdk` is present on the home page but the banner itself never rendered in this session, so no rule was shipped for it.\n- The `/download` page.\n\nNo community filter list was consulted."
   }
 }

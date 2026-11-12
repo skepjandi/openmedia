@@ -172,21 +172,22 @@ export const ru: Messages = {
     "Выберите сайты, которые вы открываете чаще всего. OpenMedia добавит их официальные рецепты и поместит их на вашу кнопку.",
   "onboarding.quickLoading": "Загрузка официальных рецептов…",
   "onboarding.quickEmpty":
-    "Для этого устройства пока нет официальных рецептов. Вы сможете добавить их позже из Каталога.",
+    "Для этого устройства пока нет официальных рецептов. Вы сможете добавить их позже из библиотеки рецептов.",
   "onboarding.quickCount": "Выбрано {count} из {limit}",
   "onboarding.quickProHint": "Это максимум для вашего тарифа. В Pro мест больше.",
   "onboarding.applying": "Добавление…",
-  "onboarding.partial": "Не удалось добавить: {names}. Вы сможете добавить их позже из Каталога.",
-  "onboarding.marketTitle": "Каталог рецептов.",
-  "onboarding.marketBody": "Больше рецептов — в Настройках, в разделе «Каталог».",
-  "onboarding.marketOfficial":
-    "Официальные рецепты создаёт OpenMedia. Рецепты сообщества загружают такие же люди, как вы.",
-  "onboarding.marketChecked":
-    "Каждый рецепт автоматически проверяется и выдерживается 14 дней, прежде чем попасть в список.",
-  "onboarding.marketReview":
+  "onboarding.partial":
+    "Не удалось добавить: {names}. Вы сможете добавить их позже из библиотеки рецептов.",
+  "onboarding.libraryTitle": "Библиотека рецептов.",
+  "onboarding.libraryBody": "Больше рецептов — в разделе «Настройки», в «Библиотеке рецептов».",
+  "onboarding.libraryOfficial":
+    "Официальные рецепты создаёт OpenMedia. Рецептами сообщества делятся такие же люди, как вы, и они добавляются после проверки сопровождающими.",
+  "onboarding.libraryChecked":
+    "Каждый рецепт встроен в приложение, поэтому при добавлении ничего не загружается.",
+  "onboarding.libraryReview":
     "Перед добавлением рецепта вы просматриваете каждое правило, которое он вносит.",
-  "onboarding.marketPro":
-    "Для загрузки, экспорта и комментариев нужен Pro. Добавлять, импортировать и оценивать можно бесплатно.",
+  "onboarding.libraryShare":
+    "Любой может поделиться рецептом в настройках. Если сопровождающие его примут, он появится в одном из следующих выпусков.",
 
   "settings.title": "Настройки",
   "settings.close": "Закрыть настройки",
@@ -285,8 +286,8 @@ export const ru: Messages = {
   "recipes.note":
     "Рецепты для популярных сайтов. Запросы на установку и всплывающие окна, мешающие странице, скрыты по умолчанию; Reels, Shorts и рекомендации показываются, пока вы их не скроете. Поставьте звезду рецепту, чтобы добавить его сайт в избранное.",
   "recipes.empty":
-    "У вас пока нет рецептов. Готовые рецепты для популярных сайтов есть в Каталоге.",
-  "recipes.openMarket": "Открыть Каталог",
+    "У вас пока нет рецептов. Готовые рецепты для популярных сайтов есть в библиотеке рецептов.",
+  "recipes.openLibrary": "Открыть библиотеку рецептов",
   "recipes.annoyances": "Раздражители · скрыты по умолчанию",
   "recipes.content": "Контент · показывается, пока вы его не скроете",
   "recipes.groupAnnoyance": "Раздражитель",
@@ -311,77 +312,43 @@ export const ru: Messages = {
 
   "hub.pages": "Страницы: {name}",
 
-  "market.title": "Каталог",
-  "market.linkNote":
-    "Рецепты от других людей, проверяются автоматически и публикуются через 14 дней",
-  "market.note":
-    "Рецепты, созданные другими людьми. Сервер автоматически проверяет каждый рецепт; прошедшие проверку сразу появляются в публичном списке и публикуются через 14 дней после отправки. Вы видите каждое правило, прежде чем что-либо будет добавлено.",
-  "market.loading": "Загрузка…",
-  "market.empty": "Пока ничего не опубликовано.",
-  "market.add": "Добавить",
-  "market.update": "Обновить",
-  "market.added": "Добавлен",
-  "market.by": "от {author}",
-  "market.addedBy": "Добавили: {count}",
-  "market.withdrawn": "Убран с этого устройства, потому что был отозван: {names}",
-  "market.review.version": "Версия {version}",
-  "market.review.replaces": "Заменяет вашу версию {version}",
-  "market.review.sites": "Работает на",
-  "market.review.pages": "Страницы",
-  "market.review.options": "Переключатели",
-  "market.review.rules": "Что меняет",
-  "market.review.hides": "Скрывает",
-  "market.review.restyles": "Меняет оформление",
-  "market.report": "Сообщить о проблеме",
-  "market.report.harmful": "Вредный",
-  "market.report.broken": "Не работает",
-  "market.report.misleading": "Вводит в заблуждение",
-  "market.report.spam": "Спам",
-  "market.report.other": "Другое",
-  "market.reported": "Спасибо, жалоба отправлена.",
-  "market.share": "Поделиться одним из ваших рецептов",
-  "market.share.note":
-    "Сервер автоматически проверяет каждый рецепт. Прошедшие проверку сразу появляются в публичном списке и публикуются через 14 дней после отправки. Новые версии можно отправлять только с этого устройства.",
-  "market.share.recipe": "Рецепт",
-  "market.share.name": "Название в каталоге",
-  "market.share.summary": "Краткое описание в одну строку",
-  "market.share.author": "Ваше имя",
-  "market.share.send": "Отправить на маркетплейс",
-  "market.share.sent": "Отправлено. Уже в публичном списке, опубликуется через 14 дней.",
-  "market.counting": "Сообщать каталогу, когда я добавляю рецепт",
-  "market.countingNote":
-    "Отправляется только название рецепта, ничего о вас. Из него складываются числа «Добавили».",
-  "market.tag.official": "Официальные",
-  "market.tag.community": "Сообщество",
-  "market.tag.mobile": "Мобильные",
-  "market.tag.desktop": "Компьютер",
-  "market.tag.hub": "Экспериментальный",
-  "market.filters": "Фильтр по тегу",
-  "market.noMatch": "Ничего не подходит под эти фильтры.",
-  "market.search": "Поиск рецептов",
-  "market.searchNone": "Нет рецептов, подходящих под ваш запрос.",
-  "market.rating.none": "Оценок пока нет",
-  "market.rate": "Ваша оценка",
-  "market.rateStars":
-    "Оценка: {count} звезда | Оценка: {count} звезды | Оценка: {count} звёзд | Оценка: {count} звезды",
-  "market.comments": "Комментарии",
-  "market.comments.loading": "Загрузка комментариев…",
-  "market.comments.none": "Комментариев пока нет.",
-  "market.comments.you": "Вы",
-  "market.comments.write": "Написать комментарий",
-  "market.comments.rules": "Без ссылок и контактных данных. До 280 символов.",
-  "market.comments.post": "Отправить",
-  "market.comments.proPrompt": "Комментировать можно с Pro. Читать комментарии может любой.",
-  "market.comments.report": "Пожаловаться",
-  "market.comments.reported": "Жалоба отправлена",
-  "market.comments.block": "Заблокировать",
-  "market.comments.blocked": "Заблокированные авторы",
-  "market.comments.blockedNote": "Вы не видите комментарии людей из этого списка.",
-  "market.comments.blockedNone": "Вы никого не заблокировали.",
-  "market.comments.unblock": "Разблокировать",
+  "library.title": "Библиотека рецептов",
+  "library.linkNote": "Готовые рецепты для популярных сайтов, встроенные в приложение",
+  "library.note":
+    "Рецепты, которые поставляются с OpenMedia. Ничего не загружается: при добавлении рецепт копируется из приложения. Вы увидите каждое правило до добавления.",
+  "library.loading": "Загрузка…",
+  "library.empty": "Пока ничего не опубликовано.",
+  "library.add": "Добавить",
+  "library.update": "Обновить",
+  "library.added": "Добавлен",
+  "library.by": "от {author}",
+  "library.review.version": "Версия {version}",
+  "library.review.replaces": "Заменяет вашу версию {version}",
+  "library.review.sites": "Работает на",
+  "library.review.pages": "Страницы",
+  "library.review.options": "Переключатели",
+  "library.review.rules": "Что меняет",
+  "library.review.hides": "Скрывает",
+  "library.review.restyles": "Меняет оформление",
+  "library.review.runsCode": "Запускает код",
+  "library.review.showCode": "Показать код",
+  "library.review.hideCode": "Скрыть код",
+  "library.review.codeNote":
+    "Этот код работает на указанных выше сайтах. Он прошёл правила безопасности приложения: без сети, хранилища, перехода по страницам и автоматизации.",
+  "library.shareRecipe": "Поделиться одним из ваших рецептов",
+  "library.tag.official": "Официальные",
+  "library.tag.community": "Сообщество",
+  "library.tag.mobile": "Мобильные",
+  "library.tag.desktop": "Компьютер",
+  "library.tag.hub": "Экспериментальный",
+  "library.filters": "Фильтр по тегу",
+  "library.noMatch": "Ничего не подходит под эти фильтры.",
+  "library.search": "Поиск рецептов",
+  "library.searchNone": "Нет рецептов, подходящих под ваш запрос.",
 
-  "share.link": "Импорт и экспорт",
-  "share.linkNote": "Переносите рецепты между устройствами в виде текста",
+  "share.link": "Импорт, экспорт и обмен",
+  "share.linkNote":
+    "Переносите рецепты между устройствами в виде текста или поделитесь одним на GitHub",
   "share.import": "Импорт",
   "share.importNote":
     "Вставляйте только рецепты от людей, которым доверяете. Вы видите каждое правило, прежде чем что-либо будет добавлено.",
@@ -395,6 +362,36 @@ export const ru: Messages = {
   "share.copied": "Скопировано",
   "share.copyFailed": "Не удалось скопировать. Выделите текст ниже и скопируйте его.",
   "share.none": "У вас пока нет собственных рецептов.",
+  "share.github.title": "Поделитесь своим рецептом со всеми",
+  "share.github.recipe": "Ваш рецепт",
+  "share.github.summary": "Опишите его в нескольких словах",
+  "share.github.count": "{count} / 140",
+  "share.github.needAccount": "Нужна бесплатная учётная запись GitHub.",
+  "share.github.whatSent":
+    "Ваш рецепт и ваше имя пользователя GitHub будут отправлены команде OpenMedia.",
+  "share.github.afterReview":
+    "Все получат его в обновлении после того, как команда проверит и одобрит рецепт.",
+  "share.github.continue": "Продолжить через GitHub",
+  "share.github.waiting":
+    "Войдите в GitHub в только что открывшемся браузере, затем вернитесь сюда.",
+  "share.github.working": "Отправляем ваш рецепт…",
+  "share.github.thanks":
+    "Спасибо! Ваш рецепт появится в следующем обновлении после проверки и одобрения.",
+  "share.github.see": "Посмотреть на GitHub",
+  "share.github.tryAgain": "Повторить",
+  "share.github.error.tooNew":
+    "Ваша учётная запись GitHub слишком новая, чтобы делиться рецептами. Попробуйте через несколько дней.",
+  "share.github.error.limit":
+    "Вы уже поделились достаточным числом рецептов на сегодня. Попробуйте завтра.",
+  "share.github.error.invalid": "Этим рецептом нельзя поделиться.",
+  "share.github.error.offline":
+    "Не удалось связаться с командой OpenMedia. Проверьте подключение и повторите попытку.",
+  "share.github.error.busy":
+    "Сейчас слишком много людей делятся рецептами. Попробуйте через несколько минут.",
+  "share.github.error.failed": "Что-то пошло не так, и ваш рецепт не отправлен. Повторите попытку.",
+  "share.github.error.cancelled": "Вы не завершили вход, поэтому ничего не отправлено.",
+  "share.github.error.timeout":
+    "Это заняло слишком много времени, поэтому ничего не отправлено. Повторите попытку.",
 
   "ai.title": "ИИ-помощник",
   "ai.note":
@@ -459,6 +456,25 @@ export const ru: Messages = {
   "assistant.accept": "Принять",
   "assistant.switchExists": "Такой переключатель уже есть",
   "assistant.matched": "совпадений: {count}",
+  "assistant.script.runs": "Запускает код на этом сайте",
+  "assistant.script.show": "Показать код",
+  "assistant.script.hide": "Скрыть код",
+  "assistant.script.afterAccept": "Код запустится только после того, как вы примете правило.",
+  "assistant.script.powers": "Что может этот код",
+  "assistant.script.line": "строка {line}",
+  "assistant.script.shareable":
+    "Он соблюдает правила безопасности скриптов, поэтому им можно поделиться.",
+  "assistant.script.notShareable":
+    "Он использует то, что правила безопасности скриптов не разрешают, поэтому им нельзя поделиться.",
+  "assistant.script.power.network": "Отправлять данные по сети",
+  "assistant.script.power.storage": "Читать и записывать сохранённые данные и cookie",
+  "assistant.script.power.dynamicCode": "Собирать и запускать код из текста",
+  "assistant.script.power.markup": "Собирать разметку или стили из текста",
+  "assistant.script.power.navigation": "Перенаправлять страницу в другое место",
+  "assistant.script.power.automation": "Нажимать, отправлять формы и действовать за вас",
+  "assistant.script.power.credentials": "Читать то, что вы вводите, и личные данные",
+  "assistant.script.power.other":
+    "Использовать функции, которые правила безопасности скриптов не разрешают",
   "assistant.requestQuote": "«{request}»",
   "assistant.unmatched":
     "{count} правило не нашло совпадений на этой странице. | {count} правила не нашли совпадений на этой странице. | {count} правил не нашли совпадений на этой странице. | {count} правила не нашло совпадений на этой странице.",

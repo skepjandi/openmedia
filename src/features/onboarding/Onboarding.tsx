@@ -5,7 +5,7 @@ import { useT } from "../../i18n/useT";
 import type { MessageKey } from "../../i18n/messages";
 import { HistoryIcon, IncognitoIcon, SlidersIcon, StatsIcon } from "../../shared/icons";
 import { useBackHandler } from "../back/useBackHandler";
-import { onboarding } from "../marketplace/ipc";
+import { onboarding } from "../library/ipc";
 import { useEntitlementStore } from "../paywall/store";
 import { QuickAccessStep, type OptionsState } from "./QuickAccessStep";
 import { quickAccessLimit, toggleSelection } from "./selection";
@@ -149,14 +149,14 @@ const STEPS: Step[] = [
 ];
 
 const QUICK_STEP = STEPS.length;
-const MARKET_STEP = STEPS.length + 1;
+const LIBRARY_STEP = STEPS.length + 1;
 const STEP_COUNT = STEPS.length + 2;
 
-const MARKET_POINTS: MessageKey[] = [
-  "onboarding.marketOfficial",
-  "onboarding.marketChecked",
-  "onboarding.marketReview",
-  "onboarding.marketPro",
+const LIBRARY_POINTS: MessageKey[] = [
+  "onboarding.libraryOfficial",
+  "onboarding.libraryChecked",
+  "onboarding.libraryReview",
+  "onboarding.libraryShare",
 ];
 
 /** First-run guide, also reachable from Settings. Full-screen so the page cannot be touched. */
@@ -204,7 +204,7 @@ function OnboardingBody() {
   };
 
   const quick = index === QUICK_STEP;
-  const market = index === MARKET_STEP;
+  const libraryStep = index === LIBRARY_STEP;
   const step = index < STEPS.length ? STEPS[index] : null;
   const last = index === STEP_COUNT - 1;
   const limit = quickAccessLimit(isPro);
@@ -289,21 +289,21 @@ function OnboardingBody() {
         </div>
       )}
 
-      {market && (
+      {libraryStep && (
         <div className="flex min-h-0 flex-1 flex-col justify-center gap-4 overflow-y-auto">
           <div>
             <p className="text-xs tracking-[0.22em] text-accent uppercase">
               {index + 1} / {STEP_COUNT}
             </p>
             <h1 className="mt-2 text-4xl leading-[1.05] font-semibold tracking-tight">
-              {t("onboarding.marketTitle")}
+              {t("onboarding.libraryTitle")}
             </h1>
             <p className="mt-3 max-w-sm text-base leading-relaxed text-paper/65">
-              {t("onboarding.marketBody")}
+              {t("onboarding.libraryBody")}
             </p>
           </div>
           <ul className="flex max-w-sm flex-col gap-2.5 text-sm leading-snug text-paper/75">
-            {MARKET_POINTS.map((point) => (
+            {LIBRARY_POINTS.map((point) => (
               <li key={point} className="flex gap-2.5">
                 <span aria-hidden="true" className="text-accent">
                   •

@@ -174,22 +174,23 @@ export const fr: Messages = {
     "Choisissez les sites que vous ouvrez le plus. OpenMedia ajoute leurs recettes officielles et les place sur votre bouton.",
   "onboarding.quickLoading": "Chargement des recettes officielles…",
   "onboarding.quickEmpty":
-    "Aucune recette officielle n’est encore listée pour cet appareil. Vous pourrez en ajouter plus tard depuis le Marché.",
+    "Aucune recette officielle n’est encore proposée pour cet appareil. Vous pourrez en ajouter plus tard depuis la bibliothèque de recettes.",
   "onboarding.quickCount": "{count} sur {limit} choisis",
   "onboarding.quickProHint": "C’est le maximum de votre offre. Pro offre plus d’emplacements.",
   "onboarding.applying": "Ajout en cours…",
   "onboarding.partial":
-    "Ajout impossible : {names}. Vous pourrez les ajouter plus tard depuis le Marché.",
-  "onboarding.marketTitle": "Un marché de recettes.",
-  "onboarding.marketBody": "Trouvez d’autres recettes dans les réglages, sous Marché.",
-  "onboarding.marketOfficial":
-    "Les recettes officielles sont créées par OpenMedia. Les recettes de la communauté sont envoyées par des gens comme vous.",
-  "onboarding.marketChecked":
-    "Chaque recette est vérifiée automatiquement et retenue 14 jours avant d’être listée.",
-  "onboarding.marketReview":
+    "Impossible d’ajouter : {names}. Vous pourrez les ajouter plus tard depuis la bibliothèque de recettes.",
+  "onboarding.libraryTitle": "Une bibliothèque de recettes.",
+  "onboarding.libraryBody":
+    "Trouvez d’autres recettes dans Réglages, sous Bibliothèque de recettes.",
+  "onboarding.libraryOfficial":
+    "Les recettes officielles sont créées par OpenMedia. Les recettes de la communauté sont partagées par des personnes comme vous et ajoutées après examen par les mainteneurs.",
+  "onboarding.libraryChecked":
+    "Chaque recette est intégrée à l’app : rien n’est téléchargé quand vous en ajoutez une.",
+  "onboarding.libraryReview":
     "Vous examinez chaque règle qu’une recette ajoute avant qu’elle ne soit ajoutée.",
-  "onboarding.marketPro":
-    "Envoyer, exporter et commenter nécessitent Pro. Ajouter, importer et noter sont gratuits.",
+  "onboarding.libraryShare":
+    "Tout le monde peut partager une recette depuis les Réglages. Si les mainteneurs l’acceptent, elle arrive dans une version ultérieure.",
 
   "settings.title": "Réglages",
   "settings.close": "Fermer les réglages",
@@ -289,8 +290,8 @@ export const fr: Messages = {
   "recipes.note":
     "Des recettes prêtes à l’emploi pour les sites populaires. Les invites d’installation et les fenêtres contextuelles qui bloquent la page sont masquées par défaut ; Reels, Shorts et les suggestions restent visibles jusqu’à ce que vous les masquiez. Mettez une recette en favori pour ajouter son site à vos favoris.",
   "recipes.empty":
-    "Vous n’avez pas encore de recettes. Trouvez-en des toutes prêtes pour les sites populaires dans le Marché.",
-  "recipes.openMarket": "Ouvrir le Marché",
+    "Vous n’avez pas encore de recettes. Trouvez-en des toutes prêtes pour les sites populaires dans la bibliothèque de recettes.",
+  "recipes.openLibrary": "Ouvrir la bibliothèque de recettes",
   "recipes.annoyances": "Éléments gênants · masqués par défaut",
   "recipes.content": "Contenu · visible jusqu’à ce que vous le masquiez",
   "recipes.groupAnnoyance": "Élément gênant",
@@ -316,77 +317,43 @@ export const fr: Messages = {
 
   "hub.pages": "Pages de {name}",
 
-  "market.title": "Marché",
-  "market.linkNote":
-    "Des recettes d’autres personnes, vérifiées automatiquement et publiées 14 jours après",
-  "market.note":
-    "Des recettes créées par d’autres personnes. Le serveur vérifie chaque recette automatiquement ; celles qui passent la vérification apparaissent aussitôt dans la liste publique et sont publiées 14 jours après l’envoi. Vous voyez chaque règle avant que quoi que ce soit ne soit ajouté.",
-  "market.loading": "Chargement…",
-  "market.empty": "Rien n’est encore listé.",
-  "market.add": "Ajouter",
-  "market.update": "Mettre à jour",
-  "market.added": "Ajoutée",
-  "market.by": "par {author}",
-  "market.addedBy": "Ajoutée par {count}",
-  "market.withdrawn": "Retirée de cet appareil car elle a été supprimée du marché : {names}",
-  "market.review.version": "Version {version}",
-  "market.review.replaces": "Remplace votre version {version}",
-  "market.review.sites": "Fonctionne sur",
-  "market.review.pages": "Pages",
-  "market.review.options": "Interrupteurs",
-  "market.review.rules": "Ce qu’elle modifie",
-  "market.review.hides": "Masque",
-  "market.review.restyles": "Change l’apparence de",
-  "market.report": "Signaler un problème",
-  "market.report.harmful": "Nuisible",
-  "market.report.broken": "Ne fonctionne pas",
-  "market.report.misleading": "Trompeuse",
-  "market.report.spam": "Spam",
-  "market.report.other": "Autre chose",
-  "market.reported": "Merci, le signalement a été envoyé.",
-  "market.share": "Partager l’une de vos recettes",
-  "market.share.note":
-    "Le serveur vérifie chaque recette automatiquement. Celles qui passent la vérification apparaissent aussitôt dans la liste publique et sont publiées 14 jours après l’envoi. Les nouvelles versions ne peuvent être envoyées que depuis cet appareil.",
-  "market.share.recipe": "Recette",
-  "market.share.name": "Nom sur le marché",
-  "market.share.summary": "Résumé en une ligne",
-  "market.share.author": "Votre nom",
-  "market.share.send": "Envoyer au marché",
-  "market.share.sent": "Envoyée. Elle est dans la liste publique et sera publiée dans 14 jours.",
-  "market.counting": "Prévenir le marché quand j’ajoute une recette",
-  "market.countingNote":
-    "Seul le nom de la recette est envoyé, rien sur vous. Il sert à calculer les chiffres « Ajoutée par ».",
-  "market.tag.official": "Officielle",
-  "market.tag.community": "Communauté",
-  "market.tag.mobile": "Mobile",
-  "market.tag.desktop": "Ordinateur",
-  "market.tag.hub": "Expérimental",
-  "market.filters": "Filtrer par étiquette",
-  "market.noMatch": "Rien ne correspond à ces filtres.",
-  "market.search": "Rechercher des recettes",
-  "market.searchNone": "Aucune recette ne correspond à votre recherche.",
-  "market.rating.none": "Aucune note pour l’instant",
-  "market.rate": "Votre note",
-  "market.rateStars": "Donner {count} étoile | Donner {count} étoiles",
-  "market.comments": "Commentaires",
-  "market.comments.loading": "Chargement des commentaires…",
-  "market.comments.none": "Aucun commentaire pour l’instant.",
-  "market.comments.you": "Vous",
-  "market.comments.write": "Écrire un commentaire",
-  "market.comments.rules": "Pas de liens ni de coordonnées. 280 caractères maximum.",
-  "market.comments.post": "Publier",
-  "market.comments.proPrompt":
-    "Commenter est une fonctionnalité Pro. Tout le monde peut lire les commentaires.",
-  "market.comments.report": "Signaler",
-  "market.comments.reported": "Signalé",
-  "market.comments.block": "Bloquer",
-  "market.comments.blocked": "Auteurs bloqués",
-  "market.comments.blockedNote": "Vous ne voyez pas les commentaires des personnes listées ici.",
-  "market.comments.blockedNone": "Vous n’avez bloqué personne.",
-  "market.comments.unblock": "Débloquer",
+  "library.title": "Bibliothèque de recettes",
+  "library.linkNote": "Des recettes toutes prêtes pour les sites populaires, intégrées à l’app",
+  "library.note":
+    "Les recettes fournies avec OpenMedia. Rien n’est téléchargé : en ajouter une la copie depuis l’app. Vous voyez chaque règle avant que quoi que ce soit soit ajouté.",
+  "library.loading": "Chargement…",
+  "library.empty": "Rien n’est encore listé.",
+  "library.add": "Ajouter",
+  "library.update": "Mettre à jour",
+  "library.added": "Ajoutée",
+  "library.by": "par {author}",
+  "library.review.version": "Version {version}",
+  "library.review.replaces": "Remplace votre version {version}",
+  "library.review.sites": "Fonctionne sur",
+  "library.review.pages": "Pages",
+  "library.review.options": "Interrupteurs",
+  "library.review.rules": "Ce qu’elle modifie",
+  "library.review.hides": "Masque",
+  "library.review.restyles": "Change l’apparence de",
+  "library.review.runsCode": "Exécute du code",
+  "library.review.showCode": "Afficher le code",
+  "library.review.hideCode": "Masquer le code",
+  "library.review.codeNote":
+    "Ce code s’exécute sur les sites ci-dessus. Il respecte les règles de sécurité de l’app : pas de réseau, de stockage, de navigation ni d’automatisation.",
+  "library.shareRecipe": "Partager l’une de vos recettes",
+  "library.tag.official": "Officielle",
+  "library.tag.community": "Communauté",
+  "library.tag.mobile": "Mobile",
+  "library.tag.desktop": "Ordinateur",
+  "library.tag.hub": "Expérimental",
+  "library.filters": "Filtrer par étiquette",
+  "library.noMatch": "Rien ne correspond à ces filtres.",
+  "library.search": "Rechercher des recettes",
+  "library.searchNone": "Aucune recette ne correspond à votre recherche.",
 
-  "share.link": "Importer et exporter",
-  "share.linkNote": "Déplacez des recettes entre appareils sous forme de texte",
+  "share.link": "Importer, exporter et partager",
+  "share.linkNote":
+    "Passez des recettes d’un appareil à l’autre sous forme de texte, ou partagez-en une sur GitHub",
   "share.import": "Importer",
   "share.importNote":
     "Collez uniquement des recettes de personnes de confiance. Vous voyez chaque règle avant que quoi que ce soit ne soit ajouté.",
@@ -400,6 +367,37 @@ export const fr: Messages = {
   "share.copied": "Copié",
   "share.copyFailed": "Impossible de copier. Sélectionnez le texte ci-dessous et copiez-le.",
   "share.none": "Vous n’avez pas encore de recettes à vous.",
+  "share.github.title": "Partagez votre recette avec tout le monde",
+  "share.github.recipe": "Votre recette",
+  "share.github.summary": "Décrivez-la en quelques mots",
+  "share.github.count": "{count} / 140",
+  "share.github.needAccount": "Il vous faut un compte GitHub gratuit.",
+  "share.github.whatSent":
+    "Votre recette et votre nom d’utilisateur GitHub seront envoyés à l’équipe OpenMedia.",
+  "share.github.afterReview":
+    "Tout le monde la reçoit dans une mise à jour, une fois que l’équipe l’a examinée et approuvée.",
+  "share.github.continue": "Continuer avec GitHub",
+  "share.github.waiting":
+    "Connectez-vous à GitHub dans le navigateur qui vient de s’ouvrir, puis revenez ici.",
+  "share.github.working": "Envoi de votre recette…",
+  "share.github.thanks":
+    "Merci ! Votre recette sera disponible dans la prochaine mise à jour, après examen et approbation.",
+  "share.github.see": "Voir sur GitHub",
+  "share.github.tryAgain": "Réessayer",
+  "share.github.error.tooNew":
+    "Votre compte GitHub est trop récent pour partager des recettes. Réessayez dans quelques jours.",
+  "share.github.error.limit":
+    "Vous avez partagé assez de recettes pour aujourd’hui. Réessayez demain.",
+  "share.github.error.invalid": "Cette recette ne peut pas être partagée.",
+  "share.github.error.offline":
+    "Impossible de joindre l’équipe OpenMedia. Vérifiez votre connexion et réessayez.",
+  "share.github.error.busy":
+    "Trop de personnes partagent en ce moment. Réessayez dans quelques minutes.",
+  "share.github.error.failed":
+    "Un problème est survenu et votre recette n’a pas été envoyée. Veuillez réessayer.",
+  "share.github.error.cancelled": "Vous n’avez pas terminé la connexion, donc rien n’a été envoyé.",
+  "share.github.error.timeout":
+    "Cela a pris trop de temps, donc rien n’a été envoyé. Veuillez réessayer.",
 
   "ai.title": "Assistant IA",
   "ai.note":
@@ -466,6 +464,25 @@ export const fr: Messages = {
   "assistant.accept": "Accepter",
   "assistant.switchExists": "Cet interrupteur existe déjà",
   "assistant.matched": "{count} correspondances",
+  "assistant.script.runs": "Exécute du code sur ce site",
+  "assistant.script.show": "Afficher le code",
+  "assistant.script.hide": "Masquer le code",
+  "assistant.script.afterAccept": "Le code ne s’exécute qu’après votre acceptation.",
+  "assistant.script.powers": "Ce que ce code peut faire",
+  "assistant.script.line": "ligne {line}",
+  "assistant.script.shareable":
+    "Elle respecte les règles de sécurité du code, elle peut donc être partagée.",
+  "assistant.script.notShareable":
+    "Elle utilise des choses que les règles de sécurité du code n’autorisent pas, elle ne peut donc pas être partagée.",
+  "assistant.script.power.network": "Envoyer des données sur le réseau",
+  "assistant.script.power.storage": "Lire ou écrire des données stockées et des cookies",
+  "assistant.script.power.dynamicCode": "Créer et exécuter du code à partir de texte",
+  "assistant.script.power.markup": "Créer du balisage ou des styles à partir de texte",
+  "assistant.script.power.navigation": "Envoyer la page ailleurs",
+  "assistant.script.power.automation": "Cliquer, envoyer ou agir à votre place",
+  "assistant.script.power.credentials": "Lire ce que vous saisissez ou des données personnelles",
+  "assistant.script.power.other":
+    "Utiliser des fonctions que les règles de sécurité du code n’autorisent pas",
   "assistant.requestQuote": "« {request} »",
   "assistant.unmatched":
     "{count} règle ne correspond à rien sur cette page. | {count} règles ne correspondent à rien sur cette page.",

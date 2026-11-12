@@ -91,6 +91,16 @@ describe("assistant flow", () => {
     };
     expect(matchedNothing(none)).toBe(true);
     expect(matchedNothing(proposal)).toBe(false);
+    const script = {
+      label: "Script",
+      kind: "script" as const,
+      selector: "",
+      matches: 0,
+      code: "return 1;",
+      powers: [],
+    };
+    expect(matchedNothing({ ...none, rules: [script], unmatched: 0, runsCode: true })).toBe(false);
+    expect(matchedNothing({ ...none, rules: [script, ...none.rules] })).toBe(false);
     const state = run([
       submit("a"),
       { type: "prepared", prepared, preview: false },

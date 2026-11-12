@@ -105,6 +105,7 @@
     "author": "OpenMedia",
     "homepage": "https://web.telegram.org/a/",
     "lastVerified": "2026-11-07",
+    "summary": "Hides app download prompts, link preview cards, photos and videos, view counts",
     "notes": "LIVE (iPhone 390x844 UA, logged out, 2026-11-07): https://t.me/s/telegram counts .tgme_channel_join_telegram=1, a.tgme_widget_message_link_preview=4, a.tgme_widget_message_photo_wrap=3, a.tgme_widget_message_video_player=13, .tgme_widget_message_views=20 (.copyonly is the ' views' label beside it, selector scoped to .tgme_widget_message_info). https://t.me/telegram landing: .tgme_head_right_btn=1 (Download), .tgme_page_additional=1. Fixtures distilled from both pages. Left alone on purpose: 'View in Telegram' button and 'Preview channel' link (the landing page's only navigation). NOT verified: https://web.telegram.org/a/ logged out shows only the QR/phone login (nothing hidden there, no rules target it); logged-in web app, reactions, polls, stickers, voice, documents, round videos, sponsored posts and non-English variants were not seen, so no rules exist for them."
   }
 }

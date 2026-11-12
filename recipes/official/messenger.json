@@ -46,6 +46,7 @@
     "author": "OpenMedia",
     "homepage": "https://www.messenger.com/",
     "lastVerified": "2026-11-08",
+    "summary": "Hides app download badges, \"Not on Facebook?\" link",
     "notes": "LIVE (headless Chromium, 2026-11-07 and 2026-11-08, Sri Lanka address, logged out). iPhone UA 390x844: www.messenger.com/ is a marketing landing page with no login form, cookie banner or pop-up; /login/ redirects to /. span:has(> a[href^=\"https://lm.messenger.com/l.php\"]) matched 3 (Android, iOS and desktop badge spans). The #modalDialog template is display:none and #header-notices is empty; the Features_subnav menu is aria-hidden and not shown at this width, so none are hidden. Desktop UA 1280x800 /login/: only a login form (email, password, Continue, 'Keep me signed in' checkbox) plus a row 'Not on Facebook? | Forgotten password | Privacy Policy'; a[href^=\"https://www.facebook.com/r.php\"] matched 1, outside the form. No cookie or consent banner, 'Get Messenger' or 'Continue as' prompt appeared in either layout (a consent dialog, if ever shown to EU users, is deliberately not hidden). NOT verified: the logged-in messenger UI (no account), banners or notifications after sign-in, EU/UK consent UI."
   }
 }

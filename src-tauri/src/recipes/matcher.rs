@@ -7,7 +7,7 @@ use tauri_plugin_siteview::site::is_public_suffix;
 use crate::error::{Error, Result};
 
 /// Each `*` in a path becomes a backtracking `.*` in the regex the page script runs, so a path
-/// with many of them can freeze a page; the marketplace refuses more than this too.
+/// with many of them can freeze a page; shared recipes are refused above this too.
 const MAX_PATH_WILDCARDS: usize = 4;
 
 /// A parsed `match` pattern: scheme, host (optionally `*.` for any subdomain depth, apex

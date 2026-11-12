@@ -7,7 +7,7 @@ import { library } from "../../shared/ipc";
 const GUIDES_URL = "https://openmedia.surf/guides/";
 
 /** The step-by-step guides on the website, one per task. */
-export type GuideSlug = "connect-ai" | "change-a-site" | "your-recipe" | "marketplace";
+export type GuideSlug = "connect-ai" | "change-a-site" | "your-recipe";
 
 export const guideUrl = (slug: GuideSlug): string => `${GUIDES_URL}${slug}/`;
 

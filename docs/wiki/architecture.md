@@ -61,11 +61,11 @@ The Rust API is shared; Swift on iOS and Kotlin on Android provide the native we
 
 ### Recipe store (Rust)
 
-Recipes are JSON files in the app data dir, one per recipe. **The app ships no bundled recipes and has no forks** (Design, 2026-11-10): the 18 site recipes live in `recipes/official/`, are validated and fixture-tested by `cargo test` but not compiled in, and are published to the marketplace as official `market.official.<site>` recipes; a fresh install has none until the user installs some (see Onboarding below). Origins are only `user`, `ai` and `imported`; page-specific AI changes write a separate `custom.<domain>` recipe beside an installed one, and hub proposals save as `custom.hub-<slug>`. The assistant never edits an installed recipe. Hubs store 2–6 launcher tabs, while the shell opens every tab in the ordinary independent site-session model. See [Recipe Format](./recipe-format.md).
+Recipes are JSON files in the app data dir, one per recipe. **Every recipe the project ships is compiled into the app and nothing is downloaded** (Design, 2026-11-13): the 18 official site recipes in `recipes/official/` and the community recipes merged into `recipes/community/` are embedded by `build.rs` and offered by the recipe library ([Recipe Library and Sharing](./recipe-library.md)); *Add* copies one into the data dir, so a fresh install has none added until the user picks some (see Onboarding below). There are no forks. Origins are only `user`, `ai` and `imported`; page-specific AI changes write a separate `custom.<domain>` recipe beside an installed one, and hub proposals save as `custom.hub-<slug>`. The assistant never edits an installed recipe. Hubs store 2–6 launcher tabs, while the shell opens every tab in the ordinary independent site-session model. See [Recipe Format](./recipe-format.md).
 
 ### AI service (Rust)
 
-Rust has Anthropic and OpenAI-compatible adapters (including Gemini, OpenRouter, OpenCode Zen, Ollama, LM Studio, and compatible endpoints). The same BYOK configuration supports structured patch generation and bounded tool calls for the read-only marketplace hub builder. Requests run in Rust, so the key never enters a webview. See [AI Assistant](./ai-assistant.md).
+Rust has Anthropic and OpenAI-compatible adapters (including Gemini, OpenRouter, OpenCode Zen, Ollama, LM Studio, and compatible endpoints). The same BYOK configuration supports structured patch generation and bounded tool calls for the read-only hub builder over the bundled recipes. Requests run in Rust, so the key never enters a webview. See [AI Assistant](./ai-assistant.md).
 
 ### Secret store (Rust)
 
@@ -73,7 +73,7 @@ The in-repository `SecretStore` uses the iOS Keychain and Android Keystore-backe
 
 ### Recipe page script (Rust-generated)
 
-Rust compiles the implemented recipe subset (`hide` and `css`) into a self-contained document-start script in `src-tauri/src/recipes/compile.rs`. It matches the page URL and injects a stylesheet. This is not a standalone TypeScript engine; SPA observers and the richer runtime described in [Site Runtime](./site-runtime.md) remain design work.
+Rust compiles the implemented recipe subset (`hide`, `css` and `script`) into a self-contained document-start script in `src-tauri/src/recipes/compile.rs`. It matches the page URL, injects a stylesheet and, for `script` rules, runs each script once after `DOMContentLoaded` (the scripts are embedded as raw function expressions, never evaluated from strings, so a page CSP does not stop them). Which scripts a recipe may carry is decided by `src-tauri/src/recipes/script_policy.rs` ([Script Policy](./script-policy.md)). This is not a standalone TypeScript engine; SPA observers and the richer runtime described in [Site Runtime](./site-runtime.md) remain design work.
 
 ### Shell (React)
 
@@ -100,7 +100,7 @@ sequenceDiagram
 
 ### Onboarding (Design)
 
-First launch shows the guide, then a step "What do you need in quick access?" that lists the official marketplace recipes for the current platform (`onboarding_options`, from the verified index), and a step explaining the marketplace. `onboarding_apply` installs the selection through the same verified path as `marketplace_install` and **replaces the favorites** with exactly the installed picks' homepages when at least one install succeeds (4 free, 6 with Pro: 5 or 6 without Pro is `pro-required`, more than 6 or a repeat is an error; picks that are not official options for this platform or fail to install are returned in `failed`; names are cut to 20 characters), then the shell calls `complete_onboarding`. Offline or failed: skipping is always allowed. See [UI Design](./ui-design.md#onboarding) and [Marketplace](./marketplace.md#onboarding-install).
+First launch shows the guide, then a step "What do you need in quick access?" that lists the official recipes for the current platform (`onboarding_options`, from the bundled set), and a step explaining the recipe library. `onboarding_apply` adds the selection through the same path as `library_install` and **replaces the favorites** with exactly the installed picks' homepages when at least one install succeeds (4 free, 6 with Pro: 5 or 6 without Pro is `pro-required`, more than 6 or a repeat is an error; picks that are not official options for this platform or fail to install are returned in `failed`; names are cut to 20 characters), then the shell calls `complete_onboarding`. Failed picks are reported and skipping is always allowed. See [UI Design](./ui-design.md#onboarding) and [Recipe Library and Sharing](./recipe-library.md).
 
 ### Launch
 
@@ -158,12 +158,11 @@ sequenceDiagram
 |------|----------|-------|
 | Favorites, settings, history and provider configuration | `<app_data>/library.json` | No API keys |
 | Usage records and policies | `<app_data>/usage.json` | Local data |
-| User recipes, imported recipes and installed marketplace recipes | `<app_data>/recipes/` | No recipes are embedded in the binary (Design, 2026-11-10); the official ones are installed from the marketplace |
-| Marketplace state: newest catalog sequence, installed marketplace recipes and their hashes, edit tokens, install-count switch. **v2 adds** (Design): the random device token (43-character base64url), the user's own star ratings (`myRating` per recipe) and the blocked-commenter list | `<app_data>/catalog-state.json` | Local data; nothing here is a signing key. The device token is an identifier that is sent to the marketplace (see [Marketplace](./marketplace.md#privacy)); the RevenueCat app user id is not stored here, it is read from the billing plugin when needed |
+| User recipes, imported recipes and added library recipes | `<app_data>/recipes/` | The bundled recipes are embedded in the binary; *Add* writes a local copy here |
 | API keys | OS secure storage | iOS Keychain; Android Keystore-backed plugin; never returned to the shell |
 | Site cookies/storage | Native webview profile store | Android behavior is not device-verified |
 
-There is no cross-device sync. Recipes move between devices by export/import (`Settings > Import and export`) and the [marketplace](./marketplace.md).
+There is no cross-device sync. Recipes move between devices by export/import (`Settings > Import and export`); a recipe that should reach everyone is shared as a pull request ([Recipe Library and Sharing](./recipe-library.md)).
 
 ## Current stack
 
@@ -188,13 +187,14 @@ src/
   shared/               Shared frontend state, IPC helpers, and components
   i18n/                 Localized UI messages
 src-tauri/
-  src/                  Rust app, commands, recipes (incl. `share.rs`), `catalog/` (marketplace client), AI, storage, usage
+  src/                  Rust app, commands, recipes (incl. `share.rs`), `recipes/bundled.rs` (the embedded library), `share/` (GitHub share client), AI, storage, usage
   plugins/
     tauri-plugin-siteview/  Swift and Kotlin native site views
     tauri-plugin-billing/   Store billing adapters
   gen/                  Generated Apple and Android native projects
 recipes/
-  official/             Official recipes, published to the marketplace (validated and fixture-tested, not embedded)
+  official/             Official recipes, embedded in the app (validated and fixture-tested)
+  community/            Community recipes merged from pull requests (validated, embedded)
   fixtures/             DOM fixtures per site
 scripts/official-recipes.mjs  Prints the SQL that publishes recipes/official/ (operator)
 blocklists/              Bundled EasyList and EasyPrivacy files

@@ -1,7 +1,6 @@
 mod ad_block;
 mod ai;
 mod boot;
-pub mod catalog;
 mod commands;
 #[cfg(target_os = "macos")]
 mod desktop_menu;
@@ -10,9 +9,11 @@ pub mod error;
 mod incognito;
 mod library;
 mod ota;
+mod recipe_library;
 pub mod recipes;
 mod secrets;
 mod self_update;
+mod share;
 mod share_commands;
 mod sites;
 mod usage;
@@ -53,10 +54,7 @@ pub fn run() {
             });
             app.manage(incognito::Incognito::default());
             app.manage(recipes::Recipes::load(data_dir.join("recipes"))?);
-            app.manage(catalog::Catalog::new(
-                catalog::Market::from_build().ok(),
-                catalog::State::load(data_dir.join("catalog-state.json")),
-            ));
+            app.manage(share::Shares::from_build());
             let ad_block = ad_block::AdBlock::bundled(app.path().app_cache_dir()?.join("ad-block"));
             app.manage(ad_block.clone());
             // The start page opens now, on another thread, while the shell boots; see `boot.rs`.
@@ -121,24 +119,17 @@ pub fn run() {
             share_commands::preview_recipe_import,
             share_commands::import_recipes,
             share_commands::remove_imported_recipe,
-            catalog::commands::marketplace_status,
-            catalog::commands::marketplace_set_counting,
-            catalog::commands::marketplace_list,
-            catalog::commands::marketplace_preview,
-            catalog::commands::marketplace_install,
-            catalog::commands::marketplace_uninstall,
-            catalog::commands::marketplace_report,
-            catalog::commands::marketplace_submit,
-            catalog::commands::marketplace_set_rating,
-            catalog::commands::marketplace_comments,
-            catalog::commands::marketplace_post_comment,
-            catalog::commands::marketplace_delete_comment,
-            catalog::commands::marketplace_report_comment,
-            catalog::commands::marketplace_block_commenter,
-            catalog::commands::marketplace_unblock_commenter,
-            catalog::commands::marketplace_blocked,
-            catalog::commands::onboarding_options,
-            catalog::commands::onboarding_apply,
+            recipe_library::library_list,
+            recipe_library::library_preview,
+            recipe_library::library_install,
+            recipe_library::library_uninstall,
+            recipe_library::onboarding_options,
+            recipe_library::onboarding_apply,
+            share::commands::share_status_available,
+            share::commands::share_start,
+            share::commands::share_status,
+            share::commands::share_open,
+            share::commands::share_cancel,
             commands::set_bottom_margin,
             commands::set_site_bottom_margin,
             commands::bottom_margin_for,

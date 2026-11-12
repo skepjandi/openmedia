@@ -16,13 +16,13 @@ use uuid::Uuid;
 use super::{
     ProviderConfig,
     activity::{Activity, StepKind, StepStatus},
-    patch::{self, Patch},
+    patch::{self, Patch, PatchRule},
     prompt::{self, EarlierTurn, Prompt, PromptInput, RepairNote, RuleFailure},
     redact,
     snapshot::{self, Snapshot},
 };
 use crate::error::{Error, Result};
-use crate::recipes::{OptionGroup, Recipe, Rule};
+use crate::recipes::{OptionGroup, Recipe, Rule, script_policy};
 
 const MAX_REQUEST_CHARS: usize = 500;
 const MAX_JOBS: usize = 8;
@@ -108,8 +108,67 @@ pub struct ProposalOption {
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
 pub struct ProposalRule {
     pub label: String,
+    #[serde(default)]
+    pub kind: ProposalRuleKind,
+    /// Empty for a script rule.
     pub selector: String,
+    /// Elements a style rule matches now; 0 for a script rule, which is never counted.
     pub matches: i64,
+    /// The script, exactly as it will be saved and run; only for a script rule.
+    #[serde(default)]
+    pub code: Option<String>,
+    /// What the script can do that the shared-recipe script policy refuses; empty for a style rule.
+    #[serde(default)]
+    pub powers: Vec<Power>,
+}
+
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub enum ProposalRuleKind {
+    #[default]
+    Style,
+    Script,
+}
+
+/// One policy finding on a script, shown to the user before they accept it.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub struct Power {
+    pub code: String,
+    pub message: String,
+    pub line: u32,
+}
+
+impl ProposalRule {
+    fn style(label: String, selector: String, matches: i64) -> Self {
+        Self {
+            label,
+            kind: ProposalRuleKind::Style,
+            selector,
+            matches,
+            code: None,
+            powers: Vec::new(),
+        }
+    }
+
+    fn script(label: String, code: String) -> Self {
+        let powers = script_policy::scan(&code)
+            .into_iter()
+            .map(|finding| Power {
+                code: finding.code.to_owned(),
+                message: finding.message,
+                line: finding.line,
+            })
+            .collect();
+        Self {
+            label,
+            kind: ProposalRuleKind::Script,
+            selector: String::new(),
+            matches: 0,
+            code: Some(code),
+            powers,
+        }
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -122,8 +181,19 @@ pub struct Proposal {
     pub recipe_name: String,
     pub option: ProposalOption,
     pub rules: Vec<ProposalRule>,
-    /// Rules that matched no element on the page.
+    /// Style rules that matched no element on the page.
     pub unmatched: usize,
+    /// Whether accepting saves a script that runs on the site's pages.
+    #[serde(default)]
+    pub runs_code: bool,
+    /// Whether every script is within the shared-recipe script policy, so the recipe could be shared.
+    #[serde(default = "default_publishable")]
+    pub publishable: bool,
+}
+
+/// Saved chats from before script rules hold style-only proposals, which are always shareable.
+fn default_publishable() -> bool {
+    true
 }
 
 /// Everything about one request that has to outlive a command call.
@@ -272,13 +342,19 @@ pub fn prepare<F: FnOnce(&str, &str) -> RecipeContext>(
     Ok(prepared(id))
 }
 
-/// The selectors the page is asked to count, and the css that previews them.
+/// The style rules the page is asked to count, and the css that previews them. Script rules are
+/// neither counted nor previewed: they run only after the user accepts.
 fn selectors_and_css(patch: &Patch, base: Option<&Recipe>) -> (Vec<(String, String)>, String) {
     match (patch, base) {
         (Patch::NewOption { rules, .. }, _) => (
             rules
                 .iter()
-                .map(|rule| (rule.label.clone(), rule.selector.clone()))
+                .filter_map(|rule| match rule {
+                    PatchRule::Style {
+                        label, selector, ..
+                    } => Some((label.clone(), selector.clone())),
+                    PatchRule::Script { .. } => None,
+                })
                 .collect(),
             patch::preview_css(patch),
         ),
@@ -303,6 +379,9 @@ fn selectors_and_css(patch: &Patch, base: Option<&Recipe>) -> (Vec<(String, Stri
 }
 
 fn counts_of(page: &impl Page, selectors: &[String]) -> Result<Vec<i64>> {
+    if selectors.is_empty() {
+        return Ok(Vec::new());
+    }
     let json = page.evaluate(snapshot::count_script(selectors))?;
     let counts: Vec<i64> =
         serde_json::from_str(&json).map_err(|_| Error::Connection(MSG_BAD_PAGE.to_owned()))?;
@@ -313,8 +392,39 @@ fn counts_of(page: &impl Page, selectors: &[String]) -> Result<Vec<i64>> {
     }
 }
 
+/// The rules as the user sees them: in the answer's order, style rules with their counts.
+fn shown_rules(
+    patch: &Patch,
+    styles: Vec<(String, String)>,
+    counts: Vec<i64>,
+) -> Vec<ProposalRule> {
+    let mut counted = styles
+        .into_iter()
+        .zip(counts)
+        .map(|((label, selector), matches)| ProposalRule::style(label, selector, matches));
+    match patch {
+        Patch::ExistingOption { .. } => counted.collect(),
+        Patch::NewOption { rules, .. } => rules
+            .iter()
+            .filter_map(|rule| match rule {
+                PatchRule::Style { .. } => counted.next(),
+                PatchRule::Script { label, code } => {
+                    Some(ProposalRule::script(label.clone(), code.clone()))
+                }
+            })
+            .collect(),
+    }
+}
+
 fn proposal_for(id: Uuid, job: &Job, patch: &Patch, rules: Vec<ProposalRule>) -> Proposal {
-    let unmatched = rules.iter().filter(|rule| rule.matches <= 0).count();
+    let unmatched = rules
+        .iter()
+        .filter(|rule| rule.kind == ProposalRuleKind::Style && rule.matches <= 0)
+        .count();
+    let runs_code = rules
+        .iter()
+        .any(|rule| rule.kind == ProposalRuleKind::Script);
+    let publishable = rules.iter().all(|rule| rule.powers.is_empty());
     let (kind, option) = match patch {
         Patch::NewOption {
             label,
@@ -360,6 +470,8 @@ fn proposal_for(id: Uuid, job: &Job, patch: &Patch, rules: Vec<ProposalRule>) ->
         option,
         rules,
         unmatched,
+        runs_code,
+        publishable,
     }
 }
 
@@ -474,15 +586,7 @@ pub async fn send(
         );
 
         if failed.is_empty() || round == MAX_REPAIRS {
-            let shown = rules
-                .into_iter()
-                .zip(counts)
-                .map(|((label, selector), matches)| ProposalRule {
-                    label,
-                    selector,
-                    matches,
-                })
-                .collect();
+            let shown = shown_rules(&patch, rules, counts);
             let proposal = proposal_for(id, &job, &patch, shown);
             agent.set_patch(id, patch);
             return Ok(proposal);
@@ -938,6 +1042,95 @@ mod tests {
             assert!(matches!(&result, Err(Error::Connection(m)) if m == MSG_CANCELLED));
             assert_eq!(*model.calls.lock().unwrap(), 1);
             assert_eq!(page.log().len(), before);
+        });
+    }
+
+    fn script_option(code: &str) -> String {
+        json!({"kind":"newOption","summary":"Posts nothing; logs the title.","optionId":null,
+          "label":"Log the title","description":"Runs a script.","group":"content",
+          "rules":[{"label":"Title","selector":null,"declarations":null,"script":code}]})
+        .to_string()
+    }
+
+    #[test]
+    fn a_script_proposal_shows_code_and_powers_and_runs_nothing_before_accept() {
+        let code = "const r = fetch(\"https://example.org/x\");\nreturn r;";
+        run(async {
+            let agent = Agent::default();
+            let page = FakePage::new(vec![]);
+            let prepared = prepare(&agent, &page, input(None)).unwrap();
+            let model = FakeModel::new(&[&script_option(code)]);
+            let proposal = send(&agent, &page, &model, &|_| {}, prepared.id)
+                .await
+                .unwrap();
+            let rule = &proposal.rules[0];
+            assert_eq!(rule.kind, ProposalRuleKind::Script);
+            assert_eq!(rule.code.as_deref(), Some(code));
+            assert_eq!(rule.selector, "");
+            assert_eq!(proposal.unmatched, 0, "a script is not counted");
+            assert!(proposal.runs_code);
+            let scanned = script_policy::scan(code);
+            assert_eq!(rule.powers.len(), scanned.len());
+            assert_eq!(proposal.publishable, scanned.is_empty());
+            assert!(
+                page.log().iter().all(|script| !script.contains("fetch(")),
+                "the script text never reaches the page before accept"
+            );
+
+            let Accepted::SaveRecipe(recipe) = accept(&agent, &page, prepared.id).unwrap() else {
+                panic!("expected a recipe");
+            };
+            assert!(recipe.rules.iter().any(|rule| matches!(
+                rule,
+                Rule::Script { code: saved, option: Some(option), .. }
+                    if saved == code && option == "log-the-title"
+            )));
+            assert_eq!(recipe.origin, crate::recipes::Origin::Ai);
+            let json = serde_json::to_string(&recipe).unwrap();
+            assert_eq!(Recipe::parse(&json).unwrap(), *recipe);
+            assert!(
+                page.log().iter().all(|script| !script.contains("fetch(")),
+                "not even accept runs it: the page script does, on the next load"
+            );
+        });
+    }
+
+    #[test]
+    fn a_mixed_proposal_keeps_order_and_counts_only_its_style_rules() {
+        run(async {
+            let agent = Agent::default();
+            let page = FakePage::new(vec![vec![0], vec![0], vec![0]]);
+            let prepared = prepare(&agent, &page, input(None)).unwrap();
+            let answer = json!({"kind":"newOption","summary":"s","optionId":null,
+            "label":"Mixed","description":"d","group":"content",
+            "rules":[
+              {"label":"Script","selector":null,"declarations":null,"script":"return 1;"},
+              {"label":"Promo","selector":"#nope","declarations":null,"script":null}
+            ]})
+            .to_string();
+            let model = FakeModel::new(&[&answer, &answer, &answer]);
+            let proposal = send(&agent, &page, &model, &|_| {}, prepared.id)
+                .await
+                .unwrap();
+            assert_eq!(proposal.rules.len(), 2);
+            assert_eq!(proposal.rules[0].kind, ProposalRuleKind::Script);
+            assert_eq!(proposal.rules[1].kind, ProposalRuleKind::Style);
+            assert_eq!(proposal.unmatched, 1);
+            assert!(proposal.runs_code);
+        });
+    }
+
+    #[test]
+    fn a_script_that_breaks_out_of_its_wrapper_is_not_proposed() {
+        run(async {
+            let agent = Agent::default();
+            let page = FakePage::new(vec![]);
+            let prepared = prepare(&agent, &page, input(None)).unwrap();
+            let evil = script_option("}); x(); (function(){");
+            let model = FakeModel::new(&[&evil, &evil, &evil]);
+            let result = send(&agent, &page, &model, &|_| {}, prepared.id).await;
+            assert!(result.is_err());
+            assert!(page.log().iter().all(|script| !script.contains("x();")));
         });
     }
 }

@@ -47,7 +47,7 @@ Web versions lack: one-time-view DMs, sending video, story poll interaction, mus
 
 ## Positioning
 
-OpenMedia is the **general, open, local-first** version: SocialLite's mechanism, generalized to any site with a declarative recipe format and an AI that writes recipes. Popular sites get official recipes served from the marketplace so the common case needs no AI and no key.
+OpenMedia is the **general, open, local-first** version: SocialLite's mechanism, generalized to any site with a declarative recipe format and an AI that writes recipes. Popular sites get official recipes that ship inside the app so the common case needs no AI and no key.
 
 ## Sources
 

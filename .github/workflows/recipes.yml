@@ -1,0 +1,29 @@
+name: Recipes
+
+on:
+  pull_request:
+    paths:
+      - "recipes/**"
+      - "shared/script-policy/**"
+      - "src-tauri/src/recipes/**"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: recipes-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    runs-on: macos-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v7
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri
+      # Parses every bundled recipe (official and community) as an imported one, which runs the
+      # recipe validator and the script policy, and checks the id and directory rules.
+      - run: cargo test --manifest-path src-tauri/Cargo.toml -p openmedia --lib recipes::

@@ -414,18 +414,18 @@ mod tests {
     }
 
     const TOOL_CALL_ANSWER: &str = r#"{"id":"msg_02","type":"message","role":"assistant","model":"claude-x",
-      "content":[{"type":"tool_use","id":"toolu_01","name":"search_marketplace",
+      "content":[{"type":"tool_use","id":"toolu_01","name":"search_recipes",
                   "input":{"query":"hide reels"}}],
       "stop_reason":"tool_use","usage":{"input_tokens":10,"output_tokens":5}}"#;
 
     const FINAL_ANSWER: &str = r#"{"id":"msg_03","type":"message","role":"assistant","model":"claude-x",
-      "content":[{"type":"text","text":"The marketplace has a recipe for that."}],
+      "content":[{"type":"text","text":"The library has a recipe for that."}],
       "stop_reason":"end_turn","usage":{"input_tokens":20,"output_tokens":9}}"#;
 
     fn search_tool() -> ToolDefinition {
         ToolDefinition {
-            name: "search_marketplace".to_owned(),
-            description: "Search the marketplace.".to_owned(),
+            name: "search_recipes".to_owned(),
+            description: "Search the recipes.".to_owned(),
             input_schema: json!({
                 "type": "object",
                 "properties": { "query": { "type": "string" } },
@@ -449,13 +449,13 @@ mod tests {
                 text: None,
                 tool_calls: vec![ToolCall {
                     id: "toolu_01".to_owned(),
-                    name: "search_marketplace".to_owned(),
+                    name: "search_recipes".to_owned(),
                     arguments: json!({ "query": "hide reels" }),
                 }],
             },
             Turn::ToolResult(ToolResult {
                 call_id: "toolu_01".to_owned(),
-                name: "search_marketplace".to_owned(),
+                name: "search_recipes".to_owned(),
                 content: "two recipes".to_owned(),
                 is_error: false,
             }),
@@ -473,7 +473,7 @@ mod tests {
         let body = &request.body;
         assert_eq!(body["model"], "claude-x");
         assert_eq!(body["system"], "SYSTEM");
-        assert_eq!(body["tools"][0]["name"], "search_marketplace");
+        assert_eq!(body["tools"][0]["name"], "search_recipes");
         assert_eq!(
             body["tools"][0]["input_schema"]["properties"]["query"]["type"],
             "string"
@@ -491,7 +491,7 @@ mod tests {
             json!({
                 "type": "tool_use",
                 "id": "toolu_01",
-                "name": "search_marketplace",
+                "name": "search_recipes",
                 "input": { "query": "hide reels" },
             })
         );
@@ -511,12 +511,12 @@ mod tests {
         };
         assert_eq!(calls.len(), 1);
         assert_eq!(calls[0].id, "toolu_01");
-        assert_eq!(calls[0].name, "search_marketplace");
+        assert_eq!(calls[0].name, "search_recipes");
         assert_eq!(calls[0].arguments, json!({ "query": "hide reels" }));
         let words = parse_tool_response(&serde_json::from_str(FINAL_ANSWER).unwrap()).unwrap();
         assert_eq!(
             words,
-            ModelReply::Text("The marketplace has a recipe for that.".to_owned())
+            ModelReply::Text("The library has a recipe for that.".to_owned())
         );
     }
 
@@ -587,7 +587,7 @@ mod tests {
         .unwrap();
         assert_eq!(
             answer,
-            ModelReply::Text("The marketplace has a recipe for that.".to_owned())
+            ModelReply::Text("The library has a recipe for that.".to_owned())
         );
         let seen = server.seen.lock().unwrap();
         assert_eq!(seen.len(), 2);

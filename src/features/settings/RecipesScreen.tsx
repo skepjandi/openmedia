@@ -10,9 +10,8 @@ import type { Hub, OptionGroup, SiteSettings } from "../../shared/ipc";
 import { SiteTile } from "../../shared/SiteTile";
 import { Screen } from "../../shared/Screen";
 import { GuideLink } from "../guides/GuideLink";
-import { useMarketplaceAvailable } from "../marketplace/Links";
 import { Switch } from "./Switch";
-import { ImportedNotice } from "../marketplace/Links";
+import { ImportedNotice } from "../library/Links";
 import { Group, GroupLabel, quietButton } from "./ui";
 
 const GROUPS: { group: OptionGroup; title: MessageKey }[] = [
@@ -62,7 +61,6 @@ export function RecipesScreen() {
   const closeSheet = useApp((s) => s.closeSheet);
   const sites = useApp((s) => s.sites);
   const openSheet = useApp((s) => s.openSheet);
-  const marketAvailable = useMarketplaceAvailable();
   const t = useT();
   if (!open) return null;
 
@@ -76,11 +74,9 @@ export function RecipesScreen() {
       {sites.length === 0 && (
         <div className="flex flex-col items-start gap-3 px-1">
           <p className="text-sm text-paper/70">{t("recipes.empty")}</p>
-          {marketAvailable && (
-            <button type="button" onClick={() => openSheet("marketplace")} className={quietButton}>
-              {t("recipes.openMarket")}
-            </button>
-          )}
+          <button type="button" onClick={() => openSheet("library")} className={quietButton}>
+            {t("recipes.openLibrary")}
+          </button>
         </div>
       )}
       <div className="flex flex-col gap-3">

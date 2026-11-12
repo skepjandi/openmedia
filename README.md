@@ -15,12 +15,12 @@
   <img src="https://img.shields.io/badge/Tauri-v2-24C8DB.svg" alt="Tauri v2">
 </p>
 
-OpenMedia is an open-source mobile browser built with Tauri, Rust, React, and TypeScript. It loads websites directly in native web views and applies local, user-controlled recipes. No account, no analytics; the only OpenMedia-operated server is the optional recipe marketplace (which, in the planned v2, receives a random device token and, on Pro actions, the RevenueCat app user id, stored only hashed), and purchases use RevenueCat.
+OpenMedia is an open-source mobile browser built with Tauri, Rust, React, and TypeScript. It loads websites directly in native web views and applies local, user-controlled recipes. No account, no analytics; the only OpenMedia-operated server is a small Worker that opens a GitHub pull request when you share a recipe, and purchases use RevenueCat.
 
 ## Features
 
 - Favorites, history, themes, usage limits, and local notifications.
-- Site recipes from the marketplace (the app bundles none; planned: official and community tags, ratings, Pro comments and Pro uploads, see the [marketplace page](docs/wiki/marketplace.md)) and EasyList/EasyPrivacy ad and tracker blocking.
+- Site recipes that ship inside the app (official ones from the maintainers, community ones merged from pull requests; see the [recipe library page](docs/wiki/recipe-library.md)) and EasyList/EasyPrivacy ad and tracker blocking.
 - Optional AI recipe assistant using a provider and API key you choose.
 - Separate site web views with isolated profile storage.
 

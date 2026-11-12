@@ -171,22 +171,22 @@ export const nl: Messages = {
     "Kies de sites die je het vaakst opent. OpenMedia voegt hun officiële recepten toe en zet ze op je knop.",
   "onboarding.quickLoading": "De officiële recepten laden…",
   "onboarding.quickEmpty":
-    "Voor dit apparaat staan er nog geen officiële recepten in de lijst. Je kunt er later wat toevoegen via de Marktplaats.",
+    "Er staan nog geen officiële recepten voor dit apparaat. Je kunt er later een paar toevoegen vanuit de receptenbibliotheek.",
   "onboarding.quickCount": "{count} van {limit} gekozen",
   "onboarding.quickProHint": "Dat is het maximum van je abonnement. Pro heeft meer plekken.",
   "onboarding.applying": "Toevoegen…",
   "onboarding.partial":
-    "Kon niet toevoegen: {names}. Je kunt ze later toevoegen via de Marktplaats.",
-  "onboarding.marketTitle": "Een marktplaats vol recepten.",
-  "onboarding.marketBody": "Meer recepten vind je in Instellingen, onder Marktplaats.",
-  "onboarding.marketOfficial":
-    "Officiële recepten zijn gemaakt door OpenMedia. Communityrecepten worden geüpload door mensen zoals jij.",
-  "onboarding.marketChecked":
-    "Elk recept wordt automatisch gecontroleerd en 14 dagen vastgehouden voordat het in de lijst komt.",
-  "onboarding.marketReview":
+    "Kon niet worden toegevoegd: {names}. Je kunt ze later toevoegen vanuit de receptenbibliotheek.",
+  "onboarding.libraryTitle": "Een bibliotheek vol recepten.",
+  "onboarding.libraryBody": "Vind meer recepten in Instellingen, onder Receptenbibliotheek.",
+  "onboarding.libraryOfficial":
+    "Officiële recepten zijn gemaakt door OpenMedia. Communityrecepten worden gedeeld door mensen zoals jij en toegevoegd nadat de beheerders ze hebben bekeken.",
+  "onboarding.libraryChecked":
+    "Elk recept zit in de app, dus er wordt niets gedownload wanneer je er een toevoegt.",
+  "onboarding.libraryReview":
     "Je bekijkt elke regel die een recept toevoegt voordat die wordt toegevoegd.",
-  "onboarding.marketPro":
-    "Uploaden, exporteren en reageren vereisen Pro. Toevoegen, importeren en beoordelen is gratis.",
+  "onboarding.libraryShare":
+    "Iedereen kan een recept delen via Instellingen. Als de beheerders het accepteren, komt het in een latere versie.",
 
   "settings.title": "Instellingen",
   "settings.close": "Instellingen sluiten",
@@ -306,82 +306,47 @@ export const nl: Messages = {
   "recipes.imported":
     "Van buiten de app toegevoegd. Verwijder het om de site weer te laten zoals hij was.",
   "recipes.empty":
-    "Je hebt nog geen recepten. Vind kant-en-klare recepten voor populaire sites op de Marktplaats.",
-  "recipes.openMarket": "Open de Marktplaats",
+    "Je hebt nog geen recepten. Vind kant-en-klare recepten voor populaire sites in de receptenbibliotheek.",
+  "recipes.openLibrary": "Open de receptenbibliotheek",
 
   "hub.pages": "Pagina's van {name}",
 
-  "market.title": "Marktplaats",
-  "market.linkNote":
-    "Recepten van anderen, automatisch gecontroleerd en 14 dagen later gepubliceerd",
-  "market.note":
-    "Recepten gemaakt door anderen. De server controleert elk recept automatisch; recepten die de controle doorstaan verschijnen meteen in de openbare lijst en worden 14 dagen na het versturen gepubliceerd. Je ziet elke regel voordat er iets wordt toegevoegd.",
-  "market.loading": "Laden…",
-  "market.empty": "Er staat nog niets in de lijst.",
-  "market.add": "Toevoegen",
-  "market.update": "Bijwerken",
-  "market.added": "Toegevoegd",
-  "market.by": "door {author}",
-  "market.addedBy": "Toegevoegd door {count}",
-  "market.withdrawn": "Van dit apparaat verwijderd omdat het is ingetrokken: {names}",
-  "market.review.version": "Versie {version}",
-  "market.review.replaces": "Vervangt je versie {version}",
-  "market.review.sites": "Werkt op",
-  "market.review.pages": "Pagina's",
-  "market.review.options": "Schakelaars",
-  "market.review.rules": "Wat het verandert",
-  "market.review.hides": "Verbergt",
-  "market.review.restyles": "Past de stijl aan van",
-  "market.report": "Een probleem melden",
-  "market.report.harmful": "Schadelijk",
-  "market.report.broken": "Kapot",
-  "market.report.misleading": "Misleidend",
-  "market.report.spam": "Spam",
-  "market.report.other": "Iets anders",
-  "market.reported": "Bedankt, de melding is verstuurd.",
-  "market.share": "Deel een van je recepten",
-  "market.share.note":
-    "De server controleert elk recept automatisch. Recepten die de controle doorstaan verschijnen meteen in de openbare lijst en worden 14 dagen na het versturen gepubliceerd. Nieuwe versies kunnen alleen vanaf dit apparaat worden verstuurd.",
-  "market.share.recipe": "Recept",
-  "market.share.name": "Naam op de marktplaats",
-  "market.share.summary": "Samenvatting in één regel",
-  "market.share.author": "Je naam",
-  "market.share.send": "Naar de marktplaats sturen",
-  "market.share.sent":
-    "Verstuurd. Het staat in de openbare lijst en wordt over 14 dagen gepubliceerd.",
-  "market.counting": "De marktplaats laten weten wanneer ik een recept toevoeg",
-  "market.countingNote":
-    "Alleen de naam van het recept wordt verstuurd, niets over jou. Hiermee worden de aantallen bij “Toegevoegd door” bepaald.",
-  "market.tag.official": "Officieel",
-  "market.tag.community": "Community",
-  "market.tag.mobile": "Mobiel",
-  "market.tag.desktop": "Desktop",
-  "market.tag.hub": "Experimenteel",
-  "market.filters": "Filteren op tag",
-  "market.noMatch": "Niets komt overeen met deze filters.",
-  "market.search": "Recepten zoeken",
-  "market.searchNone": "Geen recepten komen overeen met je zoekopdracht.",
-  "market.rating.none": "Nog geen beoordelingen",
-  "market.rate": "Jouw beoordeling",
-  "market.rateStars": "Geef {count} ster | Geef {count} sterren",
-  "market.comments": "Reacties",
-  "market.comments.loading": "Reacties laden…",
-  "market.comments.none": "Nog geen reacties.",
-  "market.comments.you": "Jij",
-  "market.comments.write": "Schrijf een reactie",
-  "market.comments.rules": "Geen links of contactgegevens. Maximaal 280 tekens.",
-  "market.comments.post": "Plaatsen",
-  "market.comments.proPrompt": "Reageren is een Pro-functie. Iedereen kan reacties lezen.",
-  "market.comments.report": "Melden",
-  "market.comments.reported": "Gemeld",
-  "market.comments.block": "Blokkeren",
-  "market.comments.blocked": "Geblokkeerde reageerders",
-  "market.comments.blockedNote": "Je ziet geen reacties van de mensen die hier staan.",
-  "market.comments.blockedNone": "Je hebt niemand geblokkeerd.",
-  "market.comments.unblock": "Deblokkeren",
+  "library.title": "Receptenbibliotheek",
+  "library.linkNote": "Kant-en-klare recepten voor populaire sites, ingebouwd in de app",
+  "library.note":
+    "Recepten die met OpenMedia meekomen. Er wordt niets gedownload: toevoegen kopieert er een uit de app. Je ziet elke regel voordat er iets wordt toegevoegd.",
+  "library.loading": "Laden…",
+  "library.empty": "Er staat nog niets in de lijst.",
+  "library.add": "Toevoegen",
+  "library.update": "Bijwerken",
+  "library.added": "Toegevoegd",
+  "library.by": "door {author}",
+  "library.review.version": "Versie {version}",
+  "library.review.replaces": "Vervangt je versie {version}",
+  "library.review.sites": "Werkt op",
+  "library.review.pages": "Pagina's",
+  "library.review.options": "Schakelaars",
+  "library.review.rules": "Wat het verandert",
+  "library.review.hides": "Verbergt",
+  "library.review.restyles": "Past de stijl aan van",
+  "library.review.runsCode": "Voert code uit",
+  "library.review.showCode": "Code tonen",
+  "library.review.hideCode": "Code verbergen",
+  "library.review.codeNote":
+    "Deze code draait op de sites hierboven. Hij voldeed aan de veiligheidsregels van de app: geen netwerk, opslag, navigatie of automatisering.",
+  "library.shareRecipe": "Deel een van je recepten",
+  "library.tag.official": "Officieel",
+  "library.tag.community": "Community",
+  "library.tag.mobile": "Mobiel",
+  "library.tag.desktop": "Desktop",
+  "library.tag.hub": "Experimenteel",
+  "library.filters": "Filteren op tag",
+  "library.noMatch": "Niets komt overeen met deze filters.",
+  "library.search": "Recepten zoeken",
+  "library.searchNone": "Geen recepten komen overeen met je zoekopdracht.",
 
-  "share.link": "Importeren en exporteren",
-  "share.linkNote": "Verplaats recepten als tekst tussen apparaten",
+  "share.link": "Importeren, exporteren en delen",
+  "share.linkNote": "Zet recepten als tekst over tussen apparaten, of deel er een op GitHub",
   "share.import": "Importeren",
   "share.importNote":
     "Plak alleen recepten van mensen die je vertrouwt. Je ziet elke regel voordat er iets wordt toegevoegd.",
@@ -395,6 +360,37 @@ export const nl: Messages = {
   "share.copied": "Gekopieerd",
   "share.copyFailed": "Kopiëren is mislukt. Selecteer de tekst hieronder en kopieer die.",
   "share.none": "Je hebt nog geen eigen recepten.",
+  "share.github.title": "Deel je recept met iedereen",
+  "share.github.recipe": "Je recept",
+  "share.github.summary": "Beschrijf het in een paar woorden",
+  "share.github.count": "{count} / 140",
+  "share.github.needAccount": "Je hebt een gratis GitHub-account nodig.",
+  "share.github.whatSent":
+    "Je recept en je GitHub-gebruikersnaam worden naar het OpenMedia-team gestuurd.",
+  "share.github.afterReview":
+    "Iedereen krijgt het met een update nadat het team het heeft bekeken en goedgekeurd.",
+  "share.github.continue": "Doorgaan met GitHub",
+  "share.github.waiting":
+    "Meld je aan bij GitHub in de browser die net is geopend en kom dan hier terug.",
+  "share.github.working": "Je recept wordt verstuurd…",
+  "share.github.thanks":
+    "Bedankt! Je recept is beschikbaar in de volgende update, na beoordeling en goedkeuring.",
+  "share.github.see": "Bekijk op GitHub",
+  "share.github.tryAgain": "Opnieuw proberen",
+  "share.github.error.tooNew":
+    "Je GitHub-account is te nieuw om recepten te delen. Probeer het over een paar dagen opnieuw.",
+  "share.github.error.limit":
+    "Je hebt vandaag genoeg recepten gedeeld. Probeer het morgen opnieuw.",
+  "share.github.error.invalid": "Dit recept kan niet worden gedeeld.",
+  "share.github.error.offline":
+    "Het OpenMedia-team kon niet worden bereikt. Controleer je verbinding en probeer het opnieuw.",
+  "share.github.error.busy":
+    "Er delen nu te veel mensen tegelijk. Probeer het over een paar minuten opnieuw.",
+  "share.github.error.failed":
+    "Er ging iets mis en je recept is niet verstuurd. Probeer het opnieuw.",
+  "share.github.error.cancelled": "Je hebt het aanmelden niet afgerond, dus er is niets verstuurd.",
+  "share.github.error.timeout":
+    "Dit duurde te lang, dus er is niets verstuurd. Probeer het opnieuw.",
 
   "ai.title": "AI-assistent",
   "ai.note":
@@ -459,6 +455,25 @@ export const nl: Messages = {
   "assistant.accept": "Accepteren",
   "assistant.switchExists": "Deze schakelaar bestaat al",
   "assistant.matched": "{count} gevonden",
+  "assistant.script.runs": "Voert code uit op deze site",
+  "assistant.script.show": "Code tonen",
+  "assistant.script.hide": "Code verbergen",
+  "assistant.script.afterAccept": "De code draait pas nadat je hem accepteert.",
+  "assistant.script.powers": "Wat deze code kan doen",
+  "assistant.script.line": "regel {line}",
+  "assistant.script.shareable":
+    "Het houdt zich aan de veiligheidsregels voor code en kan dus worden gedeeld.",
+  "assistant.script.notShareable":
+    "Het gebruikt dingen die de veiligheidsregels voor code niet toestaan en kan dus niet worden gedeeld.",
+  "assistant.script.power.network": "Gegevens over het netwerk versturen",
+  "assistant.script.power.storage": "Opgeslagen gegevens en cookies lezen of schrijven",
+  "assistant.script.power.dynamicCode": "Code bouwen en uitvoeren vanuit tekst",
+  "assistant.script.power.markup": "Opmaak of stijlen bouwen vanuit tekst",
+  "assistant.script.power.navigation": "De pagina ergens anders naartoe sturen",
+  "assistant.script.power.automation": "Klikken, versturen of namens jou handelen",
+  "assistant.script.power.credentials": "Lezen wat je typt of persoonlijke gegevens",
+  "assistant.script.power.other":
+    "Functies gebruiken die de veiligheidsregels voor code niet toestaan",
   "assistant.requestQuote": "“{request}”",
   "assistant.unmatched":
     "{count} regel kwam nergens op deze pagina overeen. | {count} regels kwamen nergens op deze pagina overeen.",

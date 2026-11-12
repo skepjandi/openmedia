@@ -2,7 +2,7 @@ import { useT } from "../../i18n/useT";
 import { useIconForUrl } from "../../shared/siteIcons";
 import { SiteTile } from "../../shared/SiteTile";
 import { quietButton } from "../settings/ui";
-import type { OnboardingOption } from "../marketplace/ipc";
+import type { OnboardingOption } from "../library/ipc";
 
 export type OptionsState =
   | { status: "loading" }

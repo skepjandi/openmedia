@@ -497,17 +497,17 @@ mod tests {
 
     const TOOL_CALL_ANSWER: &str = r#"{"id":"chatcmpl-2","object":"chat.completion","choices":[{"index":0,
       "message":{"role":"assistant","content":null,"tool_calls":[{"id":"call_01","type":"function",
-      "function":{"name":"search_marketplace","arguments":"{\"query\":\"hide reels\"}"}}]},
+      "function":{"name":"search_recipes","arguments":"{\"query\":\"hide reels\"}"}}]},
       "finish_reason":"tool_calls"}],"usage":{"prompt_tokens":10}}"#;
 
     const FINAL_ANSWER: &str = r#"{"id":"chatcmpl-3","object":"chat.completion","choices":[{"index":0,
-      "message":{"role":"assistant","content":"The marketplace has a recipe for that."},
+      "message":{"role":"assistant","content":"The library has a recipe for that."},
       "finish_reason":"stop"}],"usage":{"prompt_tokens":20}}"#;
 
     fn search_tool() -> ToolDefinition {
         ToolDefinition {
-            name: "search_marketplace".to_owned(),
-            description: "Search the marketplace.".to_owned(),
+            name: "search_recipes".to_owned(),
+            description: "Search the recipes.".to_owned(),
             input_schema: json!({
                 "type": "object",
                 "properties": { "query": { "type": "string" } },
@@ -531,13 +531,13 @@ mod tests {
                 text: None,
                 tool_calls: vec![ToolCall {
                     id: "call_01".to_owned(),
-                    name: "search_marketplace".to_owned(),
+                    name: "search_recipes".to_owned(),
                     arguments: json!({ "query": "hide reels" }),
                 }],
             },
             Turn::ToolResult(ToolResult {
                 call_id: "call_01".to_owned(),
-                name: "search_marketplace".to_owned(),
+                name: "search_recipes".to_owned(),
                 content: "two recipes".to_owned(),
                 is_error: false,
             }),
@@ -555,7 +555,7 @@ mod tests {
         let body = &request.body;
         assert_eq!(body["model"], "gpt-x");
         assert_eq!(body["tools"][0]["type"], "function");
-        assert_eq!(body["tools"][0]["function"]["name"], "search_marketplace");
+        assert_eq!(body["tools"][0]["function"]["name"], "search_recipes");
         assert_eq!(
             body["tools"][0]["function"]["parameters"]["properties"]["query"]["type"],
             "string"
@@ -577,7 +577,7 @@ mod tests {
         assert_eq!(messages[2]["tool_calls"][0]["type"], "function");
         assert_eq!(
             messages[2]["tool_calls"][0]["function"]["name"],
-            "search_marketplace"
+            "search_recipes"
         );
         assert_eq!(
             messages[2]["tool_calls"][0]["function"]["arguments"],
@@ -597,12 +597,12 @@ mod tests {
         };
         assert_eq!(calls.len(), 1);
         assert_eq!(calls[0].id, "call_01");
-        assert_eq!(calls[0].name, "search_marketplace");
+        assert_eq!(calls[0].name, "search_recipes");
         assert_eq!(calls[0].arguments, json!({ "query": "hide reels" }));
         let words = parse_tool_response(&serde_json::from_str(FINAL_ANSWER).unwrap()).unwrap();
         assert_eq!(
             words,
-            ModelReply::Text("The marketplace has a recipe for that.".to_owned())
+            ModelReply::Text("The library has a recipe for that.".to_owned())
         );
     }
 
@@ -662,7 +662,7 @@ mod tests {
         .unwrap();
         assert_eq!(
             answer,
-            ModelReply::Text("The marketplace has a recipe for that.".to_owned())
+            ModelReply::Text("The library has a recipe for that.".to_owned())
         );
         let seen = server.seen.lock().unwrap();
         assert_eq!(seen.len(), 2);

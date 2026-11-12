@@ -34,7 +34,7 @@ pub struct SiteSettings {
     pub favorite: bool,
     pub options: Vec<OptionView>,
     pub bottom_margin: Option<u32>,
-    /// Who the recipe is from: `imported` (including marketplace installs) can be removed.
+    /// Who the recipe is from: `imported` (including recipes added from the library) can be removed.
     pub origin: Origin,
 }
 

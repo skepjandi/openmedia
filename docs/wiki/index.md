@@ -8,7 +8,7 @@
 
 **Project status: implemented, with platform verification limits.** iOS is the verified platform; Android implementation and build support exist but are not device-verified. Desktop site views remain deferred. The wiki describes current behavior and labels unverified work.
 
-OpenMedia is a Tauri v2 app for browsing websites in native web views and customizing them with user-controlled recipes. It includes ad blocking, an optional AI assistant, and an opt-in recipe marketplace that also serves the official site recipes (the app bundles none; Design, 2026-11-10). No analytics or telemetry; the only OpenMedia-operated server is the marketplace (Cloudflare), which in marketplace v2 receives a random device token and, on Pro actions, the RevenueCat app user id (stored only hashed); purchases use RevenueCat.
+OpenMedia is a Tauri v2 app for browsing websites in native web views and customizing them with user-controlled recipes. It includes ad blocking, an optional AI assistant, and a built-in recipe library (official and community recipes ship inside the app; new ones arrive as GitHub pull requests). No analytics or telemetry; the only OpenMedia-operated server is a small Worker that opens a GitHub pull request when a user shares a recipe; purchases use RevenueCat.
 
 ## Pages
 
@@ -27,7 +27,8 @@ OpenMedia is a Tauri v2 app for browsing websites in native web views and custom
 | [Ad Blocking](./ad-blocking.md) | Bundled EasyList and EasyPrivacy as WebKit content rule lists: engine choice, caching, limits |
 | [Prior Art](./prior-art.md) | SocialLite and others: what they do, what we copy, where we differ |
 | [Roadmap](./roadmap.md) | Phased build plan with exit criteria, spikes, decision log, risks |
-| [Recipe Marketplace](./marketplace.md) | Export/import and the automatically published, signed Cloudflare marketplace: tags, official publishing, ratings, comments, abuse rules, threat model, API, signed index, flows, cost |
+| [Recipe Library and Sharing](./recipe-library.md) | The bundled recipes, adding and updating them, and sharing a recipe as a GitHub pull request through the Worker: flow, limits, privacy, threat model |
+| [Script Policy](./script-policy.md) | The `script` rule contract: the three trust tiers, the default-deny subset of JavaScript that bundled community recipes and imports may run, finding codes, conformance vectors |
 | [Development Guide](./development-guide.md) | Toolchain, commands, and conventions |
 | [Updates (OTA)](./updates.md) | Over-the-air updates: signed web bundles for every platform and desktop self-update, published by `yarn ota` or GitHub Actions |
 | [Store Builds](./store-builds.md) | iOS App Store and Android Google Play build, signing, and release steps |
