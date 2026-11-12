@@ -25,6 +25,14 @@ All notable changes to OpenMedia are documented here.
 
 **Verified:** `yarn ts:check`, ESLint, Prettier. **Not verified:** on a device or simulator (the flash needs a cold launch with the chunk not yet cached).
 
+### feat(fab): push the floating button off the edge to hide it
+
+**Area:** `feat(fab)`
+
+**Change:** Dragging the floating button into a screen edge (finger within 14 px of it) and lifting hides it: it slides off and a small arrow tab stays on the edge at the same height. Tapping the tab brings the button back. The button dims while the finger is in the hide zone. The hidden state is saved in `om.fab` (older saves load as visible), and the floating back button stops avoiding the hidden button's spot. New string `fab.show` is machine-drafted in non-English locales.
+
+**Verified:** `ts:check`, ESLint, Prettier, Vitest (new: `pushedOffEdge`, `peekCenterY`, `loadPosition`). **Not verified:** the drag, slide animation and tab on a device or simulator; the floating back button cannot be hidden this way (it can be switched off in Settings).
+
 ### feat(library): "Add to incognito" on a recipe in the library
 
 **Area:** `feat(library)`

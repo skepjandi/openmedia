@@ -537,6 +537,7 @@ export const ko: Messages = {
   "favorites.backgroundMediaNote":
     "끔: 다른 사이트로 전환하거나 앱을 나가면 오디오와 비디오가 일시 정지됩니다. 켬: 이 사이트는 계속 재생됩니다.",
   "fab.tabs": "탭",
+  "fab.show": "플로팅 버튼 표시",
   "tabs.title": "탭",
   "tabs.subtitle": "열린 사이트, 빠른 접근, 기록",
   "tabs.close": "탭 닫기",

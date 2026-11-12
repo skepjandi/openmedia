@@ -541,6 +541,7 @@ export const vi: Messages = {
   "favorites.backgroundMediaNote":
     "Tắt: âm thanh và video tạm dừng khi bạn chuyển sang trang khác hoặc rời ứng dụng. Bật: trang này tiếp tục phát.",
   "fab.tabs": "Thẻ",
+  "fab.show": "Hiện nút nổi",
   "tabs.title": "Thẻ",
   "tabs.subtitle": "Trang đang mở, truy cập nhanh và lịch sử",
   "tabs.close": "Đóng các thẻ",

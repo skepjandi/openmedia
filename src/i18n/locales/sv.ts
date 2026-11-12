@@ -545,6 +545,7 @@ export const sv: Messages = {
   "favorites.backgroundMediaNote":
     "Av: ljud och video pausas när du byter webbplats eller lämnar appen. På: den här webbplatsen fortsätter spela.",
   "fab.tabs": "Flikar",
+  "fab.show": "Visa den flytande knappen",
   "tabs.title": "Flikar",
   "tabs.subtitle": "Öppna webbplatser, snabbåtkomst och historik",
   "tabs.close": "Stäng flikar",

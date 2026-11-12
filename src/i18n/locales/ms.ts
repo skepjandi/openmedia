@@ -547,6 +547,7 @@ export const ms: Messages = {
   "favorites.backgroundMediaNote":
     "Mati: audio dan video dijeda apabila anda bertukar ke laman lain atau meninggalkan aplikasi. Hidup: laman ini terus bermain.",
   "fab.tabs": "Tab",
+  "fab.show": "Tunjukkan butang terapung",
   "tabs.title": "Tab",
   "tabs.subtitle": "Laman terbuka, akses pantas dan sejarah",
   "tabs.close": "Tutup tab",

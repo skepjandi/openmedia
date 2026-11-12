@@ -542,6 +542,7 @@ export const ur: Messages = {
   "favorites.backgroundMediaNote":
     "بند: دوسری سائٹ پر جانے یا ایپ چھوڑنے پر آڈیو اور ویڈیو رک جاتے ہیں۔ آن: یہ سائٹ چلتی رہتی ہے۔",
   "fab.tabs": "ٹیبز",
+  "fab.show": "تیرتا ہوا بٹن دکھائیں",
   "tabs.title": "ٹیبز",
   "tabs.subtitle": "کھلی سائٹس، فوری رسائی اور ہسٹری",
   "tabs.close": "ٹیبز بند کریں",

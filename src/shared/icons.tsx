@@ -24,6 +24,18 @@ export const BackIcon = () => (
   </Icon>
 );
 
+export const ChevronLeftIcon = ({ size }: { size?: number }) => (
+  <Icon size={size}>
+    <path d="M15 5l-7 7 7 7" />
+  </Icon>
+);
+
+export const ChevronRightIcon = ({ size }: { size?: number }) => (
+  <Icon size={size}>
+    <path d="M9 5l7 7-7 7" />
+  </Icon>
+);
+
 export const ForwardIcon = () => (
   <Icon>
     <path d="M9 5l7 7-7 7" />

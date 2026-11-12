@@ -552,6 +552,7 @@ export const it: Messages = {
   "favorites.backgroundMediaNote":
     "Disattivato: audio e video vanno in pausa quando passi a un altro sito o lasci l'app. Attivato: questo sito continua a riprodurre.",
   "fab.tabs": "Schede",
+  "fab.show": "Mostra il pulsante flottante",
   "tabs.title": "Schede",
   "tabs.subtitle": "Siti aperti, accesso rapido e cronologia",
   "tabs.close": "Chiudi le schede",

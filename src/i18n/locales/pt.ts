@@ -549,6 +549,7 @@ export const pt: Messages = {
   "favorites.backgroundMediaNote":
     "Desativado: áudio e vídeo pausam ao trocar de site ou sair do app. Ativado: este site continua tocando.",
   "fab.tabs": "Abas",
+  "fab.show": "Mostrar o botão flutuante",
   "tabs.title": "Abas",
   "tabs.subtitle": "Sites abertos, acesso rápido e histórico",
   "tabs.close": "Fechar abas",

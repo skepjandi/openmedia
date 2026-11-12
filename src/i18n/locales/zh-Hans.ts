@@ -502,6 +502,7 @@ export const zhHans: Messages = {
   "favorites.backgroundMediaNote":
     "关闭：切换到其他网站或离开应用时，音频和视频会暂停。开启：此网站继续播放。",
   "fab.tabs": "标签页",
+  "fab.show": "显示悬浮按钮",
   "tabs.title": "标签页",
   "tabs.subtitle": "已打开的网站、快速访问和历史记录",
   "tabs.close": "关闭标签页",

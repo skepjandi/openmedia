@@ -23,6 +23,11 @@ const BADGE_OVERHANG = 4;
 /** Distance from the button's centre to the far edge of its badge while the fan is open. */
 const FAB_OPEN_REACH = (FAB_SIZE / 2 + BADGE_OVERHANG) * HOLD_SCALE;
 export const EDGE_MARGIN = 10;
+/** Dropping the button this close to a screen edge, or pushing past it, hides it there. */
+export const HIDE_REACH = 14;
+/** The hidden button's tab: how far it sticks out of the edge, and how tall it is. */
+export const PEEK_WIDTH = 22;
+export const PEEK_HEIGHT = 56;
 export const FAVORITE_SIZE = 52;
 export const SETTINGS_SIZE = 44;
 export const HISTORY_SIZE = 44;
@@ -84,6 +89,23 @@ export function fabCenter(edge: Edge, y: number, viewport: Size, insets: Insets)
 export function snapToEdge(drop: Point, viewport: Size, insets: Insets): { edge: Edge; y: number } {
   const edge: Edge = drop.x < viewport.width / 2 ? "left" : "right";
   return { edge, y: fabCenter(edge, drop.y, viewport, insets).y };
+}
+
+/** The edge a drop at `drop` pushes the button off, or null when it should settle on screen. */
+export function pushedOffEdge(drop: Point, viewport: Size): Edge | null {
+  if (drop.x <= HIDE_REACH) return "left";
+  if (drop.x >= viewport.width - HIDE_REACH) return "right";
+  return null;
+}
+
+/** Vertical centre of the hidden button's tab, kept clear of the status bar and home indicator. */
+export function peekCenterY(y: number, viewport: Size, insets: Insets): number {
+  const half = PEEK_HEIGHT / 2;
+  return clamp(
+    y,
+    insets.top + EDGE_MARGIN + half,
+    viewport.height - insets.bottom - EDGE_MARGIN - half,
+  );
 }
 
 export interface FanLayout {

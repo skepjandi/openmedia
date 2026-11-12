@@ -105,6 +105,28 @@ input {
     0 0 0 1px rgb(2 22 105 / 0.12);
 }
 
+/* The hidden button's tab: it sticks out of the screen edge and slides in from it. Its glass rim
+   is dropped on the edge side so it reads as growing out of the edge. */
+.fab-peek {
+  animation: fab-peek-in 240ms var(--ease-spring) both;
+}
+
+.fab-peek[data-edge="left"] {
+  border-left-width: 0;
+  --peek-from: -100%;
+}
+
+.fab-peek[data-edge="right"] {
+  border-right-width: 0;
+  --peek-from: 100%;
+}
+
+@keyframes fab-peek-in {
+  from {
+    transform: translateX(var(--peek-from));
+  }
+}
+
 .fab-logo {
   pointer-events: none;
 }
@@ -339,7 +361,8 @@ svg {
 
 @media (prefers-reduced-motion: reduce) {
   .screen,
-  .usage-warning {
+  .usage-warning,
+  .fab-peek {
     animation: none;
   }
 }

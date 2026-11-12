@@ -519,6 +519,7 @@ export const th: Messages = {
   "favorites.backgroundMediaNote":
     "ปิด: เสียงและวิดีโอจะหยุดชั่วคราวเมื่อสลับไปไซต์อื่นหรือออกจากแอป เปิด: ไซต์นี้เล่นต่อไป",
   "fab.tabs": "แท็บ",
+  "fab.show": "แสดงปุ่มลอย",
   "tabs.title": "แท็บ",
   "tabs.subtitle": "ไซต์ที่เปิดอยู่ ทางลัด และประวัติ",
   "tabs.close": "ปิดแท็บ",

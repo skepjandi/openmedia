@@ -540,6 +540,7 @@ export const en = {
   "favorites.backgroundMediaNote":
     "Off: audio and video pause when you switch to another site or leave the app. On: this site keeps playing.",
   "fab.tabs": "Tabs",
+  "fab.show": "Show the floating button",
   "tabs.title": "Tabs",
   "tabs.subtitle": "Open sites, quick access and history",
   "tabs.close": "Close tabs",

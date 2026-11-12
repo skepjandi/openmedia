@@ -552,6 +552,7 @@ export const nl: Messages = {
   "favorites.backgroundMediaNote":
     "Uit: audio en video pauzeren als je naar een andere site gaat of de app verlaat. Aan: deze site blijft afspelen.",
   "fab.tabs": "Tabbladen",
+  "fab.show": "Zwevende knop tonen",
   "tabs.title": "Tabbladen",
   "tabs.subtitle": "Open sites, snelle toegang en geschiedenis",
   "tabs.close": "Tabbladen sluiten",

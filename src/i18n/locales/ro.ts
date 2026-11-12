@@ -554,6 +554,7 @@ export const ro: Messages = {
   "favorites.backgroundMediaNote":
     "Dezactivat: sunetul și videoclipul se opresc când treci la alt site sau părăsești aplicația. Activat: acest site continuă să redea.",
   "fab.tabs": "File",
+  "fab.show": "Afișează butonul plutitor",
   "tabs.title": "File",
   "tabs.subtitle": "Site-uri deschise, acces rapid și istoric",
   "tabs.close": "Închide filele",

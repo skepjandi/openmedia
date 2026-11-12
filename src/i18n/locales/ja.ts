@@ -543,6 +543,7 @@ export const ja: Messages = {
   "favorites.backgroundMediaNote":
     "オフ：別のサイトに切り替えたりアプリを離れたりすると、音声と動画が一時停止します。オン：このサイトは再生を続けます。",
   "fab.tabs": "タブ",
+  "fab.show": "フローティングボタンを表示",
   "tabs.title": "タブ",
   "tabs.subtitle": "開いているサイト、クイックアクセス、履歴",
   "tabs.close": "タブを閉じる",

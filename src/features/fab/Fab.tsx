@@ -10,12 +10,16 @@ import {
   HISTORY_SIZE,
   HOLD_SCALE,
   INCOGNITO_SIZE,
+  PEEK_HEIGHT,
+  PEEK_WIDTH,
   SETTINGS_SIZE,
   STATS_SIZE,
   TABS_SIZE,
   fabCenter,
   fanLayout,
   fanTargetAt,
+  peekCenterY,
+  pushedOffEdge,
   snapToEdge,
   type FanTarget,
   type Point,
@@ -30,6 +34,8 @@ import {
 import { loadPosition, savePosition, type FabPosition } from "./position";
 import { BiometricIcon } from "../incognito/BiometricIcon";
 import {
+  ChevronLeftIcon,
+  ChevronRightIcon,
   HistoryIcon,
   IncognitoIcon,
   ProIcon,
@@ -123,17 +129,23 @@ export function Fab() {
     }
   };
 
+  const moveTo = (stored: FabPosition) => {
+    setPosition(stored);
+    savePosition(stored);
+    setFabEdge(stored.edge);
+  };
+
   const apply = (effect: GestureEffect) => {
     switch (effect.type) {
       case "tap":
         openSheet("assistant");
         break;
       case "snap": {
-        const next = snapToEdge(effect.drop, viewport, insets);
-        const stored = { edge: next.edge, yRatio: next.y / viewport.height };
-        setPosition(stored);
-        savePosition(stored);
-        setFabEdge(next.edge);
+        const pushed = pushedOffEdge(effect.drop, viewport);
+        const next = pushed
+          ? { edge: pushed, y: peekCenterY(effect.drop.y, viewport, insets) }
+          : snapToEdge(effect.drop, viewport, insets);
+        moveTo({ edge: next.edge, yRatio: next.y / viewport.height, hidden: pushed !== null });
         break;
       }
       case "select":
@@ -205,6 +217,11 @@ export function Fab() {
   });
 
   const hidden = sheet !== "none" || onboardingOpen;
+  const tucked = position.hidden;
+  const pushing =
+    gesture.phase === "dragging" && pushedOffEdge(gesture.position, viewport) !== null;
+  const tuckShift = position.edge === "left" ? -FAB_SIZE : FAB_SIZE;
+  const PeekIcon = position.edge === "left" ? ChevronRightIcon : ChevronLeftIcon;
   const holdState = gesture.phase === "pressing" ? "charging" : fanOpen ? "open" : "idle";
   const enlarged = gesture.phase === "pressing" || fanOpen;
 
@@ -413,10 +430,32 @@ export function Fab() {
         <SlidersIcon />
       </button>
 
+      {tucked && !hidden && (
+        <button
+          type="button"
+          data-hit=""
+          aria-label={t("fab.show")}
+          onClick={() => moveTo({ ...position, hidden: false })}
+          style={{
+            top: peekCenterY(position.yRatio * viewport.height, viewport, insets) - PEEK_HEIGHT / 2,
+            width: PEEK_WIDTH,
+            height: PEEK_HEIGHT,
+          }}
+          className={`fab-peek fab-glass fixed z-30 grid place-items-center text-white ${
+            position.edge === "left" ? "left-0 rounded-r-full" : "right-0 rounded-l-full"
+          }`}
+          data-edge={position.edge}
+        >
+          <PeekIcon size={18} />
+        </button>
+      )}
+
       <button
         type="button"
-        data-hit={hidden ? undefined : ""}
+        data-hit={hidden || tucked ? undefined : ""}
         data-hold={holdState}
+        tabIndex={tucked ? -1 : undefined}
+        aria-hidden={tucked || undefined}
         aria-label={t("fab.assistant")}
         aria-expanded={fanOpen}
         onPointerDown={onPointerDown}
@@ -427,13 +466,17 @@ export function Fab() {
         style={{
           width: FAB_SIZE,
           height: FAB_SIZE,
-          transform: `translate(${center.x - FAB_SIZE / 2}px, ${center.y - FAB_SIZE / 2}px)${
+          transform: `translate(${center.x - FAB_SIZE / 2 + (tucked ? tuckShift : 0)}px, ${center.y - FAB_SIZE / 2}px)${
             enlarged ? ` scale(${HOLD_SCALE})` : ""
           }`,
-          transition: gesture.phase === "dragging" ? "none" : "transform 320ms var(--ease-spring)",
+          opacity: pushing ? 0.45 : tucked ? 0 : undefined,
+          transition:
+            gesture.phase === "dragging"
+              ? "none"
+              : "transform 320ms var(--ease-spring), opacity 200ms",
           touchAction: "none",
         }}
-        className={`fab fixed top-0 left-0 z-30 grid place-items-center rounded-full ${hidden ? "pointer-events-none opacity-0" : ""}`}
+        className={`fab fixed top-0 left-0 z-30 grid place-items-center rounded-full ${hidden || tucked ? "pointer-events-none" : ""} ${hidden ? "opacity-0" : ""}`}
       >
         <img src={logoMark} alt="" draggable={false} className="fab-logo relative size-10" />
         {anyUnread && !fanOpen && (

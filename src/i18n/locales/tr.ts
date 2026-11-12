@@ -545,6 +545,7 @@ export const tr: Messages = {
   "favorites.backgroundMediaNote":
     "Kapalı: başka bir siteye geçtiğinizde veya uygulamadan çıktığınızda ses ve video duraklar. Açık: bu site oynatmaya devam eder.",
   "fab.tabs": "Sekmeler",
+  "fab.show": "Yüzen düğmeyi göster",
   "tabs.title": "Sekmeler",
   "tabs.subtitle": "Açık siteler, hızlı erişim ve geçmiş",
   "tabs.close": "Sekmeleri kapat",

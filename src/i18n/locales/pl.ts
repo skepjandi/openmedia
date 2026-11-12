@@ -546,6 +546,7 @@ export const pl: Messages = {
   "favorites.backgroundMediaNote":
     "Wyłączone: dźwięk i wideo wstrzymują się po przejściu do innej witryny lub wyjściu z aplikacji. Włączone: ta witryna gra dalej.",
   "fab.tabs": "Karty",
+  "fab.show": "Pokaż pływający przycisk",
   "tabs.title": "Karty",
   "tabs.subtitle": "Otwarte witryny, szybki dostęp i historia",
   "tabs.close": "Zamknij karty",

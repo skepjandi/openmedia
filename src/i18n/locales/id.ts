@@ -545,6 +545,7 @@ export const id: Messages = {
   "favorites.backgroundMediaNote":
     "Mati: audio dan video berhenti sejenak saat Anda pindah ke situs lain atau meninggalkan aplikasi. Hidup: situs ini terus diputar.",
   "fab.tabs": "Tab",
+  "fab.show": "Tampilkan tombol mengambang",
   "tabs.title": "Tab",
   "tabs.subtitle": "Situs terbuka, akses cepat, dan riwayat",
   "tabs.close": "Tutup tab",

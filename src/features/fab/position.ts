@@ -7,9 +7,11 @@ export interface FabPosition {
   edge: Edge;
   /** Vertical centre as a fraction of the viewport height, so rotation keeps its place. */
   yRatio: number;
+  /** Pushed off the edge: only a small tab stays, to bring the button back. */
+  hidden: boolean;
 }
 
-const fallback: FabPosition = { edge: "right", yRatio: 0.62 };
+const fallback: FabPosition = { edge: "right", yRatio: 0.62, hidden: false };
 
 export function loadPosition(): FabPosition {
   try {
@@ -17,7 +19,11 @@ export function loadPosition(): FabPosition {
     if (value && typeof value === "object" && "edge" in value && "yRatio" in value) {
       const { edge, yRatio } = value;
       if ((edge === "left" || edge === "right") && typeof yRatio === "number") {
-        return { edge, yRatio: Math.min(Math.max(yRatio, 0), 1) };
+        return {
+          edge,
+          yRatio: Math.min(Math.max(yRatio, 0), 1),
+          hidden: "hidden" in value && value.hidden === true,
+        };
       }
     }
   } catch {

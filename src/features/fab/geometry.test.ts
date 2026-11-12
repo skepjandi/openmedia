@@ -11,6 +11,10 @@ import {
   fabCenter,
   fanLayout,
   fanTargetAt,
+  HIDE_REACH,
+  PEEK_HEIGHT,
+  peekCenterY,
+  pushedOffEdge,
   separateVerticalPosition,
   snapToEdge,
   type Edge,
@@ -192,5 +196,25 @@ describe("fanTargetAt", () => {
 
   it("returns null away from every item", () => {
     expect(fanTargetAt({ x: 380, y: 10 }, layout)).toBeNull();
+  });
+});
+
+describe("pushedOffEdge", () => {
+  it("hides the button only when it is dropped at a screen edge", () => {
+    expect(pushedOffEdge({ x: HIDE_REACH, y: 300 }, phone)).toBe("left");
+    expect(pushedOffEdge({ x: -20, y: 300 }, phone)).toBe("left");
+    expect(pushedOffEdge({ x: phone.width - HIDE_REACH, y: 300 }, phone)).toBe("right");
+    expect(pushedOffEdge({ x: HIDE_REACH + 1, y: 300 }, phone)).toBeNull();
+    expect(pushedOffEdge(fabCenter("right", 300, phone, insets), phone)).toBeNull();
+  });
+});
+
+describe("peekCenterY", () => {
+  it("keeps the tab clear of the status bar and the home indicator", () => {
+    expect(peekCenterY(0, phone, insets)).toBeGreaterThanOrEqual(insets.top + PEEK_HEIGHT / 2);
+    expect(peekCenterY(phone.height, phone, insets)).toBeLessThanOrEqual(
+      phone.height - insets.bottom - PEEK_HEIGHT / 2,
+    );
+    expect(peekCenterY(400, phone, insets)).toBe(400);
   });
 });

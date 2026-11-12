@@ -540,6 +540,7 @@ export const hi: Messages = {
   "favorites.backgroundMediaNote":
     "बंद: दूसरी साइट पर जाने या ऐप छोड़ने पर ऑडियो और वीडियो रुक जाते हैं। चालू: यह साइट चलती रहती है।",
   "fab.tabs": "टैब",
+  "fab.show": "तैरता हुआ बटन दिखाएँ",
   "tabs.title": "टैब",
   "tabs.subtitle": "खुली साइटें, त्वरित पहुँच और इतिहास",
   "tabs.close": "टैब बंद करें",

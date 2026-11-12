@@ -62,7 +62,7 @@ export function BackButton() {
   const rawCenter = dragCenter ?? { x: restingX, y: restingY };
   const fab = fabCenter(fabPosition.edge, fabPosition.yRatio * viewport.height, viewport, insets);
   const center =
-    Math.abs(rawCenter.x - fab.x) < (FAB_SIZE + SIZE) / 2
+    !fabPosition.hidden && Math.abs(rawCenter.x - fab.x) < (FAB_SIZE + SIZE) / 2
       ? {
           ...rawCenter,
           y: separateVerticalPosition(

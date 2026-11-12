@@ -504,6 +504,7 @@ export const zhHant: Messages = {
   "favorites.backgroundMediaNote":
     "關閉：切換到其他網站或離開 App 時，音訊和影片會暫停。開啟：此網站繼續播放。",
   "fab.tabs": "分頁",
+  "fab.show": "顯示懸浮按鈕",
   "tabs.title": "分頁",
   "tabs.subtitle": "已開啟的網站、快速存取與歷史記錄",
   "tabs.close": "關閉分頁",

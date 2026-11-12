@@ -545,6 +545,7 @@ export const cs: Messages = {
   "favorites.backgroundMediaNote":
     "Vypnuto: zvuk a video se pozastaví, když přepnete na jiný web nebo opustíte aplikaci. Zapnuto: tento web hraje dál.",
   "fab.tabs": "Karty",
+  "fab.show": "Zobrazit plovoucí tlačítko",
   "tabs.title": "Karty",
   "tabs.subtitle": "Otevřené weby, rychlý přístup a historie",
   "tabs.close": "Zavřít karty",

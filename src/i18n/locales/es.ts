@@ -553,6 +553,7 @@ export const es: Messages = {
   "favorites.backgroundMediaNote":
     "Desactivado: el audio y el vídeo se pausan al cambiar de sitio o salir de la app. Activado: este sitio sigue reproduciéndose.",
   "fab.tabs": "Pestañas",
+  "fab.show": "Mostrar el botón flotante",
   "tabs.title": "Pestañas",
   "tabs.subtitle": "Sitios abiertos, acceso rápido e historial",
   "tabs.close": "Cerrar pestañas",

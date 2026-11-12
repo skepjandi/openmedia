@@ -561,6 +561,7 @@ export const fr: Messages = {
   "favorites.backgroundMediaNote":
     "Désactivé : l'audio et la vidéo se mettent en pause quand vous changez de site ou quittez l'app. Activé : ce site continue de jouer.",
   "fab.tabs": "Onglets",
+  "fab.show": "Afficher le bouton flottant",
   "tabs.title": "Onglets",
   "tabs.subtitle": "Sites ouverts, accès rapide et historique",
   "tabs.close": "Fermer les onglets",

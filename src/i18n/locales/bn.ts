@@ -538,6 +538,7 @@ export const bn: Messages = {
   "favorites.backgroundMediaNote":
     "বন্ধ: অন্য সাইটে গেলে বা অ্যাপ ছাড়লে অডিও ও ভিডিও থেমে যায়। চালু: এই সাইট চলতে থাকে।",
   "fab.tabs": "ট্যাব",
+  "fab.show": "ভাসমান বোতাম দেখান",
   "tabs.title": "ট্যাব",
   "tabs.subtitle": "খোলা সাইট, দ্রুত অ্যাক্সেস ও ইতিহাস",
   "tabs.close": "ট্যাব বন্ধ করুন",

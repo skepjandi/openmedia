@@ -13,6 +13,7 @@ The web is the product. The screen is one full-bleed page, from under the status
 | Hold, slide onto an item, lift | Opens that favorite, Usage, Tabs, History or Settings, or toggles Incognito |
 | Hold, lift, then tap an item | Same, in two steps |
 | Drag the button | Moves it; on release it snaps to the nearer left or right edge and remembers its place |
+| Drag the button into a screen edge (the finger within `HIDE_REACH`, 14 px, of it) and lift | Hides it: the button slides off the edge and a small glass tab with an arrow (`PEEK_WIDTH` x `PEEK_HEIGHT`) stays there, at the same height. While the finger is in that zone the button dims. Tap the tab to bring the button back. The state is saved with the position (`hidden` in `om.fab`); the floating back button then ignores the main button's spot |
 | Pull the page down from the top | Native pull-to-refresh: `UIRefreshControl` on iOS, `SwipeRefreshLayout` around each page view on Android; only where the page's own scroll view is at the top |
 | Swipe in from the screen edge on a page | iOS: the web view's own back swipe (and forward from the opposite edge). Android: the system back gesture or Back button, which goes back in the page |
 | Swipe in from the screen edge on Settings, History, Usage or the paywall | Closes it. iOS: the shell's own swipe (`useEdgeSwipeBack`, left edge, right edge in right-to-left languages); the page follows the finger and slides off past 40% of the width or on a flick, else springs back. Android: the system back gesture |

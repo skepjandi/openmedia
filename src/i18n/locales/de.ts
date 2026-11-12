@@ -559,6 +559,7 @@ export const de: Messages = {
   "favorites.backgroundMediaNote":
     "Aus: Audio und Video pausieren, wenn du zu einer anderen Seite wechselst oder die App verlässt. An: Diese Seite spielt weiter.",
   "fab.tabs": "Tabs",
+  "fab.show": "Schwebende Taste anzeigen",
   "tabs.title": "Tabs",
   "tabs.subtitle": "Offene Seiten, Schnellzugriff und Verlauf",
   "tabs.close": "Tabs schließen",
