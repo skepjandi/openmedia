@@ -1,18 +1,20 @@
+import { useMemo } from "react";
 import { useT } from "../../i18n/useT";
-import type { LibraryItem, LibraryTag } from "./ipc";
-import { FILTER_KINDS, facetCount, visibleItems } from "./logic";
-import { TAG_LABELS } from "./tagLabels";
 import type { MessageKey } from "../../i18n/messages";
+import type { LibraryTag } from "./ipc";
+import { FILTER_KINDS, facetCounts, type IndexedItem, visibleIndexed } from "./logic";
+import { TAG_LABELS } from "./tagLabels";
 
 const KIND_LABELS: Record<(typeof FILTER_KINDS)[number]["id"], MessageKey> = {
   origin: "library.filterKind.origin",
   platform: "library.filterKind.platform",
   type: "library.filterKind.type",
+  status: "library.filterKind.status",
   category: "library.filterKind.category",
 };
 
 interface FilterDialogProps {
-  items: readonly LibraryItem[];
+  index: readonly IndexedItem[];
   filter: ReadonlySet<LibraryTag>;
   query: string;
   onToggleTag: (tag: LibraryTag) => void;
@@ -22,7 +24,7 @@ interface FilterDialogProps {
 
 /** Every filter in one place: a section per kind, each chip with how many recipes it would show. */
 export function FilterDialog({
-  items,
+  index,
   filter,
   query,
   onToggleTag,
@@ -30,7 +32,8 @@ export function FilterDialog({
   onClose,
 }: FilterDialogProps) {
   const t = useT();
-  const shown = visibleItems(items, filter, query).length;
+  const counts = useMemo(() => facetCounts(index, filter, query), [index, filter, query]);
+  const shown = useMemo(() => visibleIndexed(index, filter, query).length, [index, filter, query]);
 
   return (
     <div
@@ -65,7 +68,7 @@ export function FilterDialog({
               <div className="flex flex-wrap gap-2">
                 {kind.tags.map((tag) => {
                   const on = filter.has(tag);
-                  const count = facetCount(items, filter, tag, query);
+                  const count = counts.get(tag) ?? 0;
                   return (
                     <button
                       key={tag}

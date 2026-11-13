@@ -1,14 +1,18 @@
 import { describe, expect, it } from "vitest";
 import type { LibraryItem } from "./ipc";
 import {
+  activeTags,
   backTarget,
   defaultFilter,
   facetCount,
+  facetCounts,
+  indexItems,
   knownTags,
   matchesFilter,
   matchesSearch,
   platformTag,
   toggleTag,
+  visibleIndexed,
   visibleItems,
 } from "./logic";
 
@@ -23,6 +27,83 @@ const item = (id: string, tags: string[]): LibraryItem => ({
   updateAvailable: false,
   tags,
   homepage: null,
+});
+
+describe("status filter", () => {
+  const items = [
+    item("fresh", ["official", "mobile"]),
+    { ...item("have", ["official", "mobile"]), installedVersion: "1.0.0" },
+    { ...item("old", ["official", "mobile"]), installedVersion: "0.9.0", updateAvailable: true },
+  ];
+
+  it("separates what is not added, added and out of date", () => {
+    const ids = (tag: "notAdded" | "added" | "updatable") =>
+      visibleItems(items, new Set([tag])).map((entry) => entry.id);
+    expect(ids("notAdded")).toEqual(["fresh"]);
+    expect(ids("added")).toEqual(["have"]);
+    expect(ids("updatable")).toEqual(["old"]);
+  });
+
+  it("widens within the status kind and narrows against the others", () => {
+    const filter = new Set(["notAdded", "updatable", "desktop"] as const);
+    expect(visibleItems(items, filter)).toEqual([]);
+    expect(
+      visibleItems(items, new Set(["notAdded", "updatable", "mobile"] as const)).map((e) => e.id),
+    ).toEqual(["fresh", "old"]);
+  });
+});
+
+describe("facetCounts", () => {
+  const items = [
+    item("a", ["official", "mobile", "music"]),
+    item("b", ["official", "mobile", "radio"]),
+    item("c", ["community", "desktop", "music"]),
+    { ...item("d", ["official", "desktop", "news"]), installedVersion: "1.0.0" },
+  ];
+
+  it("agrees with counting each chip on its own, for every tag and any search", () => {
+    const index = indexItems(items);
+    const filter = new Set(["official", "music", "radio"] as const);
+    for (const query of ["", "a", "zzz"]) {
+      const counts = facetCounts(index, filter, query);
+      for (const [tag, count] of counts) {
+        expect(count, `${tag} for "${query}"`).toBe(facetCount(items, filter, tag, query));
+      }
+    }
+  });
+
+  it("counts the whole library for a tag when nothing else narrows it", () => {
+    const counts = facetCounts(indexItems(items), new Set());
+    expect(counts.get("official")).toBe(3);
+    expect(counts.get("music")).toBe(2);
+    expect(counts.get("added")).toBe(1);
+    expect(counts.get("notAdded")).toBe(3);
+  });
+});
+
+describe("indexItems", () => {
+  it("puts official recipes first and keeps the list order inside each group", () => {
+    const index = indexItems([
+      item("c1", ["community"]),
+      item("o1", ["official"]),
+      item("c2", ["community"]),
+      item("o2", ["official"]),
+    ]);
+    expect(index.map(({ item: entry }) => entry.id)).toEqual(["o1", "o2", "c1", "c2"]);
+    expect(visibleIndexed(index, new Set(["community"])).map(({ item: e }) => e.id)).toEqual([
+      "c1",
+      "c2",
+    ]);
+  });
+
+  it("lists the chips that are on in the dialog's order", () => {
+    expect(activeTags(new Set(["music", "mobile", "added", "official"] as const))).toEqual([
+      "official",
+      "mobile",
+      "added",
+      "music",
+    ]);
+  });
 });
 
 describe("platformTag", () => {

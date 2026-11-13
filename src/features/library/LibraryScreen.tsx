@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { memo, useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
 import { isFavoriteSite, toggleSiteFavorite } from "../../shared/favorites";
 import { library } from "../../shared/ipc";
 import { offValue } from "../../shared/options";
@@ -13,6 +13,7 @@ import {
   useIconForUrl,
   setIconCache,
 } from "../../shared/siteIcons";
+import { FilterIcon } from "../../shared/icons";
 import { Screen } from "../../shared/Screen";
 import { Spinner } from "../../shared/Spinner";
 import { Group, primaryBlockButton, field, quietBlockButton, quietButton } from "../settings/ui";
@@ -24,14 +25,15 @@ import {
   type RecipePreview,
 } from "./ipc";
 import {
-  FILTER_TAGS,
-  activeFilterCount,
+  PAGE_SIZE,
+  activeTags,
   backTarget,
   defaultFilter,
+  indexItems,
   knownTags,
   platformTag,
   toggleTag,
-  visibleItems,
+  visibleIndexed,
   type LibraryView,
 } from "./logic";
 import { FilterDialog } from "./FilterDialog";
@@ -90,6 +92,8 @@ function LibraryBody() {
     else setView(target);
   };
 
+  const openItem = useCallback((item: LibraryItem) => setView({ kind: "detail", id: item.id }), []);
+
   const detailItem =
     view.kind === "detail" ? listing?.items.find((item) => item.id === view.id) : undefined;
 
@@ -108,7 +112,7 @@ function LibraryBody() {
             setError(null);
             void refresh();
           }}
-          onOpen={(item) => setView({ kind: "detail", id: item.id })}
+          onOpen={openItem}
         />
       )}
       {view.kind === "detail" && detailItem && (
@@ -151,11 +155,25 @@ function ListView({
   onOpen,
 }: ListViewProps) {
   const t = useT();
-  const items = listing ? visibleItems(listing.items, filter, query) : [];
+  const index = useMemo(() => (listing ? indexItems(listing.items) : []), [listing]);
+  const deferredQuery = useDeferredValue(query);
+  const shown = useMemo(
+    () => visibleIndexed(index, filter, deferredQuery),
+    [index, filter, deferredQuery],
+  );
   const [filtersOpen, setFiltersOpen] = useState(false);
+  // The page grows as the reader scrolls and starts over whenever the result changes, so a long
+  // library draws a screenful of rows, not all of them.
+  const [paging, setPaging] = useState({ of: shown, rows: PAGE_SIZE });
+  const rows = paging.of === shown ? paging.rows : PAGE_SIZE;
+  const showMore = useCallback(
+    () => setPaging({ of: shown, rows: rows + PAGE_SIZE }),
+    [shown, rows],
+  );
+  const active = activeTags(filter);
 
   return (
-    <div className="flex flex-col gap-5">
+    <div className="flex flex-col gap-4">
       <p className="px-1 text-[13px] leading-snug text-paper/50">{t("library.note")}</p>
       {error && (
         <div className="flex flex-col items-start gap-3 px-1">
@@ -166,52 +184,61 @@ function ListView({
         </div>
       )}
       {!error && listing === null && <Spinner className="px-1" label={t("library.loading")} />}
-      <input
-        type="search"
-        value={query}
-        onChange={(event) => onQuery(event.target.value)}
-        aria-label={t("library.search")}
-        placeholder={t("library.search")}
-        autoComplete="off"
-        autoCorrect="off"
-        autoCapitalize="off"
-        spellCheck={false}
-        className={field}
-      />
-      <div
-        role="group"
-        aria-label={t("library.filters")}
-        className="chip-row -mx-4 flex gap-2 overflow-x-auto px-4 pb-1"
-      >
-        {FILTER_TAGS.map((tag) => (
-          <button
-            key={tag}
-            type="button"
-            aria-pressed={filter.has(tag)}
-            onClick={() => onToggleTag(tag)}
-            className={`shrink-0 rounded-full border px-3.5 py-1.5 text-sm font-medium ${
-              filter.has(tag)
-                ? "border-accent bg-accent text-on-accent"
-                : "border-hair text-paper/75"
-            }`}
-          >
-            {t(TAG_LABELS[tag])}
-          </button>
-        ))}
+      <div className="flex gap-2">
+        <input
+          type="search"
+          value={query}
+          onChange={(event) => onQuery(event.target.value)}
+          aria-label={t("library.search")}
+          placeholder={t("library.search")}
+          autoComplete="off"
+          autoCorrect="off"
+          autoCapitalize="off"
+          spellCheck={false}
+          className={field}
+        />
         <button
           type="button"
           onClick={() => setFiltersOpen(true)}
-          className="shrink-0 rounded-full border border-hair px-3.5 py-1.5 text-sm font-medium text-paper/75"
+          disabled={!listing}
+          aria-haspopup="dialog"
+          className={`flex shrink-0 items-center gap-1.5 rounded-xl border px-3.5 text-sm font-medium disabled:opacity-40 ${
+            active.length > 0 ? "border-accent text-accent" : "border-hair text-paper/80"
+          }`}
         >
+          <FilterIcon />
           {t("library.filterButton")}
-          {activeFilterCount(filter) > 0 && ` (${activeFilterCount(filter)})`}
+          {active.length > 0 && (
+            <span className="grid min-w-5 place-items-center rounded-full bg-accent px-1.5 text-xs font-semibold text-on-accent">
+              {active.length}
+            </span>
+          )}
         </button>
       </div>
+      {active.length > 0 && (
+        <div
+          role="group"
+          aria-label={t("library.filters")}
+          className="chip-row -mx-4 flex gap-2 overflow-x-auto px-4"
+        >
+          {active.map((tag) => (
+            <button
+              key={tag}
+              type="button"
+              aria-label={t("library.removeFilter", { name: t(TAG_LABELS[tag]) })}
+              onClick={() => onToggleTag(tag)}
+              className="shrink-0 rounded-full border border-accent bg-accent/15 px-3 py-1 text-sm font-medium text-accent"
+            >
+              {t(TAG_LABELS[tag])} <span aria-hidden="true">×</span>
+            </button>
+          ))}
+        </div>
+      )}
       {filtersOpen && listing && (
         <FilterDialog
-          items={listing.items}
+          index={index}
           filter={filter}
-          query={query}
+          query={deferredQuery}
           onToggleTag={onToggleTag}
           onClear={onClearFilter}
           onClose={() => setFiltersOpen(false)}
@@ -220,23 +247,59 @@ function ListView({
       {listing && listing.items.length === 0 && (
         <p className="px-1 text-sm text-paper/55">{t("library.empty")}</p>
       )}
-      {listing && listing.items.length > 0 && items.length === 0 && (
+      {listing && listing.items.length > 0 && shown.length === 0 && (
         <p className="px-1 text-sm text-paper/55">
-          {t(query.trim() ? "library.searchNone" : "library.noMatch")}
+          {t(deferredQuery.trim() ? "library.searchNone" : "library.noMatch")}
         </p>
       )}
-      {items.length > 0 && (
-        <Group>
-          {items.map((item) => (
-            <ItemRow key={item.id} item={item} onOpen={() => onOpen(item)} />
-          ))}
-        </Group>
+      {shown.length > 0 && (
+        <>
+          <p className="px-1 text-xs text-paper/50" aria-live="polite">
+            {t("library.resultCount", { count: shown.length })}
+          </p>
+          <Group>
+            {shown.slice(0, rows).map(({ item }) => (
+              <ItemRow key={item.id} item={item} onOpen={onOpen} />
+            ))}
+          </Group>
+          {rows < shown.length && <EndOfPage onReach={showMore} />}
+        </>
       )}
     </div>
   );
 }
 
-function ItemRow({ item, onOpen }: { item: LibraryItem; onOpen: () => void }) {
+/** Asks for the next page of rows when the reader scrolls close to the end of the list. */
+function EndOfPage({ onReach }: { onReach: () => void }) {
+  const marker = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const element = marker.current;
+    if (!element) return;
+    if (typeof IntersectionObserver === "undefined") {
+      onReach();
+      return;
+    }
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((entry) => entry.isIntersecting)) onReach();
+      },
+      { rootMargin: "800px 0px" },
+    );
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, [onReach]);
+
+  return <div ref={marker} aria-hidden="true" className="h-px" />;
+}
+
+const ItemRow = memo(function ItemRow({
+  item,
+  onOpen,
+}: {
+  item: LibraryItem;
+  onOpen: (item: LibraryItem) => void;
+}) {
   const t = useT();
   const iconUrl = item.hosts.map(faviconPageUrlForHost).find(Boolean);
   const fetched = useIconForUrl(iconUrl ?? "", []);
@@ -268,8 +331,8 @@ function ItemRow({ item, onOpen }: { item: LibraryItem; onOpen: () => void }) {
     <button
       ref={row}
       type="button"
-      onClick={onOpen}
-      className="flex w-full items-center gap-3 px-4 py-3.5 text-start active:bg-paper/[0.05]"
+      onClick={() => onOpen(item)}
+      className="flex w-full [contain-intrinsic-size:auto_120px] [content-visibility:auto] items-center gap-3 px-4 py-3.5 text-start active:bg-paper/[0.05]"
     >
       <SiteTile name={item.name} icon={icon} />
       <span className="min-w-0 flex-1">
@@ -290,7 +353,7 @@ function ItemRow({ item, onOpen }: { item: LibraryItem; onOpen: () => void }) {
       {state && <span className="shrink-0 text-sm text-accent">{state}</span>}
     </button>
   );
-}
+});
 
 function TagBadges({ tags }: { tags: readonly string[] }) {
   const t = useT();

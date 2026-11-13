@@ -60,6 +60,14 @@ export const CheckIcon = () => (
   </Icon>
 );
 
+export const FilterIcon = () => (
+  <Icon>
+    <path d="M4 7h9M17 7h3M4 17h3M11 17h9" />
+    <circle cx="15" cy="7" r="2" />
+    <circle cx="9" cy="17" r="2" />
+  </Icon>
+);
+
 export const ArrowIcon = () => (
   <Icon>
     <path d="M5 12h14M13 6l6 6-6 6" />

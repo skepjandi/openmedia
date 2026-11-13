@@ -6,7 +6,15 @@ interface SiteTileProps {
 /** The site's own icon when it is known, else its first letter on a tinted square. */
 export function SiteTile({ name, icon }: SiteTileProps) {
   if (icon) {
-    return <img src={icon} alt="" className="size-10 shrink-0 rounded-[10px] object-cover" />;
+    return (
+      <img
+        src={icon}
+        alt=""
+        loading="lazy"
+        decoding="async"
+        className="size-10 shrink-0 rounded-[10px] object-cover"
+      />
+    );
   }
   return (
     <span

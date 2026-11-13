@@ -45,6 +45,9 @@ export default defineConfig({
     target: "safari17",
     // Safari has had native modulepreload since 17.
     modulePreload: { polyfill: false },
+    // The bundled site icons are 270-odd small PNGs. Inlined they put hundreds of KB of base64
+    // into the entry chunk that every launch parses; as files they cost nothing until drawn.
+    assetsInlineLimit: (file) => (file.includes("/site-icons/") ? false : undefined),
     reportCompressedSize: false,
   },
   server: {

@@ -62,8 +62,21 @@ export type CategoryTag =
   | "travel"
   | "video";
 
-/** Platform and origin tags are joined by subject categories and the optional hub listing tag. */
-export type LibraryTag = "official" | "community" | "mobile" | "desktop" | "hub" | CategoryTag;
+/**
+ * Platform and origin tags are joined by subject categories and the optional hub listing tag. The
+ * status tags (`notAdded`, `added`, `updatable`) are never sent by Rust: the shell derives them
+ * from what is installed.
+ */
+export type LibraryTag =
+  | "official"
+  | "community"
+  | "mobile"
+  | "desktop"
+  | "hub"
+  | "notAdded"
+  | "added"
+  | "updatable"
+  | CategoryTag;
 
 /** One bundled recipe, as the library lists it. */
 export interface LibraryItem {
