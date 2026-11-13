@@ -28,6 +28,7 @@ import {
   ai,
   library,
   siteView,
+  type Accessibility,
   type AiState,
   type AppState,
   type Favorite,
@@ -177,6 +178,8 @@ export interface AppStore {
   /** Picks the engine the command bar searches with. */
   setSearchEngine: (engine: SearchEngine) => Promise<void>;
   setAdBlock: (enabled: boolean) => Promise<void>;
+  /** Changes some of the accessibility choices; the rest keep their value. */
+  setAccessibility: (changes: Partial<Accessibility>) => Promise<void>;
   loadSites: () => Promise<void>;
   /** Re-reads the favorites after Rust changed them on its own, as the guide's quick-access pick does. */
   reloadFavorites: () => Promise<void>;
@@ -786,6 +789,21 @@ export const useApp = create<AppStore>((set, get) => {
             current.state && previous !== undefined
               ? { ...current.state, backButton: previous }
               : current.state,
+          error: appError(error),
+        }));
+      }
+    },
+
+    setAccessibility: async (changes) => {
+      const previous = get().state?.accessibility;
+      if (!previous) return;
+      const next = { ...previous, ...changes };
+      set((current) => ({ state: current.state && { ...current.state, accessibility: next } }));
+      try {
+        await library.setAccessibility(next);
+      } catch (error) {
+        set((current) => ({
+          state: current.state && { ...current.state, accessibility: previous },
           error: appError(error),
         }));
       }

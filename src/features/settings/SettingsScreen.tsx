@@ -8,16 +8,16 @@ import { useChat } from "../ai/chatStore";
 import { Screen } from "../../shared/Screen";
 import type { SearchEngine, Theme } from "../../shared/ipc";
 import { DEFAULT_SEARCH_ENGINE, SEARCH_ENGINES } from "../../shared/searchEngines";
+import { AccessibilitySection } from "./AccessibilitySection";
 import { AiSection } from "./AiSection";
 import { FavoritesSection } from "./FavoritesSection";
 import { IncognitoFavoritesSection, IncognitoRecipesLink } from "./IncognitoSections";
-import { MarginSlider } from "./MarginSlider";
 import { LibraryLinks } from "../library/Links";
 import { RecipesLink } from "./RecipesScreen";
 import { Switch } from "./Switch";
 import { UpdatesSection } from "./UpdatesSection";
 import { Picker } from "./Picker";
-import { Group, GroupLabel, Section, primaryButton, quietButton } from "./ui";
+import { Group, Section, primaryButton, quietButton } from "./ui";
 
 export function SettingsScreen() {
   const open = useApp(selectSettingsOpen);
@@ -32,6 +32,7 @@ export function SettingsScreen() {
         <AppearanceSection />
         <LanguageSection />
         <BrowsingSection />
+        <AccessibilitySection />
         <FavoritesSection />
         <RecipesLink />
         <LibraryLinks />
@@ -110,13 +111,9 @@ function LanguageSection() {
 
 function BrowsingSection() {
   const adBlock = useApp((s) => s.state?.adBlock ?? true);
-  const backButton = useApp((s) => s.state?.backButton ?? false);
   const searchEngine = useApp((s) => s.state?.searchEngine ?? DEFAULT_SEARCH_ENGINE);
-  const margin = useApp((s) => s.state?.bottomMargin ?? 0);
   const setAdBlock = useApp((s) => s.setAdBlock);
-  const setBackButton = useApp((s) => s.setBackButton);
   const setSearchEngine = useApp((s) => s.setSearchEngine);
-  const setBottomMargin = useApp((s) => s.setBottomMargin);
   const t = useT();
 
   return (
@@ -134,28 +131,6 @@ function BrowsingSection() {
             value={searchEngine}
             options={SEARCH_ENGINES.map((engine) => ({ value: engine.id, label: engine.name }))}
             onChange={(next) => void setSearchEngine(next as SearchEngine)}
-          />
-        </div>
-      </Group>
-      <GroupLabel>{t("settings.accessibility")}</GroupLabel>
-      <Group>
-        <Switch
-          label={t("settings.backButton")}
-          description={t("settings.backButtonNote")}
-          checked={backButton}
-          onChange={(on) => void setBackButton(on)}
-        />
-        <div className="flex flex-col gap-2 px-4 py-3.5">
-          <div>
-            <div className="text-base">{t("settings.bottomMargin")}</div>
-            <div className="mt-0.5 text-sm leading-snug text-paper/55">
-              {t("settings.bottomMarginNote")}
-            </div>
-          </div>
-          <MarginSlider
-            label={t("settings.bottomMarginLabel")}
-            value={margin}
-            onCommit={(pixels) => void setBottomMargin(pixels)}
           />
         </div>
       </Group>

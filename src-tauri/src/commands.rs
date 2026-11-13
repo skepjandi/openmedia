@@ -12,6 +12,7 @@ use url::Url;
 use uuid::Uuid;
 use zeroize::Zeroizing;
 
+use crate::accessibility::Accessibility;
 use crate::ad_block::AdBlock;
 use crate::ai::{
     ProviderConfig, ProviderInput,
@@ -409,13 +410,22 @@ pub async fn set_site_option(
     Ok(())
 }
 
-/// The recipe script for the set in play: the normal choices, or the incognito ones.
+/// The page script for the set in play: its recipes, then the accessibility choices.
 pub(crate) fn current_script(
     app: &AppHandle,
     library: &Library,
     recipes: &Recipes,
 ) -> Result<String> {
-    recipes.script(&library.site_options(app.state::<Incognito>().mode())?)
+    script_for(library, recipes, app.state::<Incognito>().mode())
+}
+
+/// The page script for `mode`. The accessibility choices follow the recipes and apply in both sets.
+pub(crate) fn script_for(library: &Library, recipes: &Recipes, mode: Mode) -> Result<String> {
+    let recipe_script = recipes.script(&library.site_options(mode)?)?;
+    Ok(format!(
+        "{recipe_script}\n{}",
+        library.accessibility()?.page_script()
+    ))
 }
 
 /// Recompiles the page script from the current recipes and choices and hands it to the open
@@ -484,6 +494,19 @@ pub(crate) fn push_background_media(app: &AppHandle, sites: Vec<String>) -> Resu
 #[tauri::command]
 pub fn set_back_button(library: State<'_, Library>, enabled: bool) -> Result<()> {
     library.set_back_button(enabled)
+}
+
+/// Saves the accessibility choices. The open pages take them at once, as with a recipe switch,
+/// so this is async for the reason given at `open_site`.
+#[tauri::command]
+pub async fn set_accessibility(
+    app: AppHandle,
+    library: State<'_, Library>,
+    recipes: State<'_, Recipes>,
+    accessibility: Accessibility,
+) -> Result<()> {
+    library.set_accessibility(accessibility)?;
+    reload_script(&app, &library, &recipes)
 }
 
 /// Turns the "show what will be sent" step of the AI assistant on or off.

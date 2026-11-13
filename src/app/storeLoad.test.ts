@@ -6,6 +6,7 @@ vi.mock("@tauri-apps/api/event", () => ({ listen: vi.fn() }));
 
 import { useApp } from "./store";
 import type { Startup } from "../shared/ipc";
+import { ACCESSIBILITY_OFF } from "../shared/accessibility";
 
 const startup = {
   profileId: "default",
@@ -22,6 +23,7 @@ const startup = {
   aiPreview: true,
   locale: "en",
   searchEngine: "google",
+  accessibility: ACCESSIBILITY_OFF,
   bootSession: { id: "boot-session", url: "https://m.youtube.com/watch?v=example" },
   desktop: false,
 } satisfies Startup;

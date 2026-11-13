@@ -14,6 +14,16 @@ All notable changes to OpenMedia are documented here.
 
 **Verified:** `tsc`, ESLint, Prettier, `vitest` (434/434, new `trail.test.ts`), `cargo test library` (61/61). **Not verified:** the restart behaviour on a device or emulator.
 
+### feat(accessibility): epilepsy protection and dyslexia aids
+
+**Area:** `feat(accessibility)`
+
+**Change:** Settings has an Accessibility section. Epilepsy protection stops animations and transitions, pauses video that starts without a tap, and freezes animated GIFs, in the app and on every page. The dyslexia aids are a reading font (OpenDyslexic or Atkinson Hyperlegible, bundled, SIL OFL), wider text spacing (WCAG 1.4.12 values) and a page tint. The choices are saved as `accessibility` in `library.json` and reach pages as a script appended to the recipe script; the floating back button and bottom margin moved into the same section. New `docs/wiki/accessibility.md`.
+
+**Verified:** Rust unit tests for the script config and persistence, the i18n catalog test, TypeScript check, ESLint, and a stub-DOM run of the page script (autoplay guard, GIF still, teardown). **Not verified:** on a device or a real page; it cannot detect flashing inside a video the reader starts.
+
+**PR:** n/a
+
 ### feat(share): remember the GitHub sign-in and show the account
 
 **Area:** `feat(share)`

@@ -8,6 +8,22 @@ export type Theme = "system" | "light" | "dark";
 export type SearchEngine =
   "duckDuckGo" | "google" | "bing" | "brave" | "ecosia" | "startpage" | "yahoo";
 
+/** A reading font for pages and the app: `off` leaves each page's own. */
+export type ReadingFont = "off" | "opendyslexic" | "hyperlegible";
+
+/** A pastel laid over the page to cut glare. */
+export type Tint = "off" | "cream" | "mint" | "blue";
+
+/** Epilepsy protection and the reading aids for dyslexia; all off until chosen. */
+export interface Accessibility {
+  /** Stops animation, transitions, autoplaying video and animated GIFs. */
+  epilepsyProtection: boolean;
+  font: ReadingFont;
+  /** Wider letters, words and lines. */
+  spacing: boolean;
+  tint: Tint;
+}
+
 export interface Favorite {
   id: string;
   name: string;
@@ -45,6 +61,7 @@ export interface AppState {
   /** The language the user picked, as a BCP 47 tag; null follows the device's language. */
   locale: string | null;
   searchEngine: SearchEngine;
+  accessibility: Accessibility;
 }
 
 /** The page Rust already started loading at launch; the shell takes it over. */
@@ -231,6 +248,8 @@ export const library = {
   /** Forgets the typed addresses and the remembered last page. */
   clearHistory: () => command("clear_history"),
   setBackButton: (enabled: boolean) => command("set_back_button", { enabled }),
+  setAccessibility: (accessibility: Accessibility) =>
+    command("set_accessibility", { accessibility }),
 };
 
 export interface SectionUsage {

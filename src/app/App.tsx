@@ -9,6 +9,7 @@ import { startUsageTracking } from "../features/stats/tracker";
 import { UsageGuard } from "../features/stats/UsageGuard";
 import { WebLayer } from "../features/web/WebLayer";
 import { useApplyTheme } from "../shared/theme";
+import { ACCESSIBILITY_OFF, useApplyAccessibility } from "../shared/accessibility";
 import {
   hideSplash,
   hideSplashWhen,
@@ -80,8 +81,10 @@ export function App() {
   const locale = useApp(selectLocale);
   const incognito = useApp((s) => s.incognito.active);
   const t = useT();
+  const accessibility = useApp((s) => s.state?.accessibility ?? ACCESSIBILITY_OFF);
   const [idle, setIdle] = useState(false);
   useApplyTheme(theme);
+  useApplyAccessibility(accessibility);
   useHitRegions();
   useAndroidBack();
   useDesktopInput();

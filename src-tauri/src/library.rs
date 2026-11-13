@@ -13,6 +13,7 @@ use serde::{Deserialize, Serialize};
 use tauri_plugin_siteview::validate::parse_web_url;
 use uuid::Uuid;
 
+use crate::accessibility::Accessibility;
 use crate::ai::{AiSettings, MAX_PROVIDERS, ProviderConfig, ProviderInput};
 use crate::error::{Error, Result};
 use crate::recipes::OptionChoices;
@@ -147,6 +148,7 @@ pub struct AppState {
     pub locale: Option<String>,
     /// The engine the command bar searches with.
     pub search_engine: SearchEngine,
+    pub accessibility: Accessibility,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -209,6 +211,9 @@ struct LibraryData {
     /// Google until the user picks another.
     #[serde(default)]
     search_engine: SearchEngine,
+    /// Epilepsy protection and the reading aids for dyslexia; all off until chosen.
+    #[serde(default)]
+    accessibility: Accessibility,
 }
 
 /// The user's favorites, page, theme and provider settings, persisted as one JSON file. Holds no
@@ -270,6 +275,7 @@ impl Library {
             ai_preview: data.ai_preview,
             locale: data.locale.clone(),
             search_engine: data.search_engine,
+            accessibility: data.accessibility,
         })
     }
 
@@ -474,6 +480,16 @@ impl Library {
     pub fn set_back_button(&self, enabled: bool) -> Result<()> {
         let mut data = self.lock()?;
         data.back_button = enabled;
+        self.save(&data)
+    }
+
+    pub fn accessibility(&self) -> Result<Accessibility> {
+        Ok(self.lock()?.accessibility)
+    }
+
+    pub fn set_accessibility(&self, accessibility: Accessibility) -> Result<()> {
+        let mut data = self.lock()?;
+        data.accessibility = accessibility;
         self.save(&data)
     }
 
@@ -759,6 +775,7 @@ fn default_data() -> LibraryData {
         ai: AiSettings::default(),
         locale: None,
         search_engine: SearchEngine::Google,
+        accessibility: Accessibility::default(),
         incognito_site_options: OptionChoices::new(),
         incognito_favorites: None,
     }
@@ -802,6 +819,7 @@ static TEMP_COUNTER: AtomicU64 = AtomicU64::new(0);
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::accessibility::{ReadingFont, Tint};
     use crate::ai::ProviderKind;
 
     fn library() -> (tempfile::TempDir, Library) {
@@ -1116,6 +1134,51 @@ mod tests {
         assert_eq!(
             reload(&dir).state().unwrap().search_engine,
             SearchEngine::Brave
+        );
+    }
+
+    #[test]
+    fn accessibility_is_off_by_default_and_the_choices_persist() {
+        let (dir, library) = library();
+        assert_eq!(
+            library.state().unwrap().accessibility,
+            Accessibility::default()
+        );
+        let chosen = Accessibility {
+            epilepsy_protection: true,
+            font: ReadingFont::OpenDyslexic,
+            spacing: true,
+            tint: Tint::Mint,
+        };
+        library.set_accessibility(chosen).unwrap();
+        assert_eq!(library.accessibility().unwrap(), chosen);
+        assert_eq!(reload(&dir).state().unwrap().accessibility, chosen);
+    }
+
+    #[test]
+    fn a_library_saved_before_accessibility_existed_loads_with_it_off() {
+        let (dir, library) = library();
+        library
+            .set_accessibility(Accessibility {
+                spacing: true,
+                ..Accessibility::default()
+            })
+            .unwrap();
+        let path = dir.path().join("library.json");
+        let mut saved: serde_json::Value =
+            serde_json::from_str(&fs::read_to_string(&path).unwrap()).unwrap();
+        assert!(
+            saved
+                .as_object_mut()
+                .unwrap()
+                .remove("accessibility")
+                .is_some()
+        );
+        fs::write(&path, saved.to_string()).unwrap();
+        drop(library);
+        assert_eq!(
+            reload(&dir).state().unwrap().accessibility,
+            Accessibility::default()
         );
     }
 
