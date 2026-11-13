@@ -20,6 +20,7 @@ use tauri_plugin_siteview::site::site_of_host;
 
 const FORMAT_VERSION: u32 = 4;
 const MAX_HISTORY: usize = 100;
+const MAX_BACK: usize = 20;
 pub const MAX_FAVORITE_NAME_CHARS: usize = 20;
 const MAX_ICON_CHARS: usize = 200_000;
 /// The most site icons the app keeps. Each one is a small PNG, so this stays well under a
@@ -130,6 +131,8 @@ pub struct AppState {
     pub favorites: Vec<Favorite>,
     pub history: Vec<String>,
     pub last_url: Option<String>,
+    /// The pages behind `last_url`, oldest first, so Back still works after a restart.
+    pub last_back: Vec<String>,
     pub onboarded: bool,
     pub theme: Theme,
     pub ad_block: bool,
@@ -153,6 +156,8 @@ struct LibraryData {
     profile_id: Uuid,
     favorites: Vec<Favorite>,
     last_url: Option<String>,
+    #[serde(default)]
+    last_back: Vec<String>,
     #[serde(default)]
     onboarded: bool,
     #[serde(default)]
@@ -255,6 +260,7 @@ impl Library {
             favorites: with_icons(&data, &data.favorites),
             history: data.history.clone(),
             last_url: data.last_url.clone(),
+            last_back: data.last_back.clone(),
             onboarded: data.onboarded,
             theme: data.theme,
             ad_block: data.ad_block,
@@ -318,10 +324,19 @@ impl Library {
         ))
     }
 
-    pub fn set_last_url(&self, url: &str) -> Result<()> {
+    /// Remembers the page and the pages behind it. Addresses that do not parse are dropped, and
+    /// only the newest `MAX_BACK` are kept.
+    pub fn set_last_url(&self, url: &str, back: &[String]) -> Result<()> {
         let url = parse_web_url(url)?.to_string();
+        let mut back: Vec<String> = back
+            .iter()
+            .filter_map(|url| parse_web_url(url).ok())
+            .map(|url| url.to_string())
+            .collect();
+        back.drain(..back.len().saturating_sub(MAX_BACK));
         let mut data = self.lock()?;
         data.last_url = Some(url);
+        data.last_back = back;
         self.save(&data)
     }
 
@@ -348,6 +363,7 @@ impl Library {
         let mut data = self.lock()?;
         data.history.clear();
         data.last_url = None;
+        data.last_back.clear();
         prune_icons(&mut data);
         self.save(&data)
     }
@@ -728,6 +744,7 @@ fn default_data() -> LibraryData {
         profile_id: Uuid::new_v4(),
         favorites: default_favorites(),
         last_url: None,
+        last_back: Vec::new(),
         onboarded: false,
         theme: Theme::System,
         ad_block: true,
@@ -896,7 +913,12 @@ mod tests {
         library
             .set_favorites(vec![input(" YouTube ", "https://m.youtube.com")])
             .unwrap();
-        library.set_last_url("https://m.youtube.com/feed").unwrap();
+        library
+            .set_last_url(
+                "https://m.youtube.com/feed",
+                &["https://m.youtube.com/".to_string()],
+            )
+            .unwrap();
         let state = reload(&dir).state().unwrap();
         assert_eq!(state.favorites.len(), 1);
         assert_eq!(state.favorites[0].name, "YouTube");
@@ -904,6 +926,7 @@ mod tests {
             state.last_url.as_deref(),
             Some("https://m.youtube.com/feed")
         );
+        assert_eq!(state.last_back, ["https://m.youtube.com/"]);
     }
 
     #[test]
@@ -949,7 +972,9 @@ mod tests {
             library.start_url().unwrap().as_deref(),
             Some("https://www.google.com/")
         );
-        library.set_last_url("https://m.youtube.com/feed").unwrap();
+        library
+            .set_last_url("https://m.youtube.com/feed", &[])
+            .unwrap();
         assert_eq!(
             library.start_url().unwrap().as_deref(),
             Some("https://m.youtube.com/feed")
@@ -1031,7 +1056,7 @@ mod tests {
     #[test]
     fn last_url_rejects_non_web_urls() {
         let (_dir, library) = library();
-        assert!(library.set_last_url("javascript:1").is_err());
+        assert!(library.set_last_url("javascript:1", &[]).is_err());
         assert_eq!(library.state().unwrap().last_url, None);
     }
 
@@ -1505,7 +1530,7 @@ mod tests {
     fn clearing_history_forgets_the_last_page_but_keeps_favorites() {
         let (dir, library) = library();
         library.add_history("https://a.example/").unwrap();
-        library.set_last_url("https://a.example/").unwrap();
+        library.set_last_url("https://a.example/", &[]).unwrap();
         let favorites = library.state().unwrap().favorites;
         library.clear_history().unwrap();
         let state = reload(&dir).state().unwrap();

@@ -6,6 +6,14 @@ All notable changes to OpenMedia are documented here.
 >
 > **Wiki**: the [GitHub Wiki](https://github.com/skepjandi/openmedia/wiki) is the public-facing main wiki — architecture, recipe format, AI pipeline, security model, roadmap. Source-controlled editing surface is `docs/wiki/` in this repo; CI (`.github/workflows/sync-wiki.yml`) mirrors it to the GitHub Wiki on every merge to `main`. New single-PR changes belong here, not as new wiki pages.
 
+### fix(back): Back survives a restart
+
+**Area:** `fix(back)`
+
+**Change:** After a restart the page had no history of its own, so the back button was greyed out. The shell now tracks the pages behind the current one (up to 20) and saves them with the last URL as `lastBack` in `library.json` (older files load empty; cleared with history; not saved while incognito). Once a page has no history of its own, Back opens the previous saved page in a new session. Forward history from before the restart is not kept.
+
+**Verified:** `tsc`, ESLint, Prettier, `vitest` (434/434, new `trail.test.ts`), `cargo test library` (61/61). **Not verified:** the restart behaviour on a device or emulator.
+
 ### feat(share): remember the GitHub sign-in and show the account
 
 **Area:** `feat(share)`

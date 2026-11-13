@@ -97,11 +97,12 @@ pub fn set_last_url(
     library: State<'_, Library>,
     incognito: State<'_, Incognito>,
     url: String,
+    back: Vec<String>,
 ) -> Result<()> {
     if incognito.is_active() {
         return Ok(());
     }
-    library.set_last_url(&url)
+    library.set_last_url(&url, &back)
 }
 
 /// Records an address the user typed; returns the history, newest first. Nothing is recorded

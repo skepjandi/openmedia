@@ -31,6 +31,8 @@ export interface AppState {
   /** Addresses the user typed, newest first. */
   history: string[];
   lastUrl: string | null;
+  /** The pages behind `lastUrl`, oldest first. */
+  lastBack: string[];
   onboarded: boolean;
   theme: Theme;
   adBlock: boolean;
@@ -185,7 +187,7 @@ export const library = {
     invoke<Favorite[]>("set_site_favorite", { recipeId, favorite }),
   icons: () => invoke<Record<string, string>>("get_icons"),
   refreshIcons: (urls: string[]) => invoke<Record<string, string>>("refresh_icons", { urls }),
-  setLastUrl: (url: string) => command("set_last_url", { url }),
+  setLastUrl: (url: string, back: string[]) => command("set_last_url", { url, back }),
   completeOnboarding: () => command("complete_onboarding"),
   resetOnboarding: () => command("reset_onboarding"),
   /** Opens an https address in the system browser; for links in the shell's own UI. */

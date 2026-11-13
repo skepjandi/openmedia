@@ -9,6 +9,7 @@ import { readRect, useSiteViewRect } from "./useSiteViewRect";
 import { observeTitle, quickFavoriteOf, type Watch } from "./unreadWatch";
 import { usableQuickAccess } from "../../shared/favorites";
 import { useEntitlementStore } from "../paywall/store";
+import { advanceTrail } from "./sessions";
 import { leftSearchForSite } from "../history/searchVisit";
 import { HubBar } from "../hubs/HubBar";
 
@@ -63,6 +64,8 @@ export function WebLayer() {
     const watches = new Map<string, Watch>();
     /** The last address each session finished loading, to tell when it left a search for a site. */
     const loadedUrls = new Map<string, string>();
+    /** The pages behind each session's page, seeded from the pages saved before a restart. */
+    const trails = new Map<string, readonly string[]>();
     const raiseNotification = (page: SiteViewState) => {
       const { activeId, sessions, state } = useApp.getState();
       const observation = observeTitle(
@@ -92,17 +95,26 @@ export function WebLayer() {
         if (!page.loading && page.url) {
           const previous = loadedUrls.get(page.session) ?? null;
           loadedUrls.set(page.session, page.url);
+          const seed =
+            useApp.getState().sessions.find((session) => session.id === page.session)
+              ?.restoredBack ?? [];
+          trails.set(
+            page.session,
+            advanceTrail(trails.get(page.session) ?? seed, previous, page.url),
+          );
           if (leftSearchForSite(previous, page.url)) useApp.getState().recordVisit(page.url);
         }
         const visible = useApp.getState().activeId === page.session;
-        if (visible && !page.loading && page.url && page.url !== lastSaved) {
-          lastSaved = page.url;
-          void library.setLastUrl(page.url).catch(() => {});
+        const saved = `${page.url}\n${(trails.get(page.session) ?? []).join("\n")}`;
+        if (visible && !page.loading && page.url && saved !== lastSaved) {
+          lastSaved = saved;
+          void library.setLastUrl(page.url, [...(trails.get(page.session) ?? [])]).catch(() => {});
         }
       }),
       siteView.onClosed((session) => {
         watches.delete(session);
         loadedUrls.delete(session);
+        trails.delete(session);
         forgetSessions([session]);
       }),
       siteView.onMemoryWarning(() => trimSessions("memory")),

@@ -154,6 +154,8 @@ export interface AppStore {
   /** Shows a live session by id, for example the one a notification was tapped for. */
   openSession: (id: string) => void;
   /** Ends one live session. Favorites and history are untouched; the last open site stays. */
+  /** Back in the page; once it has no history of its own, the page saved from before a restart. */
+  goBack: () => Promise<void>;
   closeSession: (id: string) => void;
   /** Ends every live session but the visible one. */
   closeOtherSessions: () => void;
@@ -336,6 +338,7 @@ export const useApp = create<AppStore>((set, get) => {
     source: SessionSource,
     adoptedId?: string,
     hubId: string | null = null,
+    restoredBack: string[] = [],
   ) => {
     const now = Date.now();
     const id = adoptedId ?? crypto.randomUUID();
@@ -343,7 +346,7 @@ export const useApp = create<AppStore>((set, get) => {
     set((current) => ({
       sessions: [
         ...markUsed(current.sessions, previousId, now),
-        newSession(id, source, url, now, hubId),
+        newSession(id, source, url, now, hubId, restoredBack),
       ],
       activeId: id,
       sheet: "none",
@@ -471,6 +474,8 @@ export const useApp = create<AppStore>((set, get) => {
             bootSession.url,
             startSource(state.favorites, bootSession.url),
             bootSession.id,
+            null,
+            state.lastUrl === bootSession.url ? state.lastBack : [],
           );
         }
       } catch (error) {
@@ -549,6 +554,19 @@ export const useApp = create<AppStore>((set, get) => {
 
     openSession: (id) => {
       if (get().sessions.some((session) => session.id === id)) switchTo(id);
+    },
+
+    goBack: async () => {
+      const page = selectPage(get());
+      if (!page) return;
+      if (page.canGoBack || page.restoredBack.length === 0) {
+        await siteView.goBack();
+        return;
+      }
+      const behind = page.restoredBack[page.restoredBack.length - 1];
+      const rest = page.restoredBack.slice(0, -1);
+      startSession(behind, page.source, undefined, page.hubId, rest);
+      get().closeSession(page.id);
     },
 
     closeSession: (id) => {

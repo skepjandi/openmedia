@@ -1,3 +1,4 @@
+import { canStepBack } from "../web/sessions";
 import { useEffect, useState, type FormEvent } from "react";
 import { selectPage, selectQuickFavorites, useApp } from "../../app/store";
 import { describeError } from "../../i18n/errors";
@@ -379,9 +380,9 @@ export function CommandBar() {
             <button
               type="button"
               aria-label={t("common.back")}
-              disabled={!page?.canGoBack}
+              disabled={!canStepBack(page)}
               className={tool}
-              onClick={() => run(siteView.goBack)}
+              onClick={() => run(useApp.getState().goBack)}
             >
               <BackIcon />
             </button>

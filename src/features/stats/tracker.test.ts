@@ -48,6 +48,7 @@ const session = (id: string, url: string, scope: string): Session => ({
   loading: false,
   canGoBack: false,
   canGoForward: false,
+  restoredBack: [],
   painted: true,
   lastUsed: Date.now(),
   openedAt: 0,

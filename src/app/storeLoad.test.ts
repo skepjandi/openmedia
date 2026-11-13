@@ -12,6 +12,7 @@ const startup = {
   favorites: [],
   history: [],
   lastUrl: "https://m.youtube.com/watch?v=example",
+  lastBack: [],
   onboarded: true,
   theme: "system",
   adBlock: false,
