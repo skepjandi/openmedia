@@ -5,7 +5,7 @@
   "version": "2.1.0",
   "origin": "user",
   "tags": ["desktop", "mobile"],
-  "match": ["https://*.youtube.com/*"],
+  "match": ["https://www.youtube.com/*", "https://m.youtube.com/*", "https://youtube.com/*"],
   "options": [
     {
       "id": "open-app",

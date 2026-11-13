@@ -291,6 +291,7 @@ mod tests {
     #[test]
     fn every_homepage_belongs_to_its_own_site() {
         let recipes = Recipes::official_installed();
+        let mut stolen = Vec::new();
         for recipe in recipes.all() {
             // A hub opens pages that belong to other sites' recipes, so it owns no page itself.
             if recipe.hub.is_some() {
@@ -299,8 +300,15 @@ mod tests {
             let url = Url::parse(recipe.homepage().unwrap()).unwrap();
             // A hub may also cover the page, as a launcher; the site's own recipe still owns it.
             let owner = recipes.covering(&url).into_iter().find(|r| r.hub.is_none());
-            assert_eq!(owner.map(|r| r.id), Some(recipe.id));
+            if owner.as_ref().map(|r| &r.id) != Some(&recipe.id) {
+                stolen.push(format!(
+                    "{} is claimed by {:?}",
+                    recipe.id,
+                    owner.map(|r| r.id)
+                ));
+            }
         }
+        assert!(stolen.is_empty(), "{}", stolen.join("\n"));
     }
 
     #[test]
@@ -354,7 +362,11 @@ mod tests {
         ];
         let removed =
             with_site_favorite(&recipes, &favorites, "market.official.youtube", false).unwrap();
-        assert_eq!(urls(&removed), ["https://example.com/"]);
+        // YouTube Music is a site of its own, so it stays.
+        assert_eq!(
+            urls(&removed),
+            ["https://example.com/", "https://music.youtube.com/"]
+        );
     }
 
     #[test]

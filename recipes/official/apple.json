@@ -2,10 +2,10 @@
   "schema": 1,
   "id": "market.official.apple",
   "name": "Apple",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "origin": "user",
   "tags": ["desktop", "mobile"],
-  "match": ["https://*.apple.com/*"],
+  "match": ["https://www.apple.com/*", "https://apple.com/*", "https://support.apple.com/*"],
   "options": [
     {
       "id": "cookie-banners",
