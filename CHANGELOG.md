@@ -71,6 +71,18 @@ All notable changes to OpenMedia are documented here.
 
 **PR:** n/a
 
+### fix(adblock): add Brave filter-list scriptlets to native site views
+
+**Area:** `fix(adblock)`
+
+**Problem:** Native request and CSS filters cannot run filter-list scriptlets, so some ad-blocking rules had no effect in the embedded site views.
+
+**Change:** Bundle Brave filter resources and rules, plus Brave's iOS-specific list. A cached Brave engine now matches scriptlets to the session's starting URL; iOS and Android inject them at document start when supported, guarded to the main frame and starting origin. The existing global switch controls registration. Brave's narrow YouTube fallback rules are included on iOS; video ads are not guaranteed to be blocked.
+
+**Verified:** Rust adblock tests (11 passed), Android `BlockingRulesTest`, updater syntax/data validation, and an iOS Simulator debug build. **Not verified:** real-site or physical-device ad removal.
+
+**PR:** #177
+
 
 ### fix(ui): remove repeated usage editor hints
 

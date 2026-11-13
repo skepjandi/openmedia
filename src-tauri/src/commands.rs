@@ -238,12 +238,19 @@ async fn build_rule_lists(ad_block: &AdBlock) -> Result<Vec<ContentRuleList>> {
         .map_err(|e| Error::AdBlock(e.to_string()))?
 }
 
-/// Opens the page in the native site view with the recipe script and the ad-blocking rule lists
-/// attached. Every page the shell shows is opened through here: the plugin's own `open` is not
-/// granted to it.
+async fn build_scriptlets(ad_block: &AdBlock, url: String) -> Result<String> {
+    let ad_block = AdBlock::clone(ad_block);
+    tauri::async_runtime::spawn_blocking(move || ad_block.scriptlets_for_url(&url))
+        .await
+        .map_err(|error| Error::AdBlock(error.to_string()))?
+}
+
+/// Opens the page in the native site view with its recipe script, URL-matched adblock scriptlet,
+/// and enabled network/CSS rule lists. Every page the shell shows is opened through here: the
+/// plugin's own `open` is not granted to it.
 ///
-/// A failure to build the rule lists does not stop browsing; the page opens unblocked and the
-/// reason comes back as the `Ok` value, for the caller to tell the shell.
+/// A failure to build blocker data does not stop browsing; the reason comes back as the `Ok` value
+/// for the caller to tell the shell.
 ///
 /// Plugin calls wait for native code that needs the main thread, so this must never run there.
 pub(crate) async fn open_session(
@@ -256,16 +263,23 @@ pub(crate) async fn open_session(
     let recipes = app.state::<Recipes>();
     parse_session_id(&session)?;
     parse_web_url(&url)?;
-    let mut blocking_failure = None;
-    let content_rule_lists = if library.ad_block_enabled()? {
-        build_rule_lists(&app.state::<AdBlock>())
-            .await
-            .unwrap_or_else(|e| {
-                blocking_failure = Some(e.to_string());
-                Vec::new()
-            })
+    let ad_block = app.state::<AdBlock>();
+    let ad_block_enabled = library.ad_block_enabled()?;
+    let mut blocking_failures = Vec::new();
+    let content_rule_lists = if ad_block_enabled {
+        build_rule_lists(&ad_block).await.unwrap_or_else(|error| {
+            blocking_failures.push(error.to_string());
+            Vec::new()
+        })
     } else {
         Vec::new()
+    };
+    let ad_block_scriptlet = match build_scriptlets(&ad_block, url.clone()).await {
+        Ok(scriptlet) => Some(scriptlet),
+        Err(error) => {
+            blocking_failures.push(error.to_string());
+            None
+        }
     };
     // The page must load under the saved theme: the shell sets it only after it has booted, by
     // which time a page opened at launch has already read `prefers-color-scheme` once, and sites
@@ -284,8 +298,11 @@ pub(crate) async fn open_session(
         url,
         rect,
         document_start_script: Some(current_script(app, &library, &recipes)?),
+        ad_block_scriptlet,
+        ad_block_enabled,
         content_rule_lists,
     })?;
+    let blocking_failure = (!blocking_failures.is_empty()).then(|| blocking_failures.join("; "));
     Ok(blocking_failure)
 }
 
@@ -343,7 +360,7 @@ pub async fn set_ad_block(
         Vec::new()
     };
     app.siteview()
-        .set_content_rule_lists(SetContentRuleListsRequest { lists })?;
+        .set_content_rule_lists(SetContentRuleListsRequest { enabled, lists })?;
     library.set_ad_block(enabled)
 }
 

@@ -1,10 +1,10 @@
 # Ad Blocking
 
-> **Status: Implemented on iOS and Android.** Bundled EasyList and EasyPrivacy, converted to WebKit content rule lists. iOS hands them to WebKit; Android has no rule-list API, so the same JSON is matched request by request in `shouldInterceptRequest`. Not built for desktop. See [Verified results](#verified-results) for what was and was not run.
+> **Status: Implemented on iOS and Android.** Bundled EasyList, EasyPrivacy and Brave filter data feed WebKit content-rule lists. iOS also bundles Brave's iOS-specific rules. URL-matched filter-list scriptlets are registered at document start on supported native webviews. Desktop is not built. See [Verified results](#verified-results) for the exact checks; live-site ad removal is not guaranteed.
 
 ## What it does
 
-Ads and trackers are blocked inside WebKit, before a request leaves the device and before the page paints. Network rules stop the request; element-hiding rules set `display: none` from the first frame. Nothing runs in the page's JS realm, so a hostile page cannot see, list or remove the rules, and no network request is made by the app to fetch lists.
+Native content rules block requests and hide supported elements. Filter-list scriptlets also run in the page's JS realm at document start where supported; page code can observe or override them. No scriptlet grants Tauri IPC, and the app never downloads filter lists.
 
 ## Why this engine
 
@@ -21,29 +21,36 @@ On iOS a `WKWebView` cannot intercept requests, so a matching engine at runtime 
 
 ```mermaid
 flowchart LR
-  Lists["blocklists/*.txt\n(compiled into the binary)"] --> Conv["ad_block.rs\nparse + convert (adblock crate)"]
+  Lists["Bundled lists + Brave resources"] --> Conv["ad_block.rs\nparse + convert"]
   Conv -->|"JSON, cached by content hash"| Cache[("app cache dir\nad-block/*.json")]
-  Cache -->|"{id, path} per list"| Open["open_site / set_ad_block"]
-  Open --> Native["SiteViewPlugin.swift"]
-  Native -->|"lookUp id, else compile once"| Store[("WKContentRuleListStore")]
-  Store --> View["site view\nWKUserContentController"]
+  Cache --> Open["open_site / set_ad_block"]
+  Open --> Native["native site-view plugin"]
+  Native -->|iOS| Store[("WKContentRuleListStore")]
+  Store --> View["WKWebView"]
+  Native -->|Android| Intercept["shouldInterceptRequest"]
+  Intercept --> View2["Android WebView"]
+  Lists --> Engine["cached adblock Engine\nURL-matched scriptlets"]
+  Engine -->|"main-frame, document-start, origin guarded"| Native
 ```
 
-- **Lists.** `blocklists/easylist.txt` (ads) and `blocklists/easyprivacy.txt` (trackers), one WebKit list each: 74,981 and 56,385 rules at the bundled versions, against WebKit's 150,000-rule cap per list. A test fails if a list converts to nothing or exceeds the cap, so an update that grows past it is caught before release.
+- **Lists.** EasyList and EasyPrivacy provide general ad/tracker rules; Brave Specific adds Brave-authored rules and scriptlets. iOS additionally bundles Brave iOS Specific, which includes fallback YouTube rules. Each list remains separate; an iOS update test checks that every bundled list converts to non-empty output within WebKit's 150,000-rule cap.
+- **Scriptlets.** `AdBlock::scriptlets_for_url` lazily builds and caches an `adblock::Engine` from the bundled filter data and Brave resource bundle. It returns scriptlets matched to the session's starting URL. Rust wraps them with main-frame and exact-origin checks; iOS registers them as a main-frame `WKUserScript` at document start. Android registers them with `addDocumentStartJavaScript` when supported, and skips them otherwise. The global switch controls registration; recipe scripts remain separate.
 - **Ids.** A list's id is `openmedia-<name>-<16 hex of SHA-256(converter revision + list text)>`. A new list version or a new converter revision gives a new id; nothing is invalidated by hand. `CONVERTER_REVISION` in `ad_block.rs` must be bumped when the `adblock` crate is upgraded.
 - **Conversion runs once per version.** `AdBlock::rule_lists` writes `<id>.json` to `<app cache>/ad-block/` only if it is missing and deletes files of older versions. It runs on a blocking thread (`spawn_blocking`) because the first run parses several megabytes.
-- **Compilation runs once per version too.** The plugin asks `WKContentRuleListStore` for the id first and reads the JSON file only on a miss. Compiled lists persist in WebKit's store, so later launches skip both; the plugin removes stored lists whose id is no longer current. Compiling both lists took about 4 s on macOS WebKit, so the first page after an install or a list update would have waited that long. It does not: `open` loads at once, the lists compile in the background and attach to open pages without a reload, so that first page is unblocked and its next navigation is blocked. Rust converts the lists at launch (`lib.rs`) so the conversion is not on the open path either.
+- **Compilation runs once per version too.** iOS asks `WKContentRuleListStore` for the id first and reads the JSON file only on a miss. Compiled lists persist in WebKit's store. The page opens while missing lists compile in the background, so its first load may be unblocked; later navigation uses the compiled rules. Rust converts lists at launch (`lib.rs`).
 - **Subdomains.** The converter emits bare domains for element-hiding rules (`example.org##.ad`). WebKit matches a bare `if-domain` only against that exact host, so `include_subdomains` prefixes `*`; without it most domain-specific hiding rules would be inert on `www.` hosts. Checked on macOS WebKit (see roadmap decision log).
-- **The setting.** `adBlock` in `library.json`, on by default; files saved before it existed load as on. `set_ad_block(enabled)` swaps the lists on the open site view and reloads it (`set_content_rule_lists` in the plugin; with no site view open it does nothing and the next `open_site` carries the lists). The Settings screen has the switch.
-- **Android.** The same converted JSON is read by the plugin's `BlockingRules` (`android/src/main/java/surf/openmedia/siteview/BlockingRules.kt`) and matched in `shouldInterceptRequest`. WebKit's `url-filter` is an unanchored regular expression, so each rule is a `java.util.regex.Pattern`; the `action` is `block` or `ignore-previous-rules`, and the converter puts every exception after every block, so an exception cancels a block. `if-domain`/`unless-domain`, `resource-type` and `load-type` are honoured the way WebKit honours them, and the request's resource type is guessed from the URL (there is no type on the Android side). Host-anchored filters are indexed by host and looked up by the request host's dot-suffixes, so only the rules that can match a host are tested; the rest are kept in one list with a literal pre-check. Element-hiding rules (`css-display-none`) have no Android equivalent and are skipped.
-- **Failure.** If the lists cannot be built or WebKit rejects one, the page still opens unblocked and the shell shows a banner through the usual `siteview:error` event. A failed `set_ad_block` leaves the stored setting unchanged and the switch reverts.
+- **The setting.** `adBlock` in `library.json`, on by default; files saved before it existed load as on. `set_ad_block(enabled)` updates native rule lists and scriptlet registration. The native views reload active pages to apply the change; the Settings screen has the switch.
+- **Android.** The same converted JSON is read by `BlockingRules` (`android/src/main/java/surf/openmedia/siteview/BlockingRules.kt`) and matched in `shouldInterceptRequest`. WebView's URL filter is an unanchored regex; each rule is a `java.util.regex.Pattern`, with domain and resource conditions interpreted against the top document. Scriptlets are independent of request interception and require AndroidX document-start support.
+- **Failure.** If blocker data cannot be built or a native list fails, browsing remains available and the failure is reported; `set_ad_block` does not persist a failed setting.
 
 ## What it cannot do
 
-Content rule lists express only part of what EasyList and EasyPrivacy contain. The converter drops the rest, silently:
+Filter conversion and scriptlet resources cover only supported parts of the upstream lists. This is not Brave Browser parity:
 
-- Scriptlet injection, procedural cosmetic filters (`:has-text`, `:xpath`, `:upward`), `$redirect` and resource replacement, `$removeparam`, `$csp`.
-- **First-party ads** served from the site's own origin. Instagram, Facebook, YouTube and X mix ads into their own feeds; network lists do not remove them. That is what [recipes](./recipe-format.md) are for.
+- Unsupported procedural cosmetic filters, `$redirect`, resource replacement, `$removeparam`, `$csp`, and scriptlet names missing from the bundled Brave resource set do not run. Only default, zero permissions are used; privileged scriptlets are disabled.
+- **First-party and in-stream ads are not guaranteed to be blocked.** Brave iOS Specific includes a YouTube `googlevideo.com` fallback rule, but that rule is narrow; same-origin ad delivery and site changes can bypass filter rules. The YouTube recipe still hides companion/promoted page slots, not video ad playback.
+- Scriptlets match the session's starting URL. They are main-frame and origin guarded, but are not re-matched for same-origin navigation within that session.
+- Android without document-start support gets network/CSS filtering but no blocker scriptlets.
 - Anything past WebKit's per-list rule cap.
 
 ## Updating the lists
@@ -53,12 +60,12 @@ scripts/update-blocklists.sh
 cargo test --manifest-path src-tauri/Cargo.toml ad_block
 ```
 
-Lists change only with an app release. A runtime update would add a network destination and needs an [invariant 1](../../AGENTS.md) decision first. EasyList and EasyPrivacy are dual-licensed (CC BY-SA 3.0 and GPLv3); see `blocklists/README.md`.
+Lists change only with an app release. Runtime updates would add a network destination and need an [invariant 1](../../AGENTS.md) decision. EasyList/EasyPrivacy are dual-licensed (CC BY-SA 3.0 and GPLv3); Brave data is MPL-2.0. See `blocklists/README.md`.
 
 ## Not built
 
 - Per-site allowlist ("off on this site"). The only control is the global switch.
-- Desktop (needs a child webview and the `adblock` `Engine`).
+- Desktop ad blocking is not implemented; the desktop site view does not receive these rules or scriptlets.
 - Counting blocked requests. WebKit does not report matches for content rule lists.
 - Optional extra lists (cookie banners, annoyances).
 
@@ -77,4 +84,6 @@ Runs on an iPhone 17 Pro Max simulator (iOS 26.5) with the real app and a local 
 | A bare `if-domain` matches only its exact host; `*domain` matches the host and subdomains | Yes on macOS WebKit with `om.localhost` and `www.om.localhost`. Not re-run on iOS |
 | `cargo test` (app and plugin), `clippy -D warnings`, `cargo fmt --check`, `yarn ts:check`, `lint`, `format:check`, `test` | Pass locally |
 
-**Not verified:** a physical device; real sites (how much of Reddit, Instagram or YouTube is blocked, and which pages break); page performance and memory with both lists loaded; the Settings switch under a finger; the switch with no site view open; a list update through `scripts/update-blocklists.sh`.
+**This PR's checks:** `cargo test --manifest-path src-tauri/Cargo.toml ad_block` (11 passed, including Brave iOS rule conversion and YouTube fallback conversion); Android `BlockingRulesTest`; `yarn tauri ios build --debug --target aarch64-sim --no-sign --ci`; updater syntax and bundled-data validation.
+
+**Not verified:** real-site ad removal, including YouTube in-stream ads; physical-device behavior; Settings interaction by hand; adblock performance/memory on a device; an updater download cycle. The simulator build proves compilation, not live-site filtering.

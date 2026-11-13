@@ -18,11 +18,11 @@ The shell talks to the shared site-view API (`open`, `set_rect`, `navigate`, …
 |------------|-------|---------|-------|-----|---------|
 | Webview engine | WKWebView | WebView2 | WebKitGTK | WKWebView | Android System WebView |
 | Site view mechanism | Tauri child webview | Not implemented | Not implemented | Native plugin | Native plugin |
-| Document-start injection | `initialization_script` | Not implemented | Not implemented | `WKUserScript` | `addDocumentStartJavaScript` if supported, else `onPageStarted` (late) |
+| Document-start injection | `initialization_script` | Not implemented | Not implemented | `WKUserScript` (recipe and main-frame blocker scripts) | `addDocumentStartJavaScript` if supported; blocker scriptlets are omitted without it, recipe scripts fall back to `onPageStarted` (late) |
 | Isolated profiles | `WKWebsiteDataStore(forIdentifier:)` (macOS 14+; not exercised) | Not implemented | Not implemented | `WKWebsiteDataStore(forIdentifier:)` (iOS 17+; simulator-verified) | Requires `MULTI_PROFILE`; implemented, device support unverified |
 | Page → Core channel | None yet (no page script uses the bridge) | Not implemented | Not implemented | Native message handler | AndroidX web message listener |
 | Secret store | Not implemented | Not implemented | Not implemented | Keychain | Keystore-backed plugin (device behavior unverified) |
-| Ad and tracker blocking | `WKContentRuleList`, the iOS lists | Not built | Not built | `WKContentRuleList` from bundled lists ([Ad Blocking](./ad-blocking.md)) | Request interception (`shouldInterceptRequest`) over the same rule JSON ([Ad Blocking](./ad-blocking.md)) |
+| Ad and tracker blocking | `WKContentRuleList` | Not built | Not built | `WKContentRuleList` + bundled main-frame filter scriptlets ([Ad Blocking](./ad-blocking.md)) | Request interception over the same rule JSON + document-start scriptlets when supported ([Ad Blocking](./ad-blocking.md)) |
 | Distribution / updates | Mac App Store package (validated, not uploaded) | Not built | Not built | App Store | Google Play |
 | Priority | 3 | 4 | 4 | **1** | **1** |
 

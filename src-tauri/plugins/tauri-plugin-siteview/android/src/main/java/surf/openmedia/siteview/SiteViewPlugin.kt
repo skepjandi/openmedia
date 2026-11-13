@@ -54,6 +54,12 @@ import org.json.JSONObject
 import java.io.ByteArrayInputStream
 import java.util.concurrent.Executors
 
+internal fun activeAdBlockScriptlet(
+    scriptlet: String?,
+    enabled: Boolean,
+    documentStartSupported: Boolean,
+): String? = scriptlet?.takeIf { enabled && documentStartSupported && it.isNotBlank() }
+
 /**
  * Hosts native WebViews *below* the Tauri shell webview, one per session, only one visible.
  *
@@ -99,7 +105,10 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
         var mediaPaused: Boolean = false,
         var shield: View? = null,
         var recipe: String? = null,
+        var adBlockScriptlet: String? = null,
+        var adBlockEnabled: Boolean = false,
         var scriptHandler: ScriptHandler? = null,
+        var adBlockScriptHandler: ScriptHandler? = null,
         var paintHandler: ScriptHandler? = null,
     )
 
@@ -287,6 +296,9 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
             initialUrl = url.toString(),
             profile = args.profile,
             scope = DomainScope.registrableDomain(url.host),
+            recipe = args.documentStartScript,
+            adBlockScriptlet = args.adBlockScriptlet,
+            adBlockEnabled = args.adBlockEnabled,
         )
         frame.setOnChildScrollUpCallback { _, child ->
             session.innerScrolled || (child?.canScrollVertically(-1) ?: false)
@@ -500,7 +512,11 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
         worker.execute {
             if (paths.isEmpty()) rules.clear() else rules.load(paths)
             activity.runOnUiThread {
-                for (session in sessions.values) reloadUnder(session)
+                for (session in sessions.values) {
+                    session.adBlockEnabled = args.enabled
+                    installScripts(session, session.recipe)
+                    reloadUnder(session)
+                }
                 invoke.resolve()
             }
         }
@@ -1060,22 +1076,37 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
     }
 
     /**
-     * Puts the recipe script and the paint reporter in the page before it runs. Without document
-     * start support the script is injected when the page starts instead, which is late: a
-     * CSS-first rule may flash.
+     * Installs recipe scripts independently from URL-matched adblock scriptlets. Scriptlets only
+     * run when enabled and document-start support exists; the late fallback remains recipe-only.
      */
     private fun installScripts(session: Session, recipe: String?) {
         session.scriptHandler?.remove()
+        session.adBlockScriptHandler?.remove()
         session.paintHandler?.remove()
         session.scriptHandler = null
+        session.adBlockScriptHandler = null
         session.paintHandler = null
         session.recipe = recipe
-        if (!WebViewFeature.isFeatureSupported(WebViewFeature.DOCUMENT_START_SCRIPT)) return
+        val documentStartSupported =
+            WebViewFeature.isFeatureSupported(WebViewFeature.DOCUMENT_START_SCRIPT)
+        val scriptlet = activeAdBlockScriptlet(
+            session.adBlockScriptlet,
+            session.adBlockEnabled,
+            documentStartSupported,
+        )
+        if (!documentStartSupported) return
         session.paintHandler = WebViewCompat.addDocumentStartJavaScript(
             session.view,
             PAGE_REPORTER_SCRIPT,
             setOf("*"),
         )
+        if (scriptlet != null) {
+            session.adBlockScriptHandler = WebViewCompat.addDocumentStartJavaScript(
+                session.view,
+                scriptlet,
+                setOf("*"),
+            )
+        }
         if (!recipe.isNullOrEmpty()) {
             session.scriptHandler = WebViewCompat.addDocumentStartJavaScript(
                 session.view,

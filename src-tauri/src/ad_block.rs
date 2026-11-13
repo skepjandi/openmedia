@@ -1,8 +1,8 @@
-//! Ad and tracker blocking: bundled filter lists, converted to WebKit content rule lists.
+//! Ad and tracker blocking from bundled filter lists.
 //!
-//! Blocking itself runs inside WebKit, before a request leaves the device and before a page paints,
-//! so none of it touches the page's JS realm and no network request is made by us. This module only
-//! turns ABP-syntax lists into the JSON WebKit compiles, and keeps that JSON on disk.
+//! Network and CSS rules are converted to WebKit content-rule lists. A separate cached Brave
+//! engine returns URL-matched scriptlets for the native plugin to inject at document start.
+//! Neither path downloads filter data at runtime.
 
 use std::{
     borrow::Cow,
@@ -12,8 +12,10 @@ use std::{
 };
 
 use adblock::{
+    Engine,
     content_blocking::CbRule,
     lists::{FilterSet, ParseOptions},
+    resources::Resource,
 };
 use sha2::{Digest, Sha256};
 use tauri_plugin_siteview::ContentRuleList;
@@ -29,11 +31,33 @@ const MAX_RULES_PER_LIST: usize = 150_000;
 const CONVERTER_REVISION: &str = "adblock-0.13.5";
 
 /// One list per file keeps each far below WebKit's limit and lets a list change independently.
-const BUNDLED: [(&str, &str); 2] = [
+#[cfg(target_os = "ios")]
+const BUNDLED: [(&str, &str); 4] = [
     ("easylist", include_str!("../../blocklists/easylist.txt")),
     (
         "easyprivacy",
         include_str!("../../blocklists/easyprivacy.txt"),
+    ),
+    (
+        "brave-specific",
+        include_str!("../../blocklists/brave-specific.txt"),
+    ),
+    (
+        "brave-ios-specific",
+        include_str!("../../blocklists/brave-ios-specific.txt"),
+    ),
+];
+
+#[cfg(not(target_os = "ios"))]
+const BUNDLED: [(&str, &str); 3] = [
+    ("easylist", include_str!("../../blocklists/easylist.txt")),
+    (
+        "easyprivacy",
+        include_str!("../../blocklists/easyprivacy.txt"),
+    ),
+    (
+        "brave-specific",
+        include_str!("../../blocklists/brave-specific.txt"),
     ),
 ];
 
@@ -67,6 +91,8 @@ struct Inner {
     sources: Vec<Source>,
     /// One conversion at a time: the launch-time warm-up and the first `open_site` can overlap.
     conversion: Mutex<()>,
+    /// Built once on the first scriptlet query and reused for every starting URL.
+    scriptlet_engine: Mutex<Option<Engine>>,
 }
 
 /// The bundled blocklists and the directory their converted JSON is cached in. Cheap to clone.
@@ -83,6 +109,7 @@ impl AdBlock {
             dir,
             sources,
             conversion: Mutex::new(()),
+            scriptlet_engine: Mutex::new(None),
         }))
     }
 
@@ -112,6 +139,33 @@ impl AdBlock {
         self.remove_stale_files()?;
         Ok(lists)
     }
+    /// Scriptlet code matched to the page's opening URL. Native integration owns activation and timing.
+    pub fn scriptlets_for_url(&self, url: &str) -> Result<String> {
+        let page_url = url::Url::parse(url)
+            .map_err(|error| Error::AdBlock(format!("invalid scriptlet URL: {error}")))?;
+        let mut cached = self
+            .0
+            .scriptlet_engine
+            .lock()
+            .map_err(|_| Error::AdBlock("the scriptlet engine panicked".into()))?;
+        if cached.is_none() {
+            *cached = Some(scriptlet_engine()?);
+        }
+        let engine = cached
+            .as_ref()
+            .ok_or_else(|| Error::AdBlock("the scriptlet engine is unavailable".into()))?;
+        let script = engine
+            .url_cosmetic_resources(page_url.as_str())
+            .injected_script;
+        if script.is_empty() {
+            return Ok(script);
+        }
+        let origin = serde_json::to_string(&page_url.origin().ascii_serialization())
+            .map_err(|error| Error::AdBlock(format!("invalid scriptlet origin: {error}")))?;
+        Ok(format!(
+            "(function(){{if(window.top!==window||location.origin!=={origin})return;{script}}})();"
+        ))
+    }
 
     fn remove_stale_files(&self) -> Result<()> {
         for entry in fs::read_dir(&self.0.dir)? {
@@ -133,6 +187,18 @@ impl AdBlock {
                     .any(|s| name == format!("{}.json", s.id))
             })
     }
+}
+fn scriptlet_engine() -> Result<Engine> {
+    let mut filters = FilterSet::new(false);
+    for (_, text) in BUNDLED {
+        filters.add_filter_list(text.to_owned(), ParseOptions::default());
+    }
+    let resources: Vec<Resource> =
+        serde_json::from_str(include_str!("../../blocklists/brave-resources.json"))
+            .map_err(|error| Error::AdBlock(format!("invalid Brave resource bundle: {error}")))?;
+    let mut engine = Engine::new_with_filter_set(filters);
+    engine.use_resources(resources);
+    Ok(engine)
 }
 
 fn is_cache_file(path: &Path) -> bool {
@@ -260,11 +326,68 @@ mod tests {
     fn every_bundled_list_converts_within_webkits_rule_limit() {
         for (name, text) in BUNDLED {
             let count = rules(text).len();
+            let minimum = if name.starts_with("brave") { 1 } else { 1_000 };
             assert!(
-                (1_000..=MAX_RULES_PER_LIST).contains(&count),
+                (minimum..=MAX_RULES_PER_LIST).contains(&count),
                 "{name} produced {count} rules"
             );
         }
+    }
+
+    #[test]
+    fn brave_ios_specific_rules_convert() {
+        let text = include_str!("../../blocklists/brave-ios-specific.txt");
+        let converted = rules(text);
+        assert!(
+            converted.len() > 1_000,
+            "only {} rules converted",
+            converted.len()
+        );
+        assert!(
+            converted.iter().any(|rule| {
+                rule["trigger"]["url-filter"]
+                    .as_str()
+                    .is_some_and(|pattern| pattern.contains("googlevideo"))
+            }),
+            "Brave iOS YouTube fallback was not converted"
+        );
+    }
+
+    #[cfg(target_os = "ios")]
+    #[test]
+    fn ios_uses_braves_youtube_fallback_rules() {
+        let ios_rules = BUNDLED
+            .iter()
+            .find(|(name, _)| *name == "brave-ios-specific")
+            .map(|(_, text)| *text)
+            .expect("Brave iOS Specific is bundled");
+        assert!(ios_rules.contains(
+            "||googlevideo.com/videoplayback*ctier=L&*%2Cxpc%2Cctier%2C$domain=m.youtube.com|music.youtube.com"
+        ));
+        assert!(rules(ios_rules).len() > 1_000);
+    }
+
+    #[test]
+    fn brave_youtube_scriptlets_match_only_youtube_pages() {
+        let dir = tempfile::tempdir().expect("tempdir");
+        let ad_block = AdBlock::bundled(dir.path().to_owned());
+        let brave_rules = BUNDLED
+            .iter()
+            .find(|(name, _)| *name == "brave-specific")
+            .map(|(_, text)| *text)
+            .expect("Brave Specific is bundled");
+        assert!(brave_rules.contains("youtube.*##+js(brave-youtube-theater-fix)"));
+
+        let youtube = ad_block
+            .scriptlets_for_url("https://www.youtube.com/watch?v=test")
+            .expect("scriptlets are available");
+        let other_site = ad_block
+            .scriptlets_for_url("https://example.org/")
+            .expect("scriptlets are available");
+        assert!(youtube.contains("window.top!==window"));
+        assert!(youtube.contains("location.origin!==\"https://www.youtube.com\""));
+        assert!(!youtube.is_empty());
+        assert!(other_site.is_empty());
     }
 
     fn ad_block_with(dir: &Path, text: &'static str) -> AdBlock {
@@ -272,6 +395,7 @@ mod tests {
             dir: dir.to_owned(),
             sources: vec![Source::new("test", Cow::Borrowed(text))],
             conversion: Mutex::new(()),
+            scriptlet_engine: Mutex::new(None),
         }))
     }
 

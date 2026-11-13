@@ -168,7 +168,7 @@ impl<R: Runtime> Siteview<R> {
     pub fn set_content_rule_lists(&self, request: SetContentRuleListsRequest) -> Result<()> {
         self.run(
             "setContentRuleLists",
-            serde_json::json!({ "lists": request.lists }),
+            serde_json::json!({ "enabled": request.enabled, "lists": request.lists }),
         )
     }
 

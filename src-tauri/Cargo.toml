@@ -44,9 +44,8 @@ regex = "1.13.1"
 zeroize = "1.9.1"
 reqwest = { version = "0.12", default-features = false, features = ["rustls-tls", "json"] }
 url = "2.5.8"
-# Brave's filter engine. Only the ABP-syntax parser and the Safari content-blocking converter are
-# used; list matching happens in WebKit, not here.
-adblock = { version = "0.13.5", default-features = false, features = ["content-blocking", "embedded-domain-resolver"] }
+# Brave's filter engine. The resource assembler supplies URL-matched scriptlet code.
+adblock = { version = "0.13.5", default-features = false, features = ["content-blocking", "embedded-domain-resolver", "resource-assembler"] }
 sha2 = "0.11"
 ring = "0.17"
 base64 = "0.22"

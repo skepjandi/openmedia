@@ -101,6 +101,8 @@ class OpenArgs: Decodable {
   let url: String
   let rect: RectArgs?
   let documentStartScript: String?
+  let adBlockScriptlet: String?
+  let adBlockEnabled: Bool
   let contentRuleLists: [RuleListArgs]?
   let onEvent: Channel
 }
@@ -136,6 +138,7 @@ class FetchFaviconArgs: Decodable {
 }
 
 class SetContentRuleListsArgs: Decodable {
+  let enabled: Bool
   let lists: [RuleListArgs]
 }
 
@@ -242,6 +245,10 @@ private final class Session {
   let initialURL: URL
   /// The registrable domain the session may show; user-initiated navigation can move it after load.
   var scope: String
+  /// Script data is held separately so blocker toggles cannot replace recipe behavior.
+  var recipeScript: String?
+  var adBlockScriptlet: String?
+  var adBlockEnabled: Bool
   /// False during the initial load and user-initiated navigation; see `DomainScope.verdict`.
   var settled = false
   /// True once the first load has committed; before that a timeout must not reveal a blank page.
@@ -264,11 +271,22 @@ private final class Session {
   var shield: UIView?
   var observations: [NSKeyValueObservation] = []
 
-  init(id: String, view: WKWebView, scope: String, initialURL: URL) {
+  init(
+    id: String,
+    view: WKWebView,
+    scope: String,
+    initialURL: URL,
+    recipeScript: String?,
+    adBlockScriptlet: String?,
+    adBlockEnabled: Bool
+  ) {
     self.id = id
     self.view = view
     self.scope = scope
     self.initialURL = initialURL
+    self.recipeScript = recipeScript
+    self.adBlockScriptlet = adBlockScriptlet
+    self.adBlockEnabled = adBlockEnabled
   }
 }
 
@@ -386,10 +404,13 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
       if let existing = self.sessions[args.session] { self.dispose(existing) }
       if let rect = args.rect { self.pageRect = rect.cgRect }
       let view = WKWebView(
-        frame: self.shell?.superview.map { self.pageFrame(in: $0) } ?? self.screenBounds,
+        frame: .zero,
         configuration: self.makeConfiguration(
-          profileId: profileId, script: args.documentStartScript, ruleLists: cached)
-      )
+          profileId: profileId,
+          script: args.documentStartScript,
+          adBlockScriptlet: args.adBlockScriptlet,
+          adBlockEnabled: args.adBlockEnabled,
+          ruleLists: cached))
       view.allowsBackForwardNavigationGestures = true
       view.customUserAgent = safariUserAgent
       view.navigationDelegate = self
@@ -401,8 +422,13 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
       view.scrollView.refreshControl = refresh
 
       let session = Session(
-        id: args.session, view: view, scope: DomainScope.registrableDomain(of: url.host ?? ""), initialURL: url)
-      session.refreshControl = refresh
+        id: args.session,
+        view: view,
+        scope: DomainScope.registrableDomain(of: url.host ?? ""),
+        initialURL: url,
+        recipeScript: args.documentStartScript,
+        adBlockScriptlet: args.adBlockScriptlet,
+        adBlockEnabled: args.adBlockEnabled)
       session.ruleListIds = Set(cached.map(\.identifier))
       self.sessions[session.id] = session
       self.activeId = session.id
@@ -580,6 +606,12 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
       let (ruleLists, failure) = await self.loadRuleLists(args.lists)
       for session in self.sessions.values {
         let controller = session.view.configuration.userContentController
+        session.adBlockEnabled = args.enabled
+        self.installUserScripts(
+          on: controller,
+          recipe: session.recipeScript,
+          adBlockScriptlet: session.adBlockScriptlet,
+          adBlockEnabled: session.adBlockEnabled)
         controller.removeAllContentRuleLists()
         ruleLists.forEach { controller.add($0) }
         session.ruleListIds = Set(ruleLists.map(\.identifier))
@@ -606,7 +638,12 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
     DispatchQueue.main.async {
       for session in self.sessions.values {
         let controller = session.view.configuration.userContentController
-        self.installUserScripts(on: controller, recipe: args.script)
+        session.recipeScript = args.script
+        self.installUserScripts(
+          on: controller,
+          recipe: session.recipeScript,
+          adBlockScriptlet: session.adBlockScriptlet,
+          adBlockEnabled: session.adBlockEnabled)
         session.view.evaluateJavaScript(live)
       }
       invoke.resolve()
@@ -1198,12 +1235,21 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
     }
   }
 
-  private func installUserScripts(on controller: WKUserContentController, recipe: String?) {
+  private func installUserScripts(
+    on controller: WKUserContentController,
+    recipe: String?,
+    adBlockScriptlet: String?,
+    adBlockEnabled: Bool
+  ) {
     controller.removeAllUserScripts()
     controller.addUserScript(
       WKUserScript(source: firstPaintScript, injectionTime: .atDocumentStart, forMainFrameOnly: true))
     controller.addUserScript(
       WKUserScript(source: touchScrollScript, injectionTime: .atDocumentStart, forMainFrameOnly: true))
+    if adBlockEnabled, let adBlockScriptlet, !adBlockScriptlet.isEmpty {
+      controller.addUserScript(
+        WKUserScript(source: adBlockScriptlet, injectionTime: .atDocumentStart, forMainFrameOnly: true))
+    }
     if let recipe, !recipe.isEmpty {
       controller.addUserScript(
         WKUserScript(source: recipe, injectionTime: .atDocumentStart, forMainFrameOnly: false))
@@ -1355,9 +1401,13 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
     }
   }
 
-  private func makeConfiguration(profileId: UUID, script: String?, ruleLists: [WKContentRuleList])
-    -> WKWebViewConfiguration
-  {
+  private func makeConfiguration(
+    profileId: UUID,
+    script: String?,
+    adBlockScriptlet: String?,
+    adBlockEnabled: Bool,
+    ruleLists: [WKContentRuleList]
+  ) -> WKWebViewConfiguration {
     let configuration = WKWebViewConfiguration()
     configuration.websiteDataStore = WKWebsiteDataStore(forIdentifier: profileId)
     // iPhone defaults to fullscreen-only video, which covers the shell's controls. Muted video may
@@ -1368,7 +1418,11 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
     configuration.allowsInlineMediaPlayback = true
     configuration.mediaTypesRequiringUserActionForPlayback = .audio
     let controller = WKUserContentController()
-    installUserScripts(on: controller, recipe: script)
+    installUserScripts(
+      on: controller,
+      recipe: script,
+      adBlockScriptlet: adBlockScriptlet,
+      adBlockEnabled: adBlockEnabled)
     ruleLists.forEach { controller.add($0) }
     controller.add(WeakMessageHandler(self), name: bridgeHandlerName)
     controller.add(WeakPaintHandler(self), name: paintHandlerName)

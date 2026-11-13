@@ -78,12 +78,20 @@ Shared recipes are untrusted until validated on the device. **Bundled recipes** 
 
 ## Ad blocking
 
-Blocking uses WebKit content rule lists attached to the site view's `WKUserContentController` ([Ad Blocking](./ad-blocking.md)). It adds no path from a site to native code:
+Blocking combines WebKit content rule lists (network/CSS rules) with URL-matched filter-list
+scriptlets at document start where the native webview supports them ([Ad Blocking](./ad-blocking.md)).
+It adds no path from a site to native code:
 
-- The rules run inside WebKit, outside the page's JS realm; a page cannot read, list or remove them.
-- The site view gets no new message, event or capability. The plugin commands that swap the lists (`set_content_rule_lists`) and the document-start script (`set_document_start_script`) are registered but absent from `siteview:default`, like `open` and `fetch-favicon`; only Rust calls them. The script is compiled in Rust from the installed recipes and the user's saved toggles; the shell can change a toggle (`set_site_option`, which validates the recipe and option ids) but never supplies script text. It takes an id and an absolute `.json` path produced by Rust, and the plugin re-validates both (`validate_rule_lists`).
-- The filter lists are compiled into the binary and never downloaded, so invariant 1 (no new network destinations) holds. Lists change only with an app release.
-- A blocking failure is shown to the user and the page still loads unblocked; it never silently pretends to block.
+- Native content rules run outside the page's JS realm; a page cannot read, list or remove them.
+- Scriptlets intentionally run in the page's JS realm and are visible to page code. They are derived
+  from bundled filter data, restricted to the main frame and guarded by the starting origin. They
+  are not a sandbox or a guarantee against a hostile site overriding them.
+- The site view gets no new message, event or capability. The plugin commands that swap content
+  rules (`set_content_rule_lists`) and recipe scripts (`set_document_start_script`) are registered
+  but absent from `siteview:default`; only Rust calls them. The shell never supplies adblock script
+  text. Filter-list data and scriptlet resources are bundled and never downloaded at runtime.
+- A blocking failure is reported through the existing site-view error path; browsing remains
+  available.
 
 ## Sessions and the popup browser
 

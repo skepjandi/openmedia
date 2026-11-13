@@ -30,6 +30,9 @@ pub struct OpenRequest {
     #[serde(default)]
     pub document_start_script: Option<String>,
     #[serde(default)]
+    pub ad_block_scriptlet: Option<String>,
+    pub ad_block_enabled: bool,
+    #[serde(default)]
     pub content_rule_lists: Vec<ContentRuleList>,
 }
 
@@ -48,10 +51,10 @@ pub struct NotifyRequest {
     pub body: String,
 }
 
-/// Replaces the rule lists on every open site view and reloads the visible one. An empty list turns
-/// blocking off.
+/// Replaces the rule lists and scriptlet activation state on every open session.
 #[derive(Debug, Clone, Deserialize)]
 pub struct SetContentRuleListsRequest {
+    pub enabled: bool,
     pub lists: Vec<ContentRuleList>,
 }
 

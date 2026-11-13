@@ -46,6 +46,14 @@ class BlockingRulesTest {
         assertTrue(rules(listOf(block), listOf(except)).blocks("https://tracker.net/x", false, "https://a.org/"))
     }
 
+
+    @Test
+    fun adBlockScriptletsRequireEnabledDocumentStartSupport() {
+        val scriptlet = "(function(){})()"
+        assertTrue(activeAdBlockScriptlet(scriptlet, enabled = true, documentStartSupported = true) == scriptlet)
+        assertTrue(activeAdBlockScriptlet(scriptlet, enabled = false, documentStartSupported = true) == null)
+        assertTrue(activeAdBlockScriptlet(scriptlet, enabled = true, documentStartSupported = false) == null)
+    }
     @Test
     fun hostIsReadWithoutAndroidsUri() {
         assertTrue(BlockingRules.hostOfUrl("https://user:pw@Example.COM:8080/a?b") == "example.com")

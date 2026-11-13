@@ -29,6 +29,8 @@ class OpenArgs {
     var url: String = ""
     var rect: RectArgs? = null
     var documentStartScript: String? = null
+    var adBlockScriptlet: String? = null
+    var adBlockEnabled: Boolean = false
     var contentRuleLists: List<RuleListArgs>? = null
     var onEvent: Channel? = null
 }
@@ -72,6 +74,7 @@ class FetchFaviconArgs {
 
 @InvokeArg
 class SetContentRuleListsArgs {
+    var enabled: Boolean = false
     var lists: List<RuleListArgs> = emptyList()
 }
 
