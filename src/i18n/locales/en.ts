@@ -167,7 +167,7 @@ export const en = {
     "Press and hold. Slide onto a favorite and let go to open it. Above the button sit Incognito, Usage, History and Settings.",
   "onboarding.step4Title": "Make it yours.",
   "onboarding.step4Body":
-    "Drag the button to either edge and it stays there. Change your favorites in Settings, and replay this guide there any time.",
+    "Drag the button to either edge to tuck it away; tap the small tab to bring it back. It stays where you leave it. Change your favorites in Settings, and replay this guide there any time.",
   "onboarding.quickTitle": "What do you need in quick access?",
   "onboarding.quickBody":
     "Pick the sites you open most. OpenMedia adds their official recipes and puts them on your button.",

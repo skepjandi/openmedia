@@ -30,6 +30,15 @@ All notable changes to OpenMedia are documented here.
 
 ## 2026-11-13
 
+### fix(ui): teach the floating button hide gesture
+
+**Area:** `fix(ui)`
+
+**Change:** First-run onboarding now explains how to tuck the floating button away at an edge and restore it from the tab.
+
+**PR:** n/a
+
+
 ### fix(ui): remove repeated usage editor hints
 
 **Area:** `fix(ui)`
