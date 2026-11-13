@@ -230,9 +230,8 @@ export function Fab() {
       <div
         data-hit={fanOpen ? "" : undefined}
         onPointerDown={() => dispatch({ type: "dismiss" })}
-        className={`fixed inset-0 bg-black/45 transition-opacity duration-200 ${
-          fanOpen ? "opacity-100" : "pointer-events-none opacity-0"
-        }`}
+        data-open={fanOpen}
+        className="fab-dim fixed inset-0 bg-black/45"
       />
 
       {list.map(({ favorite, locked }, index) => (

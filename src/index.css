@@ -95,6 +95,13 @@ input {
   box-shadow: 0 8px 32px var(--glass-shadow);
 }
 
+/* Android's backdrop-filter blurs nothing here (see above) yet forces an offscreen layer per
+   panel; over the animating floating button that leaves stale gray tiles and ghost copies. */
+:root[data-platform="android"] .glass {
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
 /* Clear glass: no blur, so the page shows through sharp. A faint tint, a bright rim and an inner
    highlight read as a lens; the shadow keeps it visible on white pages. The floating button and
    every fan item share it, so no item has a solid background. */
@@ -200,6 +207,27 @@ input {
 
 .fan-item[data-open="true"] {
   transform: translate(0, 0) scale(1);
+  opacity: 1;
+}
+
+/* The dim behind the fan. Once faded out it is also hidden, so the shell drops its layer instead of
+   leaving a stale translucent tile over the page on Android. */
+.fab-dim {
+  transition:
+    opacity 200ms,
+    visibility 0s;
+}
+
+.fab-dim[data-open="false"] {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition:
+    opacity 200ms,
+    visibility 0s linear 200ms;
+}
+
+.fab-dim[data-open="true"] {
   opacity: 1;
 }
 

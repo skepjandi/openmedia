@@ -187,6 +187,9 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
         shell = webView
         // The shell is app chrome over the page: it must not paint a background of its own.
         webView.setBackgroundColor(Color.TRANSPARENT)
+        // A transparent WebView over other views leaves stale tiles (gray boxes, ghost copies of the
+        // floating button) when its content animates; a hardware layer repaints it whole.
+        webView.setLayerType(View.LAYER_TYPE_HARDWARE, null)
         webView.overScrollMode = View.OVER_SCROLL_NEVER
         // A view only consults its touch listener when it is clickable.
         webView.isClickable = true
