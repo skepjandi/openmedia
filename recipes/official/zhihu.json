@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "market.official.zhihu",
   "name": "Zhihu",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "origin": "user",
   "tags": ["desktop", "mobile"],
   "match": ["https://*.zhihu.com/*"],
@@ -27,6 +27,48 @@
       "description": "The Smart App Banner and install-our-app strips.",
       "group": "annoyance",
       "default": true
+    },
+    {
+      "id": "open-app-button",
+      "label": "Hide the Open App button",
+      "description": "The blue Open App button in the phone header.",
+      "group": "annoyance",
+      "default": true
+    },
+    {
+      "id": "answer-previews",
+      "label": "Answer previews",
+      "description": "Show, blur or hide the answer excerpt text under each question in the feed.",
+      "group": "content",
+      "choices": [
+        {
+          "id": "show",
+          "label": "Show"
+        },
+        {
+          "id": "blur",
+          "label": "Blur"
+        },
+        {
+          "id": "hide",
+          "label": "Hide"
+        }
+      ],
+      "default": "show"
+    },
+    {
+      "id": "vote-buttons",
+      "label": "Hide vote buttons",
+      "description": "The upvote and downvote buttons and counts on answers.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "answer-actions",
+      "label": "Hide the answer action bar",
+      "description": "The row under each answer with votes, comments and share actions.",
+      "group": "content",
+      "default": false
     }
   ],
   "rules": [
@@ -56,12 +98,67 @@
       "target": {
         "css": "#smartbanner, .smartbanner, .smart-banner, .app-banner, #app-banner, .app-download-banner, .install-app-banner"
       }
+    },
+    {
+      "id": "open-app",
+      "label": "Open App header button",
+      "type": "hide",
+      "option": "open-app-button",
+      "target": {
+        "css": "main.App-main button.Button--primary.Button--blue"
+      }
+    },
+    {
+      "id": "previews-blur",
+      "label": "Answer excerpts blurred",
+      "type": "css",
+      "option": "answer-previews",
+      "choice": [
+        "blur"
+      ],
+      "target": {
+        "css": ".RichContent-inner"
+      },
+      "declarations": {
+        "filter": "blur(6px)"
+      }
+    },
+    {
+      "id": "previews-hide",
+      "label": "Answer excerpts hidden",
+      "type": "hide",
+      "option": "answer-previews",
+      "choice": [
+        "hide"
+      ],
+      "target": {
+        "css": ".RichContent-inner"
+      }
+    },
+    {
+      "id": "vote-controls",
+      "label": "Vote buttons",
+      "type": "hide",
+      "option": "vote-buttons",
+      "target": {
+        "css": ".VoteButton"
+      }
+    },
+    {
+      "id": "action-bar",
+      "label": "Answer action bar",
+      "type": "hide",
+      "option": "answer-actions",
+      "target": {
+        "css": ".ContentItem-actions"
+      }
     }
   ],
   "meta": {
     "author": "OpenMedia",
     "homepage": "https://www.zhihu.com/",
-    "summary": "Cleans up cookie banners, ads and app prompts on Zhihu",
-    "notes": "**Not verified live.** The fixtures in `recipes/fixtures/zhihu/` are synthetic: hand-written pages that contain the targeted elements, not captures of the site, so the fixture test proves only that the selectors parse and spare protected content. These are generic cleanup rules, written from the selectors that common cookie-consent, ad and app-banner scripts use. They were not run against Zhihu; a rule that matches nothing on a page is harmless, but nothing here promises that this site shows any of them.\n\n- **Cookie banners** hides the OneTrust, Cookiebot, Quantcast, Didomi, Usercentrics, TrustArc and Osano dialogs and common `cc-window` / `#cookie-banner` boxes. Some sites lock page scroll while the dialog is open; hiding the dialog does not undo that.\n- **Ads** hides Google ad slots and ad iframes. Sites that serve their own ad markup are not covered.\n- **App banners** hides the Smart App Banner and common \"install our app\" strips.\n\nOpen a page, toggle the options in Settings and report anything that hides content you wanted."
+    "summary": "Zhihu: Open App button on the phone feed, plus answer preview, vote button and action bar controls (logged-out phone only)",
+    "notes": "Checked LIVE on 2026-11-13 on the logged-out phone page of www.zhihu.com (iPhone UA 390x844, headless Chrome); counts were taken on the saved rendered DOM. The desktop UA is redirected to the sign-in page (`/signin?next=%2F`), so no desktop feed or question page was seen and there is no desktop fixture. Zhihu uses CSS-in-JS hashes (`css-…`), which are never used; the rules use the stable design-system class names `Button--primary`, `Button--blue`, `RichContent-inner`, `VoteButton` and `ContentItem-actions`.\n\nLIVE counts on the phone home feed: `button.Button--primary.Button--blue` inside `main.App-main` 1 (the only blue primary button on the page: Open App), `.RichContent-inner` 3, `.VoteButton` 6, `.ContentItem-actions` 3 (three logged-out top stories). On other pages the Button classes may also match a blue action button, so the Open App rule is the least precise rule here.\n\nNOT verified: the desktop site and its login wall or modal, question and article pages, search, the Hot list, any language other than Simplified Chinese. The original generic rules matched nothing on the page and are kept.",
+    "lastVerified": "2026-11-13"
   }
 }

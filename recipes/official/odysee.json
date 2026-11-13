@@ -2,10 +2,15 @@
   "schema": 1,
   "id": "market.official.odysee",
   "name": "Odysee",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "origin": "user",
-  "tags": ["desktop", "mobile"],
-  "match": ["https://*.odysee.com/*"],
+  "tags": [
+    "desktop",
+    "mobile"
+  ],
+  "match": [
+    "https://*.odysee.com/*"
+  ],
   "options": [
     {
       "id": "cookie-banners",
@@ -27,6 +32,76 @@
       "description": "The Smart App Banner and install-our-app strips.",
       "group": "annoyance",
       "default": true
+    },
+    {
+      "id": "featured-banner",
+      "label": "Hide the featured banner",
+      "description": "The rotating big banner of featured channels at the top of the home page.",
+      "group": "annoyance",
+      "default": true
+    },
+    {
+      "id": "starfield",
+      "label": "Hide the starry background",
+      "description": "The animated star field and backdrop image behind every page.",
+      "group": "annoyance",
+      "default": true
+    },
+    {
+      "id": "thumbnails",
+      "label": "Video thumbnails",
+      "description": "Show, blur or hide the preview pictures of videos in grids and lists.",
+      "group": "content",
+      "choices": [
+        {
+          "id": "show",
+          "label": "Show"
+        },
+        {
+          "id": "blur",
+          "label": "Blur"
+        },
+        {
+          "id": "hide",
+          "label": "Hide"
+        }
+      ],
+      "default": "show"
+    },
+    {
+      "id": "comments",
+      "label": "Comments",
+      "description": "Show, blur or hide the comments section and comment box under a video.",
+      "group": "content",
+      "choices": [
+        {
+          "id": "show",
+          "label": "Show"
+        },
+        {
+          "id": "blur",
+          "label": "Blur"
+        },
+        {
+          "id": "hide",
+          "label": "Hide"
+        }
+      ],
+      "default": "show"
+    },
+    {
+      "id": "related-videos",
+      "label": "Hide related videos",
+      "description": "The \"Related\" list beside or under a video.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "reactions",
+      "label": "Hide like and dislike buttons",
+      "description": "The like and dislike buttons and the rating bar under a video.",
+      "group": "content",
+      "default": false
     }
   ],
   "rules": [
@@ -56,12 +131,103 @@
       "target": {
         "css": "#smartbanner, .smartbanner, .smart-banner, .app-banner, #app-banner, .app-download-banner, .install-app-banner"
       }
+    },
+    {
+      "id": "featured-banner",
+      "label": "Featured banner",
+      "type": "hide",
+      "option": "featured-banner",
+      "target": {
+        "css": ".featured-banner-wrapper"
+      }
+    },
+    {
+      "id": "starfield",
+      "label": "Star field and backdrop",
+      "type": "hide",
+      "option": "starfield",
+      "target": {
+        "css": ".main-wrapper > .stars, .main-wrapper > .background-image"
+      }
+    },
+    {
+      "id": "thumbs-blur",
+      "label": "Video thumbnails",
+      "type": "css",
+      "option": "thumbnails",
+      "choice": [
+        "blur"
+      ],
+      "target": {
+        "css": ".claim-preview--tile .media__thumb"
+      },
+      "declarations": {
+        "filter": "blur(14px)"
+      }
+    },
+    {
+      "id": "thumbs-hide",
+      "label": "Video thumbnails",
+      "type": "hide",
+      "option": "thumbnails",
+      "choice": [
+        "hide"
+      ],
+      "target": {
+        "css": ".claim-preview--tile .media__thumb"
+      }
+    },
+    {
+      "id": "comments-blur",
+      "label": "Comments section",
+      "type": "css",
+      "option": "comments",
+      "choice": [
+        "blur"
+      ],
+      "target": {
+        "css": "section.comment__list"
+      },
+      "declarations": {
+        "filter": "blur(8px)"
+      }
+    },
+    {
+      "id": "comments-hide",
+      "label": "Comments section",
+      "type": "hide",
+      "option": "comments",
+      "choice": [
+        "hide"
+      ],
+      "target": {
+        "css": "section.comment__list"
+      }
+    },
+    {
+      "id": "related-videos",
+      "label": "Related videos",
+      "type": "hide",
+      "option": "related-videos",
+      "target": {
+        "css": "section.file-page__recommended"
+      }
+    },
+    {
+      "id": "reactions",
+      "label": "Like, dislike and rating bar",
+      "type": "hide",
+      "option": "reactions",
+      "target": {
+        "css": ".button-like, .button-dislike, .ratio-bar"
+      }
     }
   ],
   "meta": {
     "author": "OpenMedia",
     "homepage": "https://odysee.com/",
-    "summary": "Cleans up cookie banners, ads and app prompts on Odysee, a media site",
-    "notes": "**Not verified live.** The fixtures in `recipes/fixtures/odysee/` are synthetic: hand-written pages that contain the targeted elements, not captures of the site, so the fixture test proves only that the selectors parse and spare protected content. These are generic cleanup rules, written from the selectors that common cookie-consent, ad and app-banner scripts use. They were not run against Odysee; a rule that matches nothing on a page is harmless, but nothing here promises that this site shows any of them.\n\n- **Cookie banners** hides the OneTrust, Cookiebot, Quantcast, Didomi, Usercentrics, TrustArc and Osano dialogs and common `cc-window` / `#cookie-banner` boxes. Some sites lock page scroll while the dialog is open; hiding the dialog does not undo that.\n- **Ads** hides Google ad slots and ad iframes. Sites that serve their own ad markup are not covered.\n- **App banners** hides the Smart App Banner and common \"install our app\" strips.\n\nOpen a page, toggle the options in Settings and report anything that hides content you wanted."
+    "summary": "Odysee: hides the featured banner and starfield, blurs or hides thumbnails and comments, can hide related videos and reactions",
+    "notes": "**Checked 2026-11-13**, logged out, headless Chrome: https://odysee.com/ with an iPhone UA and a desktop UA, and one video page with an iPhone UA (the desktop capture of that page was an empty shell). Odysee is a React app with readable BEM-style class names.\n\n- **Featured banner**: `.featured-banner-wrapper` 1 (5 slides) on both (LIVE).\n- **Star field and backdrop**: `.main-wrapper > .stars` 1 and `.main-wrapper > .background-image` 1 (LIVE).\n- **Thumbnails**: `.claim-preview--tile .media__thumb` 194 on desktop home, 194 on phone (LIVE); thumbnails are CSS background images, so the box is blurred or hidden.\n- **Comments**: `section.comment__list` 1 on a video page (LIVE). The list loads by script after the page, so it was empty in the capture.\n- **Related** `section.file-page__recommended` 1; **reactions** `.button-like` 2, `.button-dislike` 2, `.ratio-bar` 2 on a video page (LIVE).\n\nNot verified: the desktop video page layout (capture was empty), channel pages, livestream pages, the monetisation prompts, the community \"Premium\" upsells, the `.nag--helpful` bottom banner reported in a 2022 community post (not rendered here). Logged-in features were not seen. No hashed class names are used.",
+    "lastVerified": "2026-11-13"
   }
 }

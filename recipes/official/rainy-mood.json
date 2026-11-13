@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "market.official.rainy-mood",
   "name": "Rainy Mood",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "origin": "user",
   "tags": ["desktop", "mobile"],
   "match": ["https://*.rainymood.com/*"],
@@ -27,6 +27,62 @@
       "description": "The Smart App Banner and install-our-app strips.",
       "group": "annoyance",
       "default": true
+    },
+    {
+      "id": "app-promo",
+      "label": "Hide app promo video and badge",
+      "description": "The below-the-fold Rainy Mood iOS app promo video and App Store badge.",
+      "group": "annoyance",
+      "default": true
+    },
+    {
+      "id": "rain-canvas",
+      "label": "Rain animation",
+      "description": "The animated raindrop canvas behind the player. The audio keeps playing.",
+      "group": "content",
+      "choices": [
+        {
+          "id": "show",
+          "label": "Show"
+        },
+        {
+          "id": "blur",
+          "label": "Blur"
+        },
+        {
+          "id": "hide",
+          "label": "Hide"
+        }
+      ],
+      "default": "show"
+    },
+    {
+      "id": "mixes",
+      "label": "Rainy Mood mixes list",
+      "description": "The list of song pairings (Rainy Mood Mixes) below the player.",
+      "group": "content",
+      "choices": [
+        {
+          "id": "show",
+          "label": "Show"
+        },
+        {
+          "id": "dim",
+          "label": "Dim"
+        },
+        {
+          "id": "hide",
+          "label": "Hide"
+        }
+      ],
+      "default": "show"
+    },
+    {
+      "id": "streaming-links",
+      "label": "Hide streaming links",
+      "description": "The Also available on Spotify / Apple Music links.",
+      "group": "content",
+      "default": false
     }
   ],
   "rules": [
@@ -56,12 +112,86 @@
       "target": {
         "css": "#smartbanner, .smartbanner, .smart-banner, .app-banner, #app-banner, .app-download-banner, .install-app-banner"
       }
+    },
+    {
+      "id": "app-promo-video",
+      "label": "App promo video",
+      "type": "hide",
+      "option": "app-promo",
+      "target": {
+        "css": "video[poster*=\"appad\"]"
+      }
+    },
+    {
+      "id": "app-badge",
+      "label": "App Store badge",
+      "type": "hide",
+      "option": "app-promo",
+      "target": {
+        "css": "p:has(> a[href*=\"apps.apple.com\"])"
+      }
+    },
+    {
+      "id": "canvas-blur",
+      "label": "Rain canvas",
+      "type": "css",
+      "option": "rain-canvas",
+      "choice": ["blur"],
+      "target": {
+        "css": "#canvas"
+      },
+      "declarations": {
+        "filter": "blur(6px)"
+      }
+    },
+    {
+      "id": "canvas-hide",
+      "label": "Rain canvas",
+      "type": "hide",
+      "option": "rain-canvas",
+      "choice": ["hide"],
+      "target": {
+        "css": "#canvas"
+      }
+    },
+    {
+      "id": "mixes-dim",
+      "label": "Mixes list",
+      "type": "css",
+      "option": "mixes",
+      "choice": ["dim"],
+      "target": {
+        "css": "p:has(> a[href^=\"/watch?v=\"])"
+      },
+      "declarations": {
+        "opacity": "0.35"
+      }
+    },
+    {
+      "id": "mixes-hide",
+      "label": "Mixes list",
+      "type": "hide",
+      "option": "mixes",
+      "choice": ["hide"],
+      "target": {
+        "css": "p:has(> a[href^=\"/watch?v=\"])"
+      }
+    },
+    {
+      "id": "streaming-links",
+      "label": "Streaming links",
+      "type": "hide",
+      "option": "streaming-links",
+      "target": {
+        "css": "p:has(> a[href*=\"open.spotify.com\"]), p:has(> a[href*=\"music.apple.com\"])"
+      }
     }
   ],
   "meta": {
     "author": "OpenMedia",
     "homepage": "https://www.rainymood.com/",
-    "summary": "Cleans up cookie banners, ads and app prompts on Rainy Mood, a media site",
-    "notes": "**Not verified live.** The fixtures in `recipes/fixtures/rainy-mood/` are synthetic: hand-written pages that contain the targeted elements, not captures of the site, so the fixture test proves only that the selectors parse and spare protected content. These are generic cleanup rules, written from the selectors that common cookie-consent, ad and app-banner scripts use. They were not run against Rainy Mood; a rule that matches nothing on a page is harmless, but nothing here promises that this site shows any of them.\n\n- **Cookie banners** hides the OneTrust, Cookiebot, Quantcast, Didomi, Usercentrics, TrustArc and Osano dialogs and common `cc-window` / `#cookie-banner` boxes. Some sites lock page scroll while the dialog is open; hiding the dialog does not undo that.\n- **Ads** hides Google ad slots and ad iframes. Sites that serve their own ad markup are not covered.\n- **App banners** hides the Smart App Banner and common \"install our app\" strips.\n\nOpen a page, toggle the options in Settings and report anything that hides content you wanted."
+    "summary": "Rainy Mood: hide the app promo video and badge; show, blur or hide the rain canvas; dim or hide mixes; trim streaming links.",
+    "notes": "Checked 2026-11-13, logged out, headless Chrome over CDP with a desktop UA (1440x900) and an iPhone UA (390x844) on rainymood.com/. The /watch?v= pages (embedded video pairings) were not opened.\n\nLIVE counts: app-promo-video both home 1; app-badge both home 1; canvas-blur both home 1; canvas-hide both home 1; mixes-dim both home 1; mixes-hide both home 1; streaming-links both home 2. The page is hand-written; selectors use ids, a poster path (`appad`) and hrefs. The mix list is the single paragraph whose links start with /watch?v=, found with `:has(> a[href^=\"/watch?v=\"])`; no class exists on it.\n\nChoices: Rain animation Show/Blur/Hide (blur 6px), Mixes Show/Dim/Hide (opacity 0.35).\n\nNOT verified: pairing pages, the mobile app banners (none seen), different regional versions, whether the canvas rain animation is the only effect.",
+    "lastVerified": "2026-11-13"
   }
 }

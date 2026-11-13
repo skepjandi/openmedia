@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "market.official.podverse",
   "name": "Podverse",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "origin": "user",
   "tags": ["desktop", "mobile"],
   "match": ["https://*.podverse.fm/*"],
@@ -27,6 +27,41 @@
       "description": "The Smart App Banner and install-our-app strips.",
       "group": "annoyance",
       "default": true
+    },
+    {
+      "id": "library-nav",
+      "label": "Hide My Library links",
+      "description": "The My Library heading and the Queue, History, My Profile, My Clips, Playlists and Profiles links in the left navigation (they need an account).",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "theme-toggle",
+      "label": "Hide theme switch",
+      "description": "The light/dark switch in the top bar.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "category-tiles",
+      "label": "Category tiles",
+      "description": "The category tiles (Arts, Business, Comedy...) on the Podcasts page.",
+      "group": "content",
+      "choices": [
+        {
+          "id": "show",
+          "label": "Show"
+        },
+        {
+          "id": "dim",
+          "label": "Dim"
+        },
+        {
+          "id": "hide",
+          "label": "Hide"
+        }
+      ],
+      "default": "show"
     }
   ],
   "rules": [
@@ -56,12 +91,54 @@
       "target": {
         "css": "#smartbanner, .smartbanner, .smart-banner, .app-banner, #app-banner, .app-download-banner, .install-app-banner"
       }
+    },
+    {
+      "id": "library-nav",
+      "label": "My Library navigation",
+      "type": "hide",
+      "option": "library-nav",
+      "target": {
+        "css": ".navbar__section-header, a.navbar__link[href=\"/queue\"], a.navbar__link[href=\"/history\"], a.navbar__link[href=\"/my-profile\"], a.navbar__link[href=\"/playlists\"], a.navbar__link[href=\"/profiles\"]"
+      }
+    },
+    {
+      "id": "theme-toggle",
+      "label": "Theme switch",
+      "type": "hide",
+      "option": "theme-toggle",
+      "target": {
+        "css": ".navbar-secondary__theme-toggle"
+      }
+    },
+    {
+      "id": "tiles-dim",
+      "label": "Category tiles",
+      "type": "css",
+      "option": "category-tiles",
+      "choice": ["dim"],
+      "target": {
+        "css": "ul[aria-label=\"Categories\"] .tile-box"
+      },
+      "declarations": {
+        "opacity": "0.35"
+      }
+    },
+    {
+      "id": "tiles-hide",
+      "label": "Category tiles",
+      "type": "hide",
+      "option": "category-tiles",
+      "choice": ["hide"],
+      "target": {
+        "css": "ul[aria-label=\"Categories\"] .tile-box"
+      }
     }
   ],
   "meta": {
     "author": "OpenMedia",
     "homepage": "https://podverse.fm/",
-    "summary": "Cleans up cookie banners, ads and app prompts on Podverse, a media site",
-    "notes": "**Not verified live.** The fixtures in `recipes/fixtures/podverse/` are synthetic: hand-written pages that contain the targeted elements, not captures of the site, so the fixture test proves only that the selectors parse and spare protected content. These are generic cleanup rules, written from the selectors that common cookie-consent, ad and app-banner scripts use. They were not run against Podverse; a rule that matches nothing on a page is harmless, but nothing here promises that this site shows any of them.\n\n- **Cookie banners** hides the OneTrust, Cookiebot, Quantcast, Didomi, Usercentrics, TrustArc and Osano dialogs and common `cc-window` / `#cookie-banner` boxes. Some sites lock page scroll while the dialog is open; hiding the dialog does not undo that.\n- **Ads** hides Google ad slots and ad iframes. Sites that serve their own ad markup are not covered.\n- **App banners** hides the Smart App Banner and common \"install our app\" strips.\n\nOpen a page, toggle the options in Settings and report anything that hides content you wanted."
+    "summary": "Podverse: hide the My Library nav, theme switch and queue links; dim or hide category tiles. Podcast cards never rendered during research.",
+    "notes": "Checked 2026-11-13, logged out, headless Chrome over CDP with a desktop UA (1440x900) on podverse.fm/ (redirected to /podcasts). Not captured: an iPhone-UA page, podcast and episode pages, clips and the player with an episode (the network and machine were out of resources when retried).\n\nLIVE counts on /podcasts: library-nav desktop home 7; theme-toggle desktop home 1; tiles-dim desktop home 19; tiles-hide desktop home 19. Selectors are readable class names (navbar__link, navbar__section-header, tile-box) and aria labels; the player is react-h5-audio-player (`.rhap_container`) and is never touched. No cookie, ad or app banner was present, so the generic 1.0.0 rules match nothing.\n\nChoice: Category tiles Show/Dim/Hide (opacity 0.35). The My Library links are hidden by href; they all need a login.\n\nNOT verified: podcast and episode cards (so no artwork or counter rules), phone layout, signed-in pages, other pages that may reuse `.tile-box`.",
+    "lastVerified": "2026-11-13"
   }
 }

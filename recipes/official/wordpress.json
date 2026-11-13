@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "market.official.wordpress",
   "name": "WordPress",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "origin": "user",
   "tags": ["desktop", "mobile"],
   "match": ["https://*.wordpress.com/*"],
@@ -27,6 +27,41 @@
       "description": "The Smart App Banner and install-our-app strips.",
       "group": "annoyance",
       "default": true
+    },
+    {
+      "id": "action-bar",
+      "label": "Hide the site action bar",
+      "description": "The Site actions bar (Follow, Sign up) and the Follow bubble that WordPress.com adds to blogs it hosts.",
+      "group": "annoyance",
+      "default": true
+    },
+    {
+      "id": "subscribe-forms",
+      "label": "Hide subscribe forms",
+      "description": "The Jetpack email subscription box inside posts and pages.",
+      "group": "annoyance",
+      "default": true
+    },
+    {
+      "id": "post-images",
+      "label": "Post images",
+      "description": "Show, blur or hide the pictures inside posts and post lists.",
+      "group": "content",
+      "choices": [
+        {
+          "id": "show",
+          "label": "Show"
+        },
+        {
+          "id": "blur",
+          "label": "Blur"
+        },
+        {
+          "id": "hide",
+          "label": "Hide"
+        }
+      ],
+      "default": "show"
     }
   ],
   "rules": [
@@ -56,12 +91,67 @@
       "target": {
         "css": "#smartbanner, .smartbanner, .smart-banner, .app-banner, #app-banner, .app-download-banner, .install-app-banner"
       }
+    },
+    {
+      "id": "wpcom-actionbar",
+      "label": "Site action bar and follow bubble",
+      "type": "hide",
+      "option": "action-bar",
+      "target": {
+        "css": "#actionbar, #follow-bubble"
+      }
+    },
+    {
+      "id": "wpcom-app-banner",
+      "label": "Mobile app banner",
+      "type": "hide",
+      "option": "app-banners",
+      "target": {
+        "css": ".x-menu-mobile-app-banner"
+      }
+    },
+    {
+      "id": "subscribe-box",
+      "label": "Subscription form",
+      "type": "hide",
+      "option": "subscribe-forms",
+      "target": {
+        "css": ".wp-block-jetpack-subscriptions__container"
+      }
+    },
+    {
+      "id": "post-images-blur",
+      "label": "Post images blurred",
+      "type": "css",
+      "option": "post-images",
+      "choice": [
+        "blur"
+      ],
+      "target": {
+        "css": "article img"
+      },
+      "declarations": {
+        "filter": "blur(12px)"
+      }
+    },
+    {
+      "id": "post-images-hide",
+      "label": "Post images hidden",
+      "type": "hide",
+      "option": "post-images",
+      "choice": [
+        "hide"
+      ],
+      "target": {
+        "css": "article img"
+      }
     }
   ],
   "meta": {
     "author": "OpenMedia",
     "homepage": "https://wordpress.com/",
-    "summary": "Cleans up cookie banners, ads and app prompts on WordPress",
-    "notes": "**Not verified live.** The fixtures in `recipes/fixtures/wordpress/` are synthetic: hand-written pages that contain the targeted elements, not captures of the site, so the fixture test proves only that the selectors parse and spare protected content. These are generic cleanup rules, written from the selectors that common cookie-consent, ad and app-banner scripts use. They were not run against WordPress; a rule that matches nothing on a page is harmless, but nothing here promises that this site shows any of them.\n\n- **Cookie banners** hides the OneTrust, Cookiebot, Quantcast, Didomi, Usercentrics, TrustArc and Osano dialogs and common `cc-window` / `#cookie-banner` boxes. Some sites lock page scroll while the dialog is open; hiding the dialog does not undo that.\n- **Ads** hides Google ad slots and ad iframes. Sites that serve their own ad markup are not covered.\n- **App banners** hides the Smart App Banner and common \"install our app\" strips.\n\nOpen a page, toggle the options in Settings and report anything that hides content you wanted."
+    "summary": "WordPress.com: site action bar, follow bubble, subscribe forms and app banner, plus post image controls (phone UA, one blog checked)",
+    "notes": "Checked LIVE on 2026-11-13 on one WordPress.com-hosted blog, wordpress.com/blog (the WordPress.com news blog), with an iPhone UA (390x844), logged out, headless Chrome; counts were taken on the saved rendered DOM. The desktop UA was stopped by an interstitial bot check (a Checking your browser page), so the desktop layout and other blogs were not captured, and there is only a phone real fixture.\n\nLIVE counts: `#actionbar` 1 (a region labelled Site actions with the Follow button), `#follow-bubble` 1, `.wp-block-jetpack-subscriptions__container` 1, `.x-menu-mobile-app-banner` 1 (the app banner in the menu; 10 elements share the `mobile-app-banner` name), `article img` 19.\n\nThe markup comes from WordPress.com and Jetpack features, so it appears on most WordPress.com blogs, but each blog uses its own theme: the `article img` rule depends on the theme using `article` elements, and ads (WordAds), cookie banners, comments and related-posts blocks were not seen on this blog and are not targeted. The original generic rules matched nothing here and are kept. NOT verified: any other `*.wordpress.com` blog, the wordpress.com marketing home, logged-in state.",
+    "lastVerified": "2026-11-13"
   }
 }

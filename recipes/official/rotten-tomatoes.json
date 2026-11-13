@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "market.official.rotten-tomatoes",
   "name": "Rotten Tomatoes",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "origin": "user",
   "tags": ["desktop", "mobile"],
   "match": ["https://*.rottentomatoes.com/*"],
@@ -27,6 +27,76 @@
       "description": "The Smart App Banner and install-our-app strips.",
       "group": "annoyance",
       "default": true
+    },
+    {
+      "id": "sponsored-lists",
+      "label": "Hide sponsored lists",
+      "description": "The \"Brought to you by\" sponsor header on home-page movie lists.",
+      "group": "annoyance",
+      "default": true
+    },
+    {
+      "id": "scores",
+      "label": "Tomatometer and Popcornmeter scores",
+      "description": "Critic and audience percentages and icons on posters. Blur or hide to avoid being swayed before you watch.",
+      "group": "content",
+      "choices": [
+        {
+          "id": "show",
+          "label": "Show"
+        },
+        {
+          "id": "blur",
+          "label": "Blur"
+        },
+        {
+          "id": "hide",
+          "label": "Hide"
+        }
+      ],
+      "default": "show"
+    },
+    {
+      "id": "posters",
+      "label": "Posters and thumbnails",
+      "description": "Poster images and trailer/news thumbnails in lists.",
+      "group": "content",
+      "choices": [
+        {
+          "id": "show",
+          "label": "Show"
+        },
+        {
+          "id": "blur",
+          "label": "Blur"
+        },
+        {
+          "id": "hide",
+          "label": "Hide"
+        }
+      ],
+      "default": "show"
+    },
+    {
+      "id": "trending-bar",
+      "label": "Hide the trending bar",
+      "description": "The row of trending links (Free Movies, What to Watch) under the header.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "editorial",
+      "label": "Hide editorial and news carousels",
+      "description": "The Editorial Spotlight carousel and trailer/guide rows on the home page.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "footer",
+      "label": "Hide the footer",
+      "description": "The site footer with newsletter, feedback and link columns.",
+      "group": "content",
+      "default": false
     }
   ],
   "rules": [
@@ -56,12 +126,121 @@
       "target": {
         "css": "#smartbanner, .smartbanner, .smart-banner, .app-banner, #app-banner, .app-download-banner, .install-app-banner"
       }
+    },
+    {
+      "id": "ad-slots-rt",
+      "label": "RT ad containers",
+      "type": "hide",
+      "option": "ads",
+      "target": {
+        "css": "[slot=\"ad-inject\"], #top_leaderboard_wrapper, aside.adColumn, .rectangle_ad, .sleaderboard_wrapper, .mobile-interscroller"
+      }
+    },
+    {
+      "id": "mobile-app-cta",
+      "label": "Mobile app call-to-action",
+      "type": "hide",
+      "option": "app-banners",
+      "target": {
+        "css": ".mobile-app-cta-wrap"
+      }
+    },
+    {
+      "id": "sponsor-header",
+      "label": "Sponsored list header",
+      "type": "hide",
+      "option": "sponsored-lists",
+      "target": {
+        "css": ".dynamic-poster-list__sponsored-header, .dynamic-poster-list__sponsor-group"
+      }
+    },
+    {
+      "id": "scores-blur",
+      "label": "Score percentages and icons",
+      "type": "css",
+      "option": "scores",
+      "choice": [
+        "blur"
+      ],
+      "target": {
+        "css": "rt-text[slot=\"criticsScore\"], rt-text[slot=\"audienceScore\"], score-icon-critics, score-icon-audience, .score-wrap, .dynamic-text-list__tomatometer-group"
+      },
+      "declarations": {
+        "filter": "blur(6px)"
+      }
+    },
+    {
+      "id": "scores-hide",
+      "label": "Score percentages and icons",
+      "type": "hide",
+      "option": "scores",
+      "choice": [
+        "hide"
+      ],
+      "target": {
+        "css": "rt-text[slot=\"criticsScore\"], rt-text[slot=\"audienceScore\"], score-icon-critics, score-icon-audience, .score-wrap, .dynamic-text-list__tomatometer-group"
+      }
+    },
+    {
+      "id": "posters-blur",
+      "label": "Poster and thumbnail images",
+      "type": "css",
+      "option": "posters",
+      "choice": [
+        "blur"
+      ],
+      "target": {
+        "css": "poster-tile rt-img[slot=\"thumbnail\"], .trailers-and-videos-item__thumbnail-image, .movie-and-tv-guides-item__image, .dynamic-poster-list__image-container"
+      },
+      "declarations": {
+        "filter": "blur(12px)"
+      }
+    },
+    {
+      "id": "posters-hide",
+      "label": "Poster and thumbnail images",
+      "type": "hide",
+      "option": "posters",
+      "choice": [
+        "hide"
+      ],
+      "target": {
+        "css": "poster-tile rt-img[slot=\"thumbnail\"], .trailers-and-videos-item__thumbnail-group, .movie-and-tv-guides-item__image, .dynamic-poster-list__image-container"
+      }
+    },
+    {
+      "id": "trending-bar",
+      "label": "Trending bar",
+      "type": "hide",
+      "option": "trending-bar",
+      "target": {
+        "css": "section.trending-bar"
+      }
+    },
+    {
+      "id": "editorial-spotlight",
+      "label": "Editorial spotlight",
+      "type": "hide",
+      "option": "editorial",
+      "target": {
+        "css": "#editorial-spotlight, [data-qa=\"trailers-and-videos-item\"], .movie-and-tv-guides-item__header"
+      }
+    },
+    {
+      "id": "footer",
+      "label": "Footer",
+      "type": "hide",
+      "option": "footer",
+      "target": {
+        "css": "rt-footer"
+      }
     }
   ],
   "meta": {
     "author": "OpenMedia",
     "homepage": "https://www.rottentomatoes.com/",
-    "summary": "Cleans up cookie banners, ads and app prompts on Rotten Tomatoes",
-    "notes": "**Not verified live.** The fixtures in `recipes/fixtures/rotten-tomatoes/` are synthetic: hand-written pages that contain the targeted elements, not captures of the site, so the fixture test proves only that the selectors parse and spare protected content. These are generic cleanup rules, written from the selectors that common cookie-consent, ad and app-banner scripts use. They were not run against Rotten Tomatoes; a rule that matches nothing on a page is harmless, but nothing here promises that this site shows any of them.\n\n- **Cookie banners** hides the OneTrust, Cookiebot, Quantcast, Didomi, Usercentrics, TrustArc and Osano dialogs and common `cc-window` / `#cookie-banner` boxes. Some sites lock page scroll while the dialog is open; hiding the dialog does not undo that.\n- **Ads** hides Google ad slots and ad iframes. Sites that serve their own ad markup are not covered.\n- **App banners** hides the Smart App Banner and common \"install our app\" strips.\n\nOpen a page, toggle the options in Settings and report anything that hides content you wanted."
+    "summary": "Hides RT ad slots, sponsored lists and app prompts; blur or hide scores and posters; hide trending bar, editorial rows",
+    "notes": "Checked 2026-11-13, logged out, iPhone UA 390x844 in headless Chrome, rottentomatoes.com home page. Counts are `querySelectorAll` on the rendered DOM saved from that load (scripts were then switched off to evaluate): ad containers 20, mobile app call-to-action 1, sponsor header/group 8, score elements 686, poster/thumbnail images 169, trending bar 1, editorial/trailer/guide blocks 10, footer 1.\n\nThe page is built from custom elements with stable `slot`, `data-qa` and readable class names (no hashed classes). Scores and posters are Show/Blur/Hide choices so you can avoid spoilers or artwork; Hide removes the score text and icons but not the review link beneath a poster. Original cookie, ad and app-banner rules are unchanged except that the ad option gained the RT-specific `ad-inject` slots and the app option gained the mobile app strip.\n\nNOT verified: desktop home, movie/TV/critic pages, search, the network dropped before a second pass; the cookie banner (none was shown to this session); anything signed in. Selectors do not depend on English text.",
+    "lastVerified": "2026-11-13"
   }
 }

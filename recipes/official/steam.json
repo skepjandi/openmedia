@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "market.official.steam",
   "name": "Steam",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "origin": "user",
   "tags": ["desktop", "mobile"],
   "match": ["https://*.steampowered.com/*"],
@@ -27,6 +27,90 @@
       "description": "The Smart App Banner and install-our-app strips.",
       "group": "annoyance",
       "default": true
+    },
+    {
+      "id": "promo-strips",
+      "label": "Hide gift-card strip and event takeover",
+      "description": "The \"Send a Gift Card\" strip and the sale-event takeover area at the top of the store home page.",
+      "group": "annoyance",
+      "default": true
+    },
+    {
+      "id": "featured-carousel",
+      "label": "Hide the featured carousel",
+      "description": "The large rotating carousel of promoted games at the top of the store home page.",
+      "group": "annoyance",
+      "default": true
+    },
+    {
+      "id": "capsule-art",
+      "label": "Game artwork",
+      "description": "Show, blur or hide the capsule pictures and hover screenshots on store cards.",
+      "group": "content",
+      "choices": [
+        {
+          "id": "show",
+          "label": "Show"
+        },
+        {
+          "id": "blur",
+          "label": "Blur"
+        },
+        {
+          "id": "hide",
+          "label": "Hide"
+        }
+      ],
+      "default": "show"
+    },
+    {
+      "id": "prices",
+      "label": "Prices and discounts",
+      "description": "Show, blur or hide the price and the percent-off badge on store cards.",
+      "group": "content",
+      "choices": [
+        {
+          "id": "show",
+          "label": "Show"
+        },
+        {
+          "id": "blur",
+          "label": "Blur"
+        },
+        {
+          "id": "hide",
+          "label": "Hide"
+        }
+      ],
+      "default": "show"
+    },
+    {
+      "id": "home-rows",
+      "label": "Recommendation rows",
+      "description": "Show, dim or hide the recommendation, creators, recently updated, category and top-sellers rows on the home page.",
+      "group": "content",
+      "choices": [
+        {
+          "id": "show",
+          "label": "Show"
+        },
+        {
+          "id": "dim",
+          "label": "Dim"
+        },
+        {
+          "id": "hide",
+          "label": "Hide"
+        }
+      ],
+      "default": "show"
+    },
+    {
+      "id": "review-scores",
+      "label": "Hide review scores",
+      "description": "The review summary (Very Positive and so on) shown on cards and lists.",
+      "group": "content",
+      "default": false
     }
   ],
   "rules": [
@@ -56,12 +140,109 @@
       "target": {
         "css": "#smartbanner, .smartbanner, .smart-banner, .app-banner, #app-banner, .app-download-banner, .install-app-banner"
       }
+    },
+    {
+      "id": "gift-card-strip",
+      "label": "Gift card strip and event takeover",
+      "type": "hide",
+      "option": "promo-strips",
+      "target": {
+        "css": "#gift_card_banner_mobile, .static_takeover_ctn"
+      }
+    },
+    {
+      "id": "featured-carousel",
+      "label": "Featured carousel",
+      "type": "hide",
+      "option": "featured-carousel",
+      "target": {
+        "css": "#home_maincap_v7"
+      }
+    },
+    {
+      "id": "art-blur",
+      "label": "Capsule pictures and hover screenshots",
+      "type": "css",
+      "option": "capsule-art",
+      "choice": ["blur"],
+      "target": {
+        "css": ".capsule_image_ctn, .large_screenshot, .sale_capsule img"
+      },
+      "declarations": {
+        "filter": "blur(12px)"
+      }
+    },
+    {
+      "id": "art-hide",
+      "label": "Capsule pictures and hover screenshots",
+      "type": "hide",
+      "option": "capsule-art",
+      "choice": ["hide"],
+      "target": {
+        "css": ".capsule_image_ctn, .large_screenshot, .sale_capsule img"
+      }
+    },
+    {
+      "id": "prices-blur",
+      "label": "Price and discount blocks",
+      "type": "css",
+      "option": "prices",
+      "choice": ["blur"],
+      "target": {
+        "css": ".discount_block"
+      },
+      "declarations": {
+        "filter": "blur(6px)"
+      }
+    },
+    {
+      "id": "prices-hide",
+      "label": "Price and discount blocks",
+      "type": "hide",
+      "option": "prices",
+      "choice": ["hide"],
+      "target": {
+        "css": ".discount_block"
+      }
+    },
+    {
+      "id": "rows-dim",
+      "label": "Home recommendation rows",
+      "type": "css",
+      "option": "home-rows",
+      "choice": ["dim"],
+      "target": {
+        "css": "#module_recommender, #module_deep_dive, .recommended_creators_ctn, .recently_updated_block, .content_hub_carousel_ctn, #home_tab_section_autoload, #home_accountblocks_section"
+      },
+      "declarations": {
+        "opacity": "0.35"
+      }
+    },
+    {
+      "id": "rows-hide",
+      "label": "Home recommendation rows",
+      "type": "hide",
+      "option": "home-rows",
+      "choice": ["hide"],
+      "target": {
+        "css": "#module_recommender, #module_deep_dive, .recommended_creators_ctn, .recently_updated_block, .content_hub_carousel_ctn, #home_tab_section_autoload, #home_accountblocks_section"
+      }
+    },
+    {
+      "id": "review-scores",
+      "label": "Review summaries",
+      "type": "hide",
+      "option": "review-scores",
+      "target": {
+        "css": ".game_review_summary, .review_summary"
+      }
     }
   ],
   "meta": {
     "author": "OpenMedia",
     "homepage": "https://store.steampowered.com/",
-    "summary": "Cleans up cookie banners, ads and app prompts on Steam",
-    "notes": "**Not verified live.** The fixtures in `recipes/fixtures/steam/` are synthetic: hand-written pages that contain the targeted elements, not captures of the site, so the fixture test proves only that the selectors parse and spare protected content. These are generic cleanup rules, written from the selectors that common cookie-consent, ad and app-banner scripts use. They were not run against Steam; a rule that matches nothing on a page is harmless, but nothing here promises that this site shows any of them.\n\n- **Cookie banners** hides the OneTrust, Cookiebot, Quantcast, Didomi, Usercentrics, TrustArc and Osano dialogs and common `cc-window` / `#cookie-banner` boxes. Some sites lock page scroll while the dialog is open; hiding the dialog does not undo that.\n- **Ads** hides Google ad slots and ad iframes. Sites that serve their own ad markup are not covered.\n- **App banners** hides the Smart App Banner and common \"install our app\" strips.\n\nOpen a page, toggle the options in Settings and report anything that hides content you wanted."
+    "summary": "Hides Steam store gift-card strip and featured carousel; blur/hide artwork and prices; dim or hide rows",
+    "notes": "Checked 2026-11-13, logged out, real Chrome (headless) on store.steampowered.com (home): iPhone UA 390x844 and desktop UA, DOM captured after 7 seconds. Steam served the same responsive markup to both. Fixtures `real.html` and `desktop-real.html` are sanitised excerpts (text and ids of games stripped, needed ancestors only, `data-keep` on the main content and the sign-in link).\n\nLIVE: `#gift_card_banner_mobile` 1, `.static_takeover_ctn` 1, `#home_maincap_v7` 1 (the featured carousel, holds 12 `.store_main_capsule`), `.capsule_image_ctn` 95 (the main capsule is a div with a background image), `.large_screenshot` 48, `.sale_capsule img` 33, `.discount_block` 125, `#module_recommender` 1, `#module_deep_dive` 1, `.recommended_creators_ctn` 1, `.recently_updated_block` 1, `.content_hub_carousel_ctn` 1, `#home_tab_section_autoload` 1, `#home_accountblocks_section` 1, `.game_review_summary` 13, `.review_summary` 12. The original cookie, ad and app-banner rules matched nothing on this page.\n\nChoices: Game artwork Show/Blur/Hide; Prices and discounts Show/Blur/Hide; Recommendation rows Show/Dim/Hide. Steam's JS-rendered React blocks use hashed class names; no rule relies on them.\n\nSOURCE: a community uBlock list (krc gist) hides `.banner_open_in_steam`; that element did not appear in either capture, so no rule was added for it.\n\nNOT verified: app (game) pages, search results, community hub, the age-gate page, logged-in store (personalised rows differ), non-English store languages. Hiding `#home_maincap_v7` removes the whole featured carousel including its Steam Deck / event slides.",
+    "lastVerified": "2026-11-13"
   }
 }

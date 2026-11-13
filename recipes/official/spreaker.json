@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "market.official.spreaker",
   "name": "Spreaker",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "origin": "user",
   "tags": ["desktop", "mobile"],
   "match": ["https://*.spreaker.com/*"],
@@ -27,6 +27,55 @@
       "description": "The Smart App Banner and install-our-app strips.",
       "group": "annoyance",
       "default": true
+    },
+    {
+      "id": "signup-prompts",
+      "label": "Hide sign-up prompts",
+      "description": "The Sign up buttons in the top bar and the \"Your Podcasts\" link that lead to the sign-up form. Log in stays.",
+      "group": "annoyance",
+      "default": true
+    },
+    {
+      "id": "platform-promos",
+      "label": "Hide platform promo links",
+      "description": "The side-menu entries that advertise Spreaker for podcasters: How Spreaker Works, Podcasts App, Spreaker Create and Prime Network.",
+      "group": "annoyance",
+      "default": true
+    },
+    {
+      "id": "cover-art",
+      "label": "Podcast covers",
+      "description": "Show, blur or hide the podcast and episode cover pictures on cards.",
+      "group": "content",
+      "choices": [
+        {
+          "id": "show",
+          "label": "Show"
+        },
+        {
+          "id": "blur",
+          "label": "Blur"
+        },
+        {
+          "id": "hide",
+          "label": "Hide"
+        }
+      ],
+      "default": "show"
+    },
+    {
+      "id": "sponsored-rows",
+      "label": "Hide Prime and Supporters Club rows",
+      "description": "The \"Spreaker Prime Network\" and \"Supporters Club Podcasts\" rows on the home page.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "category-tiles",
+      "label": "Hide category tiles",
+      "description": "The Featured Categories grid on the home page.",
+      "group": "content",
+      "default": false
     }
   ],
   "rules": [
@@ -56,12 +105,81 @@
       "target": {
         "css": "#smartbanner, .smartbanner, .smart-banner, .app-banner, #app-banner, .app-download-banner, .install-app-banner"
       }
+    },
+    {
+      "id": "signup-links",
+      "label": "Sign-up links",
+      "type": "hide",
+      "option": "signup-prompts",
+      "target": {
+        "css": "a[href*=\"/signup\"]"
+      }
+    },
+    {
+      "id": "platform-links",
+      "label": "Side-menu platform promo links",
+      "type": "hide",
+      "option": "platform-promos",
+      "target": {
+        "css": "#app-left-nav a[href$=\"/our-platform\"], #app-left-nav a[href$=\"/podcast-app\"], #app-left-nav a[href$=\"/spreaker-create\"], #app-left-nav a[href$=\"/prime\"]"
+      }
+    },
+    {
+      "id": "cover-blur",
+      "label": "Podcast covers",
+      "type": "css",
+      "option": "cover-art",
+      "choice": ["blur"],
+      "target": {
+        "css": "img[alt=\"Podcast Cover\"]"
+      },
+      "declarations": {
+        "filter": "blur(12px)"
+      }
+    },
+    {
+      "id": "cover-hide",
+      "label": "Podcast covers",
+      "type": "hide",
+      "option": "cover-art",
+      "choice": ["hide"],
+      "target": {
+        "css": "img[alt=\"Podcast Cover\"]"
+      }
+    },
+    {
+      "id": "prime-row",
+      "label": "Spreaker Prime Network row",
+      "type": "hide",
+      "option": "sponsored-rows",
+      "target": {
+        "css": ".flex-end.mb-2:has(a[href$=\"/discover/prime\"]), .flex-end.mb-2:has(a[href$=\"/discover/prime\"]) + div"
+      }
+    },
+    {
+      "id": "supporters-row",
+      "label": "Supporters Club row",
+      "type": "hide",
+      "option": "sponsored-rows",
+      "target": {
+        "css": ".flex-end.mb-2:has(a[href$=\"/discover/supporters-club\"]), .flex-end.mb-2:has(a[href$=\"/discover/supporters-club\"]) + div"
+      }
+    },
+    {
+      "id": "category-tiles",
+      "label": "Category tiles",
+      "type": "hide",
+      "option": "category-tiles",
+      "target": {
+        "css": "a[href*=\"/category/\"]"
+      }
     }
   ],
   "meta": {
     "author": "OpenMedia",
     "homepage": "https://www.spreaker.com/",
-    "summary": "Cleans up cookie banners, ads and app prompts on Spreaker, a media site",
-    "notes": "**Not verified live.** The fixtures in `recipes/fixtures/spreaker/` are synthetic: hand-written pages that contain the targeted elements, not captures of the site, so the fixture test proves only that the selectors parse and spare protected content. These are generic cleanup rules, written from the selectors that common cookie-consent, ad and app-banner scripts use. They were not run against Spreaker; a rule that matches nothing on a page is harmless, but nothing here promises that this site shows any of them.\n\n- **Cookie banners** hides the OneTrust, Cookiebot, Quantcast, Didomi, Usercentrics, TrustArc and Osano dialogs and common `cc-window` / `#cookie-banner` boxes. Some sites lock page scroll while the dialog is open; hiding the dialog does not undo that.\n- **Ads** hides Google ad slots and ad iframes. Sites that serve their own ad markup are not covered.\n- **App banners** hides the Smart App Banner and common \"install our app\" strips.\n\nOpen a page, toggle the options in Settings and report anything that hides content you wanted."
+    "summary": "Hides Spreaker's sign-up prompts and platform promos; blur or hide podcast covers; optional promo rows",
+    "notes": "Checked 2026-11-13, logged out, real Chrome (headless) on the Spreaker home page with iPhone UA 390x844 and desktop UA, DOM captured after 7 seconds. Spreaker served the same HTML to both; the layout switches with Tailwind breakpoints. Fixtures `real.html` and `desktop-real.html` are sanitised excerpts (text stripped, needed ancestors only, `data-keep` on main content, Log in link and the audio element).\n\nLIVE: `a[href*=\"/signup\"]` 5, left-menu links to /our-platform, /podcast-app, /spreaker-create, /prime 1 each, `img[alt=\"Podcast Cover\"]` 161 (English-only alt text; locale-dependent), `.flex-end.mb-2:has(a[href$=\"/discover/prime\"])` 1 and the Supporters Club header 1 (each with its following content div), `a[href*=\"/category/\"]` 19. The original cookie rule matched 2 OneTrust elements; ad and app-banner rules matched nothing.\n\nChoices: Podcast covers Show/Blur/Hide.\n\nSpreaker is built with Tailwind utility classes and no data attributes, so rules rely on href patterns, the image alt text and the readable utility pair `flex-end mb-2` that wraps a row header. If Spreaker rewrites its markup the row rules may stop matching.\n\nNOT verified: podcast and episode pages, the Prime Network pages, the player, logged-in pages, the 'Your Podcasts' link target after redirect, other languages (alt text and path names).",
+    "lastVerified": "2026-11-13"
   }
 }

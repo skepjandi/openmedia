@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "market.official.podnews",
   "name": "Podnews",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "origin": "user",
   "tags": ["desktop", "mobile"],
   "match": ["https://*.podnews.net/*"],
@@ -27,6 +27,48 @@
       "description": "The Smart App Banner and install-our-app strips.",
       "group": "annoyance",
       "default": true
+    },
+    {
+      "id": "newsletter-pitch",
+      "label": "Hide newsletter pitch",
+      "description": "The \"Your free daily briefing email\" sign-up block, its picture and the testimonials under it.",
+      "group": "annoyance",
+      "default": true
+    },
+    {
+      "id": "supporter-logos",
+      "label": "Hide supporter logo wall",
+      "description": "The \"Readers and supporters\" section with the Gold and Silver sponsor logos.",
+      "group": "annoyance",
+      "default": true
+    },
+    {
+      "id": "story-pictures",
+      "label": "Story pictures",
+      "description": "Pictures on the front page and next to each story in the latest list.",
+      "group": "content",
+      "choices": [
+        {
+          "id": "show",
+          "label": "Show"
+        },
+        {
+          "id": "blur",
+          "label": "Blur"
+        },
+        {
+          "id": "hide",
+          "label": "Hide"
+        }
+      ],
+      "default": "show"
+    },
+    {
+      "id": "network-footer",
+      "label": "Hide Podnews Network footer",
+      "description": "The \"Podcasts from the Podnews Network\" grid in the footer.",
+      "group": "content",
+      "default": false
     }
   ],
   "rules": [
@@ -56,12 +98,72 @@
       "target": {
         "css": "#smartbanner, .smartbanner, .smart-banner, .app-banner, #app-banner, .app-download-banner, .install-app-banner"
       }
+    },
+    {
+      "id": "newsletter-hero",
+      "label": "Newsletter sign-up block",
+      "type": "hide",
+      "option": "newsletter-pitch",
+      "target": {
+        "css": "article > .row:has(> .subscribe)"
+      }
+    },
+    {
+      "id": "testimonials",
+      "label": "Testimonials",
+      "type": "hide",
+      "option": "newsletter-pitch",
+      "target": {
+        "css": "#testimonials"
+      }
+    },
+    {
+      "id": "supporter-wall",
+      "label": "Supporter logos",
+      "type": "hide",
+      "option": "supporter-logos",
+      "target": {
+        "css": "section.belowfold:has(img.sponsor)"
+      }
+    },
+    {
+      "id": "pictures-blur",
+      "label": "Story pictures",
+      "type": "css",
+      "option": "story-pictures",
+      "choice": ["blur"],
+      "target": {
+        "css": "#latest picture, main > article picture"
+      },
+      "declarations": {
+        "filter": "blur(10px)"
+      }
+    },
+    {
+      "id": "pictures-hide",
+      "label": "Story pictures",
+      "type": "hide",
+      "option": "story-pictures",
+      "choice": ["hide"],
+      "target": {
+        "css": "#latest picture, main > article picture"
+      }
+    },
+    {
+      "id": "network-footer",
+      "label": "Network footer",
+      "type": "hide",
+      "option": "network-footer",
+      "target": {
+        "css": "footer.belowfold"
+      }
     }
   ],
   "meta": {
     "author": "OpenMedia",
     "homepage": "https://podnews.net/",
-    "summary": "Cleans up cookie banners, ads and app prompts on Podnews, a media site",
-    "notes": "**Not verified live.** The fixtures in `recipes/fixtures/podnews/` are synthetic: hand-written pages that contain the targeted elements, not captures of the site, so the fixture test proves only that the selectors parse and spare protected content. These are generic cleanup rules, written from the selectors that common cookie-consent, ad and app-banner scripts use. They were not run against Podnews; a rule that matches nothing on a page is harmless, but nothing here promises that this site shows any of them.\n\n- **Cookie banners** hides the OneTrust, Cookiebot, Quantcast, Didomi, Usercentrics, TrustArc and Osano dialogs and common `cc-window` / `#cookie-banner` boxes. Some sites lock page scroll while the dialog is open; hiding the dialog does not undo that.\n- **Ads** hides Google ad slots and ad iframes. Sites that serve their own ad markup are not covered.\n- **App banners** hides the Smart App Banner and common \"install our app\" strips.\n\nOpen a page, toggle the options in Settings and report anything that hides content you wanted."
+    "summary": "Hides the Podnews newsletter hero, testimonials, supporter logo wall and network footer; blur or hide story pictures.",
+    "notes": "Checked 2026-11-13, logged out, headless Chrome over CDP with a desktop UA (1440x900) on podnews.net/. The phone page is the same server-rendered markup; an iPhone-UA capture was not obtained (Chrome and the network were out of memory on this machine at the time), so real.html is absent and the rules are proven on desktop-real.html only. Article pages (/update/...) were not captured.\n\nLIVE counts on Home: newsletter-hero desktop home 1; testimonials desktop home 1; supporter-wall desktop home 1; pictures-blur desktop home 12; pictures-hide desktop home 12; network-footer desktop home 1. Selectors use ids and stable class names (subscribe, belowfold, sponsor, testimonials, latest).\n\nChoice: Story pictures Show/Blur/Hide (blur 10px). `main > article picture` also catches the newsletter hero picture; `#latest picture` is the story list.\n\nNOT verified: article pages and their in-article sponsor reads, the jobs and events pages, a phone capture, other locales. The 1.0.0 generic cookie, ad and app rules match nothing live.",
+    "lastVerified": "2026-11-13"
   }
 }

@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "market.official.qq",
   "name": "QQ",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "origin": "user",
   "tags": ["desktop", "mobile"],
   "match": ["https://*.qq.com/*"],
@@ -27,6 +27,55 @@
       "description": "The Smart App Banner and install-our-app strips.",
       "group": "annoyance",
       "default": true
+    },
+    {
+      "id": "client-download",
+      "label": "Hide client download prompts",
+      "description": "The Download client button in the header and the banner and campaign slots at the top of the page.",
+      "group": "annoyance",
+      "default": true
+    },
+    {
+      "id": "news-pictures",
+      "label": "News pictures",
+      "description": "The pictures on headline cards and in the channel feed.",
+      "group": "content",
+      "choices": [
+        {
+          "id": "show",
+          "label": "Show"
+        },
+        {
+          "id": "blur",
+          "label": "Blur"
+        },
+        {
+          "id": "hide",
+          "label": "Hide"
+        }
+      ],
+      "default": "show"
+    },
+    {
+      "id": "hot-video",
+      "label": "Hide hot video block",
+      "description": "The hot video module on the home page.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "stock-quotes",
+      "label": "Hide stock index rows",
+      "description": "The market index quotes (Shanghai Composite and others) in the sidebar.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "product-area",
+      "label": "Hide Tencent products block",
+      "description": "The block advertising Tencent apps (QQ, WorkBuddy, and others).",
+      "group": "content",
+      "default": false
     }
   ],
   "rules": [
@@ -56,12 +105,81 @@
       "target": {
         "css": "#smartbanner, .smartbanner, .smart-banner, .app-banner, #app-banner, .app-download-banner, .install-app-banner"
       }
+    },
+    {
+      "id": "download-btn",
+      "label": "Download client button",
+      "type": "hide",
+      "option": "client-download",
+      "target": {
+        "css": "#download-btn-wrapid, a.home-download-btn"
+      }
+    },
+    {
+      "id": "banner-slots",
+      "label": "Top banner and campaign slots",
+      "type": "hide",
+      "option": "client-download",
+      "target": {
+        "css": "#qqhome-top-banner, #qqhome-china-medal"
+      }
+    },
+    {
+      "id": "pics-blur",
+      "label": "News pictures",
+      "type": "css",
+      "option": "news-pictures",
+      "choice": ["blur"],
+      "target": {
+        "css": "#qqhome-channel-feed img, #qqhome-hot-picks img"
+      },
+      "declarations": {
+        "filter": "blur(10px)"
+      }
+    },
+    {
+      "id": "pics-hide",
+      "label": "News pictures",
+      "type": "hide",
+      "option": "news-pictures",
+      "choice": ["hide"],
+      "target": {
+        "css": "#qqhome-channel-feed img, #qqhome-hot-picks img"
+      }
+    },
+    {
+      "id": "hot-video",
+      "label": "Hot video",
+      "type": "hide",
+      "option": "hot-video",
+      "target": {
+        "css": "#qqhome-hot-video"
+      }
+    },
+    {
+      "id": "stock-rows",
+      "label": "Index quotes",
+      "type": "hide",
+      "option": "stock-quotes",
+      "target": {
+        "css": "a.stock-row"
+      }
+    },
+    {
+      "id": "product-area",
+      "label": "Tencent products",
+      "type": "hide",
+      "option": "product-area",
+      "target": {
+        "css": "#qqhome-product-area"
+      }
     }
   ],
   "meta": {
     "author": "OpenMedia",
     "homepage": "https://www.qq.com/",
-    "summary": "Cleans up cookie banners, ads and app prompts on QQ",
-    "notes": "**Not verified live.** The fixtures in `recipes/fixtures/qq/` are synthetic: hand-written pages that contain the targeted elements, not captures of the site, so the fixture test proves only that the selectors parse and spare protected content. These are generic cleanup rules, written from the selectors that common cookie-consent, ad and app-banner scripts use. They were not run against QQ; a rule that matches nothing on a page is harmless, but nothing here promises that this site shows any of them.\n\n- **Cookie banners** hides the OneTrust, Cookiebot, Quantcast, Didomi, Usercentrics, TrustArc and Osano dialogs and common `cc-window` / `#cookie-banner` boxes. Some sites lock page scroll while the dialog is open; hiding the dialog does not undo that.\n- **Ads** hides Google ad slots and ad iframes. Sites that serve their own ad markup are not covered.\n- **App banners** hides the Smart App Banner and common \"install our app\" strips.\n\nOpen a page, toggle the options in Settings and report anything that hides content you wanted."
+    "summary": "Tencent QQ portal (qq.com): hide the client download button, banner slots, products and quotes; blur or hide news pictures.",
+    "notes": "Checked 2026-11-13, logged out, headless Chrome over CDP with a desktop UA (1440x900) on www.qq.com/. Not captured: an iPhone-UA page (QQ sends phones to a different mobile portal and Chrome/network were out of memory when retried), article pages (news.qq.com, new.qq.com), v.qq.com video.\n\nLIVE counts on Home: download-btn desktop home 2; banner-slots desktop home 2; pics-blur desktop home 114; pics-hide desktop home 114; hot-video desktop home 1; stock-rows desktop home 9; product-area desktop home 1. Selectors use the `qqhome-*` ids (module wrappers), the readable `stock-row` and `home-download-btn` classes; the rest of the portal uses hashed classes that are not used. The banner slots (`#qqhome-top-banner`, `#qqhome-china-medal`) were empty placeholders when captured; they are the ad / campaign slots and the rule hides them when filled (INFERRED).\n\nChoice: News pictures Show/Blur/Hide (blur 10px) on the feed and hot-picks images; the feed container `#qqhome-channel-feed` is never hidden. Log in (`#qqcom-login`) and search (`#search-regular`) are kept.\n\nNOT verified: phone portal, article pages, whether the product block is an ad slot or a static module, WeChat links. All visible text is Chinese; no text matching is used.",
+    "lastVerified": "2026-11-13"
   }
 }

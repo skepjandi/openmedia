@@ -2,10 +2,15 @@
   "schema": 1,
   "id": "market.official.nightride-fm",
   "name": "Nightride FM",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "origin": "user",
-  "tags": ["desktop", "mobile"],
-  "match": ["https://*.nightride.fm/*"],
+  "tags": [
+    "desktop",
+    "mobile"
+  ],
+  "match": [
+    "https://*.nightride.fm/*"
+  ],
   "options": [
     {
       "id": "cookie-banners",
@@ -27,6 +32,76 @@
       "description": "The Smart App Banner and install-our-app strips.",
       "group": "annoyance",
       "default": true
+    },
+    {
+      "id": "crt-effects",
+      "label": "Turn off CRT flicker and noise",
+      "description": "The scanline, flicker, noise and vignette overlays drawn over the whole player.",
+      "group": "annoyance",
+      "default": true
+    },
+    {
+      "id": "now-playing",
+      "label": "Artist and track text",
+      "description": "Show, blur or hide the artist and title in the header and under each station, so a track does not spoil a listen.",
+      "group": "content",
+      "choices": [
+        {
+          "id": "show",
+          "label": "Show"
+        },
+        {
+          "id": "blur",
+          "label": "Blur"
+        },
+        {
+          "id": "hide",
+          "label": "Hide"
+        }
+      ],
+      "default": "show"
+    },
+    {
+      "id": "chat",
+      "label": "Chat",
+      "description": "Show, blur or hide the live IRC chat tab and its messages.",
+      "group": "content",
+      "choices": [
+        {
+          "id": "show",
+          "label": "Show"
+        },
+        {
+          "id": "blur",
+          "label": "Blur"
+        },
+        {
+          "id": "hide",
+          "label": "Hide"
+        }
+      ],
+      "default": "show"
+    },
+    {
+      "id": "visualizer",
+      "label": "Hide the visualizer",
+      "description": "The animated waves and spectrum bars on the EQ page.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "video-tab",
+      "label": "Hide the Video tab",
+      "description": "The Video menu entry and the embedded live video and its chat.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "archive-tab",
+      "label": "Hide the Archive tab",
+      "description": "The Archive menu entry and the list of archived shows.",
+      "group": "content",
+      "default": false
     }
   ],
   "rules": [
@@ -56,12 +131,103 @@
       "target": {
         "css": "#smartbanner, .smartbanner, .smart-banner, .app-banner, #app-banner, .app-download-banner, .install-app-banner"
       }
+    },
+    {
+      "id": "crt-effects",
+      "label": "CRT overlays",
+      "type": "hide",
+      "option": "crt-effects",
+      "target": {
+        "css": ".overlay.flicker, .overlay.scanlines, .overlay.scanline, .overlay.noise, .overlay.radial"
+      }
+    },
+    {
+      "id": "now-playing-blur",
+      "label": "Artist and track text",
+      "type": "css",
+      "option": "now-playing",
+      "choice": [
+        "blur"
+      ],
+      "target": {
+        "css": "#npArtist, #npTitle, a.station h4"
+      },
+      "declarations": {
+        "filter": "blur(6px)"
+      }
+    },
+    {
+      "id": "now-playing-hide",
+      "label": "Artist and track text",
+      "type": "hide",
+      "option": "now-playing",
+      "choice": [
+        "hide"
+      ],
+      "target": {
+        "css": "#npArtist, #npTitle, a.station h4"
+      }
+    },
+    {
+      "id": "chat-blur",
+      "label": "Chat messages",
+      "type": "css",
+      "option": "chat",
+      "choice": [
+        "blur"
+      ],
+      "target": {
+        "css": "#pageChat pre.Msg, #pageChat h4"
+      },
+      "declarations": {
+        "filter": "blur(6px)"
+      }
+    },
+    {
+      "id": "chat-hide",
+      "label": "Chat tab and page",
+      "type": "hide",
+      "option": "chat",
+      "choice": [
+        "hide"
+      ],
+      "target": {
+        "css": "#navChat, #pageChat"
+      }
+    },
+    {
+      "id": "visualizer",
+      "label": "Visualizer canvases",
+      "type": "hide",
+      "option": "visualizer",
+      "target": {
+        "css": "canvas#waves, canvas#bars"
+      }
+    },
+    {
+      "id": "video-tab",
+      "label": "Video tab and page",
+      "type": "hide",
+      "option": "video-tab",
+      "target": {
+        "css": "#navVideo, #pageVideo"
+      }
+    },
+    {
+      "id": "archive-tab",
+      "label": "Archive tab and page",
+      "type": "hide",
+      "option": "archive-tab",
+      "target": {
+        "css": "#navArchive, #pageArchive"
+      }
     }
   ],
   "meta": {
     "author": "OpenMedia",
     "homepage": "https://nightride.fm/",
-    "summary": "Cleans up cookie banners, ads and app prompts on Nightride FM, a media site",
-    "notes": "**Not verified live.** The fixtures in `recipes/fixtures/nightride-fm/` are synthetic: hand-written pages that contain the targeted elements, not captures of the site, so the fixture test proves only that the selectors parse and spare protected content. These are generic cleanup rules, written from the selectors that common cookie-consent, ad and app-banner scripts use. They were not run against Nightride FM; a rule that matches nothing on a page is harmless, but nothing here promises that this site shows any of them.\n\n- **Cookie banners** hides the OneTrust, Cookiebot, Quantcast, Didomi, Usercentrics, TrustArc and Osano dialogs and common `cc-window` / `#cookie-banner` boxes. Some sites lock page scroll while the dialog is open; hiding the dialog does not undo that.\n- **Ads** hides Google ad slots and ad iframes. Sites that serve their own ad markup are not covered.\n- **App banners** hides the Smart App Banner and common \"install our app\" strips.\n\nOpen a page, toggle the options in Settings and report anything that hides content you wanted."
+    "summary": "Nightride FM: turns off the CRT flicker overlays, blurs or hides now-playing text and chat, can hide visualizer, video and archive tabs",
+    "notes": "**Checked 2026-11-13**, logged out, headless Chrome on https://nightride.fm/ with an iPhone UA and a desktop UA. Both received the same single-page markup (ids like `#pageEQ`, `#pageChat`), so one structure serves both fixtures.\n\n- **CRT overlays**: five `.overlay` divs (`flicker`, `scanlines`, `scanline`, `noise`, `radial`) matched 5 (LIVE).\n- **Now playing**: `#npArtist` and `#npTitle` 2 and `a.station h4` 8 station lines (LIVE).\n- **Chat**: `#navChat` and `#pageChat` 2, with `pre.Msg` messages and `h4` name rows inside (LIVE; the chat showed real nicknames, which are not kept in the fixtures).\n- **Visualizer** `canvas#waves` and `canvas#bars` 2; **video** `#navVideo` and `#pageVideo` 2; **archive** `#navArchive` and `#pageArchive` 2 (LIVE).\n\nNot verified: the Settings page, other stations' sub-pages (the app keeps one document), the player controls while a stream plays (never hidden). The chat and video panes are separate \"pages\" toggled by script, so hiding them also removes the matching menu entries only because both are listed.",
+    "lastVerified": "2026-11-13"
   }
 }

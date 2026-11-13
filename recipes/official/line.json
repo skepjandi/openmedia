@@ -2,10 +2,15 @@
   "schema": 1,
   "id": "market.official.line",
   "name": "LINE",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "origin": "user",
-  "tags": ["desktop", "mobile"],
-  "match": ["https://*.line.me/*"],
+  "tags": [
+    "desktop",
+    "mobile"
+  ],
+  "match": [
+    "https://*.line.me/*"
+  ],
   "options": [
     {
       "id": "cookie-banners",
@@ -27,6 +32,69 @@
       "description": "The Smart App Banner and install-our-app strips.",
       "group": "annoyance",
       "default": true
+    },
+    {
+      "id": "universal-link-popup",
+      "label": "Hide the open-in-app pop-up",
+      "description": "The Open in the LINE app pop-up on the LINE Store.",
+      "group": "annoyance",
+      "default": true
+    },
+    {
+      "id": "download-badges",
+      "label": "Hide app download badges",
+      "description": "App Store and Google Play badges and the hero download icon on the LINE site.",
+      "group": "annoyance",
+      "default": true
+    },
+    {
+      "id": "sticker-thumbnails",
+      "label": "Sticker thumbnails",
+      "description": "Sticker, emoji, theme and game pictures in LINE Store lists. Blur keeps the layout; Hide leaves only names.",
+      "group": "content",
+      "choices": [
+        {
+          "id": "show",
+          "label": "Show"
+        },
+        {
+          "id": "blur",
+          "label": "Blur"
+        },
+        {
+          "id": "hide",
+          "label": "Hide"
+        }
+      ],
+      "default": "show"
+    },
+    {
+      "id": "promo-banners",
+      "label": "Promo banners",
+      "description": "The store home carousel banners and the banner strip on the LINE site.",
+      "group": "content",
+      "choices": [
+        {
+          "id": "show",
+          "label": "Show"
+        },
+        {
+          "id": "blur",
+          "label": "Blur"
+        },
+        {
+          "id": "hide",
+          "label": "Hide"
+        }
+      ],
+      "default": "show"
+    },
+    {
+      "id": "item-badges",
+      "label": "Hide New and animation badges",
+      "description": "The small New and play badges on store items.",
+      "group": "content",
+      "default": false
     }
   ],
   "rules": [
@@ -56,12 +124,94 @@
       "target": {
         "css": "#smartbanner, .smartbanner, .smart-banner, .app-banner, #app-banner, .app-download-banner, .install-app-banner"
       }
+    },
+    {
+      "id": "universal-link-popup",
+      "label": "Open-in-app pop-up",
+      "type": "hide",
+      "option": "universal-link-popup",
+      "target": {
+        "css": "#global-universal-link-popup"
+      }
+    },
+    {
+      "id": "download-badges",
+      "label": "Download badges",
+      "type": "hide",
+      "option": "download-badges",
+      "target": {
+        "css": ".appStoreIcon, .googlePlayIcon, .mvDownloadIcon"
+      }
+    },
+    {
+      "id": "sticker-thumbnails-blur",
+      "label": "Blur sticker thumbnails",
+      "type": "css",
+      "option": "sticker-thumbnails",
+      "choice": [
+        "blur"
+      ],
+      "target": {
+        "css": ".mdList01Img img"
+      },
+      "declarations": {
+        "filter": "blur(10px)"
+      }
+    },
+    {
+      "id": "sticker-thumbnails-hide",
+      "label": "Sticker thumbnails",
+      "type": "hide",
+      "option": "sticker-thumbnails",
+      "choice": [
+        "hide"
+      ],
+      "target": {
+        "css": ".mdList01Img img"
+      }
+    },
+    {
+      "id": "promo-banners-blur",
+      "label": "Blur promo banners",
+      "type": "css",
+      "option": "promo-banners",
+      "choice": [
+        "blur"
+      ],
+      "target": {
+        "css": "a.home-banner-link img, section#banners"
+      },
+      "declarations": {
+        "filter": "blur(12px)"
+      }
+    },
+    {
+      "id": "promo-banners-hide",
+      "label": "Promo banners",
+      "type": "hide",
+      "option": "promo-banners",
+      "choice": [
+        "hide"
+      ],
+      "target": {
+        "css": "a.home-banner-link, section#banners"
+      }
+    },
+    {
+      "id": "item-badges",
+      "label": "New and play badges",
+      "type": "hide",
+      "option": "item-badges",
+      "target": {
+        "css": ".mdIco01New01, .mdIco01Play01"
+      }
     }
   ],
   "meta": {
     "author": "OpenMedia",
     "homepage": "https://line.me/",
-    "summary": "Cleans up cookie banners, ads and app prompts on LINE",
-    "notes": "**Not verified live.** The fixtures in `recipes/fixtures/line/` are synthetic: hand-written pages that contain the targeted elements, not captures of the site, so the fixture test proves only that the selectors parse and spare protected content. These are generic cleanup rules, written from the selectors that common cookie-consent, ad and app-banner scripts use. They were not run against LINE; a rule that matches nothing on a page is harmless, but nothing here promises that this site shows any of them.\n\n- **Cookie banners** hides the OneTrust, Cookiebot, Quantcast, Didomi, Usercentrics, TrustArc and Osano dialogs and common `cc-window` / `#cookie-banner` boxes. Some sites lock page scroll while the dialog is open; hiding the dialog does not undo that.\n- **Ads** hides Google ad slots and ad iframes. Sites that serve their own ad markup are not covered.\n- **App banners** hides the Smart App Banner and common \"install our app\" strips.\n\nOpen a page, toggle the options in Settings and report anything that hides content you wanted."
+    "summary": "Hides the open-in-app pop-up and download badges; blur or hide sticker thumbnails and promo banners; hide New and animated badges",
+    "notes": "Checked 2026-11-13, logged out. **Cached capture only**: store.line.me/home/en with an iPhone UA 390x844 and www.line.me/en/ with a desktop UA were captured once (querySelectorAll counts on the saved DOM, scripts stripped); line.me/en/ refused the iPhone UA (connection closed) and later automated visits were not possible, so the store on desktop and the product pages were not inspected. `real.html` is the store home page (phone), `desktop-real.html` the line.me/en landing page.\n\n- **Open-in-app pop-up** (LIVE, 1): `#global-universal-link-popup` inside `#popup-root` on the store (the first-term agreement popup next to it is left alone).\n- **Download badges** (LIVE on line.me/en: 17 App Store, 17 Google Play, 2 hero download icons): the install buttons repeated under every product row.\n- **Sticker thumbnails** choice (LIVE, 126 `.mdList01Img img` on the store home): the sticker, emoji, theme and game pictures. Blur keeps the layout; Hide leaves the names.\n- **Promo banners** choice (LIVE, 2 `a.home-banner-link` in the store carousel and the `#banners` strip on line.me/en).\n- **Badges** (LIVE, 5 New and 42 play-icon badges on the store home).\n\nClass names such as `mdList01Img` are LINE's old readable component classes (stable for years, not hashed) but not guaranteed. The three original rules were kept. Not verified: sticker detail pages, search results, LINE Music and the other `*.line.me` subdomains, the logged-in store.",
+    "lastVerified": "2026-11-13"
   }
 }

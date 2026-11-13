@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "market.official.red-bull-tv",
   "name": "Red Bull TV",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "origin": "user",
   "tags": ["desktop", "mobile"],
   "match": ["https://*.redbull.com/*"],
@@ -27,6 +27,69 @@
       "description": "The Smart App Banner and install-our-app strips.",
       "group": "annoyance",
       "default": true
+    },
+    {
+      "id": "drink-promo",
+      "label": "Hide energy drink promo",
+      "description": "The Energy Drinks product rail and the occasions carousel on the home page.",
+      "group": "annoyance",
+      "default": true
+    },
+    {
+      "id": "card-pictures",
+      "label": "Card pictures",
+      "description": "The pictures on rail and feed cards in the main column.",
+      "group": "content",
+      "choices": [
+        {
+          "id": "show",
+          "label": "Show"
+        },
+        {
+          "id": "blur",
+          "label": "Blur"
+        },
+        {
+          "id": "hide",
+          "label": "Hide"
+        }
+      ],
+      "default": "show"
+    },
+    {
+      "id": "event-rails",
+      "label": "Events and feed rails",
+      "description": "The Events rail and the More from Red Bull feed. The Red Bull TV rail stays.",
+      "group": "content",
+      "choices": [
+        {
+          "id": "show",
+          "label": "Show"
+        },
+        {
+          "id": "dim",
+          "label": "Dim"
+        },
+        {
+          "id": "hide",
+          "label": "Hide"
+        }
+      ],
+      "default": "show"
+    },
+    {
+      "id": "hero-panel",
+      "label": "Hide hero banner",
+      "description": "The large hero panel at the top (a featured event such as How to watch...).",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "footer",
+      "label": "Hide footer",
+      "description": "The footer panel.",
+      "group": "content",
+      "default": false
     }
   ],
   "rules": [
@@ -56,12 +119,86 @@
       "target": {
         "css": "#smartbanner, .smartbanner, .smart-banner, .app-banner, #app-banner, .app-download-banner, .install-app-banner"
       }
+    },
+    {
+      "id": "drink-rail",
+      "label": "Energy Drinks rail and occasions carousel",
+      "type": "hide",
+      "option": "drink-promo",
+      "target": {
+        "css": "[data-module-name$=\"feed-cards-rail-panel\"]:has(.energy-drink-feed-card), [data-module-name$=\"occasions-carousel-panel\"]"
+      }
+    },
+    {
+      "id": "pictures-blur",
+      "label": "Card pictures",
+      "type": "css",
+      "option": "card-pictures",
+      "choice": ["blur"],
+      "target": {
+        "css": "main.page__main-content img"
+      },
+      "declarations": {
+        "filter": "blur(12px)"
+      }
+    },
+    {
+      "id": "pictures-hide",
+      "label": "Card pictures",
+      "type": "hide",
+      "option": "card-pictures",
+      "choice": ["hide"],
+      "target": {
+        "css": "main.page__main-content img"
+      }
+    },
+    {
+      "id": "rails-dim",
+      "label": "Events and feed rails",
+      "type": "css",
+      "option": "event-rails",
+      "choice": ["dim"],
+      "target": {
+        "css": "[data-module-name$=\"combo-rail-panel\"], [data-module-name$=\"card-feed-panel\"]"
+      },
+      "declarations": {
+        "opacity": "0.35"
+      }
+    },
+    {
+      "id": "rails-hide",
+      "label": "Events and feed rails",
+      "type": "hide",
+      "option": "event-rails",
+      "choice": ["hide"],
+      "target": {
+        "css": "[data-module-name$=\"combo-rail-panel\"], [data-module-name$=\"card-feed-panel\"]"
+      }
+    },
+    {
+      "id": "hero-panel",
+      "label": "Hero banner",
+      "type": "hide",
+      "option": "hero-panel",
+      "target": {
+        "css": "[data-module-name$=\"panoptikum-panel\"]"
+      }
+    },
+    {
+      "id": "footer",
+      "label": "Footer",
+      "type": "hide",
+      "option": "footer",
+      "target": {
+        "css": "footer.page__footer"
+      }
     }
   ],
   "meta": {
     "author": "OpenMedia",
     "homepage": "https://www.redbull.com/int-en/tv",
-    "summary": "Cleans up cookie banners, ads and app prompts on Red Bull TV, a media site",
-    "notes": "**Not verified live.** The fixtures in `recipes/fixtures/red-bull-tv/` are synthetic: hand-written pages that contain the targeted elements, not captures of the site, so the fixture test proves only that the selectors parse and spare protected content. These are generic cleanup rules, written from the selectors that common cookie-consent, ad and app-banner scripts use. They were not run against Red Bull TV; a rule that matches nothing on a page is harmless, but nothing here promises that this site shows any of them.\n\n- **Cookie banners** hides the OneTrust, Cookiebot, Quantcast, Didomi, Usercentrics, TrustArc and Osano dialogs and common `cc-window` / `#cookie-banner` boxes. Some sites lock page scroll while the dialog is open; hiding the dialog does not undo that.\n- **Ads** hides Google ad slots and ad iframes. Sites that serve their own ad markup are not covered.\n- **App banners** hides the Smart App Banner and common \"install our app\" strips.\n\nOpen a page, toggle the options in Settings and report anything that hides content you wanted."
+    "summary": "Red Bull: hide the energy-drink promo rail, the hero and footer; dim or hide event and feed rails; blur or hide card pictures.",
+    "notes": "Checked 2026-11-13, logged out, headless Chrome over CDP with a desktop UA (1440x900) on www.redbull.com/us-en/ (US region). Not captured: an iPhone-UA page (Chrome/network were out of memory when retried; the site is responsive, same panel markup expected [INFERRED]), event, stories and Red Bull TV (redbull.tv) pages, the player.\n\nLIVE counts on Home: drink-rail desktop home 2; pictures-blur desktop home 30; pictures-hide desktop home 30; rails-dim desktop home 2; rails-hide desktop home 2; hero-panel desktop home 1; footer desktop home 1. Panels are matched by the `data-module-name` suffix (feed-cards-rail-panel, combo-rail-panel, card-feed-panel, panoptikum-panel, occasions-carousel-panel) and the readable `energy-drink-feed-card` class that tells the product rail from the Stories and Athletes rails. The `occasions-carousel-panel` was empty when captured. `cosmos-*` web components and hashed classes are not used.\n\nChoices: Card pictures Show/Blur/Hide (blur 12px), Events and feed rails Show/Dim/Hide (opacity 0.35). The cookie dialog (OneTrust) is handled by the existing rule.\n\nNOT verified: phone layout, other regional sites (/int-en/), redbull.tv, the live player, Stories and Athletes rails (not touched), ads inside videos.",
+    "lastVerified": "2026-11-13"
   }
 }

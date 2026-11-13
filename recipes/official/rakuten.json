@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "market.official.rakuten",
   "name": "Rakuten",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "origin": "user",
   "tags": ["desktop", "mobile"],
   "match": ["https://*.rakuten.co.jp/*"],
@@ -27,6 +27,76 @@
       "description": "The Smart App Banner and install-our-app strips.",
       "group": "annoyance",
       "default": true
+    },
+    {
+      "id": "promo-banners",
+      "label": "Hide promo banners",
+      "description": "The global campaign banner on top, the big banner slideshow, the race widget and the Rakuten Mobile banner.",
+      "group": "annoyance",
+      "default": true
+    },
+    {
+      "id": "survey-app-promo",
+      "label": "Hide survey and app promos",
+      "description": "The real-time survey box and the app promotion widget in the footer area.",
+      "group": "annoyance",
+      "default": true
+    },
+    {
+      "id": "recommendations",
+      "label": "Recommendations and ranking",
+      "description": "The Today Recommendation, Recommended Items, Ranking, Rmagazine, Brand and group recommendation modules.",
+      "group": "content",
+      "choices": [
+        {
+          "id": "show",
+          "label": "Show"
+        },
+        {
+          "id": "dim",
+          "label": "Dim"
+        },
+        {
+          "id": "hide",
+          "label": "Hide"
+        }
+      ],
+      "default": "show"
+    },
+    {
+      "id": "item-pictures",
+      "label": "Item pictures",
+      "description": "All pictures in the main column of the top page (products, banners, shops).",
+      "group": "content",
+      "choices": [
+        {
+          "id": "show",
+          "label": "Show"
+        },
+        {
+          "id": "blur",
+          "label": "Blur"
+        },
+        {
+          "id": "hide",
+          "label": "Hide"
+        }
+      ],
+      "default": "show"
+    },
+    {
+      "id": "history-widgets",
+      "label": "Hide browsing history widgets",
+      "description": "The recently viewed items, shop history, buy-again and bookmarks modules.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "deal-widgets",
+      "label": "Hide deals and coupons",
+      "description": "The Super Deal, recommended coupon and SPU point slider modules.",
+      "group": "content",
+      "default": false
     }
   ],
   "rules": [
@@ -45,7 +115,7 @@
       "type": "hide",
       "option": "ads",
       "target": {
-        "css": "ins.adsbygoogle, div[id^=\"div-gpt-ad\"], iframe[id^=\"google_ads_iframe\"], iframe[src*=\"doubleclick.net\"], iframe[src*=\"googlesyndication.com\"], div[data-google-query-id]"
+        "css": "ins.adsbygoogle, div[id^=\"div-gpt-ad\"], iframe[id^=\"google_ads_iframe\"], iframe[src*=\"doubleclick.net\"], iframe[src*=\"googlesyndication.com\"], div[data-google-query-id], #runa_Billboard_Wrapper, div[id^=\"rdn-adspot\"], [irc=\"StaticAdBanner\"]"
       }
     },
     {
@@ -56,12 +126,95 @@
       "target": {
         "css": "#smartbanner, .smartbanner, .smart-banner, .app-banner, #app-banner, .app-download-banner, .install-app-banner"
       }
+    },
+    {
+      "id": "promo-banners",
+      "label": "Promo banners",
+      "type": "hide",
+      "option": "promo-banners",
+      "target": {
+        "css": ".globalBannerWrapper, #bigBannerWidget, #raceWidget, [irc=\"MnoBanner\"]"
+      }
+    },
+    {
+      "id": "survey-app",
+      "label": "Survey and app promos",
+      "type": "hide",
+      "option": "survey-app-promo",
+      "target": {
+        "css": "[irc=\"RealtimeSurvey\"], [irc=\"AppPromotionWidget\"]"
+      }
+    },
+    {
+      "id": "recs-dim",
+      "label": "Recommendations and ranking",
+      "type": "css",
+      "option": "recommendations",
+      "choice": ["dim"],
+      "target": {
+        "css": "[irc=\"TodayRecommendationPc\"], [irc=\"RecommendedItemsPc\"], [irc=\"GroupRecommendationWidget\"], [irc=\"RankingSlider\"], [irc=\"Rmagazine\"], [irc=\"BrandGadget\"], [irc=\"BrandPortal\"]"
+      },
+      "declarations": {
+        "opacity": "0.35"
+      }
+    },
+    {
+      "id": "recs-hide",
+      "label": "Recommendations and ranking",
+      "type": "hide",
+      "option": "recommendations",
+      "choice": ["hide"],
+      "target": {
+        "css": "[irc=\"TodayRecommendationPc\"], [irc=\"RecommendedItemsPc\"], [irc=\"GroupRecommendationWidget\"], [irc=\"RankingSlider\"], [irc=\"Rmagazine\"], [irc=\"BrandGadget\"], [irc=\"BrandPortal\"]"
+      }
+    },
+    {
+      "id": "pictures-blur",
+      "label": "Item pictures",
+      "type": "css",
+      "option": "item-pictures",
+      "choice": ["blur"],
+      "target": {
+        "css": "#main-container img"
+      },
+      "declarations": {
+        "filter": "blur(12px)"
+      }
+    },
+    {
+      "id": "pictures-hide",
+      "label": "Item pictures",
+      "type": "hide",
+      "option": "item-pictures",
+      "choice": ["hide"],
+      "target": {
+        "css": "#main-container img"
+      }
+    },
+    {
+      "id": "history-widgets",
+      "label": "History widgets",
+      "type": "hide",
+      "option": "history-widgets",
+      "target": {
+        "css": "[irc=\"ItemBrowsingHistoryWidgetPc\"], [irc=\"ShopBrowsingHistoryPc\"], [irc=\"BuyAgainWidgetPc\"], [irc=\"BookmarksPc\"]"
+      }
+    },
+    {
+      "id": "deal-widgets",
+      "label": "Deals and coupons",
+      "type": "hide",
+      "option": "deal-widgets",
+      "target": {
+        "css": "[irc=\"SuperDealRecommendationPc\"], [irc=\"RecommendedCouponWidgetPc\"], [irc=\"SpuSlider\"]"
+      }
     }
   ],
   "meta": {
     "author": "OpenMedia",
     "homepage": "https://www.rakuten.co.jp/",
-    "summary": "Cleans up cookie banners, ads and app prompts on Rakuten",
-    "notes": "**Not verified live.** The fixtures in `recipes/fixtures/rakuten/` are synthetic: hand-written pages that contain the targeted elements, not captures of the site, so the fixture test proves only that the selectors parse and spare protected content. These are generic cleanup rules, written from the selectors that common cookie-consent, ad and app-banner scripts use. They were not run against Rakuten; a rule that matches nothing on a page is harmless, but nothing here promises that this site shows any of them.\n\n- **Cookie banners** hides the OneTrust, Cookiebot, Quantcast, Didomi, Usercentrics, TrustArc and Osano dialogs and common `cc-window` / `#cookie-banner` boxes. Some sites lock page scroll while the dialog is open; hiding the dialog does not undo that.\n- **Ads** hides Google ad slots and ad iframes. Sites that serve their own ad markup are not covered.\n- **App banners** hides the Smart App Banner and common \"install our app\" strips.\n\nOpen a page, toggle the options in Settings and report anything that hides content you wanted."
+    "summary": "Rakuten Ichiba (rakuten.co.jp): hide billboard ads, promo banners and survey/app promos; dim or hide recommendations; item picture choice.",
+    "notes": "Checked 2026-11-13, logged out, headless Chrome over CDP with a desktop UA (1440x900) on www.rakuten.co.jp/ (the Ichiba top page). Not captured: an iPhone-UA page (Rakuten redirects phones to a separate mobile site, and Chrome/network were out of memory when retried), item, shop and search pages, the logged-in top page.\n\nLIVE counts on the top page: billboard-ad desktop home 3; promo-banners desktop home 4; survey-app desktop home 2; recs-dim desktop home 7; recs-hide desktop home 7; pictures-blur desktop home 1460; pictures-hide desktop home 1460; history-widgets desktop home 4; deal-widgets desktop home 3. Selectors are `irc=\"...\"` widget attributes, the ids `#runa_Billboard_Wrapper`, `#bigBannerWidget`, `#raceWidget` and the readable `globalBannerWrapper` class; the page's `--3Ggnq`-style hashed classes are not used. Text is Japanese and no rule matches text.\n\nChoices: Recommendations and ranking Show/Dim/Hide (opacity 0.35); Item pictures Show/Blur/Hide (blur 12px, also catches banner pictures). Search (`SearchWidget`), the header and the side navigation stay.\n\nNOT verified: phone site, search results (which carry Rakuten Ads cards), item pages, signed-in widgets, whether widget names change between top-page experiments.",
+    "lastVerified": "2026-11-13"
   }
 }

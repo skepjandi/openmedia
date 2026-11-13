@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "market.official.sohu",
   "name": "Sohu",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "origin": "user",
   "tags": ["desktop", "mobile"],
   "match": ["https://*.sohu.com/*"],
@@ -27,6 +27,55 @@
       "description": "The Smart App Banner and install-our-app strips.",
       "group": "annoyance",
       "default": true
+    },
+    {
+      "id": "headline-pictures",
+      "label": "Top story pictures",
+      "description": "Pictures in the top-story carousel. Blur keeps the layout; Hide removes them.",
+      "group": "content",
+      "choices": [
+        {
+          "id": "show",
+          "label": "Show"
+        },
+        {
+          "id": "blur",
+          "label": "Blur"
+        },
+        {
+          "id": "hide",
+          "label": "Hide"
+        }
+      ],
+      "default": "show"
+    },
+    {
+      "id": "hot-tags",
+      "label": "Hide hot tags",
+      "description": "The row of hot topic tags under the header.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "live-scores",
+      "label": "Hide live scores",
+      "description": "The sports live-match box.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "short-videos",
+      "label": "Hide the short video block",
+      "description": "The short video plate on the home page.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "footer-links",
+      "label": "Hide footer navigation",
+      "description": "The footer navigation list.",
+      "group": "content",
+      "default": false
     }
   ],
   "rules": [
@@ -56,12 +105,85 @@
       "target": {
         "css": "#smartbanner, .smartbanner, .smart-banner, .app-banner, #app-banner, .app-download-banner, .install-app-banner"
       }
+    },
+    {
+      "id": "sohu-ad-bills",
+      "label": "Ad billboards",
+      "type": "hide",
+      "option": "ads",
+      "target": {
+        "css": ".cbd-plate-bill"
+      }
+    },
+    {
+      "id": "pictures-blur",
+      "label": "Top story pictures",
+      "type": "css",
+      "option": "headline-pictures",
+      "choice": [
+        "blur"
+      ],
+      "target": {
+        "css": ".cbd-focus-wrapper img"
+      },
+      "declarations": {
+        "filter": "blur(12px)"
+      }
+    },
+    {
+      "id": "pictures-hide",
+      "label": "Top story pictures",
+      "type": "hide",
+      "option": "headline-pictures",
+      "choice": [
+        "hide"
+      ],
+      "target": {
+        "css": ".cbd-focus-wrapper img"
+      }
+    },
+    {
+      "id": "hot-tags",
+      "label": "Hot tags",
+      "type": "hide",
+      "option": "hot-tags",
+      "target": {
+        "css": "section.hot-tags"
+      }
+    },
+    {
+      "id": "live-scores",
+      "label": "Live scores",
+      "type": "hide",
+      "option": "live-scores",
+      "target": {
+        "css": ".recommend-live"
+      }
+    },
+    {
+      "id": "short-videos",
+      "label": "Short video block",
+      "type": "hide",
+      "option": "short-videos",
+      "target": {
+        "css": "#PlateBlockShortvideo"
+      }
+    },
+    {
+      "id": "footer-links",
+      "label": "Footer navigation",
+      "type": "hide",
+      "option": "footer-links",
+      "target": {
+        "css": "footer.footer-navs-wrapper"
+      }
     }
   ],
   "meta": {
     "author": "OpenMedia",
     "homepage": "https://www.sohu.com/",
-    "summary": "Cleans up cookie banners, ads and app prompts on Sohu",
-    "notes": "**Not verified live.** The fixtures in `recipes/fixtures/sohu/` are synthetic: hand-written pages that contain the targeted elements, not captures of the site, so the fixture test proves only that the selectors parse and spare protected content. These are generic cleanup rules, written from the selectors that common cookie-consent, ad and app-banner scripts use. They were not run against Sohu; a rule that matches nothing on a page is harmless, but nothing here promises that this site shows any of them.\n\n- **Cookie banners** hides the OneTrust, Cookiebot, Quantcast, Didomi, Usercentrics, TrustArc and Osano dialogs and common `cc-window` / `#cookie-banner` boxes. Some sites lock page scroll while the dialog is open; hiding the dialog does not undo that.\n- **Ads** hides Google ad slots and ad iframes. Sites that serve their own ad markup are not covered.\n- **App banners** hides the Smart App Banner and common \"install our app\" strips.\n\nOpen a page, toggle the options in Settings and report anything that hides content you wanted."
+    "summary": "Hides Sohu ad bills; blur or hide top-story pictures; hide hot tags, live scores, short videos and footer links",
+    "notes": "Checked 2026-11-13, logged out, iPhone UA 390x844 in headless Chrome, m.sohu.com home page (Chinese interface). Counts are `querySelectorAll` on the rendered DOM saved from that load (scripts then switched off to evaluate): ad billboards `.cbd-plate-bill` 12 (11 marked as ads and one top bar), top story pictures 7, hot tags 1, live scores 1, short video block 1, footer navigation 1. Selectors are Sohu's readable `cbd-` classes and plate ids.\n\nNOT verified: the infinite feed below the fold, article pages, www.sohu.com desktop, signed-in states, the original cookie and app-banner rules (nothing matched).",
+    "lastVerified": "2026-11-13"
   }
 }

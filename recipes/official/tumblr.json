@@ -2,10 +2,12 @@
   "schema": 1,
   "id": "market.official.tumblr",
   "name": "Tumblr",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "origin": "user",
   "tags": ["desktop", "mobile"],
-  "match": ["https://*.tumblr.com/*"],
+  "match": [
+    "https://*.tumblr.com/*"
+  ],
   "options": [
     {
       "id": "cookie-banners",
@@ -27,6 +29,58 @@
       "description": "The Smart App Banner and install-our-app strips.",
       "group": "annoyance",
       "default": true
+    },
+    {
+      "id": "signup-bar",
+      "label": "Hide the sign-up bar",
+      "description": "The bar pinned to the bottom with Sign up and Log in buttons. English-only: it matches the button labels. The header Log in stays.",
+      "group": "annoyance",
+      "default": true
+    },
+    {
+      "id": "post-media",
+      "label": "Post images and GIFs",
+      "description": "Pictures and GIFs inside posts. Blur keeps the layout; Hide leaves text and tags. Avatars are separate.",
+      "group": "content",
+      "choices": [
+        { "id": "show", "label": "Show" },
+        { "id": "blur", "label": "Blur" },
+        { "id": "hide", "label": "Hide" }
+      ],
+      "default": "show"
+    },
+    {
+      "id": "avatars",
+      "label": "Blog avatars",
+      "description": "The round blog avatar at the top of each post. English-only: it matches the Avatar label.",
+      "group": "content",
+      "choices": [
+        { "id": "show", "label": "Show" },
+        { "id": "blur", "label": "Blur" },
+        { "id": "hide", "label": "Hide" }
+      ],
+      "default": "show"
+    },
+    {
+      "id": "post-footers",
+      "label": "Hide post counts and buttons",
+      "description": "The row under each post with note, reblog and like counts and buttons.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "post-tags",
+      "label": "Hide post tags",
+      "description": "The #tag links under each post.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "trending-blogs",
+      "label": "Hide Trending Blogs",
+      "description": "The Trending Blogs list in the right column. English-only: it matches the list label.",
+      "group": "content",
+      "default": false
     }
   ],
   "rules": [
@@ -56,12 +110,104 @@
       "target": {
         "css": "#smartbanner, .smartbanner, .smart-banner, .app-banner, #app-banner, .app-download-banner, .install-app-banner"
       }
+    },
+    {
+      "id": "house-ad",
+      "label": "Tumblr Premium promo in the right rail",
+      "type": "hide",
+      "option": "ads",
+      "target": {
+        "css": "a[data-testid=\"house-right-rail-ad\"]"
+      }
+    },
+    {
+      "id": "signup-bar",
+      "label": "Bottom sign-up bar",
+      "type": "hide",
+      "option": "signup-bar",
+      "target": {
+        "css": "div:has(> div > div > button[aria-label=\"Sign up\"])"
+      }
+    },
+    {
+      "id": "media-blur",
+      "label": "Blur post media",
+      "type": "css",
+      "option": "post-media",
+      "target": {
+        "css": "article figure:not([aria-label=\"Avatar\"])"
+      },
+      "declarations": {
+        "filter": "blur(14px)"
+      },
+      "choice": ["blur"]
+    },
+    {
+      "id": "media-hide",
+      "label": "Hide post media",
+      "type": "hide",
+      "option": "post-media",
+      "target": {
+        "css": "article figure:not([aria-label=\"Avatar\"])"
+      },
+      "choice": ["hide"]
+    },
+    {
+      "id": "avatar-blur",
+      "label": "Blur avatars",
+      "type": "css",
+      "option": "avatars",
+      "target": {
+        "css": "article figure[aria-label=\"Avatar\"]"
+      },
+      "declarations": {
+        "filter": "blur(6px)"
+      },
+      "choice": ["blur"]
+    },
+    {
+      "id": "avatar-hide",
+      "label": "Hide avatars",
+      "type": "hide",
+      "option": "avatars",
+      "target": {
+        "css": "article figure[aria-label=\"Avatar\"]"
+      },
+      "choice": ["hide"]
+    },
+    {
+      "id": "post-footer",
+      "label": "Post footer row",
+      "type": "hide",
+      "option": "post-footers",
+      "target": {
+        "css": "article footer[aria-label=\"Post footer\"]"
+      }
+    },
+    {
+      "id": "tag-rows",
+      "label": "Tag rows under posts",
+      "type": "hide",
+      "option": "post-tags",
+      "target": {
+        "css": "article div:has(> a[data-testid=\"tag-link\"])"
+      }
+    },
+    {
+      "id": "trending-module",
+      "label": "Trending Blogs module",
+      "type": "hide",
+      "option": "trending-blogs",
+      "target": {
+        "css": "div:has(> ul[aria-label=\"Trending Blogs\"])"
+      }
     }
   ],
   "meta": {
     "author": "OpenMedia",
     "homepage": "https://www.tumblr.com/",
-    "summary": "Cleans up cookie banners, ads and app prompts on Tumblr",
-    "notes": "**Not verified live.** The fixtures in `recipes/fixtures/tumblr/` are synthetic: hand-written pages that contain the targeted elements, not captures of the site, so the fixture test proves only that the selectors parse and spare protected content. These are generic cleanup rules, written from the selectors that common cookie-consent, ad and app-banner scripts use. They were not run against Tumblr; a rule that matches nothing on a page is harmless, but nothing here promises that this site shows any of them.\n\n- **Cookie banners** hides the OneTrust, Cookiebot, Quantcast, Didomi, Usercentrics, TrustArc and Osano dialogs and common `cc-window` / `#cookie-banner` boxes. Some sites lock page scroll while the dialog is open; hiding the dialog does not undo that.\n- **Ads** hides Google ad slots and ad iframes. Sites that serve their own ad markup are not covered.\n- **App banners** hides the Smart App Banner and common \"install our app\" strips.\n\nOpen a page, toggle the options in Settings and report anything that hides content you wanted."
+    "summary": "Tumblr logged-out dashboard: sign-up bar, Premium ad, media and avatars, tags, counts",
+    "notes": "Checked 2026-11-13, logged out, headless Chrome (iPhone UA 390x844 and desktop UA) on the tumblr.com front page; selectors were run on the saved live DOM. Blog pages on name.tumblr.com use per-blog themes and were not checked, so these rules target the dashboard-style front page and may match nothing there. Classes are hashed (for example article.FtjPK), so rules use the article element, data-testid and aria-label values; the aria-label ones are English-only.\n\n- **Sign-up bar**: the bottom bar is the one div whose grandchild holds the Sign up and Log in buttons (1 on mobile and desktop, LIVE). The header Log in button is outside it.\n- **Ads**: a[data-testid=house-right-rail-ad], the Tumblr Premium promo in the right rail, 1 on desktop, 0 on mobile (LIVE). A bait div[data-testid=adBlockTest] exists and is deliberately left alone, since hiding an ad-block test element can trigger anti-ad-block notices.\n- **Post media** (Show/Blur/Hide): article figures that are not avatars, 9 on mobile and 32 on desktop (LIVE).\n- **Avatars** (Show/Blur/Hide): article figure[aria-label=Avatar] (LIVE).\n- **Post footers**: footer[aria-label=Post footer], 6 on mobile and 20 on desktop; the counts live inside it (LIVE).\n- **Post tags**: the div holding the tag-link anchors, 3 on mobile and 11 on desktop (LIVE).\n- **Trending Blogs**: the module around ul[aria-label=Trending Blogs], 1 on desktop; the mobile layout has no such column (LIVE).\n\nNot verified: logged-in dashboard, sponsored posts (none appeared logged out), blog theme pages, the Explore page, other languages. Fixtures real.html and desktop-real.html are structure captures with text removed.",
+    "lastVerified": "2026-11-13"
   }
 }

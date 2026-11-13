@@ -62,6 +62,7 @@
     "author": "OpenMedia",
     "homepage": "https://genius.com/",
     "summary": "Cleans up cookie banners, ads and app prompts on Genius",
-    "notes": "**Not verified live.** The fixtures in `recipes/fixtures/genius/` are synthetic: hand-written pages that contain the targeted elements, not captures of the site, so the fixture test proves only that the selectors parse and spare protected content. These are generic cleanup rules, written from the selectors that common cookie-consent, ad and app-banner scripts use. They were not run against Genius; a rule that matches nothing on a page is harmless, but nothing here promises that this site shows any of them.\n\n- **Cookie banners** hides the OneTrust, Cookiebot, Quantcast, Didomi, Usercentrics, TrustArc and Osano dialogs and common `cc-window` / `#cookie-banner` boxes. Some sites lock page scroll while the dialog is open; hiding the dialog does not undo that.\n- **Ads** hides Google ad slots and ad iframes. Sites that serve their own ad markup are not covered.\n- **App banners** hides the Smart App Banner and common \"install our app\" strips.\n\nOpen a page, toggle the options in Settings and report anything that hides content you wanted."
+    "lastVerified": "2026-11-13",
+    "notes": "**Live check (2026-11-13).** Checked `https://genius.com/` in logged-out desktop Chromium at 1512×862. `div[id^=\"div-gpt-ad\"]` matched a 728×90 leaderboard visible in the viewport. No visible cookie or app banner was found. `recipes/fixtures/genius/desktop-real.html` is a sanitized excerpt of the observed ad slot; dynamic ad contents are omitted. Cookie and app selectors remain generic and are not verified for this site."
   }
 }

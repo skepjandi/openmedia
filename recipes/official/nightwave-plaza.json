@@ -2,10 +2,15 @@
   "schema": 1,
   "id": "market.official.nightwave-plaza",
   "name": "Nightwave Plaza",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "origin": "user",
-  "tags": ["desktop", "mobile"],
-  "match": ["https://*.plaza.one/*"],
+  "tags": [
+    "desktop",
+    "mobile"
+  ],
+  "match": [
+    "https://*.plaza.one/*"
+  ],
   "options": [
     {
       "id": "cookie-banners",
@@ -27,6 +32,76 @@
       "description": "The Smart App Banner and install-our-app strips.",
       "group": "annoyance",
       "default": true
+    },
+    {
+      "id": "news-window",
+      "label": "Hide the News window",
+      "description": "The floating \"News\" window that opens on top of the player, with the latest announcement.",
+      "group": "annoyance",
+      "default": true
+    },
+    {
+      "id": "cover-art",
+      "label": "Cover art",
+      "description": "Show, blur or hide the album cover next to the player.",
+      "group": "content",
+      "choices": [
+        {
+          "id": "show",
+          "label": "Show"
+        },
+        {
+          "id": "blur",
+          "label": "Blur"
+        },
+        {
+          "id": "hide",
+          "label": "Hide"
+        }
+      ],
+      "default": "show"
+    },
+    {
+      "id": "track-text",
+      "label": "Artist and track text",
+      "description": "Show, blur or hide the artist and title lines of the current song.",
+      "group": "content",
+      "choices": [
+        {
+          "id": "show",
+          "label": "Show"
+        },
+        {
+          "id": "blur",
+          "label": "Blur"
+        },
+        {
+          "id": "hide",
+          "label": "Hide"
+        }
+      ],
+      "default": "show"
+    },
+    {
+      "id": "visualizer",
+      "label": "Hide the visualizer",
+      "description": "The small animated bar next to the song time.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "listener-count",
+      "label": "Hide the listener count",
+      "description": "The \"Listeners\" number in the player status bar.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "taskbar",
+      "label": "Hide the taskbar",
+      "description": "The Windows 98 style taskbar with the Start button, window buttons and clock.",
+      "group": "content",
+      "default": false
     }
   ],
   "rules": [
@@ -56,12 +131,103 @@
       "target": {
         "css": "#smartbanner, .smartbanner, .smart-banner, .app-banner, #app-banner, .app-download-banner, .install-app-banner"
       }
+    },
+    {
+      "id": "news-window",
+      "label": "News window",
+      "type": "hide",
+      "option": "news-window",
+      "target": {
+        "css": "#window-news"
+      }
+    },
+    {
+      "id": "cover-blur",
+      "label": "Album cover",
+      "type": "css",
+      "option": "cover-art",
+      "choice": [
+        "blur"
+      ],
+      "target": {
+        "css": "#window-player .cover"
+      },
+      "declarations": {
+        "filter": "blur(14px)"
+      }
+    },
+    {
+      "id": "cover-hide",
+      "label": "Album cover",
+      "type": "hide",
+      "option": "cover-art",
+      "choice": [
+        "hide"
+      ],
+      "target": {
+        "css": "#window-player .cover"
+      }
+    },
+    {
+      "id": "track-blur",
+      "label": "Artist and title",
+      "type": "css",
+      "option": "track-text",
+      "choice": [
+        "blur"
+      ],
+      "target": {
+        "css": ".player-artist, .player-title"
+      },
+      "declarations": {
+        "filter": "blur(6px)"
+      }
+    },
+    {
+      "id": "track-hide",
+      "label": "Artist and title",
+      "type": "hide",
+      "option": "track-text",
+      "choice": [
+        "hide"
+      ],
+      "target": {
+        "css": ".player-artist, .player-title"
+      }
+    },
+    {
+      "id": "visualizer",
+      "label": "Visualizer",
+      "type": "hide",
+      "option": "visualizer",
+      "target": {
+        "css": "canvas.player-visual"
+      }
+    },
+    {
+      "id": "listener-count",
+      "label": "Listener count bar",
+      "type": "hide",
+      "option": "listener-count",
+      "target": {
+        "css": "#window-player .win-window__statusbar"
+      }
+    },
+    {
+      "id": "taskbar",
+      "label": "Taskbar",
+      "type": "hide",
+      "option": "taskbar",
+      "target": {
+        "css": ".win-taskbar-wrapper"
+      }
     }
   ],
   "meta": {
     "author": "OpenMedia",
     "homepage": "https://plaza.one/",
-    "summary": "Cleans up cookie banners, ads and app prompts on Nightwave Plaza, a media site",
-    "notes": "**Not verified live.** The fixtures in `recipes/fixtures/nightwave-plaza/` are synthetic: hand-written pages that contain the targeted elements, not captures of the site, so the fixture test proves only that the selectors parse and spare protected content. These are generic cleanup rules, written from the selectors that common cookie-consent, ad and app-banner scripts use. They were not run against Nightwave Plaza; a rule that matches nothing on a page is harmless, but nothing here promises that this site shows any of them.\n\n- **Cookie banners** hides the OneTrust, Cookiebot, Quantcast, Didomi, Usercentrics, TrustArc and Osano dialogs and common `cc-window` / `#cookie-banner` boxes. Some sites lock page scroll while the dialog is open; hiding the dialog does not undo that.\n- **Ads** hides Google ad slots and ad iframes. Sites that serve their own ad markup are not covered.\n- **App banners** hides the Smart App Banner and common \"install our app\" strips.\n\nOpen a page, toggle the options in Settings and report anything that hides content you wanted."
+    "summary": "Nightwave Plaza: hides the News window, blurs or hides cover art and track text, can hide visualizer, listener count and taskbar",
+    "notes": "**Checked 2026-11-13**, logged out, headless Chrome on https://plaza.one/ with an iPhone UA and a desktop UA; both received the same Vue app (a Windows 98 style desktop with two windows).\n\n- **News window**: `#window-news` 1 (LIVE); it was open on load and positioned absolutely over the page.\n- **Cover**: `#window-player .cover` 1 (a CSS background-image div) (LIVE).\n- **Track text**: `.player-artist` and `.player-title` 1 each (LIVE).\n- **Visualizer** `canvas.player-visual` 1; **status bar** `#window-player .win-window__statusbar` 1; **taskbar** `.win-taskbar-wrapper` 1 (LIVE).\n\nNot verified: the About, Play History, Ratings and Support windows (they open on click), the mobile minimized-window layout beyond the first load, and any ad (none rendered). Classes are plain readable names (`win-window`, `player-meta`); no hashed names are used. Hiding the taskbar also hides the clock and the Start menu button.",
+    "lastVerified": "2026-11-13"
   }
 }

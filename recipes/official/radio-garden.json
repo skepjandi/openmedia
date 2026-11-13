@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "market.official.radio-garden",
   "name": "Radio Garden",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "origin": "user",
   "tags": ["desktop", "mobile"],
   "match": ["https://*.radio.garden/*"],
@@ -27,6 +27,41 @@
       "description": "The Smart App Banner and install-our-app strips.",
       "group": "annoyance",
       "default": true
+    },
+    {
+      "id": "suggested-lists",
+      "label": "Suggested station lists",
+      "description": "The Popular in..., Picks from the Area and Popular in country lists under the first Stations list of a place.",
+      "group": "content",
+      "choices": [
+        {
+          "id": "show",
+          "label": "Show"
+        },
+        {
+          "id": "dim",
+          "label": "Dim"
+        },
+        {
+          "id": "hide",
+          "label": "Hide"
+        }
+      ],
+      "default": "show"
+    },
+    {
+      "id": "share-favorite",
+      "label": "Hide share and favourite buttons",
+      "description": "The Share and Add to favourites buttons next to a place or station.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "place-meta",
+      "label": "Hide local time and station count",
+      "description": "The local time and the number of stations under a place title.",
+      "group": "content",
+      "default": false
     }
   ],
   "rules": [
@@ -56,12 +91,54 @@
       "target": {
         "css": "#smartbanner, .smartbanner, .smart-banner, .app-banner, #app-banner, .app-download-banner, .install-app-banner"
       }
+    },
+    {
+      "id": "lists-dim",
+      "label": "Suggested lists",
+      "type": "css",
+      "option": "suggested-lists",
+      "choice": ["dim"],
+      "target": {
+        "css": "article[role=\"main\"] > div > div > section:nth-of-type(n+2)"
+      },
+      "declarations": {
+        "opacity": "0.35"
+      }
+    },
+    {
+      "id": "lists-hide",
+      "label": "Suggested lists",
+      "type": "hide",
+      "option": "suggested-lists",
+      "choice": ["hide"],
+      "target": {
+        "css": "article[role=\"main\"] > div > div > section:nth-of-type(n+2)"
+      }
+    },
+    {
+      "id": "share-favorite",
+      "label": "Share and favourite buttons",
+      "type": "hide",
+      "option": "share-favorite",
+      "target": {
+        "css": "button[aria-label=\"Share\"], button[aria-label$=\" to favorites\"]"
+      }
+    },
+    {
+      "id": "place-meta",
+      "label": "Local time and station count",
+      "type": "hide",
+      "option": "place-meta",
+      "target": {
+        "css": "#lt, #bhc"
+      }
     }
   ],
   "meta": {
     "author": "OpenMedia",
     "homepage": "https://radio.garden/",
-    "summary": "Cleans up cookie banners, ads and app prompts on Radio Garden, a media site",
-    "notes": "**Not verified live.** The fixtures in `recipes/fixtures/radio-garden/` are synthetic: hand-written pages that contain the targeted elements, not captures of the site, so the fixture test proves only that the selectors parse and spare protected content. These are generic cleanup rules, written from the selectors that common cookie-consent, ad and app-banner scripts use. They were not run against Radio Garden; a rule that matches nothing on a page is harmless, but nothing here promises that this site shows any of them.\n\n- **Cookie banners** hides the OneTrust, Cookiebot, Quantcast, Didomi, Usercentrics, TrustArc and Osano dialogs and common `cc-window` / `#cookie-banner` boxes. Some sites lock page scroll while the dialog is open; hiding the dialog does not undo that.\n- **Ads** hides Google ad slots and ad iframes. Sites that serve their own ad markup are not covered.\n- **App banners** hides the Smart App Banner and common \"install our app\" strips.\n\nOpen a page, toggle the options in Settings and report anything that hides content you wanted."
+    "summary": "Radio Garden: dim or hide suggested station lists, hide share and favourite buttons, local time and station counts.",
+    "notes": "Checked 2026-11-13, logged out, headless Chrome over CDP with a desktop UA (1440x900) and an iPhone UA (390x844) on radio.garden/ after the place drawer rendered (it opened on a default place).\n\nLIVE counts: lists-dim both home 5; lists-hide both home 5; share-favorite phone home 2; desktop home 4; place-meta both home 2. Selectors are structural or aria-based because every class carries a build hash: `article[role=\"main\"] > div > div > section:nth-of-type(n+2)` leaves the first list (Stations in <place>) and drops the later lists; the share and favourite labels are English-only.\n\nChoice: Suggested station lists Show/Dim/Hide (opacity 0.35). Radio Garden serves AdSense (`ins.adsbygoogle`, 2 on the page, display:none and unfilled when seen); the 1.0.0 ad rule already covers it.\n\nNOT verified: the full-screen search, favourites and history pages, the player bar, the globe overlay, the Press play dialog (never hidden), other languages (aria labels follow the UI language).",
+    "lastVerified": "2026-11-13"
   }
 }

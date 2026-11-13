@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "market.official.worldwide-fm",
   "name": "Worldwide FM",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "origin": "user",
   "tags": ["desktop", "mobile"],
   "match": ["https://*.worldwidefm.net/*"],
@@ -27,6 +27,48 @@
       "description": "The Smart App Banner and install-our-app strips.",
       "group": "annoyance",
       "default": true
+    },
+    {
+      "id": "discord-button",
+      "label": "Hide the Chat on Discord button",
+      "description": "The floating Chat on Discord button that sits on every page.",
+      "group": "annoyance",
+      "default": true
+    },
+    {
+      "id": "membership-appeals",
+      "label": "Hide membership appeal buttons",
+      "description": "The Learn More and JOIN NOW buttons in the page body and footer. The Support Us menu link stays.",
+      "group": "annoyance",
+      "default": true
+    },
+    {
+      "id": "show-artwork",
+      "label": "Show artwork",
+      "description": "Show, blur or hide the cover pictures on show and episode cards.",
+      "group": "content",
+      "choices": [
+        {
+          "id": "show",
+          "label": "Show"
+        },
+        {
+          "id": "blur",
+          "label": "Blur"
+        },
+        {
+          "id": "hide",
+          "label": "Hide"
+        }
+      ],
+      "default": "show"
+    },
+    {
+      "id": "site-footer",
+      "label": "Hide the site footer",
+      "description": "The footer with social links, newsletter and credits.",
+      "group": "content",
+      "default": false
     }
   ],
   "rules": [
@@ -56,12 +98,67 @@
       "target": {
         "css": "#smartbanner, .smartbanner, .smart-banner, .app-banner, #app-banner, .app-download-banner, .install-app-banner"
       }
+    },
+    {
+      "id": "discord-float",
+      "label": "Floating Discord button",
+      "type": "hide",
+      "option": "discord-button",
+      "target": {
+        "css": "body > a[href*=\"discord.gg\"]"
+      }
+    },
+    {
+      "id": "membership-buttons",
+      "label": "Membership buttons",
+      "type": "hide",
+      "option": "membership-appeals",
+      "target": {
+        "css": "main a[href=\"/membership\"], footer a[href=\"/membership\"]"
+      }
+    },
+    {
+      "id": "artwork-blur",
+      "label": "Episode pictures blurred",
+      "type": "css",
+      "option": "show-artwork",
+      "choice": [
+        "blur"
+      ],
+      "target": {
+        "css": "a[href^=\"/episode/\"] img"
+      },
+      "declarations": {
+        "filter": "blur(12px)"
+      }
+    },
+    {
+      "id": "artwork-hide",
+      "label": "Episode pictures hidden",
+      "type": "hide",
+      "option": "show-artwork",
+      "choice": [
+        "hide"
+      ],
+      "target": {
+        "css": "a[href^=\"/episode/\"] img"
+      }
+    },
+    {
+      "id": "footer-block",
+      "label": "Site footer",
+      "type": "hide",
+      "option": "site-footer",
+      "target": {
+        "css": "footer"
+      }
     }
   ],
   "meta": {
     "author": "OpenMedia",
     "homepage": "https://www.worldwidefm.net/",
-    "summary": "Cleans up cookie banners, ads and app prompts on Worldwide FM, a media site",
-    "notes": "**Not verified live.** The fixtures in `recipes/fixtures/worldwide-fm/` are synthetic: hand-written pages that contain the targeted elements, not captures of the site, so the fixture test proves only that the selectors parse and spare protected content. These are generic cleanup rules, written from the selectors that common cookie-consent, ad and app-banner scripts use. They were not run against Worldwide FM; a rule that matches nothing on a page is harmless, but nothing here promises that this site shows any of them.\n\n- **Cookie banners** hides the OneTrust, Cookiebot, Quantcast, Didomi, Usercentrics, TrustArc and Osano dialogs and common `cc-window` / `#cookie-banner` boxes. Some sites lock page scroll while the dialog is open; hiding the dialog does not undo that.\n- **Ads** hides Google ad slots and ad iframes. Sites that serve their own ad markup are not covered.\n- **App banners** hides the Smart App Banner and common \"install our app\" strips.\n\nOpen a page, toggle the options in Settings and report anything that hides content you wanted."
+    "summary": "Worldwide FM: Discord button and membership appeals, plus show artwork and footer controls",
+    "notes": "Checked LIVE on 2026-11-13: rendered DOM of www.worldwidefm.net home (iPhone UA 390x844 and desktop UA, which serve the same responsive Next.js page), logged out, captured with headless Chrome; counts were taken on the saved DOM. Fixtures real.html and desktop-real.html are structural captures with text stripped; `data-keep` marks the live player toggle, the live label link, the main content and the logo link.\n\nThe site uses Tailwind utility classes (unusable), so rules use hrefs and element position: `body > a[href*=\"discord.gg\"]` 1 (the other two Discord links are in the header and footer and are left alone), `main a[href=\"/membership\"]` 1 (Learn More) and `footer a[href=\"/membership\"]` 1 (JOIN NOW), `a[href^=\"/episode/\"] img` 81 (cards on Home; the pictures are lazy placeholders in the capture), `footer` 1.\n\nThe live player (`data-testid=live-player-toggle`) and the episode and show cards are never hidden; only their pictures can be blurred or hidden. The original generic rules matched nothing and are kept. NOT verified: show, episode and video pages, the persistent audio player, the membership page, logged-in state.",
+    "lastVerified": "2026-11-13"
   }
 }

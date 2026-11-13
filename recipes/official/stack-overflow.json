@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "market.official.stack-overflow",
   "name": "Stack Overflow",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "origin": "user",
   "tags": ["desktop", "mobile"],
   "match": ["https://*.stackoverflow.com/*"],
@@ -27,6 +27,90 @@
       "description": "The Smart App Banner and install-our-app strips.",
       "group": "annoyance",
       "default": true
+    },
+    {
+      "id": "sidebar-promos",
+      "label": "Hide sidebar promos",
+      "description": "The Stack Overflow for Agents box, The Overflow Blog list and the Collectives box in the right sidebar.",
+      "group": "annoyance",
+      "default": true
+    },
+    {
+      "id": "hot-network",
+      "label": "Hide Hot Network Questions",
+      "description": "The list of popular questions from other Stack Exchange sites in the sidebar.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "vote-stats",
+      "label": "Votes, answers and views",
+      "description": "Show, dim or hide the vote, answer and view counters next to each question in lists.",
+      "group": "content",
+      "choices": [
+        {
+          "id": "show",
+          "label": "Show"
+        },
+        {
+          "id": "dim",
+          "label": "Dim"
+        },
+        {
+          "id": "hide",
+          "label": "Hide"
+        }
+      ],
+      "default": "show"
+    },
+    {
+      "id": "excerpts",
+      "label": "Question excerpts",
+      "description": "Show, blur or hide the text preview under each question title in lists.",
+      "group": "content",
+      "choices": [
+        {
+          "id": "show",
+          "label": "Show"
+        },
+        {
+          "id": "blur",
+          "label": "Blur"
+        },
+        {
+          "id": "hide",
+          "label": "Hide"
+        }
+      ],
+      "default": "show"
+    },
+    {
+      "id": "asker-cards",
+      "label": "Asker names and avatars",
+      "description": "Show, blur or hide who asked each question, with avatar, name and reputation.",
+      "group": "content",
+      "choices": [
+        {
+          "id": "show",
+          "label": "Show"
+        },
+        {
+          "id": "blur",
+          "label": "Blur"
+        },
+        {
+          "id": "hide",
+          "label": "Hide"
+        }
+      ],
+      "default": "show"
+    },
+    {
+      "id": "footer",
+      "label": "Hide the footer",
+      "description": "The large footer with company, network and legal links.",
+      "group": "content",
+      "default": false
     }
   ],
   "rules": [
@@ -56,12 +140,136 @@
       "target": {
         "css": "#smartbanner, .smartbanner, .smart-banner, .app-banner, #app-banner, .app-download-banner, .install-app-banner"
       }
+    },
+    {
+      "id": "ad-zones",
+      "label": "Sponsored question and sidebar zones",
+      "type": "hide",
+      "option": "ads",
+      "target": {
+        "css": ".js-zone-container"
+      }
+    },
+    {
+      "id": "promo-agents",
+      "label": "Stack Overflow for Agents box",
+      "type": "hide",
+      "option": "sidebar-promos",
+      "target": {
+        "css": "aside.s-sidebarwidget:has(a[href^=\"https://agents.stackoverflow.com\"])"
+      }
+    },
+    {
+      "id": "promo-blog",
+      "label": "The Overflow Blog widget",
+      "type": "hide",
+      "option": "sidebar-promos",
+      "target": {
+        "css": "#sidebar .s-sidebarwidget__yellow"
+      }
+    },
+    {
+      "id": "promo-collectives",
+      "label": "Collectives box",
+      "type": "hide",
+      "option": "sidebar-promos",
+      "target": {
+        "css": "#sidebar .js-join-leave-container"
+      }
+    },
+    {
+      "id": "hot-network",
+      "label": "Hot Network Questions",
+      "type": "hide",
+      "option": "hot-network",
+      "target": {
+        "css": "#hot-network-questions"
+      }
+    },
+    {
+      "id": "stats-dim",
+      "label": "Question counters",
+      "type": "css",
+      "option": "vote-stats",
+      "choice": ["dim"],
+      "target": {
+        "css": ".s-post-summary--stats"
+      },
+      "declarations": {
+        "opacity": "0.35"
+      }
+    },
+    {
+      "id": "stats-hide",
+      "label": "Question counters",
+      "type": "hide",
+      "option": "vote-stats",
+      "choice": ["hide"],
+      "target": {
+        "css": ".s-post-summary--stats"
+      }
+    },
+    {
+      "id": "excerpts-blur",
+      "label": "Question excerpts",
+      "type": "css",
+      "option": "excerpts",
+      "choice": ["blur"],
+      "target": {
+        "css": ".s-post-summary--content-excerpt"
+      },
+      "declarations": {
+        "filter": "blur(5px)"
+      }
+    },
+    {
+      "id": "excerpts-hide",
+      "label": "Question excerpts",
+      "type": "hide",
+      "option": "excerpts",
+      "choice": ["hide"],
+      "target": {
+        "css": ".s-post-summary--content-excerpt"
+      }
+    },
+    {
+      "id": "askers-blur",
+      "label": "Asker cards",
+      "type": "css",
+      "option": "asker-cards",
+      "choice": ["blur"],
+      "target": {
+        "css": ".s-post-summary--meta .s-user-card"
+      },
+      "declarations": {
+        "filter": "blur(5px)"
+      }
+    },
+    {
+      "id": "askers-hide",
+      "label": "Asker cards",
+      "type": "hide",
+      "option": "asker-cards",
+      "choice": ["hide"],
+      "target": {
+        "css": ".s-post-summary--meta .s-user-card"
+      }
+    },
+    {
+      "id": "footer",
+      "label": "Page footer",
+      "type": "hide",
+      "option": "footer",
+      "target": {
+        "css": "#footer"
+      }
     }
   ],
   "meta": {
     "author": "OpenMedia",
     "homepage": "https://stackoverflow.com/",
-    "summary": "Cleans up cookie banners, ads and app prompts on Stack Overflow",
-    "notes": "**Not verified live.** The fixtures in `recipes/fixtures/stack-overflow/` are synthetic: hand-written pages that contain the targeted elements, not captures of the site, so the fixture test proves only that the selectors parse and spare protected content. These are generic cleanup rules, written from the selectors that common cookie-consent, ad and app-banner scripts use. They were not run against Stack Overflow; a rule that matches nothing on a page is harmless, but nothing here promises that this site shows any of them.\n\n- **Cookie banners** hides the OneTrust, Cookiebot, Quantcast, Didomi, Usercentrics, TrustArc and Osano dialogs and common `cc-window` / `#cookie-banner` boxes. Some sites lock page scroll while the dialog is open; hiding the dialog does not undo that.\n- **Ads** hides Google ad slots and ad iframes. Sites that serve their own ad markup are not covered.\n- **App banners** hides the Smart App Banner and common \"install our app\" strips.\n\nOpen a page, toggle the options in Settings and report anything that hides content you wanted."
+    "summary": "Hides Stack Overflow's sidebar promos; Hot Network Questions, footer; dim/blur/hide counters, excerpts, askers",
+    "notes": "Checked 2026-11-13, logged out, real Chrome (headless): iPhone UA 390x844 and desktop UA on stackoverflow.com/questions (Newest Questions list); plain curl was blocked (403) so the rendered DOM was used. Fixtures `real.html` and `desktop-real.html` are sanitised excerpts (text stripped, needed ancestors only, `data-keep` on the main column, the question list and the Log in link).\n\nLIVE (same on phone and desktop): `.js-zone-container` 6 (3 native-question and 3 sidebar ad containers, empty without an ad network), `#hot-network-questions` 1, `aside.s-sidebarwidget:has(a[href^=\"https://agents.stackoverflow.com\"])` 1 (Stack Overflow for Agents), `#sidebar .s-sidebarwidget__yellow` 1 (The Overflow Blog), `#sidebar .js-join-leave-container` 1 (Collectives), `.s-post-summary--stats` 15, `.s-post-summary--content-excerpt` 15, `.s-post-summary--meta .s-user-card` 15, `#footer` 1, `#onetrust-consent-sdk` 1 and `#onetrust-banner-sdk` 1 (original cookie rule). The original ad and app-banner rules matched nothing other than the new ad zones.\n\nChoices: Votes, answers and views Show/Dim/Hide; Question excerpts and Asker names and avatars Show/Blur/Hide. All classes are Stacks design-system names (`s-post-summary`, `s-sidebarwidget`, `s-user-card`), not hashed.\n\nSOURCE: uBlock users hide `#hot-network-questions`, the sidebar Blog widget and `#js-gdpr-consent-banner` (Stack Exchange meta answer, a Hacker News thread, the mig4ng and remcycles lists); the GDPR banner id matched nothing in this region.\n\nNOT verified: question pages (answers, comments, the related-questions column), the signed-in layout, the left navigation column, tag pages.",
+    "lastVerified": "2026-11-13"
   }
 }

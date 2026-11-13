@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "market.official.zoom",
   "name": "Zoom",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "origin": "user",
   "tags": ["desktop", "mobile"],
   "match": ["https://*.zoom.us/*"],
@@ -27,6 +27,62 @@
       "description": "The Smart App Banner and install-our-app strips.",
       "group": "annoyance",
       "default": true
+    },
+    {
+      "id": "promo-banner",
+      "label": "Hide the announcement banner",
+      "description": "The event and product announcement strip at the top of the zoom.us home page.",
+      "group": "annoyance",
+      "default": true
+    },
+    {
+      "id": "autoplay-videos",
+      "label": "Hide autoplaying promo videos",
+      "description": "The muted looping feature videos on the zoom.us home page. Meetings and recordings are not affected.",
+      "group": "annoyance",
+      "default": true
+    },
+    {
+      "id": "chat-widget",
+      "label": "Hide the chat bubble",
+      "description": "The round Open chat dialog bubble at the bottom right of the Join page and other zoom.us pages.",
+      "group": "annoyance",
+      "default": true
+    },
+    {
+      "id": "customer-logos",
+      "label": "Hide the customer logo strip",
+      "description": "The scrolling Trusted by millions logo marquee on the home page.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "social-proof",
+      "label": "Reviews and customer stories",
+      "description": "Dim or hide the star ratings block and the Customer stories carousel on the home page.",
+      "group": "content",
+      "choices": [
+        {
+          "id": "show",
+          "label": "Show"
+        },
+        {
+          "id": "dim",
+          "label": "Dim"
+        },
+        {
+          "id": "hide",
+          "label": "Hide"
+        }
+      ],
+      "default": "show"
+    },
+    {
+      "id": "news-cards",
+      "label": "Hide What's new cards",
+      "description": "The award and announcement cards under Making news, making impact.",
+      "group": "content",
+      "default": false
     }
   ],
   "rules": [
@@ -56,12 +112,85 @@
       "target": {
         "css": "#smartbanner, .smartbanner, .smart-banner, .app-banner, #app-banner, .app-download-banner, .install-app-banner"
       }
+    },
+    {
+      "id": "alert-banner",
+      "label": "Announcement banner",
+      "type": "hide",
+      "option": "promo-banner",
+      "target": {
+        "css": ".fdn-alert-banner"
+      }
+    },
+    {
+      "id": "auto-videos",
+      "label": "Autoplay promo videos",
+      "type": "hide",
+      "option": "autoplay-videos",
+      "target": {
+        "css": ".fdn-autoVideo"
+      }
+    },
+    {
+      "id": "chat-bubble",
+      "label": "Chat bubble",
+      "type": "hide",
+      "option": "chat-widget",
+      "target": {
+        "css": "#livesdk__campaign"
+      }
+    },
+    {
+      "id": "logo-strip",
+      "label": "Customer logo marquee",
+      "type": "hide",
+      "option": "customer-logos",
+      "target": {
+        "css": "section.fdn-logo-slide"
+      }
+    },
+    {
+      "id": "proof-dim",
+      "label": "Reviews and stories dimmed",
+      "type": "css",
+      "option": "social-proof",
+      "choice": [
+        "dim"
+      ],
+      "target": {
+        "css": ".zdcm-reviews-card, .zdcm-cs-expanded-card__wrapper"
+      },
+      "declarations": {
+        "opacity": "0.35"
+      }
+    },
+    {
+      "id": "proof-hide",
+      "label": "Reviews and stories hidden",
+      "type": "hide",
+      "option": "social-proof",
+      "choice": [
+        "hide"
+      ],
+      "target": {
+        "css": ".zdcm-reviews-card, .zdcm-cs-expanded-card__wrapper"
+      }
+    },
+    {
+      "id": "news-card-row",
+      "label": "What's new announcement cards",
+      "type": "hide",
+      "option": "news-cards",
+      "target": {
+        "css": ".zdcm-fdn-announcement-card-container"
+      }
     }
   ],
   "meta": {
     "author": "OpenMedia",
     "homepage": "https://zoom.us/",
-    "summary": "Cleans up cookie banners, ads and app prompts on Zoom",
-    "notes": "**Not verified live.** The fixtures in `recipes/fixtures/zoom/` are synthetic: hand-written pages that contain the targeted elements, not captures of the site, so the fixture test proves only that the selectors parse and spare protected content. These are generic cleanup rules, written from the selectors that common cookie-consent, ad and app-banner scripts use. They were not run against Zoom; a rule that matches nothing on a page is harmless, but nothing here promises that this site shows any of them.\n\n- **Cookie banners** hides the OneTrust, Cookiebot, Quantcast, Didomi, Usercentrics, TrustArc and Osano dialogs and common `cc-window` / `#cookie-banner` boxes. Some sites lock page scroll while the dialog is open; hiding the dialog does not undo that.\n- **Ads** hides Google ad slots and ad iframes. Sites that serve their own ad markup are not covered.\n- **App banners** hides the Smart App Banner and common \"install our app\" strips.\n\nOpen a page, toggle the options in Settings and report anything that hides content you wanted."
+    "summary": "Zoom: announcement banner, autoplay promo videos and chat widget, plus logo strip, reviews and news card controls",
+    "notes": "Checked LIVE on 2026-11-13: rendered DOM of zoom.us home (phone UA 390x844 and desktop UA, which serve the same responsive page) and zoom.us/join (desktop), logged out, captured with headless Chrome; counts were taken on the saved DOM. Fixtures real.html, desktop-real.html and desktop-join.html are structural captures with text stripped; `data-keep` marks the main content, the Join Meeting form, the Sign in and Join links and the search box.\n\nLIVE counts: `.fdn-alert-banner` 1 (a link with role alert in the home hero), `.fdn-autoVideo` 5 (muted looping videos inside the feature tabs), `section.fdn-logo-slide` 1, `.zdcm-reviews-card` 1, `.zdcm-cs-expanded-card__wrapper` 1, `.zdcm-fdn-announcement-card-container` 1, `#livesdk__campaign` 1 on /join only (a draggable round bubble labelled Open chat dialog).\n\nThe markup uses stable component class names (`fdn-`, `zdcm-`), not hashed ones, but Zoom's CMS can rename them. The OneTrust cookie dialog was not in the captured DOM, probably because of location, so the original cookie rule is unverified here. NOT verified: logged-in web client, the web client at app.zoom.us and the in-meeting page (the rules were not tested there), pricing pages, other languages.",
+    "lastVerified": "2026-11-13"
   }
 }

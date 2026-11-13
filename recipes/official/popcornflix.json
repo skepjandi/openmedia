@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "market.official.popcornflix",
   "name": "Popcornflix",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "origin": "user",
   "tags": ["desktop", "mobile"],
   "match": ["https://*.popcornflix.com/*"],
@@ -27,6 +27,34 @@
       "description": "The Smart App Banner and install-our-app strips.",
       "group": "annoyance",
       "default": true
+    },
+    {
+      "id": "hero-banner",
+      "label": "Featured banner",
+      "description": "The hero carousel and background poster at the top of the browse page.",
+      "group": "content",
+      "choices": [
+        {
+          "id": "show",
+          "label": "Show"
+        },
+        {
+          "id": "blur",
+          "label": "Blur"
+        },
+        {
+          "id": "hide",
+          "label": "Hide"
+        }
+      ],
+      "default": "show"
+    },
+    {
+      "id": "footer-links",
+      "label": "Hide footer links",
+      "description": "The Company and Partners link columns in the footer.",
+      "group": "content",
+      "default": false
     }
   ],
   "rules": [
@@ -36,7 +64,7 @@
       "type": "hide",
       "option": "cookie-banners",
       "target": {
-        "css": "#onetrust-consent-sdk, #onetrust-banner-sdk, #CybotCookiebotDialog, #qc-cmp2-container, .fc-consent-root, #didomi-host, #usercentrics-root, #truste-consent-track, .osano-cm-window, .cc-window, #cookie-banner, #cookie-notice, #cookieBanner"
+        "css": "#onetrust-consent-sdk, #onetrust-banner-sdk, #CybotCookiebotDialog, #qc-cmp2-container, .fc-consent-root, #didomi-host, #usercentrics-root, #truste-consent-track, .osano-cm-window, .cc-window, #cookie-banner, #cookie-notice, #cookieBanner, #gdpr_cookie_info_bar-wr, .consent-box, .consent-box-mobile"
       }
     },
     {
@@ -56,12 +84,45 @@
       "target": {
         "css": "#smartbanner, .smartbanner, .smart-banner, .app-banner, #app-banner, .app-download-banner, .install-app-banner"
       }
+    },
+    {
+      "id": "hero-blur",
+      "label": "Hero banner",
+      "type": "css",
+      "option": "hero-banner",
+      "choice": ["blur"],
+      "target": {
+        "css": "hero.heroSection, .bg-poster"
+      },
+      "declarations": {
+        "filter": "blur(14px)"
+      }
+    },
+    {
+      "id": "hero-hide",
+      "label": "Hero banner",
+      "type": "hide",
+      "option": "hero-banner",
+      "choice": ["hide"],
+      "target": {
+        "css": "hero.heroSection, .bg-poster"
+      }
+    },
+    {
+      "id": "footer-links",
+      "label": "Footer",
+      "type": "hide",
+      "option": "footer-links",
+      "target": {
+        "css": "footer.new-ui-footer"
+      }
     }
   ],
   "meta": {
     "author": "OpenMedia",
     "homepage": "https://popcornflix.com/",
-    "summary": "Cleans up cookie banners, ads and app prompts on Popcornflix, a media site",
-    "notes": "**Not verified live.** The fixtures in `recipes/fixtures/popcornflix/` are synthetic: hand-written pages that contain the targeted elements, not captures of the site, so the fixture test proves only that the selectors parse and spare protected content. These are generic cleanup rules, written from the selectors that common cookie-consent, ad and app-banner scripts use. They were not run against Popcornflix; a rule that matches nothing on a page is harmless, but nothing here promises that this site shows any of them.\n\n- **Cookie banners** hides the OneTrust, Cookiebot, Quantcast, Didomi, Usercentrics, TrustArc and Osano dialogs and common `cc-window` / `#cookie-banner` boxes. Some sites lock page scroll while the dialog is open; hiding the dialog does not undo that.\n- **Ads** hides Google ad slots and ad iframes. Sites that serve their own ad markup are not covered.\n- **App banners** hides the Smart App Banner and common \"install our app\" strips.\n\nOpen a page, toggle the options in Settings and report anything that hides content you wanted."
+    "summary": "Hides the Popcornflix cookie bar and footer, and lets you blur or hide the hero banner. Geo-blocked outside the US, shell only.",
+    "notes": "Checked 2026-11-13, logged out, headless Chrome over CDP with a desktop UA (1440x900) and an iPhone UA (390x844) on popcornflix.com/. The site served its shell and an empty catalogue: the content API returns nothing from this network (geo-limited), the page shows \"No results found\" and a hidden Access Error block. Everything below is about the shell.\n\nLIVE counts (querySelectorAll on the live DOM): gdpr-bar both home 3; hero-blur both home 2; hero-hide both home 2; footer-links both home 1. Existing cookie rule extended with `#gdpr_cookie_info_bar-wr`, `.consent-box`, `.consent-box-mobile` (cookie bar with Accept All and Manage; present but `d-none` until the script shows it). Fixtures real.html and desktop-real.html are sanitised excerpts of the shell.\n\nChoice: Featured banner Show/Blur/Hide (blur 14px) on the hero carousel and background poster.\n\nNOT verified: the movie tiles, the player page, the hero carousel contents and any ad slots, because no catalogue loaded; no thumbnail or rail selectors were invented. Ads inside the player are video ads and cannot be hidden.",
+    "lastVerified": "2026-11-13"
   }
 }

@@ -2,10 +2,15 @@
   "schema": 1,
   "id": "market.official.nike",
   "name": "Nike",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "origin": "user",
-  "tags": ["desktop", "mobile"],
-  "match": ["https://*.nike.com/*"],
+  "tags": [
+    "desktop",
+    "mobile"
+  ],
+  "match": [
+    "https://*.nike.com/*"
+  ],
   "options": [
     {
       "id": "cookie-banners",
@@ -27,6 +32,62 @@
       "description": "The Smart App Banner and install-our-app strips.",
       "group": "annoyance",
       "default": true
+    },
+    {
+      "id": "autoplay-video",
+      "label": "Hide autoplay promo videos",
+      "description": "The looping muted campaign videos in the home page story cards.",
+      "group": "annoyance",
+      "default": true
+    },
+    {
+      "id": "product-images",
+      "label": "Product and campaign images",
+      "description": "Show, blur or hide the pictures and videos on the home page cards and carousels.",
+      "group": "content",
+      "choices": [
+        {
+          "id": "show",
+          "label": "Show"
+        },
+        {
+          "id": "blur",
+          "label": "Blur"
+        },
+        {
+          "id": "hide",
+          "label": "Hide"
+        }
+      ],
+      "default": "show"
+    },
+    {
+      "id": "card-text",
+      "label": "Hide text on cards",
+      "description": "The large headlines, subtitles and captions laid over campaign and product cards.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "shop-buttons",
+      "label": "Hide Shop buttons",
+      "description": "The \"Shop ...\" call-to-action buttons on campaign cards.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "carousels",
+      "label": "Hide product carousels",
+      "description": "The sliding product rows on the home page.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "footer",
+      "label": "Hide the footer",
+      "description": "The long footer with links, locations and legal text.",
+      "group": "content",
+      "default": false
     }
   ],
   "rules": [
@@ -56,12 +117,85 @@
       "target": {
         "css": "#smartbanner, .smartbanner, .smart-banner, .app-banner, #app-banner, .app-download-banner, .install-app-banner"
       }
+    },
+    {
+      "id": "autoplay-video",
+      "label": "Promo videos",
+      "type": "hide",
+      "option": "autoplay-video",
+      "target": {
+        "css": "[data-qa=\"video-card\"] video"
+      }
+    },
+    {
+      "id": "images-blur",
+      "label": "Card images and videos",
+      "type": "css",
+      "option": "product-images",
+      "choice": [
+        "blur"
+      ],
+      "target": {
+        "css": "[data-qa=\"image-media-img\"], [data-qa=\"video-card\"] video"
+      },
+      "declarations": {
+        "filter": "blur(14px)"
+      }
+    },
+    {
+      "id": "images-hide",
+      "label": "Card images and videos",
+      "type": "hide",
+      "option": "product-images",
+      "choice": [
+        "hide"
+      ],
+      "target": {
+        "css": "[data-qa=\"image-wrapper\"], [data-qa=\"video-card\"] video"
+      }
+    },
+    {
+      "id": "card-text",
+      "label": "Card text overlays",
+      "type": "hide",
+      "option": "card-text",
+      "target": {
+        "css": "[data-qa=\"card-overlay\"], [data-qa=\"fig-caption\"]"
+      }
+    },
+    {
+      "id": "shop-buttons",
+      "label": "Shop buttons",
+      "type": "hide",
+      "option": "shop-buttons",
+      "target": {
+        "css": "[data-qa=\"cta-container\"]"
+      }
+    },
+    {
+      "id": "carousels",
+      "label": "Product carousels",
+      "type": "hide",
+      "option": "carousels",
+      "target": {
+        "css": "[data-qa=\"carousel-filmstrip\"]"
+      }
+    },
+    {
+      "id": "footer",
+      "label": "Footer",
+      "type": "hide",
+      "option": "footer",
+      "target": {
+        "css": "footer"
+      }
     }
   ],
   "meta": {
     "author": "OpenMedia",
     "homepage": "https://www.nike.com/",
-    "summary": "Cleans up cookie banners, ads and app prompts on Nike",
-    "notes": "**Not verified live.** The fixtures in `recipes/fixtures/nike/` are synthetic: hand-written pages that contain the targeted elements, not captures of the site, so the fixture test proves only that the selectors parse and spare protected content. These are generic cleanup rules, written from the selectors that common cookie-consent, ad and app-banner scripts use. They were not run against Nike; a rule that matches nothing on a page is harmless, but nothing here promises that this site shows any of them.\n\n- **Cookie banners** hides the OneTrust, Cookiebot, Quantcast, Didomi, Usercentrics, TrustArc and Osano dialogs and common `cc-window` / `#cookie-banner` boxes. Some sites lock page scroll while the dialog is open; hiding the dialog does not undo that.\n- **Ads** hides Google ad slots and ad iframes. Sites that serve their own ad markup are not covered.\n- **App banners** hides the Smart App Banner and common \"install our app\" strips.\n\nOpen a page, toggle the options in Settings and report anything that hides content you wanted."
+    "summary": "Nike: hides autoplay promo videos, blurs or hides product and campaign images, can hide card text, Shop buttons, carousels and footer",
+    "notes": "**Checked 2026-11-13**, logged out, headless Chrome on https://www.nike.com/ with an iPhone UA and a desktop UA. Both landed on the same page (regional redirect to a country home) with the same Next.js markup, so one structure serves both. Product and search pages could not be captured (network dropped), so none of their markup is used.\n\n- **Promo videos**: `[data-qa=\"video-card\"] video` 2 (LIVE).\n- **Images**: `[data-qa=\"image-media-img\"]` 96 and `[data-qa=\"image-wrapper\"]` 100 (LIVE).\n- **Card text** `[data-qa=\"card-overlay\"]` 36 and `[data-qa=\"fig-caption\"]` 28; **Shop buttons** `[data-qa=\"cta-container\"]` 20; **carousels** `[data-qa=\"carousel-filmstrip\"]` 12; **footer** `footer` 1 (LIVE).\n\nNot verified: product detail pages, search results, the cart, the country picker dialog (`#modal-select-your-location` exists but stayed closed), cookie banners (none rendered). Class names such as `_3w5yT...` and `css-vhpoxs` are hashed and not used; selectors rely on Nike's `data-qa` test attributes, which can change in a release. The sign-in link is never hidden.",
+    "lastVerified": "2026-11-13"
   }
 }

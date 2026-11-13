@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "market.official.radio-locator",
   "name": "Radio Locator",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "origin": "user",
   "tags": ["desktop", "mobile"],
   "match": ["https://*.radio-locator.com/*"],
@@ -27,6 +27,41 @@
       "description": "The Smart App Banner and install-our-app strips.",
       "group": "annoyance",
       "default": true
+    },
+    {
+      "id": "tower-art",
+      "label": "Tower artwork",
+      "description": "The decorative radio tower picture behind the search forms.",
+      "group": "content",
+      "choices": [
+        {
+          "id": "show",
+          "label": "Show"
+        },
+        {
+          "id": "blur",
+          "label": "Blur"
+        },
+        {
+          "id": "hide",
+          "label": "Hide"
+        }
+      ],
+      "default": "show"
+    },
+    {
+      "id": "welcome-text",
+      "label": "Hide welcome text",
+      "description": "The Welcome to Radio-Locator.com paragraph above the search forms.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "footer-links",
+      "label": "Hide footer links",
+      "description": "The about, FAQ, contact and partnership links. The login link stays.",
+      "group": "content",
+      "default": false
     }
   ],
   "rules": [
@@ -56,12 +91,54 @@
       "target": {
         "css": "#smartbanner, .smartbanner, .smart-banner, .app-banner, #app-banner, .app-download-banner, .install-app-banner"
       }
+    },
+    {
+      "id": "tower-blur",
+      "label": "Tower artwork",
+      "type": "css",
+      "option": "tower-art",
+      "choice": ["blur"],
+      "target": {
+        "css": ".bigscreen"
+      },
+      "declarations": {
+        "filter": "blur(6px)"
+      }
+    },
+    {
+      "id": "tower-hide",
+      "label": "Tower artwork",
+      "type": "hide",
+      "option": "tower-art",
+      "choice": ["hide"],
+      "target": {
+        "css": ".bigscreen"
+      }
+    },
+    {
+      "id": "welcome-text",
+      "label": "Welcome text",
+      "type": "hide",
+      "option": "welcome-text",
+      "target": {
+        "css": ".welcome"
+      }
+    },
+    {
+      "id": "footer-links",
+      "label": "Footer links",
+      "type": "hide",
+      "option": "footer-links",
+      "target": {
+        "css": "a.footer_link:not([href*=\"login\"])"
+      }
     }
   ],
   "meta": {
     "author": "OpenMedia",
     "homepage": "https://radio-locator.com/",
-    "summary": "Cleans up cookie banners, ads and app prompts on Radio Locator, a media site",
-    "notes": "**Not verified live.** The fixtures in `recipes/fixtures/radio-locator/` are synthetic: hand-written pages that contain the targeted elements, not captures of the site, so the fixture test proves only that the selectors parse and spare protected content. These are generic cleanup rules, written from the selectors that common cookie-consent, ad and app-banner scripts use. They were not run against Radio Locator; a rule that matches nothing on a page is harmless, but nothing here promises that this site shows any of them.\n\n- **Cookie banners** hides the OneTrust, Cookiebot, Quantcast, Didomi, Usercentrics, TrustArc and Osano dialogs and common `cc-window` / `#cookie-banner` boxes. Some sites lock page scroll while the dialog is open; hiding the dialog does not undo that.\n- **Ads** hides Google ad slots and ad iframes. Sites that serve their own ad markup are not covered.\n- **App banners** hides the Smart App Banner and common \"install our app\" strips.\n\nOpen a page, toggle the options in Settings and report anything that hides content you wanted."
+    "summary": "Radio-Locator home: tower artwork Show/Blur/Hide, hide the welcome blurb and footer links; the search forms always stay.",
+    "notes": "Checked 2026-11-13, logged out, headless Chrome over CDP with a desktop UA (1440x900) on radio-locator.com/. Not captured: an iPhone-UA page (the page is plain responsive HTML, same markup expected [INFERRED]), search result pages (/cgi-bin/finder...), station pages (the network was out of resources when retried).\n\nLIVE counts on Home: tower-blur desktop home 1; tower-hide desktop home 1; welcome-text desktop home 1; footer-links desktop home 4. No ad, iframe or cookie dialog existed on the home page, so the generic 1.0.0 rules match nothing live; any ads on result pages are NOT covered and no selector was invented for them. Readable class names only (bigscreen, welcome, footer_link).\n\nChoice: Tower artwork Show/Blur/Hide (blur 6px). The search forms (`.sect0`..`.sect4`) are never hidden.",
+    "lastVerified": "2026-11-13"
   }
 }

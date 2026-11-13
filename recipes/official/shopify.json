@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "market.official.shopify",
   "name": "Shopify",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "origin": "user",
   "tags": ["desktop", "mobile"],
   "match": ["https://*.shopify.com/*"],
@@ -27,6 +27,41 @@
       "description": "The Smart App Banner and install-our-app strips.",
       "group": "annoyance",
       "default": true
+    },
+    {
+      "id": "marketing-videos",
+      "label": "Hide marketing videos",
+      "description": "The muted product and testimonial videos and their play buttons on the home page.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "logo-animations",
+      "label": "Hide logo animations",
+      "description": "The scrolling partner-logo animation and the animated flags carousel. The logo label is matched in English.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "page-pictures",
+      "label": "Page pictures",
+      "description": "Hero, card and testimonial pictures in the page body. Blur keeps the layout; Hide removes them.",
+      "group": "content",
+      "choices": [
+        {
+          "id": "show",
+          "label": "Show"
+        },
+        {
+          "id": "blur",
+          "label": "Blur"
+        },
+        {
+          "id": "hide",
+          "label": "Hide"
+        }
+      ],
+      "default": "show"
     }
   ],
   "rules": [
@@ -56,12 +91,58 @@
       "target": {
         "css": "#smartbanner, .smartbanner, .smart-banner, .app-banner, #app-banner, .app-download-banner, .install-app-banner"
       }
+    },
+    {
+      "id": "marketing-videos",
+      "label": "Marketing videos",
+      "type": "hide",
+      "option": "marketing-videos",
+      "target": {
+        "css": "main#main video, main#main button[aria-label=\"Play testimonial video\"]"
+      }
+    },
+    {
+      "id": "logo-animations",
+      "label": "Logo and flag animations",
+      "type": "hide",
+      "option": "logo-animations",
+      "target": {
+        "css": "[role=\"img\"][aria-label^=\"Scrolling animation\"], #flags-carousel"
+      }
+    },
+    {
+      "id": "pictures-blur",
+      "label": "Body pictures",
+      "type": "css",
+      "option": "page-pictures",
+      "choice": [
+        "blur"
+      ],
+      "target": {
+        "css": "main#main img"
+      },
+      "declarations": {
+        "filter": "blur(12px)"
+      }
+    },
+    {
+      "id": "pictures-hide",
+      "label": "Body pictures",
+      "type": "hide",
+      "option": "page-pictures",
+      "choice": [
+        "hide"
+      ],
+      "target": {
+        "css": "main#main img"
+      }
     }
   ],
   "meta": {
     "author": "OpenMedia",
     "homepage": "https://www.shopify.com/",
-    "summary": "Cleans up cookie banners, ads and app prompts on Shopify",
-    "notes": "**Not verified live.** The fixtures in `recipes/fixtures/shopify/` are synthetic: hand-written pages that contain the targeted elements, not captures of the site, so the fixture test proves only that the selectors parse and spare protected content. These are generic cleanup rules, written from the selectors that common cookie-consent, ad and app-banner scripts use. They were not run against Shopify; a rule that matches nothing on a page is harmless, but nothing here promises that this site shows any of them.\n\n- **Cookie banners** hides the OneTrust, Cookiebot, Quantcast, Didomi, Usercentrics, TrustArc and Osano dialogs and common `cc-window` / `#cookie-banner` boxes. Some sites lock page scroll while the dialog is open; hiding the dialog does not undo that.\n- **Ads** hides Google ad slots and ad iframes. Sites that serve their own ad markup are not covered.\n- **App banners** hides the Smart App Banner and common \"install our app\" strips.\n\nOpen a page, toggle the options in Settings and report anything that hides content you wanted."
+    "summary": "Hides Shopify.com marketing videos and logo animations; blur or hide page pictures",
+    "notes": "Checked 2026-11-13, logged out, iPhone UA 390x844 in headless Chrome, shopify.com home page. Counts are `querySelectorAll` on the rendered DOM saved from that load (scripts then switched off to evaluate): marketing videos 13 plus 1 testimonial play button, logo animation 1, flag carousel 1, body pictures (see playbook). No cookie banner, chat widget or announcement bar appeared for this session. The `Scrolling animation` rule matches an English `aria-label` and will not match other languages.\n\nNOT verified: the pricing, blog and help pages, apps.shopify.com, desktop layout, the language popover, cookie consent in the EU, the original ad and app-banner rules. Only three new options were added because the page has few annoyances.",
+    "lastVerified": "2026-11-13"
   }
 }

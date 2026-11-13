@@ -2,10 +2,15 @@
   "schema": 1,
   "id": "market.official.ok-video",
   "name": "OK Video",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "origin": "user",
-  "tags": ["desktop", "mobile"],
-  "match": ["https://*.ok.ru/*"],
+  "tags": [
+    "desktop",
+    "mobile"
+  ],
+  "match": [
+    "https://*.ok.ru/*"
+  ],
   "options": [
     {
       "id": "cookie-banners",
@@ -27,6 +32,65 @@
       "description": "The Smart App Banner and install-our-app strips.",
       "group": "annoyance",
       "default": true
+    },
+    {
+      "id": "join-banner",
+      "label": "Hide the \"Join OK\" banner",
+      "description": "The banner that asks logged-out visitors to join OK to see more videos.",
+      "group": "annoyance",
+      "default": true
+    },
+    {
+      "id": "vk-links",
+      "label": "Hide VK ecosystem links",
+      "description": "The row of VK Mail, VK and other portal project links in the top bar.",
+      "group": "annoyance",
+      "default": true
+    },
+    {
+      "id": "thumbnails",
+      "label": "Video thumbnails",
+      "description": "Show, blur or hide the preview pictures of videos on the Video page.",
+      "group": "content",
+      "choices": [
+        {
+          "id": "show",
+          "label": "Show"
+        },
+        {
+          "id": "blur",
+          "label": "Blur"
+        },
+        {
+          "id": "hide",
+          "label": "Hide"
+        }
+      ],
+      "default": "show"
+    },
+    {
+      "id": "video-titles",
+      "label": "Video titles",
+      "description": "Show or blur the video titles under each card.",
+      "group": "content",
+      "choices": [
+        {
+          "id": "show",
+          "label": "Show"
+        },
+        {
+          "id": "blur",
+          "label": "Blur"
+        }
+      ],
+      "default": "show"
+    },
+    {
+      "id": "video-categories",
+      "label": "Hide the category tabs",
+      "description": "The row of video categories (the video navigation bar) above the cards.",
+      "group": "content",
+      "default": false
     }
   ],
   "rules": [
@@ -56,12 +120,82 @@
       "target": {
         "css": "#smartbanner, .smartbanner, .smart-banner, .app-banner, #app-banner, .app-download-banner, .install-app-banner"
       }
+    },
+    {
+      "id": "join-banner",
+      "label": "Join OK banner",
+      "type": "hide",
+      "option": "join-banner",
+      "target": {
+        "css": "auth-login-banner"
+      }
+    },
+    {
+      "id": "vk-links",
+      "label": "VK ecosystem links",
+      "type": "hide",
+      "option": "vk-links",
+      "target": {
+        "css": ".vk-ecosystem-link"
+      }
+    },
+    {
+      "id": "thumbs-blur",
+      "label": "Video thumbnails",
+      "type": "css",
+      "option": "thumbnails",
+      "choice": [
+        "blur"
+      ],
+      "target": {
+        "css": "img.vid-card_img"
+      },
+      "declarations": {
+        "filter": "blur(14px)"
+      }
+    },
+    {
+      "id": "thumbs-hide",
+      "label": "Video thumbnails",
+      "type": "hide",
+      "option": "thumbnails",
+      "choice": [
+        "hide"
+      ],
+      "target": {
+        "css": ".video-card .video-card_img-w"
+      }
+    },
+    {
+      "id": "titles-blur",
+      "label": "Video titles",
+      "type": "css",
+      "option": "video-titles",
+      "choice": [
+        "blur"
+      ],
+      "target": {
+        "css": ".video-card .video-card_n"
+      },
+      "declarations": {
+        "filter": "blur(6px)"
+      }
+    },
+    {
+      "id": "video-categories",
+      "label": "Video category tabs",
+      "type": "hide",
+      "option": "video-categories",
+      "target": {
+        "css": "video-navigation-block"
+      }
     }
   ],
   "meta": {
     "author": "OpenMedia",
     "homepage": "https://ok.ru/video",
-    "summary": "Cleans up cookie banners, ads and app prompts on OK Video, a media site",
-    "notes": "**Not verified live.** The fixtures in `recipes/fixtures/ok-video/` are synthetic: hand-written pages that contain the targeted elements, not captures of the site, so the fixture test proves only that the selectors parse and spare protected content. These are generic cleanup rules, written from the selectors that common cookie-consent, ad and app-banner scripts use. They were not run against OK Video; a rule that matches nothing on a page is harmless, but nothing here promises that this site shows any of them.\n\n- **Cookie banners** hides the OneTrust, Cookiebot, Quantcast, Didomi, Usercentrics, TrustArc and Osano dialogs and common `cc-window` / `#cookie-banner` boxes. Some sites lock page scroll while the dialog is open; hiding the dialog does not undo that.\n- **Ads** hides Google ad slots and ad iframes. Sites that serve their own ad markup are not covered.\n- **App banners** hides the Smart App Banner and common \"install our app\" strips.\n\nOpen a page, toggle the options in Settings and report anything that hides content you wanted."
+    "summary": "OK Video: hides the join banner and VK ecosystem links, blurs or hides thumbnails and titles, can hide category tabs",
+    "notes": "**Checked 2026-11-13**, logged out, headless Chrome from outside Russia on https://ok.ru/video with a desktop UA and an iPhone UA (which stayed on the same responsive layout). The page showed the logged-out video showcase with 18 cards. Individual video pages could not be captured (network dropped).\n\n- **Join banner**: `auth-login-banner` 1 (a custom element, text in English in this capture) (LIVE). `auth-login-popup` is the login form itself and is never hidden.\n- **VK links**: `.vk-ecosystem-link` 16 (LIVE).\n- **Thumbnails**: `img.vid-card_img` and `.video-card .video-card_img-w` 18/22 (LIVE).\n- **Titles**: `.video-card .video-card_n` 18 (LIVE). **Categories**: `video-navigation-block` 1 (LIVE).\n\nNot verified: video pages, comments, the feed, logged-in pages. Class names are the site's readable BEM-style names (`video-card_n`); custom element names are stable tags.",
+    "lastVerified": "2026-11-13"
   }
 }

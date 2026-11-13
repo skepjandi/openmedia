@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "market.official.shein",
   "name": "SHEIN",
-  "version": "1.0.0",
+  "version": "1.2.0",
   "origin": "user",
   "tags": ["desktop", "mobile"],
   "match": ["https://*.shein.com/*"],
@@ -27,6 +27,48 @@
       "description": "The Smart App Banner and install-our-app strips.",
       "group": "annoyance",
       "default": true
+    },
+    {
+      "id": "coupon-strips",
+      "label": "Hide coupon and free-shipping strips",
+      "description": "The Free shipping and coupon strips below the header on the home page.",
+      "group": "annoyance",
+      "default": true
+    },
+    {
+      "id": "popup-layer",
+      "label": "Hide full-screen dialog layers",
+      "description": "The dimmed dialog layer SHEIN uses for sign-up and offer pop-ups.",
+      "group": "annoyance",
+      "default": true
+    },
+    {
+      "id": "product-photos",
+      "label": "Product photos",
+      "description": "The picture on each product card. Blur keeps the layout and price; Hide removes the picture.",
+      "group": "content",
+      "choices": [
+        {
+          "id": "show",
+          "label": "Show"
+        },
+        {
+          "id": "blur",
+          "label": "Blur"
+        },
+        {
+          "id": "hide",
+          "label": "Hide"
+        }
+      ],
+      "default": "show"
+    },
+    {
+      "id": "prices",
+      "label": "Hide prices",
+      "description": "Sale prices on product cards.",
+      "group": "content",
+      "default": false
     }
   ],
   "rules": [
@@ -56,12 +98,76 @@
       "target": {
         "css": "#smartbanner, .smartbanner, .smart-banner, .app-banner, #app-banner, .app-download-banner, .install-app-banner"
       }
+    },
+    {
+      "id": "shein-branch-app",
+      "label": "Branch app-install banner",
+      "type": "hide",
+      "option": "app-banners",
+      "target": {
+        "css": "#branch-app"
+      }
+    },
+    {
+      "id": "coupon-strips",
+      "label": "Coupon strips",
+      "type": "hide",
+      "option": "coupon-strips",
+      "target": {
+        "css": "section.free-shipping-coupon"
+      }
+    },
+    {
+      "id": "popup-layer",
+      "label": "Dialog layer",
+      "type": "hide",
+      "option": "popup-layer",
+      "target": {
+        "css": "div.one-pass-dialog"
+      }
+    },
+    {
+      "id": "photos-blur",
+      "label": "Product photos",
+      "type": "css",
+      "option": "product-photos",
+      "choice": [
+        "blur"
+      ],
+      "target": {
+        "css": "img.product-card__main-img"
+      },
+      "declarations": {
+        "filter": "blur(14px)"
+      }
+    },
+    {
+      "id": "photos-hide",
+      "label": "Product photos",
+      "type": "hide",
+      "option": "product-photos",
+      "choice": [
+        "hide"
+      ],
+      "target": {
+        "css": "img.product-card__main-img"
+      }
+    },
+    {
+      "id": "prices",
+      "label": "Sale prices",
+      "type": "hide",
+      "option": "prices",
+      "target": {
+        "css": "span.prices-info__sale-price"
+      }
     }
   ],
   "meta": {
     "author": "OpenMedia",
     "homepage": "https://www.shein.com/",
-    "summary": "Cleans up cookie banners, ads and app prompts on SHEIN",
-    "notes": "**Not verified live.** The fixtures in `recipes/fixtures/shein/` are synthetic: hand-written pages that contain the targeted elements, not captures of the site, so the fixture test proves only that the selectors parse and spare protected content. These are generic cleanup rules, written from the selectors that common cookie-consent, ad and app-banner scripts use. They were not run against SHEIN; a rule that matches nothing on a page is harmless, but nothing here promises that this site shows any of them.\n\n- **Cookie banners** hides the OneTrust, Cookiebot, Quantcast, Didomi, Usercentrics, TrustArc and Osano dialogs and common `cc-window` / `#cookie-banner` boxes. Some sites lock page scroll while the dialog is open; hiding the dialog does not undo that.\n- **Ads** hides Google ad slots and ad iframes. Sites that serve their own ad markup are not covered.\n- **App banners** hides the Smart App Banner and common \"install our app\" strips.\n\nOpen a page, toggle the options in Settings and report anything that hides content you wanted."
+    "summary": "Hides SHEIN app prompts, coupon strips, and pop-up layers; blur or hide product photos; hide prices",
+    "notes": "Checked 2026-11-13, logged out, iPhone UA 390x844 in headless Chrome, shein.com home page. Counts are `querySelectorAll` on the rendered DOM saved from that load (scripts then switched off to evaluate): Branch app banner `#branch-app` 1, coupon strips 2, promo hero 1, dialog layer `.one-pass-dialog` 1 (empty; its content is not verified), product photos 16, prices 16. The promo hero selector was removed because the real fixture shows the carousel contains product cards marked `data-keep`; hiding the wrapper would hide wanted shopping content. The search suggestion carousel inside the search box (`search-term__wrapper`) is also deliberately untouched.\n\nNOT verified: product and category pages, the desktop layout, the cart and sign-up flow, the original cookie and ad rules (no banner appeared), exact content of the pop-up layer.",
+    "lastVerified": "2026-11-13"
   }
 }

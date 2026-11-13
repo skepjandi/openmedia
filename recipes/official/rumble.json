@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "market.official.rumble",
   "name": "Rumble",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "origin": "user",
   "tags": ["desktop", "mobile"],
   "match": ["https://*.rumble.com/*"],
@@ -27,6 +27,62 @@
       "description": "The Smart App Banner and install-our-app strips.",
       "group": "annoyance",
       "default": true
+    },
+    {
+      "id": "sponsored-videos",
+      "label": "Hide sponsored video cards",
+      "description": "Video cards in the featured grid that are paid placements (they link through the Rumble ad network).",
+      "group": "annoyance",
+      "default": true
+    },
+    {
+      "id": "thumbnails",
+      "label": "Video thumbnails",
+      "description": "The picture on each video card in feeds. Blur keeps the layout and badges; Hide removes only the picture.",
+      "group": "content",
+      "choices": [
+        {
+          "id": "show",
+          "label": "Show"
+        },
+        {
+          "id": "blur",
+          "label": "Blur"
+        },
+        {
+          "id": "hide",
+          "label": "Hide"
+        }
+      ],
+      "default": "show"
+    },
+    {
+      "id": "live-counts",
+      "label": "Hide live viewer counts",
+      "description": "The watching counters on live cards and the live viewer count on featured streams.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "category-rows",
+      "label": "Hide category rows",
+      "description": "The Top Live Categories row on the home page.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "followed-channels",
+      "label": "Hide followed channels",
+      "description": "The channel list in the side menu, including live dots.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "menu-footer",
+      "label": "Hide the menu footer",
+      "description": "The FAQ, About, Careers, Terms links at the bottom of the side menu.",
+      "group": "content",
+      "default": false
     }
   ],
   "rules": [
@@ -56,12 +112,94 @@
       "target": {
         "css": "#smartbanner, .smartbanner, .smart-banner, .app-banner, #app-banner, .app-download-banner, .install-app-banner"
       }
+    },
+    {
+      "id": "rumble-ad-containers",
+      "label": "Rumble ad containers",
+      "type": "hide",
+      "option": "ads",
+      "target": {
+        "css": "[id^=\"rac-ad-\"], .js-rac-mobile-container"
+      }
+    },
+    {
+      "id": "sponsored-videos",
+      "label": "Sponsored video cards",
+      "type": "hide",
+      "option": "sponsored-videos",
+      "target": {
+        "css": "rum-video-thumbnail:has(a[href*=\"ads.rmbl.ws\"])"
+      }
+    },
+    {
+      "id": "thumbs-blur",
+      "label": "Video thumbnail pictures",
+      "type": "css",
+      "option": "thumbnails",
+      "choice": [
+        "blur"
+      ],
+      "target": {
+        "css": "rum-video-thumbnail img[class*=\"rum-video-thumbnail__image\"]"
+      },
+      "declarations": {
+        "filter": "blur(12px)"
+      }
+    },
+    {
+      "id": "thumbs-hide",
+      "label": "Video thumbnail pictures",
+      "type": "hide",
+      "option": "thumbnails",
+      "choice": [
+        "hide"
+      ],
+      "target": {
+        "css": "rum-video-thumbnail img[class*=\"rum-video-thumbnail__image\"]"
+      }
+    },
+    {
+      "id": "live-counts",
+      "label": "Live viewer counts",
+      "type": "hide",
+      "option": "live-counts",
+      "target": {
+        "css": ".rum-video-thumbnail__badge--watching, .js-lineup__view-counter-container"
+      }
+    },
+    {
+      "id": "category-rows",
+      "label": "Category rows",
+      "type": "hide",
+      "option": "category-rows",
+      "target": {
+        "css": "rum-categories-row-provider"
+      }
+    },
+    {
+      "id": "followed-channels",
+      "label": "Followed channels",
+      "type": "hide",
+      "option": "followed-channels",
+      "target": {
+        "css": ".main-menu-item-channel-container"
+      }
+    },
+    {
+      "id": "menu-footer",
+      "label": "Menu footer links",
+      "type": "hide",
+      "option": "menu-footer",
+      "target": {
+        "css": ".sidebar-footer"
+      }
     }
   ],
   "meta": {
     "author": "OpenMedia",
     "homepage": "https://rumble.com/",
-    "summary": "Cleans up cookie banners, ads and app prompts on Rumble, a media site",
-    "notes": "**Not verified live.** The fixtures in `recipes/fixtures/rumble/` are synthetic: hand-written pages that contain the targeted elements, not captures of the site, so the fixture test proves only that the selectors parse and spare protected content. These are generic cleanup rules, written from the selectors that common cookie-consent, ad and app-banner scripts use. They were not run against Rumble; a rule that matches nothing on a page is harmless, but nothing here promises that this site shows any of them.\n\n- **Cookie banners** hides the OneTrust, Cookiebot, Quantcast, Didomi, Usercentrics, TrustArc and Osano dialogs and common `cc-window` / `#cookie-banner` boxes. Some sites lock page scroll while the dialog is open; hiding the dialog does not undo that.\n- **Ads** hides Google ad slots and ad iframes. Sites that serve their own ad markup are not covered.\n- **App banners** hides the Smart App Banner and common \"install our app\" strips.\n\nOpen a page, toggle the options in Settings and report anything that hides content you wanted."
+    "summary": "Hides Rumble ad cards and sponsored videos; blur or hide thumbnails, hide live viewer counts, category rows, followed channels",
+    "notes": "Checked 2026-11-13, logged out, iPhone UA 390x844 in headless Chrome, rumble.com home page. Counts are `querySelectorAll` on the rendered DOM saved from that load (scripts then switched off to evaluate): ad containers `rac-ad-*` 2 plus the mobile ad container 1, sponsored cards 1 (the card's link goes through the ads.rmbl.ws network), video thumbnail pictures 169, live watching counters 10 plus the live viewer counter 1, category rows 1, followed channels 50 (menu items with live dots), menu footer 1. Rumble uses Lit web components (`rum-video-thumbnail`, `rum-videos-row-provider`) with stable tag names; generated `rum-xxxxxx` classes are never used alone.\n\nNOT verified: video pages (comments, related list), the desktop layout, channel and search pages, signed-in states, cookie consent (none appeared), the original app-banner rule. Hide on thumbnails removes only the picture so the card link and title stay.",
+    "lastVerified": "2026-11-13"
   }
 }

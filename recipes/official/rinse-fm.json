@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "market.official.rinse-fm",
   "name": "Rinse FM",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "origin": "user",
   "tags": ["desktop", "mobile"],
   "match": ["https://*.rinse.fm/*"],
@@ -27,6 +27,41 @@
       "description": "The Smart App Banner and install-our-app strips.",
       "group": "annoyance",
       "default": true
+    },
+    {
+      "id": "promo-hero",
+      "label": "Hide the promo banner",
+      "description": "The large promotional banner at the top of the home page (an outbound campaign link).",
+      "group": "annoyance",
+      "default": true
+    },
+    {
+      "id": "slider-arrows",
+      "label": "Hide carousel arrows",
+      "description": "The previous and next buttons on each horizontal row of shows. Rows still scroll by swiping.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "show-artwork",
+      "label": "Show artwork",
+      "description": "Pictures on show, episode and event cards. Blur keeps the layout; Hide leaves the card titles over a plain tile.",
+      "group": "content",
+      "choices": [
+        {
+          "id": "show",
+          "label": "Show"
+        },
+        {
+          "id": "blur",
+          "label": "Blur"
+        },
+        {
+          "id": "hide",
+          "label": "Hide"
+        }
+      ],
+      "default": "show"
     }
   ],
   "rules": [
@@ -56,12 +91,58 @@
       "target": {
         "css": "#smartbanner, .smartbanner, .smart-banner, .app-banner, #app-banner, .app-download-banner, .install-app-banner"
       }
+    },
+    {
+      "id": "promo-hero",
+      "label": "Promo banner",
+      "type": "hide",
+      "option": "promo-hero",
+      "target": {
+        "css": "main section:has(a[href*=\"bfan.link\"])"
+      }
+    },
+    {
+      "id": "slider-arrows",
+      "label": "Row arrow buttons",
+      "type": "hide",
+      "option": "slider-arrows",
+      "target": {
+        "css": ".rns-grid-slider > button"
+      }
+    },
+    {
+      "id": "artwork-blur",
+      "label": "Card pictures",
+      "type": "css",
+      "option": "show-artwork",
+      "choice": [
+        "blur"
+      ],
+      "target": {
+        "css": ".rns-card img"
+      },
+      "declarations": {
+        "filter": "blur(12px)"
+      }
+    },
+    {
+      "id": "artwork-hide",
+      "label": "Card pictures",
+      "type": "hide",
+      "option": "show-artwork",
+      "choice": [
+        "hide"
+      ],
+      "target": {
+        "css": ".rns-card img"
+      }
     }
   ],
   "meta": {
     "author": "OpenMedia",
     "homepage": "https://www.rinse.fm/",
-    "summary": "Cleans up cookie banners, ads and app prompts on Rinse FM, a media site",
-    "notes": "**Not verified live.** The fixtures in `recipes/fixtures/rinse-fm/` are synthetic: hand-written pages that contain the targeted elements, not captures of the site, so the fixture test proves only that the selectors parse and spare protected content. These are generic cleanup rules, written from the selectors that common cookie-consent, ad and app-banner scripts use. They were not run against Rinse FM; a rule that matches nothing on a page is harmless, but nothing here promises that this site shows any of them.\n\n- **Cookie banners** hides the OneTrust, Cookiebot, Quantcast, Didomi, Usercentrics, TrustArc and Osano dialogs and common `cc-window` / `#cookie-banner` boxes. Some sites lock page scroll while the dialog is open; hiding the dialog does not undo that.\n- **Ads** hides Google ad slots and ad iframes. Sites that serve their own ad markup are not covered.\n- **App banners** hides the Smart App Banner and common \"install our app\" strips.\n\nOpen a page, toggle the options in Settings and report anything that hides content you wanted."
+    "summary": "Hides Rinse FM's promo hero banner and row arrows; blur or hide show artwork on cards",
+    "notes": "Checked 2026-11-13, logged out, iPhone UA 390x844 in headless Chrome, rinse.fm home page (Next.js). Counts are `querySelectorAll` on the rendered DOM saved from that load (scripts then switched off to evaluate); see the per-rule counts in the playbook. Rinse uses Tailwind utility classes and hashed `c-` classes for layout, so only the readable `rns-card` and `rns-grid-*` classes are used. The promo banner is matched by the outbound campaign link (`bfan.link`), which is a campaign-dependent hook: a rule that stops matching is harmless. The banner contains the only autoplaying video on the home page (3 video elements), so it is hidden with the banner. Carousel arrows (`.rns-grid-slider > button`) are an extra Hide option.\n\nNOT verified: show, schedule and radio-station pages, the persistent player, desktop layout, cookie consent (none appeared), and the original ad and app-banner rules.",
+    "lastVerified": "2026-11-13"
   }
 }

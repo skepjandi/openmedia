@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "market.official.wikipedia",
   "name": "Wikipedia",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "origin": "user",
   "tags": ["desktop", "mobile"],
   "match": ["https://*.wikipedia.org/*"],
@@ -27,6 +27,76 @@
       "description": "The Smart App Banner and install-our-app strips.",
       "group": "annoyance",
       "default": true
+    },
+    {
+      "id": "site-banners",
+      "label": "Hide fundraising and site banners",
+      "description": "The donation appeal and site notices above the article (empty when no campaign runs).",
+      "group": "annoyance",
+      "default": true
+    },
+    {
+      "id": "images",
+      "label": "Article images",
+      "description": "Show, blur or hide the pictures in articles, infoboxes and the Main Page.",
+      "group": "content",
+      "choices": [
+        {
+          "id": "show",
+          "label": "Show"
+        },
+        {
+          "id": "blur",
+          "label": "Blur"
+        },
+        {
+          "id": "hide",
+          "label": "Hide"
+        }
+      ],
+      "default": "show"
+    },
+    {
+      "id": "references",
+      "label": "Hide citation numbers",
+      "description": "The small [1] reference markers inside article text; the reference list stays.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "edit-links",
+      "label": "Hide edit links",
+      "description": "The [edit] links beside section headings and the pencil button on a phone.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "navboxes",
+      "label": "Hide navigation boxes and sister projects",
+      "description": "The wide navigation boxes, category list and sister-project boxes at the foot of articles.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "main-page-boxes",
+      "label": "Main Page news boxes",
+      "description": "Dim or hide In the news, Did you know, On this day and Today's featured picture on the Main Page.",
+      "group": "content",
+      "choices": [
+        {
+          "id": "show",
+          "label": "Show"
+        },
+        {
+          "id": "dim",
+          "label": "Dim"
+        },
+        {
+          "id": "hide",
+          "label": "Hide"
+        }
+      ],
+      "default": "show"
     }
   ],
   "rules": [
@@ -56,12 +126,103 @@
       "target": {
         "css": "#smartbanner, .smartbanner, .smart-banner, .app-banner, #app-banner, .app-download-banner, .install-app-banner"
       }
+    },
+    {
+      "id": "site-notice",
+      "label": "Donation and site notice banners",
+      "type": "hide",
+      "option": "site-banners",
+      "target": {
+        "css": "#centralNotice, #siteNotice, .cn-fe-banner, .frb"
+      }
+    },
+    {
+      "id": "images-blur",
+      "label": "Article pictures",
+      "type": "css",
+      "option": "images",
+      "choice": [
+        "blur"
+      ],
+      "target": {
+        "css": "img.mw-file-element"
+      },
+      "declarations": {
+        "filter": "blur(12px)"
+      }
+    },
+    {
+      "id": "images-hide",
+      "label": "Article figures and infobox pictures",
+      "type": "hide",
+      "option": "images",
+      "choice": [
+        "hide"
+      ],
+      "target": {
+        "css": "figure[typeof^=\"mw:File\"], .infobox-image"
+      }
+    },
+    {
+      "id": "citation-markers",
+      "label": "Citation markers",
+      "type": "hide",
+      "option": "references",
+      "target": {
+        "css": "sup.reference"
+      }
+    },
+    {
+      "id": "edit-section-links",
+      "label": "Section edit links",
+      "type": "hide",
+      "option": "edit-links",
+      "target": {
+        "css": ".mw-editsection, a.edit-page"
+      }
+    },
+    {
+      "id": "navbox-footers",
+      "label": "Navigation boxes and categories",
+      "type": "hide",
+      "option": "navboxes",
+      "target": {
+        "css": ".navbox, #catlinks, .sistersitebox"
+      }
+    },
+    {
+      "id": "main-boxes-dim",
+      "label": "Main Page boxes dimmed",
+      "type": "css",
+      "option": "main-page-boxes",
+      "choice": [
+        "dim"
+      ],
+      "target": {
+        "css": "#mp-itn, #mp-dyk, #mp-otd, #mp-tfp"
+      },
+      "declarations": {
+        "opacity": "0.35"
+      }
+    },
+    {
+      "id": "main-boxes-hide",
+      "label": "Main Page boxes hidden",
+      "type": "hide",
+      "option": "main-page-boxes",
+      "choice": [
+        "hide"
+      ],
+      "target": {
+        "css": "#mp-itn, #mp-dyk, #mp-otd, #mp-tfp"
+      }
     }
   ],
   "meta": {
     "author": "OpenMedia",
     "homepage": "https://www.wikipedia.org/",
-    "summary": "Cleans up cookie banners, ads and app prompts on Wikipedia",
-    "notes": "**Not verified live.** The fixtures in `recipes/fixtures/wikipedia/` are synthetic: hand-written pages that contain the targeted elements, not captures of the site, so the fixture test proves only that the selectors parse and spare protected content. These are generic cleanup rules, written from the selectors that common cookie-consent, ad and app-banner scripts use. They were not run against Wikipedia; a rule that matches nothing on a page is harmless, but nothing here promises that this site shows any of them.\n\n- **Cookie banners** hides the OneTrust, Cookiebot, Quantcast, Didomi, Usercentrics, TrustArc and Osano dialogs and common `cc-window` / `#cookie-banner` boxes. Some sites lock page scroll while the dialog is open; hiding the dialog does not undo that.\n- **Ads** hides Google ad slots and ad iframes. Sites that serve their own ad markup are not covered.\n- **App banners** hides the Smart App Banner and common \"install our app\" strips.\n\nOpen a page, toggle the options in Settings and report anything that hides content you wanted."
+    "summary": "Wikipedia: fundraising banners, plus image, reference, edit-link, navbox and Main Page box controls",
+    "notes": "Checked LIVE on 2026-11-13 with headless Chrome (iPhone UA 390x844 and desktop UA 1440x900), logged out, on /wiki/Bebop, /wiki/Jazz and /wiki/Main_Page of en.wikipedia.org, plus curl of the server HTML. The fixtures real.html, desktop-real.html, main.html and desktop-main.html are structural captures with text stripped.\n\nLIVE counts on Bebop (mobile / desktop): `#centralNotice` 1/1, `#siteNotice` 1/1 (both present but empty: no fundraising campaign was running when checked, so the rule only matters during campaigns), `sup.reference` 39/39, `.mw-editsection` 15/15, `a.edit-page` 1/0 (mobile pencil), `figure[typeof^=\"mw:File\"]` 3/3, `.infobox-image` 1/1, `img.mw-file-element` 6/11, `.sistersitebox` 1/1, `.navbox` 0/3 (the mobile skin collapses navboxes), `#catlinks` 0/1. Main Page: `#mp-itn`, `#mp-dyk`, `#mp-otd`, `#mp-tfp` 1 each on both. The `.cn-fe-banner` and `.frb` selectors in the banner rule come from the CentralNotice and fundraising banner markup used in community filter lists and were not seen live because no campaign was running; they are harmless when absent.\n\nNOT verified: an active donation banner, logged-in pages, other language editions (the Main Page ids are English-edition ids), Minerva night mode. The original cookie, ad and app rules matched nothing on Wikipedia, which serves none of them; they are kept unchanged.",
+    "lastVerified": "2026-11-13"
   }
 }

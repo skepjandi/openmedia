@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "market.official.prime-video",
   "name": "Prime Video",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "origin": "user",
   "tags": ["desktop", "mobile"],
   "match": ["https://*.primevideo.com/*"],
@@ -27,6 +27,55 @@
       "description": "The Smart App Banner and install-our-app strips.",
       "group": "annoyance",
       "default": true
+    },
+    {
+      "id": "join-prime",
+      "label": "Hide Join Prime button",
+      "description": "The Join Prime / Try Prime button in the top navigation. Sign in stays.",
+      "group": "annoyance",
+      "default": true
+    },
+    {
+      "id": "promo-badges",
+      "label": "Hide promo badges",
+      "description": "The NEW MOVIE, NEW EPISODE, TOP 10, TRENDING and MOST LIKED labels on title cards.",
+      "group": "annoyance",
+      "default": true
+    },
+    {
+      "id": "x-ray",
+      "label": "Hide X-Ray overlay",
+      "description": "The IMDb X-Ray panel that pops up over the player when you pause or move the mouse.",
+      "group": "annoyance",
+      "default": true
+    },
+    {
+      "id": "artwork",
+      "label": "Title artwork",
+      "description": "The poster and wide pictures of titles in the carousels.",
+      "group": "content",
+      "choices": [
+        {
+          "id": "show",
+          "label": "Show"
+        },
+        {
+          "id": "blur",
+          "label": "Blur"
+        },
+        {
+          "id": "hide",
+          "label": "Hide"
+        }
+      ],
+      "default": "show"
+    },
+    {
+      "id": "footer",
+      "label": "Hide footer",
+      "description": "The legal links footer.",
+      "group": "content",
+      "default": false
     }
   ],
   "rules": [
@@ -56,12 +105,72 @@
       "target": {
         "css": "#smartbanner, .smartbanner, .smart-banner, .app-banner, #app-banner, .app-download-banner, .install-app-banner"
       }
+    },
+    {
+      "id": "join-prime",
+      "label": "Join Prime button",
+      "type": "hide",
+      "option": "join-prime",
+      "target": {
+        "css": "[data-testid=\"pv-nav-join-prime\"]"
+      }
+    },
+    {
+      "id": "promo-badges",
+      "label": "Promo badges",
+      "type": "hide",
+      "option": "promo-badges",
+      "target": {
+        "css": "[data-testid=\"metadata-badge\"]"
+      }
+    },
+    {
+      "id": "x-ray",
+      "label": "X-Ray overlay",
+      "type": "hide",
+      "option": "x-ray",
+      "target": {
+        "css": ".xrayQuickView"
+      }
+    },
+    {
+      "id": "artwork-blur",
+      "label": "Title artwork",
+      "type": "css",
+      "option": "artwork",
+      "choice": ["blur"],
+      "target": {
+        "css": "[data-testid=\"base-image\"]"
+      },
+      "declarations": {
+        "filter": "blur(14px)"
+      }
+    },
+    {
+      "id": "artwork-hide",
+      "label": "Title artwork",
+      "type": "hide",
+      "option": "artwork",
+      "choice": ["hide"],
+      "target": {
+        "css": "[data-testid=\"base-image\"]"
+      }
+    },
+    {
+      "id": "footer",
+      "label": "Footer",
+      "type": "hide",
+      "option": "footer",
+      "target": {
+        "css": "footer#pv-footer"
+      }
     }
   ],
   "meta": {
     "author": "OpenMedia",
     "homepage": "https://www.primevideo.com/",
-    "summary": "Cleans up cookie banners, ads and app prompts on Prime Video",
-    "notes": "**Not verified live.** The fixtures in `recipes/fixtures/prime-video/` are synthetic: hand-written pages that contain the targeted elements, not captures of the site, so the fixture test proves only that the selectors parse and spare protected content. These are generic cleanup rules, written from the selectors that common cookie-consent, ad and app-banner scripts use. They were not run against Prime Video; a rule that matches nothing on a page is harmless, but nothing here promises that this site shows any of them.\n\n- **Cookie banners** hides the OneTrust, Cookiebot, Quantcast, Didomi, Usercentrics, TrustArc and Osano dialogs and common `cc-window` / `#cookie-banner` boxes. Some sites lock page scroll while the dialog is open; hiding the dialog does not undo that.\n- **Ads** hides Google ad slots and ad iframes. Sites that serve their own ad markup are not covered.\n- **App banners** hides the Smart App Banner and common \"install our app\" strips.\n\nOpen a page, toggle the options in Settings and report anything that hides content you wanted."
+    "summary": "Prime Video: hide the Join Prime button, New/Top 10 badges and X-Ray; show, blur or hide poster art; footer toggle.",
+    "notes": "Checked 2026-11-13, logged out, headless Chrome over CDP with a desktop UA (1440x900) on www.primevideo.com/ (redirected to /region/eu/). Not captured: an iPhone-UA page (Chrome/network were out of memory when retried; the mobile web mostly points to the app), a title detail page, the player, anything signed in.\n\nLIVE counts on the landing page: join-prime desktop home 2; promo-badges desktop home 112; artwork-blur desktop home 223; artwork-hide desktop home 223; footer desktop home 1. Selectors are `data-testid` values (pv-nav-join-prime, metadata-badge, base-image) and the footer id; the page's hashed classes (`dJLfVG`) are never used. The x-ray rule is SOURCE only (r/AmazonPrimeVideo \"Disable IMDB X-Ray on web browser\" and a uBlock Origin filter in r/uBlockOrigin), its fixture desktop-player.html is hand-written, and the element was not seen live.\n\nChoice: Title artwork Show/Blur/Hide (blur 14px) on `base-image` only, so title links remain clickable. The packshot and carousel containers are never hidden.\n\nNOT verified: detail pages, the player, the Next Up badge (the blog source gives no selector), signed-in UI, regional landing pages other than /region/eu/, Prime Video ads (video ads cannot be hidden).",
+    "lastVerified": "2026-11-13"
   }
 }

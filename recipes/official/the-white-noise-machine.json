@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "market.official.the-white-noise-machine",
   "name": "The White Noise Machine",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "origin": "user",
   "tags": ["desktop", "mobile"],
   "match": ["https://*.thewhitenoisemachine.com/*"],
@@ -27,6 +27,48 @@
       "description": "The Smart App Banner and install-our-app strips.",
       "group": "annoyance",
       "default": true
+    },
+    {
+      "id": "headline",
+      "label": "Headline and intro",
+      "description": "Show, dim or hide the big \"Drown out distractions\" headline and the paragraph under it.",
+      "group": "content",
+      "choices": [
+        {
+          "id": "show",
+          "label": "Show"
+        },
+        {
+          "id": "dim",
+          "label": "Dim"
+        },
+        {
+          "id": "hide",
+          "label": "Hide"
+        }
+      ],
+      "default": "show"
+    },
+    {
+      "id": "faq",
+      "label": "Hide the FAQ",
+      "description": "The accordion of questions (Is this really free, Who made this and so on) under the player.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "headphone-hint",
+      "label": "Hide the headphones hint",
+      "description": "The \"Connect to your headphones\" line under the player.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "theme-switch",
+      "label": "Hide the light/dark switch",
+      "description": "The sun/moon toggle in the top right corner.",
+      "group": "content",
+      "default": false
     }
   ],
   "rules": [
@@ -56,12 +98,63 @@
       "target": {
         "css": "#smartbanner, .smartbanner, .smart-banner, .app-banner, #app-banner, .app-download-banner, .install-app-banner"
       }
+    },
+    {
+      "id": "headline-dim",
+      "label": "Headline and intro",
+      "type": "css",
+      "option": "headline",
+      "choice": ["dim"],
+      "target": {
+        "css": "h1.mantine-Title-root, #__next > p.mantine-Text-root:nth-of-type(1)"
+      },
+      "declarations": {
+        "opacity": "0.35"
+      }
+    },
+    {
+      "id": "headline-hide",
+      "label": "Headline and intro",
+      "type": "hide",
+      "option": "headline",
+      "choice": ["hide"],
+      "target": {
+        "css": "h1.mantine-Title-root, #__next > p.mantine-Text-root:nth-of-type(1)"
+      }
+    },
+    {
+      "id": "faq",
+      "label": "FAQ accordion",
+      "type": "hide",
+      "option": "faq",
+      "target": {
+        "css": ".mantine-Accordion-root"
+      }
+    },
+    {
+      "id": "headphone-hint",
+      "label": "Headphones hint",
+      "type": "hide",
+      "option": "headphone-hint",
+      "target": {
+        "css": "#__next > p.mantine-Text-root:nth-of-type(2)"
+      }
+    },
+    {
+      "id": "theme-switch",
+      "label": "Light/dark switch",
+      "type": "hide",
+      "option": "theme-switch",
+      "target": {
+        "css": ".mantine-Switch-root"
+      }
     }
   ],
   "meta": {
     "author": "OpenMedia",
     "homepage": "https://thewhitenoisemachine.com/",
-    "summary": "Cleans up cookie banners, ads and app prompts on The White Noise Machine, a media site",
-    "notes": "**Not verified live.** The fixtures in `recipes/fixtures/the-white-noise-machine/` are synthetic: hand-written pages that contain the targeted elements, not captures of the site, so the fixture test proves only that the selectors parse and spare protected content. These are generic cleanup rules, written from the selectors that common cookie-consent, ad and app-banner scripts use. They were not run against The White Noise Machine; a rule that matches nothing on a page is harmless, but nothing here promises that this site shows any of them.\n\n- **Cookie banners** hides the OneTrust, Cookiebot, Quantcast, Didomi, Usercentrics, TrustArc and Osano dialogs and common `cc-window` / `#cookie-banner` boxes. Some sites lock page scroll while the dialog is open; hiding the dialog does not undo that.\n- **Ads** hides Google ad slots and ad iframes. Sites that serve their own ad markup are not covered.\n- **App banners** hides the Smart App Banner and common \"install our app\" strips.\n\nOpen a page, toggle the options in Settings and report anything that hides content you wanted."
+    "summary": "Lets you dim or hide The White Noise Machine's headline; hide the FAQ, headphones hint and theme switch",
+    "notes": "Checked 2026-11-13, logged out, real Chrome (headless) on thewhitenoisemachine.com with desktop UA 1440x900 and iPhone UA 390x844, DOM captured after 7 seconds. The page is a single-screen Mantine/Next.js app: headline, intro, a noise-colour selector, three audio players, a hint line, an FAQ accordion, credits. Fixtures `real.html` and `desktop-real.html` are sanitised excerpts (text stripped, needed ancestors only, `data-keep` on the colour selector and the audio players).\n\nLIVE (same on both): `h1.mantine-Title-root` 2, `#__next > p.mantine-Text-root:nth-of-type(1)` 1 (intro), `...:nth-of-type(2)` 1 (headphones hint), `.mantine-Accordion-root` 1, `.mantine-Switch-root` 1. The original cookie, ad and app-banner rules matched nothing: the page shows no cookie banner, ads or app prompt (only a Google Tag Manager noscript iframe), so there is no annoyance to add here.\n\nChoices: Headline and intro Show/Dim/Hide.\n\nRules use Mantine's component class names (`mantine-Accordion-root`, `mantine-Title-root`), which are library names, not the hashed `m-xxxx` classes; the two paragraphs are told apart by their position among siblings.\n\nNOT verified: other pages (Colours of Noise is an external link), behaviour after the audio is started, logged-in states (none exist).",
+    "lastVerified": "2026-11-13"
   }
 }

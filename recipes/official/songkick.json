@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "market.official.songkick",
   "name": "Songkick",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "origin": "user",
   "tags": ["desktop", "mobile"],
   "match": ["https://*.songkick.com/*"],
@@ -27,6 +27,48 @@
       "description": "The Smart App Banner and install-our-app strips.",
       "group": "annoyance",
       "default": true
+    },
+    {
+      "id": "artist-signup",
+      "label": "Hide the artist sign-up links",
+      "description": "\"Sign up as an artist\" and the Tourbox call-to-action in the header.",
+      "group": "annoyance",
+      "default": true
+    },
+    {
+      "id": "artist-photos",
+      "label": "Artist and event photos",
+      "description": "Artist cards, event images and genre tiles. Blur keeps the layout; Hide leaves only names and dates.",
+      "group": "content",
+      "choices": [
+        {
+          "id": "show",
+          "label": "Show"
+        },
+        {
+          "id": "blur",
+          "label": "Blur"
+        },
+        {
+          "id": "hide",
+          "label": "Hide"
+        }
+      ],
+      "default": "show"
+    },
+    {
+      "id": "track-buttons",
+      "label": "Hide Track and star buttons",
+      "description": "The Track artist star and the attendance buttons on cards.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "home-carousels",
+      "label": "Hide the home recommendation rows",
+      "description": "Trending events, popular artists, biggest tours and genre carousels on the home page.",
+      "group": "content",
+      "default": false
     }
   ],
   "rules": [
@@ -56,12 +98,85 @@
       "target": {
         "css": "#smartbanner, .smartbanner, .smart-banner, .app-banner, #app-banner, .app-download-banner, .install-app-banner"
       }
+    },
+    {
+      "id": "sk-video-ads",
+      "label": "Video ad slider and in-content ad",
+      "type": "hide",
+      "option": "ads",
+      "target": {
+        "css": "#primisSlider, .video-ad-wrapper"
+      }
+    },
+    {
+      "id": "sk-get-the-app",
+      "label": "Get-the-app band and header button",
+      "type": "hide",
+      "option": "app-banners",
+      "target": {
+        "css": ".get-the-app-band, li.get-mobile-app-button"
+      }
+    },
+    {
+      "id": "artist-signup",
+      "label": "Artist sign-up links",
+      "type": "hide",
+      "option": "artist-signup",
+      "target": {
+        "css": "li.tourbox_cta_logged_out, .tourbox-cta, a.sign-up-as-an-artist"
+      }
+    },
+    {
+      "id": "photos-blur",
+      "label": "Artist, event and genre photos",
+      "type": "css",
+      "option": "artist-photos",
+      "choice": [
+        "blur"
+      ],
+      "target": {
+        "css": "img.related-artists-v2__artist-image, img.artist-profile-image, img.genre-carousel__card-image, img.related-events-v2__event-image"
+      },
+      "declarations": {
+        "filter": "blur(12px)"
+      }
+    },
+    {
+      "id": "photos-hide",
+      "label": "Artist, event and genre photos",
+      "type": "hide",
+      "option": "artist-photos",
+      "choice": [
+        "hide"
+      ],
+      "target": {
+        "css": "img.related-artists-v2__artist-image, img.artist-profile-image, img.genre-carousel__card-image, img.related-events-v2__event-image"
+      }
+    },
+    {
+      "id": "track-buttons",
+      "label": "Track and attendance buttons",
+      "type": "hide",
+      "option": "track-buttons",
+      "target": {
+        "css": ".related-artists-v2__tracking-form, .related-artists-v2__star-button, .related-events-v2__attendance-form, .related-events-v2__star-icon"
+      }
+    },
+    {
+      "id": "home-carousels",
+      "label": "Home recommendation rows",
+      "type": "hide",
+      "option": "home-carousels",
+      "target": {
+        "css": "#homepage-trending-metro-events-carousel, #homepage-popular-artists-metro-carousel, #homepage-biggest-tours-carousel, section.genre-carousel"
+      }
     }
   ],
   "meta": {
     "author": "OpenMedia",
     "homepage": "https://www.songkick.com/",
-    "summary": "Cleans up cookie banners, ads and app prompts on Songkick, a media site",
-    "notes": "**Not verified live.** The fixtures in `recipes/fixtures/songkick/` are synthetic: hand-written pages that contain the targeted elements, not captures of the site, so the fixture test proves only that the selectors parse and spare protected content. These are generic cleanup rules, written from the selectors that common cookie-consent, ad and app-banner scripts use. They were not run against Songkick; a rule that matches nothing on a page is harmless, but nothing here promises that this site shows any of them.\n\n- **Cookie banners** hides the OneTrust, Cookiebot, Quantcast, Didomi, Usercentrics, TrustArc and Osano dialogs and common `cc-window` / `#cookie-banner` boxes. Some sites lock page scroll while the dialog is open; hiding the dialog does not undo that.\n- **Ads** hides Google ad slots and ad iframes. Sites that serve their own ad markup are not covered.\n- **App banners** hides the Smart App Banner and common \"install our app\" strips.\n\nOpen a page, toggle the options in Settings and report anything that hides content you wanted."
+    "summary": "Hides Songkick video ads, app prompts and artist sign-up; blur or hide artist photos; hide Track buttons and home carousels",
+    "notes": "Checked 2026-11-13, logged out, iPhone UA 390x844 in headless Chrome, songkick.com home page. Counts are `querySelectorAll` on the rendered DOM saved from that load (scripts then switched off to evaluate): Primis video slider and in-content video-ad wrapper in the ads option, get-the-app band and the header app button in the app-banners option, artist/Tourbox links, artist/event/genre photos, Track and attendance buttons, and the four home rows (ids `homepage-*-carousel` plus `section.genre-carousel`). Selectors are readable BEM class names and ids from Songkick's own markup, not hashed classes, and none depend on English text.\n\nPhotos are a Show/Blur/Hide choice; Hide removes only the image so names and dates stay. NOT verified: artist pages, concert detail and venue pages, search, the metro-area page, desktop layout, signed-in states, and the original cookie rules (no consent banner appeared for this session).",
+    "lastVerified": "2026-11-13"
   }
 }

@@ -2,10 +2,15 @@
   "schema": 1,
   "id": "market.official.nbc-news",
   "name": "NBC News",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "origin": "user",
-  "tags": ["desktop", "mobile"],
-  "match": ["https://*.nbcnews.com/*"],
+  "tags": [
+    "desktop",
+    "mobile"
+  ],
+  "match": [
+    "https://*.nbcnews.com/*"
+  ],
   "options": [
     {
       "id": "cookie-banners",
@@ -27,6 +32,62 @@
       "description": "The Smart App Banner and install-our-app strips.",
       "group": "annoyance",
       "default": true
+    },
+    {
+      "id": "plus-upsells",
+      "label": "Hide NBC News Plus upsells",
+      "description": "The Subscribe button in the header and the \"NBC News Plus\" badges on story cards.",
+      "group": "annoyance",
+      "default": true
+    },
+    {
+      "id": "story-pictures",
+      "label": "Story pictures",
+      "description": "Show, blur or hide the pictures on story cards and article leads.",
+      "group": "content",
+      "choices": [
+        {
+          "id": "show",
+          "label": "Show"
+        },
+        {
+          "id": "blur",
+          "label": "Blur"
+        },
+        {
+          "id": "hide",
+          "label": "Hide"
+        }
+      ],
+      "default": "show"
+    },
+    {
+      "id": "video-modules",
+      "label": "Hide video modules",
+      "description": "The large video players and preview clips in home-page story groups.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "image-credits",
+      "label": "Hide picture credits",
+      "description": "The small \"Name / NBC News; Getty\" caption under story and article pictures.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "card-durations",
+      "label": "Hide video durations",
+      "description": "The running-time labels on video story cards.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "footer",
+      "label": "Hide the footer",
+      "description": "The link blocks at the bottom of every page.",
+      "group": "content",
+      "default": false
     }
   ],
   "rules": [
@@ -56,12 +117,94 @@
       "target": {
         "css": "#smartbanner, .smartbanner, .smart-banner, .app-banner, #app-banner, .app-download-banner, .install-app-banner"
       }
+    },
+    {
+      "id": "nbc-ad-containers",
+      "label": "Ad containers",
+      "type": "hide",
+      "option": "ads",
+      "target": {
+        "css": "[data-testid=\"ad__container\"]"
+      }
+    },
+    {
+      "id": "plus-upsells",
+      "label": "Subscribe button and Plus badges",
+      "type": "hide",
+      "option": "plus-upsells",
+      "target": {
+        "css": "#hfs-subscribe-link, [data-testid=\"subscriber-badge\"]"
+      }
+    },
+    {
+      "id": "pictures-blur",
+      "label": "Story pictures",
+      "type": "css",
+      "option": "story-pictures",
+      "choice": [
+        "blur"
+      ],
+      "target": {
+        "css": "picture[data-testid=\"picture\"]"
+      },
+      "declarations": {
+        "filter": "blur(14px)"
+      }
+    },
+    {
+      "id": "pictures-hide",
+      "label": "Story pictures",
+      "type": "hide",
+      "option": "story-pictures",
+      "choice": [
+        "hide"
+      ],
+      "target": {
+        "css": "picture[data-testid=\"picture\"]"
+      }
+    },
+    {
+      "id": "video-modules",
+      "label": "Video modules",
+      "type": "hide",
+      "option": "video-modules",
+      "target": {
+        "css": "[data-testid=\"storyline-media-video\"]"
+      }
+    },
+    {
+      "id": "image-credits",
+      "label": "Picture credits",
+      "type": "hide",
+      "option": "image-credits",
+      "target": {
+        "css": "[data-testid=\"image-credit\"]"
+      }
+    },
+    {
+      "id": "card-durations",
+      "label": "Video durations",
+      "type": "hide",
+      "option": "card-durations",
+      "target": {
+        "css": "[data-testid=\"card-duration\"]"
+      }
+    },
+    {
+      "id": "footer",
+      "label": "Footer",
+      "type": "hide",
+      "option": "footer",
+      "target": {
+        "css": "footer.hfsf"
+      }
     }
   ],
   "meta": {
     "author": "OpenMedia",
     "homepage": "https://www.nbcnews.com/",
-    "summary": "Cleans up cookie banners, ads and app prompts on NBC News",
-    "notes": "**Not verified live.** The fixtures in `recipes/fixtures/nbc-news/` are synthetic: hand-written pages that contain the targeted elements, not captures of the site, so the fixture test proves only that the selectors parse and spare protected content. These are generic cleanup rules, written from the selectors that common cookie-consent, ad and app-banner scripts use. They were not run against NBC News; a rule that matches nothing on a page is harmless, but nothing here promises that this site shows any of them.\n\n- **Cookie banners** hides the OneTrust, Cookiebot, Quantcast, Didomi, Usercentrics, TrustArc and Osano dialogs and common `cc-window` / `#cookie-banner` boxes. Some sites lock page scroll while the dialog is open; hiding the dialog does not undo that.\n- **Ads** hides Google ad slots and ad iframes. Sites that serve their own ad markup are not covered.\n- **App banners** hides the Smart App Banner and common \"install our app\" strips.\n\nOpen a page, toggle the options in Settings and report anything that hides content you wanted."
+    "summary": "NBC News: hides ad containers and NBC News Plus upsells, blurs or hides story pictures, can hide video modules, credits and footer",
+    "notes": "**Checked 2026-11-13**, logged out, headless Chrome, https://www.nbcnews.com/ with an iPhone UA and a desktop UA. Both returned the same Next.js markup, so selectors apply to both. Article pages were not inspected.\n\n- **Ad containers**: `[data-testid=\"ad__container\"]` 19 desktop, 20 phone (LIVE). The slots were empty boxes in the headless visit.\n- **Plus upsells**: `#hfs-subscribe-link` 1 and `[data-testid=\"subscriber-badge\"]` 25 (LIVE).\n- **Story pictures**: `picture[data-testid=\"picture\"]` 50 desktop, 49 phone (LIVE).\n- **Video modules** `[data-testid=\"storyline-media-video\"]` 12, **credits** `[data-testid=\"image-credit\"]` 23, **durations** `[data-testid=\"card-duration\"]` 21, **footer** `footer.hfsf` 1 (LIVE).\n\nNot verified: article and video pages, the live player, the breaking-news bar, newsletter prompts. Classes with `styles_..__Hash` suffixes are CSS-module hashes and are not used; selectors use `data-testid`, the stable `hfs-` ids and the plain `hfsf` footer class. Hide video modules would also hide the lead video on pages where it is the main content.",
+    "lastVerified": "2026-11-13"
   }
 }

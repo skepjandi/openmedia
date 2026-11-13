@@ -2,10 +2,15 @@
   "schema": 1,
   "id": "market.official.nts-radio",
   "name": "NTS Radio",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "origin": "user",
-  "tags": ["desktop", "mobile"],
-  "match": ["https://*.nts.live/*"],
+  "tags": [
+    "desktop",
+    "mobile"
+  ],
+  "match": [
+    "https://*.nts.live/*"
+  ],
   "options": [
     {
       "id": "cookie-banners",
@@ -27,6 +32,62 @@
       "description": "The Smart App Banner and install-our-app strips.",
       "group": "annoyance",
       "default": true
+    },
+    {
+      "id": "signup-popups",
+      "label": "Hide sign-up pop-ups",
+      "description": "The \"Personalised Recommendations\" sign-up card and its dark overlay that appear when you favourite or follow something.",
+      "group": "annoyance",
+      "default": true
+    },
+    {
+      "id": "shop-row",
+      "label": "Hide the NTS Shop row",
+      "description": "The merchandise slider on the home page.",
+      "group": "annoyance",
+      "default": true
+    },
+    {
+      "id": "artwork",
+      "label": "Episode and show artwork",
+      "description": "Show, blur or hide the square pictures of episodes, picks and shows.",
+      "group": "content",
+      "choices": [
+        {
+          "id": "show",
+          "label": "Show"
+        },
+        {
+          "id": "blur",
+          "label": "Blur"
+        },
+        {
+          "id": "hide",
+          "label": "Hide"
+        }
+      ],
+      "default": "show"
+    },
+    {
+      "id": "genre-tags",
+      "label": "Hide genre tags",
+      "description": "The genre pills (Techno, Ambient...) under episodes and shows.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "mixtape-slider",
+      "label": "Hide the Infinite Mixtapes slider",
+      "description": "The row of 24/7 mixtape tiles on the home page.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "news-events",
+      "label": "Hide News and Events",
+      "description": "The News and Events row on the home page.",
+      "group": "content",
+      "default": false
     }
   ],
   "rules": [
@@ -56,12 +117,85 @@
       "target": {
         "css": "#smartbanner, .smartbanner, .smart-banner, .app-banner, #app-banner, .app-download-banner, .install-app-banner"
       }
+    },
+    {
+      "id": "signup-popups",
+      "label": "Sign-up pop-up and overlay",
+      "type": "hide",
+      "option": "signup-popups",
+      "target": {
+        "css": ".modal-onboarding--auth, .full-page-overlay--auth"
+      }
+    },
+    {
+      "id": "shop-row",
+      "label": "NTS Shop row",
+      "type": "hide",
+      "option": "shop-row",
+      "target": {
+        "css": "section#shop-collection"
+      }
+    },
+    {
+      "id": "artwork-blur",
+      "label": "Episode and show artwork",
+      "type": "css",
+      "option": "artwork",
+      "choice": [
+        "blur"
+      ],
+      "target": {
+        "css": ".nts-grid-picture__img"
+      },
+      "declarations": {
+        "filter": "blur(14px)"
+      }
+    },
+    {
+      "id": "artwork-hide",
+      "label": "Episode and show artwork",
+      "type": "hide",
+      "option": "artwork",
+      "choice": [
+        "hide"
+      ],
+      "target": {
+        "css": ".nts-grid-picture"
+      }
+    },
+    {
+      "id": "genre-tags",
+      "label": "Genre tags",
+      "type": "hide",
+      "option": "genre-tags",
+      "target": {
+        "css": "a.nts-tag"
+      }
+    },
+    {
+      "id": "mixtape-slider",
+      "label": "Infinite Mixtapes slider",
+      "type": "hide",
+      "option": "mixtape-slider",
+      "target": {
+        "css": "section.mixtape-slider"
+      }
+    },
+    {
+      "id": "news-events",
+      "label": "News and Events row",
+      "type": "hide",
+      "option": "news-events",
+      "target": {
+        "css": "section.home-incoming"
+      }
     }
   ],
   "meta": {
     "author": "OpenMedia",
     "homepage": "https://www.nts.live/",
-    "summary": "Cleans up cookie banners, ads and app prompts on NTS Radio, a media site",
-    "notes": "**Not verified live.** The fixtures in `recipes/fixtures/nts-radio/` are synthetic: hand-written pages that contain the targeted elements, not captures of the site, so the fixture test proves only that the selectors parse and spare protected content. These are generic cleanup rules, written from the selectors that common cookie-consent, ad and app-banner scripts use. They were not run against NTS Radio; a rule that matches nothing on a page is harmless, but nothing here promises that this site shows any of them.\n\n- **Cookie banners** hides the OneTrust, Cookiebot, Quantcast, Didomi, Usercentrics, TrustArc and Osano dialogs and common `cc-window` / `#cookie-banner` boxes. Some sites lock page scroll while the dialog is open; hiding the dialog does not undo that.\n- **Ads** hides Google ad slots and ad iframes. Sites that serve their own ad markup are not covered.\n- **App banners** hides the Smart App Banner and common \"install our app\" strips.\n\nOpen a page, toggle the options in Settings and report anything that hides content you wanted."
+    "summary": "NTS Radio: hides sign-up pop-ups and the Shop row, blurs or hides artwork, can hide genre tags, mixtape slider and News row",
+    "notes": "**Checked 2026-11-13**, logged out, headless Chrome on https://www.nts.live/ with an iPhone UA and a desktop UA. Both received the same React page with readable class names.\n\n- **Sign-up pop-up**: `.modal-onboarding--auth` 1 and `.full-page-overlay--auth` 1 are rendered in the page but sit closed; they open on actions such as saving a favourite (LIVE for existence, INFERRED for how they appear). `.modal-promo` is shared with the Live Tracklists card, so the rule does not target it.\n- **Shop row**: `section#shop-collection` 1; **News and Events** `section.home-incoming` 1 (their tiles were still skeletons in the capture) (LIVE).\n- **Artwork**: `.nts-grid-picture` 25 desktop, 25 phone (LIVE).\n- **Genre tags**: `a.nts-tag` 36 on desktop (0 on the phone home, where tags are not shown) (LIVE).\n- **Mixtape slider**: `section.mixtape-slider` 1 (LIVE).\n\nNot verified: show and episode pages (the capture of one failed when the network dropped), the Explore pages, the live player drawer (never hidden), a login. The player bars (`.footer-player`) and live header are never targeted.",
+    "lastVerified": "2026-11-13"
   }
 }

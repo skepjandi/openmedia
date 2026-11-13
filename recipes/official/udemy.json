@@ -2,10 +2,12 @@
   "schema": 1,
   "id": "market.official.udemy",
   "name": "Udemy",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "origin": "user",
   "tags": ["desktop", "mobile"],
-  "match": ["https://*.udemy.com/*"],
+  "match": [
+    "https://*.udemy.com/*"
+  ],
   "options": [
     {
       "id": "cookie-banners",
@@ -27,6 +29,53 @@
       "description": "The Smart App Banner and install-our-app strips.",
       "group": "annoyance",
       "default": true
+    },
+    {
+      "id": "promo-bar",
+      "label": "Hide the countdown promo bar",
+      "description": "The \"Ends in 5h 59m... New-learner? courses from $10.99\" bar at the top of the page.",
+      "group": "annoyance",
+      "default": true
+    },
+    {
+      "id": "hero-banners",
+      "label": "Hide hero promo banners",
+      "description": "The big rotating \"Meet your career sidekick\" / \"Jump into learning\" banners on the home page.",
+      "group": "annoyance",
+      "default": true
+    },
+    {
+      "id": "business-upsells",
+      "label": "Hide Udemy Business and Teach upsells",
+      "description": "The Udemy Business and Teach on Udemy header menus and the partner logo strip on the desktop home page.",
+      "group": "annoyance",
+      "default": true
+    },
+    {
+      "id": "course-thumbnails",
+      "label": "Course thumbnails",
+      "description": "The picture on each course card (desktop home page). Blur keeps the layout; Hide leaves the title and price.",
+      "group": "content",
+      "choices": [
+        { "id": "show", "label": "Show" },
+        { "id": "blur", "label": "Blur" },
+        { "id": "hide", "label": "Hide" }
+      ],
+      "default": "show"
+    },
+    {
+      "id": "prices",
+      "label": "Hide prices",
+      "description": "The current-price block on course cards.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "ratings",
+      "label": "Hide star ratings",
+      "description": "The rating number and stars on course cards.",
+      "group": "content",
+      "default": false
     }
   ],
   "rules": [
@@ -56,12 +105,99 @@
       "target": {
         "css": "#smartbanner, .smartbanner, .smart-banner, .app-banner, #app-banner, .app-download-banner, .install-app-banner"
       }
+    },
+    {
+      "id": "smart-bar-desktop",
+      "label": "Promo countdown bar (desktop)",
+      "type": "hide",
+      "option": "promo-bar",
+      "target": {
+        "css": "section[data-testid=\"smart-bar-container\"]"
+      }
+    },
+    {
+      "id": "smart-bar-mobile",
+      "label": "Promo countdown bar (phone)",
+      "type": "hide",
+      "option": "promo-bar",
+      "target": {
+        "css": "div[data-testid=\"smart-bar-fixed-height\"]"
+      }
+    },
+    {
+      "id": "hero-banner-desktop",
+      "label": "Hero banner carousel (desktop)",
+      "type": "hide",
+      "option": "hero-banners",
+      "target": {
+        "css": "section[data-purpose=\"hero-banner\"]"
+      }
+    },
+    {
+      "id": "hero-banner-mobile",
+      "label": "Hero banner (phone)",
+      "type": "hide",
+      "option": "hero-banners",
+      "target": {
+        "css": "div[class*=\"marketing-hero-banner_marketing-hero-banner-wide\"]"
+      }
+    },
+    {
+      "id": "business-menus",
+      "label": "Udemy Business and Teach menus, partner strip",
+      "type": "hide",
+      "option": "business-upsells",
+      "target": {
+        "css": "[data-testid=\"header-business\"], [data-testid=\"header-teach\"], [data-purpose=\"partners-banner\"]"
+      }
+    },
+    {
+      "id": "thumb-blur",
+      "label": "Blur course thumbnails",
+      "type": "css",
+      "option": "course-thumbnails",
+      "target": {
+        "css": "section[class*=\"_course-card_\"] img"
+      },
+      "declarations": {
+        "filter": "blur(10px)"
+      },
+      "choice": ["blur"]
+    },
+    {
+      "id": "thumb-hide",
+      "label": "Hide course thumbnails",
+      "type": "hide",
+      "option": "course-thumbnails",
+      "target": {
+        "css": "section[class*=\"_course-card_\"] img"
+      },
+      "choice": ["hide"]
+    },
+    {
+      "id": "price-blocks",
+      "label": "Course prices",
+      "type": "hide",
+      "option": "prices",
+      "target": {
+        "css": "[data-purpose=\"price-text-container\"]"
+      }
+    },
+    {
+      "id": "rating-blocks",
+      "label": "Course ratings",
+      "type": "hide",
+      "option": "ratings",
+      "target": {
+        "css": "[data-purpose=\"rating-number\"], [data-purpose=\"star-rating-mask\"]"
+      }
     }
   ],
   "meta": {
     "author": "OpenMedia",
     "homepage": "https://www.udemy.com/",
-    "summary": "Cleans up cookie banners, ads and app prompts on Udemy",
-    "notes": "**Not verified live.** The fixtures in `recipes/fixtures/udemy/` are synthetic: hand-written pages that contain the targeted elements, not captures of the site, so the fixture test proves only that the selectors parse and spare protected content. These are generic cleanup rules, written from the selectors that common cookie-consent, ad and app-banner scripts use. They were not run against Udemy; a rule that matches nothing on a page is harmless, but nothing here promises that this site shows any of them.\n\n- **Cookie banners** hides the OneTrust, Cookiebot, Quantcast, Didomi, Usercentrics, TrustArc and Osano dialogs and common `cc-window` / `#cookie-banner` boxes. Some sites lock page scroll while the dialog is open; hiding the dialog does not undo that.\n- **Ads** hides Google ad slots and ad iframes. Sites that serve their own ad markup are not covered.\n- **App banners** hides the Smart App Banner and common \"install our app\" strips.\n\nOpen a page, toggle the options in Settings and report anything that hides content you wanted."
+    "summary": "Udemy home page: countdown promo bar, hero banner, business upsells, thumbnails, prices",
+    "notes": "Checked 2026-11-13, logged out, from saved DOM snapshots of udemy.com (home page) taken with headless Chrome, iPhone UA 390x844 and desktop UA. Chrome and the network became unavailable afterwards, so course, search and lecture pages were not loaded, and nothing was re-run after the snapshots.\n\nUdemy serves two different front ends: the desktop UA gets a Next.js page with data-testid and data-purpose hooks, the phone UA an older page (mobile-header, marketing-hero-banner). Classes carry hashes, so rules use data-testid and data-purpose values; two use a module-name substring (_course-card_, marketing-hero-banner_...) because no attribute exists.\n\n- **Promo bar**: section[data-testid=smart-bar-container] 1 on desktop; div[data-testid=smart-bar-fixed-height] 1 on phone (LIVE snapshot).\n- **Hero banners**: section[data-purpose=hero-banner] 1 on desktop; the marketing-hero-banner-wide container 1 on phone.\n- **Business upsells**: header-business 1, header-teach 1, partners-banner 1 on desktop; none on phone.\n- **Thumbnails** (Show/Blur/Hide): 36 images in course cards on desktop. Phone course cards use other markup and are not covered.\n- **Prices**: price-text-container 23 desktop, 3 phone. **Ratings**: rating-number 31 desktop, 7 phone, with the star masks.\n\nThe header Log in link (data-testid=header-login) is never matched. The OneTrust style consent dialog (Privacy Preference Center) was present but hidden. Not verified: logged-in views, course pages, other languages.",
+    "lastVerified": "2026-11-13"
   }
 }

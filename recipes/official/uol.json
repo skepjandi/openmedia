@@ -2,10 +2,12 @@
   "schema": 1,
   "id": "market.official.uol",
   "name": "UOL",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "origin": "user",
   "tags": ["desktop", "mobile"],
-  "match": ["https://*.uol.com.br/*"],
+  "match": [
+    "https://*.uol.com.br/*"
+  ],
   "options": [
     {
       "id": "cookie-banners",
@@ -17,7 +19,7 @@
     {
       "id": "ads",
       "label": "Hide ads",
-      "description": "Google ad slots and ad iframes.",
+      "description": "Google ad slots, UOL banner areas, the floating anchor ad and UOL's own channel banner.",
       "group": "annoyance",
       "default": true
     },
@@ -27,6 +29,39 @@
       "description": "The Smart App Banner and install-our-app strips.",
       "group": "annoyance",
       "default": true
+    },
+    {
+      "id": "photos",
+      "label": "Headline photos",
+      "description": "The photo on each headline card. Blur keeps the layout; Hide leaves the headline text.",
+      "group": "content",
+      "choices": [
+        { "id": "show", "label": "Show" },
+        { "id": "blur", "label": "Blur" },
+        { "id": "hide", "label": "Hide" }
+      ],
+      "default": "show"
+    },
+    {
+      "id": "video-cards",
+      "label": "Hide video cards",
+      "description": "The video headline cards, including the AO VIVO live card and its player.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "related-lists",
+      "label": "Hide related headline lists",
+      "description": "The short lists of related headlines under the main headlines.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "flash-feed",
+      "label": "Hide the Flash Feed",
+      "description": "The Flash Feed carousel of short news items.",
+      "group": "content",
+      "default": false
     }
   ],
   "rules": [
@@ -56,12 +91,99 @@
       "target": {
         "css": "#smartbanner, .smartbanner, .smart-banner, .app-banner, #app-banner, .app-download-banner, .install-app-banner"
       }
+    },
+    {
+      "id": "lgpd-bar",
+      "label": "UOL LGPD cookie bar",
+      "type": "hide",
+      "option": "cookie-banners",
+      "target": {
+        "css": ".banner-lgpd-consent-container"
+      }
+    },
+    {
+      "id": "uol-ad-areas",
+      "label": "UOL banner areas and Google ad containers",
+      "type": "hide",
+      "option": "ads",
+      "target": {
+        "css": "div[id^=\"banner-\"], div[id^=\"google_ads_iframe\"], iframe[aria-label=\"Advertisement\"]"
+      }
+    },
+    {
+      "id": "anchor-ad",
+      "label": "Floating anchor ad on phones",
+      "type": "hide",
+      "option": "ads",
+      "target": {
+        "css": ".up-floating"
+      }
+    },
+    {
+      "id": "channel-banner",
+      "label": "UOL channel promo banner",
+      "type": "hide",
+      "option": "ads",
+      "target": {
+        "css": ".bannerChannelUol"
+      }
+    },
+    {
+      "id": "photo-blur",
+      "label": "Blur headline photos",
+      "type": "css",
+      "option": "photos",
+      "target": {
+        "css": "picture.photograph__container"
+      },
+      "declarations": {
+        "filter": "blur(10px)"
+      },
+      "choice": ["blur"]
+    },
+    {
+      "id": "photo-hide",
+      "label": "Hide headline photos",
+      "type": "hide",
+      "option": "photos",
+      "target": {
+        "css": "picture.photograph__container"
+      },
+      "choice": ["hide"]
+    },
+    {
+      "id": "video-card",
+      "label": "Video headline cards",
+      "type": "hide",
+      "option": "video-cards",
+      "target": {
+        "css": "article.cardVideo"
+      }
+    },
+    {
+      "id": "related-list",
+      "label": "Related headline lists",
+      "type": "hide",
+      "option": "related-lists",
+      "target": {
+        "css": "aside.relatedList"
+      }
+    },
+    {
+      "id": "flash-feed",
+      "label": "Flash Feed carousel",
+      "type": "hide",
+      "option": "flash-feed",
+      "target": {
+        "css": "section.flashFeed"
+      }
     }
   ],
   "meta": {
     "author": "OpenMedia",
     "homepage": "https://www.uol.com.br/",
-    "summary": "Cleans up cookie banners, ads and app prompts on UOL",
-    "notes": "**Not verified live.** The fixtures in `recipes/fixtures/uol/` are synthetic: hand-written pages that contain the targeted elements, not captures of the site, so the fixture test proves only that the selectors parse and spare protected content. These are generic cleanup rules, written from the selectors that common cookie-consent, ad and app-banner scripts use. They were not run against UOL; a rule that matches nothing on a page is harmless, but nothing here promises that this site shows any of them.\n\n- **Cookie banners** hides the OneTrust, Cookiebot, Quantcast, Didomi, Usercentrics, TrustArc and Osano dialogs and common `cc-window` / `#cookie-banner` boxes. Some sites lock page scroll while the dialog is open; hiding the dialog does not undo that.\n- **Ads** hides Google ad slots and ad iframes. Sites that serve their own ad markup are not covered.\n- **App banners** hides the Smart App Banner and common \"install our app\" strips.\n\nOpen a page, toggle the options in Settings and report anything that hides content you wanted."
+    "summary": "UOL home page: ad slots, LGPD bar, photos, video cards, related lists, Flash Feed",
+    "notes": "Checked 2026-11-13, logged out, from saved DOM snapshots of uol.com.br (home page) taken with headless Chrome, iPhone UA 390x844 and desktop UA (Brazilian Portuguese). The network became unavailable afterwards, so article pages and search were not loaded.\n\nClass names on UOL are readable BEM-style names (photograph__container, cardVideo, relatedList, flashFeed), so they are used directly.\n\n- **Cookie banners**: .banner-lgpd-consent-container, the LGPD bar, 1 on phone, 0 on desktop (LIVE).\n- **Ads**: div[id^=banner-] 25 on phone and 17 on desktop (banner areas, native slot, anchor area), div[id^=google_ads_iframe] 4 each, iframe[aria-label=Advertisement] 2 phone and 1 desktop. .up-floating (the floating anchor ad) 1 on phone. .bannerChannelUol 1 (UOL's own promo). All LIVE.\n- **Photos** (Show/Blur/Hide): picture.photograph__container, 159 on phone and 165 on desktop (LIVE).\n- **Video cards**: article.cardVideo 3 on both (LIVE). The news-player elements are inside them.\n- **Related lists**: aside.relatedList 6 on both (LIVE). **Flash Feed**: section.flashFeed 1 on both (LIVE).\n\nThe login panel (.messagesContainer.loginbox, fixed to the viewport on both layouts) is deliberately left alone. Whether the players autoplay was not observed. Not verified: article pages, UOL mail and other UOL sites, logged-in views.",
+    "lastVerified": "2026-11-13"
   }
 }

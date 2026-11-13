@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "market.official.soundclick",
   "name": "SoundClick",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "origin": "user",
   "tags": ["desktop", "mobile"],
   "match": ["https://*.soundclick.com/*"],
@@ -27,6 +27,58 @@
       "description": "The Smart App Banner and install-our-app strips.",
       "group": "annoyance",
       "default": true
+    },
+    {
+      "id": "hero-banner",
+      "label": "Hide the sign-up banner",
+      "description": "The welcome strip at the top of the home page that pushes Sign up and the listener/artist pitches.",
+      "group": "annoyance",
+      "default": true
+    },
+    {
+      "id": "app-badge",
+      "label": "Hide the app download badge",
+      "description": "The \"Download SoundClick app\" badge shown in the page footer area.",
+      "group": "annoyance",
+      "default": true
+    },
+    {
+      "id": "seasonal-deals",
+      "label": "Hide seasonal sale rails",
+      "description": "The Black Friday / seasonal deals carousel with its \"Up to 50% off\" cards on the home page.",
+      "group": "annoyance",
+      "default": true
+    },
+    {
+      "id": "artwork",
+      "label": "Cover artwork",
+      "description": "Show or blur the cover pictures on home-page carousels and song lists.",
+      "group": "content",
+      "choices": [
+        {
+          "id": "show",
+          "label": "Show"
+        },
+        {
+          "id": "blur",
+          "label": "Blur"
+        }
+      ],
+      "default": "show"
+    },
+    {
+      "id": "home-pitches",
+      "label": "Hide the home-page pitch sections",
+      "description": "The Customize, For listeners, For artists and FAQ sections at the bottom of the home page.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "scroll-top",
+      "label": "Hide the scroll-to-top button",
+      "description": "The round arrow button that floats over the page.",
+      "group": "content",
+      "default": false
     }
   ],
   "rules": [
@@ -56,12 +108,71 @@
       "target": {
         "css": "#smartbanner, .smartbanner, .smart-banner, .app-banner, #app-banner, .app-download-banner, .install-app-banner"
       }
+    },
+    {
+      "id": "hero-banner",
+      "label": "Welcome / sign-up banner",
+      "type": "hide",
+      "option": "hero-banner",
+      "target": {
+        "css": "#homepage_v6_header_hero_nag_wrapper"
+      }
+    },
+    {
+      "id": "app-badge",
+      "label": "Install app badge",
+      "type": "hide",
+      "option": "app-badge",
+      "target": {
+        "css": "span:has(> #installPWAImage), #installPWAImage"
+      }
+    },
+    {
+      "id": "seasonal-deals",
+      "label": "Seasonal sale carousel section",
+      "type": "hide",
+      "option": "seasonal-deals",
+      "target": {
+        "css": ".hp_sectionsWrapper:has(#hp_seasonal_blackfriday)"
+      }
+    },
+    {
+      "id": "artwork-blur",
+      "label": "Cover pictures",
+      "type": "css",
+      "option": "artwork",
+      "choice": ["blur"],
+      "target": {
+        "css": ".item_picture, .hp_songlist_picture"
+      },
+      "declarations": {
+        "filter": "blur(10px)"
+      }
+    },
+    {
+      "id": "home-pitches",
+      "label": "Pitch and FAQ sections",
+      "type": "hide",
+      "option": "home-pitches",
+      "target": {
+        "css": ".hp_sectionsWrapper.hp_forListeners"
+      }
+    },
+    {
+      "id": "scroll-top",
+      "label": "Scroll to top button",
+      "type": "hide",
+      "option": "scroll-top",
+      "target": {
+        "css": "#scrollToTop"
+      }
     }
   ],
   "meta": {
     "author": "OpenMedia",
     "homepage": "https://www.soundclick.com/",
-    "summary": "Cleans up cookie banners, ads and app prompts on SoundClick, a media site",
-    "notes": "**Not verified live.** The fixtures in `recipes/fixtures/soundclick/` are synthetic: hand-written pages that contain the targeted elements, not captures of the site, so the fixture test proves only that the selectors parse and spare protected content. These are generic cleanup rules, written from the selectors that common cookie-consent, ad and app-banner scripts use. They were not run against SoundClick; a rule that matches nothing on a page is harmless, but nothing here promises that this site shows any of them.\n\n- **Cookie banners** hides the OneTrust, Cookiebot, Quantcast, Didomi, Usercentrics, TrustArc and Osano dialogs and common `cc-window` / `#cookie-banner` boxes. Some sites lock page scroll while the dialog is open; hiding the dialog does not undo that.\n- **Ads** hides Google ad slots and ad iframes. Sites that serve their own ad markup are not covered.\n- **App banners** hides the Smart App Banner and common \"install our app\" strips.\n\nOpen a page, toggle the options in Settings and report anything that hides content you wanted."
+    "summary": "Hides SoundClick's sign-up banner, app badge and sale rails; blur cover art; optional pitch sections",
+    "notes": "Checked 2026-11-13, logged out, real Chrome (headless) with iPhone UA 390x844 and desktop UA on the SoundClick home page, DOM captured after 7 seconds. Fixtures `real.html` and `desktop-real.html` are sanitised excerpts of that DOM (text stripped, only ancestors the selectors need, `data-keep` on main content, Log in link and player).\n\nLIVE (querySelectorAll on the rendered home page, same counts on phone and desktop): `#homepage_v6_header_hero_nag_wrapper` 1, `#installPWAImage` 1 (inside a plain span), `#hp_seasonal_blackfriday` 2 (the id is used twice), `.item_picture` 110 (cover art is a CSS background-image on a div, so blur works and there is no img), `.hp_songlist_picture` 20, `.hp_sectionsWrapper.hp_forListeners` 5, `#scrollToTop` 1. The pop-up box `#popupBox_wrapper` exists but is empty until an interaction, so it is not touched.\n\nChoices: Cover artwork Show/Blur. No Hide choice, because the picture holds the play button in song lists.\n\nNOT verified: the cookie banner and ad rules (the three original options did not match anything on the logged-out home page in this region); artist, track and store pages; the lazy-loaded Top promoter and Top sellers sections (empty in the captured DOM); logged-in pages. Class names are readable site classes, no hashes.",
+    "lastVerified": "2026-11-13"
   }
 }

@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "market.official.radio-paradise",
   "name": "Radio Paradise",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "origin": "user",
   "tags": ["desktop", "mobile"],
   "match": ["https://*.radioparadise.com/*"],
@@ -27,6 +27,65 @@
       "description": "The Smart App Banner and install-our-app strips.",
       "group": "annoyance",
       "default": true
+    },
+    {
+      "id": "email-prompts",
+      "label": "Hide email and rating prompts",
+      "description": "The \"Give us your email\" banners and the app rating and alert prompts.",
+      "group": "annoyance",
+      "default": true
+    },
+    {
+      "id": "support-pitch",
+      "label": "Hide join and support sections",
+      "description": "The Join and Support the station sections on the home page.",
+      "group": "annoyance",
+      "default": true
+    },
+    {
+      "id": "home-extras",
+      "label": "Lower home sections",
+      "description": "The blog, Radio 2050, About (team) and Share sections under the channel list on the home page.",
+      "group": "content",
+      "choices": [
+        {
+          "id": "show",
+          "label": "Show"
+        },
+        {
+          "id": "dim",
+          "label": "Dim"
+        },
+        {
+          "id": "hide",
+          "label": "Hide"
+        }
+      ],
+      "default": "show"
+    },
+    {
+      "id": "listening-map",
+      "label": "Hide listening map",
+      "description": "The \"who is listening\" world map section on the home page.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "channel-art",
+      "label": "Channel tile artwork",
+      "description": "The artwork tiles in the channel grid. Channels stay selectable.",
+      "group": "content",
+      "choices": [
+        {
+          "id": "show",
+          "label": "Show"
+        },
+        {
+          "id": "blur",
+          "label": "Blur"
+        }
+      ],
+      "default": "show"
     }
   ],
   "rules": [
@@ -56,12 +115,76 @@
       "target": {
         "css": "#smartbanner, .smartbanner, .smart-banner, .app-banner, #app-banner, .app-download-banner, .install-app-banner"
       }
+    },
+    {
+      "id": "email-banners",
+      "label": "Email and rating prompts",
+      "type": "hide",
+      "option": "email-prompts",
+      "target": {
+        "css": ".action-banner, app-rate-this-prompter, app-prompt-alert"
+      }
+    },
+    {
+      "id": "join-support",
+      "label": "Join and Support sections",
+      "type": "hide",
+      "option": "support-pitch",
+      "target": {
+        "css": "app-homepage-redesign-join, app-homepage-redesign-support"
+      }
+    },
+    {
+      "id": "extras-dim",
+      "label": "Lower home sections",
+      "type": "css",
+      "option": "home-extras",
+      "choice": ["dim"],
+      "target": {
+        "css": "app-homepage-redesign-blog, app-homepage-redesign-radio2050, app-homepage-redesign-about, app-homepage-redesign-share"
+      },
+      "declarations": {
+        "opacity": "0.35"
+      }
+    },
+    {
+      "id": "extras-hide",
+      "label": "Lower home sections",
+      "type": "hide",
+      "option": "home-extras",
+      "choice": ["hide"],
+      "target": {
+        "css": "app-homepage-redesign-blog, app-homepage-redesign-radio2050, app-homepage-redesign-about, app-homepage-redesign-share"
+      }
+    },
+    {
+      "id": "listening-map",
+      "label": "Listening map",
+      "type": "hide",
+      "option": "listening-map",
+      "target": {
+        "css": "app-homepage-redesign-listening-map"
+      }
+    },
+    {
+      "id": "channel-tiles-blur",
+      "label": "Channel tiles",
+      "type": "css",
+      "option": "channel-art",
+      "choice": ["blur"],
+      "target": {
+        "css": "app-rp-channel-grid .channel-tile"
+      },
+      "declarations": {
+        "filter": "blur(8px)"
+      }
     }
   ],
   "meta": {
     "author": "OpenMedia",
     "homepage": "https://radioparadise.com/",
-    "summary": "Cleans up cookie banners, ads and app prompts on Radio Paradise, a media site",
-    "notes": "**Not verified live.** The fixtures in `recipes/fixtures/radio-paradise/` are synthetic: hand-written pages that contain the targeted elements, not captures of the site, so the fixture test proves only that the selectors parse and spare protected content. These are generic cleanup rules, written from the selectors that common cookie-consent, ad and app-banner scripts use. They were not run against Radio Paradise; a rule that matches nothing on a page is harmless, but nothing here promises that this site shows any of them.\n\n- **Cookie banners** hides the OneTrust, Cookiebot, Quantcast, Didomi, Usercentrics, TrustArc and Osano dialogs and common `cc-window` / `#cookie-banner` boxes. Some sites lock page scroll while the dialog is open; hiding the dialog does not undo that.\n- **Ads** hides Google ad slots and ad iframes. Sites that serve their own ad markup are not covered.\n- **App banners** hides the Smart App Banner and common \"install our app\" strips.\n\nOpen a page, toggle the options in Settings and report anything that hides content you wanted."
+    "summary": "Radio Paradise: hide email and rating prompts and donation pitches; dim or hide home extras; blur channel tiles.",
+    "notes": "Checked 2026-11-13, logged out, headless Chrome over CDP with a desktop UA (1440x900) on radioparadise.com/ after the Angular home rendered. Not captured: an iPhone-UA page (Chrome and the network were out of memory when retried), the music search, blog and what-is-playing pages. The page has a mobile-only `.action-banner`; Angular keeps both desktop and mobile copies in the DOM.\n\nLIVE counts on Home: email-banners desktop home 5; join-support desktop home 2; extras-dim desktop home 4; extras-hide desktop home 4; listening-map desktop home 1; channel-tiles-blur desktop home 10. Selectors are custom-element tag names and readable class names (action-banner, channel-tile); Angular `_ngcontent-*` attributes are never used. `app-rate-this-prompter` and `app-prompt-alert` were empty shells when captured; they fill in after listening and the rule hides them when they do (INFERRED: contents not seen).\n\nChoices: Lower home sections Show/Dim/Hide (opacity 0.35); Channel tile artwork Show/Blur (blur 8px; no Hide because the grid is the station picker).\n\nNOT verified: logged-in profile UI, phone layout, whether the rating prompter shows a dialog the rule would also hide, Rewards and merch pages.",
+    "lastVerified": "2026-11-13"
   }
 }

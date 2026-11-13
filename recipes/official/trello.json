@@ -2,10 +2,12 @@
   "schema": 1,
   "id": "market.official.trello",
   "name": "Trello",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "origin": "user",
   "tags": ["desktop", "mobile"],
-  "match": ["https://*.trello.com/*"],
+  "match": [
+    "https://*.trello.com/*"
+  ],
   "options": [
     {
       "id": "cookie-banners",
@@ -27,6 +29,53 @@
       "description": "The Smart App Banner and install-our-app strips.",
       "group": "annoyance",
       "default": true
+    },
+    {
+      "id": "signup-forms",
+      "label": "Hide sign-up forms",
+      "description": "The \"Sign up - it's free!\" email forms in the middle and at the bottom of the Trello home page.",
+      "group": "annoyance",
+      "default": true
+    },
+    {
+      "id": "promo-buttons",
+      "label": "Hide promo call-to-action buttons",
+      "description": "The Check out Trello, Take a tour and View pricing buttons in the page sections. Log in is never hidden.",
+      "group": "annoyance",
+      "default": true
+    },
+    {
+      "id": "hero-video",
+      "label": "Hide the hero video",
+      "description": "The autoplaying looped video at the top of the home page and its Watch video button.",
+      "group": "annoyance",
+      "default": true
+    },
+    {
+      "id": "template-covers",
+      "label": "Template cover images",
+      "description": "The coloured or photo cover on each tile in the template gallery. Blur keeps the layout; Hide leaves the title and author.",
+      "group": "content",
+      "choices": [
+        { "id": "show", "label": "Show" },
+        { "id": "blur", "label": "Blur" },
+        { "id": "hide", "label": "Hide" }
+      ],
+      "default": "show"
+    },
+    {
+      "id": "template-stats",
+      "label": "Hide template copy and view counts",
+      "description": "The Copies and Views counters on each template tile.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "marketing-carousels",
+      "label": "Hide carousels and blog teasers",
+      "description": "The feature and customer-quote carousels and the blog article cards on the home page.",
+      "group": "content",
+      "default": false
     }
   ],
   "rules": [
@@ -56,12 +105,90 @@
       "target": {
         "css": "#smartbanner, .smartbanner, .smart-banner, .app-banner, #app-banner, .app-download-banner, .install-app-banner"
       }
+    },
+    {
+      "id": "cookie-banner-testid",
+      "label": "Trello cookie notice bar",
+      "type": "hide",
+      "option": "cookie-banners",
+      "target": {
+        "css": "div[data-testid=\"cookies-consent-banner\"]"
+      }
+    },
+    {
+      "id": "signup-form",
+      "label": "Email sign-up forms",
+      "type": "hide",
+      "option": "signup-forms",
+      "target": {
+        "css": "form[data-testid=\"ui-email-signup-form\"]"
+      }
+    },
+    {
+      "id": "banner-buttons",
+      "label": "Promo call-to-action links",
+      "type": "hide",
+      "option": "promo-buttons",
+      "target": {
+        "css": "a[data-testid=\"ui-nav-banner-button\"]"
+      }
+    },
+    {
+      "id": "hero-video",
+      "label": "Hero video and Watch video trigger",
+      "type": "hide",
+      "option": "hero-video",
+      "target": {
+        "css": "video[data-testid=\"ui-video\"], span[data-testid=\"ui-modal-trigger\"]"
+      }
+    },
+    {
+      "id": "template-cover-blur",
+      "label": "Blur template covers",
+      "type": "css",
+      "option": "template-covers",
+      "target": {
+        "css": "[data-testid=\"templates-tile-container\"] > a > div:first-child"
+      },
+      "declarations": {
+        "filter": "blur(10px)"
+      },
+      "choice": ["blur"]
+    },
+    {
+      "id": "template-cover-hide",
+      "label": "Hide template covers",
+      "type": "hide",
+      "option": "template-covers",
+      "target": {
+        "css": "[data-testid=\"templates-tile-container\"] > a > div:first-child"
+      },
+      "choice": ["hide"]
+    },
+    {
+      "id": "template-stats",
+      "label": "Copies and views counters",
+      "type": "hide",
+      "option": "template-stats",
+      "target": {
+        "css": "[data-testid=\"templates-tile-container\"] span:has(> span > [data-testid=\"CopyIcon\"]), [data-testid=\"templates-tile-container\"] span:has(> span > [data-testid=\"SubscribeIcon\"])"
+      }
+    },
+    {
+      "id": "carousels",
+      "label": "Carousels",
+      "type": "hide",
+      "option": "marketing-carousels",
+      "target": {
+        "css": "[data-testid=\"list-carousel\"], div[data-testid=\"carousel\"], [data-testid=\"ui-blog-article\"]"
+      }
     }
   ],
   "meta": {
     "author": "OpenMedia",
     "homepage": "https://trello.com/",
-    "summary": "Cleans up cookie banners, ads and app prompts on Trello",
-    "notes": "**Not verified live.** The fixtures in `recipes/fixtures/trello/` are synthetic: hand-written pages that contain the targeted elements, not captures of the site, so the fixture test proves only that the selectors parse and spare protected content. These are generic cleanup rules, written from the selectors that common cookie-consent, ad and app-banner scripts use. They were not run against Trello; a rule that matches nothing on a page is harmless, but nothing here promises that this site shows any of them.\n\n- **Cookie banners** hides the OneTrust, Cookiebot, Quantcast, Didomi, Usercentrics, TrustArc and Osano dialogs and common `cc-window` / `#cookie-banner` boxes. Some sites lock page scroll while the dialog is open; hiding the dialog does not undo that.\n- **Ads** hides Google ad slots and ad iframes. Sites that serve their own ad markup are not covered.\n- **App banners** hides the Smart App Banner and common \"install our app\" strips.\n\nOpen a page, toggle the options in Settings and report anything that hides content you wanted."
+    "summary": "Trello marketing and template pages: sign-up forms, hero video, covers, stats",
+    "notes": "Checked 2026-11-13, logged out, headless Chrome (iPhone UA 390x844 and desktop UA): trello.com (home) and trello.com/templates. A public board was not loaded (the capture timed out), and the signed-in app (boards, lists, cards) needs an account and was not seen.\n\nWhat the logged-out site shows: a marketing home page (hero video, sign-up forms, carousels, blog cards) and a template gallery. Classes are hashed, so selectors use data-testid values, which are stable across both layouts.\n\n- **Cookie banners**: kept the generic OneTrust rule and added the Trello notice bar div[data-testid=cookies-consent-banner] (1 on /templates, LIVE). On the home page only the OneTrust root exists, hidden.\n- **Sign-up forms**: form[data-testid=ui-email-signup-form] 2 on home (LIVE).\n- **Promo buttons**: a[data-testid=ui-nav-banner-button] 7 on home, including copies in the hidden mega-menu (LIVE).\n- **Hero video**: video[data-testid=ui-video] 1 and span[data-testid=ui-modal-trigger] 1 (LIVE).\n- **Template covers** (Show/Blur/Hide): the first div of each tile, 24 on /templates (LIVE). Blur is a css rule and Hide a hide rule, each tagged with its choice.\n- **Template stats**: the Copies and Views spans, matched through their CopyIcon and SubscribeIcon children, 24 each (LIVE). The numbers are inside those spans.\n- **Carousels and blog teasers**: data-testid carousel 3, list-carousel 1, ui-blog-article 2 on home (LIVE).\n\nNot verified: the ad rule (the only match was one doubleclick.net iframe on the mobile home page, probably a tracking frame; no visible ad slot was seen), the app-banner rule (no Smart App Banner seen), logged-in views, and other languages. Fixtures real.html, real-templates.html and the desktop-real* pair are structure captures of the live DOM with text removed; synthetic.html still covers the generic rules.",
+    "lastVerified": "2026-11-13"
   }
 }

@@ -2,10 +2,15 @@
   "schema": 1,
   "id": "market.official.ncs",
   "name": "NCS",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "origin": "user",
-  "tags": ["desktop", "mobile"],
-  "match": ["https://*.ncs.io/*"],
+  "tags": [
+    "desktop",
+    "mobile"
+  ],
+  "match": [
+    "https://*.ncs.io/*"
+  ],
   "options": [
     {
       "id": "cookie-banners",
@@ -27,6 +32,55 @@
       "description": "The Smart App Banner and install-our-app strips.",
       "group": "annoyance",
       "default": true
+    },
+    {
+      "id": "social-links",
+      "label": "Hide social media links",
+      "description": "The Spotify, Instagram, YouTube and other icon links in the header menu and the footer.",
+      "group": "annoyance",
+      "default": true
+    },
+    {
+      "id": "cover-art",
+      "label": "Cover art",
+      "description": "Show, blur or hide the release covers on the list and the big picture on the featured release card.",
+      "group": "content",
+      "choices": [
+        {
+          "id": "show",
+          "label": "Show"
+        },
+        {
+          "id": "blur",
+          "label": "Blur"
+        },
+        {
+          "id": "hide",
+          "label": "Hide"
+        }
+      ],
+      "default": "show"
+    },
+    {
+      "id": "featured-release",
+      "label": "Hide the featured release card",
+      "description": "The large \"Featured Release\" banner at the top of the music library.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "artist-names",
+      "label": "Hide artist names on covers",
+      "description": "The artist line under each release title in the grid.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "footer",
+      "label": "Hide the footer",
+      "description": "The footer strip with the social icons.",
+      "group": "content",
+      "default": false
     }
   ],
   "rules": [
@@ -56,12 +110,76 @@
       "target": {
         "css": "#smartbanner, .smartbanner, .smart-banner, .app-banner, #app-banner, .app-download-banner, .install-app-banner"
       }
+    },
+    {
+      "id": "social-links",
+      "label": "Social icon links",
+      "type": "hide",
+      "option": "social-links",
+      "target": {
+        "css": "header nav a[target=\"_blank\"]:has(img.social), footer .social-media"
+      }
+    },
+    {
+      "id": "cover-blur",
+      "label": "Release covers",
+      "type": "css",
+      "option": "cover-art",
+      "choice": [
+        "blur"
+      ],
+      "target": {
+        "css": ".item .inner .img, article.module.details .bg"
+      },
+      "declarations": {
+        "filter": "blur(12px)"
+      }
+    },
+    {
+      "id": "cover-hide",
+      "label": "Release covers",
+      "type": "hide",
+      "option": "cover-art",
+      "choice": [
+        "hide"
+      ],
+      "target": {
+        "css": ".item .inner .img, article.module.details .bg"
+      }
+    },
+    {
+      "id": "featured-release",
+      "label": "Featured release card",
+      "type": "hide",
+      "option": "featured-release",
+      "target": {
+        "css": "article.module.details"
+      }
+    },
+    {
+      "id": "artist-names",
+      "label": "Artist names under covers",
+      "type": "hide",
+      "option": "artist-names",
+      "target": {
+        "css": ".item .bottom .tags"
+      }
+    },
+    {
+      "id": "footer",
+      "label": "Footer",
+      "type": "hide",
+      "option": "footer",
+      "target": {
+        "css": "footer"
+      }
     }
   ],
   "meta": {
     "author": "OpenMedia",
     "homepage": "https://ncs.io/",
-    "summary": "Cleans up cookie banners, ads and app prompts on NCS, a media site",
-    "notes": "**Not verified live.** The fixtures in `recipes/fixtures/ncs/` are synthetic: hand-written pages that contain the targeted elements, not captures of the site, so the fixture test proves only that the selectors parse and spare protected content. These are generic cleanup rules, written from the selectors that common cookie-consent, ad and app-banner scripts use. They were not run against NCS; a rule that matches nothing on a page is harmless, but nothing here promises that this site shows any of them.\n\n- **Cookie banners** hides the OneTrust, Cookiebot, Quantcast, Didomi, Usercentrics, TrustArc and Osano dialogs and common `cc-window` / `#cookie-banner` boxes. Some sites lock page scroll while the dialog is open; hiding the dialog does not undo that.\n- **Ads** hides Google ad slots and ad iframes. Sites that serve their own ad markup are not covered.\n- **App banners** hides the Smart App Banner and common \"install our app\" strips.\n\nOpen a page, toggle the options in Settings and report anything that hides content you wanted."
+    "summary": "NCS: hides social icon links, blurs or hides cover art, can hide the featured release card, artist names and footer",
+    "notes": "**Checked 2026-11-13**, logged out, headless Chrome, https://ncs.io/ with an iPhone UA and a desktop UA (the site is one responsive, server-rendered page). No cookie banner, no ads and no pop-ups were rendered in the visit, so the existing generic rules are unchanged and the new rules are content options rather than annoyance fixes (except the social links).\n\n- **Social links**: `header nav a[target=\"_blank\"]:has(img.social)` 3 (Spotify, Instagram, YouTube) and `footer .social-media` 1 (LIVE).\n- **Cover art**: `.item .inner .img` 25 release covers (CSS background images, so the whole box is blurred or hidden) and `article.module.details .bg` 1 on the featured release (LIVE).\n- **Featured release** `article.module.details` 1, **artist names** `.item .bottom .tags` 25, **footer** `footer` 1 (LIVE).\n\nNot verified: artist and release pages, the global player bar while playing, logged-in pages. Class names are plain and readable (Bootstrap grid plus `item`, `inner`, `img`); no hashed names are used. Library list view (`?display=list`) was not inspected.",
+    "lastVerified": "2026-11-13"
   }
 }

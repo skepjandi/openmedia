@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "market.official.xmplaylist",
   "name": "xmplaylist",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "origin": "user",
   "tags": ["desktop", "mobile"],
   "match": ["https://*.xmplaylist.com/*"],
@@ -27,6 +27,41 @@
       "description": "The Smart App Banner and install-our-app strips.",
       "group": "annoyance",
       "default": true
+    },
+    {
+      "id": "promo-banner",
+      "label": "Hide the promo banner",
+      "description": "The announcement strip at the top of the page (currently the ChatGPT connection promo).",
+      "group": "annoyance",
+      "default": true
+    },
+    {
+      "id": "channel-logos",
+      "label": "Channel logos",
+      "description": "Show, blur or hide the channel logo pictures in the channel grid.",
+      "group": "content",
+      "choices": [
+        {
+          "id": "show",
+          "label": "Show"
+        },
+        {
+          "id": "blur",
+          "label": "Blur"
+        },
+        {
+          "id": "hide",
+          "label": "Hide"
+        }
+      ],
+      "default": "show"
+    },
+    {
+      "id": "site-footer",
+      "label": "Hide the site footer",
+      "description": "The footer with the Explore, Connect, Info and Legal link lists.",
+      "group": "content",
+      "default": false
     }
   ],
   "rules": [
@@ -56,12 +91,67 @@
       "target": {
         "css": "#smartbanner, .smartbanner, .smart-banner, .app-banner, #app-banner, .app-download-banner, .install-app-banner"
       }
+    },
+    {
+      "id": "promo-strip",
+      "label": "Announcement banner",
+      "type": "hide",
+      "option": "promo-banner",
+      "target": {
+        "css": "aside:has(> p > a[href=\"/connections\"])"
+      }
+    },
+    {
+      "id": "xm-ad-slots",
+      "label": "Auto-placed and labelled ad regions",
+      "type": "hide",
+      "option": "ads",
+      "target": {
+        "css": "div.google-auto-placed, [role=\"region\"][aria-label=\"Advertisement\"]"
+      }
+    },
+    {
+      "id": "logos-blur",
+      "label": "Channel logos blurred",
+      "type": "css",
+      "option": "channel-logos",
+      "choice": [
+        "blur"
+      ],
+      "target": {
+        "css": "[data-view=\"grid\"] img"
+      },
+      "declarations": {
+        "filter": "blur(10px)"
+      }
+    },
+    {
+      "id": "logos-hide",
+      "label": "Channel logos hidden",
+      "type": "hide",
+      "option": "channel-logos",
+      "choice": [
+        "hide"
+      ],
+      "target": {
+        "css": "[data-view=\"grid\"] img"
+      }
+    },
+    {
+      "id": "footer-block",
+      "label": "Site footer",
+      "type": "hide",
+      "option": "site-footer",
+      "target": {
+        "css": "footer"
+      }
     }
   ],
   "meta": {
     "author": "OpenMedia",
     "homepage": "https://xmplaylist.com/",
-    "summary": "Cleans up cookie banners, ads and app prompts on xmplaylist, a media site",
-    "notes": "**Not verified live.** The fixtures in `recipes/fixtures/xmplaylist/` are synthetic: hand-written pages that contain the targeted elements, not captures of the site, so the fixture test proves only that the selectors parse and spare protected content. These are generic cleanup rules, written from the selectors that common cookie-consent, ad and app-banner scripts use. They were not run against xmplaylist; a rule that matches nothing on a page is harmless, but nothing here promises that this site shows any of them.\n\n- **Cookie banners** hides the OneTrust, Cookiebot, Quantcast, Didomi, Usercentrics, TrustArc and Osano dialogs and common `cc-window` / `#cookie-banner` boxes. Some sites lock page scroll while the dialog is open; hiding the dialog does not undo that.\n- **Ads** hides Google ad slots and ad iframes. Sites that serve their own ad markup are not covered.\n- **App banners** hides the Smart App Banner and common \"install our app\" strips.\n\nOpen a page, toggle the options in Settings and report anything that hides content you wanted."
+    "summary": "xmplaylist: ChatGPT promo banner and ad slots, plus channel logo and footer controls",
+    "notes": "Checked LIVE on 2026-11-13: rendered DOM of xmplaylist.com home (iPhone UA 390x844 and desktop UA, the same Tailwind page), logged out, captured with headless Chrome; counts were taken on the saved DOM. Fixtures real.html and desktop-real.html are structural captures with text stripped and the channel grid cut to 8 tiles.\n\nLIVE counts: `aside:has(> p > a[href=\"/connections\"])` 1 (matched by its link, not its English text), `ins.adsbygoogle` 3 (covered by the original ads rule), `div.google-auto-placed` 1 (Google auto-ads wrapper), `[role=\"region\"][aria-label=\"Advertisement\"]` 2 desktop / 3 phone (the label is English-only), `[data-view=\"grid\"] img` 179 (one logo per SiriusXM channel), `footer` 1.\n\nThe Tailwind classes are unusable; the rules use `aria-label`, `role`, `data-view` and hrefs. The channel grid itself, the primary nav and the station pages' track lists are never hidden. The original cookie and app-banner rules matched nothing and are kept. NOT verified: station and track pages, search, the cookie dialog Google may show in some regions, logged-in state.",
+    "lastVerified": "2026-11-13"
   }
 }

@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "market.official.the-lot-radio",
   "name": "The Lot Radio",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "origin": "user",
   "tags": ["desktop", "mobile"],
   "match": ["https://*.thelotradio.com/*"],
@@ -27,6 +27,62 @@
       "description": "The Smart App Banner and install-our-app strips.",
       "group": "annoyance",
       "default": true
+    },
+    {
+      "id": "newsletter-form",
+      "label": "Hide the newsletter sign-up",
+      "description": "The email sign-up form (a Substack subscribe form) on the home page.",
+      "group": "annoyance",
+      "default": true
+    },
+    {
+      "id": "artwork",
+      "label": "Show and artist pictures",
+      "description": "Show, blur or hide the show, session and resident pictures.",
+      "group": "content",
+      "choices": [
+        {
+          "id": "show",
+          "label": "Show"
+        },
+        {
+          "id": "blur",
+          "label": "Blur"
+        },
+        {
+          "id": "hide",
+          "label": "Hide"
+        }
+      ],
+      "default": "show"
+    },
+    {
+      "id": "staff-picks",
+      "label": "Hide Staff Picks",
+      "description": "The Staff Picks row of recommended past sessions.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "residents",
+      "label": "Hide Featured Residents",
+      "description": "The Featured Residents row of artists on the home page.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "shop-links",
+      "label": "Hide Shop links",
+      "description": "The Shop link in the header menu and the footer.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "footer",
+      "label": "Hide the footer",
+      "description": "The footer with the address, site links and social accounts.",
+      "group": "content",
+      "default": false
     }
   ],
   "rules": [
@@ -56,12 +112,81 @@
       "target": {
         "css": "#smartbanner, .smartbanner, .smart-banner, .app-banner, #app-banner, .app-download-banner, .install-app-banner"
       }
+    },
+    {
+      "id": "newsletter-form",
+      "label": "Newsletter sign-up form",
+      "type": "hide",
+      "option": "newsletter-form",
+      "target": {
+        "css": "form[action*=\"substack.com/subscribe\"]"
+      }
+    },
+    {
+      "id": "artwork-blur",
+      "label": "Show and artist pictures",
+      "type": "css",
+      "option": "artwork",
+      "choice": ["blur"],
+      "target": {
+        "css": "#main img"
+      },
+      "declarations": {
+        "filter": "blur(12px)"
+      }
+    },
+    {
+      "id": "artwork-hide",
+      "label": "Show and artist pictures",
+      "type": "hide",
+      "option": "artwork",
+      "choice": ["hide"],
+      "target": {
+        "css": "#main img"
+      }
+    },
+    {
+      "id": "staff-picks",
+      "label": "Staff Picks row",
+      "type": "hide",
+      "option": "staff-picks",
+      "target": {
+        "css": "#main section:has(a[href=\"/the-index\"])"
+      }
+    },
+    {
+      "id": "residents",
+      "label": "Featured Residents row",
+      "type": "hide",
+      "option": "residents",
+      "target": {
+        "css": "#main section:has(a[href=\"/artists\"])"
+      }
+    },
+    {
+      "id": "shop-links",
+      "label": "Shop links",
+      "type": "hide",
+      "option": "shop-links",
+      "target": {
+        "css": "a[href=\"/shop\"]"
+      }
+    },
+    {
+      "id": "footer",
+      "label": "Page footer",
+      "type": "hide",
+      "option": "footer",
+      "target": {
+        "css": "footer:has(a[href=\"/privacy-policy\"])"
+      }
     }
   ],
   "meta": {
     "author": "OpenMedia",
     "homepage": "https://www.thelotradio.com/",
-    "summary": "Cleans up cookie banners, ads and app prompts on The Lot Radio, a media site",
-    "notes": "**Not verified live.** The fixtures in `recipes/fixtures/the-lot-radio/` are synthetic: hand-written pages that contain the targeted elements, not captures of the site, so the fixture test proves only that the selectors parse and spare protected content. These are generic cleanup rules, written from the selectors that common cookie-consent, ad and app-banner scripts use. They were not run against The Lot Radio; a rule that matches nothing on a page is harmless, but nothing here promises that this site shows any of them.\n\n- **Cookie banners** hides the OneTrust, Cookiebot, Quantcast, Didomi, Usercentrics, TrustArc and Osano dialogs and common `cc-window` / `#cookie-banner` boxes. Some sites lock page scroll while the dialog is open; hiding the dialog does not undo that.\n- **Ads** hides Google ad slots and ad iframes. Sites that serve their own ad markup are not covered.\n- **App banners** hides the Smart App Banner and common \"install our app\" strips.\n\nOpen a page, toggle the options in Settings and report anything that hides content you wanted."
+    "summary": "Hides The Lot Radio's newsletter form and optional rows; blur or hide show pictures; footer, shop links",
+    "notes": "Checked 2026-11-13, logged out, real Chrome (headless) on thelotradio.com (home) with iPhone UA 390x844 and desktop UA, DOM captured after 7 seconds (Next.js, Tailwind, no hashed class names and no data attributes). Fixtures `real.html` and `desktop-real.html` are sanitised excerpts (text and show links stripped, needed ancestors only, `data-keep` on #main, the live stream player and the search form).\n\nLIVE: `form[action*=\"substack.com/subscribe\"]` 1, `#main img` 84, `#main section:has(a[href=\"/the-index\"])` 1 (Staff Picks), `#main section:has(a[href=\"/artists\"])` 1 (Featured Residents), `a[href=\"/shop\"]` 2, `footer:has(a[href=\"/privacy-policy\"])` 1. The \"Today's Lineup\" section holds the schedule and is never touched. The original cookie, ad and app-banner rules matched nothing; The Lot has no ads or consent dialog on the home page.\n\nChoices: Show and artist pictures Show/Blur/Hide.\n\nNo class names are used because they are Tailwind utility strings; rules use hrefs and the form action instead, which are stable URLs.\n\nNOT verified: show, artist, calendar and shop pages; the player controls and the fixed now-playing bar (left alone, no stable hook); other days (the home sections rotate with the schedule).",
+    "lastVerified": "2026-11-13"
   }
 }

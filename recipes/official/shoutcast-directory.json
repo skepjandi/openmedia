@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "market.official.shoutcast-directory",
   "name": "SHOUTcast Directory",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "origin": "user",
   "tags": ["desktop", "mobile"],
   "match": ["https://*.shoutcast.com/*"],
@@ -27,6 +27,55 @@
       "description": "The Smart App Banner and install-our-app strips.",
       "group": "annoyance",
       "default": true
+    },
+    {
+      "id": "hero",
+      "label": "Hide the hero banner",
+      "description": "The \"Leader in Streaming Audio\" headline and station count above the station list.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "station-stats",
+      "label": "Listeners, bitrate and type",
+      "description": "The Listeners, Bitrate and Type columns of the station list. Dim fades them; Hide removes them.",
+      "group": "content",
+      "choices": [
+        {
+          "id": "show",
+          "label": "Show"
+        },
+        {
+          "id": "dim",
+          "label": "Dim"
+        },
+        {
+          "id": "hide",
+          "label": "Hide"
+        }
+      ],
+      "default": "show"
+    },
+    {
+      "id": "genre-column",
+      "label": "Hide the genre column",
+      "description": "The Genre column in the station list.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "genre-sidebar",
+      "label": "Hide the genre list",
+      "description": "The expandable genre list on the left of the station list.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "footer",
+      "label": "Hide the footer",
+      "description": "Social links, Send Feedback and the footer links.",
+      "group": "content",
+      "default": false
     }
   ],
   "rules": [
@@ -56,12 +105,85 @@
       "target": {
         "css": "#smartbanner, .smartbanner, .smart-banner, .app-banner, #app-banner, .app-download-banner, .install-app-banner"
       }
+    },
+    {
+      "id": "cookie-dough",
+      "label": "SHOUTcast cookie bar",
+      "type": "hide",
+      "option": "cookie-banners",
+      "target": {
+        "css": "#cookieDough"
+      }
+    },
+    {
+      "id": "hero",
+      "label": "Hero banner",
+      "type": "hide",
+      "option": "hero",
+      "target": {
+        "css": "section#hero"
+      }
+    },
+    {
+      "id": "stats-dim",
+      "label": "Listener, bitrate and type cells",
+      "type": "css",
+      "option": "station-stats",
+      "choice": [
+        "dim"
+      ],
+      "target": {
+        "css": "#station-list td.listeners, #station-list td.bitrate, #station-list td.encode, #station-list th.listeners, #station-list th.bitrate, #station-list th.type"
+      },
+      "declarations": {
+        "opacity": "0.35"
+      }
+    },
+    {
+      "id": "stats-hide",
+      "label": "Listener, bitrate and type cells",
+      "type": "hide",
+      "option": "station-stats",
+      "choice": [
+        "hide"
+      ],
+      "target": {
+        "css": "#station-list td.listeners, #station-list td.bitrate, #station-list td.encode, #station-list th.listeners, #station-list th.bitrate, #station-list th.type"
+      }
+    },
+    {
+      "id": "genre-column",
+      "label": "Genre column",
+      "type": "hide",
+      "option": "genre-column",
+      "target": {
+        "css": "#station-list td.genre, #station-list th.genre"
+      }
+    },
+    {
+      "id": "genre-sidebar",
+      "label": "Genre list",
+      "type": "hide",
+      "option": "genre-sidebar",
+      "target": {
+        "css": "#genre-colonne"
+      }
+    },
+    {
+      "id": "footer",
+      "label": "Footer",
+      "type": "hide",
+      "option": "footer",
+      "target": {
+        "css": "body > footer, main ~ footer"
+      }
     }
   ],
   "meta": {
     "author": "OpenMedia",
     "homepage": "https://directory.shoutcast.com/",
-    "summary": "Cleans up cookie banners, ads and app prompts on SHOUTcast Directory, a media site",
-    "notes": "**Not verified live.** The fixtures in `recipes/fixtures/shoutcast-directory/` are synthetic: hand-written pages that contain the targeted elements, not captures of the site, so the fixture test proves only that the selectors parse and spare protected content. These are generic cleanup rules, written from the selectors that common cookie-consent, ad and app-banner scripts use. They were not run against SHOUTcast Directory; a rule that matches nothing on a page is harmless, but nothing here promises that this site shows any of them.\n\n- **Cookie banners** hides the OneTrust, Cookiebot, Quantcast, Didomi, Usercentrics, TrustArc and Osano dialogs and common `cc-window` / `#cookie-banner` boxes. Some sites lock page scroll while the dialog is open; hiding the dialog does not undo that.\n- **Ads** hides Google ad slots and ad iframes. Sites that serve their own ad markup are not covered.\n- **App banners** hides the Smart App Banner and common \"install our app\" strips.\n\nOpen a page, toggle the options in Settings and report anything that hides content you wanted."
+    "summary": "Hides SHOUTcast's own cookie bar (#cookieDough), the hero banner, genre list and footer; dim or hide listener and bitrate columns",
+    "notes": "Checked 2026-11-13, logged out, iPhone UA 390x844 in headless Chrome, directory.shoutcast.com home page. Counts are `querySelectorAll` on the rendered DOM saved from that load (scripts then switched off to evaluate): cookie bar `#cookieDough` 1 (the original list had no rule for it, so a new rule was added), hero 1, genre list 1, station rows 50 each with listeners/bitrate/type/genre cells, footer 1. Station list columns are `td.listeners`, `td.bitrate`, `td.encode`, `td.genre`; Play and Download cells are never touched. No ad slots were present (SHOUTcast's own ads are in the player pages, not checked).\n\nNOT verified: genre pages, search results, the station page with the Winamp player, desktop layout (same DOM, wider), original ad and app-banner rules (nothing on this page matches them).",
+    "lastVerified": "2026-11-13"
   }
 }

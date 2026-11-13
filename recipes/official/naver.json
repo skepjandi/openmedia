@@ -2,10 +2,15 @@
   "schema": 1,
   "id": "market.official.naver",
   "name": "Naver",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "origin": "user",
-  "tags": ["desktop", "mobile"],
-  "match": ["https://*.naver.com/*"],
+  "tags": [
+    "desktop",
+    "mobile"
+  ],
+  "match": [
+    "https://*.naver.com/*"
+  ],
   "options": [
     {
       "id": "cookie-banners",
@@ -27,6 +32,48 @@
       "description": "The Smart App Banner and install-our-app strips.",
       "group": "annoyance",
       "default": true
+    },
+    {
+      "id": "thumbnails",
+      "label": "News thumbnails",
+      "description": "Show, blur or hide the article pictures and press logos on the Naver News home and section lists.",
+      "group": "content",
+      "choices": [
+        {
+          "id": "show",
+          "label": "Show"
+        },
+        {
+          "id": "blur",
+          "label": "Blur"
+        },
+        {
+          "id": "hide",
+          "label": "Hide"
+        }
+      ],
+      "default": "show"
+    },
+    {
+      "id": "subscribe-buttons",
+      "label": "Hide Subscribe buttons",
+      "description": "The \"구독\" (subscribe) buttons next to each press outlet and issue group in the news feed.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "issue-tags",
+      "label": "Hide issue tags",
+      "description": "The keyword tags under news items in the issue and topic groups on News home.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "home-cards",
+      "label": "Hide home cards and shortcuts",
+      "description": "On m.naver.com: the weather, stock and disaster-alert cards and the service shortcut grid under the search box.",
+      "group": "content",
+      "default": false
     }
   ],
   "rules": [
@@ -56,12 +103,85 @@
       "target": {
         "css": "#smartbanner, .smartbanner, .smart-banner, .app-banner, #app-banner, .app-download-banner, .install-app-banner"
       }
+    },
+    {
+      "id": "naver-ad-boards",
+      "label": "Naver ad boards and banners",
+      "type": "hide",
+      "option": "ads",
+      "target": {
+        "css": "#ad_premium_area, #timeboard-ex, #whale-banner, #whale-banner-bottom, #glad_ad_sidebox, #glad_ad_sidebox_secondary, #HOME_AD, [data-issue-banner=\"ad\"], div[id^=\"main_search_specialda\"]"
+      }
+    },
+    {
+      "id": "naver-app-nudges",
+      "label": "Open-in-app nudges",
+      "type": "hide",
+      "option": "app-banners",
+      "target": {
+        "css": "#MM_HOME_NUDGE_BANNER, #__MM_OS_SUBSCRIBE_POPUP"
+      }
+    },
+    {
+      "id": "thumbs-blur",
+      "label": "News thumbnails and press logos",
+      "type": "css",
+      "option": "thumbnails",
+      "choice": [
+        "blur"
+      ],
+      "target": {
+        "css": ".cnf_news_thumb, .cni_thumb_box, .cnf_journal_thumb"
+      },
+      "declarations": {
+        "filter": "blur(10px)"
+      }
+    },
+    {
+      "id": "thumbs-hide",
+      "label": "News thumbnails and press logos",
+      "type": "hide",
+      "option": "thumbnails",
+      "choice": [
+        "hide"
+      ],
+      "target": {
+        "css": ".cnf_news_thumb, .cni_thumb_box, .cnf_journal_thumb"
+      }
+    },
+    {
+      "id": "subscribe-buttons",
+      "label": "Subscribe buttons",
+      "type": "hide",
+      "option": "subscribe-buttons",
+      "target": {
+        "css": ".cnf_btn_subscription, .cni_btn_subscribe"
+      }
+    },
+    {
+      "id": "issue-tags",
+      "label": "Issue tags",
+      "type": "hide",
+      "option": "issue-tags",
+      "target": {
+        "css": ".cni_tag_item, .cni_keyword"
+      }
+    },
+    {
+      "id": "home-cards",
+      "label": "Home cards and shortcut grid",
+      "type": "hide",
+      "option": "home-cards",
+      "target": {
+        "css": "#MM_HOME_SEARCH_WEATHER, #MM_search_stock, #MM_search_disaster, #MM_search_stock_major_index, #MM_home_menu_container"
+      }
     }
   ],
   "meta": {
     "author": "OpenMedia",
     "homepage": "https://www.naver.com/",
-    "summary": "Cleans up cookie banners, ads and app prompts on Naver",
-    "notes": "**Not verified live.** The fixtures in `recipes/fixtures/naver/` are synthetic: hand-written pages that contain the targeted elements, not captures of the site, so the fixture test proves only that the selectors parse and spare protected content. These are generic cleanup rules, written from the selectors that common cookie-consent, ad and app-banner scripts use. They were not run against Naver; a rule that matches nothing on a page is harmless, but nothing here promises that this site shows any of them.\n\n- **Cookie banners** hides the OneTrust, Cookiebot, Quantcast, Didomi, Usercentrics, TrustArc and Osano dialogs and common `cc-window` / `#cookie-banner` boxes. Some sites lock page scroll while the dialog is open; hiding the dialog does not undo that.\n- **Ads** hides Google ad slots and ad iframes. Sites that serve their own ad markup are not covered.\n- **App banners** hides the Smart App Banner and common \"install our app\" strips.\n\nOpen a page, toggle the options in Settings and report anything that hides content you wanted."
+    "summary": "Naver: hides ad boards and app nudges, blurs or hides news thumbnails, can hide subscribe buttons, home cards and issue tags",
+    "notes": "**Checked 2026-11-13**, logged out, headless Chrome: m.naver.com and news.naver.com with an iPhone UA, www.naver.com and news.naver.com with a desktop UA. Naver is many sites under one match (home, news, cafe, blog, map, shopping); only home and News were inspected.\n\n- **Ad boards**: on desktop home `#ad_premium_area`, `#timeboard-ex`, `#whale-banner`, `#whale-banner-bottom` matched 1 each; on News `#glad_ad_sidebox` and `#glad_ad_sidebox_secondary` 1 each; on mobile home `#HOME_AD` 1, `[data-issue-banner=\"ad\"]` 1, `#main_search_specialda_1` 1 (LIVE). The slots were empty in the headless visit, so what they hold on a normal visit was not seen.\n- **App nudges**: `#MM_HOME_NUDGE_BANNER` and `#__MM_OS_SUBSCRIBE_POPUP` exist on mobile home but are hidden until the page triggers them (LIVE for existence, INFERRED that they appear for visitors).\n- **Thumbnails**: `.cnf_news_thumb`, `.cni_thumb_box`, `.cnf_journal_thumb` 242 on desktop News home (LIVE).\n- **Subscribe buttons** 108 and **issue tags** 112 on desktop News home (LIVE).\n- **Home cards**: the mobile home cards (`#MM_HOME_SEARCH_WEATHER`, `#MM_search_stock`, `#MM_search_disaster`) and `#MM_home_menu_container` each matched 1 (LIVE). Some cards are display:none until data arrives.\n\nNot verified: the desktop www.naver.com home content was an empty React shell in headless Chrome (its widgets did not render), so no desktop home card rules were written. Cafe, blog and shopping were not visited. Ids and class names are stable and readable; labels are Korean but no rule uses text.",
+    "lastVerified": "2026-11-13"
   }
 }

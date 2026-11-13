@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "market.official.setlist-fm",
   "name": "setlist.fm",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "origin": "user",
   "tags": ["desktop", "mobile"],
   "match": ["https://*.setlist.fm/*"],
@@ -27,6 +27,55 @@
       "description": "The Smart App Banner and install-our-app strips.",
       "group": "annoyance",
       "default": true
+    },
+    {
+      "id": "site-stats",
+      "label": "Hide the site statistics strip",
+      "description": "The count of setlists, artists, venues and festivals under the search box.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "news-box",
+      "label": "Hide the news section",
+      "description": "The featured news articles on the home page.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "news-pictures",
+      "label": "News pictures",
+      "description": "The pictures in news article previews. Blur keeps the layout; Hide leaves only the headline.",
+      "group": "content",
+      "choices": [
+        {
+          "id": "show",
+          "label": "Show"
+        },
+        {
+          "id": "blur",
+          "label": "Blur"
+        },
+        {
+          "id": "hide",
+          "label": "Hide"
+        }
+      ],
+      "default": "show"
+    },
+    {
+      "id": "popular-artists",
+      "label": "Hide popular artists",
+      "description": "The Popular Artists box on the home page.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "footer",
+      "label": "Hide the footer",
+      "description": "The browse lists, link columns, theme switch and partner links at the bottom.",
+      "group": "content",
+      "default": false
     }
   ],
   "rules": [
@@ -56,12 +105,85 @@
       "target": {
         "css": "#smartbanner, .smartbanner, .smart-banner, .app-banner, #app-banner, .app-download-banner, .install-app-banner"
       }
+    },
+    {
+      "id": "sl-ad-rows",
+      "label": "Leaderboard rows and sticky bottom ad",
+      "type": "hide",
+      "option": "ads",
+      "target": {
+        "css": ".homePageLeaderBoard, .adhesion.closeableAd, .leaderBoard, .prmtnTop, .prmtnMbanner"
+      }
+    },
+    {
+      "id": "site-stats",
+      "label": "Site statistics strip",
+      "type": "hide",
+      "option": "site-stats",
+      "target": {
+        "css": "div.jumbobottom div.stats"
+      }
+    },
+    {
+      "id": "news-box",
+      "label": "News section",
+      "type": "hide",
+      "option": "news-box",
+      "target": {
+        "css": ".newsHomeFeatured"
+      }
+    },
+    {
+      "id": "news-pictures-blur",
+      "label": "News article pictures",
+      "type": "css",
+      "option": "news-pictures",
+      "choice": [
+        "blur"
+      ],
+      "target": {
+        "css": ".newsArticleImagePreview img, .newsArticlePreview img"
+      },
+      "declarations": {
+        "filter": "blur(12px)"
+      }
+    },
+    {
+      "id": "news-pictures-hide",
+      "label": "News article pictures",
+      "type": "hide",
+      "option": "news-pictures",
+      "choice": [
+        "hide"
+      ],
+      "target": {
+        "css": ".newsArticleImagePreview img, .newsArticlePreview img"
+      }
+    },
+    {
+      "id": "popular-artists",
+      "label": "Popular artists box",
+      "type": "hide",
+      "option": "popular-artists",
+      "target": {
+        "css": "div.transparentBox:has(#setlist-widget-stat-PopularArtistsWidget)"
+      }
+    },
+    {
+      "id": "footer",
+      "label": "Footer",
+      "type": "hide",
+      "option": "footer",
+      "target": {
+        "css": "div.footer.hidden-print"
+      }
     }
   ],
   "meta": {
     "author": "OpenMedia",
     "homepage": "https://www.setlist.fm/",
-    "summary": "Cleans up cookie banners, ads and app prompts on setlist.fm, a media site",
-    "notes": "**Not verified live.** The fixtures in `recipes/fixtures/setlist-fm/` are synthetic: hand-written pages that contain the targeted elements, not captures of the site, so the fixture test proves only that the selectors parse and spare protected content. These are generic cleanup rules, written from the selectors that common cookie-consent, ad and app-banner scripts use. They were not run against setlist.fm; a rule that matches nothing on a page is harmless, but nothing here promises that this site shows any of them.\n\n- **Cookie banners** hides the OneTrust, Cookiebot, Quantcast, Didomi, Usercentrics, TrustArc and Osano dialogs and common `cc-window` / `#cookie-banner` boxes. Some sites lock page scroll while the dialog is open; hiding the dialog does not undo that.\n- **Ads** hides Google ad slots and ad iframes. Sites that serve their own ad markup are not covered.\n- **App banners** hides the Smart App Banner and common \"install our app\" strips.\n\nOpen a page, toggle the options in Settings and report anything that hides content you wanted."
+    "summary": "Hides setlist.fm leaderboard and sticky bottom ads, site stats, news and popular-artist boxes, footer; blur or hide news pictures",
+    "notes": "Checked 2026-11-13, logged out, iPhone UA 390x844 in headless Chrome, setlist.fm home page. Counts are `querySelectorAll` on the rendered DOM saved from that load (scripts then switched off to evaluate): leaderboard rows and the closable sticky bottom ad in the ads option, statistics strip, news section with previews, popular artists box, footer. Setlist.fm uses Bootstrap-era readable class names (`homePageLeaderBoard`, `adhesion`, `newsHomeFeatured`), not hashed ones, and none depend on English text.\n\nNOT verified: setlist pages (the Spotify/Apple Music and ticket boxes), artist and venue pages, search results, the Add setlist wizard, desktop layout, signed-in states.",
+    "lastVerified": "2026-11-13"
   }
 }

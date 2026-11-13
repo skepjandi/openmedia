@@ -2,10 +2,15 @@
   "schema": 1,
   "id": "market.official.online-radio-box",
   "name": "Online Radio Box",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "origin": "user",
-  "tags": ["desktop", "mobile"],
-  "match": ["https://*.onlineradiobox.com/*"],
+  "tags": [
+    "desktop",
+    "mobile"
+  ],
+  "match": [
+    "https://*.onlineradiobox.com/*"
+  ],
   "options": [
     {
       "id": "cookie-banners",
@@ -27,6 +32,55 @@
       "description": "The Smart App Banner and install-our-app strips.",
       "group": "annoyance",
       "default": true
+    },
+    {
+      "id": "partner-links",
+      "label": "Hide partner links",
+      "description": "The \"Partners\" logo strip in the footer.",
+      "group": "annoyance",
+      "default": true
+    },
+    {
+      "id": "station-logos",
+      "label": "Station logos",
+      "description": "Show, blur or hide the station logo pictures in the station lists.",
+      "group": "content",
+      "choices": [
+        {
+          "id": "show",
+          "label": "Show"
+        },
+        {
+          "id": "blur",
+          "label": "Blur"
+        },
+        {
+          "id": "hide",
+          "label": "Hide"
+        }
+      ],
+      "default": "show"
+    },
+    {
+      "id": "local-highlight",
+      "label": "Hide the local station highlight",
+      "description": "The \"your country\" box with a featured local station.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "directory",
+      "label": "Hide the regional directory",
+      "description": "The long \"Radio stations directory by region\" link block.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "footer",
+      "label": "Hide the footer",
+      "description": "The footer with partner links, app badges and legal links.",
+      "group": "content",
+      "default": false
     }
   ],
   "rules": [
@@ -56,12 +110,94 @@
       "target": {
         "css": "#smartbanner, .smartbanner, .smart-banner, .app-banner, #app-banner, .app-download-banner, .install-app-banner"
       }
+    },
+    {
+      "id": "orb-cookie-notice",
+      "label": "Cookie notice bar",
+      "type": "hide",
+      "option": "cookie-banners",
+      "target": {
+        "css": "#alert_cookies"
+      }
+    },
+    {
+      "id": "orb-app-promo",
+      "label": "Mobile app promo block and store badges",
+      "type": "hide",
+      "option": "app-banners",
+      "target": {
+        "css": ".about-container, .link--playmarket, .link--appstore"
+      }
+    },
+    {
+      "id": "partner-links",
+      "label": "Partner links",
+      "type": "hide",
+      "option": "partner-links",
+      "target": {
+        "css": ".footer__sponsors"
+      }
+    },
+    {
+      "id": "logos-blur",
+      "label": "Station logos",
+      "type": "css",
+      "option": "station-logos",
+      "choice": [
+        "blur"
+      ],
+      "target": {
+        "css": ".stations__station img, .cooked__station__logo"
+      },
+      "declarations": {
+        "filter": "blur(8px)"
+      }
+    },
+    {
+      "id": "logos-hide",
+      "label": "Station logos",
+      "type": "hide",
+      "option": "station-logos",
+      "choice": [
+        "hide"
+      ],
+      "target": {
+        "css": ".stations__station img, .cooked__station__logo"
+      }
+    },
+    {
+      "id": "local-highlight",
+      "label": "Local station highlight",
+      "type": "hide",
+      "option": "local-highlight",
+      "target": {
+        "css": ".cooked-container"
+      }
+    },
+    {
+      "id": "directory",
+      "label": "Regional directory",
+      "type": "hide",
+      "option": "directory",
+      "target": {
+        "css": ".catalog-container"
+      }
+    },
+    {
+      "id": "footer",
+      "label": "Footer",
+      "type": "hide",
+      "option": "footer",
+      "target": {
+        "css": "footer.footer"
+      }
     }
   ],
   "meta": {
     "author": "OpenMedia",
     "homepage": "https://onlineradiobox.com/",
-    "summary": "Cleans up cookie banners, ads and app prompts on Online Radio Box, a media site",
-    "notes": "**Not verified live.** The fixtures in `recipes/fixtures/online-radio-box/` are synthetic: hand-written pages that contain the targeted elements, not captures of the site, so the fixture test proves only that the selectors parse and spare protected content. These are generic cleanup rules, written from the selectors that common cookie-consent, ad and app-banner scripts use. They were not run against Online Radio Box; a rule that matches nothing on a page is harmless, but nothing here promises that this site shows any of them.\n\n- **Cookie banners** hides the OneTrust, Cookiebot, Quantcast, Didomi, Usercentrics, TrustArc and Osano dialogs and common `cc-window` / `#cookie-banner` boxes. Some sites lock page scroll while the dialog is open; hiding the dialog does not undo that.\n- **Ads** hides Google ad slots and ad iframes. Sites that serve their own ad markup are not covered.\n- **App banners** hides the Smart App Banner and common \"install our app\" strips.\n\nOpen a page, toggle the options in Settings and report anything that hides content you wanted."
+    "summary": "Online Radio Box: hides cookie notice, app promos and partner links, blurs or hides station logos, can hide directory and footer",
+    "notes": "**Checked 2026-11-13**, logged out, headless Chrome on https://onlineradiobox.com/ (it redirected to the Sri Lanka list from this IP) with an iPhone UA and a desktop UA. Both received the same server-rendered page with plain class names.\n\n- **Cookie notice**: `#alert_cookies` 1 (a bar, not one of the consent platforms the generic rule knows) (LIVE).\n- **App promo**: `.about-container` 1 (the \"Mobile Online Radio\" block) and `.link--playmarket` / `.link--appstore` 1 each (LIVE).\n- **Partner links** `.footer__sponsors` 1; **station logos** `.stations__station img` 10 and `.cooked__station__logo` 1; **local highlight** `.cooked-container` 1; **directory** `.catalog-container` 1; **footer** `footer.footer` 1 (LIVE).\n\nNot verified: a station's player page (a fetch of one failed when the network dropped), search, the login modal (`#popup_auth`, never hidden), pages for other countries. No ad slots rendered in this capture, so the generic ad rule is unchanged.",
+    "lastVerified": "2026-11-13"
   }
 }

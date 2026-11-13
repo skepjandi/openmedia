@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "market.official.somafm",
   "name": "SomaFM",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "origin": "user",
   "tags": ["desktop", "mobile"],
   "match": ["https://*.somafm.com/*"],
@@ -27,6 +27,58 @@
       "description": "The Smart App Banner and install-our-app strips.",
       "group": "annoyance",
       "default": true
+    },
+    {
+      "id": "donation-appeals",
+      "label": "Hide donation appeals",
+      "description": "The Support SomaFM box, card and PayPal donate buttons and the fundraising progress line. The Support link stays in the menu.",
+      "group": "annoyance",
+      "default": true
+    },
+    {
+      "id": "channel-art",
+      "label": "Channel art",
+      "description": "The square logo above each channel name. Blur keeps the layout; the logo is still the link to the channel.",
+      "group": "content",
+      "choices": [
+        {
+          "id": "show",
+          "label": "Show"
+        },
+        {
+          "id": "blur",
+          "label": "Blur"
+        }
+      ],
+      "default": "show"
+    },
+    {
+      "id": "listener-count",
+      "label": "Hide the listener count",
+      "description": "The \"N people listening to SomaFM right now\" line.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "news-box",
+      "label": "Hide the SomaFM news box",
+      "description": "The short news notes in the right column of the home page.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "channel-blurbs",
+      "label": "Hide channel descriptions",
+      "description": "The one-line description under every channel name.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "footer",
+      "label": "Hide the footer",
+      "description": "Copyright, trademark notice and privacy/terms links.",
+      "group": "content",
+      "default": false
     }
   ],
   "rules": [
@@ -56,12 +108,73 @@
       "target": {
         "css": "#smartbanner, .smartbanner, .smart-banner, .app-banner, #app-banner, .app-download-banner, .install-app-banner"
       }
+    },
+    {
+      "id": "donation-box",
+      "label": "Donation box and fundraising line",
+      "type": "hide",
+      "option": "donation-appeals",
+      "target": {
+        "css": "#begathon, .BegathonMessage, .FPBegathonMessage, #rhnews p.blue"
+      }
+    },
+    {
+      "id": "channel-art-blur",
+      "label": "Channel logos",
+      "type": "css",
+      "option": "channel-art",
+      "choice": [
+        "blur"
+      ],
+      "target": {
+        "css": "#stations li img"
+      },
+      "declarations": {
+        "filter": "blur(10px)"
+      }
+    },
+    {
+      "id": "listener-count",
+      "label": "Listeners line",
+      "type": "hide",
+      "option": "listener-count",
+      "target": {
+        "css": "#listening"
+      }
+    },
+    {
+      "id": "news-box",
+      "label": "News box",
+      "type": "hide",
+      "option": "news-box",
+      "target": {
+        "css": "#rhnews span.green:has(> h1)"
+      }
+    },
+    {
+      "id": "channel-blurbs",
+      "label": "Channel descriptions",
+      "type": "hide",
+      "option": "channel-blurbs",
+      "target": {
+        "css": "#stations li p.descr"
+      }
+    },
+    {
+      "id": "footer",
+      "label": "Footer",
+      "type": "hide",
+      "option": "footer",
+      "target": {
+        "css": "#foot"
+      }
     }
   ],
   "meta": {
     "author": "OpenMedia",
     "homepage": "https://somafm.com/",
-    "summary": "Cleans up cookie banners, ads and app prompts on SomaFM, a media site",
-    "notes": "**Not verified live.** The fixtures in `recipes/fixtures/somafm/` are synthetic: hand-written pages that contain the targeted elements, not captures of the site, so the fixture test proves only that the selectors parse and spare protected content. These are generic cleanup rules, written from the selectors that common cookie-consent, ad and app-banner scripts use. They were not run against SomaFM; a rule that matches nothing on a page is harmless, but nothing here promises that this site shows any of them.\n\n- **Cookie banners** hides the OneTrust, Cookiebot, Quantcast, Didomi, Usercentrics, TrustArc and Osano dialogs and common `cc-window` / `#cookie-banner` boxes. Some sites lock page scroll while the dialog is open; hiding the dialog does not undo that.\n- **Ads** hides Google ad slots and ad iframes. Sites that serve their own ad markup are not covered.\n- **App banners** hides the Smart App Banner and common \"install our app\" strips.\n\nOpen a page, toggle the options in Settings and report anything that hides content you wanted."
+    "summary": "Hides SomaFM donation boxes, blurs channel art, hides listener counts, news box and channel blurbs",
+    "notes": "Checked 2026-11-13, logged out. SomaFM serves a stripped start page to phone user agents (one Open Player button, a donation box, a Desktop Site link; fetched with an iPhone UA in headless Chrome, 390x844) and the full channel grid to desktop browsers (desktop UA, server-rendered HTML evaluated in Chrome with scripts off). Counts are `querySelectorAll`: donation box/card/progress line 5 on desktop and 2 on the phone page, channel logos 223, channel blurbs 223, listener line 1, news box 1, footer 1. Everything is plain HTML with readable ids and classes (`#begathon`, `.BegathonMessage`, `#rhnews`, `#stations`); nothing depends on English text.\n\nChannel logos are the only link to a channel page, so the choice is Show/Blur only. NOT verified: the player pages under /player24/ and channel pages, the guestbook and news pages, signed-in states, whether the donation box returns after a donation (the site sets a SomaDonated cookie for 30 days), and the original cookie and app-banner rules, which match nothing on this site.",
+    "lastVerified": "2026-11-13"
   }
 }

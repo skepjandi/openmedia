@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "market.official.zillow",
   "name": "Zillow",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "origin": "user",
   "tags": ["desktop", "mobile"],
   "match": ["https://*.zillow.com/*"],
@@ -27,6 +27,41 @@
       "description": "The Smart App Banner and install-our-app strips.",
       "group": "annoyance",
       "default": true
+    },
+    {
+      "id": "home-recs",
+      "label": "Home recommendations",
+      "description": "Dim or hide the Home Recommendations carousel on the home page.",
+      "group": "content",
+      "choices": [
+        {
+          "id": "show",
+          "label": "Show"
+        },
+        {
+          "id": "dim",
+          "label": "Dim"
+        },
+        {
+          "id": "hide",
+          "label": "Hide"
+        }
+      ],
+      "default": "show"
+    },
+    {
+      "id": "listing-badges",
+      "label": "Hide listing badges",
+      "description": "The small status badges on property cards (for example Within BuyAbility).",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "site-footer",
+      "label": "Hide the page footer",
+      "description": "The footer with company links, app badges and social links.",
+      "group": "content",
+      "default": false
     }
   ],
   "rules": [
@@ -56,12 +91,85 @@
       "target": {
         "css": "#smartbanner, .smartbanner, .smart-banner, .app-banner, #app-banner, .app-download-banner, .install-app-banner"
       }
+    },
+    {
+      "id": "zillow-consent",
+      "label": "Cookie consent bar",
+      "type": "hide",
+      "option": "cookie-banners",
+      "target": {
+        "css": "aside.dg-consent-banner"
+      }
+    },
+    {
+      "id": "zillow-app-badges",
+      "label": "App Store and Google Play badges",
+      "type": "hide",
+      "option": "app-banners",
+      "target": {
+        "css": "a[aria-label=\"Download on the App Store\"], a[aria-label=\"Get it on Google play\"]"
+      }
+    },
+    {
+      "id": "zillow-nav-ad",
+      "label": "Navigation ad list item",
+      "type": "hide",
+      "option": "ads",
+      "target": {
+        "css": "li:has(> p[class*=\"NavAdContainer\"])"
+      }
+    },
+    {
+      "id": "recs-dim",
+      "label": "Home recommendations dimmed",
+      "type": "css",
+      "option": "home-recs",
+      "choice": [
+        "dim"
+      ],
+      "target": {
+        "css": "[data-testid=\"home-recs-carousel\"]"
+      },
+      "declarations": {
+        "opacity": "0.35"
+      }
+    },
+    {
+      "id": "recs-hide",
+      "label": "Home recommendations hidden",
+      "type": "hide",
+      "option": "home-recs",
+      "choice": [
+        "hide"
+      ],
+      "target": {
+        "css": "[data-testid=\"home-recs-carousel\"]"
+      }
+    },
+    {
+      "id": "card-badges",
+      "label": "Property card badges",
+      "type": "hide",
+      "option": "listing-badges",
+      "target": {
+        "css": "[data-testid=\"property-card-badge\"]"
+      }
+    },
+    {
+      "id": "footer-block",
+      "label": "Page footer",
+      "type": "hide",
+      "option": "site-footer",
+      "target": {
+        "css": "footer.site-footer"
+      }
     }
   ],
   "meta": {
     "author": "OpenMedia",
     "homepage": "https://www.zillow.com/",
-    "summary": "Cleans up cookie banners, ads and app prompts on Zillow",
-    "notes": "**Not verified live.** The fixtures in `recipes/fixtures/zillow/` are synthetic: hand-written pages that contain the targeted elements, not captures of the site, so the fixture test proves only that the selectors parse and spare protected content. These are generic cleanup rules, written from the selectors that common cookie-consent, ad and app-banner scripts use. They were not run against Zillow; a rule that matches nothing on a page is harmless, but nothing here promises that this site shows any of them.\n\n- **Cookie banners** hides the OneTrust, Cookiebot, Quantcast, Didomi, Usercentrics, TrustArc and Osano dialogs and common `cc-window` / `#cookie-banner` boxes. Some sites lock page scroll while the dialog is open; hiding the dialog does not undo that.\n- **Ads** hides Google ad slots and ad iframes. Sites that serve their own ad markup are not covered.\n- **App banners** hides the Smart App Banner and common \"install our app\" strips.\n\nOpen a page, toggle the options in Settings and report anything that hides content you wanted."
+    "summary": "Zillow: consent bar, app badges and nav ad slot, plus recommendations, listing badge and footer controls (home page only)",
+    "notes": "Checked LIVE on 2026-11-13 on the zillow.com home page only (iPhone UA 390x844 and desktop UA), logged out, headless Chrome; counts were taken on the saved rendered DOM. Search results, map, and home detail pages could not be captured (Zillow bot checks and the machine's network failed), so rules for those pages are limited to one cited rule.\n\nLIVE counts: `aside.dg-consent-banner` 1 on both (present but `display: none` in the capture), App Store and Google Play badge links 1 each on both, `[data-testid=\"home-recs-carousel\"]` 1 on the phone (its cards were still loading skeletons) and 0 on desktop, `[data-testid=\"property-card-badge\"]` 3 on the phone, `footer.site-footer` 1 on both.\n\nSOURCE only: `li:has(> p[class*=\"NavAdContainer\"])` comes from a filter proposed in AdGuard AdguardFilters issue 200335 (the list item holding a permanently spinning ad slot in the search results). It was not seen live, and its fixture (`desktop-nav-ad.html`) is hand-written. The Zillow classes are styled-components hashes (`StyledBox-c11n-…`) and are never used; all other rules use `data-testid`, `aria-label` and element names.\n\nNOT verified: search and listing pages (Zestimate cards, photo galleries, save buttons), the sign-in prompt that Zillow shows on some pages, logged-in state.",
+    "lastVerified": "2026-11-13"
   }
 }

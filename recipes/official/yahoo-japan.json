@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "market.official.yahoo-japan",
   "name": "Yahoo Japan",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "origin": "user",
   "tags": ["desktop", "mobile"],
   "match": ["https://*.yahoo.co.jp/*"],
@@ -27,6 +27,76 @@
       "description": "The Smart App Banner and install-our-app strips.",
       "group": "annoyance",
       "default": true
+    },
+    {
+      "id": "home-banner",
+      "label": "Hide the set-as-homepage banner",
+      "description": "The One-click banner on desktop that asks you to make Yahoo! JAPAN your homepage.",
+      "group": "annoyance",
+      "default": true
+    },
+    {
+      "id": "promo-strips",
+      "label": "Hide promo strips and tip balloons",
+      "description": "The announcement link strip, the daily treasure-chest lottery link and the theme and tip balloons.",
+      "group": "annoyance",
+      "default": true
+    },
+    {
+      "id": "news-thumbnails",
+      "label": "News thumbnails",
+      "description": "Show, blur or hide the pictures on topics and story cards, on desktop and phone.",
+      "group": "content",
+      "choices": [
+        {
+          "id": "show",
+          "label": "Show"
+        },
+        {
+          "id": "blur",
+          "label": "Blur"
+        },
+        {
+          "id": "hide",
+          "label": "Hide"
+        }
+      ],
+      "default": "show"
+    },
+    {
+      "id": "recommended-articles",
+      "label": "Recommended articles",
+      "description": "Dim or hide the desktop Recommended articles feed below the topics.",
+      "group": "content",
+      "choices": [
+        {
+          "id": "show",
+          "label": "Show"
+        },
+        {
+          "id": "dim",
+          "label": "Dim"
+        },
+        {
+          "id": "hide",
+          "label": "Hide"
+        }
+      ],
+      "default": "show"
+    },
+    {
+      "id": "realtime-search",
+      "label": "Hide realtime search keywords",
+      "description": "The Realtime search trending keywords box on the desktop home page.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "corporate-sections",
+      "label": "Hide business and corporate boxes",
+      "description": "The business ads promo, social initiatives and LY Corporation notices at the foot of the desktop home.",
+      "group": "content",
+      "default": false
     }
   ],
   "rules": [
@@ -56,12 +126,121 @@
       "target": {
         "css": "#smartbanner, .smartbanner, .smart-banner, .app-banner, #app-banner, .app-download-banner, .install-app-banner"
       }
+    },
+    {
+      "id": "yj-ad-slots",
+      "label": "Ad and sponsored slots",
+      "type": "hide",
+      "option": "ads",
+      "target": {
+        "css": "#TPR, #TBP, #TCBX, #TBPCB, #GDN, #OVERLAY, #overlayAdsContainer, #prem-ad, #opening-screen-ad, #ad-fixed-banner, #ad-popup-feedback, [id^=\"STREAMAD\"], [id^=\"ssp_ydn_\"], #stb2Ad1"
+      }
+    },
+    {
+      "id": "yj-app-banner",
+      "label": "Use the Yahoo! JAPAN app banner",
+      "type": "hide",
+      "option": "app-banners",
+      "target": {
+        "css": "#log-rsab"
+      }
+    },
+    {
+      "id": "homepage-banner",
+      "label": "Set as homepage banner",
+      "type": "hide",
+      "option": "home-banner",
+      "target": {
+        "css": "#Perorin"
+      }
+    },
+    {
+      "id": "promo-links",
+      "label": "Promo links and balloons",
+      "type": "hide",
+      "option": "promo-strips",
+      "target": {
+        "css": "#TopLink, #StatusTakarabako, #log-kisekae-balloon, #log-customBalloon, #log-homenotice"
+      }
+    },
+    {
+      "id": "thumbs-blur",
+      "label": "News pictures blurred",
+      "type": "css",
+      "option": "news-thumbnails",
+      "choice": [
+        "blur"
+      ],
+      "target": {
+        "css": "#Topics img, #Stream img, #log-stream img"
+      },
+      "declarations": {
+        "filter": "blur(12px)"
+      }
+    },
+    {
+      "id": "thumbs-hide",
+      "label": "News pictures hidden",
+      "type": "hide",
+      "option": "news-thumbnails",
+      "choice": [
+        "hide"
+      ],
+      "target": {
+        "css": "#Topics img, #Stream img, #log-stream img"
+      }
+    },
+    {
+      "id": "stream-dim",
+      "label": "Recommended articles dimmed",
+      "type": "css",
+      "option": "recommended-articles",
+      "choice": [
+        "dim"
+      ],
+      "target": {
+        "css": "#Stream"
+      },
+      "declarations": {
+        "opacity": "0.35"
+      }
+    },
+    {
+      "id": "stream-hide",
+      "label": "Recommended articles hidden",
+      "type": "hide",
+      "option": "recommended-articles",
+      "choice": [
+        "hide"
+      ],
+      "target": {
+        "css": "#Stream"
+      }
+    },
+    {
+      "id": "realtime-box",
+      "label": "Realtime search keywords",
+      "type": "hide",
+      "option": "realtime-search",
+      "target": {
+        "css": "#realtime"
+      }
+    },
+    {
+      "id": "corporate-boxes",
+      "label": "Business, CSR and info boxes",
+      "type": "hide",
+      "option": "corporate-sections",
+      "target": {
+        "css": "#biz, #csr, #info"
+      }
     }
   ],
   "meta": {
     "author": "OpenMedia",
     "homepage": "https://www.yahoo.co.jp/",
-    "summary": "Cleans up cookie banners, ads and app prompts on Yahoo Japan",
-    "notes": "**Not verified live.** The fixtures in `recipes/fixtures/yahoo-japan/` are synthetic: hand-written pages that contain the targeted elements, not captures of the site, so the fixture test proves only that the selectors parse and spare protected content. These are generic cleanup rules, written from the selectors that common cookie-consent, ad and app-banner scripts use. They were not run against Yahoo Japan; a rule that matches nothing on a page is harmless, but nothing here promises that this site shows any of them.\n\n- **Cookie banners** hides the OneTrust, Cookiebot, Quantcast, Didomi, Usercentrics, TrustArc and Osano dialogs and common `cc-window` / `#cookie-banner` boxes. Some sites lock page scroll while the dialog is open; hiding the dialog does not undo that.\n- **Ads** hides Google ad slots and ad iframes. Sites that serve their own ad markup are not covered.\n- **App banners** hides the Smart App Banner and common \"install our app\" strips.\n\nOpen a page, toggle the options in Settings and report anything that hides content you wanted."
+    "summary": "Yahoo! JAPAN: ad slots, app and homepage banners, promo strips, plus thumbnail, recommended-article and corporate-box controls",
+    "notes": "Checked LIVE on 2026-11-13: rendered DOM of www.yahoo.co.jp (desktop UA) and m.yahoo.co.jp (iPhone UA 390x844, to which the phone is redirected), logged out, captured with headless Chrome; counts were taken on the saved DOM. Fixtures real.html (phone) and desktop-real.html are structural captures with text stripped. The desktop page uses stable, readable element ids (`Perorin`, `TopLink`, `Topics`, `Stream`, `realtime`, `biz`, `csr`, `info`, `TPR`, `TBP`, `STREAMAD1` to `STREAMAD13`); the phone page uses `log-*` ids plus hashed CSS-module classes, which are not used.\n\nLIVE counts: desktop `#Perorin` 1, `#TopLink` 1, `#StatusTakarabako` 1, `#TPR`/`#TBP`/`#TCBX`/`#TBPCB`/`#GDN`/`#OVERLAY`/`#overlayAdsContainer` 1 each, `[id^=\"STREAMAD\"]` 13, `[id^=\"ssp_ydn_\"]` 2, `#Stream` 1 (50 pictures), `#Topics img` 1, `#realtime` 1, `#biz`/`#csr`/`#info` 1 each. Phone `#log-rsab` 1 (the Use the app banner), `#ad-fixed-banner`, `#ad-popup-feedback`, `#opening-screen-ad`, `#prem-ad`, `#stb2Ad1` 1 each, `[id^=\"ssp_ydn_\"]` 3, `#log-kisekae-balloon`, `#log-customBalloon`, `#log-homenotice` 1 each, `#log-stream img` 11.\n\nThe original generic cookie, ad and app rules matched nothing on this site and are kept; two Yahoo! JAPAN rules were added to the ads and app-banners options. Most slot containers were empty in the capture (the ads are served late), so this proves the containers exist, not that an ad filled them. Japanese-only site: no English labels are relied on. NOT verified: Yahoo! JAPAN News (news.yahoo.co.jp), Shopping, Auctions, Travel and other sub-sites matched by the same domain; the logged-in state.",
+    "lastVerified": "2026-11-13"
   }
 }

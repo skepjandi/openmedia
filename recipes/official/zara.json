@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "market.official.zara",
   "name": "Zara",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "origin": "user",
   "tags": ["desktop", "mobile"],
   "match": ["https://*.zara.com/*"],
@@ -27,6 +27,48 @@
       "description": "The Smart App Banner and install-our-app strips.",
       "group": "annoyance",
       "default": true
+    },
+    {
+      "id": "chat-assistant",
+      "label": "Hide the chat assistant",
+      "description": "The Chat panel and its notification bubbles at the bottom of the page.",
+      "group": "annoyance",
+      "default": true
+    },
+    {
+      "id": "newsletter-prompt",
+      "label": "Hide newsletter sign-up links",
+      "description": "The 'sign up for our newsletter' link repeated in every home page footer slide.",
+      "group": "annoyance",
+      "default": true
+    },
+    {
+      "id": "campaign-media",
+      "label": "Campaign pictures",
+      "description": "Show, blur or hide the full-screen campaign photos and videos behind each home page slide.",
+      "group": "content",
+      "choices": [
+        {
+          "id": "show",
+          "label": "Show"
+        },
+        {
+          "id": "blur",
+          "label": "Blur"
+        },
+        {
+          "id": "hide",
+          "label": "Hide"
+        }
+      ],
+      "default": "show"
+    },
+    {
+      "id": "social-links",
+      "label": "Hide social network links",
+      "description": "The TikTok, Instagram, Facebook and Pinterest links in the footer slides.",
+      "group": "content",
+      "default": false
     }
   ],
   "rules": [
@@ -56,12 +98,67 @@
       "target": {
         "css": "#smartbanner, .smartbanner, .smart-banner, .app-banner, #app-banner, .app-download-banner, .install-app-banner"
       }
+    },
+    {
+      "id": "chat-panel",
+      "label": "Chat panel and notifications",
+      "type": "hide",
+      "option": "chat-assistant",
+      "target": {
+        "css": "#chat-container, #chat-notifications"
+      }
+    },
+    {
+      "id": "newsletter-link",
+      "label": "Newsletter sign-up link",
+      "type": "hide",
+      "option": "newsletter-prompt",
+      "target": {
+        "css": ".slider-spot-slide-footer-marketing__newsletter"
+      }
+    },
+    {
+      "id": "media-blur",
+      "label": "Campaign pictures blurred",
+      "type": "css",
+      "option": "campaign-media",
+      "choice": [
+        "blur"
+      ],
+      "target": {
+        "css": ".slider-spot__slide-background"
+      },
+      "declarations": {
+        "filter": "blur(14px)"
+      }
+    },
+    {
+      "id": "media-hide",
+      "label": "Campaign pictures hidden",
+      "type": "hide",
+      "option": "campaign-media",
+      "choice": [
+        "hide"
+      ],
+      "target": {
+        "css": ".slider-spot__slide-background"
+      }
+    },
+    {
+      "id": "social-footer",
+      "label": "Footer social links",
+      "type": "hide",
+      "option": "social-links",
+      "target": {
+        "css": "#homeSocialFooter"
+      }
     }
   ],
   "meta": {
     "author": "OpenMedia",
     "homepage": "https://www.zara.com/",
-    "summary": "Cleans up cookie banners, ads and app prompts on Zara",
-    "notes": "**Not verified live.** The fixtures in `recipes/fixtures/zara/` are synthetic: hand-written pages that contain the targeted elements, not captures of the site, so the fixture test proves only that the selectors parse and spare protected content. These are generic cleanup rules, written from the selectors that common cookie-consent, ad and app-banner scripts use. They were not run against Zara; a rule that matches nothing on a page is harmless, but nothing here promises that this site shows any of them.\n\n- **Cookie banners** hides the OneTrust, Cookiebot, Quantcast, Didomi, Usercentrics, TrustArc and Osano dialogs and common `cc-window` / `#cookie-banner` boxes. Some sites lock page scroll while the dialog is open; hiding the dialog does not undo that.\n- **Ads** hides Google ad slots and ad iframes. Sites that serve their own ad markup are not covered.\n- **App banners** hides the Smart App Banner and common \"install our app\" strips.\n\nOpen a page, toggle the options in Settings and report anything that hides content you wanted."
+    "summary": "Zara: chat assistant and newsletter prompts, plus campaign picture and social link controls (desktop only verified)",
+    "notes": "Checked LIVE on 2026-11-13 on the desktop US storefront only (zara.com/us, desktop UA, headless Chrome, logged out); counts were taken on the saved rendered DOM. The iPhone UA capture returned an empty page shell (Zara serves a blank body to the automated phone browser), so nothing was verified on a phone and the recipe's desktop fixture is the only real one: there is no real.html (phone) fixture.\n\nZara's home page is a stack of full-screen campaign sliders (`slider-spot`, one per universe such as Woman, Man, Kids, Beauty) built with readable BEM class names. LIVE counts: `#chat-container` 1 and `#chat-notifications` 1 (both empty containers for the chat assistant), `.slider-spot-slide-footer-marketing__newsletter` 10, `#homeSocialFooter` 10 (one per footer slide), `.slider-spot__slide-background` 45 (the media layer of each slide; its image or video had not loaded in the capture, so the blur and hide act on the container).\n\nNot targeted on purpose: the category menu, the Cookies settings link, the cart and the logon link. The original generic rules matched nothing on the live page and are kept. NOT verified: phone layout, product listing and product pages (the recipe was only checked on the home page), other countries' storefronts, logged-in state.",
+    "lastVerified": "2026-11-13"
   }
 }

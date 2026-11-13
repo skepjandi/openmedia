@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "market.official.the-roku-channel",
   "name": "The Roku Channel",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "origin": "user",
   "tags": ["desktop", "mobile"],
   "match": ["https://*.roku.com/*"],
@@ -27,6 +27,69 @@
       "description": "The Smart App Banner and install-our-app strips.",
       "group": "annoyance",
       "default": true
+    },
+    {
+      "id": "billboard",
+      "label": "Hide the home billboard",
+      "description": "The big featured-title banner with the Watch button at the top of the home page.",
+      "group": "annoyance",
+      "default": true
+    },
+    {
+      "id": "artwork",
+      "label": "Poster artwork",
+      "description": "Show, blur or hide the posters in rows and the billboard picture.",
+      "group": "content",
+      "choices": [
+        {
+          "id": "show",
+          "label": "Show"
+        },
+        {
+          "id": "blur",
+          "label": "Blur"
+        },
+        {
+          "id": "hide",
+          "label": "Hide"
+        }
+      ],
+      "default": "show"
+    },
+    {
+      "id": "content-rows",
+      "label": "Content rows",
+      "description": "Show, dim or hide the rows of shows and movies on the home page.",
+      "group": "content",
+      "choices": [
+        {
+          "id": "show",
+          "label": "Show"
+        },
+        {
+          "id": "dim",
+          "label": "Dim"
+        },
+        {
+          "id": "hide",
+          "label": "Hide"
+        }
+      ],
+      "default": "show"
+    },
+    {
+      "id": "content-badges",
+      "label": "Hide content badges",
+      "description": "The small badges and indicators on posters (new, Roku Original and similar).",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "footer",
+      "label": "Hide the footer",
+      "description": "The page footer with Roku legal and support links.",
+      "group": "content",
+      "default": false
     }
   ],
   "rules": [
@@ -56,12 +119,86 @@
       "target": {
         "css": "#smartbanner, .smartbanner, .smart-banner, .app-banner, #app-banner, .app-download-banner, .install-app-banner"
       }
+    },
+    {
+      "id": "billboard",
+      "label": "Home billboard",
+      "type": "hide",
+      "option": "billboard",
+      "target": {
+        "css": "[data-test-id=\"page-billboard\"]"
+      }
+    },
+    {
+      "id": "artwork-blur",
+      "label": "Poster and billboard pictures",
+      "type": "css",
+      "option": "artwork",
+      "choice": ["blur"],
+      "target": {
+        "css": ".roku-collection-item img, .billboard-image"
+      },
+      "declarations": {
+        "filter": "blur(12px)"
+      }
+    },
+    {
+      "id": "artwork-hide",
+      "label": "Poster pictures",
+      "type": "hide",
+      "option": "artwork",
+      "choice": ["hide"],
+      "target": {
+        "css": ".roku-collection-item img"
+      }
+    },
+    {
+      "id": "rows-dim",
+      "label": "Content rows",
+      "type": "css",
+      "option": "content-rows",
+      "choice": ["dim"],
+      "target": {
+        "css": ".roku-collection-row"
+      },
+      "declarations": {
+        "opacity": "0.35"
+      }
+    },
+    {
+      "id": "rows-hide",
+      "label": "Content rows",
+      "type": "hide",
+      "option": "content-rows",
+      "choice": ["hide"],
+      "target": {
+        "css": ".roku-collection-row"
+      }
+    },
+    {
+      "id": "content-badges",
+      "label": "Poster indicators",
+      "type": "hide",
+      "option": "content-badges",
+      "target": {
+        "css": "[data-test-id=\"content-indicator-container\"]"
+      }
+    },
+    {
+      "id": "footer",
+      "label": "Page footer",
+      "type": "hide",
+      "option": "footer",
+      "target": {
+        "css": ".nav-footer"
+      }
     }
   ],
   "meta": {
     "author": "OpenMedia",
     "homepage": "https://therokuchannel.roku.com/",
-    "summary": "Cleans up cookie banners, ads and app prompts on The Roku Channel, a media site",
-    "notes": "**Not verified live.** The fixtures in `recipes/fixtures/the-roku-channel/` are synthetic: hand-written pages that contain the targeted elements, not captures of the site, so the fixture test proves only that the selectors parse and spare protected content. These are generic cleanup rules, written from the selectors that common cookie-consent, ad and app-banner scripts use. They were not run against The Roku Channel; a rule that matches nothing on a page is harmless, but nothing here promises that this site shows any of them.\n\n- **Cookie banners** hides the OneTrust, Cookiebot, Quantcast, Didomi, Usercentrics, TrustArc and Osano dialogs and common `cc-window` / `#cookie-banner` boxes. Some sites lock page scroll while the dialog is open; hiding the dialog does not undo that.\n- **Ads** hides Google ad slots and ad iframes. Sites that serve their own ad markup are not covered.\n- **App banners** hides the Smart App Banner and common \"install our app\" strips.\n\nOpen a page, toggle the options in Settings and report anything that hides content you wanted."
+    "summary": "Hides The Roku Channel's home billboard; blur or hide posters; dim or hide rows; badges, footer",
+    "notes": "Checked 2026-11-13, logged out, real Chrome (headless) on therokuchannel.roku.com (home) with desktop UA 1440x900 and iPhone UA 390x844, DOM captured after 7 seconds. The desktop capture is the React app; the phone capture held only the footer and one image (no content rows), so phone rules are not verified. Fixtures `real.html` (phone, footer only) and `desktop-real.html` are sanitised excerpts (text and titles stripped, needed ancestors only, `data-keep` on main, the account button and the search box).\n\nLIVE desktop: `[data-test-id=\"page-billboard\"]` 1, `.billboard-image` 1, `.roku-collection-item` 12 with their pictures, `.roku-collection-row` 1 (the other rows are lazy-loaded placeholders and appear on scroll), `[data-test-id=\"content-indicator-container\"]` 10, `.nav-footer` 1 (also on phone). The original cookie, ad and app-banner rules matched nothing. Material UI classes (`css-xxxx`, `Mui*`) are generated and not used; rules use Roku's own `roku-*` classes and `data-test-id` attributes.\n\nChoices: Poster artwork Show/Blur/Hide; Content rows Show/Dim/Hide.\n\nNOT verified: the phone site beyond the footer, the details page and the live TV guide, lazy-loaded rows after scrolling, logged-in pages, regions other than the US.",
+    "lastVerified": "2026-11-13"
   }
 }

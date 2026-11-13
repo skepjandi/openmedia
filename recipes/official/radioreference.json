@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "market.official.radioreference",
   "name": "RadioReference",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "origin": "user",
   "tags": ["desktop", "mobile"],
   "match": ["https://*.radioreference.com/*"],
@@ -27,6 +27,62 @@
       "description": "The Smart App Banner and install-our-app strips.",
       "group": "annoyance",
       "default": true
+    },
+    {
+      "id": "premium-upsell",
+      "label": "Hide Premium upsell",
+      "description": "The RadioReference Premium plans section and the Premium buttons in the hero.",
+      "group": "annoyance",
+      "default": true
+    },
+    {
+      "id": "sign-up-buttons",
+      "label": "Hide sign-up buttons",
+      "description": "The Create free account / Premium buttons in the hero. Log In stays.",
+      "group": "annoyance",
+      "default": true
+    },
+    {
+      "id": "sponsored-product",
+      "label": "Hide featured product",
+      "description": "The Featured Product card (a scanner sold through a retailer partner).",
+      "group": "annoyance",
+      "default": true
+    },
+    {
+      "id": "news-cards",
+      "label": "News and updates cards",
+      "description": "The Community News and Latest Database Updates cards on the home page.",
+      "group": "content",
+      "choices": [
+        {
+          "id": "show",
+          "label": "Show"
+        },
+        {
+          "id": "dim",
+          "label": "Dim"
+        },
+        {
+          "id": "hide",
+          "label": "Hide"
+        }
+      ],
+      "default": "show"
+    },
+    {
+      "id": "hero-art",
+      "label": "Hide hero artwork",
+      "description": "The decorative tower and signal rings behind the home page headline.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "site-stats",
+      "label": "Hide database statistics",
+      "description": "The frequency, system and other counters on the Database card.",
+      "group": "content",
+      "default": false
     }
   ],
   "rules": [
@@ -56,12 +112,81 @@
       "target": {
         "css": "#smartbanner, .smartbanner, .smart-banner, .app-banner, #app-banner, .app-download-banner, .install-app-banner"
       }
+    },
+    {
+      "id": "premium-section",
+      "label": "Premium section",
+      "type": "hide",
+      "option": "premium-upsell",
+      "target": {
+        "css": "section.rrb-prem"
+      }
+    },
+    {
+      "id": "hero-ctas",
+      "label": "Hero buttons",
+      "type": "hide",
+      "option": "sign-up-buttons",
+      "target": {
+        "css": ".rrb-hero .ctas"
+      }
+    },
+    {
+      "id": "featured-product",
+      "label": "Featured product",
+      "type": "hide",
+      "option": "sponsored-product",
+      "target": {
+        "css": ".rrb-trio .card.prod"
+      }
+    },
+    {
+      "id": "news-dim",
+      "label": "News cards",
+      "type": "css",
+      "option": "news-cards",
+      "choice": ["dim"],
+      "target": {
+        "css": ".rrb-trio .card:not(.prod)"
+      },
+      "declarations": {
+        "opacity": "0.35"
+      }
+    },
+    {
+      "id": "news-hide",
+      "label": "News cards",
+      "type": "hide",
+      "option": "news-cards",
+      "choice": ["hide"],
+      "target": {
+        "css": ".rrb-trio .card:not(.prod)"
+      }
+    },
+    {
+      "id": "hero-art",
+      "label": "Hero artwork",
+      "type": "hide",
+      "option": "hero-art",
+      "target": {
+        "css": ".heroart"
+      }
+    },
+    {
+      "id": "site-stats",
+      "label": "Database statistics",
+      "type": "hide",
+      "option": "site-stats",
+      "target": {
+        "css": ".statgrid"
+      }
     }
   ],
   "meta": {
     "author": "OpenMedia",
     "homepage": "https://www.radioreference.com/",
-    "summary": "Cleans up cookie banners, ads and app prompts on RadioReference, a media site",
-    "notes": "**Not verified live.** The fixtures in `recipes/fixtures/radioreference/` are synthetic: hand-written pages that contain the targeted elements, not captures of the site, so the fixture test proves only that the selectors parse and spare protected content. These are generic cleanup rules, written from the selectors that common cookie-consent, ad and app-banner scripts use. They were not run against RadioReference; a rule that matches nothing on a page is harmless, but nothing here promises that this site shows any of them.\n\n- **Cookie banners** hides the OneTrust, Cookiebot, Quantcast, Didomi, Usercentrics, TrustArc and Osano dialogs and common `cc-window` / `#cookie-banner` boxes. Some sites lock page scroll while the dialog is open; hiding the dialog does not undo that.\n- **Ads** hides Google ad slots and ad iframes. Sites that serve their own ad markup are not covered.\n- **App banners** hides the Smart App Banner and common \"install our app\" strips.\n\nOpen a page, toggle the options in Settings and report anything that hides content you wanted."
+    "summary": "RadioReference: hide the Premium upsell, sign-up buttons and featured product; dim or hide news cards; hero art and stats toggles.",
+    "notes": "Checked 2026-11-13, logged out, headless Chrome over CDP with a desktop UA (1440x900) on radioreference.com/. Not captured: an iPhone-UA page (the machine ran out of memory/network when retried; the page uses a `navtoggle` hamburger and a `mobile-only` nav item, so phone markup is the same document), the database (/db/), forums and wiki (separate hosts), and logged-in pages.\n\nLIVE counts on Home: premium-section desktop home 1; hero-ctas desktop home 1; featured-product desktop home 1; news-dim desktop home 2; news-hide desktop home 2; hero-art desktop home 1; site-stats desktop home 1. All selectors are readable class names of a hand-written template (rrb-prem, rrb-trio, card prod, heroart, statgrid); no hashed classes. The ads and cookie rules of 1.0.0 match nothing: no ins, iframe or cookie dialog was present.\n\nChoice: News and updates cards Show/Dim/Hide (opacity 0.35). The Featured Product card is the affiliate-style ad; Log In (`a.hdr-login`, `a.cta-login`) is never hidden.\n\nNOT verified: phone layout, the database pages and their ads, Broadcastify and wiki hosts (other domains), logged-in UI.",
+    "lastVerified": "2026-11-13"
   }
 }

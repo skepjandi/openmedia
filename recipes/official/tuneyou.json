@@ -2,10 +2,12 @@
   "schema": 1,
   "id": "market.official.tuneyou",
   "name": "TuneYou",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "origin": "user",
   "tags": ["desktop", "mobile"],
-  "match": ["https://*.tuneyou.com/*"],
+  "match": [
+    "https://*.tuneyou.com/*"
+  ],
   "options": [
     {
       "id": "cookie-banners",
@@ -27,6 +29,39 @@
       "description": "The Smart App Banner and install-our-app strips.",
       "group": "annoyance",
       "default": true
+    },
+    {
+      "id": "promo-sections",
+      "label": "Hide hero and promo sections",
+      "description": "The big \"Listen to 50,000+ Radio Stations\" banner, the Explore Radio Stations block and the Why TuneYou? pitch.",
+      "group": "annoyance",
+      "default": true
+    },
+    {
+      "id": "station-artwork",
+      "label": "Station, artist and podcast artwork",
+      "description": "The cover images on every card on the home page. Blur keeps the layout; Hide leaves the gradient placeholder.",
+      "group": "content",
+      "choices": [
+        { "id": "show", "label": "Show" },
+        { "id": "blur", "label": "Blur" },
+        { "id": "hide", "label": "Hide" }
+      ],
+      "default": "show"
+    },
+    {
+      "id": "charts",
+      "label": "Hide artist and track charts",
+      "description": "The Top Artists and Top Tracks This Week section on the home page.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "podcasts",
+      "label": "Hide Trending Podcasts",
+      "description": "The Trending Podcasts row on the home page.",
+      "group": "content",
+      "default": false
     }
   ],
   "rules": [
@@ -56,12 +91,72 @@
       "target": {
         "css": "#smartbanner, .smartbanner, .smart-banner, .app-banner, #app-banner, .app-download-banner, .install-app-banner"
       }
+    },
+    {
+      "id": "ad-iframes",
+      "label": "Ad iframes labelled Advertisement",
+      "type": "hide",
+      "option": "ads",
+      "target": {
+        "css": "iframe[aria-label=\"Advertisement\"]"
+      }
+    },
+    {
+      "id": "promo-sections",
+      "label": "Hero, Explore and Why TuneYou sections",
+      "type": "hide",
+      "option": "promo-sections",
+      "target": {
+        "css": "main section[class*=\"py-16\"]"
+      }
+    },
+    {
+      "id": "artwork-blur",
+      "label": "Blur card artwork",
+      "type": "css",
+      "option": "station-artwork",
+      "target": {
+        "css": "main img[data-nimg]"
+      },
+      "declarations": {
+        "filter": "blur(10px)"
+      },
+      "choice": ["blur"]
+    },
+    {
+      "id": "artwork-hide",
+      "label": "Hide card artwork",
+      "type": "hide",
+      "option": "station-artwork",
+      "target": {
+        "css": "main img[data-nimg]"
+      },
+      "choice": ["hide"]
+    },
+    {
+      "id": "charts",
+      "label": "Top Artists and Top Tracks section",
+      "type": "hide",
+      "option": "charts",
+      "target": {
+        "css": "main section:has(a[href^=\"/artist/\"])"
+      }
+    },
+    {
+      "id": "podcasts-row",
+      "label": "Trending Podcasts section",
+      "type": "hide",
+      "option": "podcasts",
+      "target": {
+        "css": "main section:has(a[href^=\"/podcast/\"])"
+      }
     }
   ],
   "meta": {
     "author": "OpenMedia",
     "homepage": "https://tuneyou.com/",
-    "summary": "Cleans up cookie banners, ads and app prompts on TuneYou, a media site",
-    "notes": "**Not verified live.** The fixtures in `recipes/fixtures/tuneyou/` are synthetic: hand-written pages that contain the targeted elements, not captures of the site, so the fixture test proves only that the selectors parse and spare protected content. These are generic cleanup rules, written from the selectors that common cookie-consent, ad and app-banner scripts use. They were not run against TuneYou; a rule that matches nothing on a page is harmless, but nothing here promises that this site shows any of them.\n\n- **Cookie banners** hides the OneTrust, Cookiebot, Quantcast, Didomi, Usercentrics, TrustArc and Osano dialogs and common `cc-window` / `#cookie-banner` boxes. Some sites lock page scroll while the dialog is open; hiding the dialog does not undo that.\n- **Ads** hides Google ad slots and ad iframes. Sites that serve their own ad markup are not covered.\n- **App banners** hides the Smart App Banner and common \"install our app\" strips.\n\nOpen a page, toggle the options in Settings and report anything that hides content you wanted."
+    "summary": "TuneYou home page: hero and promo sections, station artwork, charts and podcasts",
+    "notes": "Checked 2026-11-13, logged out, headless Chrome (iPhone UA 390x844 and desktop UA) on tuneyou.com (home page) only; selectors were run on the saved live DOM. Station, artist and player pages were not loaded.\n\nThe site is a Next.js app styled with Tailwind, so there are no hashed classes but also few stable hooks. Rules use the main element, href prefixes (/artist/, /podcast/), the Next image marker data-nimg and Tailwind utility names that are part of the visible design (py-16). If the design changes, those utility names can change.\n\n- **Ads**: the page has one ins.adsbygoogle (covered by the generic rule) with an iframe#aswift_0 labelled Advertisement; the new rule matches that iframe by its English aria-label. 1 on both layouts (LIVE).\n- **Hero and promo sections**: sections with py-16: the hero banner, Explore Radio Stations and Why TuneYou? 3 on both layouts (LIVE).\n- **Artwork** (Show/Blur/Hide): main img[data-nimg], 37 on desktop and 58 on mobile (LIVE).\n- **Charts**: the section containing /artist/ links, 1 (LIVE). **Podcasts**: the section containing /podcast/ links, 1 (LIVE).\n\nThe fixed header with Log In and Sign Up is never matched. The mobile page adds regional sections (Stations from your country, Active Chats) that were not given rules. No cookie banner appeared logged out (the generic rule is unverified). Not verified: logged-in views, other countries.",
+    "lastVerified": "2026-11-13"
   }
 }

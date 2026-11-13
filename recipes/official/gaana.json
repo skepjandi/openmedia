@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "market.official.gaana",
   "name": "Gaana",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "origin": "user",
   "tags": ["desktop", "mobile"],
   "match": ["https://*.gaana.com/*"],
@@ -24,7 +24,14 @@
     {
       "id": "app-banners",
       "label": "Hide app install banners",
-      "description": "The Smart App Banner and install-our-app strips.",
+      "description": "The Smart App Banner, Gaana's own app download strip and the app panel at the foot of the page.",
+      "group": "annoyance",
+      "default": true
+    },
+    {
+      "id": "renew-banner",
+      "label": "Hide the Gaana Plus trial banner",
+      "description": "The banner in the page that offers a 30-day Gaana Plus trial.",
       "group": "annoyance",
       "default": true
     }
@@ -56,12 +63,40 @@
       "target": {
         "css": "#smartbanner, .smartbanner, .smart-banner, .app-banner, #app-banner, .app-download-banner, .install-app-banner"
       }
+    },
+    {
+      "id": "app-top-banner",
+      "label": "App download strip",
+      "type": "hide",
+      "option": "app-banners",
+      "target": {
+        "css": "section.appAdTopBox"
+      }
+    },
+    {
+      "id": "app-sticky-panel",
+      "label": "Bottom app panel",
+      "type": "hide",
+      "option": "app-banners",
+      "target": {
+        "css": "div.bottomStickyPanel"
+      }
+    },
+    {
+      "id": "renew-banner",
+      "label": "Gaana Plus trial banner",
+      "type": "hide",
+      "option": "renew-banner",
+      "target": {
+        "css": "div.gaanaRenewBanner"
+      }
     }
   ],
   "meta": {
     "author": "OpenMedia",
     "homepage": "https://gaana.com/",
-    "summary": "Cleans up cookie banners, ads and app prompts on Gaana, a media site",
-    "notes": "**Not verified live.** The fixtures in `recipes/fixtures/gaana/` are synthetic: hand-written pages that contain the targeted elements, not captures of the site, so the fixture test proves only that the selectors parse and spare protected content. These are generic cleanup rules, written from the selectors that common cookie-consent, ad and app-banner scripts use. They were not run against Gaana; a rule that matches nothing on a page is harmless, but nothing here promises that this site shows any of them.\n\n- **Cookie banners** hides the OneTrust, Cookiebot, Quantcast, Didomi, Usercentrics, TrustArc and Osano dialogs and common `cc-window` / `#cookie-banner` boxes. Some sites lock page scroll while the dialog is open; hiding the dialog does not undo that.\n- **Ads** hides Google ad slots and ad iframes. Sites that serve their own ad markup are not covered.\n- **App banners** hides the Smart App Banner and common \"install our app\" strips.\n\nOpen a page, toggle the options in Settings and report anything that hides content you wanted."
+    "summary": "Hides ads, Gaana's app download strips and the Gaana Plus trial banner on Gaana, a media site",
+    "notes": "**Checked 2026-11-13**, logged out, headless Chromium on https://gaana.com/ (home page only) with an iPhone UA at 390x844 and a desktop UA at 1440x900. Both were served the same React page. Counts below are `querySelectorAll` on that DOM.\n\n- **App download strip** (LIVE 1 on the phone, 0 on the desktop): `section.appAdTopBox`, the \"Download Gaana App\" strip above the header.\n- **Bottom app panel** (LIVE 1 on each): `div.bottomStickyPanel`, the fixed app-download slider at the foot of the page; on the desktop it is rendered but has a height of 0.\n- **Gaana Plus trial banner** (LIVE 1 on each): `div.gaanaRenewBanner`, the banner whose link is labelled \"30 Days Trial Plan\".\n- **Ad slots** (LIVE 3 on the phone, 4 on the desktop): the generic ad rule already covers them. The three slots are `div[id^=\"MirchiPlus_\"]`, which carry `data-google-query-id`; the desktop page adds one `iframe[src*=\"doubleclick.net\"]`.\n- **Cookie banners**: no consent dialog was served to the research session, 0 matches for every selector in the generic rule, so that rule stays best effort only.\n- **Smart App Banner**: none was served, 0 matches.\n\nThe fixtures `real.html` and `desktop-real.html` are sanitised excerpts of the two captures (text, images and remote resources stripped, `data-keep` on the header). **Not verified:** only the home page was opened. There is no account here, so album, playlist and player pages, and every logged-in view, were not reached; the app's own pages may use different markup.",
+    "lastVerified": "2026-11-13"
   }
 }

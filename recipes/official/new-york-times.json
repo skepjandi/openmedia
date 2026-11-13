@@ -2,10 +2,15 @@
   "schema": 1,
   "id": "market.official.new-york-times",
   "name": "New York Times",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "origin": "user",
-  "tags": ["desktop", "mobile"],
-  "match": ["https://*.nytimes.com/*"],
+  "tags": [
+    "desktop",
+    "mobile"
+  ],
+  "match": [
+    "https://*.nytimes.com/*"
+  ],
   "options": [
     {
       "id": "cookie-banners",
@@ -27,6 +32,62 @@
       "description": "The Smart App Banner and install-our-app strips.",
       "group": "annoyance",
       "default": true
+    },
+    {
+      "id": "google-one-tap",
+      "label": "Hide the Google sign-in prompt",
+      "description": "The \"Sign in with Google\" card that floats in the top right corner.",
+      "group": "annoyance",
+      "default": true
+    },
+    {
+      "id": "story-images",
+      "label": "Story images",
+      "description": "Show, blur or hide the photographs and graphics next to headlines on the home page and sections.",
+      "group": "content",
+      "choices": [
+        {
+          "id": "show",
+          "label": "Show"
+        },
+        {
+          "id": "blur",
+          "label": "Blur"
+        },
+        {
+          "id": "hide",
+          "label": "Hide"
+        }
+      ],
+      "default": "show"
+    },
+    {
+      "id": "summaries",
+      "label": "Hide story summaries",
+      "description": "The grey blurb under each headline, so you choose stories by headline only.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "market-ticker",
+      "label": "Hide the market and weather strip",
+      "description": "The row of index prices and weather in the thin bar above the masthead.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "carousels",
+      "label": "Hide scrolling story carousels",
+      "description": "The side-scrolling rows of stories (Opinion, Cooking, Wirecutter style modules).",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "footer",
+      "label": "Hide the footer and site index",
+      "description": "The legal links and the full Site Index at the bottom of every page.",
+      "group": "content",
+      "default": false
     }
   ],
   "rules": [
@@ -56,12 +117,94 @@
       "target": {
         "css": "#smartbanner, .smartbanner, .smart-banner, .app-banner, #app-banner, .app-download-banner, .install-app-banner"
       }
+    },
+    {
+      "id": "nyt-ad-wrappers",
+      "label": "Advertisement wrappers",
+      "type": "hide",
+      "option": "ads",
+      "target": {
+        "css": "[data-testid=\"StandardAd\"]"
+      }
+    },
+    {
+      "id": "google-one-tap",
+      "label": "Google One Tap prompt",
+      "type": "hide",
+      "option": "google-one-tap",
+      "target": {
+        "css": "#google-one-tap-container, #google-one-tap-prompt"
+      }
+    },
+    {
+      "id": "images-blur",
+      "label": "Story images",
+      "type": "css",
+      "option": "story-images",
+      "choice": [
+        "blur"
+      ],
+      "target": {
+        "css": "#site-content figure img, #site-content figure picture"
+      },
+      "declarations": {
+        "filter": "blur(12px)"
+      }
+    },
+    {
+      "id": "images-hide",
+      "label": "Story images",
+      "type": "hide",
+      "option": "story-images",
+      "choice": [
+        "hide"
+      ],
+      "target": {
+        "css": "#site-content figure"
+      }
+    },
+    {
+      "id": "summaries",
+      "label": "Story summaries",
+      "type": "hide",
+      "option": "summaries",
+      "target": {
+        "css": "p.summary-class"
+      }
+    },
+    {
+      "id": "market-ticker",
+      "label": "Market and weather strip",
+      "type": "hide",
+      "option": "market-ticker",
+      "target": {
+        "css": "#masthead-bar-one-widgets"
+      }
+    },
+    {
+      "id": "carousels",
+      "label": "Story carousels",
+      "type": "hide",
+      "option": "carousels",
+      "target": {
+        "css": "[data-testid=\"carouselOuterClass\"]"
+      }
+    },
+    {
+      "id": "footer",
+      "label": "Footer and site index",
+      "type": "hide",
+      "option": "footer",
+      "target": {
+        "css": "footer[role=\"contentinfo\"], nav#site-index"
+      }
     }
   ],
   "meta": {
     "author": "OpenMedia",
     "homepage": "https://www.nytimes.com/",
-    "summary": "Cleans up cookie banners, ads and app prompts on New York Times",
-    "notes": "**Not verified live.** The fixtures in `recipes/fixtures/new-york-times/` are synthetic: hand-written pages that contain the targeted elements, not captures of the site, so the fixture test proves only that the selectors parse and spare protected content. These are generic cleanup rules, written from the selectors that common cookie-consent, ad and app-banner scripts use. They were not run against New York Times; a rule that matches nothing on a page is harmless, but nothing here promises that this site shows any of them.\n\n- **Cookie banners** hides the OneTrust, Cookiebot, Quantcast, Didomi, Usercentrics, TrustArc and Osano dialogs and common `cc-window` / `#cookie-banner` boxes. Some sites lock page scroll while the dialog is open; hiding the dialog does not undo that.\n- **Ads** hides Google ad slots and ad iframes. Sites that serve their own ad markup are not covered.\n- **App banners** hides the Smart App Banner and common \"install our app\" strips.\n\nOpen a page, toggle the options in Settings and report anything that hides content you wanted."
+    "summary": "New York Times: hides ad wrappers and the Google sign-in pop-up, blurs or hides story images, can hide summaries, tickers and footer",
+    "notes": "**Checked 2026-11-13**, logged out, desktop UA, headless Chrome on https://www.nytimes.com/ (the U.S. home). The iPhone-UA fetch and the article page could not be captured (network dropped during the session), so mobile and article-only markup (paywall gateway, comments, newsletter dialogs) was not inspected and no rules were written for them.\n\n- **Ad wrappers**: `[data-testid=\"StandardAd\"]` matched 5 (the box, the \"Advertisement\" label and the \"Skip advertisement\" link); the Google ad iframe inside `#dfp-ad-top` loads in a safeframe (LIVE).\n- **Google sign-in prompt**: `#google-one-tap-container` 1 (LIVE).\n- **Story images**: `#site-content figure` 79 figures, 76 images (LIVE). Headlines are separate links, so hiding the figure leaves the story.\n- **Summaries** `p.summary-class` 35; **market strip** `#masthead-bar-one-widgets` 1; **carousels** `[data-testid=\"carouselOuterClass\"]` 3; **footer** `footer[role=\"contentinfo\"]` 1 and `nav#site-index` 1 (all LIVE).\n\nNot verified: article pages, the subscription gateway and its dialog, mobile layout, the Games and Cooking sections. Class names such as `css-1abc` and `_5zuA3W_listItem` are hashed and are not used; selectors use data-testid, ids, roles and the readable `summary-class`. Data-testid values can change with a site release.",
+    "lastVerified": "2026-11-13"
   }
 }

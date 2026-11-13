@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "market.official.xiph-directory",
   "name": "Xiph Directory",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "origin": "user",
   "tags": ["desktop", "mobile"],
   "match": ["https://*.xiph.org/*"],
@@ -27,6 +27,62 @@
       "description": "The Smart App Banner and install-our-app strips.",
       "group": "annoyance",
       "default": true
+    },
+    {
+      "id": "site-intro",
+      "label": "Hide the logo and intro text",
+      "description": "The big Icecast logo and the one-line description above the station list.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "station-tags",
+      "label": "Hide genre and codec tags",
+      "description": "The genre and codec pills at the bottom of each station card. The Play button stays.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "now-playing",
+      "label": "Now playing line",
+      "description": "Show, blur or hide the On Air line (current track) on station cards.",
+      "group": "content",
+      "choices": [
+        {
+          "id": "show",
+          "label": "Show"
+        },
+        {
+          "id": "blur",
+          "label": "Blur"
+        },
+        {
+          "id": "hide",
+          "label": "Hide"
+        }
+      ],
+      "default": "show"
+    },
+    {
+      "id": "station-descriptions",
+      "label": "Station descriptions",
+      "description": "Show, blur or hide the description text under each station name.",
+      "group": "content",
+      "choices": [
+        {
+          "id": "show",
+          "label": "Show"
+        },
+        {
+          "id": "blur",
+          "label": "Blur"
+        },
+        {
+          "id": "hide",
+          "label": "Hide"
+        }
+      ],
+      "default": "show"
     }
   ],
   "rules": [
@@ -56,12 +112,85 @@
       "target": {
         "css": "#smartbanner, .smartbanner, .smart-banner, .app-banner, #app-banner, .app-download-banner, .install-app-banner"
       }
+    },
+    {
+      "id": "intro-block",
+      "label": "Logo heading and lead text",
+      "type": "hide",
+      "option": "site-intro",
+      "target": {
+        "css": "main > h1, main > p.lead"
+      }
+    },
+    {
+      "id": "tag-badges",
+      "label": "Genre and codec badges",
+      "type": "hide",
+      "option": "station-tags",
+      "target": {
+        "css": ".card-footer a.badge"
+      }
+    },
+    {
+      "id": "now-playing-blur",
+      "label": "On Air line blurred",
+      "type": "css",
+      "option": "now-playing",
+      "choice": [
+        "blur"
+      ],
+      "target": {
+        "css": ".card-subtitle"
+      },
+      "declarations": {
+        "filter": "blur(6px)"
+      }
+    },
+    {
+      "id": "now-playing-hide",
+      "label": "On Air line hidden",
+      "type": "hide",
+      "option": "now-playing",
+      "choice": [
+        "hide"
+      ],
+      "target": {
+        "css": ".card-subtitle"
+      }
+    },
+    {
+      "id": "descriptions-blur",
+      "label": "Station descriptions blurred",
+      "type": "css",
+      "option": "station-descriptions",
+      "choice": [
+        "blur"
+      ],
+      "target": {
+        "css": ".card-text"
+      },
+      "declarations": {
+        "filter": "blur(6px)"
+      }
+    },
+    {
+      "id": "descriptions-hide",
+      "label": "Station descriptions hidden",
+      "type": "hide",
+      "option": "station-descriptions",
+      "choice": [
+        "hide"
+      ],
+      "target": {
+        "css": ".card-text"
+      }
     }
   ],
   "meta": {
     "author": "OpenMedia",
     "homepage": "https://dir.xiph.org/",
-    "summary": "Cleans up cookie banners, ads and app prompts on Xiph Directory, a media site",
-    "notes": "**Not verified live.** The fixtures in `recipes/fixtures/xiph-directory/` are synthetic: hand-written pages that contain the targeted elements, not captures of the site, so the fixture test proves only that the selectors parse and spare protected content. These are generic cleanup rules, written from the selectors that common cookie-consent, ad and app-banner scripts use. They were not run against Xiph Directory; a rule that matches nothing on a page is harmless, but nothing here promises that this site shows any of them.\n\n- **Cookie banners** hides the OneTrust, Cookiebot, Quantcast, Didomi, Usercentrics, TrustArc and Osano dialogs and common `cc-window` / `#cookie-banner` boxes. Some sites lock page scroll while the dialog is open; hiding the dialog does not undo that.\n- **Ads** hides Google ad slots and ad iframes. Sites that serve their own ad markup are not covered.\n- **App banners** hides the Smart App Banner and common \"install our app\" strips.\n\nOpen a page, toggle the options in Settings and report anything that hides content you wanted."
+    "summary": "Xiph Directory: hide the logo intro and genre tags, blur or hide now-playing text and station descriptions",
+    "notes": "Checked LIVE on 2026-11-13: dir.xiph.org home page in headless Chrome (desktop UA); the markup is the same Bootstrap 4 page on a phone, so desktop-real.html is a copy of real.html. The directory is a plain static page with no cookie banner, ads, pop-ups or app prompt, so the three original generic options match nothing here and no annoyance option was added; they are kept unchanged. Counts on the home page: `main > h1` 1, `main > p.lead` 1, `.card-footer a.badge` 88 (30 cards), `.card-subtitle` 30, `.card-text` 30. Fixtures are structural captures with station text stripped and `data-keep` on the nav brand, search box, cards, titles and Play buttons.\n\nThe recipe also matches www.xiph.org (the Xiph project site), which was not checked. NOT verified: /genres, /codecs and /search result pages (the network failed during the later re-check).",
+    "lastVerified": "2026-11-13"
   }
 }

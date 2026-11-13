@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "market.official.radioline",
   "name": "Radioline",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "origin": "user",
   "tags": ["desktop", "mobile"],
   "match": ["https://*.radioline.co/*"],
@@ -27,6 +27,20 @@
       "description": "The Smart App Banner and install-our-app strips.",
       "group": "annoyance",
       "default": true
+    },
+    {
+      "id": "floating-video",
+      "label": "Hide floating video widget",
+      "description": "The Vlyby floating video widget that the page injects, and the invisible ad-box bait element.",
+      "group": "annoyance",
+      "default": true
+    },
+    {
+      "id": "footer",
+      "label": "Hide footer",
+      "description": "The footer with the app badges, station-submission link and legal links.",
+      "group": "content",
+      "default": false
     }
   ],
   "rules": [
@@ -54,14 +68,33 @@
       "type": "hide",
       "option": "app-banners",
       "target": {
-        "css": "#smartbanner, .smartbanner, .smart-banner, .app-banner, #app-banner, .app-download-banner, .install-app-banner"
+        "css": "#smartbanner, .smartbanner, .smart-banner, .app-banner, #app-banner, .app-download-banner, .install-app-banner, footer a[href*=\"apps.apple.com\"], footer a[href*=\"appgallery.huawei.com\"], footer a[href*=\"play.google.com\"]"
+      }
+    },
+    {
+      "id": "vlyby-widget",
+      "label": "Vlyby floating video widget",
+      "type": "hide",
+      "option": "floating-video",
+      "target": {
+        "css": ".vlyby_container_main, iframe[src*=\"vlyby\"], div.ad-box"
+      }
+    },
+    {
+      "id": "footer",
+      "label": "Footer",
+      "type": "hide",
+      "option": "footer",
+      "target": {
+        "css": "footer"
       }
     }
   ],
   "meta": {
     "author": "OpenMedia",
     "homepage": "https://www.radioline.co/",
-    "summary": "Cleans up cookie banners, ads and app prompts on Radioline, a media site",
-    "notes": "**Not verified live.** The fixtures in `recipes/fixtures/radioline/` are synthetic: hand-written pages that contain the targeted elements, not captures of the site, so the fixture test proves only that the selectors parse and spare protected content. These are generic cleanup rules, written from the selectors that common cookie-consent, ad and app-banner scripts use. They were not run against Radioline; a rule that matches nothing on a page is harmless, but nothing here promises that this site shows any of them.\n\n- **Cookie banners** hides the OneTrust, Cookiebot, Quantcast, Didomi, Usercentrics, TrustArc and Osano dialogs and common `cc-window` / `#cookie-banner` boxes. Some sites lock page scroll while the dialog is open; hiding the dialog does not undo that.\n- **Ads** hides Google ad slots and ad iframes. Sites that serve their own ad markup are not covered.\n- **App banners** hides the Smart App Banner and common \"install our app\" strips.\n\nOpen a page, toggle the options in Settings and report anything that hides content you wanted."
+    "summary": "Hides the Radioline floating Vlyby video widget, footer app-store badges and footer; station rows never rendered during research.",
+    "notes": "Checked 2026-11-13, logged out, headless Chrome over CDP with a desktop UA (1440x900) on radioline.co/en. Station and podcast rows were still placeholders (the API did not answer from this network), so no card selector is claimed. Not captured: an iPhone-UA page (machine out of memory/network when retried), station and podcast detail pages, the cookie dialog (none appeared).\n\nLIVE counts on Home: vlyby-widget desktop home 3; store-badges desktop home 3; footer desktop home 1. The Vlyby widget (a floating video unit loaded from /vlyby/vlyby-player-floating.html) is identified by its readable wrapper class and the iframe src; I judged it an ad-like third-party widget [INFERRED], and it is the only default-on addition. div.ad-box is a fixed invisible element.\n\nNOT verified: station rows, thumbnails, podcast pages, cookie dialog in an EU profile, phone layout. No Show/Blur/Hide option because the card markup (all hashed classes) was not available.",
+    "lastVerified": "2026-11-13"
   }
 }

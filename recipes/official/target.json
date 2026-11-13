@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "market.official.target",
   "name": "Target",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "origin": "user",
   "tags": ["desktop", "mobile"],
   "match": ["https://*.target.com/*"],
@@ -27,6 +27,76 @@
       "description": "The Smart App Banner and install-our-app strips.",
       "group": "annoyance",
       "default": true
+    },
+    {
+      "id": "ask-ai",
+      "label": "Hide the Ask Target AI button",
+      "description": "The animated \"Ask Target\" assistant button in the header.",
+      "group": "annoyance",
+      "default": true
+    },
+    {
+      "id": "cue-badges",
+      "label": "Hide Bestseller and rating badges",
+      "description": "The \"Bestseller\", \"Highly rated\" and similar pressure badges on product tiles.",
+      "group": "annoyance",
+      "default": true
+    },
+    {
+      "id": "promo-heroes",
+      "label": "Hide promo hero banners",
+      "description": "The big sale and gift-card story banners at the top of the home page.",
+      "group": "annoyance",
+      "default": true
+    },
+    {
+      "id": "product-images",
+      "label": "Product pictures",
+      "description": "Show, blur or hide the product pictures in the carousel tiles.",
+      "group": "content",
+      "choices": [
+        {
+          "id": "show",
+          "label": "Show"
+        },
+        {
+          "id": "blur",
+          "label": "Blur"
+        },
+        {
+          "id": "hide",
+          "label": "Hide"
+        }
+      ],
+      "default": "show"
+    },
+    {
+      "id": "prices",
+      "label": "Prices and promos",
+      "description": "Show, blur or hide the price and promo line on product tiles.",
+      "group": "content",
+      "choices": [
+        {
+          "id": "show",
+          "label": "Show"
+        },
+        {
+          "id": "blur",
+          "label": "Blur"
+        },
+        {
+          "id": "hide",
+          "label": "Hide"
+        }
+      ],
+      "default": "show"
+    },
+    {
+      "id": "product-carousels",
+      "label": "Hide product carousels",
+      "description": "The rows of suggested products on the home page.",
+      "group": "content",
+      "default": false
     }
   ],
   "rules": [
@@ -56,12 +126,95 @@
       "target": {
         "css": "#smartbanner, .smartbanner, .smart-banner, .app-banner, #app-banner, .app-download-banner, .install-app-banner"
       }
+    },
+    {
+      "id": "ask-ai",
+      "label": "Ask Target button",
+      "type": "hide",
+      "option": "ask-ai",
+      "target": {
+        "css": "[aria-label=\"Ask Target\"]"
+      }
+    },
+    {
+      "id": "cue-badges",
+      "label": "Product tile desirability badges",
+      "type": "hide",
+      "option": "cue-badges",
+      "target": {
+        "css": "[data-test=\"product-tile-desirability-cue-badge\"]"
+      }
+    },
+    {
+      "id": "promo-heroes",
+      "label": "Superhero story banners",
+      "type": "hide",
+      "option": "promo-heroes",
+      "target": {
+        "css": "[data-test$=\"SlingshotComponents/Superhero\"], [data-test$=\"SlingshotComponents/Storyblocks\"]"
+      }
+    },
+    {
+      "id": "images-blur",
+      "label": "Carousel tile pictures",
+      "type": "css",
+      "option": "product-images",
+      "choice": ["blur"],
+      "target": {
+        "css": "[data-test=\"carousel-tile-image\"]"
+      },
+      "declarations": {
+        "filter": "blur(12px)"
+      }
+    },
+    {
+      "id": "images-hide",
+      "label": "Carousel tile pictures",
+      "type": "hide",
+      "option": "product-images",
+      "choice": ["hide"],
+      "target": {
+        "css": "[data-test=\"carousel-tile-image\"]"
+      }
+    },
+    {
+      "id": "prices-blur",
+      "label": "Price and promo lines",
+      "type": "css",
+      "option": "prices",
+      "choice": ["blur"],
+      "target": {
+        "css": "[data-test$=\"Price/PriceAndPromoMinimal\"]"
+      },
+      "declarations": {
+        "filter": "blur(6px)"
+      }
+    },
+    {
+      "id": "prices-hide",
+      "label": "Price and promo lines",
+      "type": "hide",
+      "option": "prices",
+      "choice": ["hide"],
+      "target": {
+        "css": "[data-test$=\"Price/PriceAndPromoMinimal\"]"
+      }
+    },
+    {
+      "id": "product-carousels",
+      "label": "Products carousels",
+      "type": "hide",
+      "option": "product-carousels",
+      "target": {
+        "css": "[data-test$=\"SlingshotComponents/ProductsCarousel\"]"
+      }
     }
   ],
   "meta": {
     "author": "OpenMedia",
     "homepage": "https://www.target.com/",
-    "summary": "Cleans up cookie banners, ads and app prompts on Target",
-    "notes": "**Not verified live.** The fixtures in `recipes/fixtures/target/` are synthetic: hand-written pages that contain the targeted elements, not captures of the site, so the fixture test proves only that the selectors parse and spare protected content. These are generic cleanup rules, written from the selectors that common cookie-consent, ad and app-banner scripts use. They were not run against Target; a rule that matches nothing on a page is harmless, but nothing here promises that this site shows any of them.\n\n- **Cookie banners** hides the OneTrust, Cookiebot, Quantcast, Didomi, Usercentrics, TrustArc and Osano dialogs and common `cc-window` / `#cookie-banner` boxes. Some sites lock page scroll while the dialog is open; hiding the dialog does not undo that.\n- **Ads** hides Google ad slots and ad iframes. Sites that serve their own ad markup are not covered.\n- **App banners** hides the Smart App Banner and common \"install our app\" strips.\n\nOpen a page, toggle the options in Settings and report anything that hides content you wanted."
+    "summary": "Hides Target's Ask AI button, rating badges and promo heroes; blur/hide product pictures and prices",
+    "notes": "Checked 2026-11-13, logged out, real Chrome (headless) on www.target.com (home) with iPhone UA 390x844 and desktop UA, DOM captured after 7 seconds. Fixtures `real.html` and `desktop-real.html` are sanitised excerpts (text and product ids stripped, needed ancestors only, `data-keep` on the main container and the account link).\n\nLIVE: `[aria-label=\"Ask Target\"]` 2 on the phone page (0 on the desktop capture; the aria label is English-only), `[data-test=\"product-tile-desirability-cue-badge\"]` 96, `[data-test$=\"SlingshotComponents/Superhero\"]` 5, `[data-test$=\"SlingshotComponents/Storyblocks\"]` 2, `[data-test=\"carousel-tile-image\"]` 96, `[data-test$=\"Price/PriceAndPromoMinimal\"]` 96, `[data-test$=\"SlingshotComponents/ProductsCarousel\"]` 4. The original ad rule matched Google ad iframes (see playbook); cookie and app-banner rules matched nothing.\n\nChoices: Product pictures and Prices and promos each Show/Blur/Hide. Target's `data-test` attributes are stable test hooks; its CSS-module classes (`styles_x__Hash`) are hashed and not used.\n\nNOT verified: search results, product and category pages, the cart, logged-in home. The \"Sponsored\" tiles carry only a label (`data-test=\"sponsored-text\"`) and no wrapper hook was found, so sponsored tiles are not hidden.",
+    "lastVerified": "2026-11-13"
   }
 }

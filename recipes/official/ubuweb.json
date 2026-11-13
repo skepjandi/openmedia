@@ -2,10 +2,12 @@
   "schema": 1,
   "id": "market.official.ubuweb",
   "name": "UbuWeb",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "origin": "user",
   "tags": ["desktop", "mobile"],
-  "match": ["https://*.ubu.com/*"],
+  "match": [
+    "https://*.ubu.com/*"
+  ],
   "options": [
     {
       "id": "cookie-banners",
@@ -27,6 +29,25 @@
       "description": "The Smart App Banner and install-our-app strips.",
       "group": "annoyance",
       "default": true
+    },
+    {
+      "id": "header-space",
+      "label": "Remove the blank header space",
+      "description": "The 160px empty band and the 1x70 spacer pictures above the section list on the home page. The list and search stay.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "archive-blurb",
+      "label": "Founding blurb",
+      "description": "The \"Founded in 1996...\" paragraph under the section list. Dim fades it; Hide removes it.",
+      "group": "content",
+      "choices": [
+        { "id": "show", "label": "Show" },
+        { "id": "dim", "label": "Dim" },
+        { "id": "hide", "label": "Hide" }
+      ],
+      "default": "show"
     }
   ],
   "rules": [
@@ -56,12 +77,45 @@
       "target": {
         "css": "#smartbanner, .smartbanner, .smart-banner, .app-banner, #app-banner, .app-download-banner, .install-app-banner"
       }
+    },
+    {
+      "id": "header-spacers",
+      "label": "Header spacer div and spacer GIFs",
+      "type": "hide",
+      "option": "header-space",
+      "target": {
+        "css": ".header-spacer, img[src$=\"dot_clear.gif\"]"
+      }
+    },
+    {
+      "id": "blurb-dim",
+      "label": "Dim the blurb",
+      "type": "css",
+      "option": "archive-blurb",
+      "target": {
+        "css": ".archive"
+      },
+      "declarations": {
+        "opacity": "0.35"
+      },
+      "choice": ["dim"]
+    },
+    {
+      "id": "blurb-hide",
+      "label": "Hide the blurb",
+      "type": "hide",
+      "option": "archive-blurb",
+      "target": {
+        "css": ".archive"
+      },
+      "choice": ["hide"]
     }
   ],
   "meta": {
     "author": "OpenMedia",
     "homepage": "https://ubu.com/film/",
-    "summary": "Cleans up cookie banners, ads and app prompts on UbuWeb, a media site",
-    "notes": "**Not verified live.** The fixtures in `recipes/fixtures/ubuweb/` are synthetic: hand-written pages that contain the targeted elements, not captures of the site, so the fixture test proves only that the selectors parse and spare protected content. These are generic cleanup rules, written from the selectors that common cookie-consent, ad and app-banner scripts use. They were not run against UbuWeb; a rule that matches nothing on a page is harmless, but nothing here promises that this site shows any of them.\n\n- **Cookie banners** hides the OneTrust, Cookiebot, Quantcast, Didomi, Usercentrics, TrustArc and Osano dialogs and common `cc-window` / `#cookie-banner` boxes. Some sites lock page scroll while the dialog is open; hiding the dialog does not undo that.\n- **Ads** hides Google ad slots and ad iframes. Sites that serve their own ad markup are not covered.\n- **App banners** hides the Smart App Banner and common \"install our app\" strips.\n\nOpen a page, toggle the options in Settings and report anything that hides content you wanted."
+    "summary": "UbuWeb home page: header spacing and the founding blurb (static site, few annoyances)",
+    "notes": "Checked 2026-11-13, logged out, headless Chrome (iPhone UA and desktop UA) on ubu.com (home page) only. The site is hand-written static HTML with no scripts that inject content, no cookie banner, no ads and no app banner, so the three generic options match nothing and there is little to hide. The section pages (film, sound, papers and so on) were not loaded, so none of their markup is covered.\n\n- **Blank header space**: the div.header-spacer (1) and the img[src$=dot_clear.gif] spacer pictures (2) on the home page (LIVE). The decorative banner is a body background image, which rules cannot touch, so it stays.\n- **Founding blurb** (Show/Dim/Hide): div.archive, 1 (LIVE). Dim is a css opacity rule, Hide a hide rule.\n\nThe section list (div.ubu-links), the search box and the page title are never matched. Same page for both user agents.",
+    "lastVerified": "2026-11-13"
   }
 }
