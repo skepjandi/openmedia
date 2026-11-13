@@ -113,6 +113,9 @@ input {
    is dropped on the edge side so it reads as growing out of the edge. */
 .fab-peek {
   animation: fab-peek-in 240ms var(--ease-spring) both;
+  /* The clear glass is nearly white, so on a light page the white arrow vanished. A dark tint
+     keeps it readable on any page. */
+  background: linear-gradient(145deg, rgb(11 18 32 / 0.78), rgb(11 18 32 / 0.62));
 }
 
 .fab-peek[data-edge="left"] {

@@ -6,6 +6,18 @@ All notable changes to OpenMedia are documented here.
 >
 > **Wiki**: the [GitHub Wiki](https://github.com/skepjandi/openmedia/wiki) is the public-facing main wiki — architecture, recipe format, AI pipeline, security model, roadmap. Source-controlled editing surface is `docs/wiki/` in this repo; CI (`.github/workflows/sync-wiki.yml`) mirrors it to the GitHub Wiki on every merge to `main`. New single-PR changes belong here, not as new wiki pages.
 
+### fix(fab): the arrow on the collapsed button's tab is visible on light pages
+
+**Area:** `fix(fab)`
+
+**Problem:** The tab left at the screen edge when the floating button is hidden is clear glass with a white arrow, so on a white page (Google) the arrow could not be seen.
+
+**Change:** `.fab-peek` has a dark tint behind the glass rim, so the white arrow reads on any page.
+
+**Verified:** Prettier. **Not verified:** on a device or simulator.
+
+**PR:** n/a
+
 ### fix(incognito): no second biometric check while incognito is on
 
 **Area:** `fix(incognito)`
