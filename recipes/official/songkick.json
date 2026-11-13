@@ -131,9 +131,7 @@
       "label": "Artist, event and genre photos",
       "type": "css",
       "option": "artist-photos",
-      "choice": [
-        "blur"
-      ],
+      "choice": ["blur"],
       "target": {
         "css": "img.related-artists-v2__artist-image, img.artist-profile-image, img.genre-carousel__card-image, img.related-events-v2__event-image"
       },
@@ -146,9 +144,7 @@
       "label": "Artist, event and genre photos",
       "type": "hide",
       "option": "artist-photos",
-      "choice": [
-        "hide"
-      ],
+      "choice": ["hide"],
       "target": {
         "css": "img.related-artists-v2__artist-image, img.artist-profile-image, img.genre-carousel__card-image, img.related-events-v2__event-image"
       }

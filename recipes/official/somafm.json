@@ -123,9 +123,7 @@
       "label": "Channel logos",
       "type": "css",
       "option": "channel-art",
-      "choice": [
-        "blur"
-      ],
+      "choice": ["blur"],
       "target": {
         "css": "#stations li img"
       },

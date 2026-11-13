@@ -115,9 +115,7 @@
       "label": "Channel logos blurred",
       "type": "css",
       "option": "channel-logos",
-      "choice": [
-        "blur"
-      ],
+      "choice": ["blur"],
       "target": {
         "css": "[data-view=\"grid\"] img"
       },
@@ -130,9 +128,7 @@
       "label": "Channel logos hidden",
       "type": "hide",
       "option": "channel-logos",
-      "choice": [
-        "hide"
-      ],
+      "choice": ["hide"],
       "target": {
         "css": "[data-view=\"grid\"] img"
       }

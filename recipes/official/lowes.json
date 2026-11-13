@@ -4,13 +4,8 @@
   "name": "Lowe's",
   "version": "1.1.0",
   "origin": "user",
-  "tags": [
-    "desktop",
-    "mobile"
-  ],
-  "match": [
-    "https://*.lowes.com/*"
-  ],
+  "tags": ["desktop", "mobile"],
+  "match": ["https://*.lowes.com/*"],
   "options": [
     {
       "id": "cookie-banners",
@@ -173,9 +168,7 @@
       "label": "Blur promo images",
       "type": "css",
       "option": "promo-images",
-      "choice": [
-        "blur"
-      ],
+      "choice": ["blur"],
       "target": {
         "css": "[data-testid=\"playwright-unified-column-control\"] img, [data-testid=\"playwright-unified-scaled-image\"] img"
       },
@@ -188,9 +181,7 @@
       "label": "Promo images",
       "type": "hide",
       "option": "promo-images",
-      "choice": [
-        "hide"
-      ],
+      "choice": ["hide"],
       "target": {
         "css": "[data-testid=\"playwright-unified-column-control\"] img, [data-testid=\"playwright-unified-scaled-image\"] img"
       }
@@ -200,9 +191,7 @@
       "label": "Dim recommendations",
       "type": "css",
       "option": "recommendations",
-      "choice": [
-        "dim"
-      ],
+      "choice": ["dim"],
       "target": {
         "css": ".dynamic-cards-wrapper-container, [data-testid=\"playwright-rec-carousel-v2-mfe\"]"
       },
@@ -215,9 +204,7 @@
       "label": "Recommendations",
       "type": "hide",
       "option": "recommendations",
-      "choice": [
-        "hide"
-      ],
+      "choice": ["hide"],
       "target": {
         "css": ".dynamic-cards-wrapper-container, [data-testid=\"playwright-rec-carousel-v2-mfe\"]"
       }

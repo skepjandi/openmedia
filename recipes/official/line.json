@@ -4,13 +4,8 @@
   "name": "LINE",
   "version": "1.1.0",
   "origin": "user",
-  "tags": [
-    "desktop",
-    "mobile"
-  ],
-  "match": [
-    "https://*.line.me/*"
-  ],
+  "tags": ["desktop", "mobile"],
+  "match": ["https://*.line.me/*"],
   "options": [
     {
       "id": "cookie-banners",
@@ -148,9 +143,7 @@
       "label": "Blur sticker thumbnails",
       "type": "css",
       "option": "sticker-thumbnails",
-      "choice": [
-        "blur"
-      ],
+      "choice": ["blur"],
       "target": {
         "css": ".mdList01Img img"
       },
@@ -163,9 +156,7 @@
       "label": "Sticker thumbnails",
       "type": "hide",
       "option": "sticker-thumbnails",
-      "choice": [
-        "hide"
-      ],
+      "choice": ["hide"],
       "target": {
         "css": ".mdList01Img img"
       }
@@ -175,9 +166,7 @@
       "label": "Blur promo banners",
       "type": "css",
       "option": "promo-banners",
-      "choice": [
-        "blur"
-      ],
+      "choice": ["blur"],
       "target": {
         "css": "a.home-banner-link img, section#banners"
       },
@@ -190,9 +179,7 @@
       "label": "Promo banners",
       "type": "hide",
       "option": "promo-banners",
-      "choice": [
-        "hide"
-      ],
+      "choice": ["hide"],
       "target": {
         "css": "a.home-banner-link, section#banners"
       }

@@ -124,9 +124,7 @@
       "label": "Home recommendations dimmed",
       "type": "css",
       "option": "home-recs",
-      "choice": [
-        "dim"
-      ],
+      "choice": ["dim"],
       "target": {
         "css": "[data-testid=\"home-recs-carousel\"]"
       },
@@ -139,9 +137,7 @@
       "label": "Home recommendations hidden",
       "type": "hide",
       "option": "home-recs",
-      "choice": [
-        "hide"
-      ],
+      "choice": ["hide"],
       "target": {
         "css": "[data-testid=\"home-recs-carousel\"]"
       }

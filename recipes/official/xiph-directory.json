@@ -136,9 +136,7 @@
       "label": "On Air line blurred",
       "type": "css",
       "option": "now-playing",
-      "choice": [
-        "blur"
-      ],
+      "choice": ["blur"],
       "target": {
         "css": ".card-subtitle"
       },
@@ -151,9 +149,7 @@
       "label": "On Air line hidden",
       "type": "hide",
       "option": "now-playing",
-      "choice": [
-        "hide"
-      ],
+      "choice": ["hide"],
       "target": {
         "css": ".card-subtitle"
       }
@@ -163,9 +159,7 @@
       "label": "Station descriptions blurred",
       "type": "css",
       "option": "station-descriptions",
-      "choice": [
-        "blur"
-      ],
+      "choice": ["blur"],
       "target": {
         "css": ".card-text"
       },
@@ -178,9 +172,7 @@
       "label": "Station descriptions hidden",
       "type": "hide",
       "option": "station-descriptions",
-      "choice": [
-        "hide"
-      ],
+      "choice": ["hide"],
       "target": {
         "css": ".card-text"
       }

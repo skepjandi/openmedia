@@ -159,9 +159,7 @@
       "label": "Score percentages and icons",
       "type": "css",
       "option": "scores",
-      "choice": [
-        "blur"
-      ],
+      "choice": ["blur"],
       "target": {
         "css": "rt-text[slot=\"criticsScore\"], rt-text[slot=\"audienceScore\"], score-icon-critics, score-icon-audience, .score-wrap, .dynamic-text-list__tomatometer-group"
       },
@@ -174,9 +172,7 @@
       "label": "Score percentages and icons",
       "type": "hide",
       "option": "scores",
-      "choice": [
-        "hide"
-      ],
+      "choice": ["hide"],
       "target": {
         "css": "rt-text[slot=\"criticsScore\"], rt-text[slot=\"audienceScore\"], score-icon-critics, score-icon-audience, .score-wrap, .dynamic-text-list__tomatometer-group"
       }
@@ -186,9 +182,7 @@
       "label": "Poster and thumbnail images",
       "type": "css",
       "option": "posters",
-      "choice": [
-        "blur"
-      ],
+      "choice": ["blur"],
       "target": {
         "css": "poster-tile rt-img[slot=\"thumbnail\"], .trailers-and-videos-item__thumbnail-image, .movie-and-tv-guides-item__image, .dynamic-poster-list__image-container"
       },
@@ -201,9 +195,7 @@
       "label": "Poster and thumbnail images",
       "type": "hide",
       "option": "posters",
-      "choice": [
-        "hide"
-      ],
+      "choice": ["hide"],
       "target": {
         "css": "poster-tile rt-img[slot=\"thumbnail\"], .trailers-and-videos-item__thumbnail-group, .movie-and-tv-guides-item__image, .dynamic-poster-list__image-container"
       }

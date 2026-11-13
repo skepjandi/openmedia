@@ -4,13 +4,8 @@
   "name": "Nightwave Plaza",
   "version": "1.1.0",
   "origin": "user",
-  "tags": [
-    "desktop",
-    "mobile"
-  ],
-  "match": [
-    "https://*.plaza.one/*"
-  ],
+  "tags": ["desktop", "mobile"],
+  "match": ["https://*.plaza.one/*"],
   "options": [
     {
       "id": "cookie-banners",
@@ -146,9 +141,7 @@
       "label": "Album cover",
       "type": "css",
       "option": "cover-art",
-      "choice": [
-        "blur"
-      ],
+      "choice": ["blur"],
       "target": {
         "css": "#window-player .cover"
       },
@@ -161,9 +154,7 @@
       "label": "Album cover",
       "type": "hide",
       "option": "cover-art",
-      "choice": [
-        "hide"
-      ],
+      "choice": ["hide"],
       "target": {
         "css": "#window-player .cover"
       }
@@ -173,9 +164,7 @@
       "label": "Artist and title",
       "type": "css",
       "option": "track-text",
-      "choice": [
-        "blur"
-      ],
+      "choice": ["blur"],
       "target": {
         "css": ".player-artist, .player-title"
       },
@@ -188,9 +177,7 @@
       "label": "Artist and title",
       "type": "hide",
       "option": "track-text",
-      "choice": [
-        "hide"
-      ],
+      "choice": ["hide"],
       "target": {
         "css": ".player-artist, .player-title"
       }

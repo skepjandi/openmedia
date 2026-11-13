@@ -131,9 +131,7 @@
       "label": "Product photos",
       "type": "css",
       "option": "product-photos",
-      "choice": [
-        "blur"
-      ],
+      "choice": ["blur"],
       "target": {
         "css": "img.product-card__main-img"
       },
@@ -146,9 +144,7 @@
       "label": "Product photos",
       "type": "hide",
       "option": "product-photos",
-      "choice": [
-        "hide"
-      ],
+      "choice": ["hide"],
       "target": {
         "css": "img.product-card__main-img"
       }

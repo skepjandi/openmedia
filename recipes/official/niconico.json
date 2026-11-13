@@ -4,13 +4,8 @@
   "name": "Niconico",
   "version": "1.1.0",
   "origin": "user",
-  "tags": [
-    "desktop",
-    "mobile"
-  ],
-  "match": [
-    "https://*.nicovideo.jp/*"
-  ],
+  "tags": ["desktop", "mobile"],
+  "match": ["https://*.nicovideo.jp/*"],
   "options": [
     {
       "id": "cookie-banners",
@@ -136,9 +131,7 @@
       "label": "Thumbnails and preview clips",
       "type": "css",
       "option": "thumbnails",
-      "choice": [
-        "blur"
-      ],
+      "choice": ["blur"],
       "target": {
         "css": ".NC-Thumbnail-image, .NC-MutedVideoThumbnail"
       },
@@ -151,9 +144,7 @@
       "label": "Thumbnails and preview clips",
       "type": "hide",
       "option": "thumbnails",
-      "choice": [
-        "hide"
-      ],
+      "choice": ["hide"],
       "target": {
         "css": ".NC-Thumbnail, .NC-MutedVideoThumbnail"
       }

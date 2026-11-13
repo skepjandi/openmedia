@@ -129,9 +129,7 @@
       "label": "Story tiles dimmed",
       "type": "css",
       "option": "story-tiles",
-      "choice": [
-        "dim"
-      ],
+      "choice": ["dim"],
       "target": {
         "css": ".brick__item"
       },
@@ -171,9 +169,7 @@
       "label": "Story tiles blurred",
       "type": "css",
       "option": "story-tiles",
-      "choice": [
-        "blur"
-      ],
+      "choice": ["blur"],
       "target": {
         "css": ".brick__item"
       },

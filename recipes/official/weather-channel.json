@@ -138,9 +138,7 @@
       "label": "News rails dimmed",
       "type": "css",
       "option": "news-rails",
-      "choice": [
-        "dim"
-      ],
+      "choice": ["dim"],
       "target": {
         "css": "section[aria-label=\"Trending Now\"], section[aria-label=\"Your News\"], section[aria-label=\"News\"], section[aria-label^=\"Editor\"], section[aria-label^=\"Reviews\"]"
       },
@@ -153,9 +151,7 @@
       "label": "News rails hidden",
       "type": "hide",
       "option": "news-rails",
-      "choice": [
-        "hide"
-      ],
+      "choice": ["hide"],
       "target": {
         "css": "section[aria-label=\"Trending Now\"], section[aria-label=\"Your News\"], section[aria-label=\"News\"], section[aria-label^=\"Editor\"], section[aria-label^=\"Reviews\"]"
       }

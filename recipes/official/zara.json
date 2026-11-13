@@ -122,9 +122,7 @@
       "label": "Campaign pictures blurred",
       "type": "css",
       "option": "campaign-media",
-      "choice": [
-        "blur"
-      ],
+      "choice": ["blur"],
       "target": {
         "css": ".slider-spot__slide-background"
       },
@@ -137,9 +135,7 @@
       "label": "Campaign pictures hidden",
       "type": "hide",
       "option": "campaign-media",
-      "choice": [
-        "hide"
-      ],
+      "choice": ["hide"],
       "target": {
         "css": ".slider-spot__slide-background"
       }

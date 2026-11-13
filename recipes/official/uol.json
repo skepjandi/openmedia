@@ -5,9 +5,7 @@
   "version": "1.1.0",
   "origin": "user",
   "tags": ["desktop", "mobile"],
-  "match": [
-    "https://*.uol.com.br/*"
-  ],
+  "match": ["https://*.uol.com.br/*"],
   "options": [
     {
       "id": "cookie-banners",

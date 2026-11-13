@@ -115,9 +115,7 @@
       "label": "Card pictures",
       "type": "css",
       "option": "show-artwork",
-      "choice": [
-        "blur"
-      ],
+      "choice": ["blur"],
       "target": {
         "css": ".rns-card img"
       },
@@ -130,9 +128,7 @@
       "label": "Card pictures",
       "type": "hide",
       "option": "show-artwork",
-      "choice": [
-        "hide"
-      ],
+      "choice": ["hide"],
       "target": {
         "css": ".rns-card img"
       }

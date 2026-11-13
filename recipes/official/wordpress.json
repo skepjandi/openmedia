@@ -124,9 +124,7 @@
       "label": "Post images blurred",
       "type": "css",
       "option": "post-images",
-      "choice": [
-        "blur"
-      ],
+      "choice": ["blur"],
       "target": {
         "css": "article img"
       },
@@ -139,9 +137,7 @@
       "label": "Post images hidden",
       "type": "hide",
       "option": "post-images",
-      "choice": [
-        "hide"
-      ],
+      "choice": ["hide"],
       "target": {
         "css": "article img"
       }

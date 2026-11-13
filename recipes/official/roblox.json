@@ -122,9 +122,7 @@
       "label": "Game tile pictures",
       "type": "css",
       "option": "game-thumbnails",
-      "choice": [
-        "blur"
-      ],
+      "choice": ["blur"],
       "target": {
         "css": "[data-testid=\"sdui-tile-image-container\"]"
       },
@@ -137,9 +135,7 @@
       "label": "Game tile pictures",
       "type": "hide",
       "option": "game-thumbnails",
-      "choice": [
-        "hide"
-      ],
+      "choice": ["hide"],
       "target": {
         "css": "[data-testid=\"sdui-tile-image-container\"]"
       }

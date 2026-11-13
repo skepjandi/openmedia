@@ -141,9 +141,7 @@
       "label": "Article pictures",
       "type": "css",
       "option": "images",
-      "choice": [
-        "blur"
-      ],
+      "choice": ["blur"],
       "target": {
         "css": "img.mw-file-element"
       },
@@ -156,9 +154,7 @@
       "label": "Article figures and infobox pictures",
       "type": "hide",
       "option": "images",
-      "choice": [
-        "hide"
-      ],
+      "choice": ["hide"],
       "target": {
         "css": "figure[typeof^=\"mw:File\"], .infobox-image"
       }
@@ -195,9 +191,7 @@
       "label": "Main Page boxes dimmed",
       "type": "css",
       "option": "main-page-boxes",
-      "choice": [
-        "dim"
-      ],
+      "choice": ["dim"],
       "target": {
         "css": "#mp-itn, #mp-dyk, #mp-otd, #mp-tfp"
       },
@@ -210,9 +204,7 @@
       "label": "Main Page boxes hidden",
       "type": "hide",
       "option": "main-page-boxes",
-      "choice": [
-        "hide"
-      ],
+      "choice": ["hide"],
       "target": {
         "css": "#mp-itn, #mp-dyk, #mp-otd, #mp-tfp"
       }

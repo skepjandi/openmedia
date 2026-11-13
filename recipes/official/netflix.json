@@ -4,13 +4,8 @@
   "name": "Netflix",
   "version": "1.1.0",
   "origin": "user",
-  "tags": [
-    "desktop",
-    "mobile"
-  ],
-  "match": [
-    "https://*.netflix.com/*"
-  ],
+  "tags": ["desktop", "mobile"],
+  "match": ["https://*.netflix.com/*"],
   "options": [
     {
       "id": "cookie-banners",
@@ -125,9 +120,7 @@
       "label": "Hero and Top 10 art",
       "type": "css",
       "option": "poster-art",
-      "choice": [
-        "blur"
-      ],
+      "choice": ["blur"],
       "target": {
         "css": "[data-uia=\"hero-vlv\"] img, button[data-uia^=\"top-10-element-\"] span[style*=\"background-image\"]"
       },
@@ -140,9 +133,7 @@
       "label": "Hero and Top 10 art",
       "type": "hide",
       "option": "poster-art",
-      "choice": [
-        "hide"
-      ],
+      "choice": ["hide"],
       "target": {
         "css": "[data-uia=\"hero-vlv\"] img, button[data-uia^=\"top-10-element-\"] span[style*=\"background-image\"]"
       }

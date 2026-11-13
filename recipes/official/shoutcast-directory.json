@@ -129,9 +129,7 @@
       "label": "Listener, bitrate and type cells",
       "type": "css",
       "option": "station-stats",
-      "choice": [
-        "dim"
-      ],
+      "choice": ["dim"],
       "target": {
         "css": "#station-list td.listeners, #station-list td.bitrate, #station-list td.encode, #station-list th.listeners, #station-list th.bitrate, #station-list th.type"
       },
@@ -144,9 +142,7 @@
       "label": "Listener, bitrate and type cells",
       "type": "hide",
       "option": "station-stats",
-      "choice": [
-        "hide"
-      ],
+      "choice": ["hide"],
       "target": {
         "css": "#station-list td.listeners, #station-list td.bitrate, #station-list td.encode, #station-list th.listeners, #station-list th.bitrate, #station-list th.type"
       }

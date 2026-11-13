@@ -122,9 +122,7 @@
       "label": "Episode pictures blurred",
       "type": "css",
       "option": "show-artwork",
-      "choice": [
-        "blur"
-      ],
+      "choice": ["blur"],
       "target": {
         "css": "a[href^=\"/episode/\"] img"
       },
@@ -137,9 +135,7 @@
       "label": "Episode pictures hidden",
       "type": "hide",
       "option": "show-artwork",
-      "choice": [
-        "hide"
-      ],
+      "choice": ["hide"],
       "target": {
         "css": "a[href^=\"/episode/\"] img"
       }

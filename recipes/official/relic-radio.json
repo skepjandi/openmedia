@@ -129,9 +129,7 @@
       "label": "Slider and post pictures",
       "type": "css",
       "option": "show-artwork",
-      "choice": [
-        "blur"
-      ],
+      "choice": ["blur"],
       "target": {
         "css": "#main .fusion-flexslider img, #main .fusion-imageframe img, #main .fusion-post-wrapper img"
       },
@@ -144,9 +142,7 @@
       "label": "Slider and post pictures",
       "type": "hide",
       "option": "show-artwork",
-      "choice": [
-        "hide"
-      ],
+      "choice": ["hide"],
       "target": {
         "css": "#main .fusion-flexslider img, #main .fusion-imageframe img, #main .fusion-post-wrapper img"
       }

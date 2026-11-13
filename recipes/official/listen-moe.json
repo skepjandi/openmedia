@@ -4,13 +4,8 @@
   "name": "LISTEN.moe",
   "version": "1.1.0",
   "origin": "user",
-  "tags": [
-    "desktop",
-    "mobile"
-  ],
-  "match": [
-    "https://*.listen.moe/*"
-  ],
+  "tags": ["desktop", "mobile"],
+  "match": ["https://*.listen.moe/*"],
   "options": [
     {
       "id": "cookie-banners",
@@ -153,9 +148,7 @@
       "label": "Blur album art",
       "type": "css",
       "option": "album-art",
-      "choice": [
-        "blur"
-      ],
+      "choice": ["blur"],
       "target": {
         "css": "a[href^=\"/albums/\"] img"
       },
@@ -168,9 +161,7 @@
       "label": "Album art",
       "type": "hide",
       "option": "album-art",
-      "choice": [
-        "hide"
-      ],
+      "choice": ["hide"],
       "target": {
         "css": "a[href^=\"/albums/\"] img"
       }
@@ -180,9 +171,7 @@
       "label": "Blur background art",
       "type": "css",
       "option": "background-art",
-      "choice": [
-        "blur"
-      ],
+      "choice": ["blur"],
       "target": {
         "css": "div[class~=\"-z-10\"][class~=\"pointer-events-none\"] > img"
       },
@@ -195,9 +184,7 @@
       "label": "Background art",
       "type": "hide",
       "option": "background-art",
-      "choice": [
-        "hide"
-      ],
+      "choice": ["hide"],
       "target": {
         "css": "div[class~=\"-z-10\"][class~=\"pointer-events-none\"] > img"
       }

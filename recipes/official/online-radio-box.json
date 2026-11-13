@@ -4,13 +4,8 @@
   "name": "Online Radio Box",
   "version": "1.1.0",
   "origin": "user",
-  "tags": [
-    "desktop",
-    "mobile"
-  ],
-  "match": [
-    "https://*.onlineradiobox.com/*"
-  ],
+  "tags": ["desktop", "mobile"],
+  "match": ["https://*.onlineradiobox.com/*"],
   "options": [
     {
       "id": "cookie-banners",
@@ -143,9 +138,7 @@
       "label": "Station logos",
       "type": "css",
       "option": "station-logos",
-      "choice": [
-        "blur"
-      ],
+      "choice": ["blur"],
       "target": {
         "css": ".stations__station img, .cooked__station__logo"
       },
@@ -158,9 +151,7 @@
       "label": "Station logos",
       "type": "hide",
       "option": "station-logos",
-      "choice": [
-        "hide"
-      ],
+      "choice": ["hide"],
       "target": {
         "css": ".stations__station img, .cooked__station__logo"
       }

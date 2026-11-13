@@ -4,13 +4,8 @@
   "name": "NetEase 163",
   "version": "1.1.0",
   "origin": "user",
-  "tags": [
-    "desktop",
-    "mobile"
-  ],
-  "match": [
-    "https://*.163.com/*"
-  ],
+  "tags": ["desktop", "mobile"],
+  "match": ["https://*.163.com/*"],
   "options": [
     {
       "id": "cookie-banners",
@@ -150,9 +145,7 @@
       "label": "Covers and news pictures",
       "type": "css",
       "option": "pictures",
-      "choice": [
-        "blur"
-      ],
+      "choice": ["blur"],
       "target": {
         "css": ".u-img, img.lazy"
       },
@@ -165,9 +158,7 @@
       "label": "Covers and news pictures",
       "type": "hide",
       "option": "pictures",
-      "choice": [
-        "hide"
-      ],
+      "choice": ["hide"],
       "target": {
         "css": ".remd_img, img.lazy"
       }

@@ -5,9 +5,7 @@
   "version": "1.1.0",
   "origin": "user",
   "tags": ["desktop", "mobile"],
-  "match": [
-    "https://*.ubu.com/*"
-  ],
+  "match": ["https://*.ubu.com/*"],
   "options": [
     {
       "id": "cookie-banners",

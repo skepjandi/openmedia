@@ -120,9 +120,7 @@
       "label": "Top story pictures",
       "type": "css",
       "option": "headline-pictures",
-      "choice": [
-        "blur"
-      ],
+      "choice": ["blur"],
       "target": {
         "css": ".cbd-focus-wrapper img"
       },
@@ -135,9 +133,7 @@
       "label": "Top story pictures",
       "type": "hide",
       "option": "headline-pictures",
-      "choice": [
-        "hide"
-      ],
+      "choice": ["hide"],
       "target": {
         "css": ".cbd-focus-wrapper img"
       }

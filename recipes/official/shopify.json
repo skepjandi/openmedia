@@ -115,9 +115,7 @@
       "label": "Body pictures",
       "type": "css",
       "option": "page-pictures",
-      "choice": [
-        "blur"
-      ],
+      "choice": ["blur"],
       "target": {
         "css": "main#main img"
       },
@@ -130,9 +128,7 @@
       "label": "Body pictures",
       "type": "hide",
       "option": "page-pictures",
-      "choice": [
-        "hide"
-      ],
+      "choice": ["hide"],
       "target": {
         "css": "main#main img"
       }

@@ -120,9 +120,7 @@
       "label": "Carousel pictures",
       "type": "css",
       "option": "page-pictures",
-      "choice": [
-        "blur"
-      ],
+      "choice": ["blur"],
       "target": {
         "css": "img.c-accordion-carousel__asset-img"
       },
@@ -135,9 +133,7 @@
       "label": "Carousel pictures",
       "type": "hide",
       "option": "page-pictures",
-      "choice": [
-        "hide"
-      ],
+      "choice": ["hide"],
       "target": {
         "css": "img.c-accordion-carousel__asset-img"
       }

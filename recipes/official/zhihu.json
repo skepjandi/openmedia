@@ -113,9 +113,7 @@
       "label": "Answer excerpts blurred",
       "type": "css",
       "option": "answer-previews",
-      "choice": [
-        "blur"
-      ],
+      "choice": ["blur"],
       "target": {
         "css": ".RichContent-inner"
       },
@@ -128,9 +126,7 @@
       "label": "Answer excerpts hidden",
       "type": "hide",
       "option": "answer-previews",
-      "choice": [
-        "hide"
-      ],
+      "choice": ["hide"],
       "target": {
         "css": ".RichContent-inner"
       }

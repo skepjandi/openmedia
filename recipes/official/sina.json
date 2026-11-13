@@ -138,9 +138,7 @@
       "label": "News pictures",
       "type": "css",
       "option": "news-pictures",
-      "choice": [
-        "blur"
-      ],
+      "choice": ["blur"],
       "target": {
         "css": "img.img_width"
       },
@@ -153,9 +151,7 @@
       "label": "News pictures",
       "type": "hide",
       "option": "news-pictures",
-      "choice": [
-        "hide"
-      ],
+      "choice": ["hide"],
       "target": {
         "css": "img.img_width"
       }

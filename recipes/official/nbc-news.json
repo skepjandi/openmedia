@@ -4,13 +4,8 @@
   "name": "NBC News",
   "version": "1.1.0",
   "origin": "user",
-  "tags": [
-    "desktop",
-    "mobile"
-  ],
-  "match": [
-    "https://*.nbcnews.com/*"
-  ],
+  "tags": ["desktop", "mobile"],
+  "match": ["https://*.nbcnews.com/*"],
   "options": [
     {
       "id": "cookie-banners",
@@ -141,9 +136,7 @@
       "label": "Story pictures",
       "type": "css",
       "option": "story-pictures",
-      "choice": [
-        "blur"
-      ],
+      "choice": ["blur"],
       "target": {
         "css": "picture[data-testid=\"picture\"]"
       },
@@ -156,9 +149,7 @@
       "label": "Story pictures",
       "type": "hide",
       "option": "story-pictures",
-      "choice": [
-        "hide"
-      ],
+      "choice": ["hide"],
       "target": {
         "css": "picture[data-testid=\"picture\"]"
       }

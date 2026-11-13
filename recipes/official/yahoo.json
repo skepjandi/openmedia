@@ -159,9 +159,7 @@
       "label": "Story pictures blurred",
       "type": "css",
       "option": "story-thumbnails",
-      "choice": [
-        "blur"
-      ],
+      "choice": ["blur"],
       "target": {
         "css": ".cls-card-story img, section[aria-label=\"Top stories\"] img"
       },
@@ -174,9 +172,7 @@
       "label": "Story pictures hidden",
       "type": "hide",
       "option": "story-thumbnails",
-      "choice": [
-        "hide"
-      ],
+      "choice": ["hide"],
       "target": {
         "css": ".cls-card-story img, section[aria-label=\"Top stories\"] img"
       }
@@ -186,9 +182,7 @@
       "label": "Top stories dimmed",
       "type": "css",
       "option": "top-stories",
-      "choice": [
-        "dim"
-      ],
+      "choice": ["dim"],
       "target": {
         "css": "section[aria-label=\"Top stories\"]"
       },
@@ -201,9 +195,7 @@
       "label": "Top stories hidden",
       "type": "hide",
       "option": "top-stories",
-      "choice": [
-        "hide"
-      ],
+      "choice": ["hide"],
       "target": {
         "css": "section[aria-label=\"Top stories\"]"
       }

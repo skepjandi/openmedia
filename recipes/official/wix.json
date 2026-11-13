@@ -122,9 +122,7 @@
       "label": "Page images blurred",
       "type": "css",
       "option": "page-images",
-      "choice": [
-        "blur"
-      ],
+      "choice": ["blur"],
       "target": {
         "css": ".wixui-image img"
       },
@@ -137,9 +135,7 @@
       "label": "Page images hidden",
       "type": "hide",
       "option": "page-images",
-      "choice": [
-        "hide"
-      ],
+      "choice": ["hide"],
       "target": {
         "css": ".wixui-image"
       }

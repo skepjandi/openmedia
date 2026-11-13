@@ -168,9 +168,7 @@
       "label": "News pictures blurred",
       "type": "css",
       "option": "news-thumbnails",
-      "choice": [
-        "blur"
-      ],
+      "choice": ["blur"],
       "target": {
         "css": "#Topics img, #Stream img, #log-stream img"
       },
@@ -183,9 +181,7 @@
       "label": "News pictures hidden",
       "type": "hide",
       "option": "news-thumbnails",
-      "choice": [
-        "hide"
-      ],
+      "choice": ["hide"],
       "target": {
         "css": "#Topics img, #Stream img, #log-stream img"
       }
@@ -195,9 +191,7 @@
       "label": "Recommended articles dimmed",
       "type": "css",
       "option": "recommended-articles",
-      "choice": [
-        "dim"
-      ],
+      "choice": ["dim"],
       "target": {
         "css": "#Stream"
       },
@@ -210,9 +204,7 @@
       "label": "Recommended articles hidden",
       "type": "hide",
       "option": "recommended-articles",
-      "choice": [
-        "hide"
-      ],
+      "choice": ["hide"],
       "target": {
         "css": "#Stream"
       }

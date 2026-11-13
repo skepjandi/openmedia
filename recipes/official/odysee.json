@@ -4,13 +4,8 @@
   "name": "Odysee",
   "version": "1.1.0",
   "origin": "user",
-  "tags": [
-    "desktop",
-    "mobile"
-  ],
-  "match": [
-    "https://*.odysee.com/*"
-  ],
+  "tags": ["desktop", "mobile"],
+  "match": ["https://*.odysee.com/*"],
   "options": [
     {
       "id": "cookie-banners",
@@ -155,9 +150,7 @@
       "label": "Video thumbnails",
       "type": "css",
       "option": "thumbnails",
-      "choice": [
-        "blur"
-      ],
+      "choice": ["blur"],
       "target": {
         "css": ".claim-preview--tile .media__thumb"
       },
@@ -170,9 +163,7 @@
       "label": "Video thumbnails",
       "type": "hide",
       "option": "thumbnails",
-      "choice": [
-        "hide"
-      ],
+      "choice": ["hide"],
       "target": {
         "css": ".claim-preview--tile .media__thumb"
       }
@@ -182,9 +173,7 @@
       "label": "Comments section",
       "type": "css",
       "option": "comments",
-      "choice": [
-        "blur"
-      ],
+      "choice": ["blur"],
       "target": {
         "css": "section.comment__list"
       },
@@ -197,9 +186,7 @@
       "label": "Comments section",
       "type": "hide",
       "option": "comments",
-      "choice": [
-        "hide"
-      ],
+      "choice": ["hide"],
       "target": {
         "css": "section.comment__list"
       }

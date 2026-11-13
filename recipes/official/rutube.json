@@ -143,9 +143,7 @@
       "label": "Video preview pictures",
       "type": "css",
       "option": "video-previews",
-      "choice": [
-        "blur"
-      ],
+      "choice": ["blur"],
       "target": {
         "css": "div[class*=\"wdp-card-poster-module__imageWrapperV2\"] img"
       },
@@ -158,9 +156,7 @@
       "label": "Video preview pictures",
       "type": "hide",
       "option": "video-previews",
-      "choice": [
-        "hide"
-      ],
+      "choice": ["hide"],
       "target": {
         "css": "div[class*=\"wdp-card-poster-module__imageWrapperV2\"] img"
       }
@@ -170,9 +166,7 @@
       "label": "Channel avatars",
       "type": "css",
       "option": "channel-avatars",
-      "choice": [
-        "blur"
-      ],
+      "choice": ["blur"],
       "target": {
         "css": "button[class*=\"wdp-card-author-avatar-module__authorAvatar\"]"
       },
@@ -185,9 +179,7 @@
       "label": "Channel avatars",
       "type": "hide",
       "option": "channel-avatars",
-      "choice": [
-        "hide"
-      ],
+      "choice": ["hide"],
       "target": {
         "css": "button[class*=\"wdp-card-author-avatar-module__authorAvatar\"]"
       }

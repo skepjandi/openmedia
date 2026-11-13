@@ -136,9 +136,7 @@
       "label": "Video thumbnail pictures",
       "type": "css",
       "option": "thumbnails",
-      "choice": [
-        "blur"
-      ],
+      "choice": ["blur"],
       "target": {
         "css": "rum-video-thumbnail img[class*=\"rum-video-thumbnail__image\"]"
       },
@@ -151,9 +149,7 @@
       "label": "Video thumbnail pictures",
       "type": "hide",
       "option": "thumbnails",
-      "choice": [
-        "hide"
-      ],
+      "choice": ["hide"],
       "target": {
         "css": "rum-video-thumbnail img[class*=\"rum-video-thumbnail__image\"]"
       }

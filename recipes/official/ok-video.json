@@ -4,13 +4,8 @@
   "name": "OK Video",
   "version": "1.1.0",
   "origin": "user",
-  "tags": [
-    "desktop",
-    "mobile"
-  ],
-  "match": [
-    "https://*.ok.ru/*"
-  ],
+  "tags": ["desktop", "mobile"],
+  "match": ["https://*.ok.ru/*"],
   "options": [
     {
       "id": "cookie-banners",
@@ -144,9 +139,7 @@
       "label": "Video thumbnails",
       "type": "css",
       "option": "thumbnails",
-      "choice": [
-        "blur"
-      ],
+      "choice": ["blur"],
       "target": {
         "css": "img.vid-card_img"
       },
@@ -159,9 +152,7 @@
       "label": "Video thumbnails",
       "type": "hide",
       "option": "thumbnails",
-      "choice": [
-        "hide"
-      ],
+      "choice": ["hide"],
       "target": {
         "css": ".video-card .video-card_img-w"
       }
@@ -171,9 +162,7 @@
       "label": "Video titles",
       "type": "css",
       "option": "video-titles",
-      "choice": [
-        "blur"
-      ],
+      "choice": ["blur"],
       "target": {
         "css": ".video-card .video-card_n"
       },
