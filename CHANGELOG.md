@@ -17,6 +17,17 @@ All notable changes to OpenMedia are documented here.
 **PR:** n/a
 
 
+
+
+### fix(recipes): clarify YouTube video ad limits
+
+**Area:** `fix(recipes)`
+
+**Change:** The YouTube ad-slot option now explains that it hides separate companion/promoted placements, not ads playing inside videos.
+
+**Verified:** `cargo test --manifest-path src-tauri/Cargo.toml recipes::tests::` (29 passed); YouTube recipe JSON parses.
+
+**PR:** n/a
 ### feat(ui): clarify recipe sharing and Pro value
 
 **Area:** `feat(ui)`

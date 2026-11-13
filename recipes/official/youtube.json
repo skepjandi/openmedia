@@ -24,7 +24,7 @@
     {
       "id": "ads",
       "label": "Hide ad slots",
-      "description": "Companion and promoted ad blocks that remain after network blocking.",
+      "description": "Hides separate companion and promoted ad slots when present; it cannot block ads playing inside videos.",
       "group": "annoyance",
       "default": true
     },
