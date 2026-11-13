@@ -6,6 +6,17 @@ All notable changes to OpenMedia are documented here.
 >
 > **Wiki**: the [GitHub Wiki](https://github.com/skepjandi/openmedia/wiki) is the public-facing main wiki — architecture, recipe format, AI pipeline, security model, roadmap. Source-controlled editing surface is `docs/wiki/` in this repo; CI (`.github/workflows/sync-wiki.yml`) mirrors it to the GitHub Wiki on every merge to `main`. New single-PR changes belong here, not as new wiki pages.
 
+### feat(ui): clarify recipe sharing and Pro value
+
+**Area:** `feat(ui)`
+
+**Change:** Share form guidance is grouped into a quiet, readable panel. The paywall now describes AI assistant, incognito, usage limits and expanded favorites before listing plans.
+
+**Verified:** TypeScript check, changed-file ESLint and Prettier. **Not verified:** visual review inside Tauri; the browser preview cannot supply Tauri IPC.
+
+**PR:** n/a
+
+
 ### fix(tabs): avoid showing the boot page twice
 
 **Area:** `fix(tabs)`

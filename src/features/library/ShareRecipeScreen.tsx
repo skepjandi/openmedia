@@ -64,10 +64,10 @@ function GithubFlow() {
   const ready = summaryToSend(summary) !== null && recipeId !== "";
 
   return (
-    <section className="flex flex-col gap-4">
+    <section className="mx-auto flex w-full max-w-xl flex-col gap-5">
       {form && (
         <>
-          <label className="flex flex-col gap-1.5 text-sm text-paper/70">
+          <label className="flex flex-col gap-2 text-sm font-medium text-paper/80">
             {t("share.github.recipe")}
             <select
               value={recipeId}
@@ -81,7 +81,7 @@ function GithubFlow() {
               ))}
             </select>
           </label>
-          <label className="flex flex-col gap-1.5 text-sm text-paper/70">
+          <label className="flex flex-col gap-2 text-sm font-medium text-paper/80">
             {t("share.github.summary")}
             <input
               value={summary}
@@ -106,10 +106,10 @@ function GithubFlow() {
           >
             {t("share.github.continue")}
           </button>
-          <ul className="flex flex-col gap-1 px-1 text-[13px] leading-snug text-paper/50">
-            <li>{t("share.github.needAccount")}</li>
-            <li>{t("share.github.whatSent")}</li>
-            <li>{t("share.github.afterReview")}</li>
+          <ul className="flex flex-col gap-2 rounded-2xl border border-hair bg-paper/[0.035] p-4 text-[13px] leading-relaxed text-paper/60">
+            <li className="border-s-2 border-accent/60 ps-3">{t("share.github.needAccount")}</li>
+            <li className="border-s-2 border-accent/60 ps-3">{t("share.github.whatSent")}</li>
+            <li className="border-s-2 border-accent/60 ps-3">{t("share.github.afterReview")}</li>
           </ul>
         </>
       )}

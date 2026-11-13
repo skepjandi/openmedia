@@ -51,6 +51,34 @@ export function PaywallSheet() {
       closeLabel={t("paywall.close")}
       onClose={closeSheet}
     >
+      <section className="mb-6 border-b border-hair pb-5" aria-label={t("paywall.subtitle")}>
+        <h2 className="mb-3 text-xs font-semibold tracking-[0.16em] text-accent uppercase">
+          {t("paywall.locked")}
+        </h2>
+        <ul className="divide-y divide-hair">
+          {[
+            { title: t("ai.title"), description: t("ai.note") },
+            {
+              title: t("incognito.favoritesTitle"),
+              description: t("incognito.favoritesNote", { limit: 6 }),
+            },
+            { title: t("stats.title"), description: t("stats.subtitle") },
+            { title: t("favorites.title"), description: t("favorites.note", { limit: 6 }) },
+          ].map(({ title, description }) => (
+            <li key={title} className="flex gap-3 py-3 first:pt-0 last:pb-0">
+              <span className="mt-0.5 grid size-7 shrink-0 place-items-center rounded-full bg-accent/10 text-accent">
+                <ProIcon size={14} />
+              </span>
+              <span className="min-w-0">
+                <span className="block text-sm font-semibold">{title}</span>
+                <span className="mt-0.5 block text-xs leading-relaxed text-paper/55">
+                  {description}
+                </span>
+              </span>
+            </li>
+          ))}
+        </ul>
+      </section>
       {configured && status === "loading" ? (
         <p className="py-8 text-center text-sm text-paper/60">{t("paywall.loading")}</p>
       ) : !configured ? (
