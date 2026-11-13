@@ -6,6 +6,18 @@ All notable changes to OpenMedia are documented here.
 >
 > **Wiki**: the [GitHub Wiki](https://github.com/skepjandi/openmedia/wiki) is the public-facing main wiki — architecture, recipe format, AI pipeline, security model, roadmap. Source-controlled editing surface is `docs/wiki/` in this repo; CI (`.github/workflows/sync-wiki.yml`) mirrors it to the GitHub Wiki on every merge to `main`. New single-PR changes belong here, not as new wiki pages.
 
+### fix(tabs): avoid showing the boot page twice
+
+**Area:** `fix(tabs)`
+
+**Cause:** React Strict Mode can run the startup effect twice. Both state requests return the same native boot-session ID, but startup appended it twice, so Tabs showed duplicate entries and could label both as showing.
+
+**Change:** Startup now adopts a boot session only if that ID is not already in the live session list.
+
+**Verified:** Concurrent startup regression test.
+
+**PR:** n/a
+
 ### feat(ui): redesign usage and tighten app screens
 
 **Area:** `feat(ui)`

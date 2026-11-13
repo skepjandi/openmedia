@@ -466,7 +466,7 @@ export const useApp = create<AppStore>((set, get) => {
         void siteView.setColorScheme(state.theme).catch(() => {});
         set({ state, desktop, onboardingOpen: !state.onboarded });
         applyIcons();
-        if (bootSession) {
+        if (bootSession && !get().sessions.some((session) => session.id === bootSession.id)) {
           startSession(
             bootSession.url,
             startSource(state.favorites, bootSession.url),
