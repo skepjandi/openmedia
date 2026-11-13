@@ -449,3 +449,66 @@ svg {
     0 0 0 4px rgb(6 175 248 / 0.35),
     0 2px 6px rgb(0 0 0 / 0.35);
 }
+
+/* Accessibility. The reading fonts are the same files Rust injects into pages; they hold the Latin
+   letters, so other scripts keep the app's own font. `useApplyAccessibility` sets the attributes. */
+@font-face {
+  font-family: "OpenDyslexic";
+  font-weight: 400;
+  font-display: swap;
+  src: url("../src-tauri/src/accessibility/fonts/OpenDyslexic-Regular.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Atkinson Hyperlegible";
+  font-weight: 400;
+  font-display: swap;
+  src: url("../src-tauri/src/accessibility/fonts/AtkinsonHyperlegible-Regular.woff2")
+    format("woff2");
+}
+
+@font-face {
+  font-family: "Atkinson Hyperlegible";
+  font-weight: 700;
+  font-display: swap;
+  src: url("../src-tauri/src/accessibility/fonts/AtkinsonHyperlegible-Bold.woff2") format("woff2");
+}
+
+:root[data-reading-font="opendyslexic"] {
+  --font-sans: "OpenDyslexic", ui-sans-serif, system-ui, sans-serif;
+}
+
+:root[data-reading-font="hyperlegible"] {
+  --font-sans: "Atkinson Hyperlegible", ui-sans-serif, system-ui, sans-serif;
+}
+
+/* Zero specificity, so a component that sets its own spacing (the eyebrow) keeps it. Cursive and
+   Indic scripts join their letters, so they get none, as the eyebrow does. */
+:where(
+    :root[data-wide-text]:not(
+        :lang(ar),
+        :lang(ur),
+        :lang(hi),
+        :lang(bn),
+        :lang(ta),
+        :lang(si),
+        :lang(th)
+      )
+  )
+  * {
+  letter-spacing: 0.05em;
+  word-spacing: 0.12em;
+}
+
+/* Epilepsy protection: every duration is 1 ms and every animation plays once, so an element
+   still ends in its final state. Pages get the same rule from `accessibility/mod.rs`. */
+:root[data-calm] *,
+:root[data-calm] *::before,
+:root[data-calm] *::after {
+  animation-duration: 1ms !important;
+  animation-delay: 0s !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 1ms !important;
+  transition-delay: 0s !important;
+  scroll-behavior: auto !important;
+}

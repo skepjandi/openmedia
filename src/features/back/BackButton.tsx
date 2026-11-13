@@ -1,9 +1,9 @@
 import { useRef, useState, useSyncExternalStore, type PointerEvent } from "react";
 import { selectPage, useApp } from "../../app/store";
+import { canStepBack } from "../web/sessions";
 import { describeError } from "../../i18n/errors";
 import { useT } from "../../i18n/useT";
 import { BackIcon } from "../../shared/icons";
-import { siteView } from "../../shared/ipc";
 import { useInsets, useViewport } from "../../shared/viewport";
 import {
   EDGE_MARGIN,
@@ -36,7 +36,7 @@ interface Drag {
  */
 export function BackButton() {
   const enabled = useApp((s) => s.state?.backButton ?? false);
-  const canGoBack = useApp((s) => selectPage(s)?.canGoBack ?? false);
+  const canGoBack = useApp((s) => canStepBack(selectPage(s)));
   const onboardingOpen = useApp((s) => s.onboardingOpen);
   const reportError = useApp((s) => s.reportError);
   const hasHandler = useSyncExternalStore(subscribeBackHandlers, hasBackHandler);
@@ -99,7 +99,11 @@ export function BackButton() {
     drag.current = null;
     if (!active.moved) {
       if (runBackHandler()) return;
-      if (canAct) siteView.goBack().catch((error: unknown) => reportError(describeError(error, t)));
+      if (canAct)
+        useApp
+          .getState()
+          .goBack()
+          .catch((error: unknown) => reportError(describeError(error, t)));
       return;
     }
     const snapped = snapToEdge({ x: event.clientX, y: event.clientY }, viewport, insets);

@@ -18,7 +18,7 @@ use tauri_plugin_siteview::{
     AuthenticateRequest, BiometryKind, SetDocumentStartScriptRequest, SiteviewExt,
 };
 
-use crate::commands::current_script;
+use crate::commands::{current_script, script_for};
 use crate::entitlement::Entitlement;
 use crate::error::Result;
 use crate::library::{Favorite, FavoriteInput, Library, Mode};
@@ -51,7 +51,7 @@ fn switch_mode(app: &AppHandle, active: bool) -> Result<()> {
     let recipes = app.state::<Recipes>();
     let incognito = app.state::<Incognito>();
     let before = current_script(app, &library, &recipes)?;
-    let after = recipes.script(&library.site_options(Mode::from(active))?)?;
+    let after = script_for(&library, &recipes, Mode::from(active))?;
     if before != after {
         app.siteview()
             .set_document_start_script(SetDocumentStartScriptRequest { script: after })?;

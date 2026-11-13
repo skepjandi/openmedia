@@ -13,6 +13,7 @@ use serde::{Deserialize, Serialize};
 use tauri_plugin_siteview::validate::parse_web_url;
 use uuid::Uuid;
 
+use crate::accessibility::Accessibility;
 use crate::ai::{AiSettings, MAX_PROVIDERS, ProviderConfig, ProviderInput};
 use crate::error::{Error, Result};
 use crate::recipes::{OptionChoices, OptionValue};
@@ -20,6 +21,7 @@ use tauri_plugin_siteview::site::site_of_host;
 
 const FORMAT_VERSION: u32 = 4;
 const MAX_HISTORY: usize = 100;
+const MAX_BACK: usize = 20;
 pub const MAX_FAVORITE_NAME_CHARS: usize = 20;
 const MAX_ICON_CHARS: usize = 200_000;
 /// The most site icons the app keeps. Each one is a small PNG, so this stays well under a
@@ -130,6 +132,8 @@ pub struct AppState {
     pub favorites: Vec<Favorite>,
     pub history: Vec<String>,
     pub last_url: Option<String>,
+    /// The pages behind `last_url`, oldest first, so Back still works after a restart.
+    pub last_back: Vec<String>,
     pub onboarded: bool,
     pub theme: Theme,
     pub ad_block: bool,
@@ -144,6 +148,7 @@ pub struct AppState {
     pub locale: Option<String>,
     /// The engine the command bar searches with.
     pub search_engine: SearchEngine,
+    pub accessibility: Accessibility,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -153,6 +158,8 @@ struct LibraryData {
     profile_id: Uuid,
     favorites: Vec<Favorite>,
     last_url: Option<String>,
+    #[serde(default)]
+    last_back: Vec<String>,
     #[serde(default)]
     onboarded: bool,
     #[serde(default)]
@@ -204,6 +211,9 @@ struct LibraryData {
     /// Google until the user picks another.
     #[serde(default)]
     search_engine: SearchEngine,
+    /// Epilepsy protection and the reading aids for dyslexia; all off until chosen.
+    #[serde(default)]
+    accessibility: Accessibility,
 }
 
 /// The user's favorites, page, theme and provider settings, persisted as one JSON file. Holds no
@@ -255,6 +265,7 @@ impl Library {
             favorites: with_icons(&data, &data.favorites),
             history: data.history.clone(),
             last_url: data.last_url.clone(),
+            last_back: data.last_back.clone(),
             onboarded: data.onboarded,
             theme: data.theme,
             ad_block: data.ad_block,
@@ -264,6 +275,7 @@ impl Library {
             ai_preview: data.ai_preview,
             locale: data.locale.clone(),
             search_engine: data.search_engine,
+            accessibility: data.accessibility,
         })
     }
 
@@ -318,10 +330,19 @@ impl Library {
         ))
     }
 
-    pub fn set_last_url(&self, url: &str) -> Result<()> {
+    /// Remembers the page and the pages behind it. Addresses that do not parse are dropped, and
+    /// only the newest `MAX_BACK` are kept.
+    pub fn set_last_url(&self, url: &str, back: &[String]) -> Result<()> {
         let url = parse_web_url(url)?.to_string();
+        let mut back: Vec<String> = back
+            .iter()
+            .filter_map(|url| parse_web_url(url).ok())
+            .map(|url| url.to_string())
+            .collect();
+        back.drain(..back.len().saturating_sub(MAX_BACK));
         let mut data = self.lock()?;
         data.last_url = Some(url);
+        data.last_back = back;
         self.save(&data)
     }
 
@@ -348,6 +369,7 @@ impl Library {
         let mut data = self.lock()?;
         data.history.clear();
         data.last_url = None;
+        data.last_back.clear();
         prune_icons(&mut data);
         self.save(&data)
     }
@@ -458,6 +480,16 @@ impl Library {
     pub fn set_back_button(&self, enabled: bool) -> Result<()> {
         let mut data = self.lock()?;
         data.back_button = enabled;
+        self.save(&data)
+    }
+
+    pub fn accessibility(&self) -> Result<Accessibility> {
+        Ok(self.lock()?.accessibility)
+    }
+
+    pub fn set_accessibility(&self, accessibility: Accessibility) -> Result<()> {
+        let mut data = self.lock()?;
+        data.accessibility = accessibility;
         self.save(&data)
     }
 
@@ -728,6 +760,7 @@ fn default_data() -> LibraryData {
         profile_id: Uuid::new_v4(),
         favorites: default_favorites(),
         last_url: None,
+        last_back: Vec::new(),
         onboarded: false,
         theme: Theme::System,
         ad_block: true,
@@ -742,6 +775,7 @@ fn default_data() -> LibraryData {
         ai: AiSettings::default(),
         locale: None,
         search_engine: SearchEngine::Google,
+        accessibility: Accessibility::default(),
         incognito_site_options: OptionChoices::new(),
         incognito_favorites: None,
     }
@@ -785,6 +819,7 @@ static TEMP_COUNTER: AtomicU64 = AtomicU64::new(0);
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::accessibility::{ReadingFont, Tint};
     use crate::ai::ProviderKind;
 
     fn library() -> (tempfile::TempDir, Library) {
@@ -896,7 +931,12 @@ mod tests {
         library
             .set_favorites(vec![input(" YouTube ", "https://m.youtube.com")])
             .unwrap();
-        library.set_last_url("https://m.youtube.com/feed").unwrap();
+        library
+            .set_last_url(
+                "https://m.youtube.com/feed",
+                &["https://m.youtube.com/".to_string()],
+            )
+            .unwrap();
         let state = reload(&dir).state().unwrap();
         assert_eq!(state.favorites.len(), 1);
         assert_eq!(state.favorites[0].name, "YouTube");
@@ -904,6 +944,7 @@ mod tests {
             state.last_url.as_deref(),
             Some("https://m.youtube.com/feed")
         );
+        assert_eq!(state.last_back, ["https://m.youtube.com/"]);
     }
 
     #[test]
@@ -949,7 +990,9 @@ mod tests {
             library.start_url().unwrap().as_deref(),
             Some("https://www.google.com/")
         );
-        library.set_last_url("https://m.youtube.com/feed").unwrap();
+        library
+            .set_last_url("https://m.youtube.com/feed", &[])
+            .unwrap();
         assert_eq!(
             library.start_url().unwrap().as_deref(),
             Some("https://m.youtube.com/feed")
@@ -1031,7 +1074,7 @@ mod tests {
     #[test]
     fn last_url_rejects_non_web_urls() {
         let (_dir, library) = library();
-        assert!(library.set_last_url("javascript:1").is_err());
+        assert!(library.set_last_url("javascript:1", &[]).is_err());
         assert_eq!(library.state().unwrap().last_url, None);
     }
 
@@ -1091,6 +1134,51 @@ mod tests {
         assert_eq!(
             reload(&dir).state().unwrap().search_engine,
             SearchEngine::Brave
+        );
+    }
+
+    #[test]
+    fn accessibility_is_off_by_default_and_the_choices_persist() {
+        let (dir, library) = library();
+        assert_eq!(
+            library.state().unwrap().accessibility,
+            Accessibility::default()
+        );
+        let chosen = Accessibility {
+            epilepsy_protection: true,
+            font: ReadingFont::OpenDyslexic,
+            spacing: true,
+            tint: Tint::Mint,
+        };
+        library.set_accessibility(chosen).unwrap();
+        assert_eq!(library.accessibility().unwrap(), chosen);
+        assert_eq!(reload(&dir).state().unwrap().accessibility, chosen);
+    }
+
+    #[test]
+    fn a_library_saved_before_accessibility_existed_loads_with_it_off() {
+        let (dir, library) = library();
+        library
+            .set_accessibility(Accessibility {
+                spacing: true,
+                ..Accessibility::default()
+            })
+            .unwrap();
+        let path = dir.path().join("library.json");
+        let mut saved: serde_json::Value =
+            serde_json::from_str(&fs::read_to_string(&path).unwrap()).unwrap();
+        assert!(
+            saved
+                .as_object_mut()
+                .unwrap()
+                .remove("accessibility")
+                .is_some()
+        );
+        fs::write(&path, saved.to_string()).unwrap();
+        drop(library);
+        assert_eq!(
+            reload(&dir).state().unwrap().accessibility,
+            Accessibility::default()
         );
     }
 
@@ -1534,7 +1622,7 @@ mod tests {
     fn clearing_history_forgets_the_last_page_but_keeps_favorites() {
         let (dir, library) = library();
         library.add_history("https://a.example/").unwrap();
-        library.set_last_url("https://a.example/").unwrap();
+        library.set_last_url("https://a.example/", &[]).unwrap();
         let favorites = library.state().unwrap().favorites;
         library.clear_history().unwrap();
         let state = reload(&dir).state().unwrap();

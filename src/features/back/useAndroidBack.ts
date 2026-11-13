@@ -1,8 +1,9 @@
 import { useEffect, useSyncExternalStore } from "react";
 import { selectPage, useApp } from "../../app/store";
+import { canStepBack } from "../web/sessions";
 import { describeError } from "../../i18n/errors";
 import { useT } from "../../i18n/useT";
-import { app, siteView } from "../../shared/ipc";
+import { app } from "../../shared/ipc";
 import { isAndroid } from "../../shared/platform";
 import { useLimitBlock } from "../stats/UsageGuard";
 import { hasBackHandler, runBackHandler, subscribeBackHandlers } from "./backStack";
@@ -15,7 +16,7 @@ import { hasBackHandler, runBackHandler, subscribeBackHandlers } from "./backSta
 export function useAndroidBack() {
   const t = useT();
   const reportError = useApp((s) => s.reportError);
-  const canGoBack = useApp((s) => selectPage(s)?.canGoBack ?? false);
+  const canGoBack = useApp((s) => canStepBack(selectPage(s)));
   const { blocked } = useLimitBlock();
   const hasHandler = useSyncExternalStore(subscribeBackHandlers, hasBackHandler);
   const wanted = isAndroid() && (hasHandler || (canGoBack && !blocked));
@@ -27,7 +28,10 @@ export function useAndroidBack() {
     app
       .onBackButton(() => {
         if (runBackHandler()) return;
-        siteView.goBack().catch((error: unknown) => reportError(describeError(error, t)));
+        useApp
+          .getState()
+          .goBack()
+          .catch((error: unknown) => reportError(describeError(error, t)));
       })
       .then((registered) => {
         if (stopped) void registered.unregister();

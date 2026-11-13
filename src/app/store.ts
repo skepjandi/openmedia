@@ -28,6 +28,7 @@ import {
   ai,
   library,
   siteView,
+  type Accessibility,
   type AiState,
   type AppState,
   type Favorite,
@@ -155,6 +156,8 @@ export interface AppStore {
   /** Shows a live session by id, for example the one a notification was tapped for. */
   openSession: (id: string) => void;
   /** Ends one live session. Favorites and history are untouched; the last open site stays. */
+  /** Back in the page; once it has no history of its own, the page saved from before a restart. */
+  goBack: () => Promise<void>;
   closeSession: (id: string) => void;
   /** Ends every live session but the visible one. */
   closeOtherSessions: () => void;
@@ -176,6 +179,8 @@ export interface AppStore {
   /** Picks the engine the command bar searches with. */
   setSearchEngine: (engine: SearchEngine) => Promise<void>;
   setAdBlock: (enabled: boolean) => Promise<void>;
+  /** Changes some of the accessibility choices; the rest keep their value. */
+  setAccessibility: (changes: Partial<Accessibility>) => Promise<void>;
   loadSites: () => Promise<void>;
   /** Re-reads the favorites after Rust changed them on its own, as the guide's quick-access pick does. */
   reloadFavorites: () => Promise<void>;
@@ -335,6 +340,7 @@ export const useApp = create<AppStore>((set, get) => {
     source: SessionSource,
     adoptedId?: string,
     hubId: string | null = null,
+    restoredBack: string[] = [],
   ) => {
     const now = Date.now();
     const id = adoptedId ?? crypto.randomUUID();
@@ -342,7 +348,7 @@ export const useApp = create<AppStore>((set, get) => {
     set((current) => ({
       sessions: [
         ...markUsed(current.sessions, previousId, now),
-        newSession(id, source, url, now, hubId),
+        newSession(id, source, url, now, hubId, restoredBack),
       ],
       activeId: id,
       sheet: "none",
@@ -470,6 +476,8 @@ export const useApp = create<AppStore>((set, get) => {
             bootSession.url,
             startSource(state.favorites, bootSession.url),
             bootSession.id,
+            null,
+            state.lastUrl === bootSession.url ? state.lastBack : [],
           );
         }
       } catch (error) {
@@ -548,6 +556,19 @@ export const useApp = create<AppStore>((set, get) => {
 
     openSession: (id) => {
       if (get().sessions.some((session) => session.id === id)) switchTo(id);
+    },
+
+    goBack: async () => {
+      const page = selectPage(get());
+      if (!page) return;
+      if (page.canGoBack || page.restoredBack.length === 0) {
+        await siteView.goBack();
+        return;
+      }
+      const behind = page.restoredBack[page.restoredBack.length - 1];
+      const rest = page.restoredBack.slice(0, -1);
+      startSession(behind, page.source, undefined, page.hubId, rest);
+      get().closeSession(page.id);
     },
 
     closeSession: (id) => {
@@ -767,6 +788,21 @@ export const useApp = create<AppStore>((set, get) => {
             current.state && previous !== undefined
               ? { ...current.state, backButton: previous }
               : current.state,
+          error: appError(error),
+        }));
+      }
+    },
+
+    setAccessibility: async (changes) => {
+      const previous = get().state?.accessibility;
+      if (!previous) return;
+      const next = { ...previous, ...changes };
+      set((current) => ({ state: current.state && { ...current.state, accessibility: next } }));
+      try {
+        await library.setAccessibility(next);
+      } catch (error) {
+        set((current) => ({
+          state: current.state && { ...current.state, accessibility: previous },
           error: appError(error),
         }));
       }

@@ -19,6 +19,8 @@ export interface Session {
   loading: boolean;
   canGoBack: boolean;
   canGoForward: boolean;
+  /** Pages from before a restart, oldest first: Back opens them once the page has no history of its own. */
+  restoredBack: string[];
   /** The page has drawn its first content and is showing. */
   painted: boolean;
   /** When the session was last visible or opened, in ms. */
@@ -44,6 +46,7 @@ export function newSession(
   url: string,
   now: number,
   hubId: string | null = null,
+  restoredBack: string[] = [],
 ): Session {
   return {
     id,
@@ -56,6 +59,7 @@ export function newSession(
     loading: true,
     canGoBack: false,
     canGoForward: false,
+    restoredBack,
     painted: false,
     lastUsed: now,
     openedAt: now,
@@ -89,6 +93,23 @@ export function applyState(session: Session, state: SiteViewState, now = Date.no
     painted: state.painted,
   };
 }
+
+/** Whether Back has somewhere to go: the page's own history, else the pages saved before a restart. */
+export function canStepBack(session: Session | null): boolean {
+  return session !== null && (session.canGoBack || session.restoredBack.length > 0);
+}
+
+/**
+ * The trail of pages behind a page that finished loading `url`, after it came from `previous`.
+ * Moving to the page just behind goes back; any other address moves forward.
+ */
+export function advanceTrail(trail: readonly string[], previous: string | null, url: string) {
+  if (previous === null || previous === url) return trail;
+  if (trail[trail.length - 1] === url) return trail.slice(0, -1);
+  return [...trail, previous].slice(-MAX_TRAIL);
+}
+
+const MAX_TRAIL = 20;
 
 function hostOf(url: string): string | null {
   try {

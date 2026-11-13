@@ -1,3 +1,4 @@
+mod accessibility;
 mod ad_block;
 mod ai;
 mod boot;
@@ -132,6 +133,7 @@ pub fn run() {
             commands::bottom_margin_for,
             commands::set_site_background_media,
             commands::set_back_button,
+            commands::set_accessibility,
             commands::ai_state,
             commands::ai_save_provider,
             commands::ai_delete_provider,
