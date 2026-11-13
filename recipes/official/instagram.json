@@ -62,6 +62,83 @@
       "description": "The About, Help, Privacy and Terms links at the bottom of the page.",
       "group": "content",
       "default": false
+    },
+    {
+      "id": "thumbnails",
+      "label": "Grid thumbnails",
+      "description": "How the picture grids on profiles and Explore look: normal, blurred or hidden.",
+      "group": "content",
+      "choices": [
+        {
+          "id": "show",
+          "label": "Show"
+        },
+        {
+          "id": "blur",
+          "label": "Blur"
+        },
+        {
+          "id": "hide",
+          "label": "Hide"
+        }
+      ],
+      "default": "show"
+    },
+    {
+      "id": "post-media",
+      "label": "Post photos and videos",
+      "description": "How the photos and videos inside feed posts look. The caption and buttons stay.",
+      "group": "content",
+      "choices": [
+        {
+          "id": "show",
+          "label": "Show"
+        },
+        {
+          "id": "blur",
+          "label": "Blur"
+        },
+        {
+          "id": "hide",
+          "label": "Hide"
+        }
+      ],
+      "default": "show"
+    },
+    {
+      "id": "avatars",
+      "label": "Profile pictures",
+      "description": "The big picture on a profile and the small ones beside feed posts, with their story ring.",
+      "group": "content",
+      "choices": [
+        {
+          "id": "show",
+          "label": "Show"
+        },
+        {
+          "id": "blur",
+          "label": "Blur"
+        },
+        {
+          "id": "hide",
+          "label": "Hide"
+        }
+      ],
+      "default": "show"
+    },
+    {
+      "id": "counts",
+      "label": "Hide follower and like counts",
+      "description": "Follower and following numbers on profiles and the like count under posts.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "direct-messages",
+      "label": "Hide Messages",
+      "description": "The Messages (Direct) entry in the bottom bar and top bar. Your inbox can still be opened by address.",
+      "group": "content",
+      "default": false
     }
   ],
   "rules": [
@@ -199,13 +276,118 @@
       "target": {
         "css": "footer"
       }
+    },
+    {
+      "id": "thumbs-blur",
+      "label": "Blur grid pictures",
+      "type": "css",
+      "option": "thumbnails",
+      "choice": ["blur"],
+      "target": {
+        "css": "hr ~ div a img, main a[href*=\"/p/\"] img, main a[href*=\"/reel/\"] img"
+      },
+      "declarations": {
+        "filter": "blur(14px)"
+      }
+    },
+    {
+      "id": "thumbs-hide",
+      "label": "Grid pictures",
+      "type": "hide",
+      "option": "thumbnails",
+      "choice": ["hide"],
+      "target": {
+        "css": "hr ~ div a img, main a[href*=\"/p/\"] img, main a[href*=\"/reel/\"] img"
+      }
+    },
+    {
+      "id": "post-media-blur",
+      "label": "Blur post photos and videos",
+      "type": "css",
+      "option": "post-media",
+      "choice": ["blur"],
+      "target": {
+        "css": "article img[srcset], article video"
+      },
+      "declarations": {
+        "filter": "blur(14px)"
+      }
+    },
+    {
+      "id": "post-media-hide",
+      "label": "Post photos and videos",
+      "type": "hide",
+      "option": "post-media",
+      "choice": ["hide"],
+      "target": {
+        "css": "article img[srcset], article video"
+      }
+    },
+    {
+      "id": "avatars-blur",
+      "label": "Blur profile pictures",
+      "type": "css",
+      "option": "avatars",
+      "choice": ["blur"],
+      "target": {
+        "css": "header section img, header section canvas, article header img"
+      },
+      "declarations": {
+        "filter": "blur(10px)"
+      }
+    },
+    {
+      "id": "avatars-hide",
+      "label": "Profile pictures",
+      "type": "hide",
+      "option": "avatars",
+      "choice": ["hide"],
+      "target": {
+        "css": "header section img, header section canvas, article header img"
+      }
+    },
+    {
+      "id": "counts-profile",
+      "label": "Follower and following counts",
+      "type": "hide",
+      "option": "counts",
+      "target": {
+        "css": "header section a[href=\"#\"], header section a[href$=\"/followers/\"], header section a[href$=\"/following/\"]"
+      }
+    },
+    {
+      "id": "counts-likes",
+      "label": "Like counts under posts",
+      "type": "hide",
+      "option": "counts",
+      "target": {
+        "css": "a[href*=\"/liked_by/\"]"
+      }
+    },
+    {
+      "id": "dm-entry-direct",
+      "label": "Messages entry (direct link layout)",
+      "type": "hide",
+      "option": "direct-messages",
+      "target": {
+        "css": "div:has(> a[href^=\"/direct/\"]), div:has(> a[href^=\"/u/direct\"])"
+      }
+    },
+    {
+      "id": "dm-entry-wrapped",
+      "label": "Messages entry (wrapped link layout)",
+      "type": "hide",
+      "option": "direct-messages",
+      "target": {
+        "css": "div:has(> span > div > a[href^=\"/direct/\"])"
+      }
     }
   ],
   "meta": {
     "author": "OpenMedia",
     "homepage": "https://www.instagram.com/",
-    "lastVerified": "2026-11-10",
-    "summary": "Hides \"use the app\" pop-ups, Reels, Explore tab, Stories and Highlights, suggested posts, posts, verified badges, footer links",
-    "notes": "LIVE (logged out, iPhone UA, 390x844): app-overlay matched 1 element (the fixed overlay holding the dialog, backdrop and close button; hiding the dialog alone leaves the dimmed backdrop), open-app-pill matched 1 (unscoped a[href*=applink.instagram.com] matches 18, every grid tile), the Reels and Explore tab wrappers matched 1 each. The overlay rule needs a login link on the page, so a logged-in share sheet (also role=dialog) is never hidden. Not seen live (logged-in only, from community lists: viki53 Instagram Purified 2025-07, shraiwi Nuke Insta Slop 2026-09, Instagram Unhook): reels-video-posts, stories-tray, suggested-*, posts, wrapped tab layout. reels-profile-tab: the SVG label was seen live, the wrapper structure was not. reels-video-posts also hides ordinary video posts. posts also hides a post opened by address. Class names rotate; never use them. DESKTOP (macOS Safari UA, logged out, live in the app, 2026-11-10): the login page is all a logged-out visitor gets on /; public profiles such as /nasa/ render. Matched there: profile-highlights, verified-ticks, page-footer. The feed rules were written for the same React app and keep matching by structure, but the signed-in feed could not be reached, so the Reels, Explore, Stories and posts rules were not re-checked on desktop. Messages stays visible on purpose (the fixtures mark it data-keep)."
+    "lastVerified": "2026-11-13",
+    "summary": "Hides app pop-ups, Reels, Explore, Stories, suggestions, counts, Messages; blurs or hides grid pictures, post media, avatars",
+    "notes": "**2026-11-13 additions** (iPhone UA 390x844, headless Chrome, logged out, /nasa/ and a /p/ page): `thumbnails`, `post-media` and `avatars` are choice options (Show, Blur, Hide); the first choice is the untouched state.\n- **LIVE**: `hr ~ div a img` matched 12 grid pictures on /nasa/ (13 `a[href*=applink.instagram.com] img` in all, one is not a tile); `header section img` 1 and `header section canvas` 1 (avatar and story ring); `header section a[href=\"#\"]` 2 (the logged-out follower and following links, text `104M followers`, `91 following`); `a[href^=\"/u/direct\"]` 1 on the logged-out bottom bar (the layout there uses `/u/direct/` and `/u/profile/`).\n- **SOURCE/INFERRED, logged-in only**: `main a[href*=\"/p/\"] img` and `/reel/` grid links, `article img[srcset]` and `article video` for post media, `article header img`, `a[href$=\"/followers/\"]` and `/following/`, `a[href*=\"/liked_by/\"]` (long-standing like-count link), and the `/direct/` entry layouts. Fixture `logged-in-profile.html` is hand-written. Blur style follows shraiwi Nuke Insta Slop (2026-03), which blurs and dims suggested and video posts.\n- Not verified: any logged-in page; whether `article img[srcset]` separates photos from avatars on today's feed (avatars would otherwise also hit the avatars option); Instagram help pages describe a native Hide like and share counts setting, which is the safer way to hide counts on your own account.\n\n**Earlier checks**\n\nLIVE (logged out, iPhone UA, 390x844): app-overlay matched 1 element (the fixed overlay holding the dialog, backdrop and close button; hiding the dialog alone leaves the dimmed backdrop), open-app-pill matched 1 (unscoped a[href*=applink.instagram.com] matches 18, every grid tile), the Reels and Explore tab wrappers matched 1 each. The overlay rule needs a login link on the page, so a logged-in share sheet (also role=dialog) is never hidden. Not seen live (logged-in only, from community lists: viki53 Instagram Purified 2025-07, shraiwi Nuke Insta Slop 2026-09, Instagram Unhook): reels-video-posts, stories-tray, suggested-*, posts, wrapped tab layout. reels-profile-tab: the SVG label was seen live, the wrapper structure was not. reels-video-posts also hides ordinary video posts. posts also hides a post opened by address. Class names rotate; never use them. DESKTOP (macOS Safari UA, logged out, live in the app, 2026-11-10): the login page is all a logged-out visitor gets on /; public profiles such as /nasa/ render. Matched there: profile-highlights, verified-ticks, page-footer. The feed rules were written for the same React app and keep matching by structure, but the signed-in feed could not be reached, so the Reels, Explore, Stories and posts rules were not re-checked on desktop. Messages stays visible on purpose (the fixtures mark it data-keep)."
   }
 }

@@ -282,7 +282,7 @@ export const hi: Messages = {
   "recipes.content": "सामग्री · छिपाए जाने तक दिखती रहती है",
   "recipes.groupAnnoyance": "परेशानी",
   "recipes.groupContent": "सामग्री",
-  "recipes.nothingHidden": "कुछ भी छिपा नहीं है",
+  "recipes.nothingHidden": "सक्रिय: {total} में से {count}",
   "recipes.hiddenCount": "छिपे: {total} में से {count}",
   "recipes.options": "{name} विकल्प",
   "recipes.addFavorite": "{name} को पसंदीदा में जोड़ें",

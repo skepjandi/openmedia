@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "market.official.twitch",
   "name": "Twitch",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "origin": "user",
   "tags": ["desktop", "mobile"],
   "match": ["https://*.twitch.tv/*"],
@@ -57,6 +57,13 @@
       "default": false
     },
     {
+      "id": "follow-button",
+      "label": "Hide Follow button",
+      "description": "The Follow button next to the player on a channel page, so a stray tap cannot follow a channel.",
+      "group": "content",
+      "default": false
+    },
+    {
       "id": "featured",
       "label": "Hide the featured streams carousel",
       "description": "The big carousel at the top of the home page.",
@@ -76,6 +83,128 @@
       "description": "The title, tags and about section under the player.",
       "group": "content",
       "default": false
+    },
+    {
+      "id": "thumbnails",
+      "label": "Stream thumbnails",
+      "description": "Show, blur or hide the preview pictures of streams and categories.",
+      "group": "content",
+      "choices": [
+        {
+          "id": "show",
+          "label": "Show"
+        },
+        {
+          "id": "blur",
+          "label": "Blur"
+        },
+        {
+          "id": "hide",
+          "label": "Hide"
+        }
+      ],
+      "default": "show"
+    },
+    {
+      "id": "stream-titles",
+      "label": "Stream titles",
+      "description": "Blur the stream titles on cards, so a clickbait title does not decide what you watch.",
+      "group": "content",
+      "choices": [
+        {
+          "id": "show",
+          "label": "Show"
+        },
+        {
+          "id": "blur",
+          "label": "Blur"
+        }
+      ],
+      "default": "show"
+    },
+    {
+      "id": "viewer-counts",
+      "label": "Hide viewer counts",
+      "description": "The viewer numbers on stream cards, in the sidebar and above a live stream.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "streamer-avatars",
+      "label": "Hide streamer avatars",
+      "description": "The round channel pictures on stream cards and in the sidebar.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "chat-badges",
+      "label": "Hide chat badges",
+      "description": "The small subscriber, moderator and Bits icons before chatter names.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "chat-banners",
+      "label": "Hide predictions, gifts and chat tips",
+      "description": "The prediction, gift and raid cards pinned at the top of chat and the tip pop-ups above the chat box. Chat itself stays.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "channel-points",
+      "label": "Hide Bits and Channel Points",
+      "description": "The Bits and Channel Points balances beside the chat box.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "about-panels",
+      "label": "Hide About and channel panels",
+      "description": "The About box with follower count and links, and the panels under a stream.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "similar-channels",
+      "label": "Hide Viewers Also Watch",
+      "description": "The list of other channels that a stream page adds to the sidebar.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "recommended-channels",
+      "label": "Hide the recommended channels",
+      "description": "The Live Channels list in the left sidebar on desktop, with the channels Twitch suggests.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "activity-tab",
+      "label": "Hide the Activity tab",
+      "description": "The Activity tab in the bottom bar on a phone; logged out it only asks you to open the app.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "chat-style",
+      "label": "Chat style",
+      "description": "Fade or blur the chat messages instead of hiding them. Hide live chat overrides it.",
+      "group": "content",
+      "choices": [
+        {
+          "id": "show",
+          "label": "Show"
+        },
+        {
+          "id": "dim",
+          "label": "Dim"
+        },
+        {
+          "id": "blur",
+          "label": "Blur"
+        }
+      ],
+      "default": "show"
     }
   ],
   "rules": [
@@ -152,6 +281,15 @@
       }
     },
     {
+      "id": "follow-button",
+      "label": "Follow button",
+      "type": "hide",
+      "option": "follow-button",
+      "target": {
+        "css": "button[data-a-target=\"follow-button\"], button[data-test-selector=\"follow-button\"]"
+      }
+    },
+    {
       "id": "signup-desktop",
       "label": "Sign Up button and the join banner",
       "type": "hide",
@@ -222,13 +360,247 @@
       "target": {
         "css": "#live-channel-stream-information"
       }
+    },
+    {
+      "id": "thumbs-blur",
+      "label": "Stream and category pictures",
+      "type": "css",
+      "option": "thumbnails",
+      "choice": ["blur"],
+      "target": {
+        "css": "article img.tw-image, [data-a-target=\"tw-card-image\"] img"
+      },
+      "declarations": {
+        "filter": "blur(12px)"
+      }
+    },
+    {
+      "id": "thumbs-hide-mobile",
+      "label": "Stream pictures on a phone",
+      "type": "hide",
+      "option": "thumbnails",
+      "choice": ["hide"],
+      "target": {
+        "css": "article > button:has(.tw-aspect)"
+      }
+    },
+    {
+      "id": "thumbs-blur-carousel",
+      "label": "Featured carousel pictures",
+      "type": "css",
+      "option": "thumbnails",
+      "choice": ["blur"],
+      "target": {
+        "css": "[data-test-selector=\"featured-item-image\"]"
+      },
+      "declarations": {
+        "filter": "blur(12px)"
+      }
+    },
+    {
+      "id": "thumbs-hide-carousel",
+      "label": "Featured carousel pictures",
+      "type": "hide",
+      "option": "thumbnails",
+      "choice": ["hide"],
+      "target": {
+        "css": "[data-test-selector=\"featured-item-image\"]"
+      }
+    },
+    {
+      "id": "thumbs-hide-desktop",
+      "label": "Stream and category pictures on desktop",
+      "type": "hide",
+      "option": "thumbnails",
+      "choice": ["hide"],
+      "target": {
+        "css": "[data-a-target=\"preview-card-image-link\"], [data-a-target=\"tw-card-image\"]"
+      }
+    },
+    {
+      "id": "titles-blur-mobile",
+      "label": "Titles on a phone",
+      "type": "css",
+      "option": "stream-titles",
+      "choice": ["blur"],
+      "target": {
+        "css": "article h3"
+      },
+      "declarations": {
+        "filter": "blur(6px)"
+      }
+    },
+    {
+      "id": "titles-blur-desktop",
+      "label": "Titles on desktop",
+      "type": "css",
+      "option": "stream-titles",
+      "choice": ["blur"],
+      "target": {
+        "css": "[data-a-target=\"preview-card-title-link\"] h4"
+      },
+      "declarations": {
+        "filter": "blur(6px)"
+      }
+    },
+    {
+      "id": "viewers-cards",
+      "label": "Viewer count on stream cards",
+      "type": "hide",
+      "option": "viewer-counts",
+      "target": {
+        "css": ".tw-media-card-stat"
+      }
+    },
+    {
+      "id": "viewers-channel",
+      "label": "Viewer count above a live stream",
+      "type": "hide",
+      "option": "viewer-counts",
+      "target": {
+        "css": "div:has(> div > strong[data-a-target=\"animated-channel-viewers-count\"])"
+      }
+    },
+    {
+      "id": "viewers-sidebar",
+      "label": "Viewer count in the sidebar",
+      "type": "hide",
+      "option": "viewer-counts",
+      "target": {
+        "css": ".side-nav-card__live-status"
+      }
+    },
+    {
+      "id": "avatars-mobile",
+      "label": "Avatars on stream cards on a phone",
+      "type": "hide",
+      "option": "streamer-avatars",
+      "target": {
+        "css": "article div:has(> a > .tw-avatar)"
+      }
+    },
+    {
+      "id": "avatars-desktop",
+      "label": "Avatars on desktop cards and in the sidebar",
+      "type": "hide",
+      "option": "streamer-avatars",
+      "target": {
+        "css": "[data-test-selector=\"preview-card-avatar\"], #side-nav .tw-avatar"
+      }
+    },
+    {
+      "id": "chat-badge-icons",
+      "label": "Chat badges",
+      "type": "hide",
+      "option": "chat-badges",
+      "target": {
+        "css": "[data-a-target=\"chat-badge\"]"
+      }
+    },
+    {
+      "id": "chat-highlight-cards",
+      "label": "Prediction, gift and raid cards in chat",
+      "type": "hide",
+      "option": "chat-banners",
+      "target": {
+        "css": ".community-highlight-stack__card"
+      }
+    },
+    {
+      "id": "chat-tip-popups",
+      "label": "Tip pop-ups above the chat box",
+      "type": "hide",
+      "option": "chat-banners",
+      "target": {
+        "css": "[data-test-selector=\"chat-private-callout-queue__callout-container\"]"
+      }
+    },
+    {
+      "id": "points-summary",
+      "label": "Bits and Channel Points balances",
+      "type": "hide",
+      "option": "channel-points",
+      "target": {
+        "css": "[data-test-selector=\"community-points-summary\"]"
+      }
+    },
+    {
+      "id": "about-section",
+      "label": "About box under a stream",
+      "type": "hide",
+      "option": "about-panels",
+      "target": {
+        "css": "#live-channel-about-panel"
+      }
+    },
+    {
+      "id": "channel-panels-grid",
+      "label": "Channel panels under a stream",
+      "type": "hide",
+      "option": "about-panels",
+      "target": {
+        "css": ".channel-panels"
+      }
+    },
+    {
+      "id": "similar-channels-section",
+      "label": "Viewers Also Watch in the sidebar",
+      "type": "hide",
+      "option": "similar-channels",
+      "target": {
+        "css": ".side-nav-section:has([data-test-selector=\"similarity-channel\"])"
+      }
+    },
+    {
+      "id": "sidebar-recommended-section",
+      "label": "Recommended channels in the sidebar",
+      "type": "hide",
+      "option": "recommended-channels",
+      "target": {
+        "css": ".side-nav-section:has([data-test-selector=\"recommended-channel\"])"
+      }
+    },
+    {
+      "id": "activity-tab-link",
+      "label": "Activity tab in the bottom bar",
+      "type": "hide",
+      "option": "activity-tab",
+      "target": {
+        "css": "a[href=\"/activity\"]"
+      }
+    },
+    {
+      "id": "chat-dim",
+      "label": "Chat messages",
+      "type": "css",
+      "option": "chat-style",
+      "choice": ["dim"],
+      "target": {
+        "css": "[data-a-target=\"chat-scroller\"]"
+      },
+      "declarations": {
+        "opacity": "0.35"
+      }
+    },
+    {
+      "id": "chat-blur",
+      "label": "Chat messages",
+      "type": "css",
+      "option": "chat-style",
+      "choice": ["blur"],
+      "target": {
+        "css": "[data-a-target=\"chat-scroller\"]"
+      },
+      "declarations": {
+        "filter": "blur(4px)"
+      }
     }
   ],
   "meta": {
     "author": "OpenMedia",
     "homepage": "https://www.twitch.tv/",
-    "lastVerified": "2026-11-10",
-    "summary": "Hides Open App and Sign Up buttons, display ad overlay on streams, Prime and Bits buttons, suggested categories and curated rows",
-    "notes": "LIVE (headless Chromium, iPhone UA 390x844, logged out, 2026-11-08): https://m.twitch.tv/ nav a[href*=tt_medium=mweb]=1 (Open App, top-bar), nav > div:has(> a[...]) > button=1 (Sign Up), 'Categories we think you'll like' row matched by div:has(> div > h2 > a[href=\"/directory\"])=1, collection rows div:has(> div > h2 > a[href^=\"/directory/collection/\"])=4 at top of Home (more rows lazy-load and the list is virtualised), [aria-label^=\"Tag, \"]=108 on Home (buttons and links; also on /directory/all and category pages). https://m.twitch.tv/pathofexile (live channel, waited ~35 s, no timed prompt seen): [data-a-target=chat-scroller]=1, button[aria-label=Subscribe]=1, [data-test-selector=sda-wrapper]=1 (the slot existed but was empty, so the overlay is not seen rendering; harmless best-effort). Subscribe=1 also on /pathofexile/videos. Video pre-roll ads in the player (VOD /videos/<id> showed 'Ad 1 of 2' with a Learn More button) run inside the player and are deliberately NOT hidden. Not found logged out: cookie banner, notification prompt, drops/Prime promo tiles, marketplace/AI modules, floating action buttons (no rules written). /activity is only an 'Open App for Activity' page and /directory/following a log-in prompt: left alone, they are the page's content. Fixtures hand-distilled from the observed DOM. NOT verified: logged-in views, other regions' consent dialogs, clips and schedule tabs, desktop www.twitch.tv layout (recipe also matches it), whether sda-wrapper ever carries a visible ad. DESKTOP (macOS Safari UA, logged out, live in the app, 2026-11-10): www.twitch.tv is the full site; the mobile rules above match nothing there except display-ad, tag-pills, categories-row and collection-rows. Matched and hidden with every option on: signup-desktop (the Sign Up button and the join footer), display-ad-desktop, prime-button, featured-carousel, side-nav-bar, chat-column, subscribe-desktop and stream-information. The home page is www.twitch.tv; m.twitch.tv is where an iPhone user agent ends up."
+    "lastVerified": "2026-11-13",
+    "summary": "Hides Open App, Sign Up, Prime and Follow; blurs or hides thumbnails, titles and chat; hides counts, avatars, badges, panels",
+    "notes": "Checked 2026-11-13, logged out, real Chrome over CDP: iPhone UA 390x844 on m.twitch.tv (Home, /directory/all, a live channel) and desktop UA on www.twitch.tv (Home, a category page, several live channels). Counts below are `querySelectorAll` on the live DOM; the fixtures are sanitised excerpts of it (in desktop-live-channel.html the player, stream title and chat box wrappers, the Follow button and the Live Channels sidebar section are hand-written so data-keep can mark what no rule may hide).\n\nLIVE phone Home (48 cards): `article img.tw-image` 48, `article > button:has(.tw-aspect)` 40, `article h3` 48 (also blurs category names), `.tw-media-card-stat` 48, `article div:has(> a > .tw-avatar)` 48, `[aria-label^=\"Tag, \"]` 107, `a[href=\"/activity\"]` 1, collection rows 4, Open App 1, Sign Up 1. LIVE phone /directory/all: tag pills 24, cards 8. LIVE phone live channel: chat-scroller 1, Subscribe 1, Follow 1, sda-wrapper 1.\n\nLIVE desktop Home: `article img.tw-image` 7, `.tw-media-card-stat` 6, `.side-nav-card__live-status` 10, preview-card-avatar 6, `.side-nav-section:has([data-test-selector=\"recommended-channel\"])` 1, `[data-test-selector=\"featured-item-image\"]` 5 (the carousel pictures, outside `article` and without the tw-image class), front-page-carousel 1, #side-nav 1, Prime 1, signup 2, tag pills 31, category row 1, collection row 1. LIVE desktop live channel: chat-scroller 1, chat-column 1, chat-badge 20 and chat lines 22 (after \"Show more\"), `.community-highlight-stack__card` 1 (a Prediction card), tip callout 1, community-points-summary 1, #live-channel-about-panel 1, .channel-panels 1, similarity section 1, recommended section 1, animated-channel-viewers-count 1, Follow 1, Subscribe 2, stream-information 1.\n\nSOURCE (community lists): uBlock users hide the sidebar list with `www.twitch.tv##div[aria-label=\"Recommended Channels\"]` (blog.drale.com); the Adblock Plus list \"Twitch: Pure Viewing Experience\" (DandelionSprout/adfilt) hides `.community-highlight-stack__card` (the Hype Train banner), `.community-highlight-stack__backlog-card` and `.recommended-channels`; the \"Peaceful Twitch\" userscript hides `.side-nav-card__live-status` and the carousel viewer counts, which is what viewer-counts does.\n\nChoices: thumbnails Show/Blur/Hide, stream-titles Show/Blur, chat-style Show/Dim/Blur (opacity 0.35 / blur 4px); Hide live chat wins. No rule matches on text; classes are design-system names (tw-image, tw-avatar, tw-aspect), never hashed Layout-sc-*.\n\nNOT verified: signed in; phone chat messages and badges (the phone chat renders no chat lines logged out); hover previews; Hype Train and raid cards (same stack class as the live Prediction card); the Prime extension dock on ext.twitch.tv and the Drops pages; other locales. Video ads play inside the player and are not hidden."
   }
 }

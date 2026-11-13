@@ -102,7 +102,33 @@ A recipe may list `options`: the switches Settings shows for the site. Each rule
 | `group` | `annoyance` or `content`. Orders the switches. |
 | `default` | Whether the rules apply until the user chooses. **Policy for official recipes, enforced by a test: annoyances `true`, content `false`.** An annoyance is something that gets in the way (install prompts, pop-ups that block the page, scroll locks, ad slots); content is something the user may well want to see. |
 
-Validation: at most 30 options; every option has at least one rule; every `option` a rule names exists. Choices live in `library.json` (`siteOptions`: recipe id, then option id, then bool); an option with no saved choice follows the recipe's current default, so shipping a new option needs no migration. Adding `options` and `option` is additive, so `schema` stays 1.
+Validation: at most 30 options; every option has at least one rule; every `option` a rule names exists. Settings live in `library.json` (`siteOptions`: recipe id, then option id, then a boolean or a choice id); an option with no saved value follows the recipe's current default, so shipping a new option needs no migration. Adding `options`, `option`, `choices` and `choice` is additive, so `schema` stays 1.
+
+### Choice options (more than on or off)
+
+A switch has two states. When a thing can be tamed rather than only removed (a media grid shown, blurred or hidden; counters shown or hidden; recommendations shown, dimmed or hidden), the option lists its states instead:
+
+```json
+"options": [
+  { "id": "media", "label": "Pictures and videos", "description": "How thumbnails appear in feeds.", "group": "content",
+    "choices": [ { "id": "show", "label": "Show" }, { "id": "blur", "label": "Blur" }, { "id": "hide", "label": "Hide" } ],
+    "default": "show" }
+],
+"rules": [
+  { "id": "media-blur", "label": "Blur thumbnails", "type": "css", "option": "media", "choice": ["blur"],
+    "target": { "css": "ytm-thumbnail-view-model img" }, "declarations": { "filter": "blur(14px)" } },
+  { "id": "media-hide", "label": "Hide thumbnails", "type": "hide", "option": "media", "choice": ["hide"],
+    "target": { "css": "ytm-thumbnail-view-model" } }
+]
+```
+
+| Field | Notes |
+|-------|-------|
+| `choices` | 2 to 4 entries `{ id, label }`. `id` is lowercase letters, digits and `-`, unique in the option; `label` is at most 24 characters. **The first choice is the untouched state**: no rule may list it, and it is what "off" means (a recipe installed into incognito starts there). |
+| `default` | A choice id (a boolean for a switch, which has no `choices`). **Policy for official recipes, enforced by a test:** an `annoyance` choice option defaults to a choice other than the first (the nag is handled); a `content` one defaults to the first. |
+| rule `choice` | Required on every rule of a choice option and forbidden on any other rule: a non-empty array of that option's choices after the first, each at most once. The rule applies when the saved choice is one of them (`["blur", "hide"]` for a rule that both states need). |
+
+An unset option follows the recipe's `default`. A saved value the option no longer accepts (a recipe update renamed a choice, or a switch became a choice option) is ignored and the default applies, so a recipe change never breaks a saved library. Choose a new option `id` when changing the kind of an option. A switch is still the right control when the only sensible states are on and off. The assistant (see [AI Assistant](./ai-assistant.md)) can set a choice option through `existingOption` with `choice`, but only creates switches.
 
 ## Targets
 
@@ -212,7 +238,7 @@ What the Rust code accepts today, validated with `deny_unknown_fields` so anythi
 - `match`: `scheme://host/path` with `http`, `https` or `*`; the host may start with `*.` (matches the apex and any subdomain depth); `*` in the path is a glob. An all-sites or otherwise too broad pattern is refused for every recipe.
 - Delivery: all recipes are compiled by Rust into one document-start script. The page tests its own `location` against each recipe's matcher regexes, so one script stays correct across navigations. The shell cannot open a page without it: `open_site` is the only way, and the plugin's `open` is not granted to the shell.
 - Fixtures: every rule of a recipe in `recipes/official/` must match something in `recipes/fixtures/<site>/`; this is tested in Rust.
-- Options: `options[]` and a per-rule `option`, as above. The page script is compiled per open and per toggle from the installed recipes and the saved choices (`Recipes::script`), and only enabled rules reach it.
+- Options: `options[]` and a per-rule `option` (plus `choices[]` and a per-rule `choice` for multi-state options), as above. The page script is compiled per open and per toggle from the installed recipes and the saved choices (`Recipes::script`), and only enabled rules reach it.
 - Limits that matter when writing selectors: the 300-character, 19-comma and 2-`:has(` limits apply to the whole `css` string of one rule, so an option with many selectors uses several rules.
 - Official recipes (319, in `recipes/official/`, each with `origin: "user"`, `meta.author: "OpenMedia"` and tags from its fixtures): the 19 recipes that predate the 300-site addition have site-specific rules tested against their fixtures. The 300 additions use generic cookie-consent, Google-ad-slot and app-install-banner selectors, with **synthetic**, not site-captured fixtures; they have not been verified against the named live sites. `market.official.youtube-music` uses `ytmusic-*` selectors and also has not been verified live. They are parsed and fixture-tested by `cargo test` and compiled into the app by `build.rs`; *Add* in the recipe library copies one into the user's recipes. Each carries a `meta.summary` (one line, up to 140 characters) for the library.
 - Fixture rules: every rule matches something in its site's fixtures, and nothing a fixture marks `data-keep` (or an ancestor of it) may be hidden by a `hide` rule. Mark the login link, the feed container, the player and similar with `data-keep` when you add a fixture.

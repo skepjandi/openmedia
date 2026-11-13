@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "market.official.youtube",
   "name": "YouTube",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "origin": "user",
   "tags": ["desktop", "mobile"],
   "match": ["https://*.youtube.com/*"],
@@ -125,6 +125,163 @@
       "description": "Those tabs in the bottom bar on a phone.",
       "group": "content",
       "default": false
+    },
+    {
+      "id": "thumbnails",
+      "label": "Video thumbnails",
+      "description": "Show thumbnails as they are, blur them, or hide them in lists, search results and suggestions.",
+      "group": "content",
+      "choices": [
+        {
+          "id": "show",
+          "label": "Show"
+        },
+        {
+          "id": "blur",
+          "label": "Blur"
+        },
+        {
+          "id": "hide",
+          "label": "Hide"
+        }
+      ],
+      "default": "show"
+    },
+    {
+      "id": "video-titles",
+      "label": "Video titles",
+      "description": "Blur video titles in lists and suggestions to dodge clickbait. The title above the playing video stays readable.",
+      "group": "content",
+      "choices": [
+        {
+          "id": "show",
+          "label": "Show"
+        },
+        {
+          "id": "blur",
+          "label": "Blur"
+        }
+      ],
+      "default": "show"
+    },
+    {
+      "id": "channel-avatars",
+      "label": "Hide channel and commenter avatars",
+      "description": "The round channel pictures on video cards and beside comments.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "video-stats",
+      "label": "Hide view, like and subscriber counts",
+      "description": "View counts on cards and under the video, the like number and the subscriber count. English labels only on phones.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "hashtags",
+      "label": "Hide hashtag links",
+      "description": "The #hashtag links above a video title and inside its description.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "subscribe-buttons",
+      "label": "Hide Subscribe buttons",
+      "description": "The Subscribe button on a video page and in channel results.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "action-buttons",
+      "label": "Hide Share, Save and Download buttons",
+      "description": "The Share, Save and Download buttons under a video. Like and Dislike stay.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "player-overlays",
+      "label": "Hide video info cards and watermark",
+      "description": "The i cards teaser and button and the channel watermark inside the player. The controls stay.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "comments-look",
+      "label": "Comments style",
+      "description": "Fade or blur the comments instead of hiding them. Hide comments overrides it.",
+      "group": "content",
+      "choices": [
+        {
+          "id": "show",
+          "label": "Show"
+        },
+        {
+          "id": "dim",
+          "label": "Dim"
+        },
+        {
+          "id": "blur",
+          "label": "Blur"
+        }
+      ],
+      "default": "show"
+    },
+    {
+      "id": "related-look",
+      "label": "Up next style",
+      "description": "Fade or blur the suggested videos instead of hiding them. Hide up next videos overrides it.",
+      "group": "content",
+      "choices": [
+        {
+          "id": "show",
+          "label": "Show"
+        },
+        {
+          "id": "dim",
+          "label": "Dim"
+        },
+        {
+          "id": "blur",
+          "label": "Blur"
+        }
+      ],
+      "default": "show"
+    },
+    {
+      "id": "home-feed-look",
+      "label": "Home feed style",
+      "description": "Fade or blur the Home recommendations instead of hiding them. Hide Home recommendations overrides it.",
+      "group": "content",
+      "choices": [
+        {
+          "id": "show",
+          "label": "Show"
+        },
+        {
+          "id": "dim",
+          "label": "Dim"
+        },
+        {
+          "id": "blur",
+          "label": "Blur"
+        }
+      ],
+      "default": "show"
+    },
+    {
+      "id": "search-shelves",
+      "label": "Hide extra shelves in search",
+      "description": "Horizontal shelves between search results (Music, Latest from, People also watched). Normal results stay.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "mini-player",
+      "label": "Hide the mini player",
+      "description": "The small floating player that follows you when you scroll away from a video on desktop.",
+      "group": "content",
+      "default": false
     }
   ],
   "rules": [
@@ -233,7 +390,7 @@
       "type": "hide",
       "option": "home-feed",
       "target": {
-        "css": "ytm-rich-grid-renderer .rich-grid-renderer-contents"
+        "css": "ytm-browse:not(:has(yt-page-header-renderer)) ytm-rich-grid-renderer .rich-grid-renderer-contents"
       }
     },
     {
@@ -532,13 +689,367 @@
       "target": {
         "css": "ytm-pivot-bar-item-renderer:has(.pivot-subs)"
       }
+    },
+    {
+      "id": "thumbnails-blur-mobile",
+      "label": "Thumbnails on a phone",
+      "type": "css",
+      "option": "thumbnails",
+      "choice": ["blur"],
+      "target": {
+        "css": "ytm-thumbnail-cover img, ytm-compact-thumbnail img, yt-thumbnail-view-model img"
+      },
+      "declarations": {
+        "filter": "blur(12px)"
+      }
+    },
+    {
+      "id": "thumbnails-blur-desktop",
+      "label": "Thumbnails on desktop",
+      "type": "css",
+      "option": "thumbnails",
+      "choice": ["blur"],
+      "target": {
+        "css": "ytd-thumbnail:not(.player-container-background-image) img, yt-thumbnail-view-model img"
+      },
+      "declarations": {
+        "filter": "blur(12px)"
+      }
+    },
+    {
+      "id": "thumbnails-hide-mobile",
+      "label": "Thumbnails on a phone",
+      "type": "hide",
+      "option": "thumbnails",
+      "choice": ["hide"],
+      "target": {
+        "css": "ytm-thumbnail-cover, ytm-compact-thumbnail, yt-thumbnail-view-model"
+      }
+    },
+    {
+      "id": "thumbnails-hide-desktop",
+      "label": "Thumbnails on desktop",
+      "type": "hide",
+      "option": "thumbnails",
+      "choice": ["hide"],
+      "target": {
+        "css": "ytd-thumbnail:not(.player-container-background-image), yt-thumbnail-view-model"
+      }
+    },
+    {
+      "id": "titles-blur-mobile",
+      "label": "Titles on a phone",
+      "type": "css",
+      "option": "video-titles",
+      "choice": ["blur"],
+      "target": {
+        "css": "ytm-media-item h3, ytm-compact-video-renderer h4"
+      },
+      "declarations": {
+        "filter": "blur(6px)"
+      }
+    },
+    {
+      "id": "titles-blur-desktop",
+      "label": "Titles on desktop",
+      "type": "css",
+      "option": "video-titles",
+      "choice": ["blur"],
+      "target": {
+        "css": "yt-lockup-view-model h3, ytd-video-renderer h3, ytd-compact-video-renderer h3"
+      },
+      "declarations": {
+        "filter": "blur(6px)"
+      }
+    },
+    {
+      "id": "avatars-mobile",
+      "label": "Channel avatars on video cards and the comments teaser",
+      "type": "hide",
+      "option": "channel-avatars",
+      "target": {
+        "css": "div:has(> ytw-channel-thumbnail-with-link-renderer), comments-entry-point-teaser-view-model avatar-view-model"
+      }
+    },
+    {
+      "id": "avatars-desktop",
+      "label": "Channel avatars on cards and avatars in comments",
+      "type": "hide",
+      "option": "channel-avatars",
+      "target": {
+        "css": "yt-lockup-metadata-view-model > div:has(> yt-decorated-avatar-view-model), ytd-video-renderer #channel-info > a#channel-thumbnail, ytd-comments #author-thumbnail"
+      }
+    },
+    {
+      "id": "stats-mobile-cards",
+      "label": "View counts on video cards",
+      "type": "hide",
+      "option": "video-stats",
+      "target": {
+        "css": ".ytmBadgeAndBylineRendererItemByline:has([aria-label$=\" views\"]), .YtmCompactMediaItemStats:has([aria-label$=\" views\"])"
+      }
+    },
+    {
+      "id": "stats-mobile-watch",
+      "label": "Views and likes under a video",
+      "type": "hide",
+      "option": "video-stats",
+      "target": {
+        "css": ".ytVideoSubtitleViewModelSubstring[aria-label$=\" views\"], .ytVideoSubtitleViewModelSubstring[aria-label$=\" likes\"]"
+      }
+    },
+    {
+      "id": "stats-desktop-cards",
+      "label": "View counts on video cards",
+      "type": "hide",
+      "option": "video-stats",
+      "target": {
+        "css": "yt-content-metadata-view-model [aria-label$=\" views\"], ytd-video-meta-block #metadata-line span.inline-metadata-item:first-of-type"
+      }
+    },
+    {
+      "id": "stats-desktop-watch",
+      "label": "Views, likes and subscribers on a video page",
+      "type": "hide",
+      "option": "video-stats",
+      "target": {
+        "css": "ytd-watch-info-text, ytd-watch-metadata #owner-sub-count, ytd-watch-metadata like-button-view-model .ytSpecButtonShapeNextButtonTextContent"
+      }
+    },
+    {
+      "id": "hashtag-links",
+      "label": "Hashtag links",
+      "type": "hide",
+      "option": "hashtags",
+      "target": {
+        "css": "a[href^=\"/hashtag/\"]"
+      }
+    },
+    {
+      "id": "subscribe-mobile",
+      "label": "Subscribe buttons on a phone",
+      "type": "hide",
+      "option": "subscribe-buttons",
+      "target": {
+        "css": "yt-subscribe-button-view-model, ytm-subscribe-button-renderer"
+      }
+    },
+    {
+      "id": "subscribe-desktop",
+      "label": "Subscribe buttons on desktop",
+      "type": "hide",
+      "option": "subscribe-buttons",
+      "target": {
+        "css": "ytd-subscribe-button-renderer, yt-subscribe-button-view-model"
+      }
+    },
+    {
+      "id": "actions-mobile",
+      "label": "Share button on a phone",
+      "type": "hide",
+      "option": "action-buttons",
+      "target": {
+        "css": ".ytCompactifyVideoActionBarViewModelActionButtons > button-view-model"
+      }
+    },
+    {
+      "id": "actions-desktop",
+      "label": "Share, Save and Download on desktop",
+      "type": "hide",
+      "option": "action-buttons",
+      "target": {
+        "css": "ytd-watch-metadata yt-button-view-model:has(button[aria-label=\"Share\"]), ytd-watch-metadata yt-button-view-model:has(button[aria-label=\"Save to playlist\"]), ytd-watch-metadata ytd-download-button-renderer"
+      }
+    },
+    {
+      "id": "player-cards-watermark",
+      "label": "Info cards teaser, i button and watermark",
+      "type": "hide",
+      "option": "player-overlays",
+      "target": {
+        "css": ".ytp-cards-teaser, .ytp-cards-button, .iv-branding, .ytp-watermark"
+      }
+    },
+    {
+      "id": "comments-dim-mobile",
+      "label": "Comments on a phone",
+      "type": "css",
+      "option": "comments-look",
+      "choice": ["dim"],
+      "target": {
+        "css": "ytm-item-section-renderer:has(> lazy-list > yt-video-metadata-carousel-view-model[aria-label=\"Comments\"])"
+      },
+      "declarations": {
+        "opacity": "0.35"
+      }
+    },
+    {
+      "id": "comments-dim-desktop",
+      "label": "Comments on desktop",
+      "type": "css",
+      "option": "comments-look",
+      "choice": ["dim"],
+      "target": {
+        "css": "ytd-comments#comments"
+      },
+      "declarations": {
+        "opacity": "0.35"
+      }
+    },
+    {
+      "id": "comments-blur-mobile",
+      "label": "Comments on a phone",
+      "type": "css",
+      "option": "comments-look",
+      "choice": ["blur"],
+      "target": {
+        "css": "ytm-item-section-renderer:has(> lazy-list > yt-video-metadata-carousel-view-model[aria-label=\"Comments\"])"
+      },
+      "declarations": {
+        "filter": "blur(8px)"
+      }
+    },
+    {
+      "id": "comments-blur-desktop",
+      "label": "Comments on desktop",
+      "type": "css",
+      "option": "comments-look",
+      "choice": ["blur"],
+      "target": {
+        "css": "ytd-comments#comments"
+      },
+      "declarations": {
+        "filter": "blur(8px)"
+      }
+    },
+    {
+      "id": "related-dim-mobile",
+      "label": "Suggested videos on a phone",
+      "type": "css",
+      "option": "related-look",
+      "choice": ["dim"],
+      "target": {
+        "css": ".related-items-container"
+      },
+      "declarations": {
+        "opacity": "0.35"
+      }
+    },
+    {
+      "id": "related-dim-desktop",
+      "label": "Up next column on desktop",
+      "type": "css",
+      "option": "related-look",
+      "choice": ["dim"],
+      "target": {
+        "css": "ytd-watch-next-secondary-results-renderer"
+      },
+      "declarations": {
+        "opacity": "0.35"
+      }
+    },
+    {
+      "id": "related-blur-mobile",
+      "label": "Suggested videos on a phone",
+      "type": "css",
+      "option": "related-look",
+      "choice": ["blur"],
+      "target": {
+        "css": ".related-items-container"
+      },
+      "declarations": {
+        "filter": "blur(8px)"
+      }
+    },
+    {
+      "id": "related-blur-desktop",
+      "label": "Up next column on desktop",
+      "type": "css",
+      "option": "related-look",
+      "choice": ["blur"],
+      "target": {
+        "css": "ytd-watch-next-secondary-results-renderer"
+      },
+      "declarations": {
+        "filter": "blur(8px)"
+      }
+    },
+    {
+      "id": "home-feed-dim-mobile",
+      "label": "Home recommendations on a phone",
+      "type": "css",
+      "option": "home-feed-look",
+      "choice": ["dim"],
+      "target": {
+        "css": "ytm-browse:not(:has(yt-page-header-renderer)) ytm-rich-grid-renderer .rich-grid-renderer-contents"
+      },
+      "declarations": {
+        "opacity": "0.35"
+      }
+    },
+    {
+      "id": "home-feed-dim-desktop",
+      "label": "Home recommendations on desktop",
+      "type": "css",
+      "option": "home-feed-look",
+      "choice": ["dim"],
+      "target": {
+        "css": "ytd-browse[page-subtype=\"home\"] ytd-rich-grid-renderer > #contents"
+      },
+      "declarations": {
+        "opacity": "0.35"
+      }
+    },
+    {
+      "id": "home-feed-blur-mobile",
+      "label": "Home recommendations on a phone",
+      "type": "css",
+      "option": "home-feed-look",
+      "choice": ["blur"],
+      "target": {
+        "css": "ytm-browse:not(:has(yt-page-header-renderer)) ytm-rich-grid-renderer .rich-grid-renderer-contents"
+      },
+      "declarations": {
+        "filter": "blur(8px)"
+      }
+    },
+    {
+      "id": "home-feed-blur-desktop",
+      "label": "Home recommendations on desktop",
+      "type": "css",
+      "option": "home-feed-look",
+      "choice": ["blur"],
+      "target": {
+        "css": "ytd-browse[page-subtype=\"home\"] ytd-rich-grid-renderer > #contents"
+      },
+      "declarations": {
+        "filter": "blur(8px)"
+      }
+    },
+    {
+      "id": "search-shelves-desktop",
+      "label": "Shelves between search results",
+      "type": "hide",
+      "option": "search-shelves",
+      "target": {
+        "css": "ytd-search ytd-shelf-renderer"
+      }
+    },
+    {
+      "id": "mini-player-window",
+      "label": "Mini player",
+      "type": "hide",
+      "option": "mini-player",
+      "target": {
+        "css": "ytd-miniplayer"
+      }
     }
   ],
   "meta": {
     "author": "OpenMedia",
     "homepage": "https://www.youtube.com/",
-    "lastVerified": "2026-11-10",
-    "summary": "Hides Open App button, promo banners, ad slots, YouTube Premium prompts, Shorts, Home recommendations, topic chips, comments, up next videos",
-    "notes": "An iPhone user agent gets m.youtube.com made only of ytm-* custom elements plus newer view-model elements; ytd-* elements never appear. LIVE (logged out): open-app-pill (1, watch pages only; the Open App entry in the More sheet has no unique attribute and cannot be hidden), shorts-tab (1; .pivot-shorts alone matches 2 nodes), shorts-home-shelf (2 of 3 sections, the community post section stays), shorts-search-shelf, shorts-search-card (only after scrolling, lazy), shorts-related-shelf, shorts-channel-tab, home-feed, home-chips, comments-entry, related-videos, companion-slot, playlist-cards and mix-cards (present only on some pages). SOURCE: shorts-chip (gijsdev/ublock-hide-yt-shorts v2026.4.29; matched nothing in the tested chip bar). INFERRED from ytd-* names, never rendered logged out: promo-banners, promoted-tiles. comments-entry, shorts-chip and shorts-channel-tab depend on English labels. Never hide ytm-browse, ytm-search, ytm-watch, a bare ytm-item-section-renderer, lazy-list, ytm-pivot-bar-renderer or #movie_player. The /shorts/ID route cannot be blocked with CSS. DESKTOP (macOS Safari UA, signed in, live in the app, 2026-11-10): www.youtube.com serves ytd-* elements, not the ytm-* ones, so every ytm rule above matches nothing there and each has a desktop twin. Matched and hidden on the home, watch and search pages with every option on: promo-banners-desktop, premium-guide-entry, premium-buttons, ad-slots-desktop, ad-containers-desktop, ad-feed-tiles, shorts-guide-entry, shorts-desktop-shelves, shorts-desktop-feed-items, home-feed-desktop, home-chips-desktop, comments-desktop, related-desktop, mix-lockups, sidebar-more-section, info-panels, create-button, voice-search, notification-bell. INFERRED (nothing live to match; hand-written fixture desktop-extras.html): end-cards-overlay, live-chat-frame, shopping-shelves, playlist-cards-desktop, shorts-search-items, shorts-related-items, shorts-grid-items. The home page is www.youtube.com; an iPhone user agent is sent to m.youtube.com from there."
+    "lastVerified": "2026-11-13",
+    "summary": "Hides Open App, promos, ad slots, Premium prompts, Shorts, Home feed, comments, up next; blurs or dims thumbnails, titles and feeds",
+    "notes": "## Checked 2026-11-13\nLogged out, real Chrome over CDP: iPhone UA 390x844 on `m.youtube.com` (home, watch, search, channel Videos) and Chrome desktop UA on `www.youtube.com` (watch, search). Counts are `querySelectorAll` on that live DOM; fixtures are sanitised excerpts. A fresh logged-out Home is the empty \"Try searching\" page, so Home rules rest on the earlier fixtures.\n\n## New options\n- **LIVE phone:** thumbnails (`ytm-thumbnail-cover` 12 watch/19 search, `yt-thumbnail-view-model` 8, `ytm-compact-thumbnail` on channels), titles (`h3` 12/19, `h4` 30), avatars (`ytw-channel-thumbnail-with-link-renderer` 12/19, comments teaser 1), views (`[aria-label$=\" views\"]` 12/19/30; watch views and likes 1), Subscribe (1 watch, 1 search), Share (1), hashtags (5).\n- **LIVE desktop:** `yt-thumbnail-view-model` 46/20, `ytd-thumbnail` 29, titles 40 and 18, avatars 38, 18 and 21 in comments, views 39 and 18, info text, `#owner-sub-count` and like number 1 each, Subscribe 1, Share, Save and Download 1 each, hashtags 3 under the title (12 with description), `.ytp-cards-teaser`, `.ytp-cards-button`, `.iv-branding` 1 each, `ytd-comments#comments` 1, `ytd-watch-next-secondary-results-renderer` 1, `ytd-search ytd-shelf-renderer` 2 (Music shelves).\n- **SOURCE:** hashtags (r/uBlockOrigin thread), player cards and watermark (houssemko Youtube-Declutter), search shelves (Onsotumenh list: Latest Posts From, People also watched), thumbnail blur (YouTube Thumbnail Blur extension).\n- **INFERRED:** `.ytp-watermark` (0 here), `ytd-compact-video-renderer h3`, shelves other than Music.\n- Mini player (`ytd-miniplayer`) `LIVE` 1 on the desktop watch page. The up-next grid at the end of a video (`.ytp-modern-videowall-still`) already carries `ytp-suggestion-set`, so `end-cards` covers it.\n- Some phone selectors use Polymer class names (`ytmBadgeAndBylineRendererItemByline`, `YtmCompactMediaItemStats`, `ytVideoSubtitleViewModelSubstring`); YouTube renames those, so re-check those rules first.\n- Choices: thumbnails Show/Blur/Hide, titles Show/Blur, comments, up next and Home feed style Show/Dim/Blur (dim = opacity 0.35). The Hide toggles for those areas still win.\n\n## Fixed\n`home-feed` on a phone also hid the channel Videos grid (`ytm-rich-grid-renderer` is shared). Now scoped with `ytm-browse:not(:has(yt-page-header-renderer))`; `channel-videos.html` marks that grid `data-keep`. Caveat: the scope needs `:not()` around `:has()`; Chromium and the Rust selector engine both accept it, but an engine that refuses it would drop that one rule and leave the Home feed visible.\n\n## Fixtures\nNew excerpts: `watch-details`, `search-cards`, `channel-videos`, `desktop-watch-details`, `desktop-search-cards`. The three player overlays sit in a hand-written player shell.\n\n## Not verified\nSigned in; Home feed; phone player overlays and search shelves; English-only labels (`\" views\"`, `\" likes\"`, Share, Save to playlist, Comments, Shorts); the \"Ask\" AI button never rendered in the logged-out captures (only its label string in the page's i18n table), so there is no rule for it; in-stream ads cannot be hidden by CSS.\n\n## Earlier notes\n- iPhone UA gets `ytm-*`, desktop `ytd-*`. Never hide `ytm-browse`, `ytm-search`, `ytm-watch`, a bare `ytm-item-section-renderer`, `lazy-list`, `ytm-pivot-bar-renderer`, `#movie_player`. `/shorts/ID` cannot be blocked.\n- LIVE phone: open-app-pill (watch only), shorts-*, home-chips, comments-entry, related-videos, companion-slot. SOURCE: shorts-chip. INFERRED: promo-banners, promoted-tiles.\n- Desktop (signed in, 2026-11-10) matched: promo, premium, ad, shorts-desktop, home, comments, related, mix, sidebar, info, create, voice, bell rules. INFERRED (`desktop-extras.html`): end-cards, live-chat, shopping, playlist-cards-desktop, shorts-search-items, shorts-related-items, shorts-grid-items."
   }
 }

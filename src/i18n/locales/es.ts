@@ -292,7 +292,7 @@ export const es: Messages = {
   "recipes.content": "Contenido · se muestra hasta que lo ocultes",
   "recipes.groupAnnoyance": "Molestia",
   "recipes.groupContent": "Contenido",
-  "recipes.nothingHidden": "Nada oculto",
+  "recipes.nothingHidden": "Activos: {count} de {total}",
   "recipes.hiddenCount": "Ocultos: {count} de {total}",
   "recipes.options": "Opciones de {name}",
   "recipes.addFavorite": "Añadir {name} a favoritos",

@@ -12,6 +12,8 @@ export interface RulePreview {
 export interface OptionPreview {
   label: string;
   description: string;
+  /** The labels of a choice option's states, in order; empty for an on/off switch. */
+  choices: string[];
   onByDefault: boolean;
 }
 

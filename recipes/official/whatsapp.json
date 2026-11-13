@@ -27,6 +27,73 @@
       "description": "The footer at the bottom of whatsapp.com pages (links, language list, download buttons).",
       "group": "content",
       "default": false
+    },
+    {
+      "id": "page-images",
+      "label": "Home page pictures",
+      "description": "The phone screenshots and illustrations in the whatsapp.com home page sections, which leave the headlines and text.",
+      "group": "content",
+      "choices": [
+        { "id": "show", "label": "Show" },
+        { "id": "blur", "label": "Blur" },
+        { "id": "hide", "label": "Hide" }
+      ],
+      "default": "show"
+    },
+    {
+      "id": "feature-sections",
+      "label": "Hide feature sections",
+      "description": "The calling, privacy, groups and messaging feature sections on the whatsapp.com home page, below the first banner.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "chat-list-privacy",
+      "label": "Chat list",
+      "description": "Contact names, previews and pictures in the WhatsApp Web chat list. Switch back to Show to read them.",
+      "group": "content",
+      "choices": [
+        { "id": "show", "label": "Show" },
+        { "id": "blur", "label": "Blur" }
+      ],
+      "default": "show"
+    },
+    {
+      "id": "message-privacy",
+      "label": "Messages",
+      "description": "Message bubbles in the open chat in WhatsApp Web. Useful when sharing your screen.",
+      "group": "content",
+      "choices": [
+        { "id": "show", "label": "Show" },
+        { "id": "blur", "label": "Blur" }
+      ],
+      "default": "show"
+    },
+    {
+      "id": "profile-pictures",
+      "label": "Profile pictures",
+      "description": "Contact and group pictures in the chat list, the chat header and group messages of WhatsApp Web.",
+      "group": "content",
+      "choices": [
+        { "id": "show", "label": "Show" },
+        { "id": "blur", "label": "Blur" },
+        { "id": "hide", "label": "Hide" }
+      ],
+      "default": "show"
+    },
+    {
+      "id": "channels-tab",
+      "label": "Hide the Channels button",
+      "description": "The Channels button in the WhatsApp Web navigation bar (English interface).",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "meta-ai",
+      "label": "Hide Meta AI entries",
+      "description": "Meta AI buttons, menu items and search entries in WhatsApp Web.",
+      "group": "content",
+      "default": false
     }
   ],
   "rules": [
@@ -92,13 +159,139 @@
       "target": {
         "css": "footer[data-testid=whatsapp_www_footer]"
       }
+    },
+    {
+      "id": "images-blur",
+      "label": "Blur home page pictures",
+      "type": "css",
+      "option": "page-images",
+      "choice": ["blur"],
+      "target": {
+        "css": "[data-testid=whatsapp_www_full_page] picture"
+      },
+      "declarations": {
+        "filter": "blur(14px)"
+      }
+    },
+    {
+      "id": "images-hide",
+      "label": "Home page pictures",
+      "type": "hide",
+      "option": "page-images",
+      "choice": ["hide"],
+      "target": {
+        "css": "[data-testid=whatsapp_www_full_page] picture"
+      }
+    },
+    {
+      "id": "calling-section",
+      "label": "Calling feature section",
+      "type": "hide",
+      "option": "feature-sections",
+      "target": {
+        "css": "section[data-testid=waui_section]:has(a[href=\"https://www.whatsapp.com/calling\"])"
+      }
+    },
+    {
+      "id": "privacy-section",
+      "label": "Privacy feature section",
+      "type": "hide",
+      "option": "feature-sections",
+      "target": {
+        "css": "section[data-testid=waui_section]:has(a[href=\"https://www.whatsapp.com/privacy\"])"
+      }
+    },
+    {
+      "id": "community-section",
+      "label": "Groups and communities section",
+      "type": "hide",
+      "option": "feature-sections",
+      "target": {
+        "css": "section[data-testid=waui_section]:has(a[href=\"https://www.whatsapp.com/community\"])"
+      }
+    },
+    {
+      "id": "messaging-section",
+      "label": "Messaging features section",
+      "type": "hide",
+      "option": "feature-sections",
+      "target": {
+        "css": "section[data-testid=waui_section]:has(a[href=\"https://www.whatsapp.com/messaging\"])"
+      }
+    },
+    {
+      "id": "chat-rows-blur",
+      "label": "Blur chat list rows",
+      "type": "css",
+      "option": "chat-list-privacy",
+      "choice": ["blur"],
+      "target": {
+        "css": "#pane-side [role=\"row\"]"
+      },
+      "declarations": {
+        "filter": "blur(6px)"
+      }
+    },
+    {
+      "id": "bubbles-blur",
+      "label": "Blur message bubbles",
+      "type": "css",
+      "option": "message-privacy",
+      "choice": ["blur"],
+      "target": {
+        "css": "#main .message-in, #main .message-out"
+      },
+      "declarations": {
+        "filter": "blur(6px)"
+      }
+    },
+    {
+      "id": "pictures-blur",
+      "label": "Blur profile pictures",
+      "type": "css",
+      "option": "profile-pictures",
+      "choice": ["blur"],
+      "target": {
+        "css": "#pane-side img, #main header img, [data-testid=\"group-chat-profile-picture\"] img"
+      },
+      "declarations": {
+        "filter": "blur(8px)"
+      }
+    },
+    {
+      "id": "pictures-hide",
+      "label": "Profile pictures in group messages",
+      "type": "hide",
+      "option": "profile-pictures",
+      "choice": ["hide"],
+      "target": {
+        "css": "[data-testid=\"group-chat-profile-picture\"]"
+      }
+    },
+    {
+      "id": "channels-button",
+      "label": "Channels navigation button",
+      "type": "hide",
+      "option": "channels-tab",
+      "target": {
+        "css": "[aria-label=\"Channels\"]"
+      }
+    },
+    {
+      "id": "meta-ai-entries",
+      "label": "Meta AI entries",
+      "type": "hide",
+      "option": "meta-ai",
+      "target": {
+        "css": "[aria-label*=\"Meta AI\"]"
+      }
     }
   ],
   "meta": {
     "author": "OpenMedia",
     "homepage": "https://web.whatsapp.com/",
-    "lastVerified": "2026-11-08",
-    "summary": "Hides app download buttons, promo sections, page footer",
-    "notes": "LIVE (headless Chromium, iPhone UA 390x844, logged out, 2026-11-08): https://web.whatsapp.com/ redirects to /mobile/ which only says 'Use WhatsApp Web ... on your computer' + Share link (nothing hideable, no rules target it). https://www.whatsapp.com/ counts: header download a[href*=itunes.apple.com]=2 (one in mobile header, one in nav dropdown), article hero download=1, footer itunes links=3, section:has(web.whatsapp.com link)=1, section:has(whatsappbusiness.com link)=1, footer[data-testid=whatsapp_www_footer]=1. https://www.whatsapp.com/download: the primary iOS Download button sits in a section (not an article) so it stays visible; header/footer ones are hidden. LIVE desktop UA 1280x800 https://web.whatsapp.com/: [data-testid=download-native-client-button]=1 and -inline=1 (Download WhatsApp for Mac banner). Selectors use data-testid/href only, no hashed classes. Fixtures distilled from these pages. NOT verified: logged-in chats/Status/Channels/ads (behind phone-QR login); no cookie banner or timed pop-up appeared in ~20 s; the Mac banner's title/text card has no stable container, so only its button is hidden; other www sections (calling, privacy, groups) and faq.whatsapp.com were not given rules."
+    "lastVerified": "2026-11-13",
+    "summary": "Hides download buttons, promo and feature sections, footer; blur pictures; WhatsApp Web chat privacy blur, Channels, Meta AI",
+    "notes": "**Checked** 2026-11-08 and 2026-11-13, headless Chromium, iPhone UA 390x844 and desktop UA 1280x800, logged out.\n\n## whatsapp.com and the Web login (LIVE)\n\n- `https://web.whatsapp.com/` on an iPhone UA redirects to `/mobile/`, a static page with nothing hideable. With a desktop UA it shows the QR login: `[data-testid=download-native-client-button]` and `-inline` 1 each.\n- `https://www.whatsapp.com/`: header `a[href*=itunes.apple.com]` 2, hero article download 1, footer itunes links 3, `section[data-testid=waui_section]` 11, `footer[data-testid=whatsapp_www_footer]` 1. `/download` keeps its primary iOS button (it is in a section, not an article).\n- 2026-11-13 on the saved home page HTML loaded in Chromium: `[data-testid=whatsapp_www_full_page] picture` 18, and each `section:has(a[href=\"https://www.whatsapp.com/calling\"])`, `.../privacy`, `.../community`, `.../messaging` matched exactly 1. The first banner section is not hit by any feature-section rule; the Transform your business and Call on WhatsApp Web sections stay under the existing promo option.\n- The classes on www (`_9ta2` style) are hashed and avoided; rules use `data-testid` and `href`. `<video>` matched 0 on the home page, so no video rule exists.\n\n## WhatsApp Web app rules (SOURCE, NOT verified live)\n\nThe chat UI needs a phone to log in, so none of this ran. The fixture `web-app.html` is hand-written and the rules follow public community CSS:\n\n- SOURCE `#pane-side [role=\"row\"]` blur: andryompusunggu.com/blog/pure-css-whatsapp-blur and the greasyfork WhatsApp UI Manager (`#pane-side [role=\"row\"] { filter: blur(6px) }`). Those extensions also clear the blur on `:hover`; this recipe cannot, because a recipe selector with a pseudo-class like `:hover` cannot be checked against a fixture, so the blur is permanent while the option is on.\n- SOURCE `#main .message-in` and `.message-out` (message bubble classes used by dark-whatsapp and privacy gists). INFERRED that blur on the whole bubble is fine; the older `_3mKlI`-style hashed names are not used.\n- SOURCE `[data-testid=\"group-chat-profile-picture\"]` (greasyfork Clean UI). `#pane-side img` and `#main header img` are INFERRED from the same structure.\n- SOURCE `[aria-label=\"Channels\"]` (greasyfork Remove Channels script; English UI only) and `[aria-label*=\"Meta AI\"]` (Clean UI context-menu rule). A contact literally named Meta AI could also match.\n- Reddit r/uBlockOrigin (Jun 2025) reports WhatsApp changes its menu markup often, so expect drift.\n\n## Left alone on purpose\n\nThe compose box, chat text, QR and phone-number login, and the primary Download button on `/download`."
   }
 }

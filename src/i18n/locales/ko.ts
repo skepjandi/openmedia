@@ -283,7 +283,7 @@ export const ko: Messages = {
   "recipes.content": "콘텐츠 · 숨길 때까지 표시",
   "recipes.groupAnnoyance": "방해 요소",
   "recipes.groupContent": "콘텐츠",
-  "recipes.nothingHidden": "숨긴 항목 없음",
+  "recipes.nothingHidden": "활성화: {total}개 중 {count}개",
   "recipes.hiddenCount": "숨김: {total}개 중 {count}개",
   "recipes.options": "{name} 옵션",
   "recipes.addFavorite": "{name} 즐겨찾기에 추가",

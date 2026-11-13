@@ -90,6 +90,70 @@
       "description": "The tick next to account names.",
       "group": "content",
       "default": false
+    },
+    {
+      "id": "avatars",
+      "label": "Profile pictures",
+      "description": "The round avatar beside every post. Blur or hide it to read posts without faces.",
+      "group": "content",
+      "choices": [
+        { "id": "show", "label": "Show" },
+        { "id": "blur", "label": "Blur" },
+        { "id": "hide", "label": "Hide" }
+      ],
+      "default": "show"
+    },
+    {
+      "id": "post-media",
+      "label": "Photos and videos",
+      "description": "Pictures and video players inside posts. Blur keeps the layout; Hide removes the media block.",
+      "group": "content",
+      "choices": [
+        { "id": "show", "label": "Show" },
+        { "id": "blur", "label": "Blur" },
+        { "id": "hide", "label": "Hide" }
+      ],
+      "default": "show"
+    },
+    {
+      "id": "quote-posts",
+      "label": "Quoted posts",
+      "description": "The boxed post a person quotes inside their own post.",
+      "group": "content",
+      "choices": [
+        { "id": "show", "label": "Show" },
+        { "id": "dim", "label": "Dim" },
+        { "id": "hide", "label": "Hide" }
+      ],
+      "default": "show"
+    },
+    {
+      "id": "view-counts",
+      "label": "Hide view counts",
+      "description": "The bar-chart view count in the row under each post.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "bookmark-share",
+      "label": "Hide bookmark and share buttons",
+      "description": "The bookmark and share icons at the end of each post's button row.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "profile-counts",
+      "label": "Hide Following and Followers counts",
+      "description": "The follow numbers in a profile header.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "footer-links",
+      "label": "Hide the footer links",
+      "description": "Terms, Privacy, Accessibility and other small print under the desktop timeline.",
+      "group": "content",
+      "default": false
     }
   ],
   "rules": [
@@ -263,13 +327,200 @@
       "target": {
         "css": "[data-testid=\"icon-verified\"]"
       }
+    },
+    {
+      "id": "avatars-blur",
+      "label": "Blur profile pictures (rebuilt app)",
+      "type": "css",
+      "option": "avatars",
+      "choice": ["blur"],
+      "target": {
+        "css": "[data-post-avatar] img"
+      },
+      "declarations": {
+        "filter": "blur(6px)"
+      }
+    },
+    {
+      "id": "avatars-blur-classic",
+      "label": "Blur profile pictures (classic app)",
+      "type": "css",
+      "option": "avatars",
+      "choice": ["blur"],
+      "target": {
+        "css": "[data-testid=\"Tweet-User-Avatar\"]"
+      },
+      "declarations": {
+        "filter": "blur(6px)"
+      }
+    },
+    {
+      "id": "avatars-hide",
+      "label": "Profile pictures (rebuilt app)",
+      "type": "hide",
+      "option": "avatars",
+      "choice": ["hide"],
+      "target": {
+        "css": "[data-post-avatar] img"
+      }
+    },
+    {
+      "id": "avatars-hide-classic",
+      "label": "Profile pictures (classic app)",
+      "type": "hide",
+      "option": "avatars",
+      "choice": ["hide"],
+      "target": {
+        "css": "[data-testid=\"Tweet-User-Avatar\"]"
+      }
+    },
+    {
+      "id": "media-blur",
+      "label": "Blur photos and videos (rebuilt app)",
+      "type": "css",
+      "option": "post-media",
+      "choice": ["blur"],
+      "target": {
+        "css": "article [data-slot=\"xds-context-menu-trigger\"]"
+      },
+      "declarations": {
+        "filter": "blur(20px)"
+      }
+    },
+    {
+      "id": "media-blur-classic",
+      "label": "Blur photos and videos (classic app)",
+      "type": "css",
+      "option": "post-media",
+      "choice": ["blur"],
+      "target": {
+        "css": "[data-testid=\"tweetPhoto\"], [data-testid=\"videoPlayer\"], [data-testid=\"card.wrapper\"]"
+      },
+      "declarations": {
+        "filter": "blur(20px)"
+      }
+    },
+    {
+      "id": "media-hide",
+      "label": "Photos and videos (rebuilt app)",
+      "type": "hide",
+      "option": "post-media",
+      "choice": ["hide"],
+      "target": {
+        "css": "article [data-slot=\"xds-context-menu-trigger\"]"
+      }
+    },
+    {
+      "id": "media-hide-classic",
+      "label": "Photos and videos (classic app)",
+      "type": "hide",
+      "option": "post-media",
+      "choice": ["hide"],
+      "target": {
+        "css": "[data-testid=\"tweetPhoto\"], [data-testid=\"videoPlayer\"], [data-testid=\"card.wrapper\"]"
+      }
+    },
+    {
+      "id": "quote-dim",
+      "label": "Dim quoted posts",
+      "type": "css",
+      "option": "quote-posts",
+      "choice": ["dim"],
+      "target": {
+        "css": "[data-slot=\"embedded-tweet-frame\"]"
+      },
+      "declarations": {
+        "opacity": "0.35"
+      }
+    },
+    {
+      "id": "quote-hide",
+      "label": "Quoted posts",
+      "type": "hide",
+      "option": "quote-posts",
+      "choice": ["hide"],
+      "target": {
+        "css": "[data-slot=\"embedded-tweet-frame\"]"
+      }
+    },
+    {
+      "id": "view-count-button",
+      "label": "View count (rebuilt app)",
+      "type": "hide",
+      "option": "view-counts",
+      "target": {
+        "css": "[data-engagement-action=\"generic\"]"
+      }
+    },
+    {
+      "id": "view-count-link",
+      "label": "View count (classic app)",
+      "type": "hide",
+      "option": "view-counts",
+      "target": {
+        "css": "a[href$=\"/analytics\"]"
+      }
+    },
+    {
+      "id": "bookmark-share-rebuilt",
+      "label": "Bookmark and share (rebuilt app)",
+      "type": "hide",
+      "option": "bookmark-share",
+      "target": {
+        "css": "[data-engagement-action=\"bookmark\"], [data-engagement-action=\"share\"]"
+      }
+    },
+    {
+      "id": "bookmark-classic",
+      "label": "Bookmark (classic app)",
+      "type": "hide",
+      "option": "bookmark-share",
+      "target": {
+        "css": "[data-testid=\"bookmark\"], [data-testid=\"removeBookmark\"]"
+      }
+    },
+    {
+      "id": "follow-counts",
+      "label": "Following and Followers links",
+      "type": "hide",
+      "option": "profile-counts",
+      "target": {
+        "css": "a[href$=\"/following\"], a[href*=\"/following?\"], a[href$=\"/verified_followers\"], a[href*=\"/verified_followers?\"]"
+      }
+    },
+    {
+      "id": "footer-nav",
+      "label": "Footer links",
+      "type": "hide",
+      "option": "footer-links",
+      "target": {
+        "css": "nav[aria-label=\"Footer\"]"
+      }
+    },
+    {
+      "id": "counts-rebuilt",
+      "label": "Reply, repost and like counts (rebuilt app)",
+      "type": "hide",
+      "option": "counts",
+      "target": {
+        "css": "[data-engagement-action=\"reply\"] svg + span, [data-engagement-action=\"retweet\"] svg + span, [data-engagement-action=\"like\"] svg + span"
+      }
+    },
+    {
+      "id": "verified-ticks-rebuilt",
+      "label": "Verified badges (rebuilt app)",
+      "type": "hide",
+      "option": "verified-badges",
+      "target": {
+        "css": "span[role=\"button\"][aria-label=\"Verified account\"]"
+      }
     }
   ],
   "meta": {
     "author": "OpenMedia",
     "homepage": "https://twitter.com/",
-    "lastVerified": "2026-11-10",
-    "summary": "Hides \"open in app\" prompts, Premium and Verified upsells, promoted posts, Grok, Explore tab, right column, trends, Who to follow",
-    "notes": "X is mid-migration between two front ends. The rebuilt one (served to logged-out visitors on 2026-11-07, signed-in users move gradually) has NO data-testid attributes; it uses data-interaction, data-slot, href and role. The classic React app keeps data-testid. Selectors for both families sit in one option; the family that is absent matches nothing. LIVE on the rebuilt front end (logged out): app-obstruction matched 1 (dialog, backdrop and close button; no scroll lock), open-app-pill matched 2 (a[href*=launch_app_store] matches 50: every tab, like and status link, so it must stay narrow). Never hide a[data-interaction=mobile-top-bar-log-in]. SOURCE only (classic app, logged in): FreekyCreep x.com list 2026-09-27, AdGuard X filter 2025.1229, char gist 2025-02: every premium-*, promoted-*, grok-* rule. explore-link (AppTabBar_Explore_Link) is from memory, not a list. No selector exists for For you vs Following, Discover more, Today's News or Who to follow without text matching. DESKTOP (macOS Safari UA): x.com serves the rebuilt front end logged out, without data-testid, so the classic-app selectors in the desktop rules are INFERRED (hand-written fixture desktop-timeline.html): premium-card, right-column-desktop, trends-section, who-to-follow-card, counts-reply-repost, counts-like-views, dm-drawer, nav-jobs-lists, verified-ticks."
+    "lastVerified": "2026-11-13",
+    "summary": "Hides open-app prompts, upsells, promoted posts, Grok; blur or hide avatars, media, quotes; counts, sidebars, footer",
+    "notes": "X is mid-migration between two front ends. The rebuilt one (served to logged-out visitors on 2026-11-07, signed-in users move gradually) has NO data-testid attributes; it uses data-interaction, data-slot, href and role. The classic React app keeps data-testid. Selectors for both families sit in one option; the family that is absent matches nothing. LIVE on the rebuilt front end (logged out): app-obstruction matched 1 (dialog, backdrop and close button; no scroll lock), open-app-pill matched 2 (a[href*=launch_app_store] matches 50: every tab, like and status link, so it must stay narrow). Never hide a[data-interaction=mobile-top-bar-log-in]. SOURCE only (classic app, logged in): FreekyCreep x.com list 2026-09-27, AdGuard X filter 2025.1229, char gist 2025-02: every premium-*, promoted-*, grok-* rule. explore-link (AppTabBar_Explore_Link) is from memory, not a list. No selector exists for For you vs Following, Discover more, Today's News or Who to follow without text matching. DESKTOP (macOS Safari UA): x.com serves the rebuilt front end logged out, without data-testid, so the classic-app selectors in the desktop rules are INFERRED (hand-written fixture desktop-timeline.html): premium-card, right-column-desktop, trends-section, who-to-follow-card, counts-reply-repost, counts-like-views, dm-drawer, nav-jobs-lists, verified-ticks.\n\n## Added 2026-11-13\n\n**LIVE** (logged out, headless Chrome, `/elonmusk`, iPhone UA and 1440 desktop UA; both served the rebuilt app, 0 `data-testid`):\n\n- `avatars`: `[data-post-avatar] img` 5.\n- `post-media`: `article [data-slot=\"xds-context-menu-trigger\"]` 4 (3 video players, 1 photo; it wraps the `img` or `video` and its Play button).\n- `quote-posts`: `[data-slot=\"embedded-tweet-frame\"]` 5.\n- `view-counts`: `[data-engagement-action=\"generic\"]` 5; `bookmark-share`: bookmark 5, share 5.\n- `counts` (rebuilt rule): `[data-engagement-action=\"reply|retweet|like\"] svg + span` 5 each.\n- `verified-badges` (rebuilt rule): `span[role=\"button\"][aria-label=\"Verified account\"]` 12 (English only).\n- `profile-counts`: desktop hrefs `/user/following`, `/user/verified_followers` (1 each); on the phone they are `https://m.x.com/user/following?launch_app_store=true...` (matched by the `?` forms).\n- `footer-links`: `nav[aria-label=\"Footer\"]` 1 on desktop, 0 on the phone.\n\n**SOURCE / INFERRED** (classic app, not served logged out): `Tweet-User-Avatar`, `tweetPhoto`, `videoPlayer`, `card.wrapper`, `bookmark`, `removeBookmark` test ids and `a[href$=\"/analytics\"]`.\n\n**Deliberately not shipped:** the desktop `aside` \"Log in or sign up\" card and \"See the full profile\" bar. The header Log in link is 0 px wide on desktop, so those asides are the only visible way in.\n"
   }
 }

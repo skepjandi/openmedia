@@ -4,13 +4,13 @@ use std::fmt::Write;
 use serde::Serialize;
 
 use super::matcher::Matcher;
-use super::schema::{Recipe, Rule};
+use super::schema::{OptionValue, Recipe, Rule};
 use super::script_policy::wrap;
 use crate::error::{Error, Result};
 
-/// The user's saved toggles: recipe id, then option id. An option with no entry keeps the
+/// The user's saved settings: recipe id, then option id. An option with no entry keeps the
 /// recipe's own default.
-pub type OptionChoices = BTreeMap<String, BTreeMap<String, bool>>;
+pub type OptionChoices = BTreeMap<String, BTreeMap<String, OptionValue>>;
 
 #[derive(Serialize)]
 struct PageRecipe {

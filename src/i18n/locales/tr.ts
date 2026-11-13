@@ -289,7 +289,7 @@ export const tr: Messages = {
   "recipes.content": "İçerik · siz gizlemedikçe gösterilir",
   "recipes.groupAnnoyance": "Rahatsız edici",
   "recipes.groupContent": "İçerik",
-  "recipes.nothingHidden": "Hiçbir şey gizli değil",
+  "recipes.nothingHidden": "Açık: {total} içinden {count}",
   "recipes.hiddenCount": "Gizlenen: {total} içinden {count}",
   "recipes.options": "{name} seçenekleri",
   "recipes.addFavorite": "{name} öğesini favorilere ekle",

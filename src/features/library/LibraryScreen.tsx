@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { isFavoriteSite, toggleSiteFavorite } from "../../shared/favorites";
 import { library } from "../../shared/ipc";
+import { offValue } from "../../shared/options";
 import { registrableDomain } from "../../shared/site";
 import { useApp } from "../../app/store";
 import { describeError } from "../../i18n/errors";
@@ -365,7 +366,7 @@ function DetailView({ item, onChanged }: DetailViewProps) {
     }
     if (!freshInstall) return;
     for (const option of site?.options ?? []) {
-      await library.setSiteOption(item.id, option.id, false, false);
+      await library.setSiteOption(item.id, option.id, offValue(option), false);
     }
   };
 

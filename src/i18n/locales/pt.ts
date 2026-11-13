@@ -293,7 +293,7 @@ export const pt: Messages = {
   "recipes.content": "Conteúdo · aparece até você ocultá-lo",
   "recipes.groupAnnoyance": "Irritação",
   "recipes.groupContent": "Conteúdo",
-  "recipes.nothingHidden": "Nada ocultado",
+  "recipes.nothingHidden": "Ativos: {count} de {total}",
   "recipes.hiddenCount": "Ocultos: {count} de {total}",
   "recipes.options": "Opções de {name}",
   "recipes.addFavorite": "Adicionar {name} aos favoritos",

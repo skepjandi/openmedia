@@ -1,0 +1,44 @@
+<!doctype html>
+<!-- Feed and subreddit-header anatomy observed on www.reddit.com with an iPhone UA, logged out, 2026-11-13 (home feed and /r/pics); text, ids and links are placeholders, shadow roots are not serialized. data-keep marks what no rule may hide. -->
+<html lang="en-US" device="mobile">
+  <body>
+    <shreddit-app data-keep>
+      <main data-keep>
+        <div class="masthead">
+          <div class="@container"><div id="subreddit-banner-img" class="community-banner"></div></div>
+          <shreddit-subreddit-header data-keep><h1 data-keep>r/example</h1></shreddit-subreddit-header>
+        </div>
+        <shreddit-feed data-keep>
+          <article>
+            <shreddit-post id="t3_aaa" post-type="image">
+              <a slot="full-post-link" href="https://applink.reddit.com/r/example/"></a>
+              <span slot="credit-bar">
+                <span id="feed-post-credit-bar-t3_aaa">
+                  <a data-testid="subreddit-name" href="https://applink.reddit.com/r/example/"><span><img alt=""></span></a>
+                  <faceplate-timeago><time></time></faceplate-timeago>
+                </span>
+              </span>
+              <a slot="title" id="post-title-t3_aaa" href="/r/example/comments/aaa/a_post/">A post title</a>
+              <shreddit-post-flair slot="post-flair"></shreddit-post-flair>
+              <div slot="post-media-container"><div><img id="post-image" alt=""></div></div>
+            </shreddit-post>
+          </article>
+          <hr>
+          <article data-keep>
+            <shreddit-post id="t3_bbb" post-type="text" data-keep>
+              <a slot="title" id="post-title-t3_bbb" data-keep href="/r/example/comments/bbb/text_post/">A text post</a>
+              <shreddit-post-text-body slot="text-body" post-id="t3_bbb"></shreddit-post-text-body>
+            </shreddit-post>
+          </article>
+          <hr>
+          <article data-keep>
+            <shreddit-post id="t3_ccc" post-type="link" data-keep>
+              <a slot="title" id="post-title-t3_ccc" data-keep href="/r/example/comments/ccc/link_post/">A link post</a>
+              <div slot="thumbnail"><img alt=""></div>
+            </shreddit-post>
+          </article>
+        </shreddit-feed>
+      </main>
+    </shreddit-app>
+  </body>
+</html>

@@ -292,7 +292,7 @@ export const ru: Messages = {
   "recipes.content": "Контент · показывается, пока вы его не скроете",
   "recipes.groupAnnoyance": "Раздражитель",
   "recipes.groupContent": "Контент",
-  "recipes.nothingHidden": "Ничего не скрыто",
+  "recipes.nothingHidden": "Включено: {count} из {total}",
   "recipes.hiddenCount": "Скрыто: {count} из {total}",
   "recipes.options": "Настройки {name}",
   "recipes.addFavorite": "Добавить {name} в избранное",

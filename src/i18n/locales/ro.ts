@@ -291,7 +291,7 @@ export const ro: Messages = {
   "recipes.content": "Conținut · afișat până îl ascunzi",
   "recipes.groupAnnoyance": "Deranjant",
   "recipes.groupContent": "Conținut",
-  "recipes.nothingHidden": "Nimic ascuns",
+  "recipes.nothingHidden": "Active: {count} din {total}",
   "recipes.hiddenCount": "Ascunse: {count} din {total}",
   "recipes.options": "Opțiuni {name}",
   "recipes.addFavorite": "Adaugă {name} la favorite",

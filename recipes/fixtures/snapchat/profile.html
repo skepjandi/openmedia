@@ -12,20 +12,21 @@
       </div>
     </div>
     <div>
+      <nav data-testid="ConsumerNav_Desktop" aria-label="Desktop global navigation"><ul><li><a href="https://www.snapchat.com/spotlight" data-testid="navItem-SPOTLIGHT">Spotlight</a></li><li><a href="https://www.snapchat.com/plus" aria-label="PLUS" data-testid="navItem-PLUS">Snapchat+</a></li></ul><a href="https://snapchat.com/download" data-testid="ConsumerNav_DownloadButton">Download</a><button type="button" data-testid="ConsumerNav_LoginButton" data-keep>Log in</button></nav>
       <div data-testid="mobile-nav-top"><button aria-label="Open Mobile Navigation" data-keep></button></div>
       <div data-testid="mobile-nav-bottom">
         <nav aria-label="Mobile navigation widget"><ul><li><a href="https://link.snapchat.com/spotlight">Spotlight</a></li></ul></nav>
       </div>
     </div>
     <div class="PublicProfile_mobileContainer">
-      <div data-testid="headerWrapper" data-keep><h1>Example Creator</h1><a data-testid="profile-add-button" href="https://click.snapchat.com/x" data-keep>Add</a></div>
+      <div data-testid="headerWrapper" data-keep><div data-testid="profilePicture"><picture><img alt="Profile Picture" src="x.jpg"></picture></div><h1>Example Creator</h1><span data-testid="subscribersCountText">1.5m followers</span><a data-testid="profile-add-button" href="https://click.snapchat.com/x" data-keep>Add</a></div>
       <div data-testid="desktop-contents-section" data-keep>
-        <div role="tablist"><div role="tab">All</div><div role="tab">Spotlight</div></div>
+        <div role="tablist"><div role="tab">All</div><div role="tab">Spotlight</div><div role="tab"><button type="button"><span data-testid="related-section-heading-wrapper">Related</span></button></div></div>
         <div role="tabpanel">
           <div data-testid="all-section-wrapper" data-keep>
             <div data-testid="content-tile">
               <a href="/@example/spotlight/ID1" title=" Spotlight" data-keep>
-                <video playsinline loop aria-hidden="true"></video>
+                <img data-testid="image-tile-img" alt="" src="x.jpg"><div><div><video playsinline loop aria-hidden="true"></video></div></div>
                 <div class="CountCard_card__x"><span class="ViewCountCard_viewCountIcon"></span><h6><span>4.4k</span></h6></div>
                 <div class="CountCard_card__x"><span class="ShareCountCard_icon"></span><h6><span>49</span></h6></div>
               </a>

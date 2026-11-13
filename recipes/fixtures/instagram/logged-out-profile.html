@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- Structure observed on a logged-out profile in an iPhone-UA tab, 2026-11-07; text and links are placeholders. data-keep marks what no rule may hide. -->
+<!-- Structure observed on a logged-out profile in an iPhone-UA tab, 2026-11-07 and re-checked 2026-11-13 (avatar section, follower links, grid pictures, /u/direct/ bar link); text and links are placeholders. data-keep marks what no rule may hide. -->
 <html><body>
 <div id="react-root">
   <header>
@@ -8,12 +8,16 @@
     <a href="https://applink.instagram.com/?utm_source=open_app">Open app</a>
   </header>
   <main role="main">
-    <header><a href="https://applink.instagram.com/profile-avatar">avatar</a></header>
+    <header>
+      <section><canvas></canvas><a href="https://applink.instagram.com/profile-avatar"><img src="/avatar.jpg" alt=""></a></section>
+      <section><a href="#">104M followers</a><a href="#">91 following</a></section>
+    </header>
     <div role="tablist">
       <div><svg aria-label="Posts"></svg></div>
       <div><svg aria-label="Reels"></svg></div>
     </div>
-    <div data-keep><a href="https://applink.instagram.com/p/tile-1">tile</a><a href="https://applink.instagram.com/p/tile-2">tile</a></div>
+    <hr>
+    <div data-keep><a href="https://applink.instagram.com/p/tile-1"><img src="/t1.jpg" alt=""></a><a href="https://applink.instagram.com/p/tile-2"><img src="/t2.jpg" alt=""></a></div>
   </main>
   <div>
     <div><div><div>
@@ -24,6 +28,7 @@
     <div><a href="/?nb=l">Home</a></div>
     <div><a href="/reels/">Reels</a></div>
     <div><a href="/explore/">Explore</a></div>
+    <div><a href="/u/direct/">Direct</a></div>
   </div>
 </div>
 </body></html>

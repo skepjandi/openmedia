@@ -159,7 +159,11 @@ mod tests {
         let normal = crate::recipes::OptionChoices::new();
         let incognito = crate::recipes::OptionChoices::from([(
             "market.official.youtube".to_owned(),
-            [("shorts".to_owned(), true)].into(),
+            [(
+                "shorts".to_owned(),
+                crate::recipes::OptionValue::Toggle(true),
+            )]
+            .into(),
         )]);
         assert_eq!(
             recipes.script(&normal).unwrap(),

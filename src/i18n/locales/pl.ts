@@ -290,7 +290,7 @@ export const pl: Messages = {
   "recipes.content": "Treści · widoczne, dopóki ich nie ukryjesz",
   "recipes.groupAnnoyance": "Uciążliwość",
   "recipes.groupContent": "Treść",
-  "recipes.nothingHidden": "Nic nie jest ukryte",
+  "recipes.nothingHidden": "Włączone: {count} z {total}",
   "recipes.hiddenCount": "Ukryte: {count} z {total}",
   "recipes.options": "Opcje: {name}",
   "recipes.addFavorite": "Dodaj {name} do ulubionych",

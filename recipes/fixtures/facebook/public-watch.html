@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- Public Watch/profile structure seen on m.facebook.com logged out, 2026-11-07; names are placeholders. Stories row is SOURCE-only (kurtnettle/uBO-filters-fb). data-keep marks what no rule may hide. -->
+<!-- Public Watch/profile structure seen on m.facebook.com logged out, 2026-11-07; names are placeholders. Stories row is SOURCE-only (kurtnettle/uBO-filters-fb). Video player, profile picture, reactions and ufi_* elements were added from /watch/ on 2026-11-13 with their attributes as served (text and ids removed). data-keep marks what no rule may hide. -->
 <html class="wbloks_10"><body id="app-body">
 <div id="screen-root" data-keep>
   <div>
@@ -16,6 +16,14 @@
   </div>
   <div role="button" aria-label="View reel video from someone with 12K views"></div>
   <div aria-label="Stories"></div>
+  <div role="button" aria-label="Video player" data-type="video"><img data-type="image" alt="Video player"></div>
+  <div role="button" aria-label="Someone Profile Picture"><div role="img"><div><img src="" alt=""></div></div></div>
+  <div role="button" aria-label="Unseen story from Someone"><img src="" alt=""></div>
+  <div role="button" aria-label="12,345 reactions"></div>
+  <div data-log-comp-type="feed_post:ufi_blingbar"></div>
+  <div role="button" data-log-comp-type="seed_post:ufi_like_button"></div>
+  <div role="button" data-log-comp-type="seed_post:ufi_comment_button"></div>
+  <div role="button" data-log-comp-type="seed_post:ufi_share_button"></div>
   <div data-keep><div role="button" aria-label="Comment"></div></div>
 </div>
 <div role="dialog" aria-modal="true" aria-label="Get the full experience, Get the latest updates, newest features and the fastest experience."></div>

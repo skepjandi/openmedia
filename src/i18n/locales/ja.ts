@@ -285,7 +285,7 @@ export const ja: Messages = {
   "recipes.content": "コンテンツ · 非表示にするまで表示",
   "recipes.groupAnnoyance": "邪魔するもの",
   "recipes.groupContent": "コンテンツ",
-  "recipes.nothingHidden": "非表示の項目はありません",
+  "recipes.nothingHidden": "有効：{total} 件中 {count} 件",
   "recipes.hiddenCount": "非表示：{total} 件中 {count} 件",
   "recipes.options": "{name}のオプション",
   "recipes.addFavorite": "{name}をお気に入りに追加",

@@ -8,7 +8,7 @@ use std::fmt::Write;
 use serde::Deserialize;
 
 use super::snapshot::{Snapshot, clean};
-use crate::recipes::{OptionGroup, Recipe, Rule};
+use crate::recipes::{OptionGroup, OptionValue, Recipe, Rule};
 
 /// Bump when the system prompt changes in a way that should be visible in logs or fixtures.
 pub const PROMPT_VERSION: u32 = 3;
@@ -17,7 +17,7 @@ const PLAYBOOKS: &str = include_str!("../../../docs/wiki/site-playbooks.md");
 const SELECTOR_RULES_HEADING: &str = "Rules for writing a selector";
 const MAX_REQUEST_CHARS: usize = 500;
 const MAX_EARLIER_TURNS: usize = 4;
-const MAX_SITE_SECTION_CHARS: usize = 9000;
+const MAX_SITE_SECTION_CHARS: usize = 16000;
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct Prompt {
@@ -82,8 +82,9 @@ pub struct PromptInput<'a> {
     pub path: &'a str,
     /// The recipe the page already has, if any (a made one, or one added from the recipe library).
     pub recipe: Option<&'a Recipe>,
-    /// Option id to its current on/off state; an option missing here is shown at its default.
-    pub option_states: &'a BTreeMap<String, bool>,
+    /// Option id to its current state (on/off, or a choice id); an option missing here is shown at
+    /// its default.
+    pub option_states: &'a BTreeMap<String, OptionValue>,
     /// Redacted before it gets here.
     pub snapshot: &'a Snapshot,
     /// The site's playbook section, from [`site_section`].
@@ -164,11 +165,11 @@ Do not write anything else.";
 
 const SEMANTICS: &str = "\
 How the answer is used:
-- kind \"existingOption\": the site already has a switch for this request (see \"Existing switches\" in the user message). Give its optionId; set label, description, group and rules to null. The app turns that switch on. Prefer this whenever an existing switch covers the request, even if it is currently on.
+- kind \"existingOption\": the site already has a switch for this request (see \"Existing switches\" in the user message). Give its optionId; set label, description, group and rules to null. The app turns that switch on. For a switch marked CHOICE, also set choice to one of its choice ids other than the first (the first leaves the page alone); for an ON/OFF switch choice is null. Prefer this whenever an existing switch covers the request, even if it is currently on.
 - kind \"newOption\": a new switch. label is a short imperative phrase (at most 60 characters, for example \"Grayscale the logo\" or \"Hide suggested videos\"). description says what the switch changes (at most 160 characters). group is \"annoyance\" for nags, banners, prompts and ads, and \"content\" for feed content the user may want back (Shorts, stories, recommendations). rules has 1 to 8 entries.
 - Each rule is { label, selector, declarations, script }. A style rule has script=null. label says what the rule changes (at most 60 characters); selector is one CSS selector (a comma list is fine). Use declarations=null to hide the matched elements. To restyle them, declarations is a list of {property, value} pairs from the schema's allowed CSS properties. For example, grayscale uses [{\"property\":\"filter\",\"value\":\"grayscale(1)\"}]. A script rule has selector=null, declarations=null and script set (see \"Script rules\"). The switch turns all its rules on or off together; the app saves it switched on.
 - summary: one sentence (at most 200 characters) in plain words, saying what the switch changes and any requested effect that neither the allowed CSS nor a script can do.
-- optionId, label, description, group are null when they do not apply. Write labels and summaries in the language of the user's request.";
+- optionId, choice, label, description, group are null when they do not apply. Write labels and summaries in the language of the user's request.";
 
 const LESSONS: &str = "\
 Selector and style discipline (these override anything softer in the playbook below):
@@ -220,7 +221,7 @@ fn system(playbook: Option<&str>) -> String {
     out
 }
 
-fn describe_options(out: &mut String, recipe: &Recipe, states: &BTreeMap<String, bool>) {
+fn describe_options(out: &mut String, recipe: &Recipe, states: &BTreeMap<String, OptionValue>) {
     let _ = writeln!(
         out,
         "Existing switches for this site (recipe {}, \"{}\"); ON means the elements are currently hidden:",
@@ -231,10 +232,7 @@ fn describe_options(out: &mut String, recipe: &Recipe, states: &BTreeMap<String,
         out.push_str("(none)\n");
     }
     for option in &recipe.options {
-        let on = states
-            .get(&option.id)
-            .copied()
-            .unwrap_or(option.enabled_by_default);
+        let state = option.current(states.get(&option.id));
         let group = match option.group {
             OptionGroup::Annoyance => "annoyance",
             OptionGroup::Content => "content",
@@ -249,15 +247,34 @@ fn describe_options(out: &mut String, recipe: &Recipe, states: &BTreeMap<String,
                 }
             })
             .collect();
+        let (shown, tail) = match state {
+            OptionValue::Toggle(on) => (
+                if *on { "ON" } else { "OFF" }.to_owned(),
+                format!("hides: {}", rules.join("; ")),
+            ),
+            OptionValue::Choice(selected) => (
+                format!("CHOICE {selected}"),
+                format!(
+                    "choices (the first leaves the page alone): {}; changes: {}",
+                    option
+                        .choices
+                        .iter()
+                        .map(|choice| format!("{}={}", choice.id, clean(&choice.label, 24)))
+                        .collect::<Vec<_>>()
+                        .join(", "),
+                    rules.join("; ")
+                ),
+            ),
+        };
         let _ = writeln!(
             out,
-            "- optionId \"{}\" | {} | {} | {} | {} | hides: {}",
+            "- optionId \"{}\" | {} | {} | {} | {} | {}",
             option.id,
-            if on { "ON" } else { "OFF" },
+            shown,
             group,
             clean(&option.label, 60),
             clean(&option.description, 160),
-            rules.join("; ")
+            tail
         );
     }
 }
@@ -390,7 +407,7 @@ mod tests {
     fn input<'a>(
         snap: &'a Snapshot,
         recipe: Option<&'a Recipe>,
-        states: &'a BTreeMap<String, bool>,
+        states: &'a BTreeMap<String, OptionValue>,
     ) -> PromptInput<'a> {
         PromptInput {
             request: "hide the shorts",
@@ -482,10 +499,36 @@ mod tests {
     }
 
     #[test]
+    fn a_choice_option_is_described_with_its_current_choice_and_its_choices() {
+        let recipe = Recipe::parse(
+            r#"{"schema":1,"id":"c.default","name":"C","version":"1.0.0","origin":"user","tags":["mobile"],"match":["https://c.example/*"],
+            "options":[{"id":"media","label":"Media","description":"How pictures look.","group":"content",
+              "choices":[{"id":"show","label":"Show"},{"id":"blur","label":"Blur"}],"default":"show"}],
+            "rules":[{"id":"b","label":"Blur pictures","type":"css","option":"media","choice":["blur"],"target":{"css":".pic"},"declarations":{"filter":"blur(8px)"}}]}"#,
+        )
+        .unwrap();
+        let mut out = String::new();
+        let saved = BTreeMap::from([("media".to_owned(), OptionValue::Choice("blur".into()))]);
+        describe_options(&mut out, &recipe, &saved);
+        assert!(
+            out.contains("optionId \"media\" | CHOICE blur | content |"),
+            "{out}"
+        );
+        assert!(out.contains("choices (the first leaves the page alone): show=Show, blur=Blur"));
+        assert!(out.contains("changes: Blur pictures"));
+        let mut default = String::new();
+        describe_options(&mut default, &recipe, &BTreeMap::new());
+        assert!(default.contains("CHOICE show"));
+    }
+
+    #[test]
     fn the_user_message_has_the_request_page_options_and_a_fenced_snapshot() {
         let snap = snapshot();
         let recipe = youtube();
-        let states = BTreeMap::from([("shorts".to_owned(), false), ("comments".to_owned(), true)]);
+        let states = BTreeMap::from([
+            ("shorts".to_owned(), OptionValue::Toggle(false)),
+            ("comments".to_owned(), OptionValue::Toggle(true)),
+        ]);
         let prompt = build(&input(&snap, Some(&recipe), &states));
         let user = &prompt.user;
         assert!(user.starts_with("User request: hide the shorts\n"));

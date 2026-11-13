@@ -65,6 +65,11 @@ export function RecipeReview({ preview }: { preview: RecipePreview }) {
                 <span className="mt-0.5 block text-sm leading-snug text-paper/55">
                   {option.description}
                 </span>
+                {option.choices.length > 0 && (
+                  <span className="mt-1 block text-sm text-paper/70">
+                    {option.choices.join(" · ")}
+                  </span>
+                )}
               </div>
             ))}
           </Group>

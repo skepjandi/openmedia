@@ -295,7 +295,7 @@ export const ta: Messages = {
   "recipes.content": "உள்ளடக்கம் · நீ மறைக்கும் வரை காட்டப்படும்",
   "recipes.groupAnnoyance": "தொல்லல்",
   "recipes.groupContent": "உள்ளடக்கம்",
-  "recipes.nothingHidden": "எதுவும் மறைக்கப்படவில்லை",
+  "recipes.nothingHidden": "செயல்படுத்தப்பட்டவை: {total} இல் {count}",
   "recipes.hiddenCount": "மறைக்கப்பட்டவை: {total} இல் {count}",
   "recipes.options": "{name} விருப்பங்கள்",
   "recipes.addFavorite": "{name} ஐப் பிடித்துக்கொள்ளவிடைகளில் சேர்",

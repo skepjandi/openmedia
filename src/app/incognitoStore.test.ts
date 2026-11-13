@@ -119,7 +119,8 @@ describe("incognito mode", () => {
               label: "Shorts",
               description: "",
               group: "content",
-              enabled: false,
+              choices: [],
+              value: false,
               default: false,
             },
           ],
@@ -131,9 +132,9 @@ describe("incognito mode", () => {
     expect(invoke).toHaveBeenCalledWith("set_site_option", {
       recipeId: "youtube.default",
       optionId: "shorts",
-      enabled: true,
+      value: true,
       incognito: true,
     });
-    expect(useApp.getState().incognitoSites[0].options[0].enabled).toBe(true);
+    expect(useApp.getState().incognitoSites[0].options[0].value).toBe(true);
   });
 });

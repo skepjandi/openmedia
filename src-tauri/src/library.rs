@@ -15,7 +15,7 @@ use uuid::Uuid;
 
 use crate::ai::{AiSettings, MAX_PROVIDERS, ProviderConfig, ProviderInput};
 use crate::error::{Error, Result};
-use crate::recipes::OptionChoices;
+use crate::recipes::{OptionChoices, OptionValue};
 use tauri_plugin_siteview::site::site_of_host;
 
 const FORMAT_VERSION: u32 = 4;
@@ -386,14 +386,14 @@ impl Library {
         })
     }
 
-    /// Records one toggle in the given mode's choices. The caller has already checked that the
-    /// recipe and option exist.
+    /// Records one option's value in the given mode's choices. The caller has already checked
+    /// that the recipe and option exist and accept the value.
     pub fn set_site_option(
         &self,
         mode: Mode,
         recipe: &str,
         option: &str,
-        enabled: bool,
+        value: OptionValue,
     ) -> Result<()> {
         let mut data = self.lock()?;
         let choices = match mode {
@@ -403,7 +403,7 @@ impl Library {
         choices
             .entry(recipe.to_owned())
             .or_default()
-            .insert(option.to_owned(), enabled);
+            .insert(option.to_owned(), value);
         self.save(&data)
     }
 
@@ -1301,39 +1301,68 @@ mod tests {
         let (dir, library) = library();
         assert!(library.site_options(Mode::Normal).unwrap().is_empty());
         library
-            .set_site_option(Mode::Normal, "a.default", "x", true)
+            .set_site_option(Mode::Normal, "a.default", "x", OptionValue::Toggle(true))
             .unwrap();
         library
-            .set_site_option(Mode::Normal, "a.default", "y", false)
+            .set_site_option(Mode::Normal, "a.default", "y", OptionValue::Toggle(false))
             .unwrap();
         library
-            .set_site_option(Mode::Normal, "b.default", "x", false)
+            .set_site_option(Mode::Normal, "b.default", "x", OptionValue::Toggle(false))
             .unwrap();
         let choices = reload(&dir).site_options(Mode::Normal).unwrap();
-        assert!(choices["a.default"]["x"]);
-        assert!(!choices["a.default"]["y"]);
-        assert!(!choices["b.default"]["x"]);
+        assert_eq!(choices["a.default"]["x"], OptionValue::Toggle(true));
+        assert_eq!(choices["a.default"]["y"], OptionValue::Toggle(false));
+        assert_eq!(choices["b.default"]["x"], OptionValue::Toggle(false));
+    }
+
+    #[test]
+    fn a_choice_persists_and_booleans_saved_by_earlier_versions_still_load() {
+        let (dir, library) = library();
+        library
+            .set_site_option(
+                Mode::Normal,
+                "a.default",
+                "media",
+                OptionValue::Choice("blur".into()),
+            )
+            .unwrap();
+        let path = dir.path().join("library.json");
+        let mut json: serde_json::Value =
+            serde_json::from_str(&fs::read_to_string(&path).unwrap()).unwrap();
+        json["siteOptions"]["a.default"]["old"] = serde_json::Value::Bool(true);
+        fs::write(&path, json.to_string()).unwrap();
+        let choices = reload(&dir).site_options(Mode::Normal).unwrap();
+        assert_eq!(
+            choices["a.default"]["media"],
+            OptionValue::Choice("blur".into())
+        );
+        assert_eq!(choices["a.default"]["old"], OptionValue::Toggle(true));
     }
 
     #[test]
     fn incognito_toggles_are_a_separate_set_that_persists() {
         let (dir, library) = library();
         library
-            .set_site_option(Mode::Normal, "a.default", "x", true)
+            .set_site_option(Mode::Normal, "a.default", "x", OptionValue::Toggle(true))
             .unwrap();
         library
-            .set_site_option(Mode::Incognito, "a.default", "x", false)
+            .set_site_option(
+                Mode::Incognito,
+                "a.default",
+                "x",
+                OptionValue::Toggle(false),
+            )
             .unwrap();
         library
-            .set_site_option(Mode::Incognito, "b.default", "y", true)
+            .set_site_option(Mode::Incognito, "b.default", "y", OptionValue::Toggle(true))
             .unwrap();
         let reloaded = reload(&dir);
         let normal = reloaded.site_options(Mode::Normal).unwrap();
         let incognito = reloaded.site_options(Mode::Incognito).unwrap();
-        assert!(normal["a.default"]["x"]);
+        assert_eq!(normal["a.default"]["x"], OptionValue::Toggle(true));
         assert!(!normal.contains_key("b.default"));
-        assert!(!incognito["a.default"]["x"]);
-        assert!(incognito["b.default"]["y"]);
+        assert_eq!(incognito["a.default"]["x"], OptionValue::Toggle(false));
+        assert_eq!(incognito["b.default"]["y"], OptionValue::Toggle(true));
     }
 
     #[test]

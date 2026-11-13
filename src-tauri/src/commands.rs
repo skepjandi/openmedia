@@ -34,7 +34,7 @@ use crate::library::{
     Favorite, FavoriteInput, Library, Mode, SearchEngine, Theme, favorites_need_pro,
 };
 use crate::recipes::{
-    Recipe, Recipes,
+    OptionValue, Recipe, Recipes,
     bundled::{self, SearchHit},
 };
 use crate::secrets::SecretStore;
@@ -383,9 +383,9 @@ pub fn get_sites(
     ))
 }
 
-/// Saves one site toggle in the normal or the incognito set. The open page reloads under the
-/// recompiled recipe script only when that set is the one in play. Async for the same reason as
-/// `open_site`.
+/// Saves one site setting (a switch's boolean or a choice id) in the normal or the incognito set.
+/// The open page reloads under the recompiled recipe script only when that set is the one in
+/// play. Async for the same reason as `open_site`.
 #[tauri::command]
 pub async fn set_site_option(
     app: AppHandle,
@@ -393,15 +393,19 @@ pub async fn set_site_option(
     recipes: State<'_, Recipes>,
     recipe_id: String,
     option_id: String,
-    enabled: bool,
+    value: OptionValue,
     incognito: bool,
 ) -> Result<()> {
     recipes
         .get(&recipe_id)
-        .filter(|recipe| recipe.option(&option_id).is_some())
+        .filter(|recipe| {
+            recipe
+                .option(&option_id)
+                .is_some_and(|option| option.accepts(&value))
+        })
         .ok_or(Error::UnknownOption)?;
     let mode = Mode::from(incognito);
-    library.set_site_option(mode, &recipe_id, &option_id, enabled)?;
+    library.set_site_option(mode, &recipe_id, &option_id, value)?;
     if mode == app.state::<Incognito>().mode() {
         reload_script(&app, &library, &recipes)?;
     }
@@ -751,11 +755,12 @@ pub async fn ai_accept(
         Accepted::EnableOption {
             recipe_id,
             option_id,
+            value,
         } => library.set_site_option(
             app.state::<Incognito>().mode(),
             &recipe_id,
             &option_id,
-            true,
+            value,
         )?,
         Accepted::SaveRecipe(recipe) => {
             recipes.save_made(&recipe)?;

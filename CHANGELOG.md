@@ -13,6 +13,16 @@ All notable changes to OpenMedia are documented here.
 **Change:** `recipes/official/` gains 300 recipes: a curated set of 150 popular general sites and 150 media, streaming, radio, podcast and video-archive sites inspired by FMHY (free services; piracy-focused sites left out), including `market.official.youtube-music`. Each hides cookie-consent dialogs, Google ad slots and app-install banners, one switch per group; YouTube Music hides its `ytmusic-*` promos and Premium upsell. Their fixtures are **synthetic**, hand-written pages, so the fixture test proves the selectors parse and spare protected content, not that a site serves those elements. `recipes/categories.json` gives each bundled recipe one to three subject categories, shown as tags, and the library's new *Filters* dialog filters by source, platform, type and category with live counts. Site icons were bundled when the site exposed a fetchable image; the rest use the existing on-demand favicon path.
 
 **Verified:** Rust recipe tests; TypeScript, lint, library, i18n and icon tests. **Not verified:** selectors against live sites or the dialog on a device; 46 sites exposed no fetchable image icon; new locale labels use English text.
+### feat(recipes): choice options and richer official recipes
+
+**Area:** `feat(recipes)`
+
+**Change:** A recipe option can now be a list of 2 to 4 states instead of an on/off switch (`choices` on the option, `choice` on its rules; the first choice leaves the page alone), so a thing can be shown, blurred, dimmed or hidden. Settings shows a row of states for such an option, the recipe review lists them, saved boolean choices keep loading, and a saved value an option no longer accepts falls back to its default. The assistant can set a choice option through `existingOption` with `choice`. The Worker validator accepts the same fields. The 18 official recipes were researched again (logged-out headless Chrome plus community filter lists) and gained many options, most of them blur/dim/hide choices for pictures, avatars, counters and suggestions; thin recipes (Discord, Messenger, Kuaishou, WhatsApp, Threads, Telegram) grew the most. Schema stays 1. Format: `docs/wiki/recipe-format.md#choice-options-more-than-on-or-off`.
+
+**Verified:** Rust recipe, sites, library, AI and fixture tests; TypeScript check, ESLint and Vitest; Worker `tsc` and Vitest. **Not verified:** on a device, and logged-in selectors (marked `SOURCE`/`INFERRED` in `docs/wiki/site-playbooks.md`).
+
+**PR:** n/a
+
 
 ### feat(share): remember the GitHub sign-in and show the account
 

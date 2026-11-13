@@ -1,0 +1,30 @@
+<!doctype html>
+<!-- Comment tree anatomy observed on a Reddit post page with an iPhone UA, logged out, 2026-11-13; text, ids and links are placeholders, shadow roots are not serialized. data-keep marks what no rule may hide. -->
+<html lang="en-US" device="mobile">
+  <body>
+    <shreddit-app data-keep>
+      <main data-keep>
+        <shreddit-post id="t3_abc" data-keep>
+          <span slot="credit-bar"><a href="/r/example/" data-keep><img alt=""></a></span>
+          <h1 slot="title" data-keep>Post title</h1>
+        </shreddit-post>
+        <div id="comment-tree" data-keep>
+          <shreddit-comment id="c0" depth="0" data-keep>
+            <div slot="commentAvatar"><faceplate-img></faceplate-img></div>
+            <div slot="commentMeta" data-keep><faceplate-timeago><time></time></faceplate-timeago></div>
+            <div slot="comment" data-keep>Top-level comment</div>
+            <div slot="actionRow"><shreddit-comment-action-row><award-button></award-button></shreddit-comment-action-row></div>
+            <shreddit-comment id="c1" depth="1">
+              <div slot="comment">Reply</div>
+              <shreddit-comment id="c2" depth="2"><div slot="comment">Reply to the reply</div></shreddit-comment>
+            </shreddit-comment>
+          </shreddit-comment>
+        </div>
+        <div id="mosaic-pdp-feed" data-keep>
+          <div slot="related-community-recommendation"></div>
+          <reddit-pdp-right-rail-post></reddit-pdp-right-rail-post>
+        </div>
+      </main>
+    </shreddit-app>
+  </body>
+</html>

@@ -60,14 +60,28 @@ export interface Startup extends AppState {
 
 export type OptionGroup = "annoyance" | "content";
 
-/** One toggle for a site. `enabled` already reflects the user's choice or the site's default. */
+/** One state of a choice option, such as Show, Blur or Hide. */
+export interface OptionChoice {
+  id: string;
+  label: string;
+}
+
+/** An on/off switch is a boolean; a choice option holds the id of one of its choices. */
+export type OptionValue = boolean | string;
+
+/**
+ * One setting for a site. `value` already reflects the user's choice or the site's default.
+ * `choices` is empty for an on/off switch; otherwise it lists the states in order, and the first
+ * one leaves the page alone.
+ */
 export interface SiteOption {
   id: string;
   label: string;
   description: string;
   group: OptionGroup;
-  enabled: boolean;
-  default: boolean;
+  choices: OptionChoice[];
+  value: OptionValue;
+  default: OptionValue;
 }
 
 /** One page of a hub: the label on its tab and the address it opens. */
@@ -199,11 +213,12 @@ export const library = {
   /** The recipes with their toggles, from the normal choices or the incognito ones. */
   getSites: (incognito: boolean) => invoke<SiteSettings[]>("get_sites", { incognito }),
   /**
-   * Saves the toggle in the normal or the incognito set; the open page reloads under it only when
-   * that set is the one in play. See `set_site_option` in Rust.
+   * Saves the setting (a switch's boolean or a choice id) in the normal or the incognito set; the
+   * open page reloads under it only when that set is the one in play. See `set_site_option` in
+   * Rust.
    */
-  setSiteOption: (recipeId: string, optionId: string, enabled: boolean, incognito: boolean) =>
-    command("set_site_option", { recipeId, optionId, enabled, incognito }),
+  setSiteOption: (recipeId: string, optionId: string, value: OptionValue, incognito: boolean) =>
+    command("set_site_option", { recipeId, optionId, value, incognito }),
   /** Lets a site's media keep playing while hidden or in the background; every site pauses by default. */
   setSiteBackgroundMedia: (site: string, enabled: boolean) =>
     command("set_site_background_media", { site, enabled }),

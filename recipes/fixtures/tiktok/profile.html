@@ -1,22 +1,47 @@
 <!doctype html>
+<!-- tiktok mobile profile DOM (iPhone UA) captured from https://www.tiktok.com/@tiktok on 2026-11-13: structure only, text and personal data removed. data-keep marks what no rule may hide. -->
 <html lang="en">
 <body>
 <div id="app">
   <div class="DivShareLayout" id="user-page" data-e2e="user-page" data-keep>
     <div class="DivFlex1">
       <div class="DivShareLayoutTopHeader"><h1 data-e2e="user-header">name</h1></div>
+      <div class="DivAvatarWrapper">
+        <span shape="circle" data-e2e="user-avatar" class="SpanAvatarContainer"><img loading="lazy" alt="" class="ImgAvatar"></span>
+      </div>
       <div class="DivShareLayoutHeader">
         <div class="DivShareInfo">
           <h2 data-e2e="user-title">@user</h2>
           <div><strong title="Following" data-e2e="following-count">2</strong><span data-e2e="following">Following</span></div>
           <div><strong title="Followers" data-e2e="followers-count">96.6M</strong><span data-e2e="followers">Followers</span></div>
           <div><strong title="Likes" data-e2e="likes-count">467.3M</strong><span data-e2e="likes">Likes</span></div>
-          <div data-e2e="follow-button">Follow</div>
+          <div><button type="button" data-e2e="follow-button" aria-label="Follow user">Follow</button></div>
         </div>
+        <div data-e2e="user-bio" class="DivUserBio">bio</div>
+        <div data-e2e="user-link" class="DivUserLink"><a href="https://example.com">link</a></div>
+      </div>
+      <div class="DivVideoFeedTab">
+        <p data-e2e="videos" class="PTab"><svg></svg></p>
+        <p data-e2e="playlist" class="PTab"></p>
+        <p data-e2e="liked" class="PTab"></p>
       </div>
       <div data-e2e="user-item-list" data-keep>
-        <div class="DivItemContainer"><div data-e2e="video-item"><a href="/@user/video/1">cover</a><div data-e2e="video-views"><svg></svg>220.9K</div></div></div>
-        <div class="DivItemContainer"><div data-e2e="video-item"><a href="/@user/video/2">cover</a><div data-e2e="video-views"><svg></svg>54.1K</div></div></div>
+        <div class="DivItemContainer">
+          <div data-e2e="video-item" class="DivContainer">
+            <div class="DivWrapper">
+              <a href="/@user/video/1"><div class="Box"><span><img alt="" class="ImgPoster"></span></div></a>
+            </div>
+            <div data-e2e="video-views"><svg></svg>220.9K</div>
+          </div>
+        </div>
+        <div class="DivItemContainer">
+          <div data-e2e="video-item" class="DivContainer">
+            <div class="DivWrapper">
+              <a href="/@user/video/2"><div class="Box"><span><img alt="" class="ImgPoster"></span></div></a>
+            </div>
+            <div data-e2e="video-views"><svg></svg>54.1K</div>
+          </div>
+        </div>
       </div>
       <div class="DivCtaGuideWrapper">
         <div class="DivCover"></div>

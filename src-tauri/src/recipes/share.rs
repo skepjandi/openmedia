@@ -64,6 +64,9 @@ pub struct RecipePreview {
 pub struct OptionPreview {
     pub label: String,
     pub description: String,
+    /// The labels of a choice option's states, in order; empty for a switch.
+    pub choices: Vec<String>,
+    /// Whether the option starts changing the page (a switch on, or a choice but the first).
     pub on_by_default: bool,
 }
 
@@ -165,10 +168,11 @@ fn check_shared(recipe: &Recipe) -> Result<()> {
             recipe.id
         )));
     }
-    let option_texts = recipe
-        .options
-        .iter()
-        .flat_map(|option| [&option.label, &option.description]);
+    let option_texts = recipe.options.iter().flat_map(|option| {
+        [&option.label, &option.description]
+            .into_iter()
+            .chain(option.choices.iter().map(|choice| &choice.label))
+    });
     let rule_labels = recipe.rules.iter().map(|rule| match rule {
         Rule::Hide { label, .. } | Rule::Css { label, .. } | Rule::Script { label, .. } => label,
     });
@@ -266,7 +270,12 @@ pub fn preview(recipe: &Recipe, installed_version: Option<&str>) -> RecipePrevie
             .map(|option| OptionPreview {
                 label: option.label.clone(),
                 description: option.description.clone(),
-                on_by_default: option.enabled_by_default,
+                choices: option
+                    .choices
+                    .iter()
+                    .map(|choice| choice.label.clone())
+                    .collect(),
+                on_by_default: option.is_active(&option.default_value),
             })
             .collect(),
         rules: recipe.rules.iter().map(rule_preview).collect(),

@@ -9,8 +9,8 @@ mod share;
 pub use compile::{OptionChoices, page_script};
 pub(crate) use schema::is_script_text;
 pub use schema::{
-    Hub, HubTab, MAX_HUB_LABEL_CHARS, MAX_HUB_TABS, MIN_HUB_TABS, Meta, OptionGroup, Origin,
-    Recipe, Rule, SiteOption, Target, current_platform_tag,
+    Hub, HubTab, MAX_HUB_LABEL_CHARS, MAX_HUB_TABS, MIN_HUB_TABS, Meta, OptionChoice, OptionGroup,
+    OptionValue, Origin, Recipe, Rule, SiteOption, Target, current_platform_tag,
 };
 pub(crate) use selector::{
     CSS_PROPERTIES, targets_page_root, validate_declarations, validate_selector,
@@ -372,7 +372,7 @@ mod tests {
         let recipe = Recipe::parse(TOGGLED).unwrap();
         let saved = choices
             .iter()
-            .map(|(option, on)| ((*option).to_owned(), *on))
+            .map(|(option, on)| ((*option).to_owned(), OptionValue::Toggle(*on)))
             .collect();
         recipe_css(
             &recipe,
@@ -398,15 +398,131 @@ mod tests {
         assert!(css.contains(".always{display:none!important}"));
     }
 
+    const CHOICE: &str = r#"{"schema":1,"id":"c.default","name":"C","version":"1.0.0","origin":"user","tags":["mobile"],"match":["https://c.example/*"],
+      "options":[
+        {"id":"media","label":"Media","description":"d","group":"content",
+         "choices":[{"id":"show","label":"Show"},{"id":"blur","label":"Blur"},{"id":"hide","label":"Hide"}],"default":"show"}],
+      "rules":[
+        {"id":"b","label":"l","type":"css","option":"media","choice":["blur"],"target":{"css":".pic"},"declarations":{"filter":"blur(8px)"}},
+        {"id":"h","label":"l","type":"hide","option":"media","choice":["hide"],"target":{"css":".pic"}},
+        {"id":"x","label":"l","type":"hide","option":"media","choice":["blur","hide"],"target":{"css":".both"}}]}"#;
+
+    fn choice_css(saved: Option<OptionValue>) -> String {
+        let recipe = Recipe::parse(CHOICE).unwrap();
+        let choices = saved
+            .map(|value| {
+                OptionChoices::from([(
+                    "c.default".to_owned(),
+                    [("media".to_owned(), value)].into(),
+                )])
+            })
+            .unwrap_or_default();
+        recipe_css(&recipe, &choices)
+    }
+
+    #[test]
+    fn a_choice_option_applies_only_the_rules_of_its_selected_choice() {
+        assert_eq!(choice_css(None), "");
+        assert_eq!(choice_css(Some(OptionValue::Choice("show".into()))), "");
+        let blur = choice_css(Some(OptionValue::Choice("blur".into())));
+        assert!(blur.contains(".pic{filter:blur(8px)!important;}"));
+        assert!(blur.contains(".both{display:none!important}"));
+        assert!(!blur.contains(".pic{display:none"));
+        let hide = choice_css(Some(OptionValue::Choice("hide".into())));
+        assert!(hide.contains(".pic{display:none!important}"));
+        assert!(hide.contains(".both{display:none!important}"));
+        assert!(!hide.contains("blur"));
+    }
+
+    #[test]
+    fn a_saved_value_the_option_no_longer_accepts_falls_back_to_the_default() {
+        assert_eq!(choice_css(Some(OptionValue::Choice("gone".into()))), "");
+        assert_eq!(choice_css(Some(OptionValue::Toggle(true))), "");
+    }
+
+    #[test]
+    fn an_option_accepts_only_values_of_its_own_kind() {
+        let choice = Recipe::parse(CHOICE).unwrap();
+        let media = choice.option("media").unwrap();
+        assert!(media.accepts(&OptionValue::Choice("hide".into())));
+        assert!(!media.accepts(&OptionValue::Choice("gone".into())));
+        assert!(!media.accepts(&OptionValue::Toggle(true)));
+        assert_eq!(media.off_value(), OptionValue::Choice("show".into()));
+        let toggle = Recipe::parse(TOGGLED).unwrap();
+        let nag = toggle.option("nag").unwrap();
+        assert!(nag.accepts(&OptionValue::Toggle(false)));
+        assert!(!nag.accepts(&OptionValue::Choice("show".into())));
+        assert_eq!(nag.off_value(), OptionValue::Toggle(false));
+    }
+
+    #[test]
+    fn choice_options_and_their_rules_must_be_well_formed() {
+        let build = |option_extra: &str, rule_extra: &str| {
+            format!(
+                r#"{{"schema":1,"id":"c.default","name":"C","version":"1.0.0","origin":"user","tags":["mobile"],"match":["https://c.example/*"],
+                "options":[{{"id":"media","label":"M","description":"d","group":"content"{option_extra}}}],
+                "rules":[{{"id":"r","label":"l","type":"hide","option":"media","target":{{"css":".x"}}{rule_extra}}}]}}"#
+            )
+        };
+        let choices = r#","choices":[{"id":"show","label":"Show"},{"id":"hide","label":"Hide"}]"#;
+        assert!(
+            Recipe::parse(&build(
+                &format!(r#"{choices},"default":"show""#),
+                r#","choice":["hide"]"#
+            ))
+            .is_ok()
+        );
+        let refused = [
+            // a switch carrying a choice list on its rule, or a string default
+            (r#","default":false"#.to_owned(), r#","choice":["hide"]"#),
+            (r#","default":"show""#.to_owned(), ""),
+            // a choice option with a bad default, rule, or too few or many states
+            (format!(r#"{choices},"default":false"#), r#","choice":["hide"]"#),
+            (format!(r#"{choices},"default":"gone""#), r#","choice":["hide"]"#),
+            (format!(r#"{choices},"default":"show""#), ""),
+            (format!(r#"{choices},"default":"show""#), r#","choice":[]"#),
+            (format!(r#"{choices},"default":"show""#), r#","choice":["show"]"#),
+            (format!(r#"{choices},"default":"show""#), r#","choice":["gone"]"#),
+            (format!(r#"{choices},"default":"show""#), r#","choice":["hide","hide"]"#),
+            (
+                r#","choices":[{"id":"only","label":"Only"}],"default":"only""#.to_owned(),
+                r#","choice":["only"]"#,
+            ),
+            (
+                r#","choices":[{"id":"a","label":"A"},{"id":"a","label":"B"}],"default":"a""#.to_owned(),
+                r#","choice":["a"]"#,
+            ),
+            (
+                r#","choices":[{"id":"a","label":"A"},{"id":"b","label":"B"},{"id":"c","label":"C"},{"id":"d","label":"D"},{"id":"e","label":"E"}],"default":"a""#.to_owned(),
+                r#","choice":["b"]"#,
+            ),
+            (
+                r#","choices":[{"id":"a","label":"A"},{"id":"b","label":"  "}],"default":"a""#.to_owned(),
+                r#","choice":["b"]"#,
+            ),
+        ];
+        for (option, rule) in refused {
+            assert!(
+                Recipe::parse(&build(&option, rule)).is_err(),
+                "{option} {rule}"
+            );
+        }
+        let orphan = r#"{"schema":1,"id":"c.default","name":"C","version":"1.0.0","origin":"user","tags":["mobile"],"match":["https://c.example/*"],
+            "rules":[{"id":"r","label":"l","type":"hide","choice":["hide"],"target":{"css":".x"}}]}"#;
+        assert!(Recipe::parse(orphan).is_err());
+    }
+
     #[test]
     fn choices_for_other_recipes_or_unknown_options_change_nothing() {
         let recipe = Recipe::parse(TOGGLED).unwrap();
         let other = OptionChoices::from([(
             "other.default".to_owned(),
-            [("nag".to_owned(), false)].into(),
+            [("nag".to_owned(), OptionValue::Toggle(false))].into(),
         )]);
-        let unknown =
-            OptionChoices::from([("t.default".to_owned(), [("gone".to_owned(), true)].into())]);
+        let unknown = OptionChoices::from([(
+            "t.default".to_owned(),
+            [("gone".to_owned(), OptionValue::Toggle(true))].into(),
+        )]);
         assert_eq!(recipe_css(&recipe, &other), css_for(&[]));
         assert_eq!(recipe_css(&recipe, &unknown), css_for(&[]));
     }
@@ -488,7 +604,10 @@ mod tests {
         let recipe = Recipe::parse(&json).unwrap();
         let off = page_script(std::slice::from_ref(&recipe), &OptionChoices::new()).unwrap();
         assert!(off.contains("const scripts = []"));
-        let on = OptionChoices::from([("t.script".to_owned(), [("opt".to_owned(), true)].into())]);
+        let on = OptionChoices::from([(
+            "t.script".to_owned(),
+            [("opt".to_owned(), OptionValue::Toggle(true))].into(),
+        )]);
         assert!(
             page_script(&[recipe], &on)
                 .unwrap()
@@ -574,7 +693,7 @@ mod tests {
             assert!(!recipe.options.is_empty(), "{} has no options", recipe.id);
             for option in &recipe.options {
                 assert_eq!(
-                    option.enabled_by_default,
+                    option.is_active(&option.default_value),
                     option.group == OptionGroup::Annoyance,
                     "{}:{}",
                     recipe.id,

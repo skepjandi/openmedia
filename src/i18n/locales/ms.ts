@@ -285,7 +285,7 @@ export const ms: Messages = {
   "recipes.content": "Kandungan · ditunjukkan sehingga anda menyembunyikannya",
   "recipes.groupAnnoyance": "Gangguan",
   "recipes.groupContent": "Kandungan",
-  "recipes.nothingHidden": "Tiada apa-apa disembunyikan",
+  "recipes.nothingHidden": "Diaktifkan: {count} daripada {total}",
   "recipes.hiddenCount": "Disembunyikan: {count} daripada {total}",
   "recipes.options": "Pilihan {name}",
   "recipes.addFavorite": "Tambah {name} ke kegemaran",

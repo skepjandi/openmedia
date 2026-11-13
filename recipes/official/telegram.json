@@ -34,6 +34,75 @@
       "description": "The view counter under each channel post; the post time stays.",
       "group": "content",
       "default": false
+    },
+    {
+      "id": "avatars",
+      "label": "Profile pictures",
+      "description": "Channel and sender pictures on posts, in the preview header and on the landing page, and chat pictures in Web A.",
+      "group": "content",
+      "choices": [
+        { "id": "show", "label": "Show" },
+        { "id": "blur", "label": "Blur" },
+        { "id": "hide", "label": "Hide" }
+      ],
+      "default": "show"
+    },
+    {
+      "id": "reactions",
+      "label": "Reactions",
+      "description": "The emoji reaction chips under channel posts.",
+      "group": "content",
+      "choices": [
+        { "id": "show", "label": "Show" },
+        { "id": "dim", "label": "Dim" },
+        { "id": "hide", "label": "Hide" }
+      ],
+      "default": "show"
+    },
+    {
+      "id": "media-look",
+      "label": "Photo and video look",
+      "description": "How photo and video attachments are drawn when they are shown. Hide them with the Hide photos and videos switch.",
+      "group": "content",
+      "choices": [
+        { "id": "normal", "label": "Normal" },
+        { "id": "blur", "label": "Blur" },
+        { "id": "gray", "label": "Grayscale" }
+      ],
+      "default": "normal"
+    },
+    {
+      "id": "link-preview-images",
+      "label": "Link preview pictures",
+      "description": "The large picture inside a link preview card, leaving the title and text.",
+      "group": "content",
+      "choices": [
+        { "id": "show", "label": "Show" },
+        { "id": "blur", "label": "Blur" },
+        { "id": "hide", "label": "Hide" }
+      ],
+      "default": "show"
+    },
+    {
+      "id": "reply-headers",
+      "label": "Hide reply and forward headers",
+      "description": "The quoted post above a reply and the Forwarded from line on channel posts.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "subscriber-counts",
+      "label": "Hide subscriber counts",
+      "description": "The subscriber count under the channel name and on the t.me landing page.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "post-authors",
+      "label": "Hide the channel name on each post",
+      "description": "The channel name printed above every post in a channel preview.",
+      "group": "content",
+      "default": false
     }
   ],
   "rules": [
@@ -99,13 +168,171 @@
       "target": {
         "css": ".tgme_widget_message_views, .tgme_widget_message_info .copyonly"
       }
+    },
+    {
+      "id": "web-link-previews",
+      "label": "Web A link preview cards",
+      "type": "hide",
+      "option": "link-previews",
+      "target": {
+        "css": ".WebPage"
+      }
+    },
+    {
+      "id": "web-views",
+      "label": "Web A view counters",
+      "type": "hide",
+      "option": "view-counts",
+      "target": {
+        "css": ".MessageMeta .message-views"
+      }
+    },
+    {
+      "id": "avatars-blur",
+      "label": "Blur profile pictures",
+      "type": "css",
+      "option": "avatars",
+      "choice": ["blur"],
+      "target": {
+        "css": ".tgme_widget_message_user_photo, .tgme_page_photo_image, .Avatar"
+      },
+      "declarations": {
+        "filter": "blur(8px)"
+      }
+    },
+    {
+      "id": "avatars-hide",
+      "label": "Profile pictures",
+      "type": "hide",
+      "option": "avatars",
+      "choice": ["hide"],
+      "target": {
+        "css": ".tgme_widget_message_user, .tgme_page_photo_image"
+      }
+    },
+    {
+      "id": "reactions-dim",
+      "label": "Dim reactions",
+      "type": "css",
+      "option": "reactions",
+      "choice": ["dim"],
+      "target": {
+        "css": ".tgme_widget_message_reactions"
+      },
+      "declarations": {
+        "opacity": "0.35"
+      }
+    },
+    {
+      "id": "reactions-hide",
+      "label": "Reaction chips",
+      "type": "hide",
+      "option": "reactions",
+      "choice": ["hide"],
+      "target": {
+        "css": ".tgme_widget_message_reactions"
+      }
+    },
+    {
+      "id": "media-blur",
+      "label": "Blur photos and videos",
+      "type": "css",
+      "option": "media-look",
+      "choice": ["blur"],
+      "target": {
+        "css": ".tgme_widget_message_photo_wrap, .tgme_widget_message_video_player"
+      },
+      "declarations": {
+        "filter": "blur(14px)"
+      }
+    },
+    {
+      "id": "media-gray",
+      "label": "Grayscale photos and videos",
+      "type": "css",
+      "option": "media-look",
+      "choice": ["gray"],
+      "target": {
+        "css": ".tgme_widget_message_photo_wrap, .tgme_widget_message_video_player"
+      },
+      "declarations": {
+        "filter": "grayscale(1)"
+      }
+    },
+    {
+      "id": "link-image-blur",
+      "label": "Blur link preview pictures",
+      "type": "css",
+      "option": "link-preview-images",
+      "choice": ["blur"],
+      "target": {
+        "css": ".link_preview_image"
+      },
+      "declarations": {
+        "filter": "blur(12px)"
+      }
+    },
+    {
+      "id": "link-image-hide",
+      "label": "Link preview pictures",
+      "type": "hide",
+      "option": "link-preview-images",
+      "choice": ["hide"],
+      "target": {
+        "css": ".link_preview_image"
+      }
+    },
+    {
+      "id": "reply-quotes",
+      "label": "Reply quotes",
+      "type": "hide",
+      "option": "reply-headers",
+      "target": {
+        "css": ".tgme_widget_message_reply"
+      }
+    },
+    {
+      "id": "forward-lines",
+      "label": "Forwarded from lines",
+      "type": "hide",
+      "option": "reply-headers",
+      "target": {
+        "css": ".tgme_widget_message_forwarded_from"
+      }
+    },
+    {
+      "id": "header-subscribers",
+      "label": "Subscriber count in the header",
+      "type": "hide",
+      "option": "subscriber-counts",
+      "target": {
+        "css": ".tgme_header_counter"
+      }
+    },
+    {
+      "id": "landing-subscribers",
+      "label": "Subscriber count on the landing page",
+      "type": "hide",
+      "option": "subscriber-counts",
+      "target": {
+        "css": ".tgme_page_extra"
+      }
+    },
+    {
+      "id": "post-author-names",
+      "label": "Channel name on each post",
+      "type": "hide",
+      "option": "post-authors",
+      "target": {
+        "css": ".tgme_widget_message_author"
+      }
     }
   ],
   "meta": {
     "author": "OpenMedia",
     "homepage": "https://web.telegram.org/a/",
-    "lastVerified": "2026-11-07",
-    "summary": "Hides app download prompts, link preview cards, photos and videos, view counts",
-    "notes": "LIVE (iPhone 390x844 UA, logged out, 2026-11-07): https://t.me/s/telegram counts .tgme_channel_join_telegram=1, a.tgme_widget_message_link_preview=4, a.tgme_widget_message_photo_wrap=3, a.tgme_widget_message_video_player=13, .tgme_widget_message_views=20 (.copyonly is the ' views' label beside it, selector scoped to .tgme_widget_message_info). https://t.me/telegram landing: .tgme_head_right_btn=1 (Download), .tgme_page_additional=1. Fixtures distilled from both pages. Left alone on purpose: 'View in Telegram' button and 'Preview channel' link (the landing page's only navigation). NOT verified: https://web.telegram.org/a/ logged out shows only the QR/phone login (nothing hidden there, no rules target it); logged-in web app, reactions, polls, stickers, voice, documents, round videos, sponsored posts and non-English variants were not seen, so no rules exist for them."
+    "lastVerified": "2026-11-13",
+    "summary": "Hides app prompts, link cards, media, views, reactions, avatars, subscriber counts; blur or grayscale media",
+    "notes": "**Checked** 2026-11-07 and 2026-11-13, headless Chromium with an iPhone UA at 390x844, logged out, on `t.me/telegram`, `t.me/s/telegram`, `t.me/s/durov`, `t.me/s/contest`.\n\n## Live counts (LIVE, querySelectorAll, `t.me/s/telegram` unless noted)\n\n- `.tgme_channel_join_telegram` 1, `a.tgme_widget_message_link_preview` 4, `a.tgme_widget_message_photo_wrap` 3, `a.tgme_widget_message_video_player` 13, `.tgme_widget_message_views` 20. Landing `t.me/telegram`: `.tgme_head_right_btn` 1, `.tgme_page_additional` 1, `.tgme_page_extra` 1.\n- New, `t.me/s/durov`: `.tgme_widget_message_user_photo` 20 visible, `.tgme_widget_message_reactions` 20, `.tgme_widget_message_reply` 1, `.tgme_widget_message_forwarded_from` 1, `.tgme_header_counter` 1, `.tgme_widget_message_author` 21, `.link_preview_image` 3, `.tgme_page_photo_image` 2 (1 visible: the header picture).\n- `t.me/s/contest`: `.tgme_widget_message_reply` 3. `t.me/s/telegram` itself has no reactions, replies or forwards.\n\n## Not worth a rule\n\n`.tgme_channel_info` (the info card with counters) and `.tgme_footer` exist but are `display: none` at 390px, so hiding them does nothing on a phone. Polls, stickers, voice notes, documents and inline keyboards did not appear on any of the 10 public channels sampled, so no rule targets them.\n\n## Web A rules (SOURCE, NOT verified live)\n\n`web.telegram.org/a/` shows only the login QR logged out. `.WebPage`, `.MessageMeta .message-views` and `.Avatar` are plain, non-hashed class names in the open-source client (github.com/Ajaxy/telegram-tt: WebPage.tsx, MessageMeta.tsx, Avatar.scss). Reaction chips and chat-list badges use hashed CSS-module names there, so no Web A reaction rule exists. Fixture `web-a.html` is hand-written.\n\n## Left alone on purpose\n\nThe View in Telegram button, Preview channel link, search box and post text. Hiding `.Avatar` is not offered (it would collapse chat rows), so Hide only affects t.me pages and Blur covers Web A too."
   }
 }

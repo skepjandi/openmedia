@@ -287,7 +287,7 @@ export const nl: Messages = {
   "recipes.content": "Inhoud · getoond tot je het verbergt",
   "recipes.groupAnnoyance": "Hinder",
   "recipes.groupContent": "Inhoud",
-  "recipes.nothingHidden": "Niets verborgen",
+  "recipes.nothingHidden": "Aan: {count} van {total}",
   "recipes.hiddenCount": "Verborgen: {count} van {total}",
   "recipes.options": "Opties voor {name}",
   "recipes.addFavorite": "{name} toevoegen aan favorieten",

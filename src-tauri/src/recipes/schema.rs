@@ -14,6 +14,9 @@ const MAX_RULES: usize = 200;
 const MAX_OPTIONS: usize = 30;
 const MAX_LABEL_CHARS: usize = 60;
 const MAX_DESCRIPTION_CHARS: usize = 160;
+pub const MIN_CHOICES: usize = 2;
+pub const MAX_CHOICES: usize = 4;
+const MAX_CHOICE_LABEL_CHARS: usize = 24;
 pub const MIN_HUB_TABS: usize = 2;
 pub const MAX_HUB_TABS: usize = 6;
 pub const MAX_HUB_LABEL_CHARS: usize = 20;
@@ -69,8 +72,26 @@ pub enum OptionGroup {
     Content,
 }
 
-/// A user-facing toggle. Rules point at an option with their `option` field; the toggle turns all
-/// of them on or off together.
+/// One state of a choice option, such as Show, Blur or Hide.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct OptionChoice {
+    pub id: String,
+    pub label: String,
+}
+
+/// What an option is set to: a switch is on or off, a choice option is one of its choices. Saved
+/// libraries hold plain booleans for switches, so that shape must keep loading.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(untagged)]
+pub enum OptionValue {
+    Toggle(bool),
+    Choice(String),
+}
+
+/// A user-facing setting. Rules point at an option with their `option` field. A switch turns all
+/// of its rules on or off together. A choice option (`choices` is not empty) has 2 to 4 states;
+/// the first is the page left alone, and each rule names the states in which it applies.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields, rename_all = "camelCase")]
 pub struct SiteOption {
@@ -78,9 +99,69 @@ pub struct SiteOption {
     pub label: String,
     pub description: String,
     pub group: OptionGroup,
-    /// Whether the rules apply until the user chooses otherwise.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub choices: Vec<OptionChoice>,
+    /// What the option is set to until the user chooses otherwise: a boolean for a switch, a
+    /// choice id for a choice option.
     #[serde(rename = "default")]
-    pub enabled_by_default: bool,
+    pub default_value: OptionValue,
+}
+
+impl SiteOption {
+    pub fn is_choice(&self) -> bool {
+        !self.choices.is_empty()
+    }
+
+    /// Whether `value` is a state this option can be in.
+    pub fn accepts(&self, value: &OptionValue) -> bool {
+        match value {
+            OptionValue::Toggle(_) => !self.is_choice(),
+            OptionValue::Choice(id) => self.choices.iter().any(|choice| &choice.id == id),
+        }
+    }
+
+    /// The state in effect: the saved one when this option still accepts it (a recipe update may
+    /// have renamed a choice), else the default.
+    pub fn current<'a>(&'a self, saved: Option<&'a OptionValue>) -> &'a OptionValue {
+        saved
+            .filter(|value| self.accepts(value))
+            .unwrap_or(&self.default_value)
+    }
+
+    /// The state that leaves the page alone: a switch off, or the first choice.
+    pub fn off_value(&self) -> OptionValue {
+        match self.choices.first() {
+            Some(first) => OptionValue::Choice(first.id.clone()),
+            None => OptionValue::Toggle(false),
+        }
+    }
+
+    /// A switch has a boolean default and no choices; a choice option has 2 to 4 distinct,
+    /// short choices and names one of them as its default.
+    fn has_valid_states(&self) -> bool {
+        if !self.is_choice() {
+            return matches!(self.default_value, OptionValue::Toggle(_));
+        }
+        let mut seen = HashSet::new();
+        (MIN_CHOICES..=MAX_CHOICES).contains(&self.choices.len())
+            && self.choices.iter().all(|choice| {
+                !choice.id.is_empty()
+                    && choice
+                        .id
+                        .chars()
+                        .all(|c| c.is_ascii_lowercase() || c.is_ascii_digit() || c == '-')
+                    && !choice.label.trim().is_empty()
+                    && choice.label.chars().count() <= MAX_CHOICE_LABEL_CHARS
+                    && seen.insert(choice.id.as_str())
+            })
+            && matches!(&self.default_value, OptionValue::Choice(id)
+                if self.choices.iter().any(|choice| &choice.id == id))
+    }
+
+    /// Whether `value` changes the page (a switch on, or any choice but the first).
+    pub fn is_active(&self, value: &OptionValue) -> bool {
+        *value != self.off_value()
+    }
 }
 
 /// Only a CSS selector for now. The wiki's semantic fields (aria-label, href, text) are refused,
@@ -115,6 +196,9 @@ pub enum Rule {
         label: String,
         #[serde(default, skip_serializing_if = "Option::is_none")]
         option: Option<String>,
+        /// For a rule on a choice option: the choices in which it applies.
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        choice: Option<Vec<String>>,
         /// Narrows the rule to some of the recipe's own `match` patterns (a hub shapes each of its
         /// sites separately); none means every page the recipe matches.
         #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -126,6 +210,9 @@ pub enum Rule {
         label: String,
         #[serde(default, skip_serializing_if = "Option::is_none")]
         option: Option<String>,
+        /// For a rule on a choice option: the choices in which it applies.
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        choice: Option<Vec<String>>,
         #[serde(default, skip_serializing_if = "Option::is_none")]
         on: Option<Vec<String>>,
         target: Target,
@@ -138,6 +225,9 @@ pub enum Rule {
         label: String,
         #[serde(default, skip_serializing_if = "Option::is_none")]
         option: Option<String>,
+        /// For a rule on a choice option: the choices in which it applies.
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        choice: Option<Vec<String>>,
         #[serde(default, skip_serializing_if = "Option::is_none")]
         on: Option<Vec<String>>,
         code: String,
@@ -156,6 +246,15 @@ impl Rule {
         match self {
             Self::Hide { option, .. } | Self::Css { option, .. } | Self::Script { option, .. } => {
                 option.as_deref()
+            }
+        }
+    }
+
+    /// The choices of its option in which this rule applies; `None` for a rule on a switch.
+    pub fn choice(&self) -> Option<&[String]> {
+        match self {
+            Self::Hide { choice, .. } | Self::Css { choice, .. } | Self::Script { choice, .. } => {
+                choice.as_deref()
             }
         }
     }
@@ -213,15 +312,19 @@ impl Recipe {
         self.options.iter().find(|option| option.id == id)
     }
 
-    /// Whether a rule applies, given the user's saved choices for this recipe's options.
-    pub fn rule_applies(&self, rule: &Rule, choices: Option<&BTreeMap<String, bool>>) -> bool {
+    /// Whether a rule applies, given the user's saved values for this recipe's options.
+    pub fn rule_applies(&self, rule: &Rule, saved: Option<&BTreeMap<String, OptionValue>>) -> bool {
         let Some(option) = rule.option().and_then(|id| self.option(id)) else {
             return true;
         };
-        choices
-            .and_then(|saved| saved.get(&option.id))
-            .copied()
-            .unwrap_or(option.enabled_by_default)
+        match (
+            option.current(saved.and_then(|saved| saved.get(&option.id))),
+            rule.choice(),
+        ) {
+            (OptionValue::Toggle(on), None) => *on,
+            (OptionValue::Choice(selected), Some(applies)) => applies.contains(selected),
+            _ => false,
+        }
     }
 
     pub(super) fn validate(&self) -> Result<()> {
@@ -272,6 +375,7 @@ impl Recipe {
                     rule.id()
                 )));
             }
+            self.validate_rule_choice(rule)?;
             if let Some(on) = rule.on()
                 && (on.is_empty() || on.iter().any(|pattern| !self.matches.contains(pattern)))
             {
@@ -445,6 +549,32 @@ impl Recipe {
         Ok(())
     }
 
+    /// A rule on a choice option names the choices it applies in, never the first (that state
+    /// leaves the page alone); a rule on a switch or on no option names none.
+    fn validate_rule_choice(&self, rule: &Rule) -> Result<()> {
+        let invalid = |reason: &str| Error::Recipe(format!("rule {} {reason}", rule.id()));
+        let option = rule.option().and_then(|id| self.option(id));
+        match (option, rule.choice()) {
+            (Some(option), Some(applies)) if option.is_choice() => {
+                let mut seen = HashSet::new();
+                let known = |id: &String| option.choices.iter().skip(1).any(|c| &c.id == id);
+                if applies.is_empty() || !applies.iter().all(|id| known(id) && seen.insert(id)) {
+                    return Err(invalid(
+                        "must list choices of its option, not the first, each once",
+                    ));
+                }
+                Ok(())
+            }
+            (Some(option), None) if option.is_choice() => {
+                Err(invalid("needs a choice because its option is a choice"))
+            }
+            (_, Some(_)) => Err(invalid(
+                "has a choice but its option is not a choice option",
+            )),
+            _ => Ok(()),
+        }
+    }
+
     fn validate_options(&self) -> Result<()> {
         if self.options.len() > MAX_OPTIONS {
             return Err(Error::Recipe(format!(
@@ -462,7 +592,7 @@ impl Recipe {
                 && !option.label.trim().is_empty()
                 && option.label.chars().count() <= MAX_LABEL_CHARS
                 && option.description.chars().count() <= MAX_DESCRIPTION_CHARS;
-            if !well_formed || !seen.insert(option.id.as_str()) {
+            if !well_formed || !seen.insert(option.id.as_str()) || !option.has_valid_states() {
                 return Err(Error::Recipe(format!("option {} is invalid", option.id)));
             }
             if !self

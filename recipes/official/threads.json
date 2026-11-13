@@ -27,6 +27,72 @@
       "description": "The \"Related threads\" block under a post.",
       "group": "content",
       "default": false
+    },
+    {
+      "id": "avatars",
+      "label": "Profile pictures",
+      "description": "Round avatars next to names in feeds and replies. Blur or hide them to read posts without faces.",
+      "group": "content",
+      "choices": [
+        { "id": "show", "label": "Show" },
+        { "id": "blur", "label": "Blur" },
+        { "id": "hide", "label": "Hide" }
+      ],
+      "default": "show"
+    },
+    {
+      "id": "post-media",
+      "label": "Photos, GIFs and videos",
+      "description": "Media attached to posts. Blur hides detail but keeps the layout; Hide leaves an empty box of the same size.",
+      "group": "content",
+      "choices": [
+        { "id": "show", "label": "Show" },
+        { "id": "blur", "label": "Blur" },
+        { "id": "hide", "label": "Hide" }
+      ],
+      "default": "show"
+    },
+    {
+      "id": "post-actions",
+      "label": "Hide the like, reply, repost and share row",
+      "description": "The row of four buttons under every post. Logged out, each one only opens the log-in page.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "counts",
+      "label": "Hide like, reply and repost counts",
+      "description": "The numbers beside the like, comment, repost and share icons. The icons stay.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "topic-tags",
+      "label": "Hide topic tags",
+      "description": "The topic link (for example \"Midterms 2026\") shown beside the author's name on a post.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "verified-badges",
+      "label": "Hide verified badges",
+      "description": "The blue check next to verified names.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "post-times",
+      "label": "Hide post times",
+      "description": "The \"14h\" age shown next to each post. The post link stays.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "instagram-link",
+      "label": "Hide the Instagram link on profiles",
+      "description": "The link to the person's Instagram account in the profile header.",
+      "group": "content",
+      "default": false
     }
   ],
   "rules": [
@@ -74,13 +140,113 @@
       "target": {
         "css": "div[role=\"dialog\"]:has(i[aria-label=\"Instagram\"]):not(:has(a[href*=\"applink.threads.com\"]))"
       }
+    },
+    {
+      "id": "avatars-blur",
+      "label": "Blur profile pictures",
+      "type": "css",
+      "option": "avatars",
+      "choice": ["blur"],
+      "target": {
+        "css": "[data-pressable-container] a > div > img:not([draggable])"
+      },
+      "declarations": {
+        "filter": "blur(6px)"
+      }
+    },
+    {
+      "id": "avatars-hide",
+      "label": "Profile pictures",
+      "type": "hide",
+      "option": "avatars",
+      "choice": ["hide"],
+      "target": {
+        "css": "[data-pressable-container] a > div > img:not([draggable])"
+      }
+    },
+    {
+      "id": "post-media-blur",
+      "label": "Blur post media",
+      "type": "css",
+      "option": "post-media",
+      "choice": ["blur"],
+      "target": {
+        "css": "[data-pressable-container] img[draggable=\"false\"], [data-pressable-container] img[aria-hidden=\"true\"], [data-pressable-container] video"
+      },
+      "declarations": {
+        "filter": "blur(18px)"
+      }
+    },
+    {
+      "id": "post-media-hide",
+      "label": "Post media",
+      "type": "hide",
+      "option": "post-media",
+      "choice": ["hide"],
+      "target": {
+        "css": "[data-pressable-container] img[draggable=\"false\"], [data-pressable-container] img[aria-hidden=\"true\"], [data-pressable-container] video"
+      }
+    },
+    {
+      "id": "post-actions-row",
+      "label": "Like, comment, repost and share row",
+      "type": "hide",
+      "option": "post-actions",
+      "target": {
+        "css": "[data-pressable-container] div:has(> div > div[role=\"button\"] > div > div > svg + span[dir=\"auto\"])"
+      }
+    },
+    {
+      "id": "count-numbers",
+      "label": "Like, comment, repost and share counts",
+      "type": "hide",
+      "option": "counts",
+      "target": {
+        "css": "[data-pressable-container] div[role=\"button\"] > div > div > svg + span[dir=\"auto\"]"
+      }
+    },
+    {
+      "id": "topic-tag-pill",
+      "label": "Topic tag beside the name",
+      "type": "hide",
+      "option": "topic-tags",
+      "target": {
+        "css": "div:has(> div > a[href*=\"serp_type=tags\"])"
+      }
+    },
+    {
+      "id": "verified-check",
+      "label": "Verified check",
+      "type": "hide",
+      "option": "verified-badges",
+      "target": {
+        "css": "svg[aria-label=\"Verified\"]"
+      }
+    },
+    {
+      "id": "post-time",
+      "label": "Post age",
+      "type": "hide",
+      "option": "post-times",
+      "target": {
+        "css": "[data-pressable-container] time"
+      }
+    },
+    {
+      "id": "instagram-profile-link",
+      "label": "Instagram link in the profile header",
+      "type": "hide",
+      "option": "instagram-link",
+      "target": {
+        "css": "#barcelona-page-layout div:has(> a[href^=\"https://www.instagram.com/\"])"
+      }
     }
   ],
   "meta": {
     "author": "OpenMedia",
     "homepage": "https://www.threads.com/",
-    "lastVerified": "2026-11-10",
-    "summary": "Hides \"open the app\" prompts, \"log in to see more\" notices, related threads",
-    "notes": "LIVE (logged out, iPhone UA 390x844, headless Chromium, 2026-11-07): www.threads.com serves the mobile web app - header #barcelona-header, bottom nav, #scrollview - and every fresh load puts a modal sheet over the page: 'Thread on Threads / There's more to do, see and chat about in the app.' with an 'Open Threads' link (a[download] to applink.threads.com) and 'Continue with Instagram'. open-app-sheet matches the body-level wrapper that holds that sheet (1 match on /, /@zuck and a post page); the sheet and the dim backdrop are both inside it, so hiding it removes both, and the page behind still scrolls (no scroll lock was seen: html overflow auto, body visible), so no unlock rule is needed. get-app-header matches the 'Get app' App Store link wrapper in the header (1 match on the same three pages; the desktop layout has no #barcelona-header). login-wall-notice matches 'Log in to see more replies.' on a post (1) and 'Log in to see more from <user>.' on a profile (1); the login link is /login on the profile and /login?show_choice_screen=false&variant=username on the post, so the rule keys on the span+div shape and an href starting with /login. The bottom-nav login entry (a[href='/login/']) and the header 'Log in' button are not matched. related-threads-block matches the section that holds the 'Related threads' heading and the five threads_logged_out_related_posts_* pagelets (1 on a post, 0 on / and /@zuck). The 'Say more with Threads' login sheet (a[aria-label='Open Threads'] to applink.threads.com, no download attribute) is deliberately NOT matched: the two sheets live in separate body-level wrappers, so the login path stays. Not verified: logged-in pages (no account was available), WKWebView rendering, the desktop layout (it shows the login sheet instead of the open-app sheet), other routes (search, notifications, post composer), ads (none were served to the logged-out session) and suggested accounts (none were shown). DESKTOP (macOS Safari UA, logged out, live in the app, 2026-11-10): www.threads.com shows a Say more with Threads dialog over the feed (role=dialog with a Continue with Instagram button and no links); login-dialog matched it and leaves the mobile sheet alone (it carries an applink.threads.com link)."
+    "lastVerified": "2026-11-13",
+    "summary": "Hides open-app prompts, login notices, related threads; blur or hide avatars and media; counts, actions, tags",
+    "notes": "**LIVE** (logged out, headless Chrome, iPhone UA 390x844 and a 1440 desktop UA, 2026-11-07 and 2026-11-13). `www.threads.com` serves a mobile-style app (`#barcelona-header`, `#scrollview`, `#barcelona-page-layout`); every fresh load puts a modal sheet over the page.\n\n## Original rules (2026-11-07)\n\n- `open-app-sheet`: `body > div:has(a[download][href*=\"applink.threads.com\"])` matched 1 on `/`, `/@zuck` and a post. It holds the dim backdrop and the card, and nothing scroll-locks behind it.\n- `get-app-header`: the header App Store link, 1 match on the same pages.\n- `login-wall-notice`: \"Log in to see more replies\" (post) and \"...from user\" (profile), 1 each. The header Log in button and the `/login/` nav entry are not matched.\n- `related-threads-block`: 1 on a post, 0 on `/` and profiles.\n- `login-dialog`: the desktop \"Say more with Threads\" sheet. The log-in link stays in the header.\n\n## Added 2026-11-13\n\nAll counts were taken on `/@zuck` (27 posts, desktop counts in brackets are from `/`).\n\n- `avatars` (choice show/blur/hide): `[data-pressable-container] a > div > img:not([draggable])` matched 28 (the 36 px avatars; media images carry `draggable=\"false\"`). The 64 px header avatar is outside a post and is left alone. The `alt` text is localized and `@` is not allowed in selectors, so neither is used.\n- `post-media` (choice): `[data-pressable-container] img[draggable=\"false\"], ... img[aria-hidden=\"true\"], ... video` matched 28 (24 images and 4 videos); with the avatars that is all 52 images in posts. Hiding the `img` leaves the sized box: measured, the post only collapsed when a hashed-class carousel ancestor ten levels up was hidden, which has no stable selector. Hence \"Hide leaves an empty box\".\n- `post-actions-row`: `div:has(> div > div[role=\"button\"] > div > div > svg + span[dir=\"auto\"])` matched exactly one row per post (5 of 5 loaded) and removing it shrank the post from 325 to 289 px.\n- `count-numbers`: `... div[role=\"button\"] > div > div > svg + span[dir=\"auto\"]` matched 107 on the profile (four per post), 19 on `/` desktop. \"Follow\" and \"Mention\" buttons have no svg+span and are not matched.\n- `topic-tag-pill`: `div:has(> div > a[href*=\"serp_type=tags\"])` matched 6 on the profile and 3 on `/` desktop. Inline hashtags in post text have the same href but sit in a different shape and were not seen matched.\n- `verified-check`: `svg[aria-label=\"Verified\"]` matched 1 on `/@zuck`. The label is localized, so it only works in English.\n- `post-time`: 5 to 28 `time` elements depending on how far the feed had loaded.\n- `instagram-link`: 1 on `/@zuck` (the profile header link), 0 on `/`.\n\n## Not verified\n\n- Logged-in pages, WKWebView, the Replies, Reposts and Media tabs, and a reply thread (`threads_post_page_{n}` looked like replies but could not be told apart from the post continuation, so no replies option ships).\n- The fixture `post-details.html` is a hand-condensed copy of the observed structure (picture and carousel wrappers reduced), not a raw capture.\n"
   }
 }
