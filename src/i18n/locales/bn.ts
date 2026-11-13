@@ -580,6 +580,7 @@ export const bn: Messages = {
   "tabs.open": "খোলা সাইট",
   "tabs.openEmpty": "কোনো সাইট খোলা নেই।",
   "tabs.closeOthers": "অন্য সাইটগুলো বন্ধ করুন",
+  "tabs.newTab": "নতুন ট্যাব",
   "tabs.closeNote": "সাইট বন্ধ করলে শুধু তার খোলা পেজ শেষ হয়। আপনার প্রিয় ও ইতিহাস থেকে যায়।",
   "tabs.closeOne": "{name} বন্ধ করুন",
   "tabs.quickAccess": "দ্রুত অ্যাক্সেস",

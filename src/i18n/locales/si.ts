@@ -583,6 +583,7 @@ export const si: Messages = {
   "tabs.open": "විවෘත අඩවි",
   "tabs.openEmpty": "කිසිදු අඩවියක් විවෘත නැත.",
   "tabs.closeOthers": "අනෙක් අඩවි වසන්න",
+  "tabs.newTab": "නව ටැබය",
   "tabs.closeNote":
     "අඩවියක් වැසීමෙන් එහි විවෘත පිටුව පමණක් අවසන් වේ. ඔබේ ප්‍රියතම සහ ඉතිහාසය ඉතිරි වේ.",
   "tabs.closeOne": "{name} වසන්න",

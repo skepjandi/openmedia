@@ -582,6 +582,7 @@ export const hi: Messages = {
   "tabs.open": "खुली साइटें",
   "tabs.openEmpty": "कोई साइट खुली नहीं है।",
   "tabs.closeOthers": "बाकी साइटें बंद करें",
+  "tabs.newTab": "नया टैब",
   "tabs.closeNote":
     "साइट बंद करने से केवल उसका खुला पृष्ठ समाप्त होता है। आपके पसंदीदा और इतिहास बने रहते हैं।",
   "tabs.closeOne": "{name} बंद करें",

@@ -601,6 +601,7 @@ export const ta: Messages = {
   "tabs.open": "திறந்த தளங்கள்",
   "tabs.openEmpty": "எந்த தளமும் திறக்கப்படவில்லை.",
   "tabs.closeOthers": "மற்ற தளங்களை மூடு",
+  "tabs.newTab": "புதிய தாவல்",
   "tabs.closeNote":
     "தளத்தை மூடினால் அதன் திறந்த பக்கம் மட்டுமே முடிகிறது. உங்கள் பிடித்தவை மற்றும் வரலாறு இருக்கும்.",
   "tabs.closeOne": "{name} ஐ மூடு",

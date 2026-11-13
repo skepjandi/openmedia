@@ -582,6 +582,7 @@ export const en = {
   "tabs.open": "Open sites",
   "tabs.openEmpty": "No site is open.",
   "tabs.closeOthers": "Close the other sites",
+  "tabs.newTab": "New tab",
   "tabs.closeNote": "Closing a site only ends its open page. Your favorites and history stay.",
   "tabs.closeOne": "Close {name}",
   "tabs.quickAccess": "Quick access",

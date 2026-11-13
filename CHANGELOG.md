@@ -16,6 +16,14 @@ All notable changes to OpenMedia are documented here.
 
 **PR:** n/a
 
+### feat(tabs): a New tab button on the Tabs page
+
+**Area:** `feat(tabs)`
+
+**Change:** The Tabs page has a New tab button above the open sites. It shows an empty page and opens the command bar on it; the open sites stay alive and listed. Opening an address, a search, a favorite, a history entry or an open site replaces the empty page. While it shows, the app treats the screen as having no page (Back, usage tracking and the assistant ignore the hidden site). One new string, `tabs.newTab`, in all 29 locales; the 28 non-English versions are mine and need a native-speaker review. Google was already the default search engine (Rust `SearchEngine::default` and `DEFAULT_SEARCH_ENGINE`); a library that saved another engine keeps it.
+
+**Verified:** `tsc`, ESLint, Prettier, new store tests for the New tab flow. **Not verified:** the layout and the empty page covering a live site on a device or simulator.
+
 ### feat(recipes): 300 official recipes and category filters in the library
 
 **Area:** `feat(recipes)`

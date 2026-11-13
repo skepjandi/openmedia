@@ -595,6 +595,7 @@ export const es: Messages = {
   "tabs.open": "Sitios abiertos",
   "tabs.openEmpty": "No hay ningún sitio abierto.",
   "tabs.closeOthers": "Cerrar los demás sitios",
+  "tabs.newTab": "Nueva pestaña",
   "tabs.closeNote":
     "Cerrar un sitio solo termina su página abierta. Tus favoritos y tu historial se conservan.",
   "tabs.closeOne": "Cerrar {name}",

@@ -25,7 +25,7 @@ export function WebLayer() {
   const slot = useRef<HTMLDivElement>(null);
   const profileId = useApp((s) => s.state?.profileId);
   const action = useApp((s) => s.action);
-  const hasSession = useApp((s) => s.activeId !== null);
+  const showEmpty = useApp((s) => s.activeId === null || s.blankTab);
   const opening = useApp((s) => s.error === null && !pageShowing(selectPage(s)));
   const setSessionState = useApp((s) => s.setSessionState);
   const sessionOpenFailed = useApp((s) => s.sessionOpenFailed);
@@ -135,8 +135,11 @@ export function WebLayer() {
 
   return (
     <>
-      {!hasSession && (
-        <div className="fixed inset-0 grid place-items-center bg-ink p-10 text-center text-paper/60">
+      {showEmpty && (
+        <div
+          data-hit=""
+          className="fixed inset-0 grid place-items-center bg-ink p-10 text-center text-paper/60"
+        >
           <p className="max-w-60 text-sm leading-relaxed">{t("web.emptyHint")}</p>
         </div>
       )}

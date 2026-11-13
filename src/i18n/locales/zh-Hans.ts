@@ -546,6 +546,7 @@ export const zhHans: Messages = {
   "tabs.open": "已打开的网站",
   "tabs.openEmpty": "没有打开的网站。",
   "tabs.closeOthers": "关闭其他网站",
+  "tabs.newTab": "新标签页",
   "tabs.closeNote": "关闭网站只会结束它已打开的页面。你的收藏和历史记录会保留。",
   "tabs.closeOne": "关闭{name}",
   "tabs.quickAccess": "快速访问",
