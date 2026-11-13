@@ -37,7 +37,7 @@ export function StatsSheet() {
       <div
         role="tablist"
         aria-label={t("stats.title")}
-        className="mb-6 flex rounded-full bg-paper/[0.07] p-1"
+        className="mb-6 flex gap-7 border-b border-hair"
       >
         {TABS.map(({ id, label }) => (
           <button
@@ -46,8 +46,8 @@ export function StatsSheet() {
             role="tab"
             aria-selected={tab === id}
             onClick={() => setTab(id)}
-            className={`flex-1 rounded-full py-2.5 text-base font-semibold ${
-              tab === id ? "bg-paper/[0.14] text-paper" : "text-paper/55"
+            className={`-mb-px border-b-2 px-1 pb-3 text-base font-semibold ${
+              tab === id ? "border-accent text-paper" : "border-transparent text-paper/50"
             }`}
           >
             {t(label)}

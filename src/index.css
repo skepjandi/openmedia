@@ -13,6 +13,8 @@
   --color-on-accent: #04101f;
   --color-navy: #021669;
   --color-hair: rgb(190 220 255 / 0.16);
+  --color-warn: #fbbf24;
+  --color-danger: #f87171;
   --ease-spring: cubic-bezier(0.22, 1.5, 0.36, 1);
 }
 
@@ -31,6 +33,8 @@
   --color-ink: #f4f7fc;
   --color-paper: #0b1220;
   --color-hair: rgb(11 18 32 / 0.14);
+  --color-warn: #b45309;
+  --color-danger: #dc2626;
   --glass: rgb(255 255 255 / 0.74);
   --glass-shadow: rgb(11 18 32 / 0.18);
   color-scheme: light;
@@ -365,6 +369,29 @@ svg {
   .fab-peek {
     animation: none;
   }
+}
+
+/* A small label above a block: usage totals, settings sections. Letter-spacing breaks the joined
+   shapes of cursive and Indic scripts, so those languages get none. */
+.eyebrow {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--color-paper) 55%, transparent);
+}
+
+.eyebrow:is(:lang(ar), :lang(ur), :lang(hi), :lang(bn), :lang(ta), :lang(si), :lang(th)) {
+  letter-spacing: 0;
+}
+
+/* Horizontal chip rows scroll instead of wrapping; the scrollbar is noise on a phone. */
+.chip-row {
+  scrollbar-width: none;
+}
+
+.chip-row::-webkit-scrollbar {
+  display: none;
 }
 
 /* Duration sliders: a filled track and a thumb big enough for a finger. `--fill` is set inline. */

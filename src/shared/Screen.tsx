@@ -47,11 +47,11 @@ export function Screen({
         {back && button}
         <div className="min-w-0 flex-1">
           <h1 className="text-[2rem] leading-none font-semibold tracking-tight">{title}</h1>
-          {subtitle && <p className="mt-2 truncate text-sm text-paper/55">{subtitle}</p>}
+          {subtitle && <p className="mt-2 line-clamp-2 text-sm text-paper/55">{subtitle}</p>}
         </div>
         {!back && button}
       </header>
-      <div className="flex-1 overflow-y-auto overscroll-contain px-4 pt-6 pb-[calc(var(--safe-bottom)+40px)]">
+      <div className="flex-1 overflow-y-auto overscroll-contain px-4 pt-6 pb-[calc(var(--safe-bottom)+96px)]">
         {children}
       </div>
     </div>

@@ -66,11 +66,13 @@ export function RecipesScreen() {
 
   return (
     <Screen title={t("recipes.title")} closeLabel={t("common.back")} onClose={closeSheet} back>
-      <p className="px-1 pb-4 text-[13px] leading-snug text-paper/50">
-        {t("recipes.note")} <GuideLink slug="your-recipe" labelKey="guides.makeRecipe" inline />
-        {" · "}
-        <GuideLink slug="change-a-site" labelKey="guides.customizeSite" inline />
-      </p>
+      <div className="mb-6 rounded-2xl border border-hair bg-paper/[0.04] p-4">
+        <p className="text-sm leading-relaxed text-paper/65">{t("recipes.note")}</p>
+        <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1">
+          <GuideLink slug="your-recipe" labelKey="guides.makeRecipe" />
+          <GuideLink slug="change-a-site" labelKey="guides.customizeSite" />
+        </div>
+      </div>
       {sites.length === 0 && (
         <div className="flex flex-col items-start gap-3 px-1">
           <p className="text-sm text-paper/70">{t("recipes.empty")}</p>

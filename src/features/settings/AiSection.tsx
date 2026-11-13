@@ -435,7 +435,7 @@ function ProviderForm({ initial, onClose, onChanged }: FormProps) {
         {draft.id && (
           <button
             type="button"
-            className={`${quietButton} ms-auto text-red-400`}
+            className={`${quietButton} ms-auto text-danger`}
             disabled={busy}
             onClick={() => void remove()}
           >

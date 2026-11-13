@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { Screen } from "../../shared/Screen";
+import { ProIcon } from "../../shared/icons";
 import { appError, useApp } from "../../app/store";
 import { library } from "../../shared/ipc";
 import { useT } from "../../i18n/useT";
@@ -73,11 +74,18 @@ export function PaywallSheet() {
                       closeSheet();
                   })
                 }
-                className={`w-full rounded-2xl border p-4 text-start disabled:opacity-45 ${index === 0 ? "border-accent bg-accent/10" : "border-hair bg-paper/[0.04]"}`}
+                className={`w-full rounded-2xl border p-4 text-start transition-colors disabled:opacity-45 ${index === 0 ? "border-accent/60 bg-accent/[0.08]" : "border-hair bg-paper/[0.04]"}`}
               >
                 <span className="flex items-center justify-between gap-4">
-                  <span className="font-semibold">{label}</span>
-                  <span className="text-sm text-paper/75">
+                  <span className="flex min-w-0 items-center gap-3">
+                    {index === 0 && (
+                      <span className="grid size-8 shrink-0 place-items-center rounded-full bg-accent/15 text-accent">
+                        <ProIcon size={16} />
+                      </span>
+                    )}
+                    <span className="font-semibold">{label}</span>
+                  </span>
+                  <span className="shrink-0 text-sm font-semibold tabular-nums text-paper/75">
                     {item ? t(priceKey, { price: item.price }) : "—"}
                   </span>
                 </span>
@@ -100,7 +108,7 @@ export function PaywallSheet() {
             <p className="text-center text-sm text-paper/60">{t("paywall.empty")}</p>
           )}
           {error && (
-            <p role="status" className="text-sm text-red-300">
+            <p role="status" className="text-sm text-danger">
               {showError}
             </p>
           )}

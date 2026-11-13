@@ -447,11 +447,7 @@ function FavoriteEditor({
           {t("common.cancel")}
         </button>
         {onRemove && (
-          <button
-            type="button"
-            onClick={onRemove}
-            className={`${quietButton} ms-auto text-red-400`}
-          >
+          <button type="button" onClick={onRemove} className={`${quietButton} ms-auto text-danger`}>
             {t("common.remove")}
           </button>
         )}

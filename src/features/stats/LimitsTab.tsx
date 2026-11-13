@@ -3,7 +3,8 @@ import { useApp } from "../../app/store";
 import { describeError } from "../../i18n/errors";
 import type { Translate } from "../../i18n/translate";
 import { useT } from "../../i18n/useT";
-import { DownIcon, PlusIcon } from "../../shared/icons";
+import { Chevron } from "../../shared/Chevron";
+import { PlusIcon } from "../../shared/icons";
 import { usage } from "../../shared/ipc";
 import { Group, GroupLabel, field, primaryButton } from "../settings/ui";
 import { formatDuration, localDay, sectionLabel } from "./format";
@@ -51,9 +52,9 @@ function StatusChip({ policy, spent }: { policy: UsagePolicy | undefined; spent:
         : "";
   if (!text) return null;
   const tone = reached
-    ? "bg-red-400/15 text-red-500"
+    ? "bg-danger/15 text-danger"
     : status.state === "warned"
-      ? "bg-amber-400/15 text-amber-500"
+      ? "bg-warn/15 text-warn"
       : "bg-paper/[0.08] text-paper/70";
   return (
     <span className={`shrink-0 rounded-full px-2.5 py-1 text-xs font-medium tabular-nums ${tone}`}>
@@ -151,9 +152,7 @@ function LimitRow({
           <span className="block text-sm leading-snug text-paper/55">{summaryOf(policy, t)}</span>
         </span>
         <StatusChip policy={policy} spent={spent} />
-        <span aria-hidden="true" className={`text-paper/45 ${open ? "rotate-180" : ""}`}>
-          <DownIcon />
-        </span>
+        <Chevron open={open} />
       </button>
       {open && (
         <>
@@ -230,7 +229,7 @@ function AddSite({ suggestions, onAdd }: AddSiteProps) {
         </button>
       </form>
       {error && (
-        <p role="alert" className="mt-2 px-1 text-sm text-red-500">
+        <p role="alert" className="mt-2 px-1 text-sm text-danger">
           {error}
         </p>
       )}

@@ -179,14 +179,18 @@ function ListView({
         spellCheck={false}
         className={field}
       />
-      <div role="group" aria-label={t("library.filters")} className="flex flex-wrap gap-2 px-1">
+      <div
+        role="group"
+        aria-label={t("library.filters")}
+        className="chip-row -mx-4 flex gap-2 overflow-x-auto px-4 pb-1"
+      >
         {FILTER_TAGS.map((tag) => (
           <button
             key={tag}
             type="button"
             aria-pressed={filter.has(tag)}
             onClick={() => onToggleTag(tag)}
-            className={`rounded-full border px-3.5 py-1.5 text-sm font-medium ${
+            className={`shrink-0 rounded-full border px-3.5 py-1.5 text-sm font-medium ${
               filter.has(tag)
                 ? "border-accent bg-accent text-on-accent"
                 : "border-hair text-paper/75"

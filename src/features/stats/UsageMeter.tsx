@@ -7,15 +7,16 @@ import type { UsagePolicy } from "./policy";
 const FILL: Record<LimitStatus["state"], string> = {
   none: "bg-accent",
   ok: "bg-accent",
-  warned: "bg-amber-400",
-  reached: "bg-red-400",
+  warned: "bg-warn",
+  reached: "bg-danger",
 };
 
-const TEXT: Record<LimitStatus["state"], string> = {
+/** The colour of the sentence that says where a limit stands. */
+export const STATUS_TEXT: Record<LimitStatus["state"], string> = {
   none: "text-paper/55",
   ok: "text-paper/70",
-  warned: "text-amber-500",
-  reached: "text-red-500",
+  warned: "text-warn",
+  reached: "text-danger",
 };
 
 /** One line saying where today stands against the limit. Empty when nothing is set. */
@@ -59,7 +60,7 @@ export function UsageMeter({ spentSeconds, policy, compact = false }: UsageMeter
         used: formatDuration(spent, t),
         status: statusText(status, t),
       })}
-      className={`relative rounded-full bg-paper/12 ${compact ? "h-1" : "h-2"}`}
+      className={`relative rounded-full bg-paper/12 ${compact ? "h-1.5" : "h-2"}`}
     >
       <div
         className={`h-full rounded-full transition-[width] duration-300 ${FILL[status.state]}`}
@@ -88,7 +89,7 @@ export function MeterCaption({
   const status = limitStatus(policy, spentSeconds);
   const today = t("usage.todayValue", { value: formatDuration(Math.floor(spentSeconds), t) });
   return (
-    <p className={`text-sm tabular-nums ${TEXT[status.state]}`}>
+    <p className={`text-sm tabular-nums ${STATUS_TEXT[status.state]}`}>
       {status.state === "none"
         ? today
         : t("usage.todayStatus", {

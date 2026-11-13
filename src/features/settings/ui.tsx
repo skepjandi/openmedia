@@ -1,5 +1,6 @@
 import { useEffect, useState, type ReactNode } from "react";
-import { ProIcon } from "../../shared/icons";
+import { Chevron } from "../../shared/Chevron";
+import { DownIcon, ProIcon } from "../../shared/icons";
 import { BiometricIcon } from "../incognito/BiometricIcon";
 
 export const field =
@@ -10,6 +11,10 @@ export const primaryButton =
 
 export const quietButton =
   "rounded-full border border-hair px-4 py-2 text-sm font-medium text-paper/85 disabled:opacity-40";
+
+/** The confirming step of something that erases data: red, so it never looks like a plain "OK". */
+export const dangerButton =
+  "rounded-full bg-danger/15 px-5 py-2 text-sm font-semibold text-danger disabled:opacity-40";
 
 /** Full-width, equal-height variants for button stacks at the bottom of a page. */
 export const quietBlockButton = `flex min-h-11 w-full items-center justify-center gap-2 ${quietButton}`;
@@ -29,10 +34,13 @@ interface SectionProps {
 export function Section({ title, note, defaultOpen = true, children }: SectionProps) {
   return (
     <details className="group" open={defaultOpen}>
-      <summary className="flex cursor-pointer list-none items-center justify-between px-1 py-2 text-sm font-semibold text-paper">
+      <summary className="eyebrow flex cursor-pointer list-none items-center justify-between px-1 py-2">
         <span>{title}</span>
-        <span aria-hidden="true" className="text-paper/45 group-open:rotate-180">
-          ⌄
+        <span
+          aria-hidden="true"
+          className="text-paper/45 transition-transform duration-200 group-open:rotate-180"
+        >
+          <DownIcon />
         </span>
       </summary>
       <div className="pt-3">
@@ -121,7 +129,7 @@ export function LockedSection({
         aria-busy={checking}
         disabled={checking}
         onClick={() => void toggle()}
-        className="flex w-full cursor-pointer items-center justify-between px-1 py-2 text-start text-sm font-semibold text-paper disabled:opacity-60"
+        className="eyebrow flex w-full cursor-pointer items-center justify-between px-1 py-2 text-start disabled:opacity-60"
       >
         <span className="flex items-center gap-2">
           {needsPro ? (
@@ -133,11 +141,7 @@ export function LockedSection({
           )}
           {title}
         </span>
-        {!needsPro && (
-          <span aria-hidden="true" className={`text-paper/45 ${open ? "rotate-180" : ""}`}>
-            ⌄
-          </span>
-        )}
+        {!needsPro && <Chevron open={open} />}
       </button>
       {open ? (
         <div className="pt-3">

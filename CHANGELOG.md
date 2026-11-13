@@ -6,6 +6,16 @@ All notable changes to OpenMedia are documented here.
 >
 > **Wiki**: the [GitHub Wiki](https://github.com/skepjandi/openmedia/wiki) is the public-facing main wiki — architecture, recipe format, AI pipeline, security model, roadmap. Source-controlled editing surface is `docs/wiki/` in this repo; CI (`.github/workflows/sync-wiki.yml`) mirrors it to the GitHub Wiki on every merge to `main`. New single-PR changes belong here, not as new wiki pages.
 
+### feat(ui): redesign usage and tighten app screens
+
+**Area:** `feat(ui)`
+
+**Change:** Usage now leads with a readable total and site-share bar, groups the ranked site list, and gives limit states semantic colors. Shared screen spacing, settings section labels, library filters, recipes guidance, and Pro plan cards receive visual polish.
+
+**Verified:** `yarn ts:check`, focused lint/format checks, and browser review at phone width in dark and light themes. **Not verified:** native device rendering.
+
+**PR:** n/a
+
 ## 2026-11-13
 
 ### fix(siteview): a sign-in redirect the page makes from script stays in the app
