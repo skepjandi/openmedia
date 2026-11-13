@@ -357,6 +357,9 @@ export const cs: Messages = {
   "share.github.afterReview":
     "Všichni ho dostanou v aktualizaci poté, co ho tým zkontroluje a schválí.",
   "share.github.continue": "Pokračovat přes GitHub",
+  "share.github.send": "Sdílet recept",
+  "share.github.signedInAs": "Přihlášen na GitHubu jako @{login}",
+  "share.github.signOut": "Nejste to vy? Odhlásit se",
   "share.github.waiting":
     "Přihlaste se k GitHubu v prohlížeči, který se právě otevřel, a pak se vraťte sem.",
   "share.github.working": "Odesílání receptu…",

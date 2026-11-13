@@ -58,7 +58,7 @@ sequenceDiagram
 
 ### Privacy
 
-The app contacts the Worker only when the user taps *Share on GitHub*; the Worker sees the recipe the user chose to share, their GitHub login, numeric id and account creation date, and the connection. It stores the pending session (the recipe, hashed tokens, the result) for at most 15 minutes and a counter row (GitHub id, time) for 2 days. It stores no IP address and does not use Workers Logs. GitHub sees the login and the pull request like any other. Nothing about this reaches the Worker unless the user shares.
+The app contacts the Worker only when the user taps *Share on GitHub*; the Worker sees the recipe the user chose to share, their GitHub login, numeric id and account creation date, and the connection. It stores the pending session (the recipe, hashed tokens, the result) for at most 15 minutes and a counter row (GitHub id, time) for 2 days. After a first sign-in it also keeps, for 90 days or until the user taps *Sign out*, the SHA-256 of a random remember token plus the GitHub login, numeric id and account creation date. The app keeps the token (with the login, to show who is signed in) in the OS secure store and sends it as `X-Remember-Token`; the Worker then shares as that account without opening the browser. It never stores a GitHub token. It stores no IP address and does not use Workers Logs. GitHub sees the login and the pull request like any other. Nothing about this reaches the Worker unless the user shares.
 
 ## Threat model
 

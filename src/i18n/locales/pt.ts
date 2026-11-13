@@ -362,6 +362,9 @@ export const pt: Messages = {
   "share.github.afterReview":
     "Todos a recebem em uma atualização depois que a equipe a revisar e aprovar.",
   "share.github.continue": "Continuar com o GitHub",
+  "share.github.send": "Compartilhar receita",
+  "share.github.signedInAs": "Sessão iniciada no GitHub como @{login}",
+  "share.github.signOut": "Não é você? Terminar sessão",
   "share.github.waiting": "Entre no GitHub no navegador que acabou de abrir e depois volte aqui.",
   "share.github.working": "Enviando sua receita…",
   "share.github.thanks":

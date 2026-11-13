@@ -360,6 +360,9 @@ export const ro: Messages = {
   "share.github.afterReview":
     "Toată lumea o primește într-o actualizare, după ce echipa o verifică și o aprobă.",
   "share.github.continue": "Continuă cu GitHub",
+  "share.github.send": "Distribuie rețeta",
+  "share.github.signedInAs": "Autentificat pe GitHub ca @{login}",
+  "share.github.signOut": "Nu ești tu? Deconectează-te",
   "share.github.waiting":
     "Conectează-te la GitHub în browserul care tocmai s-a deschis, apoi revino aici.",
   "share.github.working": "Se trimite rețeta…",

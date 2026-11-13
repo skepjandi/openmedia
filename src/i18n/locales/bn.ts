@@ -349,6 +349,9 @@ export const bn: Messages = {
     "আপনার রেসিপি ও GitHub ব্যবহারকারীর নাম OpenMedia টিমের কাছে পাঠানো হবে।",
   "share.github.afterReview": "টিম পর্যালোচনা করে অনুমোদন দেওয়ার পর সবাই এটি একটি আপডেটে পাবেন।",
   "share.github.continue": "GitHub দিয়ে চালিয়ে যান",
+  "share.github.send": "রেসিপি শেয়ার করুন",
+  "share.github.signedInAs": "GitHub-এ @{login} হিসেবে সাইন ইন করা আছে",
+  "share.github.signOut": "আপনি নন? সাইন আউট করুন",
   "share.github.waiting": "এইমাত্র খোলা ব্রাউজারে GitHub-এ সাইন ইন করুন, তারপর এখানে ফিরে আসুন।",
   "share.github.working": "আপনার রেসিপি পাঠানো হচ্ছে…",
   "share.github.thanks":

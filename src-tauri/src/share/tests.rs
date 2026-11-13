@@ -13,6 +13,7 @@ use std::{
 };
 
 use super::*;
+use crate::secrets::MemoryStore;
 
 const SHARE_ID: &str = "abcdefghijklmnopqrstuv";
 const POLL_TOKEN: &str = "0123456789012345678901234567890123456789012";
@@ -174,10 +175,17 @@ fn silent() -> Server {
 
 fn start_share(shares: &Shares, recipes: &Recipes, summary: &str) -> (Result<String>, Vec<String>) {
     let opened = Mutex::new(Vec::new());
-    let result = run(start(shares, recipes, "custom.calm", summary, |url| {
-        opened.lock().unwrap().push(url.to_owned());
-        Ok(())
-    }));
+    let result = run(start(
+        shares,
+        recipes,
+        &MemoryStore::default(),
+        "custom.calm",
+        summary,
+        |url| {
+            opened.lock().unwrap().push(url.to_owned());
+            Ok(())
+        },
+    ));
     (result, opened.into_inner().unwrap())
 }
 
@@ -219,7 +227,7 @@ fn a_status_follows_the_share_and_keeps_only_a_real_pull_request_address() {
     )]));
     let shares = server.shares();
     shares.insert(SHARE_ID.into(), POLL_TOKEN.into());
-    let seen = run(status(&shares, SHARE_ID)).unwrap();
+    let seen = run(status(&shares, &MemoryStore::default(), SHARE_ID)).unwrap();
     assert_eq!(seen.state, ShareState::Done);
     assert_eq!(seen.pr_url.as_deref(), Some(PR));
     assert_eq!(seen.login.as_deref(), Some("ada-l"));
@@ -235,7 +243,7 @@ fn a_status_follows_the_share_and_keeps_only_a_real_pull_request_address() {
     assert_eq!(opened.into_inner().unwrap(), [PR]);
 
     shares.cancel(SHARE_ID);
-    let gone = run(status(&shares, SHARE_ID)).unwrap();
+    let gone = run(status(&shares, &MemoryStore::default(), SHARE_ID)).unwrap();
     assert_eq!(gone.state, ShareState::Failed);
     assert!(open_pull_request(&shares, SHARE_ID, |_| Ok(())).is_err());
 }
@@ -264,7 +272,7 @@ fn a_malicious_pull_request_address_or_login_is_dropped_and_never_opened() {
         )]));
         let shares = server.shares();
         shares.insert(SHARE_ID.into(), POLL_TOKEN.into());
-        let seen = run(status(&shares, SHARE_ID)).unwrap();
+        let seen = run(status(&shares, &MemoryStore::default(), SHARE_ID)).unwrap();
         assert_eq!(seen.pr_url, None, "{pr}");
         assert_eq!(seen.login, None);
         assert_eq!(seen.error, None);
@@ -294,7 +302,7 @@ fn a_failed_share_shows_a_sentence_written_here_with_a_stable_code() {
         )]));
         let shares = server.shares();
         shares.insert(SHARE_ID.into(), POLL_TOKEN.into());
-        let seen = run(status(&shares, SHARE_ID)).unwrap();
+        let seen = run(status(&shares, &MemoryStore::default(), SHARE_ID)).unwrap();
         assert_eq!(seen.state, ShareState::Failed);
         assert_eq!(seen.error_code, Some(expected));
         assert_eq!(seen.error.as_deref(), Some(sentence));
@@ -307,7 +315,7 @@ fn an_unknown_state_or_a_gone_share_is_not_trusted() {
     let server = Server::start(routes(&[(&format!("GET /v1/shares/{SHARE_ID}"), 200, odd)]));
     let shares = server.shares();
     shares.insert(SHARE_ID.into(), POLL_TOKEN.into());
-    assert!(run(status(&shares, SHARE_ID)).is_err());
+    assert!(run(status(&shares, &MemoryStore::default(), SHARE_ID)).is_err());
 
     let server = Server::start(routes(&[(
         &format!("GET /v1/shares/{SHARE_ID}"),
@@ -316,10 +324,15 @@ fn an_unknown_state_or_a_gone_share_is_not_trusted() {
     )]));
     let shares = server.shares();
     shares.insert(SHARE_ID.into(), POLL_TOKEN.into());
-    let gone = run(status(&shares, SHARE_ID)).unwrap();
+    let gone = run(status(&shares, &MemoryStore::default(), SHARE_ID)).unwrap();
     assert_eq!(gone.error.as_deref(), Some(messages::EXPIRED));
 
-    let unknown = run(status(&shares, "zzzzzzzzzzzzzzzzzzzzzz")).unwrap();
+    let unknown = run(status(
+        &shares,
+        &MemoryStore::default(),
+        "zzzzzzzzzzzzzzzzzzzzzz",
+    ))
+    .unwrap();
     assert_eq!(unknown.state, ShareState::Failed);
 }
 
@@ -357,7 +370,17 @@ fn only_the_users_own_recipes_with_a_summary_that_fits_are_sent() {
 }
 
 fn run_for(shares: &Shares, recipes: &Recipes, id: &str, summary: &str) -> (Result<String>, ()) {
-    (run(start(shares, recipes, id, summary, |_| Ok(()))), ())
+    (
+        run(start(
+            shares,
+            recipes,
+            &MemoryStore::default(),
+            id,
+            summary,
+            |_| Ok(()),
+        )),
+        (),
+    )
 }
 
 #[test]
@@ -436,9 +459,14 @@ fn a_browser_that_will_not_open_drops_the_share() {
     let server = Server::start_with(|port| routes(&[("POST /v1/shares", 201, created(port))]));
     let (_dir, recipes) = recipes_with(&custom(""));
     let shares = server.shares();
-    let result = run(start(&shares, &recipes, "custom.calm", "Tidy", |_| {
-        Err(Error::Share("x".into()))
-    }));
+    let result = run(start(
+        &shares,
+        &recipes,
+        &MemoryStore::default(),
+        "custom.calm",
+        "Tidy",
+        |_| Err(Error::Share("x".into())),
+    ));
     assert!(matches!(result, Err(Error::Share(text)) if text == messages::BROWSER));
     assert!(shares.sessions().is_empty());
 }
@@ -493,4 +521,149 @@ fn only_a_github_pull_request_address_has_the_right_shape() {
     for bad in ["", "a b", "a_b", "<x>", &"a".repeat(40)] {
         assert!(!is_login(bad), "{bad}");
     }
+}
+
+const REMEMBER_TOKEN: &str = "abcdefghijabcdefghijabcdefghijabcdefghijabc";
+
+fn remembering(login: &str) -> MemoryStore {
+    let store = MemoryStore::default();
+    store
+        .set(REMEMBERED_SECRET, &format!("{login}:{REMEMBER_TOKEN}"))
+        .unwrap();
+    store
+}
+
+fn done_with_token(login: &str) -> String {
+    format!(
+        r#"{{"state":"done","prUrl":"{PR}","login":"{login}","error":null,"errorCode":null,"rememberToken":"{REMEMBER_TOKEN}"}}"#
+    )
+}
+
+#[test]
+fn the_token_after_a_sign_in_is_kept_with_its_login_and_sent_on_the_next_share() {
+    let server = Server::start_with(|port| {
+        routes(&[
+            (
+                "GET /v1/shares/abcdefghijklmnopqrstuv",
+                200,
+                done_with_token("ada-l"),
+            ),
+            ("POST /v1/shares", 201, created(port)),
+        ])
+    });
+    let (_dir, recipes) = recipes_with(&custom(""));
+    let shares = server.shares();
+    let store = MemoryStore::default();
+    assert_eq!(account(&store), None);
+
+    run(start(
+        &shares,
+        &recipes,
+        &store,
+        "custom.calm",
+        "Tidy",
+        |_| Ok(()),
+    ))
+    .unwrap();
+    assert!(!server.hits()[0].contains("x-remember-token"));
+    let seen = run(status(&shares, &store, SHARE_ID)).unwrap();
+    assert_eq!(seen.login.as_deref(), Some("ada-l"));
+    assert_eq!(account(&store).as_deref(), Some("ada-l"));
+    let shown = serde_json::to_string(&seen).unwrap();
+    assert!(!shown.contains(REMEMBER_TOKEN), "{shown}");
+
+    run(start(
+        &shares,
+        &recipes,
+        &store,
+        "custom.calm",
+        "Tidy",
+        |_| Ok(()),
+    ))
+    .unwrap();
+    let hits = server.hits();
+    assert!(hits[2].contains(&format!("x-remember-token: {REMEMBER_TOKEN}")));
+}
+
+#[test]
+fn a_remembered_share_opens_no_browser() {
+    let body = format!(
+        r#"{{"id":"{SHARE_ID}","pollToken":"{POLL_TOKEN}","loginUrl":null,"login":"ada-l"}}"#
+    );
+    let server = Server::start(routes(&[("POST /v1/shares", 201, body)]));
+    let (_dir, recipes) = recipes_with(&custom(""));
+    let shares = server.shares();
+    let opened = Mutex::new(Vec::new());
+    let id = run(start(
+        &shares,
+        &recipes,
+        &remembering("ada-l"),
+        "custom.calm",
+        "Tidy",
+        |url| {
+            opened.lock().unwrap().push(url.to_owned());
+            Ok(())
+        },
+    ))
+    .unwrap();
+    assert_eq!(id, SHARE_ID);
+    assert!(opened.into_inner().unwrap().is_empty());
+    assert!(shares.sessions().contains_key(SHARE_ID));
+}
+
+#[test]
+fn a_token_or_login_of_the_wrong_shape_is_never_kept() {
+    for (token, login) in [
+        ("short", "ada-l"),
+        (REMEMBER_TOKEN, "not a login"),
+        ("<script>alert(1)</script>abcdefghijabcdefghijab", "ada-l"),
+    ] {
+        let reply = format!(
+            r#"{{"state":"done","prUrl":"{PR}","login":"{login}","errorCode":null,"rememberToken":"{token}"}}"#
+        );
+        let server = Server::start(routes(&[(
+            &format!("GET /v1/shares/{SHARE_ID}"),
+            200,
+            reply,
+        )]));
+        let shares = server.shares();
+        shares.insert(SHARE_ID.into(), POLL_TOKEN.into());
+        let store = MemoryStore::default();
+        run(status(&shares, &store, SHARE_ID)).unwrap();
+        assert_eq!(account(&store), None, "{token} {login}");
+    }
+}
+
+#[test]
+fn a_damaged_stored_account_counts_as_signed_out() {
+    for secret in [
+        "",
+        "ada-l",
+        "ada-l:short",
+        ":abcdefghijabcdefghijabcdefghijabcdefghijabc",
+    ] {
+        let store = MemoryStore::default();
+        store.set(REMEMBERED_SECRET, secret).unwrap();
+        assert_eq!(account(&store), None, "{secret}");
+    }
+}
+
+#[test]
+fn signing_out_forgets_the_account_here_and_tells_the_service() {
+    let server = Server::start(routes(&[("DELETE /v1/remember", 204, String::new())]));
+    let shares = server.shares();
+    let store = remembering("ada-l");
+    run(sign_out(&shares, &store)).unwrap();
+    assert_eq!(account(&store), None);
+    let hits = server.hits();
+    assert_eq!(hits.len(), 1);
+    assert!(hits[0].contains(&format!("x-remember-token: {REMEMBER_TOKEN}")));
+}
+
+#[test]
+fn signing_out_works_when_the_service_cannot_be_reached() {
+    let shares = Shares::new(None);
+    let store = remembering("ada-l");
+    run(sign_out(&shares, &store)).unwrap();
+    assert_eq!(account(&store), None);
 }

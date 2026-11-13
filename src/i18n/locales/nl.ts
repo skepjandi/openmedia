@@ -359,6 +359,9 @@ export const nl: Messages = {
   "share.github.afterReview":
     "Iedereen krijgt het met een update nadat het team het heeft bekeken en goedgekeurd.",
   "share.github.continue": "Doorgaan met GitHub",
+  "share.github.send": "Recept delen",
+  "share.github.signedInAs": "Aangemeld bij GitHub als @{login}",
+  "share.github.signOut": "Ben jij het niet? Afmelden",
   "share.github.waiting":
     "Meld je aan bij GitHub in de browser die net is geopend en kom dan hier terug.",
   "share.github.working": "Je recept wordt verstuurd…",

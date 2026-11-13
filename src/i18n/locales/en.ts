@@ -356,6 +356,9 @@ export const en = {
   "share.github.afterReview":
     "Everyone gets it in an update after the team reviews and approves it.",
   "share.github.continue": "Continue with GitHub",
+  "share.github.send": "Share recipe",
+  "share.github.signedInAs": "Signed in to GitHub as @{login}",
+  "share.github.signOut": "Not you? Sign out",
   "share.github.waiting":
     "Sign in with GitHub in the browser that just opened, then come back here.",
   "share.github.working": "Sending your recipe…",

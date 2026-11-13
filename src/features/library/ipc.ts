@@ -120,4 +120,8 @@ export const share = {
   cancel: (id: string) => command("share_cancel", { id }),
   status: (id: string) => invoke<ShareStatus>("share_status", { id }),
   open: (id: string) => command("share_open", { id }),
+  /** The GitHub login this device shares as after a first sign-in, or null. Never a token. */
+  account: () => invoke<string | null>("share_account"),
+  /** Forgets the GitHub account here and at the Worker; the next share signs in again. */
+  signOut: () => command("share_sign_out"),
 };

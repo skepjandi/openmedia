@@ -125,6 +125,8 @@ pub fn run() {
             share::commands::share_status,
             share::commands::share_open,
             share::commands::share_cancel,
+            share::commands::share_account,
+            share::commands::share_sign_out,
             commands::set_bottom_margin,
             commands::set_site_bottom_margin,
             commands::bottom_margin_for,

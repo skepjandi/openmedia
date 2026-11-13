@@ -6,6 +6,17 @@ All notable changes to OpenMedia are documented here.
 >
 > **Wiki**: the [GitHub Wiki](https://github.com/skepjandi/openmedia/wiki) is the public-facing main wiki — architecture, recipe format, AI pipeline, security model, roadmap. Source-controlled editing surface is `docs/wiki/` in this repo; CI (`.github/workflows/sync-wiki.yml`) mirrors it to the GitHub Wiki on every merge to `main`. New single-PR changes belong here, not as new wiki pages.
 
+### feat(share): remember the GitHub sign-in and show the account
+
+**Area:** `feat(share)`
+
+**Change:** After the first GitHub sign-in the Worker hands the app a random remember token (stored hashed, 90 days). The app keeps it with the login in the OS secure store, so the next share opens no browser. The share screen shows "Signed in to GitHub as @login" with a *Sign out* link that forgets the account here and at the Worker. Needs Worker migration `0008_remembered_sign_in.sql`.
+
+**Verified:** Rust share tests, TypeScript check, ESLint, i18n catalog test. **Not verified:** on-device flow against a deployed Worker.
+
+**PR:** n/a
+
+
 ### feat(ui): clarify recipe sharing and Pro value
 
 **Area:** `feat(ui)`

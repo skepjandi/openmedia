@@ -340,6 +340,9 @@ export const th: Messages = {
   "share.github.whatSent": "สูตรและชื่อผู้ใช้ GitHub ของคุณจะถูกส่งไปยังทีม OpenMedia",
   "share.github.afterReview": "ทุกคนจะได้รับสูตรนี้ในการอัปเดตหลังจากทีมตรวจสอบและอนุมัติแล้ว",
   "share.github.continue": "ดำเนินการต่อด้วย GitHub",
+  "share.github.send": "แชร์สูตร",
+  "share.github.signedInAs": "เข้าสู่ระบบ GitHub ในชื่อ @{login}",
+  "share.github.signOut": "ไม่ใช่คุณใช่ไหม ออกจากระบบ",
   "share.github.waiting": "ลงชื่อเข้าใช้ GitHub ในเบราว์เซอร์ที่เพิ่งเปิดขึ้น แล้วกลับมาที่นี่",
   "share.github.working": "กำลังส่งสูตรของคุณ…",
   "share.github.thanks":

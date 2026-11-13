@@ -359,6 +359,9 @@ export const sv: Messages = {
   "share.github.afterReview":
     "Alla får det i en uppdatering när teamet har granskat och godkänt det.",
   "share.github.continue": "Fortsätt med GitHub",
+  "share.github.send": "Dela recept",
+  "share.github.signedInAs": "Inloggad på GitHub som @{login}",
+  "share.github.signOut": "Inte du? Logga ut",
   "share.github.waiting":
     "Logga in på GitHub i webbläsaren som just öppnades och kom sedan tillbaka hit.",
   "share.github.working": "Skickar ditt recept…",

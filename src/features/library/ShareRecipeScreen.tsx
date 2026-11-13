@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { appError, useApp } from "../../app/store";
 import { useT } from "../../i18n/useT";
 import { Screen } from "../../shared/Screen";
@@ -39,6 +39,7 @@ function GithubFlow() {
   const own = sites.filter((site) => site.origin === "user" || site.origin === "ai");
   const t = useT();
   const { flow, begin, cancel, reset } = useShare();
+  const account = useShareAccount(flow.phase === "done");
   const [recipeId, setRecipeId] = useState(own[0]?.recipeId ?? "");
   const [summary, setSummary] = useState(() => suggestedSummary(own[0]?.name ?? ""));
 
@@ -104,10 +105,15 @@ function GithubFlow() {
             onClick={() => begin(recipeId, summaryToSend(summary) ?? "")}
             className={primaryBlockButton}
           >
-            {t("share.github.continue")}
+            {t(account.login ? "share.github.send" : "share.github.continue")}
           </button>
+          {account.login && (
+            <AccountRow login={account.login} onSignOut={() => void account.signOut()} />
+          )}
           <ul className="flex flex-col gap-2 rounded-2xl border border-hair bg-paper/[0.035] p-4 text-[13px] leading-relaxed text-paper/60">
-            <li className="border-s-2 border-accent/60 ps-3">{t("share.github.needAccount")}</li>
+            {!account.login && (
+              <li className="border-s-2 border-accent/60 ps-3">{t("share.github.needAccount")}</li>
+            )}
             <li className="border-s-2 border-accent/60 ps-3">{t("share.github.whatSent")}</li>
             <li className="border-s-2 border-accent/60 ps-3">{t("share.github.afterReview")}</li>
           </ul>
@@ -130,7 +136,12 @@ function GithubFlow() {
         </div>
       )}
       {flow.phase === "done" && (
-        <ThanksStep id={flow.id} hasLink={flow.prUrl !== null} onDone={reset} />
+        <ThanksStep
+          id={flow.id}
+          hasLink={flow.prUrl !== null}
+          login={flow.login ?? account.login}
+          onDone={reset}
+        />
       )}
       {(flow.phase === "failed" || flow.phase === "timeout") && (
         <div className="flex flex-col items-start gap-4 px-1">
@@ -152,13 +163,66 @@ function GithubFlow() {
   );
 }
 
-function ThanksStep({ id, hasLink, onDone }: { id: string; hasLink: boolean; onDone: () => void }) {
+/** The GitHub account this device shares as, kept in Rust. Looked up again after a share ends. */
+function useShareAccount(refreshWhen: boolean) {
+  const [login, setLogin] = useState<string | null>(null);
+
+  useEffect(() => {
+    let stale = false;
+    share
+      .account()
+      .then((found) => {
+        if (!stale) setLogin(found);
+      })
+      .catch(() => {
+        if (!stale) setLogin(null);
+      });
+    return () => {
+      stale = true;
+    };
+  }, [refreshWhen]);
+
+  const signOut = useCallback(async () => {
+    try {
+      await share.signOut();
+    } finally {
+      setLogin(null);
+    }
+  }, []);
+
+  return { login, signOut };
+}
+
+function AccountRow({ login, onSignOut }: { login: string; onSignOut: () => void }) {
+  const t = useT();
+  return (
+    <div className="flex flex-wrap items-center justify-between gap-2 px-1 text-sm text-paper/70">
+      <span>{t("share.github.signedInAs", { login })}</span>
+      <button type="button" onClick={onSignOut} className="py-1 font-medium text-accent">
+        {t("share.github.signOut")}
+      </button>
+    </div>
+  );
+}
+
+function ThanksStep({
+  id,
+  hasLink,
+  login,
+  onDone,
+}: {
+  id: string;
+  hasLink: boolean;
+  login: string | null;
+  onDone: () => void;
+}) {
   const t = useT();
   const [openError, setOpenError] = useState<string | null>(null);
 
   return (
     <div role="status" className="flex flex-col items-stretch gap-4 px-1">
       <p className="text-lg leading-snug font-medium">{t("share.github.thanks")}</p>
+      {login && <p className="text-sm text-paper/60">{t("share.github.signedInAs", { login })}</p>}
       {hasLink && (
         <button
           type="button"

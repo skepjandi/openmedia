@@ -15,6 +15,7 @@ const SHARE_URL: Option<&str> = option_env!("OPENMEDIA_SHARE_URL");
 const MAX_REPLY_BYTES: usize = 8 * 1024;
 const TIMEOUT: Duration = Duration::from_secs(20);
 const HEADER_POLL_TOKEN: &str = "X-Poll-Token";
+const HEADER_REMEMBER_TOKEN: &str = "X-Remember-Token";
 
 pub struct Worker {
     base: Url,
@@ -22,12 +23,13 @@ pub struct Worker {
 }
 
 /// What the service answers to a new share, checked: the id and poll token have the shape the
-/// service issues, and the login address is on the service's own origin.
+/// service issues, and the login address (if any) is on the service's own origin. There is no
+/// login address when the service recognised the remember token: nobody needs to sign in.
 #[derive(Debug)]
 pub struct Created {
     pub id: String,
     pub poll_token: String,
-    pub login_url: Url,
+    pub login_url: Option<Url>,
 }
 
 /// The service's answer about a share, before `super` turns it into what the shell sees.
@@ -38,6 +40,8 @@ pub struct Reply {
     pub pr_url: Option<String>,
     pub login: Option<String>,
     pub error_code: Option<String>,
+    /// Handed over once, with the first answer after a sign-in.
+    pub remember_token: Option<String>,
 }
 
 #[derive(Debug)]
@@ -52,7 +56,7 @@ pub enum Polled {
 struct WireCreated {
     id: String,
     poll_token: String,
-    login_url: String,
+    login_url: Option<String>,
 }
 
 impl Worker {
@@ -76,22 +80,32 @@ impl Worker {
         Ok(Self { base, http })
     }
 
-    pub async fn create(&self, body: Vec<u8>) -> Result<Created> {
-        let request = self
+    /// `remember` is the token from an earlier sign-in; the service may then skip the sign-in.
+    pub async fn create(&self, body: Vec<u8>, remember: Option<&str>) -> Result<Created> {
+        let mut request = self
             .http
             .post(self.endpoint("v1/shares")?)
             .header("content-type", "application/json")
             .body(body);
+        if let Some(token) = remember {
+            request = request.header(HEADER_REMEMBER_TOKEN, token);
+        }
         let response = request.send().await.map_err(unreachable)?;
         let bytes = read_capped(checked(response)?, MAX_REPLY_BYTES).await?;
         let wire: WireCreated = serde_json::from_slice(&bytes).map_err(unexpected)?;
         if !is_token(&wire.id, 22, 64) || !is_token(&wire.poll_token, 43, 43) {
             return Err(unexpected(()));
         }
-        let login_url = Url::parse(&wire.login_url).map_err(unexpected)?;
-        if login_url.origin() != self.base.origin() || !login_url.username().is_empty() {
-            return Err(unexpected(()));
-        }
+        let login_url = wire
+            .login_url
+            .map(|text| {
+                let url = Url::parse(&text).map_err(unexpected)?;
+                if url.origin() != self.base.origin() || !url.username().is_empty() {
+                    return Err(unexpected(()));
+                }
+                Ok(url)
+            })
+            .transpose()?;
         Ok(Created {
             id: wire.id,
             poll_token: wire.poll_token,
@@ -120,6 +134,18 @@ impl Worker {
             .map_err(unexpected)
     }
 
+    /// Asks the service to forget a remember token. The answer says nothing about the token.
+    pub async fn forget(&self, token: &str) -> Result<()> {
+        let response = self
+            .http
+            .delete(self.endpoint("v1/remember")?)
+            .header(HEADER_REMEMBER_TOKEN, token)
+            .send()
+            .await
+            .map_err(unreachable)?;
+        checked(response).map(drop)
+    }
+
     fn endpoint(&self, path: &str) -> Result<Url> {
         self.base
             .join(path)
@@ -128,7 +154,7 @@ impl Worker {
 }
 
 /// Ids and poll tokens are URL-safe random strings.
-fn is_token(text: &str, min: usize, max: usize) -> bool {
+pub(super) fn is_token(text: &str, min: usize, max: usize) -> bool {
     (min..=max).contains(&text.len())
         && text
             .bytes()

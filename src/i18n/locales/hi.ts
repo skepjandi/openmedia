@@ -351,6 +351,9 @@ export const hi: Messages = {
   "share.github.afterReview":
     "टीम के समीक्षा करने और मंज़ूर करने के बाद यह सबको एक अपडेट में मिल जाएगी।",
   "share.github.continue": "GitHub के साथ जारी रखें",
+  "share.github.send": "रेसिपी साझा करें",
+  "share.github.signedInAs": "GitHub में @{login} के रूप में साइन इन हैं",
+  "share.github.signOut": "आप नहीं हैं? साइन आउट करें",
   "share.github.waiting": "अभी खुले ब्राउज़र में GitHub से साइन इन करें, फिर यहाँ लौट आएँ।",
   "share.github.working": "आपकी रेसिपी भेजी जा रही है…",
   "share.github.thanks":

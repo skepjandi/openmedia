@@ -6,6 +6,7 @@ use tauri::{AppHandle, State};
 use tauri_plugin_opener::OpenerExt;
 
 use super::{ShareStatus, Shares, messages};
+use crate::commands::Secrets;
 use crate::error::{Error, Result};
 use crate::recipes::Recipes;
 
@@ -33,19 +34,41 @@ pub async fn share_start(
     app: AppHandle,
     shares: State<'_, Shares>,
     recipes: State<'_, Recipes>,
+    secrets: State<'_, Secrets>,
     recipe_id: String,
     summary: String,
 ) -> Result<StartedShare> {
-    let id = super::start(&shares, &recipes, &recipe_id, &summary, |url| {
-        open_in_browser(&app, url)
-    })
+    let id = super::start(
+        &shares,
+        &recipes,
+        secrets.0.as_ref(),
+        &recipe_id,
+        &summary,
+        |url| open_in_browser(&app, url),
+    )
     .await?;
     Ok(StartedShare { id })
 }
 
 #[tauri::command]
-pub async fn share_status(shares: State<'_, Shares>, id: String) -> Result<ShareStatus> {
-    super::status(&shares, &id).await
+pub async fn share_status(
+    shares: State<'_, Shares>,
+    secrets: State<'_, Secrets>,
+    id: String,
+) -> Result<ShareStatus> {
+    super::status(&shares, secrets.0.as_ref(), &id).await
+}
+
+/// The GitHub login this device shares as, if the user signed in before. Never the token.
+#[tauri::command]
+pub fn share_account(secrets: State<'_, Secrets>) -> Option<String> {
+    super::account(secrets.0.as_ref())
+}
+
+/// Forgets the GitHub account: the next share asks for the sign-in again.
+#[tauri::command]
+pub async fn share_sign_out(shares: State<'_, Shares>, secrets: State<'_, Secrets>) -> Result<()> {
+    super::sign_out(&shares, secrets.0.as_ref()).await
 }
 
 /// Opens the pull request page of a finished share in the system browser.

@@ -20,13 +20,14 @@ use uuid::Uuid;
 use zeroize::Zeroizing;
 
 pub use client::Worker;
-use client::{Polled, Reply};
+use client::{Polled, Reply, is_token};
 
 use crate::error::{Error, Result};
 use crate::recipes::{
     self, MARKET_PREFIX, MAX_RECIPE_BYTES, MAX_SUMMARY_CHARS, Meta, Origin, Recipe, Recipes,
     bundled, is_plain_text,
 };
+use crate::secrets::SecretStore;
 
 /// The sentences people read. Written here; nothing the service says is ever shown.
 pub(crate) mod messages {
@@ -56,6 +57,10 @@ const MAX_SLUG_NAME_CHARS: usize = 40;
 const SUFFIX_CHARS: usize = 4;
 const MAX_LOGIN_CHARS: usize = 39;
 const CUSTOM_PREFIX: &str = "custom.";
+/// Where the sign-in the service let us remember is kept, in the OS secure store: `login:token`.
+/// One fixed entry; there is only ever one account.
+const REMEMBERED_SECRET: Uuid = Uuid::from_u128(0x6f70_656e_6d65_6469_6100_7368_6172_6531);
+const REMEMBER_TOKEN_CHARS: usize = 43;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
 #[serde(rename_all = "lowercase")]
@@ -195,21 +200,64 @@ impl Shares {
     }
 }
 
+/// The GitHub account the service remembered for this device.
+struct Remembered {
+    login: String,
+    token: Zeroizing<String>,
+}
+
+fn remembered(store: &dyn SecretStore) -> Option<Remembered> {
+    let secret = store.get(REMEMBERED_SECRET).ok().flatten()?;
+    let (login, token) = secret.split_once(':')?;
+    (is_login(login) && is_token(token, REMEMBER_TOKEN_CHARS, REMEMBER_TOKEN_CHARS)).then(|| {
+        Remembered {
+            login: login.to_owned(),
+            token: Zeroizing::new(token.to_owned()),
+        }
+    })
+}
+
+/// The login name of the account this device shares as, if the user signed in before.
+pub fn account(store: &dyn SecretStore) -> Option<String> {
+    remembered(store).map(|account| account.login)
+}
+
+/// Forgets the account here and, as far as the service can be reached, there. Never fails the
+/// user's sign-out: the local copy is gone either way.
+pub async fn sign_out(shares: &Shares, store: &dyn SecretStore) -> Result<()> {
+    let account = remembered(store);
+    store.delete(REMEMBERED_SECRET)?;
+    if let (Some(account), Ok(worker)) = (account, shares.worker()) {
+        let _ = worker.forget(&account.token).await;
+    }
+    Ok(())
+}
+
 /// Starts sharing one of the user's own recipes. Everything the service would refuse for the
-/// recipe is checked here first, so nothing is sent for a recipe that cannot be shared. On
-/// success the sign-in page has been opened in the system browser and only the share id returns.
+/// recipe is checked here first, so nothing is sent for a recipe that cannot be shared. If the
+/// user signed in before, the service shares straight away; otherwise the sign-in page has been
+/// opened in the system browser. Only the share id returns.
 pub async fn start(
     shares: &Shares,
     recipes: &Recipes,
+    store: &dyn SecretStore,
     recipe_id: &str,
     summary: &str,
     open: impl FnOnce(&str) -> Result<()>,
 ) -> Result<String> {
     let worker = shares.worker()?;
     let body = request_body(recipes, recipe_id, summary)?;
-    let created = worker.create(body).await?;
+    let remember = remembered(store);
+    let created = worker
+        .create(
+            body,
+            remember.as_ref().map(|account| account.token.as_str()),
+        )
+        .await?;
     shares.insert(created.id.clone(), created.poll_token);
-    if open(created.login_url.as_str()).is_err() {
+    if let Some(login_url) = created.login_url
+        && open(login_url.as_str()).is_err()
+    {
         shares.cancel(&created.id);
         return Err(Error::Share(messages::BROWSER.into()));
     }
@@ -354,7 +402,7 @@ fn default_summary(recipe: &Recipe) -> String {
 
 /// Asks the service how a share is going. A share this device does not know (or that expired) is
 /// reported as failed without asking anyone.
-pub async fn status(shares: &Shares, id: &str) -> Result<ShareStatus> {
+pub async fn status(shares: &Shares, store: &dyn SecretStore, id: &str) -> Result<ShareStatus> {
     let worker = shares.worker()?;
     let token = shares
         .sessions()
@@ -366,12 +414,26 @@ pub async fn status(shares: &Shares, id: &str) -> Result<ShareStatus> {
     match worker.poll(id, &token).await? {
         Polled::Gone => Ok(ShareStatus::failed(ErrorCode::Failed, messages::EXPIRED)),
         Polled::Reply(reply) => {
+            remember_sign_in(store, &reply);
             let status = checked_status(reply)?;
             if let Some(session) = shares.sessions().get_mut(id) {
                 session.pr_url.clone_from(&status.pr_url);
             }
             Ok(status)
         }
+    }
+}
+
+/// Keeps the token the service hands over after a sign-in, together with the login it belongs
+/// to. Anything that does not have the shape of one is ignored; a failed write only means the
+/// user signs in again next time.
+fn remember_sign_in(store: &dyn SecretStore, reply: &Reply) {
+    let (Some(token), Some(login)) = (reply.remember_token.as_deref(), reply.login.as_deref())
+    else {
+        return;
+    };
+    if is_login(login) && is_token(token, REMEMBER_TOKEN_CHARS, REMEMBER_TOKEN_CHARS) {
+        let _ = store.set(REMEMBERED_SECRET, &format!("{login}:{token}"));
     }
 }
 

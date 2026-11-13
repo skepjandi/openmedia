@@ -360,6 +360,9 @@ export const uk: Messages = {
   "share.github.afterReview":
     "Усі отримають його в оновленні після того, як команда перевірить і схвалить рецепт.",
   "share.github.continue": "Продовжити через GitHub",
+  "share.github.send": "Поділитися рецептом",
+  "share.github.signedInAs": "Ви ввійшли в GitHub як @{login}",
+  "share.github.signOut": "Це не ви? Вийти",
   "share.github.waiting":
     "Увійдіть у GitHub у браузері, що щойно відкрився, а потім поверніться сюди.",
   "share.github.working": "Надсилаємо ваш рецепт…",

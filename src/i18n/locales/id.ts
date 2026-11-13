@@ -355,6 +355,9 @@ export const id: Messages = {
   "share.github.afterReview":
     "Semua orang akan mendapatkannya lewat pembaruan setelah tim meninjau dan menyetujuinya.",
   "share.github.continue": "Lanjutkan dengan GitHub",
+  "share.github.send": "Bagikan resep",
+  "share.github.signedInAs": "Masuk ke GitHub sebagai @{login}",
+  "share.github.signOut": "Bukan Anda? Keluar",
   "share.github.waiting": "Masuk ke GitHub di peramban yang baru terbuka, lalu kembali ke sini.",
   "share.github.working": "Mengirim resep Anda…",
   "share.github.thanks":

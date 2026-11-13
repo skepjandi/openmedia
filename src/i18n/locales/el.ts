@@ -364,6 +364,9 @@ export const el: Messages = {
   "share.github.afterReview":
     "Όλοι θα την πάρουν σε μια ενημέρωση, αφού η ομάδα την ελέγξει και την εγκρίνει.",
   "share.github.continue": "Συνέχεια με το GitHub",
+  "share.github.send": "Κοινοποίηση συνταγής",
+  "share.github.signedInAs": "Συνδεδεμένος στο GitHub ως @{login}",
+  "share.github.signOut": "Δεν είστε εσείς; Αποσύνδεση",
   "share.github.waiting":
     "Συνδεθείτε στο GitHub στο πρόγραμμα περιήγησης που μόλις άνοιξε και μετά επιστρέψτε εδώ.",
   "share.github.working": "Αποστολή της συνταγής σας…",

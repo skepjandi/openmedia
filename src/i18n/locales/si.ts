@@ -351,6 +351,9 @@ export const si: Messages = {
   "share.github.whatSent": "ඔබේ ක්‍රමය සහ ඔබේ GitHub පරිශීලක නම OpenMedia කණ්ඩායමට යවනු ලැබේ.",
   "share.github.afterReview": "කණ්ඩායම සමාලෝචනය කර අනුමත කළ පසු, යාවත්කාලීනයකින් සැමට එය ලැබේ.",
   "share.github.continue": "GitHub සමඟ ඉදිරියට යන්න",
+  "share.github.send": "වට්ටෝරුව බෙදාගන්න",
+  "share.github.signedInAs": "GitHub වෙත @{login} ලෙස පුරනය වී ඇත",
+  "share.github.signOut": "ඔබ නොවේද? වරන්න",
   "share.github.waiting": "දැන් විවෘත වූ බ්‍රවුසරයේ GitHub වෙත පිවිසී, ඉන්පසු මෙතැනට ආපසු එන්න.",
   "share.github.working": "ඔබේ ක්‍රමය යවමින්…",
   "share.github.thanks":

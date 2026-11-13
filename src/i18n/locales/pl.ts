@@ -358,6 +358,9 @@ export const pl: Messages = {
   "share.github.afterReview":
     "Wszyscy dostaną go w aktualizacji, gdy zespół go sprawdzi i zatwierdzi.",
   "share.github.continue": "Kontynuuj przez GitHub",
+  "share.github.send": "Udostępnij przepis",
+  "share.github.signedInAs": "Zalogowano w GitHubie jako @{login}",
+  "share.github.signOut": "To nie Ty? Wyloguj się",
   "share.github.waiting":
     "Zaloguj się w GitHub w przeglądarce, która się właśnie otworzyła, a potem wróć tutaj.",
   "share.github.working": "Wysyłanie przepisu…",

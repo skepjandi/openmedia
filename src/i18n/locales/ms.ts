@@ -356,6 +356,9 @@ export const ms: Messages = {
   "share.github.afterReview":
     "Semua orang akan mendapatkannya dalam satu kemas kini selepas pasukan menyemak dan meluluskannya.",
   "share.github.continue": "Teruskan dengan GitHub",
+  "share.github.send": "Kongsi resipi",
+  "share.github.signedInAs": "Dilog masuk ke GitHub sebagai @{login}",
+  "share.github.signOut": "Bukan anda? Log keluar",
   "share.github.waiting":
     "Log masuk ke GitHub dalam pelayar yang baru dibuka, kemudian kembali ke sini.",
   "share.github.working": "Menghantar resipi anda…",

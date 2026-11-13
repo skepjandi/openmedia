@@ -365,6 +365,9 @@ export const ta: Messages = {
   "share.github.afterReview":
     "குழு மதிப்பாய்வு செய்து ஒப்புதல் அளித்த பிறகு, ஒரு புதுப்பிப்பில் எல்லோருக்கும் கிடைக்கும்.",
   "share.github.continue": "GitHub உடன் தொடர்",
+  "share.github.send": "செய்முறையைப் பகிர்",
+  "share.github.signedInAs": "GitHub இல் @{login} ஆக உள்நுழைந்துள்ளீர்கள்",
+  "share.github.signOut": "நீங்கள் இல்லையா? வெளியேறு",
   "share.github.waiting": "இப்போது திறந்த உலாவியில் GitHub இல் உள்நுழை, பிறகு இங்கே திரும்பி வா.",
   "share.github.working": "உன் ரெசிபி அனுப்பப்படுகிறது…",
   "share.github.thanks":

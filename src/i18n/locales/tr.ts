@@ -356,6 +356,9 @@ export const tr: Messages = {
   "share.github.afterReview":
     "Ekip inceleyip onayladıktan sonra herkes bunu bir güncellemeyle alır.",
   "share.github.continue": "GitHub ile devam et",
+  "share.github.send": "Tarifi paylaş",
+  "share.github.signedInAs": "GitHub'da @{login} olarak oturum açıldı",
+  "share.github.signOut": "Siz değil misiniz? Oturumu kapat",
   "share.github.waiting": "Az önce açılan tarayıcıda GitHub'a giriş yap, sonra buraya dön.",
   "share.github.working": "Tarifin gönderiliyor…",
   "share.github.thanks":

@@ -353,6 +353,9 @@ export const vi: Messages = {
   "share.github.afterReview":
     "Mọi người sẽ nhận được nó trong một bản cập nhật sau khi nhóm xem xét và duyệt.",
   "share.github.continue": "Tiếp tục với GitHub",
+  "share.github.send": "Chia sẻ công thức",
+  "share.github.signedInAs": "Đã đăng nhập GitHub với tên @{login}",
+  "share.github.signOut": "Không phải bạn? Đăng xuất",
   "share.github.waiting": "Hãy đăng nhập GitHub trong trình duyệt vừa mở, rồi quay lại đây.",
   "share.github.working": "Đang gửi công thức của bạn…",
   "share.github.thanks":

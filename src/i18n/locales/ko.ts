@@ -353,6 +353,9 @@ export const ko: Messages = {
   "share.github.afterReview":
     "팀이 검토하고 승인하면 업데이트를 통해 모든 사람이 사용할 수 있습니다.",
   "share.github.continue": "GitHub로 계속하기",
+  "share.github.send": "레시피 공유",
+  "share.github.signedInAs": "GitHub에 @{login}(으)로 로그인됨",
+  "share.github.signOut": "본인이 아닌가요? 로그아웃",
   "share.github.waiting": "방금 열린 브라우저에서 GitHub에 로그인한 다음 여기로 돌아오세요.",
   "share.github.working": "레시피를 보내는 중…",
   "share.github.thanks":

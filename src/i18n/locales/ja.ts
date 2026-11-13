@@ -356,6 +356,9 @@ export const ja: Messages = {
   "share.github.afterReview":
     "チームが確認して承認すると、次のアップデートでみんなが使えるようになります。",
   "share.github.continue": "GitHub で続ける",
+  "share.github.send": "レシピを共有",
+  "share.github.signedInAs": "GitHub に @{login} としてサインイン中",
+  "share.github.signOut": "別のアカウントですか？ サインアウト",
   "share.github.waiting":
     "いま開いたブラウザーで GitHub にサインインして、ここに戻ってきてください。",
   "share.github.working": "レシピを送信しています…",

@@ -12,6 +12,7 @@
 | Recipes | Integrity: a malicious recipe could hide warnings, mislead, or redirect |
 | App-shell IPC | A route from a website into native capabilities |
 | Share Worker session (recipe, hashed tokens, result) | Held for at most 15 minutes while a GitHub login completes; never a GitHub token, never a purchase identifier |
+| Share Worker remember token (SHA-256, GitHub login and id) / app-side token | Worker: 90 days or until *Sign out*; app: OS secure store, read only in Rust, never sent to the shell (the shell sees the login name only). Lets a returning user share without a browser sign-in |
 
 ## Trust boundaries
 
