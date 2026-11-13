@@ -2,10 +2,18 @@ import { useMemo } from "react";
 import { useT } from "../../i18n/useT";
 import type { MessageKey } from "../../i18n/messages";
 import type { LibraryTag } from "./ipc";
-import { FILTER_KINDS, facetCounts, type IndexedItem, visibleIndexed } from "./logic";
+import {
+  FILTER_KINDS,
+  facetCounts,
+  type Filterable,
+  type IndexedItem,
+  visibleIndexed,
+} from "./logic";
 import { TAG_LABELS } from "./tagLabels";
 
-const KIND_LABELS: Record<(typeof FILTER_KINDS)[number]["id"], MessageKey> = {
+type KindId = (typeof FILTER_KINDS)[number]["id"];
+
+const KIND_LABELS: Record<KindId, MessageKey> = {
   discover: "library.filterKind.discover",
   origin: "library.filterKind.origin",
   platform: "library.filterKind.platform",
@@ -15,10 +23,12 @@ const KIND_LABELS: Record<(typeof FILTER_KINDS)[number]["id"], MessageKey> = {
 };
 
 interface FilterDialogProps {
-  index: readonly IndexedItem[];
+  index: readonly IndexedItem<Filterable>[];
   filter: ReadonlySet<LibraryTag>;
   query: string;
   onToggleTag: (tag: LibraryTag) => void;
+  /** The sections to show; all of them by default. */
+  kinds?: readonly KindId[];
   onClear: () => void;
   onClose: () => void;
 }
@@ -29,6 +39,7 @@ export function FilterDialog({
   filter,
   query,
   onToggleTag,
+  kinds,
   onClear,
   onClose,
 }: FilterDialogProps) {
@@ -61,7 +72,7 @@ export function FilterDialog({
           </button>
         </div>
         <div className="flex min-h-0 flex-1 flex-col gap-5 overflow-y-auto pb-4">
-          {FILTER_KINDS.map((kind) => (
+          {FILTER_KINDS.filter((kind) => !kinds || kinds.includes(kind.id)).map((kind) => (
             <section key={kind.id} aria-label={t(KIND_LABELS[kind.id])}>
               <h3 className="pb-2 text-xs tracking-[0.15em] text-paper/50 uppercase">
                 {t(KIND_LABELS[kind.id])}

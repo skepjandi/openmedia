@@ -1,5 +1,9 @@
 import type { CategoryTag, LibraryItem, LibraryTag } from "./ipc";
 
+/** What the filter, the counts and the search read from a recipe; the library and the guide both have it. */
+export type Filterable = Pick<LibraryItem, "name" | "summary" | "tags" | "popularRank" | "isNew"> &
+  Partial<Pick<LibraryItem, "author" | "hosts" | "installedVersion" | "updateAvailable">>;
+
 const ORIGIN_TAGS: readonly LibraryTag[] = ["official", "community"];
 const PLATFORM_TAGS: readonly LibraryTag[] = ["mobile", "desktop"];
 const HUB_TAGS: readonly LibraryTag[] = ["hub"];
@@ -70,7 +74,7 @@ export function toggleTag(filter: ReadonlySet<LibraryTag>, tag: LibraryTag): Set
 }
 
 /** Where the recipe stands on this device: not added, added, or added with a newer version here. */
-function statusTag(item: LibraryItem): LibraryTag {
+function statusTag(item: Filterable): LibraryTag {
   if (!item.installedVersion) return "notAdded";
   return item.updateAvailable ? "updatable" : "added";
 }
@@ -103,14 +107,16 @@ export function matchesFilter(tags: readonly string[], filter: ReadonlySet<Libra
 
 const searchWords = (query: string): string[] => query.toLowerCase().split(/\s+/).filter(Boolean);
 
-const searchText = (item: LibraryItem): string =>
-  [item.name, item.author, item.summary, ...item.hosts, ...item.tags].join("\n").toLowerCase();
+const searchText = (item: Filterable): string =>
+  [item.name, item.author ?? "", item.summary, ...(item.hosts ?? []), ...item.tags]
+    .join("\n")
+    .toLowerCase();
 
 /**
  * True when every word of the query appears, case-insensitively and literally, in the item's name,
  * author, summary, hosts or tags. A blank query matches everything.
  */
-export function matchesSearch(item: LibraryItem, query: string): boolean {
+export function matchesSearch(item: Filterable, query: string): boolean {
   const words = searchWords(query);
   if (words.length === 0) return true;
   const haystack = searchText(item);
@@ -118,8 +124,8 @@ export function matchesSearch(item: LibraryItem, query: string): boolean {
 }
 
 /** A recipe with everything the filter and the search need worked out once. */
-export interface IndexedItem {
-  item: LibraryItem;
+export interface IndexedItem<T extends Filterable = LibraryItem> {
+  item: T;
   tags: ReadonlySet<string>;
   text: string;
 }
@@ -129,7 +135,7 @@ export interface IndexedItem {
  * every item's tags and search text computed once. Filtering and counting then never look at an
  * item's strings again, so typing in the search stays cheap with hundreds of recipes.
  */
-export function indexItems(items: readonly LibraryItem[]): IndexedItem[] {
+export function indexItems<T extends Filterable>(items: readonly T[]): IndexedItem<T>[] {
   const indexed = items.map((item) => {
     const tags = new Set([...item.tags, statusTag(item)]);
     if (item.popularRank !== null) tags.add("popular");
@@ -142,7 +148,7 @@ export function indexItems(items: readonly LibraryItem[]): IndexedItem[] {
 }
 
 const passes = (
-  entry: IndexedItem,
+  entry: IndexedItem<Filterable>,
   filter: ReadonlySet<LibraryTag>,
   words: readonly string[],
   skip?: string,
@@ -154,17 +160,17 @@ const passes = (
  * The indexed items the filter and the search let through, in index order. With the popular chip
  * on they come in the maintainers' popular order instead.
  */
-export function visibleIndexed(
-  index: readonly IndexedItem[],
+export function visibleIndexed<T extends Filterable>(
+  index: readonly IndexedItem<T>[],
   filter: ReadonlySet<LibraryTag>,
   query = "",
-): IndexedItem[] {
+): IndexedItem<T>[] {
   const words = searchWords(query);
   const found = index.filter((entry) => passes(entry, filter, words));
   return filter.has("popular") ? byPopularity(found) : found;
 }
 
-const byPopularity = (entries: readonly IndexedItem[]): IndexedItem[] =>
+const byPopularity = <T extends Filterable>(entries: readonly IndexedItem<T>[]): IndexedItem<T>[] =>
   [...entries].sort(
     (a, b) =>
       (a.item.popularRank ?? Number.MAX_SAFE_INTEGER) -
@@ -179,7 +185,10 @@ export const SHELF_SIZE = 10;
  * maintainers' order, or the ones the latest release added. Recipes already on this device are
  * left out, since a shelf is for finding something to add.
  */
-export function shelfOf(shown: readonly IndexedItem[], tag: "popular" | "new"): IndexedItem[] {
+export function shelfOf<T extends Filterable>(
+  shown: readonly IndexedItem<T>[],
+  tag: "popular" | "new",
+): IndexedItem<T>[] {
   const open = shown.filter((entry) => entry.tags.has(tag) && entry.tags.has("notAdded"));
   return (tag === "popular" ? byPopularity(open) : open).slice(0, SHELF_SIZE);
 }
@@ -190,7 +199,7 @@ export function shelfOf(shown: readonly IndexedItem[], tag: "popular" | "new"): 
  * away. One pass per kind, however many tags it has.
  */
 export function facetCounts(
-  index: readonly IndexedItem[],
+  index: readonly IndexedItem<Filterable>[],
   filter: ReadonlySet<LibraryTag>,
   query = "",
 ): Map<LibraryTag, number> {

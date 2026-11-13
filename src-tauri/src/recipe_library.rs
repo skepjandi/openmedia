@@ -50,6 +50,10 @@ pub struct OnboardingOption {
     pub summary: String,
     pub homepage: String,
     pub tags: Vec<String>,
+    /// Place in the editorial popular list, 0 for the first; none when it is not on the list.
+    pub popular_rank: Option<u32>,
+    /// True for the recipes the latest release added.
+    pub is_new: bool,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize)]
@@ -135,6 +139,8 @@ fn options_for(entries: &[Bundled], platform: &str) -> Vec<OnboardingOption> {
                 summary: bundled.summary().to_owned(),
                 homepage: bundled.recipe.homepage()?.to_owned(),
                 tags: bundled.tags(),
+                popular_rank: bundled::popular_rank(&bundled.recipe.id),
+                is_new: bundled::is_new(&bundled.recipe.id),
             })
         })
         .collect();
@@ -402,6 +408,8 @@ mod tests {
             summary: String::new(),
             homepage: "https://x.example/".into(),
             tags: vec![],
+            popular_rank: None,
+            is_new: false,
         };
         let favorite = favorite_for(&option);
         assert_eq!(favorite.name.chars().count(), MAX_FAVORITE_NAME_CHARS);

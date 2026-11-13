@@ -6,6 +6,16 @@ All notable changes to OpenMedia are documented here.
 >
 > **Wiki**: the [GitHub Wiki](https://github.com/skepjandi/openmedia/wiki) is the public-facing main wiki — architecture, recipe format, AI pipeline, security model, roadmap. Source-controlled editing surface is `docs/wiki/` in this repo; CI (`.github/workflows/sync-wiki.yml`) mirrors it to the GitHub Wiki on every merge to `main`. New single-PR changes belong here, not as new wiki pages.
 
+### feat(onboarding): search and filters in the quick-access step
+
+**Area:** `feat(onboarding)`
+
+**Change:** The guide's "What do you need in quick access?" step now has the library's search box and Filters dialog (Discover, Type, Category, with live counts), so a list of 100+ official recipes can be narrowed. `onboarding_options` also returns `popularRank` and `isNew`. The library's filter logic is generic over any item with name, summary and tags, and `FilterDialog` takes an optional list of sections.
+
+**Verified:** TypeScript, ESLint, library and onboarding unit tests, Rust recipe tests. **Not verified:** the step on a device or simulator.
+
+**PR:** n/a
+
 ### feat(library): add Popular and New discovery shelves
 
 **Area:** `feat(library)`

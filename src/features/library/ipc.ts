@@ -107,6 +107,10 @@ export interface OnboardingOption {
   summary: string;
   homepage: string;
   tags: string[];
+  /** Place in the maintainers' popular list, 0 for the first; null when it is not on the list. */
+  popularRank: number | null;
+  /** True for the recipes the latest release added. */
+  isNew: boolean;
 }
 
 export interface OnboardingResult {
