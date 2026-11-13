@@ -3,47 +3,549 @@
 // Every icon was fetched from the site's own files, never from an icon service. Run the script
 // again to refresh them; the sources are listed in src/assets/site-icons/manifest.json.
 
+import icon9gag from "../assets/site-icons/9gag.png";
+import adobe from "../assets/site-icons/adobe.png";
+import airbnb from "../assets/site-icons/airbnb.png";
+import aliexpress from "../assets/site-icons/aliexpress.png";
+import allegro from "../assets/site-icons/allegro.png";
+import amazon from "../assets/site-icons/amazon.png";
+import ambientMixer from "../assets/site-icons/ambient-mixer.png";
+import apple from "../assets/site-icons/apple.png";
+import arte from "../assets/site-icons/arte.png";
+import asiancrush from "../assets/site-icons/asiancrush.png";
+import audiomack from "../assets/site-icons/audiomack.png";
+import audionautix from "../assets/site-icons/audionautix.png";
+import audius from "../assets/site-icons/audius.png";
+import baidu from "../assets/site-icons/baidu.png";
+import bbc from "../assets/site-icons/bbc.png";
+import bensound from "../assets/site-icons/bensound.png";
+import bild from "../assets/site-icons/bild.png";
+import bilibili from "../assets/site-icons/bilibili.png";
+import bing from "../assets/site-icons/bing.png";
+import blogger from "../assets/site-icons/blogger.png";
+import bloomberg from "../assets/site-icons/bloomberg.png";
+import boomplay from "../assets/site-icons/boomplay.png";
+import broadcastify from "../assets/site-icons/broadcastify.png";
+import buzzfeed from "../assets/site-icons/buzzfeed.png";
+import byutv from "../assets/site-icons/byutv.png";
+import canva from "../assets/site-icons/canva.png";
+import ccmixter from "../assets/site-icons/ccmixter.png";
+import chegg from "../assets/site-icons/chegg.png";
+import chillhop from "../assets/site-icons/chillhop.png";
+import cinemata from "../assets/site-icons/cinemata.png";
+import cineverse from "../assets/site-icons/cineverse.png";
+import claude from "../assets/site-icons/claude.png";
+import cnbc from "../assets/site-icons/cnbc.png";
+import cnn from "../assets/site-icons/cnn.png";
+import costco from "../assets/site-icons/costco.png";
+import coursera from "../assets/site-icons/coursera.png";
+import craigslist from "../assets/site-icons/craigslist.png";
+import curiositystream from "../assets/site-icons/curiositystream.png";
+import dailymotion from "../assets/site-icons/dailymotion.png";
+import daum from "../assets/site-icons/daum.png";
+import deezer from "../assets/site-icons/deezer.png";
 import discord from "../assets/site-icons/discord.png";
+import disneynow from "../assets/site-icons/disneynow.png";
 import douyin from "../assets/site-icons/douyin.png";
+import dropout from "../assets/site-icons/dropout.png";
+import duolingo from "../assets/site-icons/duolingo.png";
+import ebay from "../assets/site-icons/ebay.png";
+import ektoplazm from "../assets/site-icons/ektoplazm.png";
+import espn from "../assets/site-icons/espn.png";
+import etsy from "../assets/site-icons/etsy.png";
 import facebook from "../assets/site-icons/facebook.png";
+import fawesome from "../assets/site-icons/fawesome.png";
+import filmzie from "../assets/site-icons/filmzie.png";
+import flickr from "../assets/site-icons/flickr.png";
+import flipkart from "../assets/site-icons/flipkart.png";
+import forbes from "../assets/site-icons/forbes.png";
+import funkwhale from "../assets/site-icons/funkwhale.png";
+import gaana from "../assets/site-icons/gaana.png";
+import geeksforgeeks from "../assets/site-icons/geeksforgeeks.png";
+import github from "../assets/site-icons/github.png";
+import gitlab from "../assets/site-icons/gitlab.png";
+import globo from "../assets/site-icons/globo.png";
+import goodreads from "../assets/site-icons/goodreads.png";
+import hidive from "../assets/site-icons/hidive.png";
+import ign from "../assets/site-icons/ign.png";
+import ikea from "../assets/site-icons/ikea.png";
+import ilovemusic from "../assets/site-icons/ilovemusic.png";
+import imdb from "../assets/site-icons/imdb.png";
+import imgur from "../assets/site-icons/imgur.png";
+import indeed from "../assets/site-icons/indeed.png";
 import instagram from "../assets/site-icons/instagram.png";
+import internetRadio from "../assets/site-icons/internet-radio.png";
+import jamendo from "../assets/site-icons/jamendo.png";
+import jango from "../assets/site-icons/jango.png";
+import jiosaavn from "../assets/site-icons/jiosaavn.png";
+import kakao from "../assets/site-icons/kakao.png";
+import kick from "../assets/site-icons/kick.png";
+import kosmi from "../assets/site-icons/kosmi.png";
 import kuaishou from "../assets/site-icons/kuaishou.png";
+import letterboxd from "../assets/site-icons/letterboxd.png";
+import librivox from "../assets/site-icons/librivox.png";
+import line from "../assets/site-icons/line.png";
 import linkedin from "../assets/site-icons/linkedin.png";
+import lowes from "../assets/site-icons/lowes.png";
+import max from "../assets/site-icons/max.png";
+import medium from "../assets/site-icons/medium.png";
 import messenger from "../assets/site-icons/messenger.png";
+import microsoft from "../assets/site-icons/microsoft.png";
+import mirlo from "../assets/site-icons/mirlo.png";
+import mixcloud from "../assets/site-icons/mixcloud.png";
+import mixesdb from "../assets/site-icons/mixesdb.png";
+import mozilla from "../assets/site-icons/mozilla.png";
+import msn from "../assets/site-icons/msn.png";
+import mubi from "../assets/site-icons/mubi.png";
+import mynoise from "../assets/site-icons/mynoise.png";
+import mytunerRadio from "../assets/site-icons/mytuner-radio.png";
+import napster from "../assets/site-icons/napster.png";
+import naver from "../assets/site-icons/naver.png";
+import ncs from "../assets/site-icons/ncs.png";
+import nebula from "../assets/site-icons/nebula.png";
+import netflix from "../assets/site-icons/netflix.png";
+import nfsa from "../assets/site-icons/nfsa.png";
+import nike from "../assets/site-icons/nike.png";
+import notion from "../assets/site-icons/notion.png";
+import odysee from "../assets/site-icons/odysee.png";
+import openmhz from "../assets/site-icons/openmhz.png";
+import openwhyd from "../assets/site-icons/openwhyd.png";
+import operavision from "../assets/site-icons/operavision.png";
+import pandora from "../assets/site-icons/pandora.png";
+import patreon from "../assets/site-icons/patreon.png";
+import paypal from "../assets/site-icons/paypal.png";
+import perplexity from "../assets/site-icons/perplexity.png";
 import pinterest from "../assets/site-icons/pinterest.png";
+import plex from "../assets/site-icons/plex.png";
+import podbean from "../assets/site-icons/podbean.png";
+import podchaser from "../assets/site-icons/podchaser.png";
+import podnews from "../assets/site-icons/podnews.png";
+import podverse from "../assets/site-icons/podverse.png";
+import popcornflix from "../assets/site-icons/popcornflix.png";
+import qobuz from "../assets/site-icons/qobuz.png";
+import qq from "../assets/site-icons/qq.png";
+import quora from "../assets/site-icons/quora.png";
+import radioLocator from "../assets/site-icons/radio-locator.png";
+import radioline from "../assets/site-icons/radioline.png";
+import radioreference from "../assets/site-icons/radioreference.png";
+import rakuten from "../assets/site-icons/rakuten.png";
 import reddit from "../assets/site-icons/reddit.png";
+import reuters from "../assets/site-icons/reuters.png";
+import roblox from "../assets/site-icons/roblox.png";
+import rumble from "../assets/site-icons/rumble.png";
+import rutube from "../assets/site-icons/rutube.png";
+import salesforce from "../assets/site-icons/salesforce.png";
+import shein from "../assets/site-icons/shein.png";
+import shopify from "../assets/site-icons/shopify.png";
+import sina from "../assets/site-icons/sina.png";
+import slack from "../assets/site-icons/slack.png";
+import sling from "../assets/site-icons/sling.png";
 import snapchat from "../assets/site-icons/snapchat.png";
+import sohu from "../assets/site-icons/sohu.png";
+import somafm from "../assets/site-icons/somafm.png";
+import songkick from "../assets/site-icons/songkick.png";
+import soundcloud from "../assets/site-icons/soundcloud.png";
+import spotify from "../assets/site-icons/spotify.png";
+import streema from "../assets/site-icons/streema.png";
+import substack from "../assets/site-icons/substack.png";
+import taobao from "../assets/site-icons/taobao.png";
+import target from "../assets/site-icons/target.png";
 import telegram from "../assets/site-icons/telegram.png";
 import threads from "../assets/site-icons/threads.png";
+import tidal from "../assets/site-icons/tidal.png";
 import tiktok from "../assets/site-icons/tiktok.png";
+import titantv from "../assets/site-icons/titantv.png";
+import trello from "../assets/site-icons/trello.png";
+import tripadvisor from "../assets/site-icons/tripadvisor.png";
+import tumblr from "../assets/site-icons/tumblr.png";
+import tunein from "../assets/site-icons/tunein.png";
+import tuneyou from "../assets/site-icons/tuneyou.png";
 import twitch from "../assets/site-icons/twitch.png";
 import twitter from "../assets/site-icons/twitter.png";
+import videa from "../assets/site-icons/videa.png";
+import viki from "../assets/site-icons/viki.png";
+import vimeo from "../assets/site-icons/vimeo.png";
+import vk from "../assets/site-icons/vk.png";
+import w3schools from "../assets/site-icons/w3schools.png";
+import walmart from "../assets/site-icons/walmart.png";
 import weibo from "../assets/site-icons/weibo.png";
+import wfmu from "../assets/site-icons/wfmu.png";
 import whatsapp from "../assets/site-icons/whatsapp.png";
+import wikipedia from "../assets/site-icons/wikipedia.png";
+import wix from "../assets/site-icons/wix.png";
+import wordpress from "../assets/site-icons/wordpress.png";
+import wqxr from "../assets/site-icons/wqxr.png";
+import xmplaylist from "../assets/site-icons/xmplaylist.png";
+import yahoo from "../assets/site-icons/yahoo.png";
+import yandex from "../assets/site-icons/yandex.png";
+import yelp from "../assets/site-icons/yelp.png";
 import youtube from "../assets/site-icons/youtube.png";
+import zara from "../assets/site-icons/zara.png";
+import zhihu from "../assets/site-icons/zhihu.png";
+import zillow from "../assets/site-icons/zillow.png";
+import zoom from "../assets/site-icons/zoom.png";
+import adultSwim from "../assets/site-icons/adult-swim.png";
+import apNews from "../assets/site-icons/ap-news.png";
+import asahiShimbun from "../assets/site-icons/asahi-shimbun.png";
+import bestBuy from "../assets/site-icons/best-buy.png";
+import bfiPlayer from "../assets/site-icons/bfi-player.png";
+import bookingCom from "../assets/site-icons/booking-com.png";
+import businessInsider from "../assets/site-icons/business-insider.png";
+import chicagoFilmArchives from "../assets/site-icons/chicago-film-archives.png";
+import classicalMusicOnly from "../assets/site-icons/classical-music-only.png";
+import corriereDellaSera from "../assets/site-icons/corriere-della-sera.png";
+import criterionChannel from "../assets/site-icons/criterion-channel.png";
+import cytube from "../assets/site-icons/cytube.png";
+import dailyMail from "../assets/site-icons/daily-mail.png";
+import derSpiegel from "../assets/site-icons/der-spiegel.png";
+import diFm from "../assets/site-icons/di-fm.png";
+import dvids from "../assets/site-icons/dvids.png";
+import elPais from "../assets/site-icons/el-pais.png";
+import foundTv from "../assets/site-icons/found-tv.png";
+import foxNews from "../assets/site-icons/fox-news.png";
+import freeMusicArchive from "../assets/site-icons/free-music-archive.png";
+import generativeFm from "../assets/site-icons/generative-fm.png";
+import globalFreeTv from "../assets/site-icons/global-free-tv.png";
+import hindustanTimes from "../assets/site-icons/hindustan-times.png";
+import historicFilms from "../assets/site-icons/historic-films.png";
+import historyPlay from "../assets/site-icons/history-play.png";
+import homeDepot from "../assets/site-icons/home-depot.png";
+import huggingFace from "../assets/site-icons/hugging-face.png";
+import hypeMachine from "../assets/site-icons/hype-machine.png";
+import iheartradio from "../assets/site-icons/iheartradio.png";
+import internetArchive from "../assets/site-icons/internet-archive.png";
+import khanAcademy from "../assets/site-icons/khan-academy.png";
+import lastFm from "../assets/site-icons/last-fm.png";
+import leMonde from "../assets/site-icons/le-monde.png";
+import libby from "../assets/site-icons/libby.png";
+import libraryOfCongressFilm from "../assets/site-icons/library-of-congress-film.png";
+import listenMoe from "../assets/site-icons/listen-moe.png";
+import listenNotes from "../assets/site-icons/listen-notes.png";
+import mailRu from "../assets/site-icons/mail-ru.png";
+import mercadoLibre from "../assets/site-icons/mercado-libre.png";
+import nationalFilmBoardOfCanada from "../assets/site-icons/national-film-board-of-canada.png";
+import netease163 from "../assets/site-icons/netease-163.png";
+import newYorkTimes from "../assets/site-icons/new-york-times.png";
+import niconico from "../assets/site-icons/niconico.png";
+import nightrideFm from "../assets/site-icons/nightride-fm.png";
+import nightwavePlaza from "../assets/site-icons/nightwave-plaza.png";
+import nprTinyDesk from "../assets/site-icons/npr-tiny-desk.png";
+import ntsRadio from "../assets/site-icons/nts-radio.png";
+import okVideo from "../assets/site-icons/ok-video.png";
+import oldTimeRadioDownloads from "../assets/site-icons/old-time-radio-downloads.png";
+import onlineRadioBox from "../assets/site-icons/online-radio-box.png";
+import paramountPlus from "../assets/site-icons/paramount-plus.png";
+import peacock from "../assets/site-icons/peacock.png";
+import peertube from "../assets/site-icons/peertube.png";
+import phishIn from "../assets/site-icons/phish-in.png";
+import playerFm from "../assets/site-icons/player-fm.png";
+import plutoTv from "../assets/site-icons/pluto-tv.png";
+import podcastIndex from "../assets/site-icons/podcast-index.png";
+import prelingerArchives from "../assets/site-icons/prelinger-archives.png";
+import primeVideo from "../assets/site-icons/prime-video.png";
+import publicDomainMovies from "../assets/site-icons/public-domain-movies.png";
+import radioGarden from "../assets/site-icons/radio-garden.png";
+import radioNet from "../assets/site-icons/radio-net.png";
+import radioParadise from "../assets/site-icons/radio-paradise.png";
+import rainyMood from "../assets/site-icons/rainy-mood.png";
+import redBullTv from "../assets/site-icons/red-bull-tv.png";
+import relayFm from "../assets/site-icons/relay-fm.png";
+import relicRadio from "../assets/site-icons/relic-radio.png";
+import setlistFm from "../assets/site-icons/setlist-fm.png";
+import shoutcastDirectory from "../assets/site-icons/shoutcast-directory.png";
+import showroom from "../assets/site-icons/showroom.png";
+import stackOverflow from "../assets/site-icons/stack-overflow.png";
+import steam from "../assets/site-icons/steam.png";
+import technobaseFm from "../assets/site-icons/technobase-fm.png";
+import theGuardian from "../assets/site-icons/the-guardian.png";
+import theLotRadio from "../assets/site-icons/the-lot-radio.png";
+import theRokuChannel from "../assets/site-icons/the-roku-channel.png";
+import theWhiteNoiseMachine from "../assets/site-icons/the-white-noise-machine.png";
+import timesOfIndia from "../assets/site-icons/times-of-india.png";
+import toonamiAftermath from "../assets/site-icons/toonami-aftermath.png";
+import ubuweb from "../assets/site-icons/ubuweb.png";
+import usaToday from "../assets/site-icons/usa-today.png";
+import vkVideo from "../assets/site-icons/vk-video.png";
+import wallStreetJournal from "../assets/site-icons/wall-street-journal.png";
+import washingtonPost from "../assets/site-icons/washington-post.png";
+import weatherChannel from "../assets/site-icons/weather-channel.png";
+import xiphDirectory from "../assets/site-icons/xiph-directory.png";
+import yahooJapan from "../assets/site-icons/yahoo-japan.png";
+import youAreListeningTo from "../assets/site-icons/you-are-listening-to.png";
 
 /** The icons that ship with the app, by the domain of the site they belong to. */
 export const BUNDLED_ICON_BY_DOMAIN: Record<string, string> = {
+  "9gag.com": icon9gag,
+  "adobe.com": adobe,
+  "airbnb.com": airbnb,
+  "aliexpress.com": aliexpress,
+  "allegro.pl": allegro,
+  "amazon.com": amazon,
+  "ambient-mixer.com": ambientMixer,
+  "apple.com": apple,
+  "arte.tv": arte,
+  "asiancrush.com": asiancrush,
+  "audiomack.com": audiomack,
+  "audionautix.com": audionautix,
+  "audius.co": audius,
+  "baidu.com": baidu,
+  "bbc.com": bbc,
+  "bensound.com": bensound,
+  "bild.de": bild,
+  "bilibili.com": bilibili,
+  "bing.com": bing,
+  "blogger.com": blogger,
+  "bloomberg.com": bloomberg,
+  "boomplay.com": boomplay,
+  "broadcastify.com": broadcastify,
+  "buzzfeed.com": buzzfeed,
+  "byutv.org": byutv,
+  "canva.com": canva,
+  "ccmixter.org": ccmixter,
+  "chegg.com": chegg,
+  "chillhop.com": chillhop,
+  "cinemata.org": cinemata,
+  "cineverse.com": cineverse,
+  "claude.ai": claude,
+  "cnbc.com": cnbc,
+  "cnn.com": cnn,
+  "costco.com": costco,
+  "coursera.org": coursera,
+  "craigslist.org": craigslist,
+  "curiositystream.com": curiositystream,
+  "dailymotion.com": dailymotion,
+  "daum.net": daum,
+  "deezer.com": deezer,
   "discord.com": discord,
+  "disneynow.com": disneynow,
   "douyin.com": douyin,
+  "dropout.tv": dropout,
+  "duolingo.com": duolingo,
+  "ebay.com": ebay,
+  "ektoplazm.com": ektoplazm,
+  "espn.com": espn,
+  "etsy.com": etsy,
   "facebook.com": facebook,
+  "fawesome.tv": fawesome,
+  "filmzie.com": filmzie,
+  "flickr.com": flickr,
+  "flipkart.com": flipkart,
+  "forbes.com": forbes,
+  "funkwhale.audio": funkwhale,
+  "gaana.com": gaana,
+  "geeksforgeeks.org": geeksforgeeks,
+  "github.com": github,
+  "gitlab.com": gitlab,
+  "globo.com": globo,
+  "goodreads.com": goodreads,
+  "hidive.com": hidive,
+  "ign.com": ign,
+  "ikea.com": ikea,
+  "ilovemusic.de": ilovemusic,
+  "imdb.com": imdb,
+  "imgur.com": imgur,
+  "indeed.com": indeed,
   "instagram.com": instagram,
+  "internet-radio.com": internetRadio,
+  "jamendo.com": jamendo,
+  "jango.com": jango,
+  "jiosaavn.com": jiosaavn,
+  "kakao.com": kakao,
+  "kick.com": kick,
+  "kosmi.io": kosmi,
   "kuaishou.com": kuaishou,
+  "letterboxd.com": letterboxd,
+  "librivox.org": librivox,
+  "line.me": line,
   "linkedin.com": linkedin,
+  "lowes.com": lowes,
+  "max.com": max,
+  "medium.com": medium,
   "messenger.com": messenger,
+  "microsoft.com": microsoft,
+  "mirlo.space": mirlo,
+  "mixcloud.com": mixcloud,
+  "mixesdb.com": mixesdb,
+  "mozilla.org": mozilla,
+  "msn.com": msn,
+  "mubi.com": mubi,
+  "mynoise.net": mynoise,
+  "mytuner-radio.com": mytunerRadio,
+  "napster.com": napster,
+  "naver.com": naver,
+  "ncs.io": ncs,
+  "nebula.tv": nebula,
+  "netflix.com": netflix,
+  "nfsa.gov.au": nfsa,
+  "nike.com": nike,
+  "notion.so": notion,
+  "odysee.com": odysee,
+  "openmhz.com": openmhz,
+  "openwhyd.org": openwhyd,
+  "operavision.eu": operavision,
+  "pandora.com": pandora,
+  "patreon.com": patreon,
+  "paypal.com": paypal,
+  "perplexity.ai": perplexity,
   "pinterest.com": pinterest,
+  "plex.tv": plex,
+  "podbean.com": podbean,
+  "podchaser.com": podchaser,
+  "podnews.net": podnews,
+  "podverse.fm": podverse,
+  "popcornflix.com": popcornflix,
+  "qobuz.com": qobuz,
+  "qq.com": qq,
+  "quora.com": quora,
+  "radio-locator.com": radioLocator,
+  "radioline.co": radioline,
+  "radioreference.com": radioreference,
+  "rakuten.co.jp": rakuten,
   "reddit.com": reddit,
+  "reuters.com": reuters,
+  "roblox.com": roblox,
+  "rumble.com": rumble,
+  "rutube.ru": rutube,
+  "salesforce.com": salesforce,
+  "shein.com": shein,
+  "shopify.com": shopify,
+  "sina.com.cn": sina,
+  "slack.com": slack,
+  "sling.com": sling,
   "snapchat.com": snapchat,
+  "sohu.com": sohu,
+  "somafm.com": somafm,
+  "songkick.com": songkick,
+  "soundcloud.com": soundcloud,
+  "spotify.com": spotify,
+  "streema.com": streema,
+  "substack.com": substack,
+  "taobao.com": taobao,
+  "target.com": target,
   "t.me": telegram,
   "telegram.org": telegram,
   "threads.com": threads,
   "threads.net": threads,
+  "tidal.com": tidal,
   "tiktok.com": tiktok,
+  "titantv.com": titantv,
+  "trello.com": trello,
+  "tripadvisor.com": tripadvisor,
+  "tumblr.com": tumblr,
+  "tunein.com": tunein,
+  "tuneyou.com": tuneyou,
   "twitch.tv": twitch,
   "twitter.com": twitter,
   "x.com": twitter,
+  "videa.hu": videa,
+  "viki.com": viki,
+  "vimeo.com": vimeo,
+  "vk.com": vk,
+  "w3schools.com": w3schools,
+  "walmart.com": walmart,
   "weibo.cn": weibo,
   "weibo.com": weibo,
+  "wfmu.org": wfmu,
   "whatsapp.com": whatsapp,
+  "wikipedia.org": wikipedia,
+  "wix.com": wix,
+  "wordpress.com": wordpress,
+  "wqxr.org": wqxr,
+  "xmplaylist.com": xmplaylist,
+  "yahoo.com": yahoo,
+  "yandex.ru": yandex,
+  "yelp.com": yelp,
   "youtube.com": youtube,
+  "zara.com": zara,
+  "zhihu.com": zhihu,
+  "zillow.com": zillow,
+  "zoom.us": zoom,
+  "adultswim.com": adultSwim,
+  "apnews.com": apNews,
+  "asahi.com": asahiShimbun,
+  "bestbuy.com": bestBuy,
+  "bfi.org.uk": bfiPlayer,
+  "booking.com": bookingCom,
+  "businessinsider.com": businessInsider,
+  "chicagofilmarchives.org": chicagoFilmArchives,
+  "classicalmusiconly.com": classicalMusicOnly,
+  "corriere.it": corriereDellaSera,
+  "criterionchannel.com": criterionChannel,
+  "cytu.be": cytube,
+  "dailymail.co.uk": dailyMail,
+  "spiegel.de": derSpiegel,
+  "di.fm": diFm,
+  "dvidshub.net": dvids,
+  "elpais.com": elPais,
+  "foundtv.com": foundTv,
+  "foxnews.com": foxNews,
+  "freemusicarchive.org": freeMusicArchive,
+  "generative.fm": generativeFm,
+  "globalfreetv.com": globalFreeTv,
+  "hindustantimes.com": hindustanTimes,
+  "historicfilms.com": historicFilms,
+  "history.com": historyPlay,
+  "homedepot.com": homeDepot,
+  "huggingface.co": huggingFace,
+  "hypem.com": hypeMachine,
+  "iheart.com": iheartradio,
+  "archive.org": internetArchive,
+  "khanacademy.org": khanAcademy,
+  "last.fm": lastFm,
+  "lemonde.fr": leMonde,
+  "libbyapp.com": libby,
+  "loc.gov": libraryOfCongressFilm,
+  "listen.moe": listenMoe,
+  "listennotes.com": listenNotes,
+  "mail.ru": mailRu,
+  "mercadolibre.com": mercadoLibre,
+  "nfb.ca": nationalFilmBoardOfCanada,
+  "163.com": netease163,
+  "nytimes.com": newYorkTimes,
+  "nicovideo.jp": niconico,
+  "nightride.fm": nightrideFm,
+  "plaza.one": nightwavePlaza,
+  "npr.org": nprTinyDesk,
+  "nts.live": ntsRadio,
+  "ok.ru": okVideo,
+  "oldtimeradiodownloads.com": oldTimeRadioDownloads,
+  "onlineradiobox.com": onlineRadioBox,
+  "paramountplus.com": paramountPlus,
+  "peacocktv.com": peacock,
+  "joinpeertube.org": peertube,
+  "phish.in": phishIn,
+  "player.fm": playerFm,
+  "pluto.tv": plutoTv,
+  "podcastindex.org": podcastIndex,
+  "panix.com": prelingerArchives,
+  "primevideo.com": primeVideo,
+  "publicdomainmovie.net": publicDomainMovies,
+  "radio.garden": radioGarden,
+  "radio.net": radioNet,
+  "radioparadise.com": radioParadise,
+  "rainymood.com": rainyMood,
+  "redbull.com": redBullTv,
+  "relay.fm": relayFm,
+  "relicradio.com": relicRadio,
+  "setlist.fm": setlistFm,
+  "shoutcast.com": shoutcastDirectory,
+  "showroom-live.com": showroom,
+  "stackoverflow.com": stackOverflow,
+  "steampowered.com": steam,
+  "technobase.fm": technobaseFm,
+  "theguardian.com": theGuardian,
+  "thelotradio.com": theLotRadio,
+  "roku.com": theRokuChannel,
+  "thewhitenoisemachine.com": theWhiteNoiseMachine,
+  "indiatimes.com": timesOfIndia,
+  "toonamiaftermath.com": toonamiAftermath,
+  "ubu.com": ubuweb,
+  "usatoday.com": usaToday,
+  "vkvideo.ru": vkVideo,
+  "wsj.com": wallStreetJournal,
+  "washingtonpost.com": washingtonPost,
+  "weather.com": weatherChannel,
+  "xiph.org": xiphDirectory,
+  "yahoo.co.jp": yahooJapan,
+  "youarelistening.to": youAreListeningTo,
 };

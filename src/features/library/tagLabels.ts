@@ -1,0 +1,26 @@
+import type { MessageKey } from "../../i18n/messages";
+import type { LibraryTag } from "./ipc";
+
+export const TAG_LABELS: Record<LibraryTag, MessageKey> = {
+  official: "library.tag.official",
+  community: "library.tag.community",
+  mobile: "library.tag.mobile",
+  desktop: "library.tag.desktop",
+  hub: "library.tag.hub",
+  ai: "library.tag.ai",
+  archive: "library.tag.archive",
+  education: "library.tag.education",
+  games: "library.tag.games",
+  music: "library.tag.music",
+  news: "library.tag.news",
+  podcasts: "library.tag.podcasts",
+  productivity: "library.tag.productivity",
+  radio: "library.tag.radio",
+  reference: "library.tag.reference",
+  search: "library.tag.search",
+  shopping: "library.tag.shopping",
+  social: "library.tag.social",
+  tech: "library.tag.tech",
+  travel: "library.tag.travel",
+  video: "library.tag.video",
+};

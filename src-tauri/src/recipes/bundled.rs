@@ -3,7 +3,10 @@
 //! files; each is parsed once as a bundled recipe, so a script in it passes the same policy as
 //! any shared recipe. Nothing here touches the network or the disk at run time.
 
-use std::{collections::HashSet, sync::OnceLock};
+use std::{
+    collections::{HashMap, HashSet},
+    sync::OnceLock,
+};
 
 use serde::Serialize;
 
@@ -18,6 +21,34 @@ pub const OFFICIAL_ID_PREFIX: &str = "market.official.";
 pub const TAG_OFFICIAL: &str = "official";
 pub const TAG_COMMUNITY: &str = "community";
 pub const TAG_HUB: &str = "hub";
+
+/// The subject tags the library filters by. `recipes/categories.json` assigns one to three of them
+/// to each bundled recipe by id; they are library-only, never stored inside a recipe.
+pub const CATEGORIES: &[&str] = &[
+    "ai",
+    "archive",
+    "education",
+    "games",
+    "music",
+    "news",
+    "podcasts",
+    "productivity",
+    "radio",
+    "reference",
+    "search",
+    "shopping",
+    "social",
+    "tech",
+    "travel",
+    "video",
+];
+
+const CATEGORIES_JSON: &str = include_str!("../../../recipes/categories.json");
+
+fn category_table() -> &'static HashMap<String, Vec<String>> {
+    static TABLE: OnceLock<HashMap<String, Vec<String>>> = OnceLock::new();
+    TABLE.get_or_init(|| serde_json::from_str(CATEGORIES_JSON).unwrap_or_default())
+}
 
 const MAX_SEARCH_RESULTS: usize = 8;
 const MAX_HOSTS: usize = 10;
@@ -77,9 +108,13 @@ impl Bundled {
             .unwrap_or_default()
     }
 
-    /// Platform tags, then `official` or `community`, then `hub` for a recipe with launcher tabs.
+    /// Platform tags, then the subject categories, then `official` or `community`, then `hub` for
+    /// a recipe with launcher tabs.
     pub fn tags(&self) -> Vec<String> {
         let mut tags = self.recipe.tags.clone();
+        if let Some(categories) = category_table().get(&self.recipe.id) {
+            tags.extend(categories.iter().cloned());
+        }
         tags.push(self.channel.tag().to_owned());
         if self.recipe.hub.is_some() {
             tags.push(TAG_HUB.to_owned());
@@ -395,6 +430,38 @@ mod tests {
         let tags = hub.tags();
         assert_eq!(tags[tags.len() - 2..], ["official", "hub"]);
         assert!(!official.tags().contains(&"hub".to_owned()));
+    }
+
+    #[test]
+    fn every_bundled_recipe_has_one_to_three_known_categories_and_none_is_stale() {
+        let table = category_table();
+        for bundled in all() {
+            let categories = table
+                .get(&bundled.recipe.id)
+                .unwrap_or_else(|| panic!("{} has no categories", bundled.recipe.id));
+            assert!((1..=3).contains(&categories.len()), "{}", bundled.recipe.id);
+            let unique: HashSet<_> = categories.iter().collect();
+            assert_eq!(unique.len(), categories.len(), "{}", bundled.recipe.id);
+            for category in categories {
+                assert!(
+                    CATEGORIES.contains(&category.as_str()),
+                    "{}: unknown category {category}",
+                    bundled.recipe.id
+                );
+            }
+        }
+        for id in table.keys() {
+            assert!(
+                find(id).is_some(),
+                "categories.json names unknown recipe {id}"
+            );
+        }
+    }
+
+    #[test]
+    fn categories_sit_between_the_platforms_and_the_channel() {
+        let tags = find("market.official.youtube-music").unwrap().tags();
+        assert_eq!(tags, ["desktop", "mobile", "music", "official"]);
     }
 
     #[test]

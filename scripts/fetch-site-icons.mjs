@@ -335,7 +335,8 @@ function cachedByFile(manifest, site) {
 
 /** The identifier an icon is imported under: the slug with its dashes turned into camel case. */
 function identifierOf(slug) {
-  return slug.replace(/-([a-z0-9])/g, (_, character) => character.toUpperCase());
+  const identifier = slug.replace(/-([a-z0-9])/g, (_, character) => character.toUpperCase());
+  return /^[a-z_$]/i.test(identifier) ? identifier : `icon${identifier}`;
 }
 
 /** The name a domain has: the part before the first dot. */

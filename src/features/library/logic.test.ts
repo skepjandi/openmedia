@@ -3,6 +3,7 @@ import type { LibraryItem } from "./ipc";
 import {
   backTarget,
   defaultFilter,
+  facetCount,
   knownTags,
   matchesFilter,
   matchesSearch,
@@ -69,8 +70,33 @@ describe("tag filter", () => {
     expect(shown.map((entry) => entry.id)).toEqual(["o1", "o2", "c1", "c2"]);
   });
 
+  it("widens within the categories and narrows against the other kinds", () => {
+    const items = [
+      item("a", ["mobile", "music", "official"]),
+      item("b", ["mobile", "radio", "official"]),
+      item("c", ["mobile", "news", "official"]),
+      item("d", ["desktop", "music", "official"]),
+    ];
+    const filter = new Set(["mobile", "music", "radio"] as const);
+    expect(visibleItems(items, filter).map((entry) => entry.id)).toEqual(["a", "b"]);
+  });
+
+  it("counts a chip against the other kinds only, so its own kind never hides it", () => {
+    const items = [
+      item("a", ["mobile", "music", "official"]),
+      item("b", ["mobile", "radio", "official"]),
+      item("d", ["desktop", "music", "official"]),
+    ];
+    const filter = new Set(["mobile", "music"] as const);
+    expect(facetCount(items, filter, "radio")).toBe(1);
+    expect(facetCount(items, filter, "music")).toBe(1);
+    expect(facetCount(items, filter, "desktop")).toBe(1);
+    expect(facetCount(items, filter, "music", "no such")).toBe(0);
+  });
+
   it("ignores tags the app does not know", () => {
     expect(knownTags(["mobile", "beta", "official", "hub"])).toEqual(["official", "mobile", "hub"]);
+    expect(knownTags(["video", "mobile", "music"])).toEqual(["mobile", "music", "video"]);
   });
 });
 

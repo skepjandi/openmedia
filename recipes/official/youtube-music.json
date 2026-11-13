@@ -1,0 +1,92 @@
+{
+  "schema": 1,
+  "id": "market.official.youtube-music",
+  "name": "YouTube Music",
+  "version": "1.0.0",
+  "origin": "user",
+  "tags": ["desktop", "mobile"],
+  "match": ["https://music.youtube.com/*"],
+  "options": [
+    {
+      "id": "promos",
+      "label": "Hide promo banners",
+      "description": "The mealbar promo strip and the statement banner that push Premium or the app.",
+      "group": "annoyance",
+      "default": true
+    },
+    {
+      "id": "upsell",
+      "label": "Hide the Premium upsell dialog",
+      "description": "The pop-up asking you to upgrade to YouTube Music Premium.",
+      "group": "annoyance",
+      "default": true
+    },
+    {
+      "id": "upgrade-tab",
+      "label": "Hide the Upgrade tab",
+      "description": "The Upgrade entry in the top tab bar.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "cookie-banners",
+      "label": "Hide cookie banners",
+      "description": "Cookie-consent dialogs from the common consent platforms.",
+      "group": "annoyance",
+      "default": true
+    }
+  ],
+  "rules": [
+    {
+      "id": "mealbar-promo",
+      "label": "Mealbar promo strip",
+      "type": "hide",
+      "option": "promos",
+      "target": {
+        "css": "ytmusic-mealbar-promo-renderer"
+      }
+    },
+    {
+      "id": "statement-banner",
+      "label": "Statement banner",
+      "type": "hide",
+      "option": "promos",
+      "target": {
+        "css": "ytmusic-statement-banner-renderer"
+      }
+    },
+    {
+      "id": "upsell-dialog",
+      "label": "Premium upsell dialog",
+      "type": "hide",
+      "option": "upsell",
+      "target": {
+        "css": "ytmusic-upsell-dialog-renderer"
+      }
+    },
+    {
+      "id": "upgrade-tab",
+      "label": "Upgrade tab",
+      "type": "hide",
+      "option": "upgrade-tab",
+      "target": {
+        "css": "ytmusic-pivot-bar-item-renderer[tab-id=\"SPunlimited\"]"
+      }
+    },
+    {
+      "id": "cookie-banners",
+      "label": "Cookie consent dialogs",
+      "type": "hide",
+      "option": "cookie-banners",
+      "target": {
+        "css": "#onetrust-consent-sdk, #onetrust-banner-sdk, #CybotCookiebotDialog, #qc-cmp2-container, .fc-consent-root, #didomi-host, #usercentrics-root, #truste-consent-track, .osano-cm-window, .cc-window, #cookie-banner, #cookie-notice, #cookieBanner"
+      }
+    }
+  ],
+  "meta": {
+    "author": "OpenMedia",
+    "homepage": "https://music.youtube.com/",
+    "summary": "Hides YouTube Music promo banners, the Premium upsell pop-up, and optionally the Upgrade tab",
+    "notes": "**Not verified live.** The fixtures in `recipes/fixtures/youtube-music/` are synthetic: hand-written pages that contain the targeted elements, not captures of the site, so the fixture test proves only that the selectors parse and spare protected content. The `ytmusic-*` element names and the `SPunlimited` tab id come from public content-blocker filter lists and the YouTube Music web client; they were not run against a live page, and YouTube renames elements without notice. A rule that matches nothing is harmless.\n\nThe recipe covers `music.youtube.com` only. The separate YouTube recipe covers `www.youtube.com` and `m.youtube.com`.\n\n- **Promo banners** and the **Premium upsell** are on by default.\n- **Upgrade tab** is off by default: it is a navigation entry you may want.\n- Ads inside playback are not touched: CSS cannot remove them."
+  }
+}

@@ -6,6 +6,14 @@ All notable changes to OpenMedia are documented here.
 >
 > **Wiki**: the [GitHub Wiki](https://github.com/skepjandi/openmedia/wiki) is the public-facing main wiki — architecture, recipe format, AI pipeline, security model, roadmap. Source-controlled editing surface is `docs/wiki/` in this repo; CI (`.github/workflows/sync-wiki.yml`) mirrors it to the GitHub Wiki on every merge to `main`. New single-PR changes belong here, not as new wiki pages.
 
+### feat(recipes): 300 official recipes and category filters in the library
+
+**Area:** `feat(recipes)`
+
+**Change:** `recipes/official/` gains 300 recipes: a curated set of 150 popular general sites and 150 media, streaming, radio, podcast and video-archive sites inspired by FMHY (free services; piracy-focused sites left out), including `market.official.youtube-music`. Each hides cookie-consent dialogs, Google ad slots and app-install banners, one switch per group; YouTube Music hides its `ytmusic-*` promos and Premium upsell. Their fixtures are **synthetic**, hand-written pages, so the fixture test proves the selectors parse and spare protected content, not that a site serves those elements. `recipes/categories.json` gives each bundled recipe one to three subject categories, shown as tags, and the library's new *Filters* dialog filters by source, platform, type and category with live counts. Site icons were bundled when the site exposed a fetchable image; the rest use the existing on-demand favicon path.
+
+**Verified:** Rust recipe tests; TypeScript, lint, library, i18n and icon tests. **Not verified:** selectors against live sites or the dialog on a device; 46 sites exposed no fetchable image icon; new locale labels use English text.
+
 ### feat(share): remember the GitHub sign-in and show the account
 
 **Area:** `feat(share)`

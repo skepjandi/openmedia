@@ -1,0 +1,67 @@
+{
+  "schema": 1,
+  "id": "market.official.byutv",
+  "name": "BYUtv",
+  "version": "1.0.0",
+  "origin": "user",
+  "tags": ["desktop", "mobile"],
+  "match": ["https://*.byutv.org/*"],
+  "options": [
+    {
+      "id": "cookie-banners",
+      "label": "Hide cookie banners",
+      "description": "Cookie-consent dialogs from the common consent platforms. The site may still lock scrolling.",
+      "group": "annoyance",
+      "default": true
+    },
+    {
+      "id": "ads",
+      "label": "Hide ads",
+      "description": "Google ad slots and ad iframes.",
+      "group": "annoyance",
+      "default": true
+    },
+    {
+      "id": "app-banners",
+      "label": "Hide app install banners",
+      "description": "The Smart App Banner and install-our-app strips.",
+      "group": "annoyance",
+      "default": true
+    }
+  ],
+  "rules": [
+    {
+      "id": "cookie-banners",
+      "label": "Cookie consent dialogs",
+      "type": "hide",
+      "option": "cookie-banners",
+      "target": {
+        "css": "#onetrust-consent-sdk, #onetrust-banner-sdk, #CybotCookiebotDialog, #qc-cmp2-container, .fc-consent-root, #didomi-host, #usercentrics-root, #truste-consent-track, .osano-cm-window, .cc-window, #cookie-banner, #cookie-notice, #cookieBanner"
+      }
+    },
+    {
+      "id": "ad-slots",
+      "label": "Ad slots and ad iframes",
+      "type": "hide",
+      "option": "ads",
+      "target": {
+        "css": "ins.adsbygoogle, div[id^=\"div-gpt-ad\"], iframe[id^=\"google_ads_iframe\"], iframe[src*=\"doubleclick.net\"], iframe[src*=\"googlesyndication.com\"], div[data-google-query-id]"
+      }
+    },
+    {
+      "id": "app-banners",
+      "label": "App install banners",
+      "type": "hide",
+      "option": "app-banners",
+      "target": {
+        "css": "#smartbanner, .smartbanner, .smart-banner, .app-banner, #app-banner, .app-download-banner, .install-app-banner"
+      }
+    }
+  ],
+  "meta": {
+    "author": "OpenMedia",
+    "homepage": "https://www.byutv.org/",
+    "summary": "Cleans up cookie banners, ads and app prompts on BYUtv, a media site",
+    "notes": "**Not verified live.** The fixtures in `recipes/fixtures/byutv/` are synthetic: hand-written pages that contain the targeted elements, not captures of the site, so the fixture test proves only that the selectors parse and spare protected content. These are generic cleanup rules, written from the selectors that common cookie-consent, ad and app-banner scripts use. They were not run against BYUtv; a rule that matches nothing on a page is harmless, but nothing here promises that this site shows any of them.\n\n- **Cookie banners** hides the OneTrust, Cookiebot, Quantcast, Didomi, Usercentrics, TrustArc and Osano dialogs and common `cc-window` / `#cookie-banner` boxes. Some sites lock page scroll while the dialog is open; hiding the dialog does not undo that.\n- **Ads** hides Google ad slots and ad iframes. Sites that serve their own ad markup are not covered.\n- **App banners** hides the Smart App Banner and common \"install our app\" strips.\n\nOpen a page, toggle the options in Settings and report anything that hides content you wanted."
+  }
+}
