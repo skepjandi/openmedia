@@ -52,6 +52,7 @@ export function IncognitoRecipesLink() {
   const unlock = useApp((s) => s.unlockIncognito);
   const needsPro = useEntitlementStore((s) => s.status !== "pro");
   const [checking, setChecking] = useState(false);
+  const incognitoActive = useApp((s) => s.incognito.active);
   const t = useT();
 
   const open = async () => {
@@ -84,9 +85,11 @@ export function IncognitoRecipesLink() {
             <ProIcon size={12} />
           </span>
         ) : (
-          <span aria-hidden="true" className="shrink-0 text-paper/45">
-            <BiometricIcon size={18} />
-          </span>
+          !incognitoActive && (
+            <span aria-hidden="true" className="shrink-0 text-paper/45">
+              <BiometricIcon size={18} />
+            </span>
+          )
         )}
         <span aria-hidden="true" className="text-paper/50 rtl:-scale-x-100">
           <ForwardIcon />

@@ -989,6 +989,8 @@ export const useApp = create<AppStore>((set, get) => {
         get().openSheet("paywall");
         return false;
       }
+      // Entering incognito already passed the check, so its own screens need no second one.
+      if (get().incognito.active) return true;
       try {
         return await incognitoIpc.unlock(translate()("incognito.unlockReason"));
       } catch (error) {

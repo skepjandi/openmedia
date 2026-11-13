@@ -6,6 +6,16 @@ All notable changes to OpenMedia are documented here.
 >
 > **Wiki**: the [GitHub Wiki](https://github.com/skepjandi/openmedia/wiki) is the public-facing main wiki — architecture, recipe format, AI pipeline, security model, roadmap. Source-controlled editing surface is `docs/wiki/` in this repo; CI (`.github/workflows/sync-wiki.yml`) mirrors it to the GitHub Wiki on every merge to `main`. New single-PR changes belong here, not as new wiki pages.
 
+### fix(incognito): no second biometric check while incognito is on
+
+**Area:** `fix(incognito)`
+
+**Change:** Entering incognito already passes Face ID, Touch ID or the passcode, so while it is on the incognito recipes row, the incognito favorites section and *Add to incognito* in the recipe library open without another check, and their fingerprint icon is hidden. Outside incognito they still ask. `unlockIncognito` returns true when incognito is active (after the Pro check).
+
+**Verified:** `yarn ts:check`, Vitest `src/app` (48). **Not verified:** on a device or simulator.
+
+**PR:** n/a
+
 ### feat(onboarding): search and filters in the quick-access step
 
 **Area:** `feat(onboarding)`

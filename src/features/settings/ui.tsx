@@ -1,4 +1,5 @@
 import { useEffect, useState, type ReactNode } from "react";
+import { useApp } from "../../app/store";
 import { Chevron } from "../../shared/Chevron";
 import { DownIcon, ProIcon } from "../../shared/icons";
 import { BiometricIcon } from "../incognito/BiometricIcon";
@@ -93,6 +94,7 @@ export function LockedSection({
 }: LockedSectionProps) {
   const [open, setOpen] = useState(false);
   const [checking, setChecking] = useState(false);
+  const incognitoActive = useApp((s) => s.incognito.active);
 
   useEffect(() => {
     const lockWhenHidden = () => {
@@ -137,7 +139,7 @@ export function LockedSection({
               <ProIcon size={12} />
             </span>
           ) : (
-            !open && <BiometricIcon />
+            !open && !incognitoActive && <BiometricIcon />
           )}
           {title}
         </span>
