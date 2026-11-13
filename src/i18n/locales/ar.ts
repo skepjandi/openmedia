@@ -558,6 +558,7 @@ export const ar: Messages = {
   "tabs.open": "المواقع المفتوحة",
   "tabs.openEmpty": "لا يوجد موقع مفتوح.",
   "tabs.closeOthers": "إغلاق المواقع الأخرى",
+  "tabs.newTab": "علامة تبويب جديدة",
   "tabs.closeNote": "إغلاق موقع ينهي صفحته المفتوحة فقط. تبقى مفضلاتك وسجلك.",
   "tabs.closeOne": "إغلاق {name}",
   "tabs.quickAccess": "الوصول السريع",

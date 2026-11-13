@@ -120,6 +120,8 @@ export interface AppStore {
   onboardingOpen: boolean;
   sessions: Session[];
   activeId: string | null;
+  /** An empty page covers the open sessions until the user opens or picks one. */
+  blankTab: boolean;
   action: SessionAction | null;
   /** Edge the floating button rests on; the back button takes the other one. */
   fabEdge: Edge;
@@ -134,6 +136,8 @@ export interface AppStore {
   load: () => Promise<void>;
   openSheet: (sheet: Sheet) => void;
   closeSheet: () => void;
+  /** An empty page with the command bar open: a new tab. The sessions stay open underneath it. */
+  openNewTab: () => void;
   /** Opens the Recipes page with this recipe's card expanded. */
   openRecipe: (recipeId: string) => void;
   /** Fetches what only Settings and the fan need: site options and missing icons. Runs after the first page shows. */
@@ -240,7 +244,7 @@ function withOption(site: SiteSettings, optionId: string, value: OptionValue): S
 
 /** The page the user is looking at. */
 export const selectPage = (store: AppStore): Session | null =>
-  store.sessions.find((session) => session.id === store.activeId) ?? null;
+  store.blankTab ? null : (store.sessions.find((session) => session.id === store.activeId) ?? null);
 
 const NO_FAVORITES: readonly Favorite[] = [];
 
@@ -351,6 +355,7 @@ export const useApp = create<AppStore>((set, get) => {
         newSession(id, source, url, now, hubId, restoredBack),
       ],
       activeId: id,
+      blankTab: false,
       sheet: "none",
       action: adoptedId
         ? { nonce: ++nonce, type: "adopt", id, url, previousId: null }
@@ -365,6 +370,7 @@ export const useApp = create<AppStore>((set, get) => {
     set((current) => ({
       sessions: markUsed(markUsed(current.sessions, previousId, now), id, now),
       activeId: id,
+      blankTab: false,
       sheet: "none",
       action: { nonce: ++nonce, type: "activate", id },
     }));
@@ -457,6 +463,7 @@ export const useApp = create<AppStore>((set, get) => {
     onboardingOpen: false,
     sessions: [],
     activeId: null,
+    blankTab: false,
     action: null,
     fabEdge: loadPosition().edge,
     sites: [],
@@ -499,6 +506,9 @@ export const useApp = create<AppStore>((set, get) => {
     openSheet: (sheet) => {
       const isPro = useEntitlementStore.getState().status === "pro";
       set((current) => showSheet(current, !isPro && sheet === "stats" ? "paywall" : sheet));
+    },
+    openNewTab: () => {
+      set((current) => ({ ...showSheet(current, "assistant"), blankTab: true }));
     },
     closeSheet: () =>
       set((current) => ({

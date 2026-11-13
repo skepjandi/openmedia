@@ -556,6 +556,7 @@ export const th: Messages = {
   "tabs.open": "ไซต์ที่เปิดอยู่",
   "tabs.openEmpty": "ไม่มีไซต์ที่เปิดอยู่",
   "tabs.closeOthers": "ปิดไซต์อื่น",
+  "tabs.newTab": "แท็บใหม่",
   "tabs.closeNote": "การปิดไซต์จะสิ้นสุดเฉพาะหน้าที่เปิดอยู่ รายการโปรดและประวัติของคุณยังอยู่",
   "tabs.closeOne": "ปิด {name}",
   "tabs.quickAccess": "ทางลัด",

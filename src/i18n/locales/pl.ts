@@ -582,6 +582,7 @@ export const pl: Messages = {
   "tabs.open": "Otwarte witryny",
   "tabs.openEmpty": "Żadna witryna nie jest otwarta.",
   "tabs.closeOthers": "Zamknij pozostałe witryny",
+  "tabs.newTab": "Nowa karta",
   "tabs.closeNote":
     "Zamknięcie witryny kończy tylko jej otwartą stronę. Ulubione i historia zostają.",
   "tabs.closeOne": "Zamknij {name}",

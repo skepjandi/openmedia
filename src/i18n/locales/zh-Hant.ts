@@ -542,6 +542,7 @@ export const zhHant: Messages = {
   "tabs.open": "已開啟的網站",
   "tabs.openEmpty": "沒有開啟的網站。",
   "tabs.closeOthers": "關閉其他網站",
+  "tabs.newTab": "新分頁",
   "tabs.closeNote": "關閉網站只會結束它已開啟的頁面。你的最愛和歷史記錄會保留。",
   "tabs.closeOne": "關閉{name}",
   "tabs.quickAccess": "快速存取",

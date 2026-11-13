@@ -588,6 +588,7 @@ export const it: Messages = {
   "tabs.open": "Siti aperti",
   "tabs.openEmpty": "Nessun sito è aperto.",
   "tabs.closeOthers": "Chiudi gli altri siti",
+  "tabs.newTab": "Nuova scheda",
   "tabs.closeNote":
     "Chiudere un sito termina solo la sua pagina aperta. Preferiti e cronologia restano.",
   "tabs.closeOne": "Chiudi {name}",

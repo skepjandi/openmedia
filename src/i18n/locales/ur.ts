@@ -578,6 +578,7 @@ export const ur: Messages = {
   "tabs.open": "کھلی سائٹس",
   "tabs.openEmpty": "کوئی سائٹ کھلی نہیں ہے۔",
   "tabs.closeOthers": "باقی سائٹس بند کریں",
+  "tabs.newTab": "نیا ٹیب",
   "tabs.closeNote":
     "سائٹ بند کرنے سے صرف اس کا کھلا صفحہ ختم ہوتا ہے۔ آپ کے پسندیدہ اور ہسٹری برقرار رہتے ہیں۔",
   "tabs.closeOne": "{name} بند کریں",

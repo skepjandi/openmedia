@@ -595,6 +595,7 @@ export const de: Messages = {
   "tabs.open": "Offene Seiten",
   "tabs.openEmpty": "Keine Seite ist geöffnet.",
   "tabs.closeOthers": "Die anderen Seiten schließen",
+  "tabs.newTab": "Neuer Tab",
   "tabs.closeNote":
     "Beim Schließen wird nur die geöffnete Seite beendet. Favoriten und Verlauf bleiben erhalten.",
   "tabs.closeOne": "{name} schließen",

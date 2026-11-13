@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 vi.mock("@tauri-apps/api/core", () => ({ invoke: vi.fn() }));
 vi.mock("@tauri-apps/api/event", () => ({ listen: vi.fn() }));
 
-import { selectSettingsOpen, useApp } from "./store";
+import { selectPage, selectSettingsOpen, useApp } from "./store";
 import { newSession } from "../features/web/sessions";
 import { useEntitlementStore } from "../features/paywall/store";
 
@@ -98,5 +98,33 @@ describe("closing sites from the Tabs screen", () => {
     useApp.getState().closeOtherSessions();
     expect(useApp.getState().sessions.map((s) => s.id)).toEqual(["b"]);
     expect(useApp.getState().activeId).toBe("b");
+  });
+});
+
+describe("a new tab", () => {
+  const session = newSession("a", "typed", "https://example.com/", 0);
+
+  beforeEach(() => {
+    useApp.setState({ sessions: [session], activeId: "a", blankTab: false, sheet: "tabs" });
+  });
+
+  it("is an empty page with the command bar open, and keeps the open sessions", () => {
+    useApp.getState().openNewTab();
+    const store = useApp.getState();
+    expect(store.sheet).toBe("assistant");
+    expect(store.blankTab).toBe(true);
+    expect(selectPage(store)).toBeNull();
+    expect(store.sessions).toHaveLength(1);
+  });
+
+  it("gives way to a site the user opens or switches to", () => {
+    useApp.getState().openNewTab();
+    useApp.getState().openSession("a");
+    expect(useApp.getState().blankTab).toBe(false);
+    expect(selectPage(useApp.getState())?.id).toBe("a");
+    useApp.getState().openNewTab();
+    useApp.getState().openSearch("https://www.google.com/search?q=cats");
+    expect(useApp.getState().blankTab).toBe(false);
+    expect(useApp.getState().sessions).toHaveLength(2);
   });
 });

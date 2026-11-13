@@ -586,6 +586,7 @@ export const ru: Messages = {
   "tabs.open": "Открытые сайты",
   "tabs.openEmpty": "Нет открытых сайтов.",
   "tabs.closeOthers": "Закрыть остальные сайты",
+  "tabs.newTab": "Новая вкладка",
   "tabs.closeNote":
     "Закрытие сайта завершает только его открытую страницу. Избранное и история сохраняются.",
   "tabs.closeOne": "Закрыть {name}",

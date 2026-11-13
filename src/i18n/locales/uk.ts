@@ -586,6 +586,7 @@ export const uk: Messages = {
   "tabs.open": "Відкриті сайти",
   "tabs.openEmpty": "Немає відкритих сайтів.",
   "tabs.closeOthers": "Закрити інші сайти",
+  "tabs.newTab": "Нова вкладка",
   "tabs.closeNote":
     "Закриття сайту завершує лише його відкриту сторінку. Обране та історія залишаються.",
   "tabs.closeOne": "Закрити {name}",

@@ -581,6 +581,7 @@ export const id: Messages = {
   "tabs.open": "Situs terbuka",
   "tabs.openEmpty": "Tidak ada situs yang terbuka.",
   "tabs.closeOthers": "Tutup situs lainnya",
+  "tabs.newTab": "Tab baru",
   "tabs.closeNote":
     "Menutup situs hanya mengakhiri halaman yang terbuka. Favorit dan riwayat Anda tetap ada.",
   "tabs.closeOne": "Tutup {name}",

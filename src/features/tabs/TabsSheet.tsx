@@ -3,12 +3,13 @@ import { selectLocale, useApp } from "../../app/store";
 import { useT } from "../../i18n/useT";
 import { displayHost, quickAccess } from "../../shared/favorites";
 import { usage, type Favorite, type UsageReport } from "../../shared/ipc";
+import { PlusIcon } from "../../shared/icons";
 import { Screen } from "../../shared/Screen";
 import { useIconForUrl } from "../../shared/siteIcons";
 import { SiteTile } from "../../shared/SiteTile";
 import { describeAddress } from "../history/address";
 import { formatDuration, localDay } from "../stats/format";
-import { Group, GroupLabel, quietButton } from "../settings/ui";
+import { Group, GroupLabel, primaryBlockButton, quietButton } from "../settings/ui";
 import { findFavoriteSession, sessionForFavorite, type Session } from "../web/sessions";
 import { formatMs, orderedTabs, secondsTodayFor } from "./tabs";
 
@@ -24,6 +25,8 @@ export function TabsSheet() {
   const openSheet = useApp((s) => s.openSheet);
   const sessions = useApp((s) => s.sessions);
   const activeId = useApp((s) => s.activeId);
+  const blankTab = useApp((s) => s.blankTab);
+  const openNewTab = useApp((s) => s.openNewTab);
   const favorites = useApp((s) => s.state?.favorites) ?? NO_FAVORITES;
   const history = useApp((s) => s.state?.history) ?? NO_HISTORY;
   const sites = useApp((s) => s.sites);
@@ -67,6 +70,10 @@ export function TabsSheet() {
       <div className="flex flex-col gap-6">
         <section>
           <GroupLabel>{t("tabs.open")}</GroupLabel>
+          <button type="button" onClick={openNewTab} className={`mb-3 ${primaryBlockButton}`}>
+            <PlusIcon />
+            {t("tabs.newTab")}
+          </button>
           {tabs.length === 0 ? (
             <Empty text={t("tabs.openEmpty")} />
           ) : (
@@ -75,7 +82,7 @@ export function TabsSheet() {
                 <OpenTab
                   key={session.id}
                   session={session}
-                  active={session.id === activeId}
+                  active={session.id === activeId && !blankTab}
                   now={now}
                   secondsToday={secondsTodayFor(report, session.scope)}
                   favorites={favorites}
