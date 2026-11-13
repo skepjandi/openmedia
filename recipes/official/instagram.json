@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "market.official.instagram",
   "name": "Instagram",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "origin": "user",
   "tags": ["desktop", "mobile"],
   "match": ["https://*.instagram.com/*"],
@@ -158,6 +158,15 @@
       "option": "app-prompts",
       "target": {
         "css": "header:has(a[href^=\"/accounts/login\"]) a[href*=\"applink.instagram.com\"]"
+      }
+    },
+    {
+      "id": "terms-banner",
+      "label": "\"By continuing, you agree\" terms bar at the bottom",
+      "type": "hide",
+      "option": "app-prompts",
+      "target": {
+        "css": "body:has(a[href^=\"/accounts/login\"]) div:has(> span > a[href*=\"581066165581870\"])"
       }
     },
     {
