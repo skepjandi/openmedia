@@ -6,6 +6,16 @@ All notable changes to OpenMedia are documented here.
 >
 > **Wiki**: the [GitHub Wiki](https://github.com/skepjandi/openmedia/wiki) is the public-facing main wiki — architecture, recipe format, AI pipeline, security model, roadmap. Source-controlled editing surface is `docs/wiki/` in this repo; CI (`.github/workflows/sync-wiki.yml`) mirrors it to the GitHub Wiki on every merge to `main`. New single-PR changes belong here, not as new wiki pages.
 
+### feat(library): filter popup, status filter, faster list and 307 bundled icons
+
+**Area:** `feat(library)`
+
+**Change:** The recipe library's *Filters* button now sits beside the search box (it was the last chip in a scrolling row, off screen on a phone) and opens a popup with sections for source, platform, type, **status** (not added, added, update available) and category, each chip with a live count. The chips that are on show under the search as removable chips with the result count. The list is built for 300+ recipes: it is indexed once (tags, status, search text), the counts are one pass per kind instead of one filter pass per chip, the search is deferred while typing, rows are memoized, drawn thirty at a time as you scroll and skip layout when off screen, and tile images load lazily. Bundled site icons are now emitted as files instead of inlined, which takes 313 KB of base64 out of the entry chunk (1.65 MB to 1.34 MB). `yarn icons:fetch` reads each site's own files in parallel (homepage links, the bare and `www.` forms, the web app manifest, the Windows tile, `/favicon.*`), lets `google.com` and `duckduckgo.com` use their own files, remembers sites that offer nothing for 30 days, and **no longer fails the build when a site has no icon** (`--strict` restores that). It was exiting 1 with 46 misses, which broke `yarn build:web`. `--site <slug> --file <path> --source <url>` adds an icon a browser took from a page that turns scripts away. 307 of 319 recipes now ship an icon (273 before). The 60 recipe files from #180 are formatted so `yarn format:check` passes for them.
+
+**Verified:** Library, i18n and icon unit tests (new tests for status, facet counts and the index), TypeScript, ESLint, `vite build`. **Not verified:** the popup and list on a device or simulator (no Tauri IPC in a browser preview). 12 sites still have no icon (`7plus`, `british-pathe`, `crackle`, `crunchyroll`, `epic-games`, `fandango-at-home`, `hulu`, `liveatc`, `pocket-casts`, `shudder`, `temu`, `xumo-play`): they block scripts and browsers from here, or redirect to another brand; they show the monogram or the icon the site serves when opened. The new locale labels are English in every language. `blocklists/brave-resources.json` also fails `format:check` and is not touched here.
+
+**PR:** n/a
+
 ### feat(recipes): 300 official recipes and category filters in the library
 
 **Area:** `feat(recipes)`

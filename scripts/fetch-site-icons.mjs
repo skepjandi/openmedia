@@ -44,7 +44,7 @@ const GENERATED = path.join(ROOT, "src", "shared", "bundledSiteIcons.ts");
 /** The size of a bundled icon, in pixels. The app shows them at most 40 points wide. */
 const ICON_SIZE = 96;
 const MAX_BYTES = 400_000;
-const MAX_CANDIDATES = 8;
+const MAX_CANDIDATES = 12;
 const TIMEOUT_MS = 12_000;
 const USER_AGENT =
   "Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1";
@@ -72,7 +72,8 @@ function hostOfPattern(pattern) {
 
 /**
  * Services that hand out other people's icons. The app never asks one of them for an icon: a
- * site's icon is its own file, even when it lives on the site's own CDN.
+ * site's icon is its own file, even when it lives on the site's own CDN. A service's own domain
+ * is allowed for the site that owns it: google.com's icon is a file of google.com.
  */
 const ICON_SERVICES = [
   "google.com",
@@ -85,26 +86,30 @@ const ICON_SERVICES = [
   "logo.dev",
 ];
 
-function isIconService(url) {
+function isIconService(url, owned = new Set()) {
   const host = url.hostname.toLowerCase();
-  return ICON_SERVICES.some((service) => host === service || host.endsWith(`.${service}`));
+  return ICON_SERVICES.some(
+    (service) => (host === service || host.endsWith(`.${service}`)) && !owned.has(service),
+  );
 }
 
-async function get(url, attempts = 1) {
+async function get(url, attempts = 1, owned) {
   for (let attempt = 0; attempt < attempts; attempt++) {
-    const found = await getOnce(url);
+    const found = await getOnce(url, owned);
     if (found) return found;
   }
   return null;
 }
 
-async function getOnce(url) {
+async function getOnce(url, owned) {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
   try {
     let target = new URL(url);
     for (let redirects = 0; redirects <= 5; redirects++) {
-      if (!["http:", "https:"].includes(target.protocol) || isIconService(target)) return null;
+      if (!["http:", "https:"].includes(target.protocol) || isIconService(target, owned)) {
+        return null;
+      }
       const response = await fetch(target, {
         redirect: "manual",
         signal: controller.signal,
@@ -166,15 +171,81 @@ function iconLinks(html, base) {
   return [...touch, ...plain];
 }
 
+/** The icons a web app manifest lists, biggest first: the ones a site made for home screens. */
+async function manifestIcons(html, base, owned) {
+  const link = [...html.matchAll(/<link\b[^>]*>/gi)]
+    .map((match) => match[0])
+    .find((tag) => attribute(tag, "rel")?.toLowerCase() === "manifest");
+  const href = link ? attribute(link, "href") : null;
+  if (!href) return [];
+  let manifestUrl;
+  try {
+    manifestUrl = new URL(href, base);
+  } catch {
+    return [];
+  }
+  const found = await get(manifestUrl, 1, owned);
+  if (!found) return [];
+  try {
+    const icons = JSON.parse(found.bytes.toString("utf8")).icons ?? [];
+    const side = (icon) => Number(String(icon.sizes ?? "").split(/[x\s]/)[0]) || 0;
+    return icons
+      .filter((icon) => typeof icon.src === "string")
+      .sort((a, b) => side(b) - side(a))
+      .slice(0, 2)
+      .map((icon) => new URL(icon.src, found.url));
+  } catch {
+    return [];
+  }
+}
+
+/** The Windows tile image a page names, when it names one. */
+function tileImage(html, base) {
+  for (const match of html.matchAll(/<meta\b[^>]*>/gi)) {
+    if (attribute(match[0], "name")?.toLowerCase() !== "msapplication-tileimage") continue;
+    const content = attribute(match[0], "content");
+    if (!content) continue;
+    try {
+      return [new URL(content, base)];
+    } catch {
+      return [];
+    }
+  }
+  return [];
+}
+
+/** The pages to read icon links from: the homepage, then the bare and `www.` forms of its domain. */
+function pagesOf(site) {
+  const home = new URL(site.homepage);
+  const domain = registrableDomain(home.hostname);
+  const others = [`https://${domain}/`, `https://www.${domain}/`];
+  return [home.toString(), ...others.filter((url) => url !== home.toString())];
+}
+
 /** The icon of one site: the first of its own icon files that can be read. */
 async function findIcon(site, sources, log) {
+  // A site may fetch from its own domain even where an icon service shares it (google.com).
+  const owned = new Set(site.domains);
   const candidates = [];
-  const page = await get(site.homepage, 3);
-  if (page) {
-    for (const url of iconLinks(page.bytes.toString("utf8"), page.url)) candidates.push(url);
+  let base = new URL(site.homepage);
+  for (const address of pagesOf(site)) {
+    const page = await get(address, address === site.homepage ? 3 : 1, owned);
+    if (!page) continue;
+    const html = page.bytes.toString("utf8");
+    base = new URL(page.url);
+    candidates.push(...iconLinks(html, page.url));
+    candidates.push(...(await manifestIcons(html, page.url, owned)));
+    candidates.push(...tileImage(html, page.url));
+    break;
   }
-  for (const path of ["/apple-touch-icon.png", "/favicon.ico"]) {
-    candidates.push(new URL(path, site.homepage));
+  for (const path of [
+    "/apple-touch-icon.png",
+    "/apple-touch-icon-precomposed.png",
+    "/favicon.ico",
+    "/favicon.png",
+    "/favicon.svg",
+  ]) {
+    candidates.push(new URL(path, base));
   }
   for (const source of sources) {
     try {
@@ -189,13 +260,13 @@ async function findIcon(site, sources, log) {
     const key = candidate.toString();
     if (tried.has(key)) continue;
     tried.add(key);
-    if (isIconService(candidate)) {
+    if (isIconService(candidate, owned)) {
       log(`    skipped ${key} (a third-party icon service)`);
       continue;
     }
-    const found = await get(candidate);
+    const found = await get(candidate, 1, owned);
     if (!found) continue;
-    if (isIconService(new URL(found.url))) {
+    if (isIconService(new URL(found.url), owned)) {
       log(`    skipped ${key} (led to a third-party icon service)`);
       continue;
     }
@@ -380,63 +451,110 @@ ${entries.join("\n")}
 `;
 }
 
+/** How long a site that offered no icon is left alone, so a build does not ask it again at once. */
+const MISS_TTL_DAYS = 30;
+const CONCURRENCY = 8;
+
+/** Runs `work` on every item, at most `limit` at a time, and returns the results in order. */
+async function pool(items, limit, work) {
+  const results = new Array(items.length);
+  let next = 0;
+  const workers = Array.from({ length: Math.min(limit, items.length) }, async () => {
+    while (next < items.length) {
+      const at = next++;
+      results[at] = await work(items[at]);
+    }
+  });
+  await Promise.all(workers);
+  return results;
+}
+
+/** An icon file already on disk, converted like a downloaded one; `source` says where it came from. */
+async function fromLocalFile(file, source) {
+  const bytes = await toPng(await readFile(file), path.extname(file).toLowerCase());
+  return bytes ? { bytes, source: source ?? file } : null;
+}
+
 async function main() {
   const args = process.argv.slice(2);
   const force = args.includes("--force");
   const probe = args.includes("--probe");
+  const retry = args.includes("--retry");
+  const strict = args.includes("--strict");
   const only = args.includes("--site") ? args[args.indexOf("--site") + 1] : null;
   const given = args.includes("--source") ? args[args.indexOf("--source") + 1] : null;
-  const log = (message) => console.log(message);
+  // `--site <slug> --file <path> --source <url>`: an icon a browser took from the site's own page,
+  // for the sites that turn a script away. It still goes through the same conversion.
+  const fromFile = args.includes("--file") ? args[args.indexOf("--file") + 1] : null;
 
-  const sites = await readSites();
+  const sites = (await readSites()).filter(
+    (site) => !only || site.slug === only || site.id === only,
+  );
   const manifest = await readManifest();
-  const entries = [];
-  let missing = 0;
+  const missingSince = manifest.missing ?? {};
+  const now = Date.now();
+  const recentMiss = (site) => {
+    const at = Date.parse(missingSince[site.id] ?? "");
+    return !Number.isNaN(at) && now - at < MISS_TTL_DAYS * 86_400_000;
+  };
 
-  for (const site of sites) {
-    if (only && site.slug !== only && site.id !== only) continue;
+  const outcomes = await pool(sites, CONCURRENCY, async (site) => {
+    const lines = [];
+    const log = (message) => lines.push(message);
     const cached = manifest.sites?.[site.id] ?? cachedByFile(manifest, site);
     const file = path.join(ASSETS, `${site.slug}.png`);
     if (!force && !given && cached?.file) {
       try {
         const bytes = await readFile(file);
-        entries.push({ ...cached, bytes: bytes.length });
-        log(`${site.name}: kept ${cached.file} (${cached.source})`);
-        continue;
+        return { site, lines, entry: { ...cached, bytes: bytes.length } };
       } catch {
         // the file is gone; fetch it again
       }
     }
+    if (!force && !given && !retry && !only && recentMiss(site)) {
+      return { site, lines, skipped: true };
+    }
     log(`${site.name}: fetching from ${site.homepage}`);
     const sources = [given, cached?.source].filter((source) => Boolean(source));
-    const found = await findIcon(site, sources, log);
+    const found = fromFile
+      ? await fromLocalFile(fromFile, given)
+      : await findIcon(site, sources, log);
     if (!found) {
-      missing += 1;
-      console.error(`${site.name}: no icon found`);
-      continue;
+      log(`${site.name}: no icon found`);
+      return { site, lines, missed: true };
     }
     if (!probe) {
       await mkdir(ASSETS, { recursive: true });
       await writeFile(file, found.bytes);
     }
-    entries.push({
-      file: `${site.slug}.png`,
-      source: found.source,
-      domains: site.domains,
-      bytes: found.bytes.length,
-      sha256: createHash("sha256").update(found.bytes).digest("hex"),
-    });
     log(`  ${found.source} -> ${site.slug}.png (${found.bytes.length} bytes)`);
-  }
+    return {
+      site,
+      lines,
+      entry: {
+        file: `${site.slug}.png`,
+        source: found.source,
+        domains: site.domains,
+        bytes: found.bytes.length,
+        sha256: createHash("sha256").update(found.bytes).digest("hex"),
+      },
+    };
+  });
+
+  for (const { lines } of outcomes) for (const line of lines) console.log(line);
+  const missed = outcomes.filter((outcome) => outcome.missed).map(({ site }) => site);
+  const skipped = outcomes.filter((outcome) => outcome.skipped).map(({ site }) => site);
 
   if (probe) {
-    log(`\n${entries.length} icon(s) found, ${missing} missing. Nothing was written.`);
+    const found = outcomes.filter((outcome) => outcome.entry).length;
+    console.log(
+      `\n${found} icon(s) found, ${missed.length} missing, ${skipped.length} skipped as recent misses.`,
+    );
     return;
   }
 
   const byId = new Map();
-  for (const site of sites) {
-    const entry = entries.find((candidate) => candidate.file === `${site.slug}.png`);
+  for (const { site, entry } of outcomes) {
     if (entry) {
       byId.set(site.id, entry);
       continue;
@@ -447,20 +565,37 @@ async function main() {
     }
   }
 
+  // A run limited to one site must not forget the rest of the library.
+  const inRun = new Set(sites.map((site) => site.id));
+  for (const [id, entry] of Object.entries(manifest.sites ?? {})) {
+    if (!inRun.has(id) && !byId.has(id)) byId.set(id, entry);
+  }
+  const misses = Object.fromEntries(
+    Object.entries(missingSince).filter(([id]) => !inRun.has(id) && !byId.has(id)),
+  );
+  for (const site of missed) misses[site.id] = new Date(now).toISOString();
+  for (const site of skipped) misses[site.id] = missingSince[site.id];
+
   await mkdir(ASSETS, { recursive: true });
   await writeFile(
     MANIFEST,
-    await format(JSON.stringify({ sites: Object.fromEntries(byId) }), {
+    await format(JSON.stringify({ sites: Object.fromEntries(byId), missing: misses }), {
       ...(await resolveConfig(MANIFEST)),
       parser: "json",
     }),
   );
-  await writeFile(GENERATED, generatedModule(sites.filter((site) => byId.has(site.id))));
+  const all = await readSites();
+  await writeFile(GENERATED, generatedModule(all.filter((site) => byId.has(site.id))));
 
-  log(`\n${byId.size} icon(s) written to src/assets/site-icons/.`);
-  if (missing > 0) {
-    console.error(`${missing} site(s) have no icon.`);
-    process.exitCode = 1;
+  console.log(`\n${byId.size} icon(s) in src/assets/site-icons/.`);
+  const without = [...missed, ...skipped];
+  if (without.length > 0) {
+    // A site with no icon file of its own is not an error: the app draws its monogram, or the
+    // icon the site serves when the reader opens it.
+    console.warn(
+      `${without.length} site(s) offer no icon of their own: ${without.map((site) => site.slug).join(", ")}`,
+    );
+    if (strict) process.exitCode = 1;
   }
 }
 

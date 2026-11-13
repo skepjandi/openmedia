@@ -1,5 +1,180 @@
 {
   "sites": {
+    "market.official.uppbeat": {
+      "file": "uppbeat.png",
+      "source": "https://cdn.uppbeat.io/images/logo/apple-touch-icon.png",
+      "domains": ["uppbeat.io"],
+      "bytes": 3181,
+      "sha256": "4f991ff10a7cef55adb16ed16f254f901eef60c75b92fb5ae9457668906f8de0"
+    },
+    "market.official.uol": {
+      "file": "uol.png",
+      "source": "https://conteudo.imguol.com.br/c/home/layout/camaleao/app/512x512.png",
+      "domains": ["uol.com.br"],
+      "bytes": 10041,
+      "sha256": "a52df9440a7fd31a396e371a7dcb7d0f5e4434f4d568af36a12964c141e3bc5c"
+    },
+    "market.official.udemy": {
+      "file": "udemy.png",
+      "source": "https://www.udemy.com/frontends-logged-out-homepage/favicon.ico",
+      "domains": ["udemy.com"],
+      "bytes": 7753,
+      "sha256": "df3fdaea87436bf12d7660c741fa80f74d6f2ec4a27043a90e9ff542a9337540"
+    },
+    "market.official.spreaker": {
+      "file": "spreaker.png",
+      "source": "https://d2nsw11i8ho592.cloudfront.net/build/assets/apple-touch-icon-2ee5b08f.png",
+      "domains": ["spreaker.com"],
+      "bytes": 2703,
+      "sha256": "866243cd91731dde8371f7d531271d526375846c9c791cb0d67222cfd3621033"
+    },
+    "market.official.soundclick": {
+      "file": "soundclick.png",
+      "source": "https://static.soundclick.com/images/icons/apple-touch-icon.png?v=2022",
+      "domains": ["soundclick.com"],
+      "bytes": 4320,
+      "sha256": "af0909b011ce369e21cea90daa5c90957a9ee357018de3b722ed9180fa4f54cf"
+    },
+    "market.official.rotten-tomatoes": {
+      "file": "rotten-tomatoes.png",
+      "source": "https://www.rottentomatoes.com/assets/pizza-pie/head-assets/images/apple-touch-icon-180.jpg",
+      "domains": ["rottentomatoes.com"],
+      "bytes": 7323,
+      "sha256": "e96c18941430aadc412a8bc79d12c2ed0de71f54836347d998a6e59bdf0d4991"
+    },
+    "market.official.rinse-fm": {
+      "file": "rinse-fm.png",
+      "source": "https://www.rinse.fm/favicon/apple-touch-icon.png",
+      "domains": ["rinse.fm"],
+      "bytes": 3254,
+      "sha256": "84d510538fa4884d539afeca677f20c0c27682e7b4dbb26239ee090aaad3ca38"
+    },
+    "market.official.quizlet": {
+      "file": "quizlet.png",
+      "source": "https://quizlet.com/_next/static/media/apple-touch-icon.39a33aec.png",
+      "domains": ["quizlet.com"],
+      "bytes": 4285,
+      "sha256": "6da2a67a025482476ff4f51707bdb730388b7d7bf4eff3e295b93e5e80f53b4b"
+    },
+    "market.official.outlook": {
+      "file": "outlook.png",
+      "source": "https://www.microsoft.com/favicon.ico?v2",
+      "domains": ["live.com"],
+      "bytes": 670,
+      "sha256": "1ba37779e7eb4ea2a98268399b205a4c9166c4647e2493751a0f01ef342f7dc4"
+    },
+    "market.official.openai": {
+      "file": "openai.png",
+      "source": "https://openai.com/apple-icon.png?apple-icon.3o0tf8iy4mx7y.png",
+      "domains": ["openai.com"],
+      "bytes": 5024,
+      "sha256": "dd738aa480e2ae91fff00df588e6f159499cadec50de7ec59703dd4d04adfb75"
+    },
+    "market.official.nbc-news": {
+      "file": "nbc-news.png",
+      "source": "https://nodeassets.nbcnews.com/cdnassets/projects/ramen/favicon/nbcnews/all-other-sizes-PNG.ico/apple-icon-180x180.png",
+      "domains": ["nbcnews.com"],
+      "bytes": 6171,
+      "sha256": "c1f8f1299da3429f99451859ed09da3e3c338151a336b5ce79c400ff6d6a5b85"
+    },
+    "market.official.kanopy": {
+      "file": "kanopy.png",
+      "source": "https://www.kanopy.com/kui-assets/favicon.ico",
+      "domains": ["kanopy.com"],
+      "bytes": 3479,
+      "sha256": "d13e238c4d166a744d81c418cd15a824e2373cf578fe657cd8d0c1b2750c45c8"
+    },
+    "market.official.imperial-war-museums": {
+      "file": "imperial-war-museums.png",
+      "source": "https://www.iwm.org.uk/sites/default/files/favicon.ico",
+      "domains": ["iwm.org.uk"],
+      "bytes": 6486,
+      "sha256": "52f8c8e2e5699bd4e8adde93646ccc78d6067f599b6983574eb597eda5ac2f39"
+    },
+    "market.official.huffpost": {
+      "file": "huffpost.png",
+      "source": "https://www.huffpost.com/static-assets/cambria/app/favicon-new.ico",
+      "domains": ["huffpost.com"],
+      "bytes": 2501,
+      "sha256": "1a9af15af207bd764e77f952270208ef169387bdb15d85693c8866d27d65a90f"
+    },
+    "market.official.hoopla": {
+      "file": "hoopla.png",
+      "source": "https://www.hoopladigital.com/images/h-favicon.png",
+      "domains": ["hoopladigital.com"],
+      "bytes": 9986,
+      "sha256": "62cc38035c8119a705c1d5407ce4cd596eee7468e13da46e95e4804e6691b258"
+    },
+    "market.official.genius": {
+      "file": "genius.png",
+      "source": "https://assets.genius.com/images/apple-touch-icon.png",
+      "domains": ["genius.com"],
+      "bytes": 3214,
+      "sha256": "a6fa4cc2193c01393fc9504dfaff2e449eacf35cc62e1b76417bf5c5084f0607"
+    },
+    "market.official.gamespot": {
+      "file": "gamespot.png",
+      "source": "https://www.gamespot.com/wp-content/uploads/2026/04/cropped-gamespot-favicon.png?w=180",
+      "domains": ["gamespot.com"],
+      "bytes": 7957,
+      "sha256": "7127110b16c390fc6fb0cb4b601477a27278fd76235bfc24a9cc436510e1a71e"
+    },
+    "market.official.fandom": {
+      "file": "fandom.png",
+      "source": "https://www.fandom.com/f2/assets/favicons/apple-touch-icon.png",
+      "domains": ["fandom.com"],
+      "bytes": 2519,
+      "sha256": "a117f6df340e31d5ac68630511586d23a82a6bae0106de5119ba4cf601fda811"
+    },
+    "market.official.dublab": {
+      "file": "dublab.png",
+      "source": "https://www.dublab.com/assets/icons/apple-touch-icon-180x180.png",
+      "domains": ["dublab.com"],
+      "bytes": 6024,
+      "sha256": "341f89f5d69af631246ca2a566f3ad2ea542fb4d02bf0a67e79d2ade8799800c"
+    },
+    "market.official.dropbox": {
+      "file": "dropbox.png",
+      "source": "https://cfl.dropboxstatic.com/static/metaserver/static/images/favicon.ico",
+      "domains": ["dropbox.com"],
+      "bytes": 8479,
+      "sha256": "b90b3d2edcf40cc079eda9d4c888bd1971053396c505174c27b09295594c2660"
+    },
+    "market.official.disney-plus": {
+      "file": "disney-plus.png",
+      "source": "https://static-assets.bamgrid.com/product/disneyplus/favicons/disPlus-favicon-180x180.7d56f648dc95f591721935193bc827cb.png",
+      "domains": ["disneyplus.com"],
+      "bytes": 14342,
+      "sha256": "4b6211d35d22e584cc771093a31b78e7d2496c96ad7a4cf6c64bd7eed86bb02f"
+    },
+    "market.official.chatgpt": {
+      "file": "chatgpt.png",
+      "source": "https://chatgpt.com/unauth-mweb/apple-touch-icon.png",
+      "domains": ["chatgpt.com"],
+      "bytes": 5686,
+      "sha256": "b044c36d17817c3595bc90f987a06eef695d884a4914f4804d942376100bbb7e"
+    },
+    "market.official.bandcamp": {
+      "file": "bandcamp.png",
+      "source": "https://s4.bcbits.com/client-bundle/1/PageLayout_1/favicon-e91a942bb76c26f619d5945a00cf8e60.static/favicon/apple-touch-icon.png",
+      "domains": ["bandcamp.com"],
+      "bytes": 1379,
+      "sha256": "6012dbff6e6c7c6531a2aea52a3d67da7e7ee22db5c66a5ddf393a8966f6e682"
+    },
+    "market.official.anghami": {
+      "file": "anghami.png",
+      "source": "https://cdnweb.anghami.com/web/assets/img/logos/favicons/apple-touch-icon-152x152.png",
+      "domains": ["anghami.com"],
+      "bytes": 10997,
+      "sha256": "c724077129dd0c4b6e65ceaac653bf444c1df1bb245672812dd9ce45258cd180"
+    },
+    "market.official.accuradio": {
+      "file": "accuradio.png",
+      "source": "https://static.accuradio.com/static/images/favicon-180.png",
+      "domains": ["accuradio.com"],
+      "bytes": 6828,
+      "sha256": "f2302c9be5dd850a774b1a0290009f37c1f19b9def5a457e7d6bba38f5ffdc60"
+    },
     "market.official.9gag": {
       "file": "9gag.png",
       "source": "https://9gag.com/s/fab0aa49/1964fa78467949b70bfe56e7ded0251d6af62bcb/static/dist/mobile/img/apple-touch-icon-180.png",
@@ -434,6 +609,13 @@
       "bytes": 8182,
       "sha256": "2578b9c777cf631f167f3aa47105488e959a1965f716a6340292ef81e17da139"
     },
+    "market.official.duckduckgo": {
+      "file": "duckduckgo.png",
+      "source": "https://duckduckgo.com/static-assets/favicons/DDG-iOS-icon_60x60.png",
+      "domains": ["duckduckgo.com"],
+      "bytes": 10206,
+      "sha256": "9287e8a32908727537d62239da200cca538f8b72c00f9c0203b780b2b88102f5"
+    },
     "market.official.duolingo": {
       "file": "duolingo.png",
       "source": "https://d35aaqx5ub95lt.cloudfront.net/images/duolingo-touch-icon2.png",
@@ -602,12 +784,47 @@
       "bytes": 6237,
       "sha256": "9d756387b192ced6bab9fa30520ca067351795471072d679ce2bad0953af668c"
     },
+    "market.official.gmail": {
+      "file": "gmail.png",
+      "source": "https://www.google.com/images/branding/product_ios/3x/googleg_60dp.png",
+      "domains": ["google.com"],
+      "bytes": 5592,
+      "sha256": "699c41e578a371f500a7164dd37ab02154b45818f5ab4cae537166aa2a53d0bd"
+    },
     "market.official.goodreads": {
       "file": "goodreads.png",
       "source": "https://www.goodreads.com/apple-touch-icon.png",
       "domains": ["goodreads.com"],
       "bytes": 4210,
       "sha256": "730c07c7368d4b6f84e5eb9a5ccde02e1e60496e936eaac472f1207d220191fa"
+    },
+    "market.official.google-drive": {
+      "file": "google-drive.png",
+      "source": "https://www.google.com/images/branding/product_ios/3x/googleg_60dp.png",
+      "domains": ["google.com"],
+      "bytes": 5592,
+      "sha256": "699c41e578a371f500a7164dd37ab02154b45818f5ab4cae537166aa2a53d0bd"
+    },
+    "market.official.google-maps": {
+      "file": "google-maps.png",
+      "source": "https://www.google.com/images/branding/product_ios/3x/googleg_60dp.png",
+      "domains": ["google.com"],
+      "bytes": 5592,
+      "sha256": "699c41e578a371f500a7164dd37ab02154b45818f5ab4cae537166aa2a53d0bd"
+    },
+    "market.official.google-news": {
+      "file": "google-news.png",
+      "source": "https://www.google.com/images/branding/product_ios/3x/googleg_60dp.png",
+      "domains": ["google.com"],
+      "bytes": 5592,
+      "sha256": "699c41e578a371f500a7164dd37ab02154b45818f5ab4cae537166aa2a53d0bd"
+    },
+    "market.official.google": {
+      "file": "google.png",
+      "source": "https://www.google.com/images/branding/product_ios/3x/googleg_60dp.png",
+      "domains": ["google.com"],
+      "bytes": 5592,
+      "sha256": "699c41e578a371f500a7164dd37ab02154b45818f5ab4cae537166aa2a53d0bd"
     },
     "market.official.hidive": {
       "file": "hidive.png",
@@ -1021,6 +1238,13 @@
       "domains": ["nytimes.com"],
       "bytes": 6103,
       "sha256": "87ba8b2703e94daf24bf0c326e618e5debb75ef27c196f66c90d7b2b9ea20331"
+    },
+    "market.official.newgrounds-audio": {
+      "file": "newgrounds-audio.png",
+      "source": "https://img.ngfiles.com/misc/ios/apple-touch-icon.png",
+      "domains": ["newgrounds.com"],
+      "bytes": 9752,
+      "sha256": "229cc632bb74f150698e089e0b241054eb95c56aa68bffe3f207579c93ba0de4"
     },
     "market.official.nfsa": {
       "file": "nfsa.png",
@@ -1652,6 +1876,13 @@
       "bytes": 4916,
       "sha256": "48452a97a46c1f7e14a29d54c86b53e839e52036c34c3ad2fd445da69e9cef7e"
     },
+    "market.official.tubi": {
+      "file": "tubi.png",
+      "source": "https://gdpr.tubi.tv/favicon.ico",
+      "domains": ["tubitv.com"],
+      "bytes": 7406,
+      "sha256": "26c7424e4f62b0c264c6bede0035778faf16820b3e712ae215db2563139ba496"
+    },
     "market.official.tumblr": {
       "file": "tumblr.png",
       "source": "https://assets.tumblr.com/pop/manifest/apple-touch-icon-f8ea2554.png",
@@ -1813,6 +2044,13 @@
       "bytes": 9421,
       "sha256": "372bcba33d4d23612f943fc0b54088246e5c31f87fb78cccbb343fa1e92c623e"
     },
+    "market.official.worldwide-fm": {
+      "file": "worldwide-fm.png",
+      "source": "https://www.worldwidefm.net/favicon.svg",
+      "domains": ["worldwidefm.net"],
+      "bytes": 10905,
+      "sha256": "7942b5c9dfd69b36789b6f58660c449e3a5a8d3ae621631a4c36cafa2234ad40"
+    },
     "market.official.wqxr": {
       "file": "wqxr.png",
       "source": "https://media.wnyc.org/static/img/favicon_wqxr.ico",
@@ -1911,5 +2149,19 @@
       "bytes": 13058,
       "sha256": "fa9e1d64dd8aa624adf0ba722884307e1b5a93ed655016a18e659d41af2c2db5"
     }
+  },
+  "missing": {
+    "market.official.7plus": "2026-11-13T21:32:01.260Z",
+    "market.official.british-pathe": "2026-11-13T21:32:01.260Z",
+    "market.official.crackle": "2026-11-13T21:32:01.260Z",
+    "market.official.crunchyroll": "2026-11-13T21:32:01.260Z",
+    "market.official.epic-games": "2026-11-13T21:32:01.260Z",
+    "market.official.fandango-at-home": "2026-11-13T21:32:01.260Z",
+    "market.official.hulu": "2026-11-13T21:32:01.260Z",
+    "market.official.liveatc": "2026-11-13T21:32:01.260Z",
+    "market.official.pocket-casts": "2026-11-13T21:32:01.260Z",
+    "market.official.shudder": "2026-11-13T21:32:01.260Z",
+    "market.official.temu": "2026-11-13T21:32:01.260Z",
+    "market.official.xumo-play": "2026-11-13T21:32:01.260Z"
   }
 }
