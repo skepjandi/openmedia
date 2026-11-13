@@ -118,14 +118,16 @@ export function LimitEditor({ host, section, policy, spentSeconds }: LimitEditor
 
   return (
     <div className="border-t border-hair bg-paper/[0.03]">
-      <div className="px-4 pt-4 pb-4">
-        <MeterCaption spentSeconds={spentSeconds} policy={policyOf(shown)} />
-        {active && (
-          <div className="mt-2.5">
-            <UsageMeter spentSeconds={spentSeconds} policy={policyOf(shown)} />
-          </div>
-        )}
-      </div>
+      {(active || section === null) && (
+        <div className="px-4 pt-4 pb-4">
+          <MeterCaption spentSeconds={spentSeconds} policy={policyOf(shown)} />
+          {active && (
+            <div className="mt-2.5">
+              <UsageMeter spentSeconds={spentSeconds} policy={policyOf(shown)} />
+            </div>
+          )}
+        </div>
+      )}
 
       {active ? (
         <div className="divide-y divide-hair border-t border-hair">
@@ -194,7 +196,7 @@ export function LimitEditor({ host, section, policy, spentSeconds }: LimitEditor
         </div>
       )}
 
-      <p className="px-4 pb-3 text-[13px] text-paper/45">{t("usage.saveHint")}</p>
+      {active && <p className="px-4 pb-3 text-[13px] text-paper/45">{t("usage.saveHint")}</p>}
       {error && (
         <p role="alert" className="px-4 pb-3 text-sm text-danger">
           {error}

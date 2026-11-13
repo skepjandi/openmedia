@@ -18,6 +18,14 @@ All notable changes to OpenMedia are documented here.
 
 ## 2026-11-13
 
+### fix(ui): remove repeated usage editor hints
+
+**Area:** `fix(ui)`
+
+**Change:** Unconfigured section editors no longer repeat their usage total or slider save hint when the parent row already shows the section's time.
+
+**PR:** n/a
+
 ### fix(siteview): a sign-in redirect the page makes from script stays in the app
 
 **Area:** `fix(siteview)`

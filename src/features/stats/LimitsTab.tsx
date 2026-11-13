@@ -158,8 +158,8 @@ function LimitRow({
         <>
           <LimitEditor host={site.host} section={null} policy={policy} spentSeconds={spent} />
           {parts.length > 0 && (
-            <div className="border-t border-hair">
-              <p className="px-4 pt-3 text-xs font-medium tracking-[0.18em] text-paper/50 uppercase">
+            <div>
+              <p className="px-4 pt-5 pb-3 text-sm font-semibold text-paper/60">
                 {t("usage.partsTitle")}
               </p>
               <ul>
