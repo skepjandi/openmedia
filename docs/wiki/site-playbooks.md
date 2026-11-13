@@ -14,7 +14,7 @@ Evidence tags used everywhere:
 
 ## How options and defaults work
 
-See [Recipe Format: Options](./recipe-format.md#options-user-facing-toggles). In short: Settings → Recipes shows one switch per option; ON means hidden. **Annoyances** (install prompts, pop-ups that block the page, scroll locks, ad slots) default ON; **content** (Reels, Shorts, Stories, suggestions, feeds) defaults OFF. A test enforces the policy for every official recipe. Changing a switch recompiles the script and applies it to the page at once, without a reload. The user's choices are stored as overrides, so a release can change a default without migrating anyone who never touched the switch.
+See [Recipe Format: Options](./recipe-format.md#options-user-facing-toggles). In short: Settings → Recipes shows one control per option. An **on/off switch** hides what its rules point at when it is ON. A **choice option** lists 2 to 4 states instead (Show / Blur / Hide, Show / Dim / Hide), the first of which leaves the page alone, and each of its rules names the states in which it applies. **Annoyances** (install prompts, pop-ups that block the page, scroll locks, ad slots) default to hiding themselves; **content** (Reels, Shorts, Stories, suggestions, feeds) defaults to being left alone. A test enforces the policy for every official recipe. Changing a control recompiles the script and applies it to the page at once, without a reload. The user's choices are stored as overrides, so a release can change a default without migrating anyone who never touched the control.
 
 ## Desktop and mobile are different pages
 
@@ -56,18 +56,37 @@ What the validator allows: one CSS selector (comma lists fine) per rule; at most
 
 | Option (default) | Rules and evidence |
 |---|---|
-| `app-prompts` (on) | `body:has(a[href^="/accounts/login"]) div:has(> div > div > div > [role="dialog"][aria-modal="true"])` `LIVE` 1 match on a profile and on `/reels/`: the fixed overlay that holds the dialog, the dimmed backdrop and the close button. Hiding only the dialog leaves a backdrop that eats taps; hiding it with `div:has([role=dialog])` matches 11 ancestors and blanks the page. The login-link prefix limits it to the logged-out state, so a logged-in share sheet is untouched (the full selector, prefix included, was re-run on a profile: 1 match, and 1 login link on the page). `header:has(a[href^="/accounts/login"]) a[href*="applink.instagram.com"]` `LIVE` 1: the Open app pill. |
-| `reels` (off) | `div:has(> a[href="/reels/"])` `LIVE` 1 on `/`: the tab cell (the bar re-laid out cleanly). `div:has(> span > div > a[href="/reels/"])` `SOURCE` (Instagram Purified 2025-07; Hacker News 2025-08), the logged-in wrapper. `article:has(div[aria-label="Video player"])` `SOURCE` (Nuke Insta Slop, updated 2026-09): every video post, Reels **and ordinary videos**. `div[role="tablist"] > div:has(svg[aria-label="Reels"])` the SVG label is `LIVE` (1), the wrapper is `INFERRED`. |
-| `explore-tab` (off) | `div:has(> a[href="/explore/"])` `LIVE` 1; wrapped form `div:has(> span > div > a[href="/explore/"])` `SOURCE`. Removes the search entry too. |
-| `stories` (off) | `[aria-label="Stories"], [aria-label^="Story by"]` `SOURCE` (Instagram Unhook, 2025). Logged in only. |
-| `suggested-posts` (off) | `main article + div:has(img[src*="illo-confirm-refresh"])` and the same followed by ` ~ article` `SOURCE` (Instagram Purified 2025-07-25). A structural proxy: the "You're all caught up" illustration; everything after it is hidden. Image path may rotate. |
-| `feed-posts` (off) | `main article` `INFERRED/SOURCE`. Also hides a post opened by address, because CSS cannot tell the feed from a post page. |
+| `app-prompts` (on) | unchanged: overlay `body:has(a[href^="/accounts/login"]) div:has(> div > div > div > [role="dialog"][aria-modal="true"])` `LIVE` 1; `header:has(a[href^="/accounts/login"]) a[href*="applink.instagram.com"]` `LIVE` 1. |
+| `reels` (off) | unchanged: `div:has(> a[href="/reels/"])` `LIVE` 1; wrapped form, `article:has(div[aria-label="Video player"])`, `div[role="tablist"] > div:has(svg[aria-label="Reels"])` `SOURCE`/`INFERRED` as before. |
+| `explore-tab` (off) | unchanged (`LIVE` 1 direct, `SOURCE` wrapped). |
+| `stories` (off) | unchanged (`SOURCE`, logged in only). |
+| `suggested-posts` (off) | unchanged (`SOURCE`). |
+| `feed-posts` (off) | unchanged (`INFERRED/SOURCE`). |
+| `verified-badges` (off) | `svg[aria-label="Verified"]` `LIVE` 1 on `/nasa/`. |
+| `footer` (off) | `footer` (desktop fixture). |
+| `thumbnails` (choice, show) | blur `css` `filter: blur(14px)` or hide, same selector: `hr ~ div a img` `LIVE` 12 on `/nasa/` (logged-out grid; tiles link to `applink.instagram.com`); `main a[href*="/p/"] img, main a[href*="/reel/"] img` `INFERRED` (logged-in profile and Explore grid links). |
+| `post-media` (choice, show) | blur 14 px or hide: `article img[srcset], article video` `INFERRED` (logged in; `srcset` is assumed to separate photos from avatars). Style follows Nuke Insta Slop (`SOURCE`, 2026-03: opacity .2, blur, grayscale on suggested and video posts). |
+| `avatars` (choice, show) | blur 10 px or hide: `header section img, header section canvas, article header img`. `LIVE` 1 img and 1 canvas (the avatar and its story ring) on `/nasa/`; `article header img` `INFERRED`. |
+| `counts` (off) | `header section a[href="#"]` `LIVE` 2 logged out (followers, following; the links have no real href); `header section a[href$="/followers/"], … $="/following/"` `INFERRED` logged in; `a[href*="/liked_by/"]` `INFERRED` (like count link). Instagram's own Hide like and share counts setting is the safer route for your own account. |
+| `direct-messages` (off) | `div:has(> a[href^="/direct/"]), div:has(> a[href^="/u/direct"])` `LIVE` 1 for `/u/direct/` in the logged-out bottom bar (`a[href^="/u/direct"]`, aria-label "Direct"); wrapped form `div:has(> span > div > a[href^="/direct/"])` `INFERRED`. |
 
 **CSS cannot:** block `/reels/` (hide the entry points; a redirect rule does not exist yet); match "Suggested for you" or "Sponsored" by text; hide the splash "Open Instagram / Log In / Sign Up" buttons (hashed classes only, no stable attribute; they only appear logged out); dismiss the cookie dialog (never shown to the research session, no validated rule); Notes (not visible logged out, no selector).
 
 **Pitfalls.** `a[href*="applink.instagram.com"]` unscoped matches 18 elements on a profile, including every grid tile. `header:has(a[href*="applink.instagram.com"])` also matches the profile's own `header`. `[role=dialog]` alone is 1 match but leaves the backdrop. No scroll lock was seen on these overlays (`html` `overflow: auto scroll`, `body` visible), so there is no unlock rule. The Threads link rule seen in a list was dropped: undated, and Threads moved domains in 2025.
 
 **Examples.** *"Remove the Reels tab"* → `div:has(> a[href="/reels/"])`: the href is stable and `:has` removes the wrapper so no empty slot remains. *"Get rid of the 'Watch this reel in the app' popup"* → the overlay selector above, not `[role=dialog]`, because the dim backdrop sits beside the dialog. *"Hide Open app but keep the profile grid"* → scope under the header that holds the login link.
+
+Re-checked 2026-11-13 (headless Chrome, iPhone UA 390x844, logged out: `/nasa/`, a `/p/` page). Choice options (Show / Blur / Hide) are marked `choice`: the first state is the untouched one and no rule lists it.
+
+**CSS cannot:** (added) tell a photo post from a video post except through `Video player`; hide the like count by text; match avatars inside comments (no stable attribute).
+
+**Pitfalls.** Logged-out bottom bar links are `/u/direct/` and `/u/profile/`, not `/direct/inbox/`; the logged-out 404 page (`/p/<bad>/`) shows `nav` with only Log in and Open app, `footer` and `main`. `a[href*="applink.instagram.com"] img` also matches the avatar-sized tile link (13 in all, 12 tiles): scope grids with `hr ~ div`. `header section` is the profile header only; the site's top `header` has no `section`. The avatar sits inside an `a > object > a > img` chain with a sibling `canvas` story ring.
+
+Re-checked 2026-11-13 (headless Chrome, iPhone UA 390x844, logged out: `/nasa/`, a `/p/` page). Choice options (Show / Blur / Hide) are marked `choice`: the first state is the untouched one and no rule lists it.
+
+**CSS cannot:** (added) tell a photo post from a video post except through `Video player`; hide the like count by text; match avatars inside comments (no stable attribute).
+
+**Pitfalls.** Logged-out bottom bar links are `/u/direct/` and `/u/profile/`, not `/direct/inbox/`; the logged-out 404 page (`/p/<bad>/`) shows `nav` with only Log in and Open app, `footer` and `main`. `a[href*="applink.instagram.com"] img` also matches the avatar-sized tile link (13 in all, 12 tiles): scope grids with `hr ~ div`. `header section` is the profile header only; the site's top `header` has no `section`. The avatar sits inside an `a > object > a > img` chain with a sibling `canvas` story ring.
 
 ## Facebook (`facebook.default`)
 
@@ -76,16 +95,35 @@ What the validator allows: one CSS selector (comma lists fine) per rule; at most
 
 | Option (default) | Rules and evidence |
 |---|---|
-| `app-prompts` (on) | `div:has(> div > [aria-label^="Get Facebook"])` `LIVE` 1: the 42 px banner on the login page, login form intact. `[data-log-comp-type="navbar:open_app"]` `LIVE` 1 on `/facebook`, `/marketplace/`, `/watch/`, `/reel/`: the sticky Open app button; the attribute is language-independent. |
-| `login-wall` (on) | `[role="dialog"][aria-modal="true"][aria-label^="Get the full experience"]` `LIVE` 1 on `/watch/`: hiding it let Watch scroll. Scroll unlock (`css`, `overflow: auto`) on `html:has(…)` and `body:has(…)` with the same dialog selector: the sheet sets `html{overflow:hidden}` on `/reel/` and `body{overflow:auto hidden}` on `/watch/`. Scoped so pages without the sheet keep their own overflow. |
-| `reels` (off) | `[role="tab"][aria-label="Reels"]` `LIVE` 1 on `/facebook` (profile tab). `[role="button"][aria-label^="Reels"]` `LIVE` 1 on `/watch/` (the "Reels , 2 of 5" chip; prefix because of the counter). `[aria-label^="View reel video"]` `LIVE` (thumbnails; leaves an empty "Reels" header row, no stable parent found). |
-| `stories` (off) | `div[aria-label="Stories"]` `SOURCE` (kurtnettle/uBO-filters-fb, undated). |
+| `app-prompts` (on) | unchanged (`LIVE`: `div:has(> div > [aria-label^="Get Facebook"])`, `[data-log-comp-type="navbar:open_app"]`). |
+| `login-wall` (on) | unchanged (`LIVE`: full-experience dialog plus `overflow: auto` unlock). |
+| `sponsored` (on) | unchanged (`SOURCE`/desktop: `[data-pagelet^="FeedUnit"]:has(a[href*="/ads/about"])`, right-rail box). |
+| `reels` (off) | unchanged (`LIVE`: tab, chip, thumbnails; `SOURCE`: feed units and nav links). |
+| `stories` (off) | unchanged (`SOURCE`). |
+| `right-rail`, `left-rail`, `video-tabs` (off) | unchanged (desktop `data-pagelet` / banner links, hand-written fixture). |
+| `reaction-counts` (off) | `[role="button"][aria-label$=" reactions"]` `LIVE` 8 on `/watch/` (English label, "12,345 reactions"); `[data-log-comp-type="feed_post:ufi_blingbar"]` `LIVE` in one server dump, absent after hydration in the next load. |
+| `post-buttons` (off) | `[data-log-comp-type$="ufi_like_button"], …"ufi_comment_button"], …"ufi_share_button"]` `LIVE` 8 each, 24 together. The attribute is language-independent; both `seed_post:` (Watch) and `feed_post:` prefixes exist. |
+| `videos` (choice, show) | blur `filter: blur(16px)` or hide: `[data-type="video"]` `LIVE` 8 (one per video card, role=button aria-label "Video player"); `[data-pagelet^="FeedUnit"] video` `INFERRED` desktop. Hiding it on `/reel/` hides the reel. |
+| `profile-pictures` (choice, show) | blur 8 px or hide: `[aria-label$="Profile Picture"] img` `LIVE` 5 (role=button, English), `[aria-label^="Unseen story from"] img` `LIVE` 3, `[aria-label$="profile picture"] img` seen in a server dump only. |
+| `suggested-sections` (off) | `[aria-posinset]:has(a[href="/friends/"])`, `…:has(a[href="/groups/discover/"])`, `…:has([aria-label="Suggested pages"])` `SOURCE` (mustafamohsen Facebook uBO filters gist, undated; desktop feed only, hand-written fixture). |
 
 **CSS cannot:** block `/reel/` or `/stories/` (network rules only); match "Suggested for you", "Sponsored", "People you may know" by text (Facebook splits "Sponsored" into one-character spans). No Bloks selector was found for suggested or sponsored posts, People you may know, Groups suggestions, or the Marketplace/Watch/Gaming tabs, so there are no options for them: `INFERRED` tab labels would be English-only guesses. The cookie dialog (`[data-testid="cookie-policy-manage-dialog"]`, a second-hand summary) and a Messenger prompt were not seen and are not shipped.
 
 **Pitfalls.** Never hide `[role="dialog"]` or every `aria-modal` dialog: a logged-in comment or share sheet is one too (`INFERRED`), and `[role=dialog]` alone matched 0 on some pages and 1 on others. On the login page a 844 px `div.wbloks_115` sits four levels above the banner and wraps the whole form: never climb that far. `:has()` over `[data-mcomponent]` can match the feed container itself and hide every post. `[aria-label="Open app"]` matches 2 (the bar and the sheet button); prefer the data attribute. Search-engine-suggested filters like `[data-type*="reel" i]` match nothing (`data-type` is `container` or `text`). The 2020 `m.facebook.com###login_top_banner` rule is for a different DOM and reportedly broke login.
 
 **Examples.** *"Remove the 'Get Facebook for iOS' bar"* → `div:has(> div > [aria-label^="Get Facebook"])`: stable label text on a deep child, climb to the 42 px wrapper and stop. *"Stop the sign-in popup on Watch"* → hide the labelled dialog **and** unlock `html`/`body`.
+
+Re-checked 2026-11-13: `m.facebook.com/watch/`, iPhone UA 390x844, headless Chrome, logged out. Choice options (Show / Blur / Hide): the first state is the untouched one.
+
+**CSS cannot:** (added) match Reels, Stories or Sponsored by visible text; find the Bloks feed unit boundary logged out; blur only photos in a post (`img[data-type="image"]` also covers 16 px reaction icons, thumbnails and avatars: 46 on `/watch/`).
+
+**Pitfalls.** Bloks exposes language-independent hooks that the old playbook missed: `data-log-comp-type` (`navbar:logo`, `navbar:login`, `navbar:open_app`, `seed_post:ufi_*`, `feed_post:ufi_*`), `data-type` (`video`, `image`, `container`, `vscroller`, `text`), `data-video-id`, `data-testid="story-photo-N"` (on the video cards). Everything else wraps in `data-mcomponent="MContainer"`; do not select by it. `/watch/` cards are children of one `data-type="vscroller"` (68 children); there is no per-post wrapper attribute. Avatar labels are capitalised ("Profile Picture") in the card but lower-case in some server dumps; list both.
+
+Re-checked 2026-11-13: `m.facebook.com/watch/`, iPhone UA 390x844, headless Chrome, logged out. Choice options (Show / Blur / Hide): the first state is the untouched one.
+
+**CSS cannot:** (added) match Reels, Stories or Sponsored by visible text; find the Bloks feed unit boundary logged out; blur only photos in a post (`img[data-type="image"]` also covers 16 px reaction icons, thumbnails and avatars: 46 on `/watch/`).
+
+**Pitfalls.** Bloks exposes language-independent hooks that the old playbook missed: `data-log-comp-type` (`navbar:logo`, `navbar:login`, `navbar:open_app`, `seed_post:ufi_*`, `feed_post:ufi_*`), `data-type` (`video`, `image`, `container`, `vscroller`, `text`), `data-video-id`, `data-testid="story-photo-N"` (on the video cards). Everything else wraps in `data-mcomponent="MContainer"`; do not select by it. `/watch/` cards are children of one `data-type="vscroller"` (68 children); there is no per-post wrapper attribute. Avatar labels are capitalised ("Profile Picture") in the card but lower-case in some server dumps; list both.
 
 ## X / Twitter (`twitter.default`)
 
@@ -95,11 +133,15 @@ What the validator allows: one CSS selector (comma lists fine) per rule; at most
 
 | Option (default) | Rules and evidence |
 |---|---|
-| `app-prompts` (on) | `[data-interaction="app-store-obstruction"]` `LIVE` 1 on a profile and a post: the dialog wrapper; hiding it removed the dialog, dim and close button. `a[data-slot="xds-button"][href$="launch_app_store=true"]` `LIVE` 2: the header Open app pills. |
-| `premium-upsells` (on) | `SOURCE` (FreekyCreep list 2026-09-27; AdGuard X filter 2025.1229; char gist 2025-02): `[data-testid="premium-signup-tab"]`, `[data-testid="verified_profile_visitor_upsell"]`, `[data-testid="TopNavBar"] a[href="/i/premium_sign_up"]`, and `nav a[href="/i/premium_sign_up"]` / `/i/verified-choose` / `/i/premium-business` / `/i/verified-orgs-signup`. Classic app only. |
-| `promoted` (on) | `SOURCE`: `[data-testid="placementTracking"]:has(article)`; `[data-testid="cellInnerDiv"]:has([data-testid="top-impression-pixel"])` (hides the timeline cell, not the timeline; the second is from an undated gist). Default on as an in-feed ad the network blocker cannot see. |
-| `grok` (off) | `SOURCE` (FreekyCreep): `a[href="/i/grok"]`, `a[href^="/i/grok-redirect"]`, `[data-testid="GrokDrawer"]`, `[data-testid="grokImgGen"]`, and `button[aria-label]:has(svg[viewBox="0 0 33 32"])` (the Grok logo, locale-independent). |
-| `explore-tab` (off) | `a[data-testid="AppTabBar_Explore_Link"]` `INFERRED` (from memory of the classic tab bar). Trending lives on Explore on a phone, so this is the practical way to remove it. |
+| `counts` (off) | existing classic rules `SOURCE`. **Added (rebuilt)** `[data-engagement-action="reply"] svg + span, [data-engagement-action="retweet"] svg + span, [data-engagement-action="like"] svg + span` `LIVE` 5 each (the count wrapper is the span after the icon). |
+| `verified-badges` (off) | existing `[data-testid="icon-verified"]` classic `SOURCE`. **Added (rebuilt)** `span[role="button"][aria-label="Verified account"]` `LIVE` 12 (wraps the `svg > use`). English label only. |
+| `avatars` (choice show/blur/hide, show) | rebuilt `[data-post-avatar] img` `LIVE` 5; classic `[data-testid="Tweet-User-Avatar"]` `SOURCE` (widely used in uBlock/AdGuard X lists, not served logged out). Blur is `filter: blur(6px)`. |
+| `post-media` (choice show/blur/hide, show) | rebuilt `article [data-slot="xds-context-menu-trigger"]` `LIVE` 4 (3 video players + 1 photo; it wraps the `img`/`video` and the Play button); classic `[data-testid="tweetPhoto"], [data-testid="videoPlayer"], [data-testid="card.wrapper"]` `SOURCE`. Blur is `filter: blur(20px)`; hide removes the media block. |
+| `quote-posts` (choice show/dim/hide, show) | `[data-slot="embedded-tweet-frame"]` `LIVE` 5 (rebuilt only; contains a nested `article`). Dim is `opacity: 0.35`. No classic rule shipped (no reliable test id). |
+| `view-counts` (off) | rebuilt `[data-engagement-action="generic"]` `LIVE` 5; classic `a[href$="/analytics"]` `INFERRED` (the classic view count is a link to `/status/<id>/analytics`). |
+| `bookmark-share` (off) | rebuilt `[data-engagement-action="bookmark"], [data-engagement-action="share"]` `LIVE` 5 each; classic `[data-testid="bookmark"], [data-testid="removeBookmark"]` `SOURCE`. |
+| `profile-counts` (off) | `a[href$="/following"], a[href*="/following?"], a[href$="/verified_followers"], a[href*="/verified_followers?"]` `LIVE` 1 each: desktop hrefs end in the path, phone hrefs are `https://m.x.com/<user>/following?launch_app_store=true&ct=engagement_generic`. |
+| `footer-links` (off) | `nav[aria-label="Footer"]` `LIVE` 1 on desktop, 0 on the phone (not rendered). English label only. |
 
 **CSS cannot:** hide only "For you" or force "Following" (no href or text to tell the tabs apart, and `[role=presentation]:first-child` would also hide "Posts" on profiles); hide "Discover more", "Today's News" or "Trending now" by text (all published rules use `:has-text`); block `/explore` or `/i/grok`; rewrite the logged-out `launch_app_store` links (`pointer-events:none` on them would make the page inert); dismiss the classic cookie banner (needs the `d_prefs` cookie). Sidebar rules (`sidebarColumn`, "Who to follow", `news_sidebar`) do nothing at phone width because the sidebar is not rendered, so they are not shipped.
 
@@ -107,29 +149,69 @@ What the validator allows: one CSS selector (comma lists fine) per rule; at most
 
 **Examples.** *"Stop the open-in-app popup"* → `[data-interaction="app-store-obstruction"]` plus the narrow `$=` pill rule: semantic markers, and the suffix excludes the 48 other `launch_app_store` links. *"Hide Grok everywhere"* → href, test id and the logo-`viewBox` form together.
 
+Rebuilt front end re-checked logged out on 2026-11-13 on `/elonmusk` with an iPhone UA and a 1440 px desktop UA: both got the rebuilt app (0 `data-testid`, 0 `[data-testid]` anywhere), same DOM. New hooks seen: `data-post-avatar`, `data-engagement-action` (`reply`, `retweet`, `like`, `generic` = views, `bookmark`, `share`), `data-slot="embedded-tweet-frame"` (quote box), `data-slot="xds-context-menu-trigger"` (media holder), `data-press-control`, `nav[aria-label="Footer"]` (desktop only).
+
+**CSS cannot (add):** hide the desktop "Log in or sign up for X" card and the "See the full profile" bar; they are `aside` elements and the only visible log-in/sign-up controls on desktop (the header `mobile-top-bar-log-in` link measures 0x0 there), so hiding them would remove the way in. Hide only "Posts"/"Replies" profile tabs (their hrefs are `launch_app_store` links, a rule would hit all 50).
+
+**Pitfalls (add).**
+- Phone profile links are absolute `https://m.x.com/...?launch_app_store=true...` URLs; desktop ones are relative. Rules on `href` need both `$=` and `*="...?"` forms.
+- `[data-slot="xds-context-menu-trigger"]` is also on other menus: keep the `article` prefix (4 inside articles on the profile, more outside).
+- Embedded quote posts contain their own `article` and `data-post-avatar`, so avatar and media rules also affect them, which is intended.
+
+Rebuilt front end re-checked logged out on 2026-11-13 on `/elonmusk` with an iPhone UA and a 1440 px desktop UA: both got the rebuilt app (0 `data-testid`, 0 `[data-testid]` anywhere), same DOM. New hooks seen: `data-post-avatar`, `data-engagement-action` (`reply`, `retweet`, `like`, `generic` = views, `bookmark`, `share`), `data-slot="embedded-tweet-frame"` (quote box), `data-slot="xds-context-menu-trigger"` (media holder), `data-press-control`, `nav[aria-label="Footer"]` (desktop only).
+
+**CSS cannot (add):** hide the desktop "Log in or sign up for X" card and the "See the full profile" bar; they are `aside` elements and the only visible log-in/sign-up controls on desktop (the header `mobile-top-bar-log-in` link measures 0x0 there), so hiding them would remove the way in. Hide only "Posts"/"Replies" profile tabs (their hrefs are `launch_app_store` links, a rule would hit all 50).
+
+**Pitfalls (add).**
+- Phone profile links are absolute `https://m.x.com/...?launch_app_store=true...` URLs; desktop ones are relative. Rules on `href` need both `$=` and `*="...?"` forms.
+- `[data-slot="xds-context-menu-trigger"]` is also on other menus: keep the `article` prefix (4 inside articles on the profile, more outside).
+- Embedded quote posts contain their own `article` and `data-post-avatar`, so avatar and media rules also affect them, which is intended.
+
 ## YouTube (`youtube.default`)
 
-- **Where it lands.** `m.youtube.com` stays on `m.youtube.com` (adds `?ra=m`). An iPhone UA gets a DOM made of `ytm-*` custom elements plus newer view-model elements (`yt-lockup-view-model`, `grid-shelf-view-model`, `yt-tab-shape`, `chip-shape`, `lazy-list`, `yt-video-metadata-carousel-view-model`). **`ytd-*` elements never appear.** SPA. Paths: `/`, `/results?search_query=`, `/watch?v=`, `/shorts/ID`, `/@handle`, `/playlist?list=`, `/feed/you`, `/feed/subscriptions`; `/feed/explore` and `/feed/trending` redirected to `/`.
-- Logged-out bottom bar: Home, Shorts, You (Subscriptions appears logged in, `INFERRED`). A fresh logged-out Home can be an empty "Try searching" page; later loads showed a feed. "Open App" appears only on `/watch`. No overlay and no scroll lock anywhere; `body{overflow:hidden}` on the watch layout is normal, do not override it.
-- Lazy loading: Shorts cards appear after scrolling (0 → 3 → 9); CSS applies as nodes arrive.
+- **Where it lands.** `m.youtube.com` stays on `m.youtube.com` (adds `?ra=m`). An iPhone UA gets a DOM made of `ytm-*` custom elements plus newer view-model elements (`yt-lockup-view-model`, `grid-shelf-view-model`, `yt-tab-shape`, `chip-shape`, `lazy-list`, `yt-video-metadata-carousel-view-model`, `yt-subscribe-button-view-model`, `yt-compactify-video-action-bar-view-model`). **`ytd-*` elements never appear there.** Desktop (`www.youtube.com`) is `ytd-*` plus `yt-lockup-view-model` / `yt-thumbnail-view-model` cards. SPA. Paths: `/`, `/results?search_query=`, `/watch?v=`, `/shorts/ID`, `/@handle`, `/@handle/videos`, `/playlist?list=`, `/feed/you`, `/feed/subscriptions`.
+- Logged-out bottom bar: Home, Shorts, You (Subscriptions appears logged in, `INFERRED`). A fresh logged-out Home is the empty "Try searching to get started" page on both platforms, so Home rules are checked against older fixtures. "Open App" appears only on `/watch`. No overlay and no scroll lock anywhere; `body{overflow:hidden}` on the watch layout is normal, do not override it.
+- Lazy loading: Shorts cards appear after scrolling (0 → 3 → 9); CSS applies as nodes arrive. The desktop app needs about 20 s in headless Chrome before the page renders.
+- 2026-11-13 re-check: real Chrome over CDP, logged out, iPhone UA 390x844 (home, watch, search, channel Videos) and Chrome desktop UA (watch, search). Counts below are `querySelectorAll` on that DOM; new fixtures are sanitised excerpts of it.
 
 | Option (default) | Rules and evidence |
 |---|---|
 | `open-app` (on) | `ytm-mobile-topbar-renderer ytm-button-renderer:has(> a[href^="vnd.youtube://"])` `LIVE` 1 on `/watch`: the header pill (height 40 → 0, nothing else changed). The mic button is also a `ytm-button-renderer`, so the `vnd.youtube://` link anchors it. |
-| `promos` (on) | `ytm-mealbar-promo-renderer, ytm-statement-banner-renderer, ytm-upsell-dialog-renderer, ytm-brand-video-singleton-renderer` `INFERRED` from the `ytd-*` names in mjones.network and yt-neuter; none rendered logged out. |
-| `ads` (on) | `ytm-companion-slot` `LIVE` 1 (empty companion container). `ytm-promoted-sparkles-web-renderer, ytm-promoted-video-renderer, ytm-ad-slot-renderer, ytm-masthead-ad-renderer` `INFERRED` (no ads were served to the logged-out sessions). |
-| `shorts` (off) | `ytm-pivot-bar-item-renderer:has(.pivot-shorts)` `LIVE` 1 (`.pivot-shorts` alone matches 2 nodes). `ytm-rich-section-renderer:has(ytm-shorts-lockup-view-model)` `LIVE` 2 of 3 Home sections (the community-post section stays). `grid-shelf-view-model:has(ytm-shorts-lockup-view-model)` `LIVE` 4–5 on search. `ytm-video-with-context-renderer:has(a[href^="/shorts/"])` `LIVE` 3 after scrolling. `ytm-reel-shelf-renderer` `LIVE` 1 on `/watch`. `yt-tab-shape[tab-title="Shorts"]` `LIVE` 1 on a channel (English label). `ytm-chip-cloud-chip-renderer:has([aria-label="Shorts"])` `SOURCE` (gijsdev/ublock-hide-yt-shorts v2026.4.29; 0 in the tested chip bar, chips are personalised). |
-| `home-feed` (off) | `ytm-rich-grid-renderer .rich-grid-renderer-contents` `LIVE` 1 (the feed container; `ytm-rich-grid-renderer` is only used on Home). Counted, not visually tested as hidden. |
-| `home-chips` (off) | `ytm-feed-filter-chip-bar-renderer` `LIVE` 1 (leaves a blank gap of about the bar's height). |
-| `comments` (off) | `ytm-item-section-renderer:has(> lazy-list > yt-video-metadata-carousel-view-model[aria-label="Comments"])` `LIVE` 1 (113 px → 0). English label. |
-| `related` (off) | `.related-items-container` `LIVE` 1: player, title, actions and comments unaffected. |
-| `playlists` (off) | `ytm-compact-playlist-renderer`, `ytm-compact-radio-renderer` `LIVE` (present on some pages only). |
+| `promos` (on) | `ytm-mealbar-promo-renderer, ytm-statement-banner-renderer, ytm-upsell-dialog-renderer, ytm-brand-video-singleton-renderer` `INFERRED` from the `ytd-*` names in mjones.network and yt-neuter; none rendered logged out. Desktop twin `ytd-statement-banner-renderer, ytd-banner-promo-renderer, ...` `LIVE` (signed in, 2026-11-10). |
+| `ads` (on) | `ytm-companion-slot` `LIVE` 1 (empty companion container). `ytm-promoted-sparkles-web-renderer, ytm-promoted-video-renderer, ytm-ad-slot-renderer, ytm-masthead-ad-renderer` `INFERRED`. Desktop: `ytd-ad-slot-renderer`, `ytd-search-pyv-renderer` `LIVE` 3 each on a search page (2026-11-13), masthead and player containers `LIVE`. Video ads inside the player are not hidden (see CSS cannot). |
+| `premium-upsell` (on) | Desktop only: `ytd-guide-entry-renderer:has(a[href*="premium"])`, `ytd-button-renderer:has(a[href*="premium"])` `LIVE` (signed in, 2026-11-10). |
+| `shorts` (off) | `ytm-pivot-bar-item-renderer:has(.pivot-shorts)` `LIVE` 1 (`.pivot-shorts` alone matches 2 nodes). `ytm-rich-section-renderer:has(ytm-shorts-lockup-view-model)` `LIVE` 2 of 3 Home sections (the community-post section stays). `grid-shelf-view-model:has(ytm-shorts-lockup-view-model)` `LIVE` 2 to 5 on search. `ytm-video-with-context-renderer:has(a[href^="/shorts/"])` `LIVE` 3 after scrolling. `ytm-reel-shelf-renderer` `LIVE` 1 on `/watch`. `yt-tab-shape[tab-title="Shorts"]` `LIVE` 1 on a channel (English label). `ytm-chip-cloud-chip-renderer:has([aria-label="Shorts"])` `SOURCE` (gijsdev/ublock-hide-yt-shorts v2026.4.29; 0 in the tested chip bar). Desktop twins (`ytd-reel-shelf-renderer`, `ytd-rich-shelf-renderer[is-shorts]`, sidebar entry, `ytd-video-renderer:has(a[href^="/shorts/"])`) `LIVE` on home, search and watch. |
+| `home-feed` (off) | Phone: `ytm-browse:not(:has(yt-page-header-renderer)) ytm-rich-grid-renderer .rich-grid-renderer-contents` `LIVE` 1 on Home, **0 on a channel Videos tab** (fixed 2026-11-13: `ytm-rich-grid-renderer` is shared by Home and channels, the bare selector emptied channel video lists too; the channel has `yt-page-header-renderer`, Home does not). Desktop: `ytd-browse[page-subtype="home"] ytd-rich-grid-renderer > #contents` `LIVE`. |
+| `home-chips` (off) | `ytm-feed-filter-chip-bar-renderer` `LIVE` 1 (leaves a blank gap about the bar's height); desktop `ytd-feed-filter-chip-bar-renderer` `LIVE`. |
+| `comments` (off) | `ytm-item-section-renderer:has(> lazy-list > yt-video-metadata-carousel-view-model[aria-label="Comments"])` `LIVE` 1 (113 px → 0; English label). Desktop `ytd-comments#comments, ytd-comments-entry-point-header-renderer` `LIVE` 1. |
+| `related` (off) | `.related-items-container` `LIVE` 1; desktop `ytd-watch-next-secondary-results-renderer` `LIVE` 1. Player, title, actions and comments unaffected. |
+| `playlists` (off) | `ytm-compact-playlist-renderer`, `ytm-compact-radio-renderer` `LIVE` (some pages only); desktop playlist, radio and `yt-lockup-view-model:has(a[href*="list=RD"])` cards. |
+| `sidebar-more` (off) | Desktop `ytd-guide-section-renderer:has(a[href="/premium"]), ytd-guide-renderer #footer`; `INFERRED` (the guide drawer was not open in captures). |
+| `end-cards` (off) | `.ytp-ce-element, .ytp-ce-covering-overlay, .ytp-endscreen-content, .ytp-pause-overlay, .ytp-suggestion-set` `LIVE` (`.ytp-ce-element` 4, `.ytp-endscreen-content` 1 on desktop watch). |
+| `live-chat` (off) | `ytd-live-chat-frame` `INFERRED` (hand-written fixture). |
+| `shopping` (off) | `ytd-merch-shelf-renderer, ytd-ticket-shelf-renderer, ytd-product-list-renderer, ytd-donation-shelf-renderer` `INFERRED`; `ytd-info-panel-container-renderer, #clarify-box` `LIVE`. |
+| `topbar-buttons` (off) | `#voice-search-button` and the Create button `LIVE` (desktop). |
+| `notifications` (off) | `ytd-notification-topbar-button-renderer` `LIVE` (signed in). |
+| `library-tabs` (off) | `ytm-pivot-bar-item-renderer:has(.pivot-you)`, `:has(.pivot-subs)` `LIVE` on a phone. |
+| `thumbnails` (choice Show/Blur/Hide, show) | blur (css `filter: blur(12px)`): phone `ytm-thumbnail-cover img, ytm-compact-thumbnail img, yt-thumbnail-view-model img` `LIVE` 12 on watch, 19 + 8 on search, `ytm-compact-thumbnail` 30 on a channel; desktop `ytd-thumbnail:not(.player-container-background-image) img, yt-thumbnail-view-model img` `LIVE` 29 + 20 on search, 46 on watch. Hide: the same elements without `img` (duration badge goes with it). The `:not` skips the invisible cinematic backdrop. |
+| `video-titles` (choice Show/Blur, show) | css `filter: blur(6px)`: phone `ytm-media-item h3, ytm-compact-video-renderer h4` `LIVE` 12/19 and 30; desktop `yt-lockup-view-model h3` `LIVE` 40, `ytd-video-renderer h3` `LIVE` 18, `ytd-compact-video-renderer h3` `INFERRED`. The `h1` above the player is not touched. |
+| `channel-avatars` (off) | Phone `div:has(> ytw-channel-thumbnail-with-link-renderer)` `LIVE` 12/19; `comments-entry-point-teaser-view-model avatar-view-model` `LIVE` 1. Desktop `yt-lockup-metadata-view-model > div:has(> yt-decorated-avatar-view-model)` `LIVE` 38; `ytd-video-renderer #channel-info > a#channel-thumbnail` `LIVE` 18; `ytd-comments #author-thumbnail` `LIVE` 21. |
+| `video-stats` (off) | Phone: `.ytmBadgeAndBylineRendererItemByline:has([aria-label$=" views"])` `LIVE` 12/19; `.YtmCompactMediaItemStats:has(...)` `LIVE` on channels; `.ytVideoSubtitleViewModelSubstring[aria-label$=" views"]` and `" likes"` `LIVE` 1 each. Desktop: `yt-content-metadata-view-model [aria-label$=" views"]` `LIVE` 39; `ytd-video-meta-block #metadata-line span.inline-metadata-item:first-of-type` `LIVE` 18; `ytd-watch-info-text`, `ytd-watch-metadata #owner-sub-count`, the like number (`like-button-view-model .ytSpecButtonShapeNextButtonTextContent`) `LIVE` 1 each. English `aria-label` suffix; "1 view" is missed. |
+| `hashtags` (off) | `a[href^="/hashtag/"]` `LIVE` 5 (phone crawler description), 3 under the desktop title and 12 in all. `SOURCE` r/uBlockOrigin "disable hashtag links from titles" (`###title h1 a[href^="/hashtag/"]`). |
+| `subscribe-buttons` (off) | `yt-subscribe-button-view-model, ytm-subscribe-button-renderer` `LIVE` 1 on watch and 1 on search (phone); `ytd-subscribe-button-renderer, yt-subscribe-button-view-model` `LIVE` 1 (desktop). |
+| `action-buttons` (off) | Phone `.ytCompactifyVideoActionBarViewModelActionButtons > button-view-model` `LIVE` 1 (Share). Desktop `ytd-watch-metadata yt-button-view-model:has(button[aria-label="Share"])`, `...[aria-label="Save to playlist"]`, `ytd-watch-metadata ytd-download-button-renderer` `LIVE` 1 each. Like and Dislike stay. |
+| `player-overlays` (off) | `.ytp-cards-teaser, .ytp-cards-button, .iv-branding, .ytp-watermark` `LIVE` 1, 1, 1 on desktop watch (the watermark is `INFERRED`, 0 on the test video); `SOURCE` houssemko Youtube-Declutter. Phone player overlays not rendered logged out. |
+| `comments-look` (choice Show/Dim/Blur, show) | css on `ytm-item-section-renderer:has(> lazy-list > yt-video-metadata-carousel-view-model[aria-label="Comments"])` (`LIVE` 1) and `ytd-comments#comments` (`LIVE` 1): dim `opacity: 0.35`, blur `filter: blur(8px)`. The hide toggle wins. |
+| `related-look` (choice Show/Dim/Blur, show) | the `related` selectors, dim or blur 8px. |
+| `home-feed-look` (choice Show/Dim/Blur, show) | the `home-feed` selectors (with the channel-page guard), dim or blur 8px. |
+| `search-shelves` (off) | `ytd-search ytd-shelf-renderer` `LIVE` 2 (Music shelves on a "music" search); `SOURCE` Onsotumenh YouTube-Cosmetic-Filters (Latest Posts From, People also watched share the element, `INFERRED`). Desktop only; no phone shelf seen. |
+| `mini-player` (off) | `ytd-miniplayer` `LIVE` 1 on the desktop watch page: the small floating player that follows you when you scroll away. Desktop only. The up-next grid at the end of a video (`.ytp-modern-videowall-still`) already carries `ytp-suggestion-set`, so `end-cards` covers it. |
 
-**CSS cannot:** block `/shorts/ID` (hide every entry point; direct links still open the player; a request-level redirect is the known workaround, not available here); hide the "Open App" entry in the More sheet (an unmarked `<button>`, identical to "Feedback"); match by length or text; show only subscriptions; disable autoplay or video ads. The consent page (`consent.youtube.com`, EU) is another origin and was not reachable.
+**CSS cannot:** block `/shorts/ID` (hide every entry point; direct links still open the player); hide the "Open App" entry in the More sheet (an unmarked `<button>`, identical to "Feedback"); match by length or text; show only subscriptions; disable autoplay; hide or skip video ads, which play inside the player (see `.rpiv/artifacts/research/*youtube-instream-ads.md`). Hovering to reveal blurred thumbnails is not possible in the rule model. The consent page (`consent.youtube.com`, EU) is another origin and was not reachable. The "Ask" AI button never rendered in the logged-out captures (only its label string in the page's i18n table), so there is no rule for it.
 
-**Pitfalls.** Never hide `ytm-app`, `ytm-browse` (shared by Home, channels, playlists), `ytm-search`, `ytm-watch`, a bare `ytm-item-section-renderer` (also holds comments and all search results), `lazy-list`, `ytm-pivot-bar-renderer`, `#player` or `#movie_player`. A blanket `ytm-rich-section-renderer` hides the community posts and nudges too: scope with `:has(ytm-shorts-lockup-view-model)`. Endscreen cards (`.ytp-ce-element`) are `INFERRED` and sit inside `#movie_player`.
+**Pitfalls.** Never hide `ytm-app`, `ytm-browse` (shared by Home, channels, playlists), `ytm-search`, `ytm-watch`, a bare `ytm-item-section-renderer` (also holds comments and all search results), `lazy-list`, `ytm-pivot-bar-renderer`, `#player` or `#movie_player`. `ytm-rich-grid-renderer` is used on Home **and** on a channel Videos tab; scope with `ytm-browse:not(:has(yt-page-header-renderer))`. A blanket `ytm-rich-section-renderer` hides the community posts and nudges too: scope with `:has(ytm-shorts-lockup-view-model)`. `ytd-thumbnail` also draws the invisible player backdrop on a watch page (`.player-container-background-image`). `yt-thumbnail-view-model` and `yt-lockup-view-model` are shared by Home, watch and search cards on desktop and by Shorts shelves on a phone. Endscreen cards (`.ytp-ce-element`) sit inside `#movie_player`. Hide-based "look" choices (Dim/Blur) stack under the plain hide toggles: the toggle wins because it removes the element.
 
-**Examples.** *"Hide Shorts everywhere"* → the `shorts` rules: each is the smallest container of an anchor unique to Shorts. *"Stop recommended videos on the watch page"* → `.related-items-container`. *"Empty my Home but keep search"* → `ytm-rich-grid-renderer .rich-grid-renderer-contents`.
+**Examples.** *"Hide Shorts everywhere"* → the `shorts` rules. *"Stop recommended videos on the watch page"* → `related`, or `related-look` to just dim it. *"Empty my Home but keep search"* → `home-feed`. *"No clickbait"* → `thumbnails` Blur plus `video-titles` Blur.
 
 ## Reddit (`reddit.default`)
 
@@ -139,14 +221,16 @@ What the validator allows: one CSS selector (comma lists fine) per rule; at most
 
 | Option (default) | Rules and evidence |
 |---|---|
-| `app-prompts` (on) | `#xpromo-small-header, #open-app-header-cta` `LIVE` 1 each on the home feed, a subreddit and a post (`#open-app-header-cta` is the orange link, `#xpromo-small-header` its wrapper; **no banner under the header was found**, the old label was wrong). `div[id^="configured-xpromo-"]:not([id*="nsfw"])` `LIVE` 1 once the sheet is open, 0 before; hiding it removed card and backdrop. `html, body, body.rpl-scroll-lock` with `overflow-y: auto` (`css` rule), see pitfalls. |
-| `google-sign-in` (on) | `#credential_picker_container, #credential_picker_iframe, auth-flow-google-one-tap-prompt`. The `position:fixed` 144 px `iframe#credential_picker_iframe` was seen `LIVE` once on a post page and did not return (intermittent); `auth-flow-google-one-tap-prompt` is `LIVE` 1 and empty; the container is `INFERRED` (Google Identity Services' standard wrapper). |
-| `ads` (on) | `shreddit-ad-post, shreddit-ad-post + hr` `LIVE` 4 on `/`, 1 on a subreddit (the `hr` must go too or a stray divider stays). `shreddit-comments-page-ad` `LIVE` 1 on a post page (empty). `shreddit-sidebar-ad`, `shreddit-comment-tree-ad` `SOURCE` (Reddit UI Enhancer userscript dumps 2026-09/10), 0 matches logged out. |
-| `advertise-links` (on) | `li:has(> a[href*="ads.reddit.com"])`, `li:has(> a[href^="/reddit-pro"])` the links were counted `LIVE` (1 each, in the account drawer); the `li` rows were not applied. |
-| `video-posts` (off) | `article:has(> shreddit-post[post-type="video"])` and `… + hr` `LIVE` 7 of 7 on `/`. The same pattern works for `image` (6), `gallery` (1), `link`. |
-| `suggested-communities` (off) | `in-feed-community-recommendations` `LIVE` 4 on `/explore/`; 0 in the home feed. |
-| `related-posts` (off) | `#answers-suggested-queries-mosaic, div[id$="_related"], div[id$="_translations"]` `LIVE` on a post page: 1 each; hiding all three took `#mosaic-pdp-feed` to 0 px and the 5 comments stayed. |
-| `comments` (off) | `div[id^="comment-tree-content-anchor"]` `LIVE` 1 (the post body is a separate sibling). |
+| `suggested-communities` (off) | existing `in-feed-community-recommendations` `LIVE` 4 on `/explore/`, 0 in the home feed. **Added** `[slot="related-community-recommendation"]` `LIVE` 1 on a post page. |
+| `related-posts` (off) | existing three rules (`LIVE` 1 each). **Added** `reddit-pdp-right-rail-post` `LIVE` 25 on a post page (related posts that also appear on the phone page). |
+| `feed-media` (choice show/blur/hide, show) | `article shreddit-post [slot="post-media-container"], article shreddit-post [slot="thumbnail"]` `LIVE` 18 + 3 on `/`, 28 on `/r/pics`; 4 more containers sit inside `shreddit-ad-post` and are not matched. The `article` prefix leaves post pages (no `article`) untouched. Blur is `filter: blur(18px)`. Hide collapses the slot, leaving title and flair. |
+| `avatars` (choice show/blur/hide, show) | `shreddit-post [slot="credit-bar"] img, shreddit-comment [slot="commentAvatar"]` `LIVE` 36 header icons on `/`, 16 on `/r/pics`, 6 comment avatars on a post. Blur is `filter: blur(6px)`. |
+| `reply-depth` (choice show/dim/hide, show) | `shreddit-comment[depth="1"]` `LIVE` 2 of 6 comments on a post (`depth` is `0` for top-level). Dim is `opacity: 0.35` on the reply, which carries everything nested under it; hide removes the whole reply subtree. Only `depth="1"` is matched on purpose (matching deeper levels would multiply the opacity). |
+| `post-flair` (off) | `shreddit-post-flair` `LIVE` 28 on `/` and `/r/pics`. |
+| `text-previews` (off) | `article shreddit-post [slot="text-body"]` `LIVE` 10 on `/`; not applied on post pages (0 matches there, so the full body stays). |
+| `timestamps` (off) | `faceplate-timeago` `LIVE` 28 on `/`, 33 on a post (posts and comments). |
+| `comment-actions` (off) | `shreddit-comment [slot="actionRow"]` `LIVE` 9 on a post (vote, reply, award and share row). |
+| `subreddit-banner` (off) | `div:has(> #subreddit-banner-img)` `LIVE` 1 on `/r/pics` and `/r/AskReddit`: the 64 px banner wrapper inside the masthead; name, icon and Join stay. |
 
 **CSS cannot:** reach the search overlay's "Trending" and "Ask" (shadow DOM; hiding `reddit-search-small` breaks search); rewrite the `applink.reddit.com` links; stop the 30-second sheet from being created (hide and unlock only); tell suggested posts from normal ones (`shreddit-post[recommendation-source]` matches every post: 16 of 16 logged out); unblur NSFW posts; style old Reddit. A route block for `/answers/` or `/explore/` needs a redirect.
 
@@ -162,151 +246,247 @@ What the validator allows: one CSS selector (comma lists fine) per rule; at most
 
 **Examples.** *"Stop the pop-up that blocks scrolling"* → hide `div[id^="configured-xpromo-"]:not([id*="nsfw"])` and add the `css` rule on `html, body, body.rpl-scroll-lock`. *"Remove ads"* → `shreddit-ad-post` plus its `+ hr`. *"Hide all video posts"* → hide the article from its child with `:has(> shreddit-post[post-type="video"])`, and its divider.
 
+**CSS cannot (add):** hide or blur vote scores and comment counts on feed posts (they are `faceplate-number` inside the `shreddit-post` shadow root, together with the vote buttons); hide the post "..." menu without also touching the action row (`shreddit-post-overflow-menu` is light DOM but removing it is not requested). A desktop UA in headless Chrome got a JS challenge page (`?js_challenge=1`), so only the mobile shreddit DOM was re-checked on 2026-11-13.
+
+**Pitfalls (add).**
+- `[slot="post-media-container"]` also exists inside `shreddit-ad-post` (4 on `/`); prefixing `shreddit-post` or `article shreddit-post` avoids touching ads (hidden separately by `ads`).
+- Post pages put `shreddit-post` outside any `article`: always prefix feed-only rules with `article`.
+- `[slot="text-body"]` on a post page is the post body: never match it without the `article` prefix.
+- Comment nesting is the `depth` attribute (0, 1, 2...); `shreddit-comment` elements nest inside their parent's `children` slot, so one rule on `depth="1"` covers every deeper reply.
+- A post URL needs the full slug to resolve; `/comments/<id>/` alone returned "not found" for a logged-out phone UA.
+
+**CSS cannot (add):** hide or blur vote scores and comment counts on feed posts (they are `faceplate-number` inside the `shreddit-post` shadow root, together with the vote buttons); hide the post "..." menu without also touching the action row (`shreddit-post-overflow-menu` is light DOM but removing it is not requested). A desktop UA in headless Chrome got a JS challenge page (`?js_challenge=1`), so only the mobile shreddit DOM was re-checked on 2026-11-13.
+
+**Pitfalls (add).**
+- `[slot="post-media-container"]` also exists inside `shreddit-ad-post` (4 on `/`); prefixing `shreddit-post` or `article shreddit-post` avoids touching ads (hidden separately by `ads`).
+- Post pages put `shreddit-post` outside any `article`: always prefix feed-only rules with `article`.
+- `[slot="text-body"]` on a post page is the post body: never match it without the `article` prefix.
+- Comment nesting is the `depth` attribute (0, 1, 2...); `shreddit-comment` elements nest inside their parent's `children` slot, so one rule on `depth="1"` covers every deeper reply.
+- A post URL needs the full slug to resolve; `/comments/<id>/` alone returned "not found" for a logged-out phone UA.
+
 ## Bottom margin
 
 Some sites draw fixed bars at the very bottom that sit under the screen edge or under the floating button. Settings → Bottom margin shrinks the native site view from the bottom (0–200 px, shared), and an expanded favorite in Settings → Favorites can override it. It is a native layout setting, not CSS, so it works the same on every page and needs no selector. See [UI Design](./ui-design.md#settings).
 
 ## Discord (`discord.default`)
 
-Matches `https://*.discord.com/*`. Checked 2026-11-07, logged out, headless Chromium as iPhone (390x844).
+Matches `https://*.discord.com/*`. Checked 2026-11-07 and 2026-11-13, logged out, headless Chromium as iPhone (390x844).
 
-**Where it lands.** `/app` redirects to `/login`, which is only a login form: nothing to hide (the QR panel is already `display`-less at phone width). The recipe therefore only touches the marketing home `https://discord.com/`. The logged-in app was not reachable, so it has no rules.
+**Where it lands.** `/app` redirects to `/login`, which is only a login form. Logged out, rules touch the marketing home `https://discord.com/`. The logged-in web app was not reachable, so its rules are SOURCE or INFERRED (see table) and match on stable class prefixes (`[class*="x"]`) because real class names carry a hash suffix.
 
 | Option (default) | Rules and evidence |
 |---|---|
-| Hide download-the-app prompts (on) | `a[href*="/api/downloads/distributions/"]` LIVE 3 (hero and bottom buttons visible, hamburger one in a closed menu). `.banner-top` LIVE 1 but `hiden`, 0px high at phone width, INFERRED to show elsewhere. `.discord_banner` LIVE 1 (closing "go chat" section, 631px). |
-| Hide cookie consent banner (on) | `#onetrust-consent-sdk` LIVE 1 as a container; the banner itself never rendered in this session (region/consent), so what it holds is INFERRED from OneTrust's standard markup. |
+| Hide download-the-app prompts (on) | `body:has(div.home--hero) a[href*="/api/downloads/distributions/"]` LIVE 3 (hero, mobile menu, closing band). The same href matches 18 links on `/download`, hence the scope. |
+| Hide the closing app promo band (on) | `div.discord_banner` LIVE 1 (631px closing "go chat" band), 0 on `/download`, `/nitro`, `/quests`, `/login`. |
+| `cookie-banner` (on) | `#onetrust-consent-sdk` LIVE 1 but empty, 0px: the banner never rendered here (region). Contents are SOURCE (OneTrust standard markup, EasyList cookie lists). `#onetrust-banner-sdk` LIVE 0. |
+| `site-footer` (off) | `.footer_new` LIVE 1. The page's `<footer>` tag only holds a decorative robot animation. |
+| `home-artwork` Show / Dim / Hide (Show) | `.home--image-wr` LIVE 8, containing all 6 `main video` loops. Dim is `opacity: 0.35`; text stays. |
+| `sparkle-decor` (off) | `.star-hero-home` LIVE 89 (5 in view at load). |
+| `chat-upsells` (on) | SOURCE `button[aria-label="Send a gift"]` (espimarisa gist; English UI) and `[class*="channelAppLauncher"]` (ikl.sh/garden/discord_ublock, Aug 2024). Web app only, not run live. |
+| `dm-store-links` (off) | INFERRED `[class*="privateChannels"] a[href="/store"]` and `a[href="/shop"]`. The ikl.sh list targets these by text xpath, so the hrefs are recalled from the client. |
+| `active-now` (off) | SOURCE `[class*="nowPlayingColumn"]` (JustZix example, toydotgame Vencord CSS, r/BetterDiscord). A Dec 2025 thread says older selectors broke after an update, so expect drift. |
+| `avatars` Show / Blur (Show) | SOURCE `img[class*="avatar_"]`: `avatar_` classes exist in the shipped login-page CSS (`avatar_SISQ-M`). |
+| `chat-media` Show / Blur / Hide (Show) | INFERRED `[class*="imageWrapper_"], [class*="embedWrapper_"]`: long-lived names in community themes, absent from the login CSS chunks. |
 
-**Left alone on purpose.** The "Open Discord in your browser" button (it is the way into the web app), the footer and nav "Download" links to `/download`.
+**CSS cannot do:** pick the Activity group in the member list (it is an unclassed `div`; uBlock needs `:xpath`), or pick Nitro/Shop by their text.
 
-**Not verified / CSS cannot do.** Anything in the logged-in app: server/DM lists, Nitro and Quests promos, in-app pop-ups. Class names there are hashed (`name_hash`), so recipes would need stable anchors seen while signed in. The `/download` page was not inspected. No community filter list was consulted.
+**Pitfalls.** The page's `<footer>` is not the footer; use `.footer_new`. Logged-in class names are `name_hash`; never match the hash. Left alone: the "Open Discord in your browser" button, nav and footer `/download` links.
 
 ## Douyin (`douyin.default`)
 
-- **Where it lands.** `www.douyin.com` serves an iPhone UA a React app that renders logged out (no captcha wall was seen; an invisible `#nocaptcha-container` iframe exists). Home is a vertical video feed: `[data-e2e="slideList"]` holding `[data-e2e="feed-item"]` slides with xgplayer controls, under a header (`#douyin-mobile-header`) with search, Log in, Get APP.
-- **Classes are hashed**; stable hooks are `data-e2e`, ids and a few readable classes (`disturb-login-panel`, `ai-douyin-entry`).
+- **Where it lands.** Two layouts were seen for the same iPhone UA. 2026-11-07: `www.douyin.com/` served the vertical slide feed (`[data-e2e="slideList"]` > `[data-e2e="feed-item"]`, xgplayer). 2026-11-13: it redirected to `/jingxuan`, a desktop-style Featured grid (`.discover-video-card-item` cards under `.discover-tab-bar`, left navigation with a red Get APP tile) squeezed into 390 px. Rules for both are kept; each rule only matches in its own layout.
+- **Classes are hashed**; stable hooks are `data-e2e`, ids, `discover-*`, `waterfall-videoCardContainer`, `videoImage`, `tab-get_app`, `xgplayer-*`/`xg-*` tags, `disturb-login-panel`, `ai-douyin-entry`.
 
 | Option (default) | Rules and evidence |
 |---|---|
-| `guide-overlay` (on) | `[data-e2e="recommend-guide-mask"]` `LIVE` 1: the "scroll for more videos" tutorial with a confirm button. |
-| `login-nag` (on) | `.disturb-login-panel` `LIVE` 3 (empty or 0 px until triggered). That it is the login nag is `INFERRED` from the name; never saw it populated. |
-| `ai-features` (off) | `.ai-douyin-entry` `LIVE` 2; `[data-e2e="chapter-container"]` `LIVE` 1; `#chapterVideoSideCard` `LIVE` 1 (AI chapter summary card, labelled "generated by AI"). |
-| `follow-buttons` (off) | `[data-e2e="feed-follow-icon"]` `LIVE` 5: the badge on avatars. |
-| `video-info` (off) | `[data-e2e="video-info"]` `LIVE` 2: author, date, co-creators and caption overlay. |
+| `guide-overlay` (on) | `[data-e2e="recommend-guide-mask"]` `LIVE` 1 (slide layout, 11-07). |
+| `login-nag` (on) | `.disturb-login-panel` `LIVE` 3 (11-07; empty until triggered). Login-nag role `INFERRED`. |
+| `ai-features` (off) | `.ai-douyin-entry` `LIVE` 2; `[data-e2e="chapter-container"]` `LIVE` 1; `#chapterVideoSideCard` `LIVE` 1 (11-07). |
+| `follow-buttons` (off) | `[data-e2e="feed-follow-icon"]` `LIVE` 5 (11-07). |
+| `video-info` (off) | `[data-e2e="video-info"]` `LIVE` 2 (11-07). |
+| `thumbnails` (choice Show/Blur/Hide, show) | blur: `.discover-video-card-img` css `filter: blur(16px)` `LIVE` 30; hide: `.discover-video-card-item .videoImage` `LIVE` 30 (grid layout, 11-13). |
+| `card-captions` (off) | `.discover-video-card-item .videoImage + div` `LIVE` 30: title, author and date under each card (11-13). |
+| `video-blur` (off) | `xg-video-container video` css `filter: blur(20px)`; `SOURCE` earlier 11-07 fixture (0 on the grid layout). |
+| `player-chrome` (choice Show/Dim/Faint, show) | `.xgplayer-controls xg-left-grid, .xgplayer-controls xg-right-grid, .xgplayer-video-info-wrap` css opacity 0.35 (dim) or 0.1 (faint). `SOURCE` greasyfork douyin-helper "pure mode" (opacity 0.1 controls, 0.3 info wrap) plus 11-07 fixture; not LIVE on the grid layout. |
+| `side-counters` (off) | `[data-e2e="video-player-digg"] > div, [data-e2e="feed-comment-icon"] > div, [data-e2e="video-player-share"] > div`: counts only, buttons stay. 11-07 fixture, `INFERRED` for current layout. |
+| `app-promo` (on) | `.tab-get_app` `LIVE` 1: red Get APP tile in the left navigation (11-13). The slide layout's header Get APP has no stable hook. |
+| `category-tabs` (off) | `.discover-tab-bar` `LIVE` 1 (11-13). Hide the bar only; `.discover-tab-container` also wraps the grid. |
+| `header-icons` (off) | `[data-e2e="notice-entry"], [data-e2e="im-entry"]` `LIVE` 1 + 1 (11-13). |
 
-- **Not done.** The Get APP / Log in header buttons have only hashed classes and text, so CSS cannot target them without guessing by position; left alone.
-- **Not verified.** Logged-in pages, WKWebView, search/user/live routes, and what the login panels look like when they fire. Headless showed an empty dark player, so the visual effect of the hides is unconfirmed.
+Fixtures: `feed-logged-out.html` (slide layout) and `jingxuan-grid.html` (grid layout, hand-reduced from the live DOM).
+
+What CSS cannot do: block the sponsored first video or full-screen ad popups (AdGuard issue 212150 reports them); they are fed by the API response.
+
+Pitfalls: hashed class names rotate per deploy, never use them. The same URL can yield a different layout per visit; do not assume the slide feed exists. `.discover-tab-container` contains the whole grid, so hide only `.discover-tab-bar`.
 
 ## Kuaishou (`kuaishou.default`)
 
-Lands on `https://m.kuaishou.com/` (the mobile UA is redirected there from `www`). Logged out this is a static brand landing page whose only job is to push the app; the feed and videos could not be reached, so the recipe is deliberately small.
+Lands on `https://m.kuaishou.com/` (mobile UA is redirected there from `www`). Logged out this is a static brand landing page whose job is to push the app. Re-checked 2026-11-13: same page; the real web app (`www.kuaishou.com/brilliant`, desktop UA) timed out again (~50 s), so feed/video/profile/live are not covered. No community cosmetic list was found for m.kuaishou.com; every rule is `LIVE`.
 
 | Option (default) | Rules and evidence |
 | --- | --- |
-| Hide app download prompts (on) | LIVE: `.com-download-bar` = 1 (fixed bottom carousel); `a.open-or-download-app-main, .cover .arrrow-wrapper` = 2 (big CTA button and scroll arrow); `.open-in-browser-dialog, .open-app-confirm-dialog` = 2 (in the DOM, `display:none` until an app-open attempt, so best-effort) |
-| Hide the Top up link (off) | LIVE: `.com-header li.nav.highlight` = 1 (recharge link in header menu) |
+| `app-prompts` (on) | `.com-download-bar` `LIVE` 1; `a.open-or-download-app-main, .cover .arrrow-wrapper` `LIVE` 2; `.open-in-browser-dialog, .open-app-confirm-dialog` `LIVE` 2 (display:none until an app-open attempt, best-effort). |
+| `top-up-link` (off) | `.com-header li.nav.highlight` `LIVE` 1. |
+| `landing-pictures` (choice Show/Blur/Hide, show) | blur: `.title-pic .pic-wrapper img.pic` css `filter: blur(14px)` `LIVE` 3; hide: `.title-pic .pic-wrapper` `LIVE` 3 (phone screenshots). |
+| `marketing-sections` (off) | `.page-content .title-pic` `LIVE` 3: headline + tagline + picture blocks. |
+| `brand-slogan` (off) | `.cover img.slogan` `LIVE` 1: slogan artwork above the download button. |
+| `header-menus` (off) | `.com-header .navs > li.nav:has(> a > span.triangle)` `LIVE` 2: the APP and About dropdowns (Home and Top up stay separate). |
+| `registration-footer` (off) | `.com-icp` `LIVE` 1: ICP and public-security links. |
 
 Fixture: `recipes/fixtures/kuaishou/landing.html` (header, hero and content marked `data-keep`).
 
 What CSS cannot do: stop the page's own app-open redirect attempts; the dialogs are only shown by script.
 
-Not verified: feed, video, profile and live pages (`www.kuaishou.com/brilliant` timed out; the app is required), desktop layout, logged-in state, ads, comments, counters.
+Pitfalls: `www.kuaishou.com` desktop app was unreachable from headless Chromium, so do not add feed rules without a live session.
 
 ## LinkedIn (`linkedin.default`)
 
-Matches `https://*.linkedin.com/*`. Logged-out pages are server-rendered with stable BEM class names and `data-*` attributes, so selectors are plain class/attribute anchors.
+Matches `https://*.linkedin.com/*`. Logged-out pages are server-rendered with stable BEM class names and `data-*` attributes (no hashed classes), so selectors are plain class/attribute anchors.
 
-**Evidence caveat:** the automation browser would not start in this session, so there is no rendered-page (LIVE) evidence. Every count below comes from the HTML `www.linkedin.com` returned to curl with an iPhone UA, logged out, 2026-11-08 (HTTP 200): `/`, `/jobs/`, `/in/williamhgates`, a `/pulse/` article, a job view, job search, `/company/microsoft`. Tagged HTML.
+**Evidence.** LIVE = `querySelectorAll` in headless Chrome (puppeteer), logged out, 2026-11-13, iPhone UA 390x844 and macOS Safari UA 1280x800: `/`, `/in/williamhgates`, `/company/microsoft`, a `/jobs/view/<id>`, `/jobs/search/?keywords=engineer`. HTML = server HTML via curl, iPhone UA, 2026-11-08 (earlier evidence, still valid). SOURCE = named current list, not seen on a page here (the signed-in app needs a login; hand-written fixtures `desktop-feed.html`, `desktop-feed-new.html`). INFERRED = reasoned. Counts are total (visible).
 
 | Option (default) | Rules and evidence |
 |------------------|--------------------|
-| App prompts (on) | `.promo-bottom-sheet`: 1 on `/jobs/` (HTML; ships with class `hidden`, script shows it; "LinkedIn is better on the app"). Absent from the other pages' HTML. |
-| Sign-in pop-up (on) | `.contextual-sign-in-modal[data-show-on-page-load]`: 1 on profile, article, job view, job search, company (HTML; overlay starts `opacity-0 invisible`, script opens it). Tap-to-open wrappers (Follow, Connect, Apply) lack the attribute and stay. |
-| Join banners (on) | `.bottom-cta-banner` 1 (profile); `.aside-section-container:has(.top-content-cta)` 1 (profile, job); `.find-a-referral` 1 (job); `[data-id="conversion-prompt"]` 1 (company, hidden by default). |
-| Suggestions (off) | `.browsemap`, `.related-posts` (profile); `.articles-content-card`, `.top-content-categories` (article); `.people-also-viewed` (job); `data-test-id` affiliated-pages / similar-pages / browse-jobs (company); 1 each (HTML). |
-| Similar jobs and searches (off) | `.similar-jobs` 1, `.similar-searches` 1, `[data-test-id="more-searches"]` 1 (job page, HTML). |
-| Comments and reactions bar (off) | `.comments__container` 1 (5 `.comment`), `.article-social-activity` 1 fixed bottom bar (article, HTML). |
-| Posts and activity (off) | `section.activities` 1 (profile), `section.updates` 1 (company, HTML). |
-| Promo sections and footer (off) | `.explore-top-content`, `.top-product-categories`, `.game-hub-banner`, `section.directory` 1 each on `/`; `footer.li-footer` 1 on every page (HTML). |
+| App prompts (on) | `.promo-bottom-sheet`: 1 on `/jobs/` (HTML; ships with class `hidden`, script shows it). Absent from the other pages. |
+| Sign-in pop-up (on) | `.contextual-sign-in-modal[data-show-on-page-load]`: 1 on profile, article, job, job search, company (HTML); LIVE 1 (0 visible until its script opens it) on profile and company. Tap-to-open wrappers (Follow, Connect, Apply) lack the attribute and stay. `#credential_picker_container` 1 (1) on desktop pages, LIVE. **The dialog that really opens is portaled:** `.top-level-modal-container` 1 (1) on profile, company and job pages (0 on `/`), holding `.modal--contextual-sign-in-v2` ("View Bill's full profile"); the v1 `.modal--contextual-sign-in` inside the attribute wrapper no longer exists (0 matches). New rule `.top-level-modal-container`; with it hidden the profile renders fully (checked with a screenshot). The other modals (logo, title, contact info, mutual connections, Follow) are inline and stay. |
+| Join banners (on) | `.bottom-cta-banner` 1 (1) LIVE profile; `.aside-section-container:has(.top-content-cta)` 1 (profile, job, HTML); `.find-a-referral` 1 (job, HTML); `[data-id="conversion-prompt"]` 1 (0 visible), LIVE company. |
+| Promoted posts and ads (on) | INFERRED + SOURCE (signed in): `.ad-banner-container`, `.ad-banner`, `.feed-shared-update-v2:has(.update-components-actor__sub-description a[href*="/ad"])`. LinkedIn Focus also uses `.ad-banner-container`. |
+| Premium prompts (on) | SOURCE (signed in): `.premium-upsell-link`, `.premium-upsell-card`, `a[href*="/premium/products"]` (mig4ng/ublock-origin-filters has `.premium-upsell-link`). |
+| Suggestions (off) | `.browsemap` 1, `.related-posts` 1 LIVE profile; `.articles-content-card`, `.top-content-categories` (article), `.people-also-viewed` (job), `data-test-id` affiliated-pages / similar-pages / browse-jobs (company); HTML. |
+| Similar jobs and searches (off) | `.similar-jobs` 1, `.similar-searches` 1, `[data-test-id="more-searches"]` 1 (job, HTML). |
+| Comments and reaction bars (off) | `.comments__container` 1 (5 `.comment`), `.article-social-activity` 1 fixed bottom bar (article, HTML). New rule `.social-action-bar`: 8 (8) profile, 10 (10) company, LIVE (the Like, Comment, Share row under each public post card). |
+| Posts and activity (off) | `section.activities` 1 LIVE profile; `section.updates` 1 LIVE company. |
+| Promo sections and footer (off) | `.explore-top-content`, `.top-product-categories`, `.game-hub-banner`, `section.directory` 1 each on `/`; `footer.li-footer` 1 on every page; LIVE mobile and desktop. |
+| Feed sidebars (off) | INFERRED (signed in): `.scaffold-layout__aside, .scaffold-layout__sidebar`. |
+| Messaging pop-up (off) | INFERRED + SOURCE: `.msg-overlay-container` (mig4ng list has `.msg-overlay-container`). |
+| **Photos and logos** (choice: Show / Blur / Hide, default Show) | Blur: `filter: blur(10px)`; Hide: `hide`; both on `.top-card__profile-image-container, .top-card-layout__entity-image-container, .face-pile__images-container, .base-main-card__media, .search-entity-media, .profile-section-card__image-link, img.artdeco-entity-image`. LIVE profile 25 (14 visible): container 1, face pile 11 (5), article thumbnails 10 (3), experience logos 5 (5); company 2; job `img.artdeco-entity-image` 2; job search `.search-entity-media` 60 (60). Faces and logos are `div[role=img]` with a background image, so the container is blurred. |
+| **Hide follower and connection counts** (off) | `.top-card-layout .not-first-middot` 1 (1) LIVE profile ("41M followers", "8 connections"). Companies have no such element (see CSS cannot). |
+| **Hide reaction and comment counts** (off) | `[data-test-id="social-actions__reactions"]`, `[data-test-id="social-actions__comments"]` 28 (15) each LIVE profile, 10 (10) company. `.social-details-social-counts`: SOURCE (feed markup sample from a scraper vendor), not seen on a page. |
+| **Hide applicant counts and job badges** (off) | `.num-applicants__caption` 1 (1) LIVE job; `.job-posting-benefits` 53 (53) LIVE job search ("Be an early applicant" 40, "Actively Hiring" 12; 0 on a job page). |
+| **Feed posts** (choice: Show / Dim / Hide, default Show) | SOURCE, signed in. Dim: `opacity: 0.35` on `[data-testid="mainFeed"], .feed-shared-update-v2`. Hide: same selector plus `.feed-sort-toggle-dsa__wrapper`. `mainFeed` is the React-shell feed (LinkedIn Focus, verified by its author 2026-07), `.feed-shared-update-v2` the classic-shell post (JustZix blog, LinkedIn Focus, mig4ng). |
+| **Hide notification badges** (off) | SOURCE, signed in (LinkedIn Focus): `[data-testid="primary-nav"] span[data-color-scheme]`, `#global-nav .notification-badge`, `.notification-badge--show`, `.notification-badge__count`. |
 
-**CSS cannot do:** stop the page script from re-opening the sign-in wall on a tap, dismiss pop-ups it counts as shown (cool-off is stored by the site), or unlock body scroll if the pop-up sets it (none was shipped; unverified).
+**CSS cannot do:** stop the page script from re-opening the sign-in wall on a tap, dismiss pop-ups it counts as shown (cool-off is stored by the site), or unlock body scroll if the pop-up sets it (none was shipped; unverified). Split "Redmond, Washington · 29,506,499 followers" on a company page: it is one text node in `.top-card-layout__first-subline`. Un-blur a photo on tap. Select a promoted post by its "Promoted" label (no stable class; the only pure-CSS handle is the sub-description link).
 
-**Not verified:** any rendered layout, the pop-up and bottom sheet while shown, timed pop-ups after 30 s, cookie/consent banners (none in the HTML; the generic `#toasts` template is deliberately left alone), the logged-in app, routes that answer 999 to curl, and any community filter list.
+**Pitfalls:**
+- Hiding every `.feed-shared-update-v2` (Feed posts Hide) means a fixture can no longer mark an organic post `data-keep`; the `ad-banners` rule's "do not hide organic posts" guard is therefore reasoning, not a test.
+- `.not-first-middot` is a utility class used elsewhere on the page (4 matches on a profile); always scope it with `.top-card-layout`.
+- Blur on both `.search-entity-media` and the `img` inside it compounds; harmless.
+- `/in/<name>` answers 999 to curl but renders fine in Chrome; use a real browser for evidence.
+
+**Not verified:** how the sign-in pop-up and bottom sheet look while shown, scroll lock, `#toasts` (cookie toast template, deliberately left alone), the whole signed-in app (feed, badges, composer, notifications), and `.social-details-social-counts`.
 
 ## Messenger (`messenger.default`)
 
-Matches `https://*.messenger.com/*`. Observed 2026-11-07/08 logged out from a Sri Lanka address: iPhone UA at 390×844, and a desktop UA at 1280×800 for `/login/`.
-
-**Where it lands.** `www.messenger.com/` serves a marketing landing page to a phone UA (`/login/` redirects there): header with a hamburger (menu already hidden at this width), the headline, three download badges, a footer with the language list. The login form appears only with a desktop UA: email, password, Continue, "Keep me signed in", then a row "Not on Facebook? | Forgotten password | Privacy Policy". No cookie banner, "Get Messenger" or "Continue as" prompt was seen in either layout. The logged-in chat UI was not reachable.
+Matches `https://*.messenger.com/*` **and, since 2026-11-13, `https://www.facebook.com/messages` and `https://www.facebook.com/messages/*`.** Meta ended messaging on messenger.com on 2026-04-16 and redirects computers to `facebook.com/messages` (TechCrunch 2026-02-19; Business Standard 2026-02-20; IBTimes 2026-04); `www.messenger.com/` still serves the marketing landing page (`LIVE` 2026-11-13, iPhone UA 390x844, logged out). The Facebook recipe also matches `facebook.com/messages`; option choices are saved per recipe. Choice options (Show / Blur / Hide): the first state is the untouched one.
 
 | Option (default) | Rules and evidence |
 |---|---|
-| Hide app download badges (on, annoyance) | `span:has(> a[href^="https://lm.messenger.com/l.php"])`: `LIVE` 3 (Android `#messenger_markerting_android_button`, iOS `#messenger_markerting_ios_button`, a third desktop-app badge span without an id) |
-| Hide the "Not on Facebook?" link (on, annoyance) | `a[href^="https://www.facebook.com/r.php"]`: `LIVE` 1 on desktop `/login/`, outside `#login_form` |
+| `app-badges` (on, annoyance) | unchanged: `span:has(> a[href^="https://lm.messenger.com/l.php"])` `LIVE` (3 earlier; the phone layout showed the App Store badge span). |
+| `signup-link` (on, annoyance) | unchanged: `a[href^="https://www.facebook.com/r.php"]` `LIVE` 1 on desktop `/login/`. |
+| `landing-art` (off) | `div[role="main"]:not(:has(footer)) div > img` `LIVE` 2 on the landing page (the 330x479 and 1136x1648 phone pictures). The outer `#root[role=main]` holds the footer so it is excluded; header, badge and footer logos sit in `span` or `a` parents. |
+| `chat-list` (choice, show) | blur 8 px: `[role="navigation"] [role="row"]` `SOURCE` (Caprine fork css/browser.css, 2026: private mode blurs these rows); hide: `div[aria-label="Thread list"]` `SOURCE` (greasyfork Messenger Hide Chat List, 2024, messenger.com; `INFERRED` still the label on `/messages`). Hide removes the way to switch chats. |
+| `conversation` (choice, show; 2 states) | blur 7 px: `[role="grid"][aria-label^="Messages in conversation"] [role="row"]` `SOURCE` (Shadeed 2021 and its Habr translation: `role=grid` labelled "Messages in conversation with <name>", `role=row` per message, `role=gridcell` inside). 2021, not re-checked. |
+| `chat-avatars` (choice, show) | blur 6 px or hide: `[role="navigation"] [role="row"] img, [role="navigation"] [role="row"] image, [role="grid"][aria-label^="Messages in conversation"] img` `INFERRED` (rows are `SOURCE`; avatar tags are not). |
+| `facebook-bar` (off) | `body:not(:has([role="dialog"])) div[role="banner"]` `SOURCE` (Caprine hides `[role='banner']` on `/messages`; the guard is `INFERRED` from Caprine's note that the photo viewer's Close button is mounted inside `role=banner`). `div` only: the landing page header is `header[role=banner]`. |
+| `call-buttons` (off) | `[aria-label="Start a voice call"], [aria-label="Start a video call"]` `INFERRED` (English labels; not seen). |
 
-**Notes.**
-- The badges are wrapped in outbound-link redirector anchors (`lm.messenger.com/l.php?u=…`); the host prefix is a stable anchor where the classes (`_3n-0`) are generated.
-- Not shipped, because nothing could be observed: anything inside the signed-in app (chat list, stories, suggested contacts, ads, banners) and the EU/UK consent banner (a required consent dialog must not be hidden anyway).
-- Not hidden on purpose: `header[role="banner"]`, `footer[role="contentinfo"]`, `[aria-label="Main content"]`, the "Keep me signed in" checkbox (a user choice), the empty `#header-notices`, the `display:none` `#modalDialog` template and the aria-hidden `#Features_subnav`.
-- Fixtures: `landing.html` (phone landing) and `login.html` (desktop login), both distilled from the live pages.
+**CSS cannot:** read or hide unread dots, active status or Notes (hashed classes only); block seen or typing receipts (network rules only, e.g. uBO `||facebook.com/ajax/mercury/change_read_status.php$xmlhttprequest`, and `facebook.com/messages` uses the newer transport); keep the chat list blurred but readable on hover (no `:hover` in `css` rules).
+
+**Pitfalls.** `/messages` is logged-in only and redirects to the login page logged out, so every `/messages` rule is `SOURCE`/`INFERRED`; fixture `messages.html` is hand-written. `[role="banner"]` unqualified would also hit the landing header (`header[role=banner]`, `data-keep` in the fixture). Fixtures: `landing.html` (phone landing, now with the picture divs), `login.html` (desktop login), `messages.html` (hand-written /messages; named without the `desktop-` prefix so `tags` stay `["mobile"]`).
 
 ## Pinterest (`pinterest.default`)
 
-Matches `https://*.pinterest.com/*`. Logged out, a phone UA gets the mobile web app (React, hashed classes, stable `data-test-id`). The home page is itself a sign-up screen; every other route (pin, profile, board, search) shows the content behind a modal sign-up dialog.
+Matches `https://*.pinterest.com/*`. Logged out, a phone UA gets the mobile web app (React, hashed classes, stable `data-test-id`). The home page is itself a sign-up screen; every other route (pin, profile, board, search) shows the content behind a sign-up dialog: a bottom sheet on phones, a full-page "Welcome to Pinterest" log-in window on desktop.
 
-Evidence: LIVE = seen on the real page (iPhone UA 390x844, logged out, 2026-11-08, pages `/`, `/pin/<id>/`, `/<user>/`, `/<user>/<board>/`, `/search/pins/?q=test`). SOURCE and INFERRED: none used.
+Evidence: LIVE = `querySelectorAll` in headless Chrome (puppeteer), logged out. 2026-11-08: iPhone UA 390x844 on `/`, `/pin/<id>/`, `/<user>/`, `/<user>/<board>/`, `/search/pins/?q=test`. 2026-11-13: iPhone UA and macOS Safari UA 1280x800 on a pin and on `/search/pins/?q=kitchen island`. SOURCE = named list, not seen logged out (Pinterest Power Menu userscript, Angel2mp3; uBlockOrigin/uAssets issue 18369), hand-written fixture `feed-logged-in.html`. Counts are total (visible).
 
 | Option (default) | Rules and evidence |
 | --- | --- |
-| `signup-popup` (on) | LIVE: `div[role="dialog"]:has([data-test-id="mobile-signup-mask"])`, 1 match on pin, profile, board and search, 0 on home. Holds backdrop, card, "Get Pinterest app", email and Google buttons. With it hidden the grid scrolls and no second pop-up came back in 25 s. |
+| `signup-popup` (on) | LIVE phone: `div[role="dialog"]:has([data-test-id="mobile-signup-mask"])` 1 on pin, profile, board, search (0 on home). New, LIVE desktop pin and search: `[data-test-id="fullPageSignupModal"]` 1 (0 visible: the wrapper has no box, its fixed children cover the page, 60% black layer, `<style>body{overflow:hidden !important}</style>` ships with it; with the modal hidden the window still scrolled 1200 px); `[data-test-id="bottom-right-upsell"]` 1 (1) ("You are signed out", fixed bottom right). |
 | `home-promo` (on) | LIVE, home only: `[data-test-id^="homepage-section-"]` 3, `bottom-signup-header` 1, `unauth-homepage-redesign-footer` 1. The hero sign-up block stays (`data-keep`). |
-| `related-pins` (off) | LIVE: `related-pins-without-drawer` 1 and `more-like-this-button` 2 on a pin; `more-ideas-container` 1 on a board ("More like this"). |
-| `comments-button` (off) | LIVE: `comment-button` 1 on a pin. Only the button exists logged out. |
+| `one-tap` (on) | LIVE desktop home and pin: `#credential_picker_container, #credential_picker_iframe` (Google One Tap card top right). |
+| `related-pins` (off) | LIVE phone: `related-pins-without-drawer` 1 and `more-like-this-button` 2 on a pin; `more-ideas-container` 1 on a board. New, LIVE desktop: `[data-test-id="relatedPins"] [role="listitem"] [data-grid-item-idx]:not([data-grid-item-idx="0"])` 11-13 on a desktop pin, 4-5 on phone (the count varies per load). **On desktop `relatedPins` also contains the pin itself (grid item 0), so the wrapper must not be hidden; the rule skips grid item 0 by its index.** No match was ever inside `CloseupMainPin` (checked). Avoid `:not(:has(...))` here: the recipe selector engine does not need that nesting. |
+| `comments-button` (off) | LIVE phone: `comment-button` 1 on a pin. Only the button exists logged out on a phone. |
 | `follower-counts` (off) | LIVE: `follower-count` 1 on a pin, `div:has(> [data-test-id="profile-followers-count"])` 1 on a profile. |
+| **`sponsored`** (annoyance, on) | SOURCE only, signed in: two rules, `[role="listitem"]:has(div[title^="Sponsored"]), [role="listitem"]:has(div[title^="Partner"])` and `[role="listitem"]:has([data-test-id="otpp"])` (Power Menu hides list items with the titles Sponsored, Partner Content and Sponsored Content; uAssets issue 18369 hides `[data-test-id="otpp"]` and its list item). 0 matches on live pages (no promoted pin appeared logged out in 2026-11-08 or 2026-11-13). Split into several rules because one selector may carry at most two `:has(`. |
+| **`pin-images`** (choice: Show / Grayscale / Blur, default Show) | `filter: grayscale(1)` / `blur(14px)` on `[data-test-id="gated-pin-rep"] img, [data-test-id="pinWrapper"] img, [data-test-id="pin"] img, [data-test-id="pin-closeup-image"]`. LIVE: `gated-pin-rep img` 8 (8) phone search, 14 (14) desktop search; `pin-closeup-image` is a div on desktop, an img on phone, so the element itself is filtered. `pinWrapper` / `pin`: SOURCE (Power Menu). |
+| **`video-pins`** (choice: Show / Blur / Hide, default Show) | Blur: `[data-test-id="gated-pin-video"], [data-test-id="closeup-video-with-visibility"]`. Hide: `[role="listitem"]:has([data-test-id="gated-pin-video"]), [role="listitem"]:has([data-test-id="story-pin-video-block"])`. LIVE: 3 on a desktop pin, 1 on desktop search, 0 on a phone search (the "0:10" badge `PinTypeIdentifier` is on the same cards); 0 matches on a normal pin grid. `closeup-video-with-visibility`, `story-pin-video-block`: SOURCE. |
+| **`comments`** (choice: Show / Dim / Hide, default Show) | Dim `opacity: 0.35` / hide `[data-test-id="aggregated-comment-list"], [data-test-id="comments-count-container"]`. LIVE desktop pin: 1 each, visible (the comment box `unauth-comment-composer` is inside `comments-count-container`); none on a phone. |
+| **`shopping`** (off) | SOURCE only: `duplo-shopping-module`, `ShopTheLookSimilarProducts`, `visual-search-shopping-bar`, `related-products`, `ShopTheLookAnnotations`, `shopping-module`; product pins in two rules, `[role="listitem"]:has([aria-label="Shoppable Pin indicator"]), [role="listitem"]:has([data-test-id="product-price-text"])` and `[role="listitem"]:has([data-test-id="pincard-product-with-link"])`. Not seen logged out; 0 matches on live pages. |
+| **`search-chips`** (off) | LIVE: `[data-test-id="one-bar-module-3"]` 9 (9) phone search, 25 (25) desktop search (Small, Pendant lights, Seating...). `one-bar-module-0` is the filter button and stays. |
+| **`visual-search`** (off) | LIVE: `[data-test-id="visual-search-icon"]` 1 (1) desktop pin (magnifier button in the corner of the picture). |
 
 CSS cannot do:
 - Open the real comments or pins: gated cards are not links logged out and need a login anyway.
-- Remove sponsored pins: none were shown logged out, so nothing to target.
+- Close the gap a hidden masonry card leaves: cards are absolutely positioned.
+- Undo `body{overflow:hidden !important}` from the desktop modal (not needed: the root scroller still works) or un-blur on tap.
+- Select a promoted pin without a signed-in label: none appeared logged out.
 
-Not verified: logged-in pages (promoted pins, shopping/"Shop" modules, comment threads, notification prompts, boards with collaborators), non-US regional hosts (`nz.`, `uk.` etc. share the `*.pinterest.com` match but were not opened), cookie banners, and the Google One Tap card that showed once over the search page.
+Pitfalls:
+- On desktop `relatedPins` wraps the whole pin page including the main pin; select its other `role="listitem"` children, never the wrapper.
+- Keep selectors free of `:not(:has(...))`: the recipe validator only allows plain attribute `:not()` here, and the desktop pin page is the only place where the main pin has to be skipped.
+- The desktop log-in modal wrapper reports zero size; check with `display:none` and a screenshot, not `getBoundingClientRect`.
+- The same pin page hydrates differently per run (12 vs 13 related items); compare ranges, not exact counts.
+
+Not verified: logged-in pages (promoted pins, shopping modules, the signed-in grid), non-US regional hosts, cookie banners, a desktop home sign-up screen beyond the One Tap card.
 
 ## Snapchat (`snapchat.default`)
 
-Lands on `https://*.snapchat.com/*`. Checked live on 2026-11-08 (headless Chromium, iPhone 390x844 UA, logged out): home, `/spotlight` (redirects to a video at `/@<user>/spotlight/<id>`), a public profile (`/@<user>`, `/add/<user>` redirects there), `/discover` (Stories), `/topic`. The site is a Next.js app with `data-testid` anchors; it asks for the app on every page but shows no cookie banner, sign-in wall or timed pop-up (30 s on home and Spotlight).
+Lands on `https://*.snapchat.com/*`. Next.js app with `data-testid` anchors; it asks for the app on every page but shows no cookie banner, sign-in wall or timed pop-up (30 s on home and Spotlight). Evidence: LIVE = headless Chrome, logged out. 2026-11-08 iPhone UA 390x844: home, `/spotlight` (redirects to `/@<user>/spotlight/<id>`), a profile, `/discover`, `/topic`. 2026-11-13 (puppeteer `querySelectorAll`, counts total (visible)): `/` on iPhone and macOS Safari UA 1280x800, `/@mrbeast` on both, `/spotlight` on iPhone.
 
 | Option (default) | Rules and evidence |
 |---|---|
-| Hide "better on the app" pop-up (on) | `[data-testid="mobileExpandedCtaBanner"]` and `-backdrop`: 1 each on profile, `/discover` (fixed bottom sheet, Open in Snapchat / Continue). LIVE |
-| Hide Open Snapchat bars (on) | `[data-testid="mobileCTAHeader"]` 1 (profile, Stories, topic); `[data-testid="mobile-nav"] a[class*="downloadButton"]` 1 (home, Spotlight); `a[data-testid="home-install-link"]` 1 (home); `div[class*="EndOfFeedPrompt_inlineContainer"]` 1 (profile, "Get the full app experience"). LIVE |
-| Hide home page download promo (on) | `a[data-testid="home-hero-download"]` 1, `[data-testid="home-mobile"] div[class*="mobileSlides"]` 1 (looping feature videos), `section[aria-labelledby="home-mobile-closing-heading"]` 1. LIVE |
+| Hide "better on the app" pop-up (on) | `[data-testid="mobileExpandedCtaBanner"]` and `-backdrop`: 1 each on profile, `/discover` (fixed bottom sheet). LIVE |
+| Hide Open Snapchat bars (on) | `[data-testid="mobileCTAHeader"]` 1 (profile, Stories, topic); `[data-testid="mobile-nav"] a[class*="downloadButton"]` 1 (home, Spotlight); `a[data-testid="home-install-link"]` 1 (home); `div[class*="EndOfFeedPrompt_inlineContainer"]` 1 (profile). New: `[data-testid="ConsumerNav_DownloadButton"]` 1 (1) desktop profile (0 visible at 390 px). LIVE |
+| Hide home page download promo (on) | `a[data-testid="home-hero-download"]` 1, `[data-testid="home-mobile"] div[class*="mobileSlides"]` 1, `section[aria-labelledby="home-mobile-closing-heading"]` 1; desktop: `video-slide-*` and `home-chat-now`. LIVE |
+| **Hide Snapchat+ promo** (on) | `li:has(> a[data-testid="navItem-PLUS"])` 1 (1 on desktop profile, 0 visible at 390 px; the item is a "Snapchat+" link in the desktop nav). LIVE |
 | Hide the Comment button (off) | `[data-testid="spotlight-engagement-rail"] button:nth-of-type(3)`: 2 (active and next slide). LIVE; position based (Like, Recommend, Comment, Share). |
-| Hide like, share and view counts (off) | `[data-testid="spotlight-engagement-rail"] span[class*="__count"]` 7; `[data-testid="content-tile"] div[class*="CountCard_card"]` 24 (12 tiles x views+shares). LIVE |
-| Hide local and topic lists (off) | `[data-testid="home-explore"]` 1 (local favorites, popular now, funny topics). LIVE |
-| Hide the bottom tab bar (off) | `[data-testid="mobile-tab-bar"]` 1 (home, Spotlight); `[data-testid="mobile-nav-bottom"]` 1 (profile, Stories). Both only deep-link to the app. LIVE |
+| Hide like, share and view counts (off) | `[data-testid="spotlight-engagement-rail"] span[class*="__count"]` 7; `[data-testid="content-tile"] div[class*="CountCard_card"]` 24. LIVE |
+| Hide local and topic lists (off) | `[data-testid="home-explore"]` 1 (`home-explore-local`, `home-explore-entertainment`). LIVE |
+| Hide the bottom tab bar (off) | `[data-testid="mobile-tab-bar"]` 1 (home, Spotlight); `[data-testid="mobile-nav-bottom"]` 1 (profile, Stories). LIVE |
 | Hide footer links (off) | `[data-testid="global-footer"]` 1 (home); `div[class*="Footer_entertainmentBar"]` 1 (profile). LIVE |
+| Hide the parents banner (off) | `[data-testid="home-parents-banner"]` 1 (1) desktop home. LIVE |
+| **Hide business links** (off) | `nav:has(> [data-testid="home-advertisers-link"])` 1 (1) mobile home: the Advertisers, Creators, Developers links under the Download block. LIVE |
+| **Hide follower count** (off) | `[data-testid="subscribersCountText"]` 1 (1) on `/@mrbeast`, mobile and desktop ("1.5m followers"). LIVE |
+| **Hide the Related tab** (off) | `[role="tab"]:has([data-testid="related-section-heading-wrapper"])` 1 (1) mobile and desktop profile; tabs are All, Stories, Spotlight, Related. LIVE |
+| **Thumbnails and videos** (choice: Show / Dim / Blur, default Show) | `opacity: 0.35` / `filter: blur(14px)` on `[data-testid="content-tile"] img, [data-testid="content-tile"] div:has(> video), [data-testid="spotlight-player"] div[role="region"]`. LIVE profile 18 (9 visible: 15 images, 3 videos); Spotlight player video 1 (1). Blur the video's wrapper, never the `<video>`: Chromium composites a video on its own layer and ignores a filter set on it (checked with a screenshot). |
+| **Profile pictures** (choice: Show / Blur / Hide, default Show) | `filter: blur(8px)` / hide `[data-testid="profilePicture"]`: 7 (4 visible) on a profile (header avatar and bubbles in the search drop-down). LIVE |
+| **Spotlight caption** (choice: Show / Dim / Hide, default Show) | `opacity: 0.35` / hide `[data-testid="spotlight-metadata"], [data-testid="spotlight-sound"]`: 2 + 1 (all visible) on a Spotlight video. LIVE |
+| **Spotlight buttons** (choice: Show / Dim / Hide, default Show) | `opacity: 0.35` / hide `[data-testid="spotlight-engagement-rail"]`: 2 (all visible; active and next slide). Includes the creator avatar link and Copy link. LIVE |
 
-Class-substring anchors (`downloadButton`, `mobileSlides`, `__count`, `CountCard_card`, `EndOfFeedPrompt_inlineContainer`, `Footer_entertainmentBar`) use the CSS-module name before the hashed suffix, not the hash; a rebuild could rename them.
+Class-substring anchors (`downloadButton`, `mobileSlides`, `__count`, `CountCard_card`, `EndOfFeedPrompt_inlineContainer`, `Footer_entertainmentBar`) use the CSS-module name before the hashed suffix, not the hash; a rebuild could rename them. New rules use only `data-testid` and roles.
 
-What CSS cannot do: the Comment button is found by position, not by label; the "Add" button on profiles (opens the app) and the Spotlight player are left alone; counts cannot be hidden per kind on profile tiles (views and shares share one class).
+What CSS cannot do: the Comment button is found by position, not by label; the "Add" button on profiles and the Spotlight player are left alone; counts cannot be hidden per kind on profile tiles (views and shares share one class); a blurred or dimmed tile still opens on tap and cannot be un-blurred.
 
-Not verified: logged-in app, desktop layout (desktop nav Download / Snapchat Ads buttons, whether the desktop footer shows at mobile widths), Stories player pages beyond the landing list, the official `/@snapchat` profile (returned "content not found"), any sign-in wall or timed pop-up beyond 30 s. The empty `mobile-cta-bottom-sheet` placeholder on home has no rule.
+Pitfalls:
+- The mobile and desktop navs are both in the DOM; each hides with CSS at the other width, so a rule can match with 0 visible. That is fine, count both.
+- `[data-testid="profilePicture"]` also matches the search drop-down bubbles, not only the header avatar.
+- The Spotlight page keeps several slides mounted (active and next); selectors match them all.
+
+Not verified: logged-in app, Stories player pages beyond the landing list, the official `/@snapchat` profile (returned "content not found"), any sign-in wall or timed pop-up beyond 30 s, the desktop Spotlight page. The empty `mobile-cta-bottom-sheet` placeholder on home has no rule.
 
 ## Telegram (`telegram.default`)
 
-Matches `https://*.telegram.org/*` and `https://t.me/*`. In practice it lands on two logged-out pages: the `t.me/<name>` landing page and the `t.me/s/<name>` public channel preview. The logged-out `web.telegram.org/a/` shows only the QR/phone login; no rule targets it. Verified 2026-11-07 at 390x844 with an iPhone user agent, logged out.
+Matches `https://*.telegram.org/*` and `https://t.me/*`. Lands on the `t.me/<name>` landing page and the `t.me/s/<name>` public channel preview; logged-out `web.telegram.org/a/` shows only the QR login. Verified 2026-11-07 and 2026-11-13 at 390x844, iPhone UA, logged out, on `t.me/s/telegram`, `t.me/s/durov`, `t.me/s/contest`, `t.me/telegram`.
 
 | Option (default) | Rules and evidence |
 |---|---|
-| `app-nags` (on) | `.tgme_channel_join_telegram` (preview header Join, LIVE, 1); `.tgme_head_right_btn` (landing Download, LIVE, 1); `.tgme_page_additional` (landing "If you have Telegram" blurb, LIVE, 1) |
-| `link-previews` (off) | `a.tgme_widget_message_link_preview` (LIVE, 4 on t.me/s/telegram) |
-| `media` (off) | `a.tgme_widget_message_photo_wrap` (LIVE, 3); `a.tgme_widget_message_video_player` (LIVE, 13) |
-| `view-counts` (off) | `.tgme_widget_message_views` (LIVE, 20) plus the ` views` label `.tgme_widget_message_info .copyonly` (LIVE) |
+| `app-nags` (on) | `.tgme_channel_join_telegram` (LIVE 1); `.tgme_head_right_btn` (landing Download, LIVE 1); `.tgme_page_additional` (landing blurb, LIVE 1) |
+| `link-previews` (off) | `a.tgme_widget_message_link_preview` (LIVE 4 on `t.me/s/telegram`); SOURCE `.WebPage` (Web A, telegram-tt WebPage.tsx, not run live) |
+| `media` (off) | `a.tgme_widget_message_photo_wrap` (LIVE 3); `a.tgme_widget_message_video_player` (LIVE 13) |
+| `view-counts` (off) | `.tgme_widget_message_views` (LIVE 20) plus the ` views` label `.tgme_widget_message_info .copyonly` (LIVE); SOURCE `.MessageMeta .message-views` (Web A) |
+| `avatars` Show / Blur / Hide (Show) | Blur `.tgme_widget_message_user_photo` (LIVE 20 on `t.me/s/durov`), `.tgme_page_photo_image` (LIVE 2, 1 visible), SOURCE `.Avatar` (Web A). Hide `.tgme_widget_message_user` and `.tgme_page_photo_image`; Web A avatars are not hideable (would collapse chat rows) |
+| `reactions` Show / Dim / Hide (Show) | `.tgme_widget_message_reactions` (LIVE 20 on `t.me/s/durov`, 0 on `t.me/s/telegram`). Dim is `opacity: 0.35` |
+| `media-look` Normal / Blur / Grayscale (Normal) | `a.tgme_widget_message_photo_wrap, a.tgme_widget_message_video_player`: `filter: blur(14px)` or `grayscale(1)`. Hiding stays on the `media` switch |
+| `link-preview-images` Show / Blur / Hide (Show) | `.link_preview_image` (LIVE 3 on `t.me/s/durov`, 4 on `t.me/s/telegram`); title and text stay |
+| `reply-headers` (off) | `.tgme_widget_message_reply` (LIVE 1 on `t.me/s/durov`, 3 on `t.me/s/contest`); `.tgme_widget_message_forwarded_from` (LIVE 1 on `t.me/s/durov`) |
+| `subscriber-counts` (off) | `.tgme_header_counter` (LIVE 1); `.tgme_page_extra` (landing, LIVE 1) |
+| `post-authors` (off) | `.tgme_widget_message_author` (LIVE 21 on `t.me/s/durov`) |
 
-Selectors use the stable `tgme_*` class family, which is hand-written (not hashed) and has been stable for years. No INFERRED or SOURCE rules.
+**CSS cannot do:** `.tgme_channel_info` (info card with counters) and `.tgme_footer` exist but are `display: none` at 390px, so no rules. Web A reaction chips and chat badges use hashed CSS-module classes.
 
-**Not hidden on purpose:** the "View in Telegram" button and "Preview channel" link on the landing page are its only navigation.
-
-**Not verified / CSS cannot do:** logged-in web app (needs an account), reactions, polls, stickers, voice, documents, round videos, sponsored posts. The preview's "Join" and Download links open the app store or `tg://`; CSS only hides them, it cannot stop a deep link a post contains.
+**Pitfalls.** `t.me/s/telegram` has no reactions, replies or forwards, so count those on a busier channel (`durov`, `contest`). No polls, stickers, voice or documents appeared on 10 sampled channels, so nothing targets them. Web A is SOURCE only (class names read from github.com/Ajaxy/telegram-tt); the logged-in app was not opened.
 
 ## Threads (`threads.default`)
 
@@ -317,46 +497,100 @@ Selectors use the stable `tgme_*` class family, which is hand-written (not hashe
 | Option (default) | Rules and evidence |
 |---|---|
 | `app-prompts` (on) | `body > div:has(a[download][href*="applink.threads.com"])` `LIVE` 1 on `/`, `/@zuck` and a post: the body-level wrapper of the "Thread on Threads" sheet, which holds the dim backdrop and the card. `#barcelona-header div:has(> a[href*="apps.apple.com"])` `LIVE` 1 on the same three pages: the "Get app" button. |
-| `login-wall` (on) | `div:has(> span + div > a[href^="/login"])` `LIVE` 1 on a post ("Log in to see more replies.") and 1 on a profile ("Log in to see more from ..."). The login link is `/login` on a profile and `/login?show_choice_screen=false&variant=username` on a post, so the rule keys on the span+div shape and an href starting with `/login`. The nav entry `a[href="/login/"]` and the header Log in button are not matched. |
-| `related-threads` (off) | `div:has(> [data-pagelet^="threads_logged_out_related_posts"])` `LIVE` 1 on a post: the section with the heading and the five `threads_logged_out_related_posts_*` pagelets; 0 on `/` and on profiles. |
+| `login-wall` (on) | `div:has(> span + div > a[href^="/login"])` `LIVE` 1 on a post ("Log in to see more replies.") and 1 on a profile ("Log in to see more from ..."). The nav entry `a[href="/login/"]` and the header Log in button are not matched. Desktop: `div[role="dialog"]:has(i[aria-label="Instagram"]):not(:has(a[href*="applink.threads.com"]))`. |
+| `related-threads` (off) | `div:has(> [data-pagelet^="threads_logged_out_related_posts"])` `LIVE` 1 on a post; 0 on `/` and profiles. |
+| `avatars` (choice show/blur/hide, show) | `[data-pressable-container] a > div > img:not([draggable])` `LIVE` 28 on `/@zuck`, 5 on desktop `/` (the 36 px avatars; media images carry `draggable="false"`). Blur is `filter: blur(6px)`. The 64 px profile-header avatar is outside a post and untouched. |
+| `post-media` (choice show/blur/hide, show) | `[data-pressable-container] img[draggable="false"], ... img[aria-hidden="true"], ... video` `LIVE` 28 on `/@zuck` (24 images + 4 videos), 6 on desktop `/`; together with `avatars` it covers all 52 post images. Blur is `filter: blur(18px)`. Hide leaves a **blank box of the same size** (see Pitfalls). |
+| `post-actions` (off) | `[data-pressable-container] div:has(> div > div[role="button"] > div > div > svg + span[dir="auto"])` `LIVE` exactly one row per post (5 of 5 loaded); hiding it took a post from 325 to 289 px. |
+| `counts` (off) | `[data-pressable-container] div[role="button"] > div > div > svg + span[dir="auto"]` `LIVE` 107 on `/@zuck` (four per post), 19 on desktop `/`. Follow and Mention buttons have no svg+span and are not matched. |
+| `topic-tags` (off) | `div:has(> div > a[href*="serp_type=tags"])` `LIVE` 6 on `/@zuck`, 3 on desktop `/`: the pill row (icon + link) beside the author name. |
+| `verified-badges` (off) | `svg[aria-label="Verified"]` `LIVE` 1 on `/@zuck`. English labels only. |
+| `post-times` (off) | `[data-pressable-container] time` `LIVE` one per post (5 to 28 depending on how much of the feed had loaded). The permalink `a` around it stays. |
+| `instagram-link` (off) | `#barcelona-page-layout div:has(> a[href^="https://www.instagram.com/"])` `LIVE` 1 on `/@zuck`, 0 on `/`. |
 
 - **Left alone on purpose.** The "Say more with Threads" login sheet: its Open Threads link carries `aria-label="Open Threads"` and no `download` attribute, and the sheet sits in its own body-level wrapper, so the login path survives while the open-app sheet is hidden.
 - **CSS cannot:** dismiss the sheet in the page's own state (it can only be hidden), match the sheet text, unlock posts or replies behind the login wall, or tell a post from a reply.
 - **Not verified.** Logged-in pages (no account was available), WKWebView rendering, the desktop layout, ads and suggested accounts (none were served to the logged-out session), and the other routes (search, notifications, post composer).
 
+**CSS cannot (add):** collapse the media box of a post without hiding a hashed-class carousel ancestor (measured: the post height only dropped when the 10th ancestor of the `img` was hidden, `div` with `overflow: auto`, no stable attribute); match `@` handles (`@` is rejected in selectors, so `a[href^="/@"]` cannot be used: use structure and `draggable` instead); match localized `alt`/`aria-label` text outside English; tell replies from the post continuation (`threads_post_page_{n}` holds both); hide follower counts in the profile header (plain text spans, no hook).
+
+**Pitfalls (add).**
+- Avatars and post images are both `img` in a `[data-pressable-container]`. The stable separator is `draggable="false"` (+ `aria-hidden="true"`) on media and no `draggable` on avatars; the `alt` is "<user>'s profile picture" and localized.
+- The action-row buttons are `div[role="button"]`, never `button`. Only the four count buttons have `svg + span[dir="auto"]`.
+- `[data-pressable-container]` is the post card; images are lazy, so counts grow while scrolling.
+- Fixture `post-details.html` is a hand-condensed copy of the observed structure (picture/carousel wrappers reduced).
+
+**CSS cannot (add):** collapse the media box of a post without hiding a hashed-class carousel ancestor (measured: the post height only dropped when the 10th ancestor of the `img` was hidden, `div` with `overflow: auto`, no stable attribute); match `@` handles (`@` is rejected in selectors, so `a[href^="/@"]` cannot be used: use structure and `draggable` instead); match localized `alt`/`aria-label` text outside English; tell replies from the post continuation (`threads_post_page_{n}` holds both); hide follower counts in the profile header (plain text spans, no hook).
+
+**Pitfalls (add).**
+- Avatars and post images are both `img` in a `[data-pressable-container]`. The stable separator is `draggable="false"` (+ `aria-hidden="true"`) on media and no `draggable` on avatars; the `alt` is "<user>'s profile picture" and localized.
+- The action-row buttons are `div[role="button"]`, never `button`. Only the four count buttons have `svg + span[dir="auto"]`.
+- `[data-pressable-container]` is the post card; images are lazy, so counts grow while scrolling.
+- Fixture `post-details.html` is a hand-condensed copy of the observed structure (picture/carousel wrappers reduced).
+
 ## TikTok (`tiktok.default`)
 
-- **Where it lands.** `www.tiktok.com` with an iPhone UA serves the mobile web app (feed `/foryou`, `/discover`, `/@user`, `/@user/video/<id>`); `/explore` redirects to `/foryou`. React/styled-components: classes are `css-<hash>-<hash>--DivName eXXXX`, so rules use `data-e2e` hooks, ids and custom elements. Match pattern `https://*.tiktok.com/*`. Checked logged out on 2026-11-08, headless Chromium, 390x844.
-- **Timed pop-ups are session dependent.** The "Get the full app experience" modal showed on first load of `/` and again after the first swipe, but not on every later load; the video-page "Watch this video on TikTok" sheet showed only on the first video load.
+- **Where it lands.** `www.tiktok.com` with an iPhone UA serves the mobile web app (feed `/foryou`, `/discover`, `/@user`, `/@user/video/<id>`); a desktop UA serves the desktop web app (For You column, `/@user`, `/discover`, `/@user/video/<id>`). The mobile app uses styled-components (`css-<hash>-<hash>--DivName`), the desktop app uses `css-<hash>-<hash>--DivName` plus `e<hash>` shorthands, so rules use `data-e2e` hooks, ids and custom elements. Match pattern `https://*.tiktok.com/*`.
+- **Two very different pages.** The mobile feed renders a full-screen slide (`[data-e2e="video-slide-active"]`) with a right-hand action column; the desktop For You page renders a vertical column of media cards (`#main-content-homepage_hot`) with the action buttons and the caption in the description layer of each card. A rule written for one rarely matches the other, so each option carries one rule per platform.
+- **Checked logged out on 2026-11-13**, headless Chromium, iPhone UA 390x844 for the mobile app and a macOS Safari UA 1440x900 for the desktop site. `www.tiktok.com` served both apps without a bot wall; `/explore` redirects to `/foryou`.
 
 | Option (default) | Rules and evidence |
 |---|---|
-| `app-prompts` (on) | LIVE: `body > div:has(#login-modal)` modal + mask (1 on `/`); feed header "Open app" pill `div:has(> div > button[class*="CTAOpenApp"])` (1); video page: top bar `div:has(> div > [data-e2e="top-banner-open"])` (1), bottom bar via `bottom-banner-open` (1), "Watch on TikTok" section via `bottom_banner` (1), sheet `.launch-popup-sheet-host` (1) and its "Continue on web" wrapper (1); profile: in-flow cover under the grid (1) and the fixed `bottom-cta-container` popup (1, in DOM, not visible); Discover "Discover more" float button (1). |
-| `cookie-banner` (on) | INFERRED: `tiktok-cookie-banner` custom element exists on every page but is empty (height 0, shadow root holds an empty `cookie-setting-modal`) from the research region. EU banners not seen. |
-| `suggested-videos` (off) | LIVE: video page "You may like" wrapper via `ul[data-e2e="recommend-list"]` (1, 24 items); Discover "Selected by TikTok" heading (1) and list scoped by `video-user-item` (1, 4 items; the same `video-item` on profiles is not matched). |
-| `discover-genres` (off) | LIVE: `div:has(> a[href^="/discover/"])` = the genre card row (1). |
-| `counters` (off) | LIVE: feed `like-count`/`comment-count`/`share-count` (2 each); video page `play-side-*` spans (1 each); profile stat blocks via `following-count`/`followers-count`/`likes-count` (1 each); `video-views` (24 on `/@tiktok`) and `video-likes` on Discover. |
+| `app-prompts` (on) | `body > div:has(#login-modal)` LIVE 1 (the "Get the full app experience" modal), `div:has(> div > button[class*="CTAOpenApp"])` LIVE 1 (the feed header "Open app" button), `div:has(> div > [data-e2e="top-banner-open"])` and `div:has(> div > [data-e2e="bottom-banner-open"])` LIVE 1 each (the bars above and under a video), `div:has(> div > div > [data-e2e="bottom_banner"])` LIVE 1 (the "Watch on TikTok" section), `.launch-popup-sheet-host` LIVE 1 and `div:has(> [data-e2e="launch-popup-close"])` LIVE 1 (the "Watch this video on TikTok" sheet), `[data-e2e="user-page"] div:has(> div + div > p + div > div > button)` LIVE 1 (the app cover on a profile), `div:has(> div > div > [data-e2e="bottom-cta-container"])` LIVE 1 (the app pop-up on a profile), `[class*="DivFloatButtonWrapper"]` LIVE 1 (the "Discover more" button), `[data-e2e="side-nav-utilities-get-app"]` LIVE 1 (the desktop sidebar Get App button). |
+| `cookie-banner` (on) | `tiktok-cookie-banner` LIVE 2 (the cookie notice element in the fixtures; the site then keeps its default cookie settings). |
+| `screen-time` (on) | `.box-border:has(.tt-intro__container)` LIVE 3 on the mobile feed: "Screen time breaks", "To support your well-being, your daily screen time" and "Ready to close TikTok?". Each sheet and its dim backdrop (`.tt-sheet__mask`) sit inside the same `.box-border`, so one rule removes the prompt and the backdrop. The sheets were in the DOM but parked off-screen, so whether every account sees them is not verified. |
+| `suggested-videos` (off) | `div:has(> ul[data-e2e="recommend-list"])` LIVE 1 (the "You may like" list under a video), `div:has(> h2 + [data-e2e="page-header-three-dots"])` and `div:has(> [data-e2e="video-item"] [data-e2e="video-user-item"])` LIVE 1 each (the "Selected by TikTok" heading and list on Discover). |
+| `discover-genres` (off) | `div:has(> a[href^="/discover/"])` LIVE 1 (the genre card row at the top of Discover). |
+| `counters` (off) | `[data-e2e="like-count"], [data-e2e="comment-count"], [data-e2e="share-count"]` LIVE 2 each in the feed, `[data-e2e="play-side-like"] span, [data-e2e="play-side-comment"] span, [data-e2e="share-count"], [data-e2e="play-side-share"] span` LIVE 4 on a mobile video page, `div:has(> [data-e2e="following-count"])` and `div:has(> [data-e2e="followers-count"])` LIVE 2 and `div:has(> [data-e2e="likes-count"])` LIVE 1 on a profile, `[data-e2e="video-views"], [data-e2e="video-likes"]` LIVE 6 on the grid covers, `[data-e2e="favorite-count"]` LIVE 1 on the desktop player. SOURCE: JustZix "TikTok: hide all engagement counts" and the tiktok-unhook extension (vanity metrics). |
+| `sidebar-nav` (off) | `[data-e2e="nav-live"], button[aria-label="LIVE"]` LIVE 4, `[data-e2e="nav-explore"], a[href^="/shortdrama"], button[aria-label="Explore"], button[aria-label="Short dramas"]` LIVE 4 (desktop sidebar only). |
+| `sidebar-footer` (off) | `div[class*="DivFooterContainer"]` LIVE 2 (the links and copyright line at the bottom of the desktop sidebar). |
+| `for-you-feed` (off) | `#main-content-homepage_hot` LIVE 4 (the desktop For You video column). |
+| `captions` (off) | `[data-e2e="video-desc"], [data-e2e="browse-video-desc"]` LIVE 3 (the caption block on a video page and on Discover), `[class*="DivVideoCaption"] [class*="DivOverflowContainer"] > span` LIVE 7 and `[class*="DivVideoCaption"] [class*="DivBtnWrapper"]` LIVE 2 (the caption text and its "more" button in the mobile feed). The mobile rule leaves the hashtag links in place, because the `hashtags` option owns them. |
+| `thumbnails` (show) | `filter: blur(10px)` on `[data-e2e="video-item"] img, [data-e2e="user-post-item"] img` LIVE 5 (mobile profile grid 24 covers, mobile Discover 12, desktop profile grid 32 when it renders) and the same selector with `display: none` for the Hide state. |
+| `avatars` (show) | `filter: blur(8px)` on `[data-e2e="user-avatar"], [data-e2e="video-author-avatar"], [data-e2e="play-side-author"] img` LIVE 6 (mobile profile picture 1, feed author avatars 2, video page author picture 2, desktop creator picture 1) and the same selector with `display: none` for the Hide state. On the mobile feed the avatar is a `background-image` on a `div`, so the blur lands on the circle itself. |
+| `hashtags` (show) | `opacity: 0.35` on `[class*="DivVideoCaption"] a[href^="/tag/"], [data-e2e="video-desc"] a[href^="/tag/"]` LIVE 5-9 (mobile feed caption hashtags) and LIVE 3-5 (desktop caption hashtags), and `display: none` on the same links for the Hide state. On the desktop site the whole caption block is one `data-e2e="video-desc"` element, so the `captions` option removes the hashtags along with the text. |
+| `music` (off) | `[data-e2e="music-name"], [data-e2e="music-cover"]` LIVE 2 each (the sound name under a video and the music disc in the feed), `[data-e2e="video-music"]` LIVE 2 (the music disc on the desktop player). |
+| `follow-buttons` (off) | `[class*="DivFollowPlus"]` LIVE 2 (the + badge on the author's picture in the feed), `[data-e2e="cinema-video-info-follow"]` LIVE 1 (the Follow button next to the creator on the desktop site). |
+| `suggested-accounts` (off) | `[class*="DivUserCardListContainer"]` LIVE 1 (the Suggested accounts panel on a desktop profile), `[class*="DivDiscoverUserCardSwiperContainer"]` LIVE 1 (the popular creators row on the desktop Discover page). SOURCE: JustZix "TikTok: hide suggested accounts" hides the same block. |
+| `profile-tabs` (off) | `[data-e2e="playlist"], [data-e2e="liked"]` LIVE 1 each (the mobile profile tabs), `[data-e2e="drama-tab"], [data-e2e="repost-tab"], [data-e2e="favorites-tab"], [data-e2e="liked-tab"]` LIVE 1 each (the desktop profile tabs). The Videos tab stays. |
 
-**Caveat.** `CTAOpenApp` and `DivFloatButtonWrapper` are readable styled-components names matched with `[class*=]`; there is no `data-*` hook. The hash part is never used.
+What CSS cannot do: dismiss the script-driven sheets (the "Get the full app experience" modal, the "Watch this video on TikTok" sheet and the screen time sheets) — CSS only removes what is in the DOM, so a sheet that renders later comes back; and it cannot keep the app prompts from being re-shown by TikTok's own scripts.
 
-**CSS cannot:** stop the app from re-showing the modal on swipe (it is hidden, not dismissed), block `/live`, or remove the red `+` follow badge without also hiding the avatar link.
-
-**Not verified:** logged-in pages; comments (none rendered logged out); ads or sponsored items (none in the logged-out feed); notification prompts; TikTok Shop; desktop layout; search (results area blank logged out); `/live` shelves left alone on purpose (it is a catalogue); EU cookie banner.
+Pitfalls: the mobile feed slide is a `background-image` on a `div`, so an avatar rule must target the `div`, not an `img`; the desktop creator picture is an `<a data-e2e="video-author-avatar">` wrapping the image, so the same rule covers both layouts. `[data-e2e="video-desc"]` on the desktop site holds the caption text *and* its hashtag links in one element, so hiding the caption also hides the hashtags there. `[class*="DivVideoCaption"] [class*="DivText"]` covers the caption text *and* the hashtag links in the mobile feed, so the feed rule targets `[class*="DivOverflowContainer"] > span` instead. The mobile feed has no `data-e2e="share-count"]`: the share number lives in `[data-e2e="play-side-share"] span` on a video page. The desktop Discover page has no "Selected by TikTok" list, and the mobile profile has no `user-post-item` (that hook is desktop only). The `data-e2e="follow-button"` hook is a `div` in the feed and a `button` on a profile, so the follow rules use the class and the desktop `cinema-video-info-follow` hook instead of the shared attribute. A desktop profile sometimes renders the "Your next discovery is waiting" empty state instead of the video grid, which is why the desktop grid count varies between loads.
 
 ## Twitch (`twitch.default`)
 
-Matches `https://*.twitch.tv/*`. A phone UA lands on `m.twitch.tv`, a React app whose classes are hashed styled-components (`Layout-sc-…`, `ScCoreLink-sc-…`) and unusable; selectors use `data-a-target`, `data-test-selector`, `aria-label`, `href` paths and structure around `h2 > a[href]`.
-
-Checked 2026-11-08 with headless Chromium (iPhone UA 390x844), logged out: `/`, `/directory`, `/directory/all`, a category page, `/directory/following`, `/activity`, `/home`, a live channel (~35 s wait), its `/videos` tab and a VOD.
+Matches `https://*.twitch.tv/*`. One recipe, two different sites: an iPhone UA lands on `m.twitch.tv`, a React app whose classes are hashed styled-components (`Layout-sc-…`, `ScCoreLink-sc-…`) and unusable, so selectors use `data-a-target`, `data-test-selector`, `aria-label`, `href` and structure; a desktop UA lands on `www.twitch.tv`, the full site. Checked 2026-11-13, logged out, real Chrome over CDP: iPhone UA 390x844 on m.twitch.tv (Home, `/directory/all`, a live channel) and desktop UA on www.twitch.tv (Home, a category page, several live channels). Counts are `querySelectorAll` on the live DOM; the fixtures are sanitised excerpts of it.
 
 | Option (default) | Rules and evidence |
 |---|---|
-| `app-nags` (on) | `nav a[href*="tt_medium=mweb"]` Open App, and `nav > div:has(> a[href*="tt_medium=mweb"]) > button` Sign Up. LIVE: 1 each, top bar of Home, `/directory/following` and category pages. |
-| `ad-overlays` (on) | `[data-test-selector="sda-wrapper"]` display-ad slot over the player. LIVE: 1 on a live channel, but empty when seen; harmless best-effort. |
-| `suggested-rows` (off) | `div:has(> div > h2 > a[href="/directory"])` ("Categories we think you'll like", LIVE 1) and `div:has(> div > h2 > a[href^="/directory/collection/"])` (themed rows, LIVE 4 at top of Home; more load while scrolling). "Live on Twitch" (`/directory/all`) stays. |
-| `stream-tags` (off) | `[aria-label^="Tag, "]` language, genre and DropsEnabled pills on cards. LIVE: 108 on Home. |
-| `chat` (off) | `[data-a-target="chat-scroller"]` message list on a live channel. LIVE: 1. The "Send Chat" launcher stays. |
-| `subscribe` (off) | `button[aria-label="Subscribe"]`. LIVE: 1 on a channel page and on its profile. Follow stays. |
+| `app-nags` (on) | Phone: `nav a[href*="tt_medium=mweb"]` (Open App) 1 and `nav > div:has(> a[href*="tt_medium=mweb"]) > button` (Sign Up) 1, both in the top bar. Desktop: `[data-a-target="signup-button"], #twilight-sticky-footer-root` 2 (the Sign Up button and the join footer). `LIVE` |
+| `ad-overlays` (on) | Phone `[data-test-selector="sda-wrapper"]` 1 on a live channel (the slot was empty, best effort). Desktop `div[aria-label="Advertisement"], .stream-display-ad__wrapper` 1 on Home. `LIVE` |
+| `prime-offers` (on) | `button[aria-label="Prime offers"], [data-a-target="top-nav-get-bits-button"]` 1 on desktop Home. `LIVE` |
+| `suggested-rows` (off) | `div:has(> div > h2 > a[href="/directory"])` (the "Categories we think you'll like" row) 1 and `div:has(> div > h2 > a[href^="/directory/collection/"])` (themed collection rows) 4 on phone Home, 1 on desktop Home. "Live on Twitch" (`/directory/all`) stays. `LIVE` |
+| `stream-tags` (off) | `[aria-label^="Tag, "]` (language, genre, DropsEnabled pills) 107 on phone Home, 24 on `/directory/all`, 31 on desktop Home. `LIVE` |
+| `chat` (off) | Phone and desktop `[data-a-target="chat-scroller"]` (the message list) 1; desktop `.channel-root__right-column` (the whole chat column) 1. The Send Chat box stays. `LIVE` |
+| `subscribe` (off) | Phone `button[aria-label="Subscribe"]` 1 on a live channel; desktop `[data-a-target="subscribe-button"], [data-a-target="gift-button"]` 2. Follow stays (it has its own switch). `LIVE` |
+| `follow-button` (off) | `button[data-a-target="follow-button"], button[data-test-selector="follow-button"]` 1 on a live channel, phone and desktop (both attributes sit on the same button). `LIVE` |
+| `featured` (off) | `.front-page-carousel` 1 on desktop Home (the big carousel at the top). `LIVE` |
+| `side-nav` (off) | `#side-nav` 1 on desktop Home and on a live channel (the whole left sidebar). The phone has no sidebar. `LIVE` |
+| `stream-info` (off) | `#live-channel-stream-information` 1 on desktop, a live channel (title, tags, about under the player). `LIVE` |
+| `thumbnails` (choice Show/Blur/Hide, show) | blur `filter: blur(12px)` on `article img.tw-image, [data-a-target="tw-card-image"] img` (`LIVE` 48 stream pictures on phone Home, 7 on desktop Home) and on `[data-test-selector="featured-item-image"]` (5, the carousel pictures, which sit outside `article` and carry no `tw-image` class); hide `article > button:has(.tw-aspect)` (40 on phone Home), `[data-a-target="preview-card-image-link"], [data-a-target="tw-card-image"]` (12 on desktop Home) and the carousel picture. `LIVE` |
+| `stream-titles` (choice Show/Blur, show) | blur `filter: blur(6px)` on `article h3` (`LIVE` 48 on phone Home, and the same markup carries the category names) and `[data-a-target="preview-card-title-link"] h4` (6 on desktop Home). `LIVE` |
+| `viewer-counts` (off) | `.tw-media-card-stat` (the count on a card) 48 on phone Home and 6 on desktop Home; `div:has(> div > strong[data-a-target="animated-channel-viewers-count"])` 1 above a desktop live stream; `.side-nav-card__live-status` 10 in the desktop sidebar. `LIVE` |
+| `streamer-avatars` (off) | `article div:has(> a > .tw-avatar)` 48 on phone Home; `[data-test-selector="preview-card-avatar"], #side-nav .tw-avatar` 17 on desktop Home (card and sidebar avatars). `LIVE` |
+| `chat-badges` (off) | `[data-a-target="chat-badge"]` 20 on a busy desktop channel (subscriber, moderator and Bits icons before the names). The phone chat renders no lines logged out, so nothing matches there. `LIVE` |
+| `chat-banners` (off) | `.community-highlight-stack__card` 1 (a pinned Prediction card; the same stack holds gift, raid and Hype Train cards) and `[data-test-selector="chat-private-callout-queue__callout-container"]` 1 (the tip pop-up) on a desktop live channel. `LIVE` |
+| `channel-points` (off) | `[data-test-selector="community-points-summary"]` 1 (the Bits and Channel Points balance beside the chat box). `LIVE` |
+| `about-panels` (off) | `#live-channel-about-panel` 1 and `.channel-panels` 1 on a desktop live channel (the About box with the follower count and links, and the panels under the stream). `LIVE` |
+| `similar-channels` (off) | `.side-nav-section:has([data-test-selector="similarity-channel"])` 1 on a desktop live channel ("Viewers Also Watch", 3 cards). `LIVE` |
+| `recommended-channels` (off) | `.side-nav-section:has([data-test-selector="recommended-channel"])` 1 on desktop Home and 1 on a live channel (the "Live Channels" section with the 10 channels Twitch suggests). `SOURCE` (uBlock `www.twitch.tv##div[aria-label="Recommended Channels"]`, blog.drale.com) and `LIVE`. |
+| `activity-tab` (off) | `a[href="/activity"]` 1 in the phone's bottom tab bar; logged out the page is only an "Open App for Activity" prompt. `LIVE` |
+| `chat-style` (choice Show/Dim/Blur, show) | css on `[data-a-target="chat-scroller"]` (`LIVE` 1 on a desktop live channel): dim `opacity: 0.35`, blur `filter: blur(4px)`. Hide live chat wins over it. |
+
+**CSS cannot:** hide or skip the pre-roll and mid-roll video ads, because they play inside the player element itself; only the display-ad slot around the player can go. It cannot open the chat: logged out the phone chat renders no lines, and on desktop the messages appear only after the "Show more" button is clicked, which is script-driven. It cannot turn off the carousel's auto-advance or the hover preview that plays on card hover. It cannot change a count's text, only hide its box.
+
+**Pitfalls:** the phone and desktop card markup differ, so a picture rule has to name both (`article img.tw-image` covers the phone and the desktop stream cards, `[data-a-target="tw-card-image"] img` the desktop category art, `[data-test-selector="featured-item-image"]` the carousel, which is outside `article` and has no `tw-image` class). `article h3` is the stream title on a phone and the category name on a category page, so blurring titles blurs both. `.tw-media-card-stat` is the viewer count, not a duration. The desktop sidebar's suggestion section is now labelled "Live Channels" (`aria-label`), so the community filter `div[aria-label="Recommended Channels"]` no longer matches it; its cards still carry `data-test-selector="recommended-channel"`, which is what the rule uses. The two sidebar sections are disjoint: the suggestions use `recommended-channel`, "Viewers Also Watch" uses `similarity-channel`. The chat's community cards all share `.community-highlight-stack__card`, so the rule covers Prediction, gift, raid and Hype Train cards alike. `data-a-target="tw-core-button-label-text"` is generic (every button label); prefer the button's own `data-a-target` or `data-test-selector`. The hashed `Layout-sc-*` classes change on every deploy; only `tw-image`, `tw-avatar`, `tw-aspect`, `tw-media-card-stat` and the `data-a-target` / `data-test-selector` values are stable.
 
 ## What CSS cannot do
 
@@ -371,40 +605,49 @@ No cookie/consent banner, notification prompt, Drops or Prime promo, shopping or
 
 ## Weibo (`weibo.default`)
 
-Matches `*.weibo.cn` and `*.weibo.com`. Only the mobile site `m.weibo.cn` was observed (logged out, iPhone UA, 2026-11-08). It opens via `visitor.passport.weibo.cn` and then serves a Vue app: home feed, `/search?containerid=231583` (hot search) and `/status/<id>` (post page).
+Matches `*.weibo.cn` and `*.weibo.com`. Only the mobile site `m.weibo.cn` was observed (logged out, iPhone UA, 2026-11-08 and 2026-11-13). It opens via `visitor.passport.weibo.cn` then serves a Vue app: home feed, `/search?containerid=231583` (hot search), `/status/<id>` (post page). 2026-11-13 re-check covered the home feed only (15 posts).
 
 | Option (default) | Rules and evidence |
 |---|---|
-| `login-button` (on) | `div.login-box:has(> a.login-btn)`: LIVE, 1 match, fixed button at the bottom of every feed view |
-| `follow-buttons` (on) | `header.weibo-top > div.m-followBtn`: LIVE, 20 matches on the Charts tab, 0 on Hot; leads only to sign-in |
-| `trending` (off) | `div.card.card16.m-col-2` (2) and `div.card.card11.ctype-3` (1) on the search page: LIVE |
-| `feed-tabs` (off) | `.lite-topbar > div.nav-main`: LIVE, 1 match (Hot, Charts, Local, ... tabs) |
-| `counters` (off) | `footer.f-footer-ctrl > div.m-diy-btn` (45 on 15 posts) and `div.lite-page-tab div.tab-item > i + i` (3): LIVE |
-| `comments` (off) | `div.comment-content` (1), `div.lite-page-tab` (1), `div.lite-page-editor` (1): LIVE on a post page |
-| `media` (off) | `div.weibo-media.f-media`: LIVE, pictures and video players in posts |
+| `login-button` (on) | `div.login-box:has(> a.login-btn)` `LIVE` 1, fixed button on every feed view. |
+| `follow-buttons` (on) | `header.weibo-top > div.m-followBtn` `LIVE` 20 on Charts, 0 on Hot; leads only to sign-in. |
+| `trending` (off) | `div.card.card16.m-col-2` (2) and `div.card.card11.ctype-3` (1) on the search page, `LIVE`. |
+| `feed-tabs` (off) | `.lite-topbar.main-top > div.nav-main` `LIVE` 1. |
+| `counters` (off) | `footer.f-footer-ctrl > div.m-diy-btn` `LIVE` 45 on 15 posts; `div.lite-page-tab div.tab-item > i + i` `LIVE` 3. |
+| `comments` (off) | `div.comment-content` 1, `div.lite-page-tab` 1, `div.lite-page-editor` 1, `LIVE` on a post page. |
+| `media` (off) | `div.weibo-media.f-media` `LIVE`: image grids and video players. |
+| `avatars` (choice Show/Blur/Hide, show) | blur: `.weibo-top .m-avatar-box img` css `filter: blur(8px)` `LIVE` 15; hide: `.weibo-top > .m-avatar-box` `LIVE` 15 (picture and V badge). |
+| `quoted-reposts` (choice Show/Dim/Hide, show) | `.weibo-rp` `LIVE` 2: dim css opacity 0.35, or hide. |
+| `media-blur` (choice Show/Blur/Strong blur, show) | `.weibo-media img` css `filter: blur(10px)` / `blur(28px)` `LIVE` 29 (pictures and video covers). Works together with `media` (hide wins). |
+| `post-source` (off) | `.weibo-top h4 > .from, .weibo-top h4 > .time` `LIVE` 12 + 15: date and "from <client>" line (some posts have no client). |
+| `vip-badges` (off) | `.weibo-top .m-avatar-box i.m-icon` `LIVE` 15 (goldv/orangev badges); `.weibo-top h3 img.vipicon` `LIVE` 15 (member icon). |
+| `video-stats` (off) | `.mwb-video .mwbv-info-bar` `LIVE` 8: play count and duration on video covers. |
+| `search-hint` (off) | `.nav-top .nav-search .m-text-cut` `LIVE` 1: the "everyone is searching" topic hint; search link stays. |
 
-Classes are Weibo's own layout names (not hashed); `data-v-*` attributes are never used.
+What CSS cannot do: stop the app-install address-bar popup and the login popup after playing a video (uBlockOrigin/uAssets issues 23990 and 23851); they are script-driven.
 
-What CSS cannot do:
-- After several scrolls or reloads, logged out, Weibo redirects the whole tab to `passport.weibo.com/sso/signin`; nothing on the page is hideable.
-- `/profile/<uid>` redirected to the same sign-in page immediately, so no profile rules exist.
-- The search box placeholder ("大家都在搜: ...") is a trending topic, but it sits inside the search field, so it is left alone.
-
-Not verified: logged-in views, desktop `weibo.com`, `video.weibo.com`, super-topic pages, in-app variant, mainland-China-only prompts. A `div.ad-wrap` exists on post pages but was `display:none` and empty, so no ad rule ships. No cookie banner, app-install sheet or notification prompt appeared in 30 s of waiting.
+Pitfalls: `.weibo-media` also matches the inner `.weibo-media-wraps`; target images (`.weibo-media img`) for blur rather than the wrapper. `.weibo-top` is both the header of a post and, on the post page, the author block, so `> .m-avatar-box` selectors cover both. Some posts have no `.from`.
 
 ## WhatsApp (`whatsapp.default`)
 
-Matches `https://*.whatsapp.com/*`. On iPhone UA `web.whatsapp.com` redirects to `/mobile/`, a static "use WhatsApp Web on your computer" page with nothing to hide. Rules therefore land on the `www.whatsapp.com` marketing pages and the desktop-UA WebMessenger login screen. Chats are behind phone/QR login and are not touched.
+Matches `https://*.whatsapp.com/*`. On iPhone UA `web.whatsapp.com` redirects to `/mobile/`, a static page with nothing to hide. Rules land on the `www.whatsapp.com` marketing pages, the desktop-UA WebMessenger login, and (SOURCE only) the logged-in chat UI. Checked 2026-11-08 and 2026-11-13.
 
 | Option (default) | Rules and evidence |
 |---|---|
-| `app-nags` (on) | LIVE: header `a[href*=itunes.apple.com]` in `[data-testid=whatsapp_www_header]` (2, mobile icon + nav dropdown); hero `article a[href*=...ct=website_cta]` (1); footer itunes links (3); desktop web `[data-testid=download-native-client-button]` and `-inline` (1 each). The primary Download button on `/download` is in a `section`, so it stays |
-| `promo-sections` (off) | LIVE: `section[data-testid=waui_section]:has(a[href="https://web.whatsapp.com/"])` (1, "Call on WhatsApp Web"); `:has(a[href^="https://whatsappbusiness.com"])` (1, "Transform your business") |
+| `app-nags` (on) | LIVE: header `a[href*=itunes.apple.com]` in `[data-testid=whatsapp_www_header]` (2), hero `article a[href*=...ct=website_cta]` (1), footer itunes links (3), desktop web `[data-testid=download-native-client-button]` and `-inline` (1 each). The primary Download button on `/download` is in a `section`, so it stays |
+| `promo-sections` (off) | LIVE: `section[data-testid=waui_section]:has(a[href="https://web.whatsapp.com/"])` (1); `:has(a[href^="https://whatsappbusiness.com"])` (1) |
 | `footer` (off) | LIVE: `footer[data-testid=whatsapp_www_footer]` (1) |
+| `page-images` Show / Blur / Hide (Show) | `[data-testid=whatsapp_www_full_page] picture` LIVE 18 on the saved home page HTML. Blur is `blur(14px)` |
+| `feature-sections` (off) | `section[data-testid=waui_section]:has(a[href="https://www.whatsapp.com/calling"])`, `.../privacy`, `.../community`, `.../messaging`: LIVE 1 each (of 11 sections). Four rules, one per `:has` link |
+| `chat-list-privacy` Show / Blur (Show) | SOURCE `#pane-side [role="row"]` (andryompusunggu.com/blog/pure-css-whatsapp-blur, greasyfork UI Manager); not run live (needs login) |
+| `message-privacy` Show / Blur (Show) | SOURCE `#main .message-in, #main .message-out` (dark-whatsapp, privacy gists); not run live |
+| `profile-pictures` Show / Blur / Hide (Show) | SOURCE `[data-testid="group-chat-profile-picture"]` (greasyfork Clean UI); INFERRED `#pane-side img, #main header img`. Hide only covers group message pictures |
+| `channels-tab` (off) | SOURCE `[aria-label="Channels"]` (greasyfork Remove Channels script; English UI only) |
+| `meta-ai` (off) | SOURCE `[aria-label*="Meta AI"]` (greasyfork Clean UI context-menu rule). A contact named Meta AI could also match |
 
-CSS cannot do: the "Download WhatsApp for Mac" banner card on web.whatsapp.com has only generated classes, so just its button is hidden and the title/blurb text stays.
+**CSS cannot do:** hover-to-reveal for the blur options (the privacy extensions use `:hover`, which a recipe selector cannot be fixture-checked for, so the blur is permanent while on). The "Download WhatsApp for Mac" card on web.whatsapp.com has only generated classes, so just its button is hidden.
 
-Not verified: logged-in app (chats, Status, Channels, ads), cookie/consent prompts (none seen in ~20 s), faq.whatsapp.com, other marketing sections. Selectors use `data-testid` and `href` only; the `_au07`-style classes on www are hashed and avoided.
+**Pitfalls.** www classes (`_9ta2` style) are hashed: use `data-testid` and `href`. `<video>` matched 0 on the www home page, so there is no video rule. WhatsApp Web markup changes often (r/uBlockOrigin Jun 2025: old menu filters stopped working); the logged-in rules are community-sourced and unverified. Not verified: chats, Status, Channels page, cookie prompts, faq.whatsapp.com.
 
 ## Sources
 

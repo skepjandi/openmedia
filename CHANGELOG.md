@@ -6,6 +6,17 @@ All notable changes to OpenMedia are documented here.
 >
 > **Wiki**: the [GitHub Wiki](https://github.com/skepjandi/openmedia/wiki) is the public-facing main wiki — architecture, recipe format, AI pipeline, security model, roadmap. Source-controlled editing surface is `docs/wiki/` in this repo; CI (`.github/workflows/sync-wiki.yml`) mirrors it to the GitHub Wiki on every merge to `main`. New single-PR changes belong here, not as new wiki pages.
 
+### feat(recipes): choice options and richer official recipes
+
+**Area:** `feat(recipes)`
+
+**Change:** A recipe option can now be a list of 2 to 4 states instead of an on/off switch (`choices` on the option, `choice` on its rules; the first choice leaves the page alone), so a thing can be shown, blurred, dimmed or hidden. Settings shows a row of states for such an option, the recipe review lists them, saved boolean choices keep loading, and a saved value an option no longer accepts falls back to its default. The assistant can set a choice option through `existingOption` with `choice`. The Worker validator accepts the same fields. The 18 official recipes were researched again (logged-out headless Chrome plus community filter lists) and gained many options, most of them blur/dim/hide choices for pictures, avatars, counters and suggestions; thin recipes (Discord, Messenger, Kuaishou, WhatsApp, Threads, Telegram) grew the most. Schema stays 1. Format: `docs/wiki/recipe-format.md#choice-options-more-than-on-or-off`.
+
+**Verified:** Rust recipe, sites, library, AI and fixture tests; TypeScript check, ESLint and Vitest; Worker `tsc` and Vitest. **Not verified:** on a device, and logged-in selectors (marked `SOURCE`/`INFERRED` in `docs/wiki/site-playbooks.md`).
+
+**PR:** n/a
+
+
 ### feat(share): remember the GitHub sign-in and show the account
 
 **Area:** `feat(share)`

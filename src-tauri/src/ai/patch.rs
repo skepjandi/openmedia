@@ -10,7 +10,7 @@ use serde_json::{Value, json};
 
 use crate::error::{Error, Result};
 use crate::recipes::{
-    CSS_PROPERTIES, Meta, OptionGroup, Origin, Recipe, Rule, SiteOption, Target,
+    CSS_PROPERTIES, Meta, OptionGroup, OptionValue, Origin, Recipe, Rule, SiteOption, Target,
     current_platform_tag, is_script_text, script_policy, targets_page_root, validate_declarations,
     validate_selector,
 };
@@ -46,8 +46,13 @@ impl PatchRule {
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum Patch {
-    /// A switch for this already exists; accepting it turns that option on.
-    ExistingOption { option_id: String, summary: String },
+    /// A setting for this already exists; accepting it turns that switch on, or sets that choice
+    /// option to `choice`.
+    ExistingOption {
+        option_id: String,
+        choice: Option<String>,
+        summary: String,
+    },
     /// A new switch with its hide rules.
     NewOption {
         summary: String,
@@ -83,7 +88,7 @@ pub fn patch_schema() -> Value {
     json!({
         "type": "object",
         "additionalProperties": false,
-        "required": ["kind", "summary", "optionId", "label", "description", "group", "rules"],
+        "required": ["kind", "summary", "optionId", "choice", "label", "description", "group", "rules"],
         "properties": {
             "kind": {
                 "type": "string",
@@ -97,6 +102,10 @@ pub fn patch_schema() -> Value {
             "optionId": {
                 "type": ["string", "null"],
                 "description": "existingOption only: the id of the existing switch. null for newOption."
+            },
+            "choice": {
+                "type": ["string", "null"],
+                "description": "existingOption on a CHOICE switch only: one of its choice ids other than the first. null for an ON/OFF switch and for newOption."
             },
             "label": {
                 "type": ["string", "null"],
@@ -149,6 +158,8 @@ struct Raw {
     summary: String,
     #[serde(default)]
     option_id: Option<String>,
+    #[serde(default)]
+    choice: Option<String>,
     #[serde(default)]
     label: Option<String>,
     #[serde(default)]
@@ -319,17 +330,32 @@ pub fn parse_patch(json: &str, recipe: Option<&Recipe>) -> Result<Patch> {
                 return Err(reject("an existing option takes no new rules"));
             }
             let option_id = raw.option_id.as_deref().map(str::trim).unwrap_or_default();
-            if !recipe.is_some_and(|recipe| recipe.option(option_id).is_some()) {
+            let Some(option) = recipe.and_then(|recipe| recipe.option(option_id)) else {
                 return Err(reject("the option it names does not exist for this site"));
+            };
+            let choice = raw
+                .choice
+                .as_deref()
+                .map(str::trim)
+                .filter(|c| !c.is_empty());
+            let valid_choice = match choice {
+                Some(id) => option.choices.iter().skip(1).any(|c| c.id == id),
+                None => !option.is_choice(),
+            };
+            if !valid_choice {
+                return Err(reject(
+                    "a choice switch needs one of its choices after the first, and an ON/OFF switch takes none",
+                ));
             }
             Ok(Patch::ExistingOption {
                 option_id: option_id.to_owned(),
+                choice: choice.map(str::to_owned),
                 summary,
             })
         }
         "newOption" => {
-            if !blank(&raw.option_id) {
-                return Err(reject("a new option has no optionId"));
+            if !blank(&raw.option_id) || !blank(&raw.choice) {
+                return Err(reject("a new option has no optionId or choice"));
             }
             let label = plain(
                 raw.label.as_deref().unwrap_or(""),
@@ -479,7 +505,8 @@ pub fn apply_patch(base: Option<&Recipe>, host_domain: &str, patch: &Patch) -> R
         label: label.clone(),
         description: description.clone(),
         group: *group,
-        enabled_by_default: true,
+        choices: Vec::new(),
+        default_value: OptionValue::Toggle(true),
     });
     for (index, rule) in rules.iter().enumerate() {
         let tail = slug(rule.label(), MAX_ID_CHARS);
@@ -500,6 +527,7 @@ pub fn apply_patch(base: Option<&Recipe>, host_domain: &str, patch: &Patch) -> R
                 id,
                 label: label.clone(),
                 option,
+                choice: None,
                 on: None,
                 target: Target {
                     css: selector.clone(),
@@ -514,6 +542,7 @@ pub fn apply_patch(base: Option<&Recipe>, host_domain: &str, patch: &Patch) -> R
                 id,
                 label: label.clone(),
                 option,
+                choice: None,
                 on: None,
                 target: Target {
                     css: selector.clone(),
@@ -523,6 +552,7 @@ pub fn apply_patch(base: Option<&Recipe>, host_domain: &str, patch: &Patch) -> R
                 id,
                 label: label.clone(),
                 option,
+                choice: None,
                 on: None,
                 code: code.clone(),
             },
@@ -578,23 +608,33 @@ pub fn preview_css(patch: &Patch) -> String {
     css
 }
 
-/// The css of an existing option's hide and style rules, to preview turning it on.
-pub fn option_css(recipe: &Recipe, option_id: &str) -> String {
+/// Whether this rule belongs to the option and, for a choice option, applies in `choice`.
+pub fn rule_in(rule: &Rule, option_id: &str, choice: Option<&str>) -> bool {
+    rule.option() == Some(option_id)
+        && match (rule.choice(), choice) {
+            (Some(applies), Some(choice)) => applies.iter().any(|id| id == choice),
+            (None, None) => true,
+            _ => false,
+        }
+}
+
+/// The css of an existing option's hide and style rules, to preview turning it on (or setting
+/// it to `choice`).
+pub fn option_css(recipe: &Recipe, option_id: &str, choice: Option<&str>) -> String {
     let mut css = String::new();
-    for rule in &recipe.rules {
+    for rule in recipe
+        .rules
+        .iter()
+        .filter(|rule| rule_in(rule, option_id, choice))
+    {
         match rule {
-            Rule::Hide { target, option, .. } if option.as_deref() == Some(option_id) => {
-                append_rule_css(&mut css, &target.css, None);
-            }
+            Rule::Hide { target, .. } => append_rule_css(&mut css, &target.css, None),
             Rule::Css {
                 target,
-                option,
                 declarations,
                 ..
-            } if option.as_deref() == Some(option_id) => {
-                append_rule_css(&mut css, &target.css, Some(declarations));
-            }
-            _ => {}
+            } => append_rule_css(&mut css, &target.css, Some(declarations)),
+            Rule::Script { .. } => {}
         }
     }
     css
@@ -642,6 +682,50 @@ mod tests {
         json!([{ "label": "Stories row", "selector": selector }])
     }
 
+    fn choice_recipe() -> Recipe {
+        Recipe::parse(
+            r#"{"schema":1,"id":"c.default","name":"C","version":"1.0.0","origin":"user","tags":["mobile"],"match":["https://c.example/*"],
+            "options":[{"id":"media","label":"Media","description":"d","group":"content",
+              "choices":[{"id":"show","label":"Show"},{"id":"blur","label":"Blur"},{"id":"hide","label":"Hide"}],"default":"show"}],
+            "rules":[
+              {"id":"b","label":"l","type":"css","option":"media","choice":["blur"],"target":{"css":".pic"},"declarations":{"filter":"blur(8px)"}},
+              {"id":"h","label":"l","type":"hide","option":"media","choice":["hide"],"target":{"css":".pic"}}]}"#,
+        )
+        .unwrap()
+    }
+
+    #[test]
+    fn an_existing_choice_option_needs_one_of_its_later_choices_and_a_switch_takes_none() {
+        let recipe = choice_recipe();
+        let answer = |id: &str, choice: Value| {
+            json!({"kind":"existingOption","summary":"Blurs the media.","optionId":id,"choice":choice,
+                   "label":null,"description":null,"group":null,"rules":null})
+            .to_string()
+        };
+        let patch = parse_patch(&answer("media", json!("blur")), Some(&recipe)).unwrap();
+        assert_eq!(
+            patch,
+            Patch::ExistingOption {
+                option_id: "media".into(),
+                choice: Some("blur".into()),
+                summary: "Blurs the media.".into()
+            }
+        );
+        for bad in [Value::Null, json!("show"), json!("gone")] {
+            assert!(parse_patch(&answer("media", bad), Some(&recipe)).is_err());
+        }
+        assert_eq!(
+            option_css(&recipe, "media", Some("blur")),
+            ".pic{filter:blur(8px)!important;}\n"
+        );
+        assert_eq!(
+            option_css(&recipe, "media", Some("hide")),
+            ".pic{display:none!important;}\n"
+        );
+        let shorts = youtube();
+        assert!(parse_patch(&answer("shorts", json!("blur")), Some(&shorts)).is_err());
+    }
+
     #[test]
     fn a_good_new_option_is_accepted() {
         let patch = parse_patch(
@@ -687,7 +771,7 @@ mod tests {
             Rule::Css { declarations, .. }
                 if declarations.get("filter").map(String::as_str) == Some("grayscale(1)")
         ));
-        assert_eq!(option_css(&recipe, &recipe.options[0].id), expected);
+        assert_eq!(option_css(&recipe, &recipe.options[0].id, None), expected);
     }
 
     #[test]
@@ -852,6 +936,7 @@ mod tests {
             patch,
             Patch::ExistingOption {
                 option_id: "shorts".into(),
+                choice: None,
                 summary: "Turns on the Shorts switch.".into()
             }
         );
@@ -861,7 +946,7 @@ mod tests {
         assert!(parse_patch(&answer("shorts", one_rule("a.x")), Some(&recipe)).is_err());
         assert_eq!(preview_css(&patch), "");
         assert!(
-            option_css(&recipe, "shorts")
+            option_css(&recipe, "shorts", None)
                 .contains("ytm-reel-shelf-renderer{display:none!important;}")
         );
         assert!(apply_patch(Some(&recipe), "youtube.com", &patch).is_err());
@@ -912,7 +997,7 @@ mod tests {
         assert_eq!(recipe.rules.len(), 2);
         let option = &recipe.options[0];
         assert_eq!(option.id, "hide-the-stories-row");
-        assert!(option.enabled_by_default);
+        assert_eq!(option.default_value, OptionValue::Toggle(true));
         assert_eq!(option.group, OptionGroup::Content);
         assert!(
             matches!(&recipe.rules[0], Rule::Hide { id, option, .. } if id == "hide-the-stories-row-stories-row" && option.as_deref() == Some("hide-the-stories-row"))
@@ -977,7 +1062,7 @@ mod tests {
         assert_eq!(recipe.origin, Origin::Ai);
         assert_eq!(recipe.matches, ["https://*.example.com/*"]);
         assert_eq!(recipe.options.len(), 1);
-        assert!(recipe.options[0].enabled_by_default);
+        assert_eq!(recipe.options[0].default_value, OptionValue::Toggle(true));
         assert_eq!(recipe.homepage(), Some("https://example.com/"));
         assert_eq!(recipe.tags, [current_platform_tag()]);
         for bad in [
@@ -1033,8 +1118,8 @@ mod tests {
         assert_eq!(recipe.origin, Origin::Ai);
         let again = Recipe::parse(&serde_json::to_string(&recipe).unwrap()).unwrap();
         assert_eq!(again, recipe);
-        assert!(option_css(&recipe, "hide-the-stories-row").contains("#promo"));
-        assert!(!option_css(&recipe, "hide-the-stories-row").contains("document.title"));
+        assert!(option_css(&recipe, "hide-the-stories-row", None).contains("#promo"));
+        assert!(!option_css(&recipe, "hide-the-stories-row", None).contains("document.title"));
     }
 
     #[test]

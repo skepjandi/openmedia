@@ -5,9 +5,10 @@ use url::Url;
 
 use crate::error::{Error, Result};
 use crate::library::{Favorite, FavoriteInput};
-use crate::recipes::{Hub, OptionChoices, OptionGroup, Origin, Recipes};
+use crate::recipes::{Hub, OptionChoice, OptionChoices, OptionGroup, OptionValue, Origin, Recipes};
 
-/// One toggle as Settings shows it.
+/// One setting as Settings shows it. `choices` is empty for a switch, whose `value` and `default`
+/// are booleans; for a choice option they are ids from `choices`.
 #[derive(Debug, Clone, PartialEq, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct OptionView {
@@ -15,9 +16,10 @@ pub struct OptionView {
     pub label: String,
     pub description: String,
     pub group: OptionGroup,
-    pub enabled: bool,
+    pub choices: Vec<OptionChoice>,
+    pub value: OptionValue,
     #[serde(rename = "default")]
-    pub enabled_by_default: bool,
+    pub default_value: OptionValue,
 }
 
 /// A recipe as Settings shows it: its toggles with the user's choices applied, its
@@ -57,11 +59,11 @@ pub fn site_settings(
                     label: option.label.clone(),
                     description: option.description.clone(),
                     group: option.group,
-                    enabled: saved
-                        .and_then(|saved| saved.get(&option.id))
-                        .copied()
-                        .unwrap_or(option.enabled_by_default),
-                    enabled_by_default: option.enabled_by_default,
+                    choices: option.choices.clone(),
+                    value: option
+                        .current(saved.and_then(|saved| saved.get(&option.id)))
+                        .clone(),
+                    default_value: option.default_value.clone(),
                 })
                 .collect();
             options.sort_by_key(|option| option.group);
@@ -154,7 +156,7 @@ mod tests {
             assert!(
                 site.options
                     .iter()
-                    .all(|option| option.enabled == option.enabled_by_default)
+                    .all(|option| option.value == option.default_value)
             );
             assert_eq!(site.bottom_margin, None);
             assert!(!site.favorite);
@@ -189,18 +191,30 @@ mod tests {
         let recipes = Recipes::official_installed();
         let choices = OptionChoices::from([(
             "market.official.youtube".to_owned(),
-            [("shorts".to_owned(), true), ("open-app".to_owned(), false)].into(),
+            [
+                ("shorts".to_owned(), OptionValue::Toggle(true)),
+                ("open-app".to_owned(), OptionValue::Toggle(false)),
+            ]
+            .into(),
         )]);
         let sites = site_settings(&recipes, &choices, &BTreeMap::new(), &[]);
         let youtube = site(&sites, "market.official.youtube");
-        let state = |id: &str| youtube.options.iter().find(|o| o.id == id).unwrap().enabled;
-        assert!(state("shorts"));
-        assert!(!state("open-app"));
+        let state = |id: &str| {
+            youtube
+                .options
+                .iter()
+                .find(|o| o.id == id)
+                .unwrap()
+                .value
+                .clone()
+        };
+        assert_eq!(state("shorts"), OptionValue::Toggle(true));
+        assert_eq!(state("open-app"), OptionValue::Toggle(false));
         assert!(
             site(&sites, "market.official.instagram")
                 .options
                 .iter()
-                .all(|option| option.enabled == option.enabled_by_default)
+                .all(|option| option.value == option.default_value)
         );
     }
 

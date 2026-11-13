@@ -275,7 +275,7 @@ export const th: Messages = {
   "recipes.content": "เนื้อหา · แสดงอยู่จนกว่าคุณจะซ่อน",
   "recipes.groupAnnoyance": "สิ่งรบกวน",
   "recipes.groupContent": "เนื้อหา",
-  "recipes.nothingHidden": "ไม่มีอะไรถูกซ่อน",
+  "recipes.nothingHidden": "เปิดใช้งาน: {count} จาก {total}",
   "recipes.hiddenCount": "ซ่อน: {count} จาก {total}",
   "recipes.options": "ตัวเลือกของ {name}",
   "recipes.addFavorite": "เพิ่ม {name} ในรายการโปรด",

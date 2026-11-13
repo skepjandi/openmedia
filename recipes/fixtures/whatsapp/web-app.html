@@ -1,0 +1,30 @@
+<!doctype html>
+<!-- Hand-written from community WhatsApp Web CSS (andryompusunggu.com/blog/pure-css-whatsapp-blur, greasyfork Clean UI and Remove Channels scripts, vednoc/dark-whatsapp); the logged-in app is not reachable without a phone. -->
+<html lang="en"><body>
+<div id="app">
+  <header>
+    <button type="button" aria-label="Chats" data-keep>Chats</button>
+    <button type="button" aria-label="Channels">Channels</button>
+  </header>
+  <div id="side" data-keep>
+    <div id="pane-side" data-keep>
+      <div role="grid">
+        <div role="row"><img src="" alt=""><span>Contact name</span><span>Last message</span></div>
+        <div role="row"><img src="" alt=""><span>Meta AI</span></div>
+      </div>
+    </div>
+  </div>
+  <div id="main" data-keep>
+    <header><img src="" alt=""><span>Contact name</span></header>
+    <div role="application">
+      <div role="row" data-keep>
+        <div class="message-in"><span class="copyable-text">Incoming message</span></div>
+        <div class="message-out"><span class="copyable-text">Outgoing message</span></div>
+        <div data-testid="group-chat-profile-picture"><img src="" alt=""></div>
+        <button type="button" aria-label="Ask Meta AI about this">AI</button>
+      </div>
+    </div>
+    <footer data-keep><div contenteditable="true" role="textbox"></div></footer>
+  </div>
+</div>
+</body></html>

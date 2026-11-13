@@ -278,7 +278,7 @@ export const ar: Messages = {
   "recipes.content": "المحتوى · ظاهر حتى تخفيه",
   "recipes.groupAnnoyance": "مزعجة",
   "recipes.groupContent": "محتوى",
-  "recipes.nothingHidden": "لا شيء مخفي",
+  "recipes.nothingHidden": "مفعّل: {count} من {total}",
   "recipes.hiddenCount": "المخفي: {count} من {total}",
   "recipes.options": "خيارات {name}",
   "recipes.addFavorite": "إضافة {name} إلى المفضلة",

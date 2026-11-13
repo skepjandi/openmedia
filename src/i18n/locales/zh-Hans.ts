@@ -269,7 +269,7 @@ export const zhHans: Messages = {
   "recipes.content": "内容 · 隐藏前一直显示",
   "recipes.groupAnnoyance": "干扰项",
   "recipes.groupContent": "内容",
-  "recipes.nothingHidden": "没有隐藏任何内容",
+  "recipes.nothingHidden": "已启用：{total} 项中的 {count} 项",
   "recipes.hiddenCount": "已隐藏：{total} 项中的 {count} 项",
   "recipes.options": "{name} 选项",
   "recipes.addFavorite": "将 {name} 添加到收藏",

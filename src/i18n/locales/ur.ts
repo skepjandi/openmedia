@@ -289,7 +289,7 @@ export const ur: Messages = {
   "recipes.content": "مواد · چھپانے تک دکھایا جاتا ہے",
   "recipes.groupAnnoyance": "پریشان کن",
   "recipes.groupContent": "مواد",
-  "recipes.nothingHidden": "کچھ بھی چھپا نہیں",
+  "recipes.nothingHidden": "فعال: {total} میں سے {count}",
   "recipes.hiddenCount": "چھپایا گیا: {total} میں سے {count}",
   "recipes.options": "{name} کے اختیارات",
   "recipes.addFavorite": "{name} کو پسندیدہ میں شامل کریں",

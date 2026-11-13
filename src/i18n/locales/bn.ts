@@ -282,7 +282,7 @@ export const bn: Messages = {
   "recipes.content": "বিষয়বস্তু · লুকানোর আগ পর্যন্ত দেখানো",
   "recipes.groupAnnoyance": "বিরক্তিকর বিষয়",
   "recipes.groupContent": "বিষয়বস্তু",
-  "recipes.nothingHidden": "কিছুই লুকানো নেই",
+  "recipes.nothingHidden": "সক্রিয়: {total}টির মধ্যে {count}টি",
   "recipes.hiddenCount": "লুকানো: {total}টির মধ্যে {count}টি",
   "recipes.options": "{name} বিকল্প",
   "recipes.addFavorite": "{name} পছন্দের তালিকায় যোগ করুন",

@@ -290,7 +290,7 @@ export const cs: Messages = {
   "recipes.content": "Obsah · zobrazený, dokud ho neskryjete",
   "recipes.groupAnnoyance": "Rušivý prvek",
   "recipes.groupContent": "Obsah",
-  "recipes.nothingHidden": "Nic není skryto",
+  "recipes.nothingHidden": "Zapnuto: {count} z {total}",
   "recipes.hiddenCount": "Skryto: {count} z {total}",
   "recipes.options": "Možnosti pro {name}",
   "recipes.addFavorite": "Přidat {name} do oblíbených",

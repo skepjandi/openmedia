@@ -62,6 +62,69 @@
       "description": "Those tabs in the top navigation.",
       "group": "content",
       "default": false
+    },
+    {
+      "id": "reaction-counts",
+      "label": "Hide reaction counts",
+      "description": "The reactions number and reaction bar under posts and videos.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "post-buttons",
+      "label": "Hide Like, Comment and Share",
+      "description": "The three action buttons under posts and videos.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "videos",
+      "label": "Videos",
+      "description": "How the video players in Watch and the feed look: normal, blurred or hidden.",
+      "group": "content",
+      "choices": [
+        {
+          "id": "show",
+          "label": "Show"
+        },
+        {
+          "id": "blur",
+          "label": "Blur"
+        },
+        {
+          "id": "hide",
+          "label": "Hide"
+        }
+      ],
+      "default": "show"
+    },
+    {
+      "id": "profile-pictures",
+      "label": "Profile pictures",
+      "description": "The round pictures beside posts and in the Stories row.",
+      "group": "content",
+      "choices": [
+        {
+          "id": "show",
+          "label": "Show"
+        },
+        {
+          "id": "blur",
+          "label": "Blur"
+        },
+        {
+          "id": "hide",
+          "label": "Hide"
+        }
+      ],
+      "default": "show"
+    },
+    {
+      "id": "suggested-sections",
+      "label": "Hide People you may know and Suggested",
+      "description": "The People you may know, Suggested groups and Suggested pages blocks in the desktop feed.",
+      "group": "content",
+      "default": false
     }
   ],
   "rules": [
@@ -211,13 +274,113 @@
       "target": {
         "css": "div[role=\"banner\"] a[aria-label=\"Watch\"], div[role=\"banner\"] a[aria-label=\"Video\"], div[role=\"banner\"] a[aria-label=\"Marketplace\"], div[role=\"banner\"] a[aria-label=\"Gaming\"]"
       }
+    },
+    {
+      "id": "reaction-count-buttons",
+      "label": "Reactions count",
+      "type": "hide",
+      "option": "reaction-counts",
+      "target": {
+        "css": "[role=\"button\"][aria-label$=\" reactions\"]"
+      }
+    },
+    {
+      "id": "reaction-bling-bar",
+      "label": "Reaction bar",
+      "type": "hide",
+      "option": "reaction-counts",
+      "target": {
+        "css": "[data-log-comp-type=\"feed_post:ufi_blingbar\"]"
+      }
+    },
+    {
+      "id": "post-buttons-ufi",
+      "label": "Like, Comment and Share buttons",
+      "type": "hide",
+      "option": "post-buttons",
+      "target": {
+        "css": "[data-log-comp-type$=\"ufi_like_button\"], [data-log-comp-type$=\"ufi_comment_button\"], [data-log-comp-type$=\"ufi_share_button\"]"
+      }
+    },
+    {
+      "id": "videos-blur",
+      "label": "Blur videos",
+      "type": "css",
+      "option": "videos",
+      "choice": ["blur"],
+      "target": {
+        "css": "[data-type=\"video\"], [data-pagelet^=\"FeedUnit\"] video"
+      },
+      "declarations": {
+        "filter": "blur(16px)"
+      }
+    },
+    {
+      "id": "videos-hide",
+      "label": "Videos",
+      "type": "hide",
+      "option": "videos",
+      "choice": ["hide"],
+      "target": {
+        "css": "[data-type=\"video\"], [data-pagelet^=\"FeedUnit\"] video"
+      }
+    },
+    {
+      "id": "profile-pictures-blur",
+      "label": "Blur profile pictures",
+      "type": "css",
+      "option": "profile-pictures",
+      "choice": ["blur"],
+      "target": {
+        "css": "[aria-label$=\"Profile Picture\"] img, [aria-label$=\"profile picture\"] img, [aria-label^=\"Unseen story from\"] img"
+      },
+      "declarations": {
+        "filter": "blur(8px)"
+      }
+    },
+    {
+      "id": "profile-pictures-hide",
+      "label": "Profile pictures",
+      "type": "hide",
+      "option": "profile-pictures",
+      "choice": ["hide"],
+      "target": {
+        "css": "[aria-label$=\"Profile Picture\"] img, [aria-label$=\"profile picture\"] img, [aria-label^=\"Unseen story from\"] img"
+      }
+    },
+    {
+      "id": "suggested-people",
+      "label": "People you may know",
+      "type": "hide",
+      "option": "suggested-sections",
+      "target": {
+        "css": "[aria-posinset]:has(a[href=\"/friends/\"])"
+      }
+    },
+    {
+      "id": "suggested-groups",
+      "label": "Suggested groups",
+      "type": "hide",
+      "option": "suggested-sections",
+      "target": {
+        "css": "[aria-posinset]:has(a[href=\"/groups/discover/\"])"
+      }
+    },
+    {
+      "id": "suggested-pages",
+      "label": "Suggested pages",
+      "type": "hide",
+      "option": "suggested-sections",
+      "target": {
+        "css": "[aria-posinset]:has([aria-label=\"Suggested pages\"])"
+      }
     }
   ],
   "meta": {
     "author": "OpenMedia",
     "homepage": "https://www.facebook.com/",
-    "lastVerified": "2026-11-10",
-    "summary": "Hides \"get the app\" banners, sign-in pop-up, sponsored posts, Reels, Stories, right column, left column, Watch, Marketplace and Gaming",
-    "notes": "Facebook serves iPhone user agents the Bloks layout on m.facebook.com (www redirects there); desktop selectors (aria-posinset, role=feed, hashed x* classes) match nothing, and the generic wbloks_* and m classes sit on almost every element. LIVE (logged out): get-app-bar matched the 42 px banner on the login page, open-app-button matched the sticky button on public pages, full-experience-sheet matched the one dialog on /watch/ and /reel/ (its aria-label starts \"Get the full experience\"; hiding every aria-modal dialog would also hide logged-in comment and share sheets), reels-profile-tab matched on a page's tab strip, reels-chip matched the \"Reels , 2 of 5\" chip, reels-thumbnails matched the \"View reel video from ...\" buttons. On /reel/ the whole page is the wall, so hiding the sheet is cosmetic. unlock-scroll is scoped to pages that hold the sheet because Bloks may rely on body overflow elsewhere. SOURCE only, not seen live (logged-in): stories-row (kurtnettle/uBO-filters-fb). Labels are English only. No CSS selector was found for suggested or sponsored posts on Bloks, so there is no option for them. DESKTOP (macOS Safari UA): www.facebook.com serves the full React site, not the Bloks layout above. Logged out it is only the login form, so every desktop rule is INFERRED from data-pagelet and aria-label attributes (hand-written fixture desktop-feed.html): sponsored-feed-posts, sponsored-right-rail, stories-pagelet, reels-feed-posts, reels-nav-link, right-column, left-column, video-tab-links."
+    "lastVerified": "2026-11-13",
+    "summary": "Hides app banners, sign-in pop-up, ads, Reels, Stories, columns, tabs, counts, buttons, suggestions; blurs or hides videos, avatars",
+    "notes": "**2026-11-13 additions** (m.facebook.com Bloks, iPhone UA 390x844, headless Chrome, logged out, /watch/): `videos` and `profile-pictures` are choice options (Show, Blur, Hide).\n- **LIVE** on /watch/: `[data-log-comp-type$=\"ufi_like_button\"]`, `ufi_comment_button` and `ufi_share_button` 8 each (24 together; the attribute is language-independent); `[role=\"button\"][aria-label$=\" reactions\"]` 8 (English label, the counter is part of it); `[data-type=\"video\"]` 8 (one per video card); `[aria-label$=\"Profile Picture\"] img` 5 and `[aria-label^=\"Unseen story from\"] img` 3 (English labels). `[data-log-comp-type=\"feed_post:ufi_blingbar\"]` was in one server dump of /watch/ and absent after hydration in the next load: kept as a harmless extra.\n- **SOURCE**: the three suggested-section rules come from mustafamohsen's Facebook uBO filters (gist, undated): `[aria-posinset]` units that link to `/friends/`, `/groups/discover/` or carry `aria-label=\"Suggested pages\"`. They are desktop-feed rules; the Bloks feed was not reachable logged out. `[data-pagelet^=\"FeedUnit\"] video` in `videos` is desktop INFERRED.\n- Fixtures: `desktop-feed.html` is hand-written (logged-out desktop is only a login form); the new Bloks hooks were added to `public-watch.html` with the attributes seen live.\n- Not verified: any logged-in page, Marketplace, Gaming, the Bloks feed. No selector for ads by label (Facebook splits `Sponsored` into one-letter spans).\n\n**Earlier checks**\n\nFacebook serves iPhone user agents the Bloks layout on m.facebook.com (www redirects there); desktop selectors (aria-posinset, role=feed, hashed x* classes) match nothing, and the generic wbloks_* and m classes sit on almost every element. LIVE (logged out): get-app-bar matched the 42 px banner on the login page, open-app-button matched the sticky button on public pages, full-experience-sheet matched the one dialog on /watch/ and /reel/ (its aria-label starts \"Get the full experience\"; hiding every aria-modal dialog would also hide logged-in comment and share sheets), reels-profile-tab matched on a page's tab strip, reels-chip matched the \"Reels , 2 of 5\" chip, reels-thumbnails matched the \"View reel video from ...\" buttons. On /reel/ the whole page is the wall, so hiding the sheet is cosmetic. unlock-scroll is scoped to pages that hold the sheet because Bloks may rely on body overflow elsewhere. SOURCE only, not seen live (logged-in): stories-row (kurtnettle/uBO-filters-fb). Labels are English only. No CSS selector was found for suggested or sponsored posts on Bloks, so there is no option for them. DESKTOP (macOS Safari UA): www.facebook.com serves the full React site, not the Bloks layout above. Logged out it is only the login form, so every desktop rule is INFERRED from data-pagelet and aria-label attributes (hand-written fixture desktop-feed.html): sponsored-feed-posts, sponsored-right-rail, stories-pagelet, reels-feed-posts, reels-nav-link, right-column, left-column, video-tab-links."
   }
 }

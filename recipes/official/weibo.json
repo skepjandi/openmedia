@@ -55,6 +55,97 @@
       "description": "The image grids and video players inside posts, so the feed is text only.",
       "group": "content",
       "default": false
+    },
+    {
+      "id": "avatars",
+      "label": "Profile pictures",
+      "description": "The round profile picture and verification badge at the top of each post.",
+      "group": "content",
+      "choices": [
+        {
+          "id": "show",
+          "label": "Show"
+        },
+        {
+          "id": "blur",
+          "label": "Blur"
+        },
+        {
+          "id": "hide",
+          "label": "Hide"
+        }
+      ],
+      "default": "show"
+    },
+    {
+      "id": "quoted-reposts",
+      "label": "Quoted reposts",
+      "description": "The quoted original post inside a repost.",
+      "group": "content",
+      "choices": [
+        {
+          "id": "show",
+          "label": "Show"
+        },
+        {
+          "id": "dim",
+          "label": "Dim"
+        },
+        {
+          "id": "hide",
+          "label": "Hide"
+        }
+      ],
+      "default": "show"
+    },
+    {
+      "id": "media-blur",
+      "label": "Blur pictures and videos",
+      "description": "Blurs post images and video covers instead of removing them.",
+      "group": "content",
+      "choices": [
+        {
+          "id": "show",
+          "label": "Show"
+        },
+        {
+          "id": "blur",
+          "label": "Blur"
+        },
+        {
+          "id": "strong",
+          "label": "Strong blur"
+        }
+      ],
+      "default": "show"
+    },
+    {
+      "id": "post-source",
+      "label": "Hide time and client name",
+      "description": "The \"11-10 10:05 from iPhone\" line under the author name.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "vip-badges",
+      "label": "Hide verification and VIP badges",
+      "description": "The coloured V badge on avatars and the member icon next to author names.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "video-stats",
+      "label": "Hide video play counts",
+      "description": "The \"3.5M plays\" and length bar on video covers.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "search-hint",
+      "label": "Hide the trending hint in the search bar",
+      "description": "The \"Everyone is searching...\" topic suggestion inside the search bar at the top.",
+      "group": "content",
+      "default": false
     }
   ],
   "rules": [
@@ -156,13 +247,130 @@
       "target": {
         "css": "div.weibo-media.f-media"
       }
+    },
+    {
+      "id": "avatar-blur",
+      "label": "Blur profile pictures",
+      "type": "css",
+      "option": "avatars",
+      "choice": ["blur"],
+      "target": {
+        "css": ".weibo-top .m-avatar-box img"
+      },
+      "declarations": {
+        "filter": "blur(8px)"
+      }
+    },
+    {
+      "id": "avatar-hide",
+      "label": "Profile picture column",
+      "type": "hide",
+      "option": "avatars",
+      "choice": ["hide"],
+      "target": {
+        "css": ".weibo-top > .m-avatar-box"
+      }
+    },
+    {
+      "id": "repost-dim",
+      "label": "Dim quoted reposts",
+      "type": "css",
+      "option": "quoted-reposts",
+      "choice": ["dim"],
+      "target": {
+        "css": ".weibo-rp"
+      },
+      "declarations": {
+        "opacity": "0.35"
+      }
+    },
+    {
+      "id": "repost-hide",
+      "label": "Quoted reposts",
+      "type": "hide",
+      "option": "quoted-reposts",
+      "choice": ["hide"],
+      "target": {
+        "css": ".weibo-rp"
+      }
+    },
+    {
+      "id": "media-soft-blur",
+      "label": "Blur post media",
+      "type": "css",
+      "option": "media-blur",
+      "choice": ["blur"],
+      "target": {
+        "css": ".weibo-media img"
+      },
+      "declarations": {
+        "filter": "blur(10px)"
+      }
+    },
+    {
+      "id": "media-strong-blur",
+      "label": "Strongly blur post media",
+      "type": "css",
+      "option": "media-blur",
+      "choice": ["strong"],
+      "target": {
+        "css": ".weibo-media img"
+      },
+      "declarations": {
+        "filter": "blur(28px)"
+      }
+    },
+    {
+      "id": "source-line",
+      "label": "Time and client line",
+      "type": "hide",
+      "option": "post-source",
+      "target": {
+        "css": ".weibo-top h4 > .from, .weibo-top h4 > .time"
+      }
+    },
+    {
+      "id": "badge-v",
+      "label": "Verification V badge",
+      "type": "hide",
+      "option": "vip-badges",
+      "target": {
+        "css": ".weibo-top .m-avatar-box i.m-icon"
+      }
+    },
+    {
+      "id": "badge-vip",
+      "label": "Member icon next to names",
+      "type": "hide",
+      "option": "vip-badges",
+      "target": {
+        "css": ".weibo-top h3 img.vipicon"
+      }
+    },
+    {
+      "id": "video-info-bar",
+      "label": "Video play count and length bar",
+      "type": "hide",
+      "option": "video-stats",
+      "target": {
+        "css": ".mwb-video .mwbv-info-bar"
+      }
+    },
+    {
+      "id": "search-hint-text",
+      "label": "Trending hint text in the search bar",
+      "type": "hide",
+      "option": "search-hint",
+      "target": {
+        "css": ".nav-top .nav-search .m-text-cut"
+      }
     }
   ],
   "meta": {
     "author": "OpenMedia",
     "homepage": "https://m.weibo.cn/",
-    "lastVerified": "2026-11-08",
-    "summary": "Hides floating log-in button, Follow buttons, trending searches, feed category tabs, repost, comment and like counts, comments",
-    "notes": "LIVE (logged out, iPhone UA 390x844, headless Chromium, 2026-11-08, from a non-China IP): https://m.weibo.cn/ redirects through visitor.passport.weibo.cn and lands on the Vue mobile feed (#app). Seen: a fixed 'login-box' button (1 match, a.login-btn, floats at the bottom of every feed view), 'm-followBtn' Follow buttons in header.weibo-top (20 on the Charts tab, 0 on the Hot tab), nav-main category tab row (Hot/Charts/Local/Society/Tech/...: 1 match), footer.f-footer-ctrl with 3 .m-diy-btn counters per post (15 posts = 45 matches). Search page /search?containerid=231583: 2 div.card16.m-col-2 hot-search cards + 1 div.card11.ctype-3 (Hot people / Hot live tiles). Post page /status/<id>: div.lite-page-tab (3 .tab-item, counts are the second <i>), div.comment-content (1 list), fixed div.lite-page-editor ('Write a comment'), div.weibo-media on posts with pictures or video. A div.ad-wrap exists on post pages but is display:none and empty, so no ad rule ships. No cookie banner, app-install sheet, notification prompt or timed pop-up appeared in about 30 s of waiting on the feed. NOT hideable with CSS: after several scrolls or a reload loop Weibo redirects the whole tab to passport.weibo.com/sso/signin, and /profile/<uid> redirected to the same sign-in page straight away (no public profile is viewable logged out). Counter selectors rely on stable layout classes (no hashed names); the Vue data-v-* attributes are never used. NOT verified: logged-in views, the desktop weibo.com site, video.weibo.com, super-topic (/p/index) pages, the in-app (WebView) variant, mainland-China-only prompts. Fixtures are distilled by hand with English placeholder text."
+    "lastVerified": "2026-11-13",
+    "summary": "Hides login button, Follow, trending, tabs, counts, comments, media; blur/dim/hide avatars, reposts, media; hide badges, source",
+    "notes": "## Weibo recipe notes\n\nRe-checked 2026-11-13: `m.weibo.cn` (iPhone UA 390x844, logged out, headless Chromium, non-China IP) redirected through visitor.passport.weibo.cn and loaded the Vue feed with no captcha. Home feed only; the search and post pages were not re-opened this round (their rules keep the 2026-11-08 evidence).\n\n## LIVE on the home feed (15 posts)\n\n- `.weibo-top > .m-avatar-box` 15, `.weibo-top .m-avatar-box img` 15, `.weibo-top .m-avatar-box i.m-icon` 15 (goldv / orangev badge classes)\n- `.weibo-top h3 img.vipicon` 15 (member icon); `.weibo-top h4 > .time` 15, `.weibo-top h4 > .from` 12 (some posts lack a client name)\n- `.weibo-rp` 2 (quoted original inside a repost; both carry their own media)\n- `.weibo-media img` 29 (picture and video cover images), `.mwb-video .mwbv-info-bar` 8 (plays and duration)\n- `.nav-top .nav-search .m-text-cut` 1 (search-bar hint text; the search link itself is kept)\n- Unchanged from before: `div.login-box:has(> a.login-btn)` 1; `.m-followBtn` 0 on the Hot tab (20 on Charts earlier); `footer.f-footer-ctrl > div.m-diy-btn` 45; `.nav-main` 1.\n\n## Notes\n\n- `.weibo-media` also matches the inner wrap, so the hide-media rule is not touched; the new blur rules target the images only.\n- Source: weibo.cn / weibo.com nuisance reports in uBlockOrigin/uAssets (#23990 app-install popup, #23851 login popup on video) describe script-driven popups that CSS cannot stop; no cosmetic list rule exists for these classes.\n\n## Not verified\n\n- Logged-in feeds, desktop weibo.com, the \"Follow\" button count on Hot, the hint text on other pages.\n- Badges and the avatar column rules on the post page (fixture only).\n"
   }
 }

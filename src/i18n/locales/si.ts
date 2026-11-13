@@ -283,7 +283,7 @@ export const si: Messages = {
   "recipes.content": "අන්තර්ගතය · ඔබ එය සඟවන තුරු පෙන්වනු ලැබේ",
   "recipes.groupAnnoyance": "අමාරුකම",
   "recipes.groupContent": "අන්තර්ගතය",
-  "recipes.nothingHidden": "කිසිවක් සඟවා නැත",
+  "recipes.nothingHidden": "සක්‍රිය: {total} න් {count}",
   "recipes.hiddenCount": "සඟවා ඇත: {total} න් {count}",
   "recipes.options": "{name} විකල්ප",
   "recipes.addFavorite": "{name} ආදරණීය අයිතිතයට එකතු කරන්න",

@@ -289,7 +289,7 @@ export const sv: Messages = {
   "recipes.content": "Innehåll · visas tills du döljer det",
   "recipes.groupAnnoyance": "Störande inslag",
   "recipes.groupContent": "Innehåll",
-  "recipes.nothingHidden": "Inget dolt",
+  "recipes.nothingHidden": "Aktiverade: {count} av {total}",
   "recipes.hiddenCount": "Dolt: {count} av {total}",
   "recipes.options": "Alternativ för {name}",
   "recipes.addFavorite": "Lägg till {name} i favoriter",

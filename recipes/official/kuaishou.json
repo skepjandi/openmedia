@@ -20,6 +20,55 @@
       "description": "The highlighted 'Top up' (recharge) link in the page header menu.",
       "group": "content",
       "default": false
+    },
+    {
+      "id": "landing-pictures",
+      "label": "Landing page pictures",
+      "description": "The three large phone screenshots on the Kuaishou landing page.",
+      "group": "content",
+      "choices": [
+        {
+          "id": "show",
+          "label": "Show"
+        },
+        {
+          "id": "blur",
+          "label": "Blur"
+        },
+        {
+          "id": "hide",
+          "label": "Hide"
+        }
+      ],
+      "default": "show"
+    },
+    {
+      "id": "marketing-sections",
+      "label": "Hide the marketing sections",
+      "description": "The three headline and tagline blocks that make up the landing page body.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "brand-slogan",
+      "label": "Hide the brand slogan image",
+      "description": "The big slogan artwork above the download button.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "header-menus",
+      "label": "Hide the APP and About menus",
+      "description": "The APP and About drop-down menus in the header (home and Top up are separate).",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "registration-footer",
+      "label": "Hide the registration footer",
+      "description": "The ICP and public-security registration links at the bottom.",
+      "group": "content",
+      "default": false
     }
   ],
   "rules": [
@@ -58,13 +107,72 @@
       "target": {
         "css": ".com-header li.nav.highlight"
       }
+    },
+    {
+      "id": "picture-blur",
+      "label": "Blur landing pictures",
+      "type": "css",
+      "option": "landing-pictures",
+      "choice": ["blur"],
+      "target": {
+        "css": ".title-pic .pic-wrapper img.pic"
+      },
+      "declarations": {
+        "filter": "blur(14px)"
+      }
+    },
+    {
+      "id": "picture-hide",
+      "label": "Landing pictures",
+      "type": "hide",
+      "option": "landing-pictures",
+      "choice": ["hide"],
+      "target": {
+        "css": ".title-pic .pic-wrapper"
+      }
+    },
+    {
+      "id": "marketing-blocks",
+      "label": "Headline and tagline blocks",
+      "type": "hide",
+      "option": "marketing-sections",
+      "target": {
+        "css": ".page-content .title-pic"
+      }
+    },
+    {
+      "id": "slogan-image",
+      "label": "Slogan artwork",
+      "type": "hide",
+      "option": "brand-slogan",
+      "target": {
+        "css": ".cover img.slogan"
+      }
+    },
+    {
+      "id": "header-dropdowns",
+      "label": "APP and About menus",
+      "type": "hide",
+      "option": "header-menus",
+      "target": {
+        "css": ".com-header .navs > li.nav:has(> a > span.triangle)"
+      }
+    },
+    {
+      "id": "icp-links",
+      "label": "Registration links",
+      "type": "hide",
+      "option": "registration-footer",
+      "target": {
+        "css": ".com-icp"
+      }
     }
   ],
   "meta": {
     "author": "OpenMedia",
     "homepage": "https://www.kuaishou.com/",
-    "lastVerified": "2026-11-08",
-    "summary": "Hides app download prompts and the Top up link",
-    "notes": "LIVE (iPhone 390x844 UA, logged out, 2026-11-08): https://m.kuaishou.com/ (www.kuaishou.com redirects there on mobile UA) is only a static marketing landing page: .com-download-bar=1 (fixed 65px bottom bar carousel, 3 slides), a.open-or-download-app-main=1, .cover .arrrow-wrapper=1, .open-in-browser-dialog=1 and .open-app-confirm-dialog=1 (both present but display:none until app-open attempts / WeChat), .com-header li.nav.highlight=1. No timed pop-ups appeared after 30 s. Left alone: header, hero text, ICP links. m.kuaishou.com/kuaiying/ redirects to h5.kwaiying.com (other host, not matched); /short-video/<bad id> gave a 'page not found' page. NOT verified: the feed, video, profile and live pages (www.kuaishou.com/brilliant timed out; the web app needs the app or login), desktop layout, logged-in state, comments, ads, counters. No rules target them."
+    "lastVerified": "2026-11-13",
+    "summary": "Hides app download prompts, Top up link, header menus, slogan, registration footer; blur or hide pictures, hide marketing sections",
+    "notes": "## Kuaishou recipe notes\n\nRe-checked 2026-11-13 (iPhone UA 390x844, logged out, headless Chromium): `https://m.kuaishou.com/` is still only the static brand landing page. **The real web app (`www.kuaishou.com/brilliant`, desktop UA) timed out again (about 50 s, no response), so feed, video, profile and live pages are NOT verified.** Nothing in the options touches those pages; adding rules for them would be guesswork.\n\n## LIVE (landing page)\n\n- First version, unchanged: `.com-download-bar` 1, `a.open-or-download-app-main` 1, `.cover .arrrow-wrapper` 1, `.open-in-browser-dialog` 1, `.open-app-confirm-dialog` 1 (both display:none until an app-open attempt), `.com-header li.nav.highlight` 1\n- New: `.title-pic .pic-wrapper` 3 and `.title-pic .pic-wrapper img.pic` 3 (screenshots), `.page-content .title-pic` 3 (headline blocks), `.cover img.slogan` 1, `.com-header .navs > li.nav:has(> a > span.triangle)` 2 (APP and About menus), `.com-icp` 1\n\n## Notes\n\n- The landing page is small and static; the new options exist for people who open Kuaishou links in the browser and want a quiet page. Header home link, the Download button (under \"app prompts\") and the ICP legal links are kept unless the matching option is on.\n- Community sources searched (greasyfork kuaishou.com scripts, uBlock/AdGuard lists) hold no cosmetic rules for m.kuaishou.com; all additions are LIVE-counted on the page above.\n"
   }
 }

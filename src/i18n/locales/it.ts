@@ -291,7 +291,7 @@ export const it: Messages = {
   "recipes.content": "Contenuti · mostrati finché non li nascondi",
   "recipes.groupAnnoyance": "Fastidio",
   "recipes.groupContent": "Contenuti",
-  "recipes.nothingHidden": "Nessun elemento nascosto",
+  "recipes.nothingHidden": "Attivi: {count} di {total}",
   "recipes.hiddenCount": "Nascosti: {count} di {total}",
   "recipes.options": "Opzioni di {name}",
   "recipes.addFavorite": "Aggiungi {name} ai preferiti",

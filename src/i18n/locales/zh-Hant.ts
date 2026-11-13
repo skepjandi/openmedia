@@ -270,7 +270,7 @@ export const zhHant: Messages = {
   "recipes.content": "內容 · 隱藏前都會顯示",
   "recipes.groupAnnoyance": "惱人的元素",
   "recipes.groupContent": "內容",
-  "recipes.nothingHidden": "沒有隱藏任何內容",
+  "recipes.nothingHidden": "已啟用：{total} 個中的 {count} 個",
   "recipes.hiddenCount": "已隱藏：{total} 個中的 {count} 個",
   "recipes.options": "{name} 選項",
   "recipes.addFavorite": "將 {name} 加入我的最愛",

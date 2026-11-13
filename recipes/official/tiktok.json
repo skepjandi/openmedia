@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "market.official.tiktok",
   "name": "TikTok",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "origin": "user",
   "tags": ["desktop", "mobile"],
   "match": ["https://*.tiktok.com/*"],
@@ -10,7 +10,7 @@
     {
       "id": "app-prompts",
       "label": "Hide \"open the app\" prompts",
-      "description": "The \"Get the full app experience\" and \"Watch this video on TikTok\" pop-ups, the Open app bars and buttons, and the \"Discover more\" button.",
+      "description": "The \"Get the full app experience\" and \"Watch this video on TikTok\" pop-ups, the Open app bars, the \"Discover more\" button and the desktop Get App button.",
       "group": "annoyance",
       "default": true
     },
@@ -18,6 +18,13 @@
       "id": "cookie-banner",
       "label": "Hide the cookie banner",
       "description": "TikTok's cookie notice at the bottom of the page. The site then keeps its default cookie settings.",
+      "group": "annoyance",
+      "default": true
+    },
+    {
+      "id": "screen-time",
+      "label": "Hide the screen time prompts",
+      "description": "TikTok's screen time and well-being sheets: the daily screen time notice, the break reminders and the close-TikTok prompt.",
       "group": "annoyance",
       "default": true
     },
@@ -38,35 +45,99 @@
     {
       "id": "counters",
       "label": "Hide like, comment and view counts",
-      "description": "Like, comment and share numbers, view counts on thumbnails, and follower, following and likes totals on profiles.",
+      "description": "Like, comment and share numbers, view counts on thumbnails, follower, following and likes totals on profiles, and the desktop favorite count.",
       "group": "content",
       "default": false
     },
     {
       "id": "sidebar-nav",
       "label": "Hide LIVE, Explore and Short dramas",
-      "description": "These entries in the left sidebar. For You, Following, Upload and Profile stay.",
+      "description": "The LIVE, Explore and Short dramas entries in the desktop sidebar.",
       "group": "content",
       "default": false
     },
     {
       "id": "sidebar-footer",
       "label": "Hide the sidebar footer",
-      "description": "The Company, Programme and Terms links under the sidebar.",
+      "description": "The links and copyright line at the bottom of the desktop sidebar.",
       "group": "content",
       "default": false
     },
     {
       "id": "for-you-feed",
       "label": "Hide the For You feed",
-      "description": "The endless video feed on the home page.",
+      "description": "The video column of the desktop For You page.",
       "group": "content",
       "default": false
     },
     {
       "id": "captions",
       "label": "Hide captions and hashtags",
-      "description": "The description text over and beside each video.",
+      "description": "The caption text over and beside each video, on the feed and on a video page. On the desktop site this also removes the hashtags in the same block.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "thumbnails",
+      "label": "Video thumbnails",
+      "description": "The cover pictures of the videos in the profile grid, the Discover list and the desktop profile.",
+      "group": "content",
+      "choices": [
+        { "id": "show", "label": "Show" },
+        { "id": "blur", "label": "Blur" },
+        { "id": "hide", "label": "Hide" }
+      ],
+      "default": "show"
+    },
+    {
+      "id": "avatars",
+      "label": "Profile pictures",
+      "description": "The profile picture on a profile page and the author's picture next to a video in the feed.",
+      "group": "content",
+      "choices": [
+        { "id": "show", "label": "Show" },
+        { "id": "blur", "label": "Blur" },
+        { "id": "hide", "label": "Hide" }
+      ],
+      "default": "show"
+    },
+    {
+      "id": "hashtags",
+      "label": "Hashtags in captions",
+      "description": "The hashtag links in the caption under a video: shown, faded, or gone.",
+      "group": "content",
+      "choices": [
+        { "id": "show", "label": "Show" },
+        { "id": "dim", "label": "Dim" },
+        { "id": "hide", "label": "Hide" }
+      ],
+      "default": "show"
+    },
+    {
+      "id": "music",
+      "label": "Hide the sound and music links",
+      "description": "The sound name under a video and the music disc in the feed, plus the music disc on the desktop player.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "follow-buttons",
+      "label": "Hide the follow buttons",
+      "description": "The small + badge on the author's picture in the feed and the Follow button next to the creator on the desktop site.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "suggested-accounts",
+      "label": "Hide the suggested accounts",
+      "description": "The Suggested accounts panel on a desktop profile and the popular creators row on the desktop Discover page.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "profile-tabs",
+      "label": "Hide the extra profile tabs",
+      "description": "The Liked, Playlist, Short dramas, Reposts and Favorites tabs of a profile. The Videos tab stays.",
       "group": "content",
       "default": false
     }
@@ -163,12 +234,30 @@
       }
     },
     {
+      "id": "desktop-get-app",
+      "label": "\"Get App\" button in the desktop sidebar",
+      "type": "hide",
+      "option": "app-prompts",
+      "target": {
+        "css": "[data-e2e=\"side-nav-utilities-get-app\"]"
+      }
+    },
+    {
       "id": "cookie-banner-element",
       "label": "Cookie banner",
       "type": "hide",
       "option": "cookie-banner",
       "target": {
         "css": "tiktok-cookie-banner"
+      }
+    },
+    {
+      "id": "screen-time-sheets",
+      "label": "Screen time and well-being sheets",
+      "type": "hide",
+      "option": "screen-time",
+      "target": {
+        "css": ".box-border:has(.tt-intro__container)"
       }
     },
     {
@@ -222,7 +311,7 @@
       "type": "hide",
       "option": "counters",
       "target": {
-        "css": "[data-e2e=\"play-side-like\"] span, [data-e2e=\"play-side-comment\"] span, [data-e2e=\"play-side-share\"] span"
+        "css": "[data-e2e=\"play-side-like\"] span, [data-e2e=\"play-side-comment\"] span, [data-e2e=\"share-count\"], [data-e2e=\"play-side-share\"] span"
       }
     },
     {
@@ -250,6 +339,15 @@
       "option": "counters",
       "target": {
         "css": "[data-e2e=\"video-views\"], [data-e2e=\"video-likes\"]"
+      }
+    },
+    {
+      "id": "desktop-favorite-count",
+      "label": "Favorite count on the desktop player",
+      "type": "hide",
+      "option": "counters",
+      "target": {
+        "css": "[data-e2e=\"favorite-count\"]"
       }
     },
     {
@@ -296,13 +394,163 @@
       "target": {
         "css": "[data-e2e=\"video-desc\"], [data-e2e=\"browse-video-desc\"]"
       }
+    },
+    {
+      "id": "feed-caption-text",
+      "label": "Caption text in the mobile feed",
+      "type": "hide",
+      "option": "captions",
+      "target": {
+        "css": "[class*=\"DivVideoCaption\"] [class*=\"DivOverflowContainer\"] > span, [class*=\"DivVideoCaption\"] [class*=\"DivBtnWrapper\"]"
+      }
+    },
+    {
+      "id": "thumbnail-blur",
+      "label": "Blur video thumbnails",
+      "type": "css",
+      "option": "thumbnails",
+      "choice": ["blur"],
+      "target": {
+        "css": "[data-e2e=\"video-item\"] img, [data-e2e=\"user-post-item\"] img"
+      },
+      "declarations": {
+        "filter": "blur(10px)"
+      }
+    },
+    {
+      "id": "thumbnail-hide",
+      "label": "Hide video thumbnails",
+      "type": "hide",
+      "option": "thumbnails",
+      "choice": ["hide"],
+      "target": {
+        "css": "[data-e2e=\"video-item\"] img, [data-e2e=\"user-post-item\"] img"
+      }
+    },
+    {
+      "id": "avatar-blur",
+      "label": "Blur profile pictures",
+      "type": "css",
+      "option": "avatars",
+      "choice": ["blur"],
+      "target": {
+        "css": "[data-e2e=\"user-avatar\"], [data-e2e=\"video-author-avatar\"], [data-e2e=\"play-side-author\"] img"
+      },
+      "declarations": {
+        "filter": "blur(8px)"
+      }
+    },
+    {
+      "id": "avatar-hide",
+      "label": "Hide profile pictures",
+      "type": "hide",
+      "option": "avatars",
+      "choice": ["hide"],
+      "target": {
+        "css": "[data-e2e=\"user-avatar\"], [data-e2e=\"video-author-avatar\"], [data-e2e=\"play-side-author\"] img"
+      }
+    },
+    {
+      "id": "hashtag-dim",
+      "label": "Dim hashtags in captions",
+      "type": "css",
+      "option": "hashtags",
+      "choice": ["dim"],
+      "target": {
+        "css": "[class*=\"DivVideoCaption\"] a[href^=\"/tag/\"], [data-e2e=\"video-desc\"] a[href^=\"/tag/\"]"
+      },
+      "declarations": {
+        "opacity": "0.35"
+      }
+    },
+    {
+      "id": "hashtag-hide",
+      "label": "Hide hashtags in captions",
+      "type": "hide",
+      "option": "hashtags",
+      "choice": ["hide"],
+      "target": {
+        "css": "[class*=\"DivVideoCaption\"] a[href^=\"/tag/\"], [data-e2e=\"video-desc\"] a[href^=\"/tag/\"]"
+      }
+    },
+    {
+      "id": "feed-music",
+      "label": "Sound name and music disc in the feed",
+      "type": "hide",
+      "option": "music",
+      "target": {
+        "css": "[data-e2e=\"music-name\"], [data-e2e=\"music-cover\"]"
+      }
+    },
+    {
+      "id": "desktop-music-disc",
+      "label": "Music disc on the desktop player",
+      "type": "hide",
+      "option": "music",
+      "target": {
+        "css": "[data-e2e=\"video-music\"]"
+      }
+    },
+    {
+      "id": "feed-follow-badge",
+      "label": "Follow + badge on the author's picture",
+      "type": "hide",
+      "option": "follow-buttons",
+      "target": {
+        "css": "[class*=\"DivFollowPlus\"]"
+      }
+    },
+    {
+      "id": "desktop-follow-button",
+      "label": "Follow button next to the creator",
+      "type": "hide",
+      "option": "follow-buttons",
+      "target": {
+        "css": "[data-e2e=\"cinema-video-info-follow\"]"
+      }
+    },
+    {
+      "id": "profile-suggested-accounts",
+      "label": "Suggested accounts panel on a desktop profile",
+      "type": "hide",
+      "option": "suggested-accounts",
+      "target": {
+        "css": "[class*=\"DivUserCardListContainer\"]"
+      }
+    },
+    {
+      "id": "discover-popular-creators",
+      "label": "Popular creators row on the desktop Discover page",
+      "type": "hide",
+      "option": "suggested-accounts",
+      "target": {
+        "css": "[class*=\"DivDiscoverUserCardSwiperContainer\"]"
+      }
+    },
+    {
+      "id": "mobile-profile-tabs",
+      "label": "Liked and Playlist tabs on a mobile profile",
+      "type": "hide",
+      "option": "profile-tabs",
+      "target": {
+        "css": "[data-e2e=\"playlist\"], [data-e2e=\"liked\"]"
+      }
+    },
+    {
+      "id": "desktop-profile-tabs",
+      "label": "Extra tabs on a desktop profile",
+      "type": "hide",
+      "option": "profile-tabs",
+      "target": {
+        "css": "[data-e2e=\"drama-tab\"], [data-e2e=\"repost-tab\"], [data-e2e=\"favorites-tab\"], [data-e2e=\"liked-tab\"]"
+      }
     }
   ],
   "meta": {
     "author": "OpenMedia",
     "homepage": "https://www.tiktok.com/",
-    "lastVerified": "2026-11-10",
-    "summary": "Hides \"open the app\" prompts, cookie banner, suggested videos, genre cards on Discover, like, comment and view counts",
-    "notes": "LIVE (logged out, headless Chromium, iPhone UA 390x844, 2026-11-08; www.tiktok.com serves the mobile web app, no region wall): / and /foryou (feed with 2 slides, swipe to move on), /discover, /@tiktok, /@tiktok/video/<id>, /search?q=test, /live. /explore redirects to /foryou. Match counts: header button div:has(> div > button[class*=CTAOpenApp])=1 on /; body > div:has(#login-modal)=1 (the 'Get the full app experience / Open TikTok / Not now' modal; present on first load and again after the first swipe, absent on some later loads, so it is session dependent; hiding it removes dim mask too, body overflow is already hidden by the app so no unlock rule); like/comment/share count spans=2 each (two slides); video page: top-banner-open wrapper=1, bottom-banner-open wrapper=1, bottom_banner section=1, play-side-* spans=1 each, recommend-list wrapper=1 (24 items under 'You may like'); the 'Watch this video on TikTok' bottom sheet (.launch-popup-sheet-host)=1 and its 'Continue on web' link=1 were seen on the first video load only (session dependent, not on later loads); profile: followers/following/likes stat blocks=1 each, video-views=24, in-flow 'Get the full app experience' cover under the grid=1 (it fades out the last row of thumbnails), fixed bottom-cta popup container=1 (in DOM, invisible when checked); discover: genre cards row=1, 'Selected by TikTok' heading=1, list=1 (4 items), float button 'Discover more'=1. Hidden element screenshots confirmed on the video page (all banners and the sheet gone, player and caption intact) and on the feed (modal and Open app pill gone, swipe still worked). SELECTOR CAVEAT: two rules use a readable styled-components name via [class*=] (CTAOpenApp, DivFloatButtonWrapper); TikTok has no data-* hook there and the hash part of the class is never matched. INFERRED: tiktok-cookie-banner is a custom element present on every page but empty from this region (host height 0, shadow root holds only an empty cookie-setting-modal), so the cookie rule is a best-effort hide of the element and was not seen covering content; EU banners were not observed. Left alone on purpose: search (logged out the results area stays blank), /live (a content catalogue; hiding live shelves would empty the page), hamburger menu (About/Careers links), Log in button, bottom tab bar, follow buttons. NOT verified: logged-in pages, comments (none rendered logged out), ads or sponsored items (none seen in the logged-out feed), notification prompts, TikTok Shop, desktop layout (a non-mobile UA gets a different app), timed pop-ups beyond ~60 s. DESKTOP (macOS Safari UA, logged out, live in the app, 2026-11-10): www.tiktok.com/foryou is a different layout (left sidebar, full-size player) that shares the data-e2e names of the counters. Matched on it: feed-counts, cookie-banner-element, nav-live, nav-explore-shortdrama, sidebar-footer-links, for-you-list and video-captions. Deep links (profiles, videos) answered with an empty bot-check page when loaded directly, so the profile rules were not re-checked on desktop."
+    "lastVerified": "2026-11-13",
+    "summary": "Hides app prompts, cookie banner and screen time sheets; blurs or hides thumbnails, avatars and hashtags; hides music and follows",
+    "notes": "LIVE (logged out, headless Chromium, iPhone UA 390x844 for the mobile web app and a macOS Safari UA 1440x900 for the desktop site, 2026-11-13; www.tiktok.com served the mobile app and the desktop app without a bot wall). Counts are querySelectorAll on the live DOM.\n\nMobile feed (/foryou): author avatars 2 ([data-e2e=\"video-author-avatar\"]), sound name 2 ([data-e2e=\"music-name\"]), music disc 2 ([data-e2e=\"music-cover\"]), follow + badges 2 ([class*=\"DivFollowPlus\"]), caption hashtag links 5-9 ([class*=\"DivVideoCaption\"] a[href^=\"/tag/\"]), caption text spans 7 ([class*=\"DivVideoCaption\"] [class*=\"DivOverflowContainer\"] > span), the caption \"more\" button 2 ([class*=\"DivVideoCaption\"] [class*=\"DivBtnWrapper\"]), like/comment/share counts 2 each, screen time sheets 3 (.box-border:has(.tt-intro__container), titles \"Screen time breaks\", \"To support your well-being, your daily screen time\", \"Ready to close TikTok?\"). The sheet and its dim backdrop sit inside the same .box-border, so one rule removes both.\n\nMobile /@tiktok: profile picture 1 ([data-e2e=\"user-avatar\"]), grid covers 24 ([data-e2e=\"video-item\"] img), Playlist and Liked tabs 1 each, Follow button 1, bio 1, link 1. Mobile /discover: grid covers 12. Mobile video page: author picture 2 ([data-e2e=\"play-side-author\"] img), recommendation covers 60.\n\nDesktop /foryou: Get App button 1 ([data-e2e=\"side-nav-utilities-get-app\"]), favorite count 1, Follow button next to the creator 1 ([data-e2e=\"cinema-video-info-follow\"]), creator picture 1, caption hashtag links 3-5 ([data-e2e=\"video-desc\"] a[href^=\"/tag/\"]). Desktop video page: music disc 2 ([data-e2e=\"video-music\"]). Desktop /@tiktok: Suggested accounts panel 1 ([class*=\"DivUserCardListContainer\"]), profile grid covers 32 when the grid renders ([data-e2e=\"user-post-item\"] img; later loads showed the empty-profile state), Videos/Short dramas/Reposts/Favorites/Liked tabs 1 each, profile picture 1. Desktop /discover: popular creators row 1 ([class*=\"DivDiscoverUserCardSwiperContainer\"]).\n\nSOURCE: JustZix \"TikTok: hide suggested accounts\" and \"TikTok: hide all engagement counts\" (the same blocks and counts), the tiktok-unhook extension (hides vanity metrics) and AdGuardFilters issue 235370 (TikTok nag pop-ups).\n\nNot verified: logged-in pages (comments, notifications, inbox, live studio, coins), the EU cookie banner, ads and sponsored items, TikTok Shop, the /live catalogue, and whether the screen time sheets are shown to every account (they were in the DOM but parked off-screen). The mobile fixtures are hand-written from the live DOM; the desktop ones are captured structures with text and personal data removed."
   }
 }

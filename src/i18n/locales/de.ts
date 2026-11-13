@@ -287,7 +287,7 @@ export const de: Messages = {
   "recipes.content": "Inhalte · angezeigt, bis du sie ausblendest",
   "recipes.groupAnnoyance": "Störung",
   "recipes.groupContent": "Inhalt",
-  "recipes.nothingHidden": "Nichts ausgeblendet",
+  "recipes.nothingHidden": "Aktiv: {count} von {total}",
   "recipes.hiddenCount": "Ausgeblendet: {count} von {total}",
   "recipes.options": "Optionen für {name}",
   "recipes.addFavorite": "{name} zu Favoriten hinzufügen",

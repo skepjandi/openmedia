@@ -283,7 +283,7 @@ export const id: Messages = {
   "recipes.content": "Konten · ditampilkan sampai Anda menyembunyikannya",
   "recipes.groupAnnoyance": "Gangguan",
   "recipes.groupContent": "Konten",
-  "recipes.nothingHidden": "Tidak ada yang disembunyikan",
+  "recipes.nothingHidden": "Aktif: {count} dari {total}",
   "recipes.hiddenCount": "Disembunyikan: {count} dari {total}",
   "recipes.options": "Opsi {name}",
   "recipes.addFavorite": "Tambahkan {name} ke favorit",

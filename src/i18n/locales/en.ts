@@ -289,7 +289,7 @@ export const en = {
   "recipes.content": "Content · shown until you hide it",
   "recipes.groupAnnoyance": "Annoyance",
   "recipes.groupContent": "Content",
-  "recipes.nothingHidden": "Nothing hidden",
+  "recipes.nothingHidden": "On: {count} of {total}",
   "recipes.hiddenCount": "Hidden: {count} of {total}",
   "recipes.options": "{name} options",
   "recipes.addFavorite": "Add {name} to favorites",

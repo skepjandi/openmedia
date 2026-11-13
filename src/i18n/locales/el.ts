@@ -295,7 +295,7 @@ export const el: Messages = {
   "recipes.content": "Περιεχόμενο · εμφανίζεται μέχρι να το κρύψετε",
   "recipes.groupAnnoyance": "Ενόχληση",
   "recipes.groupContent": "Περιεχόμενο",
-  "recipes.nothingHidden": "Δεν είναι τίποτα κρυφό",
+  "recipes.nothingHidden": "Ενεργά: {count} από {total}",
   "recipes.hiddenCount": "Κρυφά: {count} από {total}",
   "recipes.options": "Επιλογές {name}",
   "recipes.addFavorite": "Προσθήκη {name} στα αγαπημένα",

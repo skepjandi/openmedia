@@ -32,6 +32,7 @@ import {
   type AppState,
   type Favorite,
   type FavoriteInput,
+  type OptionValue,
   type SearchEngine,
   type SiteSettings,
   type SiteViewState,
@@ -178,7 +179,7 @@ export interface AppStore {
   loadSites: () => Promise<void>;
   /** Re-reads the favorites after Rust changed them on its own, as the guide's quick-access pick does. */
   reloadFavorites: () => Promise<void>;
-  setSiteOption: (recipeId: string, optionId: string, enabled: boolean) => Promise<void>;
+  setSiteOption: (recipeId: string, optionId: string, value: OptionValue) => Promise<void>;
   setBottomMargin: (pixels: number) => Promise<void>;
   /** `null` returns the site to the shared margin. */
   setSiteBottomMargin: (recipeId: string, pixels: number | null) => Promise<void>;
@@ -214,7 +215,7 @@ export interface AppStore {
   loadIncognitoFavorites: () => Promise<void>;
   saveIncognitoFavorites: (favorites: FavoriteInput[]) => Promise<boolean>;
   loadIncognitoSites: () => Promise<void>;
-  setIncognitoSiteOption: (recipeId: string, optionId: string, enabled: boolean) => Promise<void>;
+  setIncognitoSiteOption: (recipeId: string, optionId: string, value: OptionValue) => Promise<void>;
 }
 
 function updateSite(
@@ -225,12 +226,10 @@ function updateSite(
   return sites.map((site) => (site.recipeId === recipeId ? change(site) : site));
 }
 
-function withOption(site: SiteSettings, optionId: string, enabled: boolean): SiteSettings {
+function withOption(site: SiteSettings, optionId: string, value: OptionValue): SiteSettings {
   return {
     ...site,
-    options: site.options.map((option) =>
-      option.id === optionId ? { ...option, enabled } : option,
-    ),
+    options: site.options.map((option) => (option.id === optionId ? { ...option, value } : option)),
   };
 }
 
@@ -729,11 +728,11 @@ export const useApp = create<AppStore>((set, get) => {
       }
     },
 
-    setSiteOption: async (recipeId, optionId, enabled) => {
+    setSiteOption: async (recipeId, optionId, value) => {
       const before = get().sites;
-      set({ sites: updateSite(before, recipeId, (site) => withOption(site, optionId, enabled)) });
+      set({ sites: updateSite(before, recipeId, (site) => withOption(site, optionId, value)) });
       try {
-        await library.setSiteOption(recipeId, optionId, enabled, false);
+        await library.setSiteOption(recipeId, optionId, value, false);
       } catch (error) {
         set({ sites: before, error: appError(error) });
       }
@@ -988,13 +987,13 @@ export const useApp = create<AppStore>((set, get) => {
       }
     },
 
-    setIncognitoSiteOption: async (recipeId, optionId, enabled) => {
+    setIncognitoSiteOption: async (recipeId, optionId, value) => {
       const before = get().incognitoSites;
       set({
-        incognitoSites: updateSite(before, recipeId, (site) => withOption(site, optionId, enabled)),
+        incognitoSites: updateSite(before, recipeId, (site) => withOption(site, optionId, value)),
       });
       try {
-        await library.setSiteOption(recipeId, optionId, enabled, true);
+        await library.setSiteOption(recipeId, optionId, value, true);
       } catch (error) {
         set({ incognitoSites: before, error: appError(error) });
       }

@@ -296,7 +296,7 @@ export const fr: Messages = {
   "recipes.content": "Contenu · visible jusqu’à ce que vous le masquiez",
   "recipes.groupAnnoyance": "Élément gênant",
   "recipes.groupContent": "Contenu",
-  "recipes.nothingHidden": "Rien n’est masqué",
+  "recipes.nothingHidden": "Activés : {count} sur {total}",
   "recipes.hiddenCount": "Masqués : {count} sur {total}",
   "recipes.options": "Options de {name}",
   "recipes.addFavorite": "Ajouter {name} aux favoris",

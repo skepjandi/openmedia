@@ -291,7 +291,7 @@ export const uk: Messages = {
   "recipes.content": "Контент · показується, доки ви його не приховаєте",
   "recipes.groupAnnoyance": "Подразник",
   "recipes.groupContent": "Контент",
-  "recipes.nothingHidden": "Нічого не приховано",
+  "recipes.nothingHidden": "Увімкнено: {count} з {total}",
   "recipes.hiddenCount": "Приховано: {count} з {total}",
   "recipes.options": "Налаштування {name}",
   "recipes.addFavorite": "Додати {name} до обраного",

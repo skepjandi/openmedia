@@ -125,6 +125,77 @@
       "description": "The Join button on each post and community header.",
       "group": "content",
       "default": false
+    },
+    {
+      "id": "feed-media",
+      "label": "Feed images, videos and thumbnails",
+      "description": "Media under each post title in feeds. Blur keeps the layout; Hide leaves only the title. Post pages are not changed.",
+      "group": "content",
+      "choices": [
+        { "id": "show", "label": "Show" },
+        { "id": "blur", "label": "Blur" },
+        { "id": "hide", "label": "Hide" }
+      ],
+      "default": "show"
+    },
+    {
+      "id": "avatars",
+      "label": "Avatars and community icons",
+      "description": "The round community icon in post headers and the avatar beside each comment.",
+      "group": "content",
+      "choices": [
+        { "id": "show", "label": "Show" },
+        { "id": "blur", "label": "Blur" },
+        { "id": "hide", "label": "Hide" }
+      ],
+      "default": "show"
+    },
+    {
+      "id": "reply-depth",
+      "label": "Replies to comments",
+      "description": "Replies nested under a top-level comment. Dim fades them; Hide removes every reply and keeps the top-level comments.",
+      "group": "content",
+      "choices": [
+        { "id": "show", "label": "Show" },
+        { "id": "dim", "label": "Dim" },
+        { "id": "hide", "label": "Hide" }
+      ],
+      "default": "show"
+    },
+    {
+      "id": "post-flair",
+      "label": "Hide post flair",
+      "description": "The coloured flair tags under post titles.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "text-previews",
+      "label": "Hide text previews in feeds",
+      "description": "The first lines of a text post shown under its title in feeds. Post pages are not changed.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "timestamps",
+      "label": "Hide timestamps",
+      "description": "\"5 hr. ago\" on posts and comments.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "comment-actions",
+      "label": "Hide comment vote and reply rows",
+      "description": "The vote, reply, award and share row under each comment.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "subreddit-banner",
+      "label": "Hide the community banner",
+      "description": "The wide banner image at the top of a community page. The name and Join button stay.",
+      "group": "content",
+      "default": false
     }
   ],
   "rules": [
@@ -382,13 +453,145 @@
       "target": {
         "css": "shreddit-join-button"
       }
+    },
+    {
+      "id": "feed-media-blur",
+      "label": "Blur feed media",
+      "type": "css",
+      "option": "feed-media",
+      "choice": ["blur"],
+      "target": {
+        "css": "article shreddit-post [slot=\"post-media-container\"], article shreddit-post [slot=\"thumbnail\"]"
+      },
+      "declarations": {
+        "filter": "blur(18px)"
+      }
+    },
+    {
+      "id": "feed-media-hide",
+      "label": "Feed media",
+      "type": "hide",
+      "option": "feed-media",
+      "choice": ["hide"],
+      "target": {
+        "css": "article shreddit-post [slot=\"post-media-container\"], article shreddit-post [slot=\"thumbnail\"]"
+      }
+    },
+    {
+      "id": "avatars-blur",
+      "label": "Blur avatars and icons",
+      "type": "css",
+      "option": "avatars",
+      "choice": ["blur"],
+      "target": {
+        "css": "shreddit-post [slot=\"credit-bar\"] img, shreddit-comment [slot=\"commentAvatar\"]"
+      },
+      "declarations": {
+        "filter": "blur(6px)"
+      }
+    },
+    {
+      "id": "avatars-hide",
+      "label": "Avatars and icons",
+      "type": "hide",
+      "option": "avatars",
+      "choice": ["hide"],
+      "target": {
+        "css": "shreddit-post [slot=\"credit-bar\"] img, shreddit-comment [slot=\"commentAvatar\"]"
+      }
+    },
+    {
+      "id": "replies-dim",
+      "label": "Dim replies",
+      "type": "css",
+      "option": "reply-depth",
+      "choice": ["dim"],
+      "target": {
+        "css": "shreddit-comment[depth=\"1\"]"
+      },
+      "declarations": {
+        "opacity": "0.35"
+      }
+    },
+    {
+      "id": "replies-hide",
+      "label": "Replies",
+      "type": "hide",
+      "option": "reply-depth",
+      "choice": ["hide"],
+      "target": {
+        "css": "shreddit-comment[depth=\"1\"]"
+      }
+    },
+    {
+      "id": "flair-tags",
+      "label": "Post flair",
+      "type": "hide",
+      "option": "post-flair",
+      "target": {
+        "css": "shreddit-post-flair"
+      }
+    },
+    {
+      "id": "text-preview",
+      "label": "Text preview",
+      "type": "hide",
+      "option": "text-previews",
+      "target": {
+        "css": "article shreddit-post [slot=\"text-body\"]"
+      }
+    },
+    {
+      "id": "time-ago",
+      "label": "Timestamps",
+      "type": "hide",
+      "option": "timestamps",
+      "target": {
+        "css": "faceplate-timeago"
+      }
+    },
+    {
+      "id": "comment-action-rows",
+      "label": "Comment action row",
+      "type": "hide",
+      "option": "comment-actions",
+      "target": {
+        "css": "shreddit-comment [slot=\"actionRow\"]"
+      }
+    },
+    {
+      "id": "banner-image",
+      "label": "Community banner",
+      "type": "hide",
+      "option": "subreddit-banner",
+      "target": {
+        "css": "div:has(> #subreddit-banner-img)"
+      }
+    },
+    {
+      "id": "right-rail-related-posts",
+      "label": "Related posts in the right rail",
+      "type": "hide",
+      "option": "related-posts",
+      "target": {
+        "css": "reddit-pdp-right-rail-post"
+      }
+    },
+    {
+      "id": "related-community-slot",
+      "label": "Related community suggestion on post pages",
+      "type": "hide",
+      "option": "suggested-communities",
+      "target": {
+        "css": "[slot=\"related-community-recommendation\"]"
+      }
     }
   ],
   "meta": {
     "author": "OpenMedia",
     "homepage": "https://www.reddit.com/",
-    "lastVerified": "2026-11-10",
-    "summary": "Hides \"use the app\" prompts, Google sign-in prompt, ads, Advertise and Reddit Pro, video posts, suggested communities",
-    "notes": "Reddit serves iPhone user agents the shreddit web-component site on www.reddit.com (m., i. and bare reddit.com redirect there; old.reddit.com redirects to a login page when logged out). The DOM is chosen by user agent, not viewport. LIVE (logged out): open-app-button (#open-app-header-cta is the link, #xpromo-small-header the wrapper; no banner under the header was found), app-sheet (after about 28 s of scrolling a feed, div#configured-xpromo-mweb3x_feeds_blocking_xpromo_lo_page_fade appears under shreddit-app and body gets class rpl-scroll-lock; the experiment suffix changes, so only the id prefix is matched), ad-posts and ad-slots (shreddit-ad-post, each followed by an hr), advertise rows, video-articles (7 of 7 on a feed), community-cards (on /explore/), related-and-answers and comment-tree (on a post page; comments stayed after hiding the first). The old selector configured-xpromo-modal is only a template host and hiding it did nothing; .configured-xpromo also matches the 18+ gate on /r/nsfw/ (div#configured-xpromo-bypassable_xpromo_nsfw_bypassable), which must stay. unlock-scroll needs body.rpl-scroll-lock in the selector: the page sets .rpl-scroll-lock{overflow:hidden!important} on body, which beats a plain html, body rule on specificity (measured with wheel scrolling; with html set to auto the viewport scrolls). Not verified: google-one-tap's wrapper #credential_picker_container (the iframe was seen once, intermittent), ad-slots other than shreddit-comments-page-ad (SOURCE: Reddit UI Enhancer userscript dumps 2026-09/10), the menu rows' <li> hiding (links counted, rows not applied), the cookie banner (reddit-cookie-banner, SOURCE only; no consent banner appeared in a Sri Lanka session), the Chat button. CSS cannot reach the search overlay (shadow root of reddit-search-small) or rewrite the applink.reddit.com links that feed posts carry after the first navigation. There is no option for the sign-up sheet that appears when logged out and tapping Join, vote or comment: it carries the log-in link, so hiding it would remove the only way in from that sheet. DESKTOP (macOS Safari UA, signed in, live in the app, 2026-11-10): www.reddit.com serves the same shreddit components as on iPhone, so the feed rules need no twin; the desktop page adds a left sidebar and a right sidebar. Matched and hidden with every option on: advertise-button, right-rail-promotion, right-sidebar-container, chat-button, image-articles, image-dividers, crosspost-articles, crosspost-dividers. The left sidebar sections are matched by the name prefix of the faceplate-loader before them (the suffix is hashed): reddit-pro-section, games-card, recent-list, custom-feeds-section, communities-section and resources-section matched on the first load; the sidebar loads lazily and did not finish on later loads in a hidden window, so desktop-left-nav.html transcribes the child order seen then."
+    "lastVerified": "2026-11-13",
+    "summary": "Hides app prompts, ads, Google sign-in; blur or hide feed media and avatars, dim replies, flair, timestamps, sidebars",
+    "notes": "Reddit serves iPhone user agents the shreddit web-component site on www.reddit.com (m., i. and bare reddit.com redirect there; old.reddit.com redirects to a login page when logged out). The DOM is chosen by user agent, not viewport. LIVE (logged out): open-app-button (#open-app-header-cta is the link, #xpromo-small-header the wrapper; no banner under the header was found), app-sheet (after about 28 s of scrolling a feed, div#configured-xpromo-mweb3x_feeds_blocking_xpromo_lo_page_fade appears under shreddit-app and body gets class rpl-scroll-lock; the experiment suffix changes, so only the id prefix is matched), ad-posts and ad-slots (shreddit-ad-post, each followed by an hr), advertise rows, video-articles (7 of 7 on a feed), community-cards (on /explore/), related-and-answers and comment-tree (on a post page; comments stayed after hiding the first). The old selector configured-xpromo-modal is only a template host and hiding it did nothing; .configured-xpromo also matches the 18+ gate on /r/nsfw/ (div#configured-xpromo-bypassable_xpromo_nsfw_bypassable), which must stay. unlock-scroll needs body.rpl-scroll-lock in the selector: the page sets .rpl-scroll-lock{overflow:hidden!important} on body, which beats a plain html, body rule on specificity (measured with wheel scrolling; with html set to auto the viewport scrolls). Not verified: google-one-tap's wrapper #credential_picker_container (the iframe was seen once, intermittent), ad-slots other than shreddit-comments-page-ad (SOURCE: Reddit UI Enhancer userscript dumps 2026-09/10), the menu rows' <li> hiding (links counted, rows not applied), the cookie banner (reddit-cookie-banner, SOURCE only; no consent banner appeared in a Sri Lanka session), the Chat button. CSS cannot reach the search overlay (shadow root of reddit-search-small) or rewrite the applink.reddit.com links that feed posts carry after the first navigation. There is no option for the sign-up sheet that appears when logged out and tapping Join, vote or comment: it carries the log-in link, so hiding it would remove the only way in from that sheet. DESKTOP (macOS Safari UA, signed in, live in the app, 2026-11-10): www.reddit.com serves the same shreddit components as on iPhone, so the feed rules need no twin; the desktop page adds a left sidebar and a right sidebar. Matched and hidden with every option on: advertise-button, right-rail-promotion, right-sidebar-container, chat-button, image-articles, image-dividers, crosspost-articles, crosspost-dividers. The left sidebar sections are matched by the name prefix of the faceplate-loader before them (the suffix is hashed): reddit-pro-section, games-card, recent-list, custom-feeds-section, communities-section and resources-section matched on the first load; the sidebar loads lazily and did not finish on later loads in a hidden window, so desktop-left-nav.html transcribes the child order seen then.\n\n## Added 2026-11-13 (LIVE, logged out, headless Chrome, iPhone UA)\n\n- `feed-media`: `article shreddit-post [slot=\"post-media-container\"]` 18 on `/`, 28 on `/r/pics` (ad media excluded); `[slot=\"thumbnail\"]` 3 on `/`. The article prefix leaves post pages alone.\n- `avatars`: credit-bar `img` 36 on `/`; `[slot=\"commentAvatar\"]` 6 on a post.\n- `reply-depth`: `shreddit-comment[depth=\"1\"]` 2 of 6 comments; dim fades a reply and its replies once.\n- `post-flair` 28, `text-previews` 10, `timestamps` 33, `comment-actions` 9, `subreddit-banner` 1 (64 px).\n- `reddit-pdp-right-rail-post` 25 and `[slot=\"related-community-recommendation\"]` 1 on a post page, added to two existing options.\n- Impossible: feed vote and comment counts (shadow root of `shreddit-post`). Desktop UA hit a JS challenge, so desktop was not re-checked.\n"
   }
 }

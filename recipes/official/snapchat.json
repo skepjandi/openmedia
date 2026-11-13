@@ -69,6 +69,82 @@
       "description": "The Family Center banner on the home page.",
       "group": "content",
       "default": false
+    },
+    {
+      "id": "plus-promo",
+      "label": "Hide Snapchat+ promo",
+      "description": "The Snapchat+ subscription link in the desktop top bar.",
+      "group": "annoyance",
+      "default": true
+    },
+    {
+      "id": "business-links",
+      "label": "Hide business links",
+      "description": "The Advertisers, Creators and Developers links under the Download button on the home page.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "follower-count",
+      "label": "Hide follower count",
+      "description": "The \"1.5m followers\" line under a public profile name.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "related-tab",
+      "label": "Hide the Related tab",
+      "description": "The \"Related\" tab on public profiles (accounts Snapchat suggests next to this one).",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "media-style",
+      "label": "Thumbnails and videos",
+      "description": "How profile tiles and the Spotlight player picture appear: normal, dimmed or blurred.",
+      "group": "content",
+      "choices": [
+        { "id": "show", "label": "Show" },
+        { "id": "dim", "label": "Dim" },
+        { "id": "blur", "label": "Blur" }
+      ],
+      "default": "show"
+    },
+    {
+      "id": "avatars",
+      "label": "Profile pictures",
+      "description": "Profile pictures on public profiles and in search results.",
+      "group": "content",
+      "choices": [
+        { "id": "show", "label": "Show" },
+        { "id": "blur", "label": "Blur" },
+        { "id": "hide", "label": "Hide" }
+      ],
+      "default": "show"
+    },
+    {
+      "id": "spotlight-info",
+      "label": "Spotlight caption",
+      "description": "The creator name, caption and sound line over a Spotlight video.",
+      "group": "content",
+      "choices": [
+        { "id": "show", "label": "Show" },
+        { "id": "dim", "label": "Dim" },
+        { "id": "hide", "label": "Hide" }
+      ],
+      "default": "show"
+    },
+    {
+      "id": "spotlight-rail",
+      "label": "Spotlight buttons",
+      "description": "The Like, Recommend, Comment and Share column beside a Spotlight video.",
+      "group": "content",
+      "choices": [
+        { "id": "show", "label": "Show" },
+        { "id": "dim", "label": "Dim" },
+        { "id": "hide", "label": "Hide" }
+      ],
+      "default": "show"
     }
   ],
   "rules": [
@@ -242,13 +318,153 @@
       "target": {
         "css": "[data-testid=\"home-parents-banner\"]"
       }
+    },
+    {
+      "id": "nav-plus-item",
+      "label": "Snapchat+ item in the top bar",
+      "type": "hide",
+      "option": "plus-promo",
+      "target": {
+        "css": "li:has(> a[data-testid=\"navItem-PLUS\"])"
+      }
+    },
+    {
+      "id": "nav-download-button",
+      "label": "Download button in the desktop top bar",
+      "type": "hide",
+      "option": "app-bars",
+      "target": {
+        "css": "[data-testid=\"ConsumerNav_DownloadButton\"]"
+      }
+    },
+    {
+      "id": "home-persona-links",
+      "label": "Advertisers, Creators and Developers links",
+      "type": "hide",
+      "option": "business-links",
+      "target": {
+        "css": "nav:has(> [data-testid=\"home-advertisers-link\"])"
+      }
+    },
+    {
+      "id": "profile-followers",
+      "label": "Followers line on a profile",
+      "type": "hide",
+      "option": "follower-count",
+      "target": {
+        "css": "[data-testid=\"subscribersCountText\"]"
+      }
+    },
+    {
+      "id": "profile-related-tab",
+      "label": "Related tab on a profile",
+      "type": "hide",
+      "option": "related-tab",
+      "target": {
+        "css": "[role=\"tab\"]:has([data-testid=\"related-section-heading-wrapper\"])"
+      }
+    },
+    {
+      "id": "media-dim",
+      "label": "Dim tiles and Spotlight video",
+      "type": "css",
+      "option": "media-style",
+      "choice": ["dim"],
+      "target": {
+        "css": "[data-testid=\"content-tile\"] img, [data-testid=\"content-tile\"] div:has(> video), [data-testid=\"spotlight-player\"] div[role=\"region\"]"
+      },
+      "declarations": {
+        "opacity": "0.35"
+      }
+    },
+    {
+      "id": "media-blur",
+      "label": "Blur tiles and Spotlight video",
+      "type": "css",
+      "option": "media-style",
+      "choice": ["blur"],
+      "target": {
+        "css": "[data-testid=\"content-tile\"] img, [data-testid=\"content-tile\"] div:has(> video), [data-testid=\"spotlight-player\"] div[role=\"region\"]"
+      },
+      "declarations": {
+        "filter": "blur(14px)"
+      }
+    },
+    {
+      "id": "avatars-blur",
+      "label": "Blur profile pictures",
+      "type": "css",
+      "option": "avatars",
+      "choice": ["blur"],
+      "target": {
+        "css": "[data-testid=\"profilePicture\"]"
+      },
+      "declarations": {
+        "filter": "blur(8px)"
+      }
+    },
+    {
+      "id": "avatars-hide",
+      "label": "Profile pictures",
+      "type": "hide",
+      "option": "avatars",
+      "choice": ["hide"],
+      "target": {
+        "css": "[data-testid=\"profilePicture\"]"
+      }
+    },
+    {
+      "id": "spotlight-info-dim",
+      "label": "Dim Spotlight caption",
+      "type": "css",
+      "option": "spotlight-info",
+      "choice": ["dim"],
+      "target": {
+        "css": "[data-testid=\"spotlight-metadata\"], [data-testid=\"spotlight-sound\"]"
+      },
+      "declarations": {
+        "opacity": "0.35"
+      }
+    },
+    {
+      "id": "spotlight-info-hide",
+      "label": "Spotlight caption and sound",
+      "type": "hide",
+      "option": "spotlight-info",
+      "choice": ["hide"],
+      "target": {
+        "css": "[data-testid=\"spotlight-metadata\"], [data-testid=\"spotlight-sound\"]"
+      }
+    },
+    {
+      "id": "spotlight-rail-dim",
+      "label": "Dim Spotlight buttons",
+      "type": "css",
+      "option": "spotlight-rail",
+      "choice": ["dim"],
+      "target": {
+        "css": "[data-testid=\"spotlight-engagement-rail\"]"
+      },
+      "declarations": {
+        "opacity": "0.35"
+      }
+    },
+    {
+      "id": "spotlight-rail-hide",
+      "label": "Spotlight button column",
+      "type": "hide",
+      "option": "spotlight-rail",
+      "choice": ["hide"],
+      "target": {
+        "css": "[data-testid=\"spotlight-engagement-rail\"]"
+      }
     }
   ],
   "meta": {
     "author": "OpenMedia",
     "homepage": "https://www.snapchat.com/",
-    "lastVerified": "2026-11-10",
-    "summary": "Hides \"better on the app\" pop-up, Open Snapchat bars, home page download promo, Comment button, like, share and view counts",
-    "notes": "LIVE (headless Chromium, iPhone 390x844 UA, logged out, 2026-11-08). www.snapchat.com/: [data-testid=mobile-nav] a[class*=downloadButton]=1 (Open Snapchat), a[data-testid=home-install-link]=1, a[data-testid=home-hero-download]=1, [data-testid=home-mobile] div[class*=mobileSlides]=1, section[aria-labelledby=home-mobile-closing-heading]=1, [data-testid=home-explore]=1, [data-testid=mobile-tab-bar]=1, [data-testid=global-footer]=1 (footer links, aria-hidden content collapsed). Still the same after 30 s; no cookie banner, no role=dialog, mobile-cta-bottom-sheet is an empty aria-hidden placeholder, so no rule targets it. /spotlight redirects to a video at /@<user>/spotlight/<id> (scaffold, player, engagement rail): [data-testid=spotlight-engagement-rail] button:nth-of-type(3)=2 (Comment; slides active+next are rendered), span[class*=__count]=7 (Like/Recommend/Share numbers), top-bar Open Snapchat=1, tab bar=1. Public profile /@<user> (/add/<user> redirects there): [data-testid=mobileExpandedCtaBanner]=1 and -backdrop=1 (fixed, 'Snapchat is better on the app' sheet with Open in Snapchat / Continue), [data-testid=mobileCTAHeader]=1, [data-testid=mobile-nav-bottom]=1, div[class*=EndOfFeedPrompt_inlineContainer]=1 ('Get the full app experience'), [data-testid=content-tile] div[class*=CountCard_card]=24 for 12 tiles, div[class*=Footer_entertainmentBar]=1. /discover (Stories) and /topic show the same CTA header, sheet and tab bar. Class-substring anchors (`downloadButton`, `mobileSlides`, `__count`, `CountCard_card`, `EndOfFeedPrompt_inlineContainer`, `Footer_entertainmentBar`) match the stable CSS-module name before the hashed suffix; Snapchat rebuilds could rename them. Fixtures are hand-distilled from these pages. Left alone: video player, tile grid, profile Add button, search, hamburger menu, login on desktop nav. NOT verified: logged-in app; desktop layout (desktop nav Download/Snapchat Ads buttons, desktop footer visibility); Stories player pages beyond landing; /@snapchat showed 'content not found' so the official profile was not seen; the Spotlight page never showed a sign-in wall or timed pop-up in 30 s. DESKTOP (macOS Safari UA, logged out, live in the app, 2026-11-10): www.snapchat.com/ serves data-testid=desktop-nav and home-desktop beside the mobile ones; the footer, explore and mobile-nav rules still match. Matched: home-desktop-slides and home-parents. The Open Snapchat links that carry click.snapchat.com are in the mobile nav only."
+    "lastVerified": "2026-11-13",
+    "summary": "Hides app pop-ups and download promos; Show/Dim/Blur or Hide for tiles, videos, avatars, Spotlight captions and buttons",
+    "notes": "## 2026-11-13 additions (LIVE, headless Chrome via puppeteer, logged out)\nPages: `/` (iPhone UA 390x844 and macOS Safari UA 1280x800), `/@mrbeast` (both), `/spotlight` (redirects to `/@<user>/spotlight/<id>`, iPhone). Counts are `querySelectorAll` totals (visible):\n- `[data-testid=\"subscribersCountText\"]` 1 (1) profile mobile+desktop.\n- `[role=\"tab\"]:has([data-testid=\"related-section-heading-wrapper\"])` 1 (1); tabs are All, Stories, Spotlight, Related.\n- `li:has(> a[data-testid=\"navItem-PLUS\"])` 1 (visible only on desktop; 0 visible at 390px); `[data-testid=\"ConsumerNav_DownloadButton\"]` 1, same.\n- `nav:has(> [data-testid=\"home-advertisers-link\"])` 1 (1) on mobile home (Advertisers, Creators, Developers links).\n- `[data-testid=\"profilePicture\"]` 7 (4 visible: header avatar and search-result bubbles).\n- `[data-testid=\"content-tile\"] img, ... video` 18 (9 visible: 15 images and 3 videos); Spotlight `[data-testid=\"spotlight-player\"] video` 1. Blur is applied to the wrapper of a video (`div:has(> video)`, `div[role=\"region\"]`), not to the `<video>` itself: Chromium composites a video on its own layer and ignores a filter set on it (checked with a screenshot).\n- `spotlight-metadata` 2 and `spotlight-sound` 1; `spotlight-engagement-rail` 2 (active and next slide), all visible.\n## New options\n- **Choices:** Thumbnails and videos (Show/Dim/Blur), Profile pictures (Show/Blur/Hide), Spotlight caption and Spotlight buttons (Show/Dim/Hide). Dim is `opacity: 0.35`, Blur is `filter: blur(8px..14px)`.\n- **Toggles:** Snapchat+ promo (annoyance, on), business links, follower count, Related tab (content, off).\n- The desktop Download button joined **Hide Open Snapchat bars**.\n## Original check (LIVE, iPhone UA, 2026-11-08)\nHome, profile, `/discover`, `/topic`, Spotlight. No cookie banner, sign-in wall or timed pop-up in 30 s. `mobile-cta-bottom-sheet` on home is an empty aria-hidden placeholder, so no rule targets it. Comment button is the third button of the rail (position based). Class-substring anchors (`downloadButton`, `mobileSlides`, `__count`, `CountCard_card`, `EndOfFeedPrompt_inlineContainer`, `Footer_entertainmentBar`) use the CSS-module name before the hash and may be renamed by a rebuild. Desktop home (macOS UA, 2026-11-10): `home-desktop-slides` and `home-parents` match.\n## Not verified\n- Logged-in app, Stories player pages, `/@snapchat` (\"content not found\").\n- Tapping a blurred or dimmed tile still opens it; CSS cannot un-blur on tap.\n- Fixtures are distilled and hand-extended: profile.html gained the desktop nav, avatar, followers line, Related tab and tile image; spotlight.html the sound line; home.html the business links."
   }
 }

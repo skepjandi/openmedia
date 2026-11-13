@@ -1049,6 +1049,7 @@ mod tests {
                 id: format!("rule-{index}"),
                 label: format!("Rule {index}"),
                 option: None,
+                choice: None,
                 on: None,
                 target: crate::recipes::Target {
                     css: format!(".rule-{index}"),

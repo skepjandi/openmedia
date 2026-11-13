@@ -6,10 +6,12 @@ import { useIconForUrl } from "../../shared/siteIcons";
 import { isFavoriteSite, toggleSiteFavorite } from "../../shared/favorites";
 import { tabHost } from "../../shared/hubs";
 import { DownIcon, ForwardIcon, StarIcon } from "../../shared/icons";
-import type { Hub, OptionGroup, SiteSettings } from "../../shared/ipc";
+import { isActive, isChoiceOption } from "../../shared/options";
+import type { Hub, OptionGroup, OptionValue, SiteSettings } from "../../shared/ipc";
 import { SiteTile } from "../../shared/SiteTile";
 import { Screen } from "../../shared/Screen";
 import { GuideLink } from "../guides/GuideLink";
+import { ChoiceRow } from "./ChoiceRow";
 import { Switch } from "./Switch";
 import { ImportedNotice } from "../library/Links";
 import { Group, GroupLabel, quietButton } from "./ui";
@@ -25,10 +27,7 @@ export function RecipesLink() {
   const openSheet = useApp((s) => s.openSheet);
   const t = useT();
   const total = sites.reduce((sum, site) => sum + site.options.length, 0);
-  const hidden = sites.reduce(
-    (sum, site) => sum + site.options.filter((option) => option.enabled).length,
-    0,
-  );
+  const hidden = sites.reduce((sum, site) => sum + site.options.filter(isActive).length, 0);
 
   return (
     <Group>
@@ -98,7 +97,7 @@ export function SiteCard({ site, incognito = false }: { site: SiteSettings; inco
   const favorites = useApp((s) => s.state?.favorites);
   const setSiteFavorite = useApp((s) => s.setSiteFavorite);
   const icon = useIconForUrl(site.homepage ?? "", favorites ?? []);
-  const hidden = site.options.filter((option) => option.enabled).length;
+  const hidden = site.options.filter(isActive).length;
   const incognitoFavorites = useApp((s) => s.incognito.favorites);
   const saveIncognitoFavorites = useApp((s) => s.saveIncognitoFavorites);
   const t = useT();
@@ -179,7 +178,7 @@ function SiteOptions({ site }: { site: SiteSettings }) {
       )}
       <OptionGroups
         site={site}
-        onToggle={(optionId, enabled) => void setSiteOption(site.recipeId, optionId, enabled)}
+        onChange={(optionId, value) => void setSiteOption(site.recipeId, optionId, value)}
       />
     </div>
   );
@@ -228,21 +227,19 @@ function IncognitoSiteOptions({ site }: { site: SiteSettings }) {
       )}
       <OptionGroups
         site={site}
-        onToggle={(optionId, enabled) =>
-          void setIncognitoSiteOption(site.recipeId, optionId, enabled)
-        }
+        onChange={(optionId, value) => void setIncognitoSiteOption(site.recipeId, optionId, value)}
       />
     </div>
   );
 }
 
-/** The site's switches, annoyances first and then content. */
+/** The site's settings, annoyances first and then content: a switch or a row of states each. */
 function OptionGroups({
   site,
-  onToggle,
+  onChange,
 }: {
   site: SiteSettings;
-  onToggle: (optionId: string, enabled: boolean) => void;
+  onChange: (optionId: string, value: OptionValue) => void;
 }) {
   const t = useT();
 
@@ -253,15 +250,26 @@ function OptionGroups({
       <div key={group}>
         <GroupLabel>{t(title)}</GroupLabel>
         <Group>
-          {options.map((option) => (
-            <Switch
-              key={option.id}
-              label={option.label}
-              description={option.description}
-              checked={option.enabled}
-              onChange={(enabled) => onToggle(option.id, enabled)}
-            />
-          ))}
+          {options.map((option) =>
+            isChoiceOption(option) ? (
+              <ChoiceRow
+                key={option.id}
+                label={option.label}
+                description={option.description}
+                choices={option.choices}
+                value={String(option.value)}
+                onChange={(choice) => onChange(option.id, choice)}
+              />
+            ) : (
+              <Switch
+                key={option.id}
+                label={option.label}
+                description={option.description}
+                checked={option.value === true}
+                onChange={(enabled) => onChange(option.id, enabled)}
+              />
+            ),
+          )}
         </Group>
       </div>
     );

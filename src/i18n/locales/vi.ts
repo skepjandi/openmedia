@@ -286,7 +286,7 @@ export const vi: Messages = {
   "recipes.content": "Nội dung · hiện cho tới khi bạn ẩn",
   "recipes.groupAnnoyance": "Phiền nhiễu",
   "recipes.groupContent": "Nội dung",
-  "recipes.nothingHidden": "Không ẩn gì",
+  "recipes.nothingHidden": "Đã bật: {count}/{total}",
   "recipes.hiddenCount": "Đã ẩn: {count}/{total}",
   "recipes.options": "Tùy chọn của {name}",
   "recipes.addFavorite": "Thêm {name} vào yêu thích",

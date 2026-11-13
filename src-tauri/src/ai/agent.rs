@@ -22,7 +22,7 @@ use super::{
     snapshot::{self, Snapshot},
 };
 use crate::error::{Error, Result};
-use crate::recipes::{OptionGroup, Recipe, Rule, script_policy};
+use crate::recipes::{OptionGroup, OptionValue, Recipe, Rule, script_policy};
 
 const MAX_REQUEST_CHARS: usize = 500;
 const MAX_JOBS: usize = 8;
@@ -204,7 +204,7 @@ pub struct Job {
     pub provider: ProviderConfig,
     /// The recipe that already covers the page, if any.
     pub base: Option<Recipe>,
-    pub option_states: BTreeMap<String, bool>,
+    pub option_states: BTreeMap<String, OptionValue>,
     pub earlier: Vec<EarlierTurn>,
     pub snapshot: Snapshot,
     pub patch: Option<Patch>,
@@ -263,7 +263,7 @@ impl Agent {
 /// The recipe that already covers the page, found once the page's host is known.
 pub struct RecipeContext {
     pub base: Option<Recipe>,
-    pub option_states: BTreeMap<String, bool>,
+    pub option_states: BTreeMap<String, OptionValue>,
 }
 
 /// What `ai_prepare` needs to know that only the commands can look up.
@@ -358,21 +358,22 @@ fn selectors_and_css(patch: &Patch, base: Option<&Recipe>) -> (Vec<(String, Stri
                 .collect(),
             patch::preview_css(patch),
         ),
-        (Patch::ExistingOption { option_id, .. }, Some(recipe)) => (
+        (
+            Patch::ExistingOption {
+                option_id, choice, ..
+            },
+            Some(recipe),
+        ) => (
             recipe
                 .rules
                 .iter()
+                .filter(|rule| patch::rule_in(rule, option_id, choice.as_deref()))
                 .filter_map(|rule| match rule {
-                    Rule::Hide {
-                        label,
-                        option: Some(option),
-                        target,
-                        ..
-                    } if option == option_id => Some((label.clone(), target.css.clone())),
+                    Rule::Hide { label, target, .. } => Some((label.clone(), target.css.clone())),
                     _ => None,
                 })
                 .collect(),
-            patch::option_css(recipe, option_id),
+            patch::option_css(recipe, option_id, choice.as_deref()),
         ),
         (Patch::ExistingOption { .. }, None) => (Vec::new(), String::new()),
     }
@@ -609,10 +610,11 @@ pub fn reject(agent: &Agent, page: &impl Page, id: Uuid) {
 
 /// What accepting changes.
 pub enum Accepted {
-    /// Turn this existing option on.
+    /// Turn this existing switch on, or set this choice option to the chosen state.
     EnableOption {
         recipe_id: String,
         option_id: String,
+        value: OptionValue,
     },
     /// Save this recipe as a `custom.` recipe.
     SaveRecipe(Box<Recipe>),
@@ -627,7 +629,9 @@ pub fn accept(agent: &Agent, page: &impl Page, id: Uuid) -> Result<Accepted> {
         .as_ref()
         .ok_or_else(|| Error::Connection(MSG_NO_JOB.to_owned()))?;
     let accepted = match patch {
-        Patch::ExistingOption { option_id, .. } => {
+        Patch::ExistingOption {
+            option_id, choice, ..
+        } => {
             let recipe = job
                 .base
                 .as_ref()
@@ -635,6 +639,9 @@ pub fn accept(agent: &Agent, page: &impl Page, id: Uuid) -> Result<Accepted> {
             Accepted::EnableOption {
                 recipe_id: recipe.id.clone(),
                 option_id: option_id.clone(),
+                value: choice
+                    .clone()
+                    .map_or(OptionValue::Toggle(true), OptionValue::Choice),
             }
         }
         Patch::NewOption { .. } => Accepted::SaveRecipe(Box::new(patch::apply_patch(
@@ -801,7 +808,7 @@ mod tests {
             };
             assert_eq!(recipe.id, "custom.example.org");
             assert_eq!(recipe.options.len(), 1);
-            assert!(recipe.options[0].enabled_by_default);
+            assert_eq!(recipe.options[0].default_value, OptionValue::Toggle(true));
             assert!(agent.get(prepared.id).is_err(), "the job is gone");
         });
     }
@@ -965,9 +972,11 @@ mod tests {
                 Accepted::EnableOption {
                     recipe_id,
                     option_id,
+                    value,
                 } => {
                     assert_eq!(recipe_id, "market.official.youtube");
                     assert_eq!(option_id, option);
+                    assert_eq!(value, OptionValue::Toggle(true));
                 }
                 Accepted::SaveRecipe(_) => panic!("nothing to save"),
             }
