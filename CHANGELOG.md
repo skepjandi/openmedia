@@ -6,6 +6,16 @@ All notable changes to OpenMedia are documented here.
 >
 > **Wiki**: the [GitHub Wiki](https://github.com/skepjandi/openmedia/wiki) is the public-facing main wiki — architecture, recipe format, AI pipeline, security model, roadmap. Source-controlled editing surface is `docs/wiki/` in this repo; CI (`.github/workflows/sync-wiki.yml`) mirrors it to the GitHub Wiki on every merge to `main`. New single-PR changes belong here, not as new wiki pages.
 
+### feat(library): add Popular and New discovery shelves
+
+**Area:** `feat(library)`
+
+**Change:** The recipe library now surfaces *Popular* and *New* shelves for unadded recipes, with *See all* actions, a Discover filter section with live counts, popularity-ranked results, and a *New* badge. The editorial lists are bundled in `recipes/discover.json`; they are maintainer selections, not usage data. No telemetry or trending claims.
+
+**Verified:** Library, i18n and shared-icon tests, TypeScript, ESLint, Rust recipe tests (114). **Not verified:** visual behavior on device or simulator.
+
+**PR:** n/a
+
 ### feat(library): filter popup, status filter, faster list and 307 bundled icons
 
 **Area:** `feat(library)`

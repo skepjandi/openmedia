@@ -394,6 +394,12 @@ export const ta: Messages = {
   "library.tag.added": "Added",
   "library.tag.updatable": "Update available",
   "library.resultCount": "{count} recipes",
+  "library.filterKind.discover": "Discover",
+  "library.tag.popular": "Popular",
+  "library.tag.new": "New",
+  "library.seeAll": "See all",
+  "library.shelfNote":
+    "Popular is the maintainers' pick of widely used sites, not usage data: OpenMedia collects none.",
   "library.removeFilter": "Remove filter: {name}",
   "library.noMatch": "இந்த வடிகட்டிகளுக்குப் பொருந்துவது எதுவும் இல்லை.",
   "library.search": "ரெசிபிகளைத் தேடு",

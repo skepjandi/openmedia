@@ -388,6 +388,12 @@ export const ru: Messages = {
   "library.tag.added": "Added",
   "library.tag.updatable": "Update available",
   "library.resultCount": "{count} recipes",
+  "library.filterKind.discover": "Discover",
+  "library.tag.popular": "Popular",
+  "library.tag.new": "New",
+  "library.seeAll": "See all",
+  "library.shelfNote":
+    "Popular is the maintainers' pick of widely used sites, not usage data: OpenMedia collects none.",
   "library.removeFilter": "Remove filter: {name}",
   "library.noMatch": "Ничего не подходит под эти фильтры.",
   "library.search": "Поиск рецептов",

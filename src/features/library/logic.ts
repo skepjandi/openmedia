@@ -4,6 +4,7 @@ const ORIGIN_TAGS: readonly LibraryTag[] = ["official", "community"];
 const PLATFORM_TAGS: readonly LibraryTag[] = ["mobile", "desktop"];
 const HUB_TAGS: readonly LibraryTag[] = ["hub"];
 const STATUS_TAGS: readonly LibraryTag[] = ["notAdded", "added", "updatable"];
+const DISCOVER_TAGS: readonly LibraryTag[] = ["popular", "new"];
 
 /** The subject categories, in the order the filter dialog lists them. */
 export const CATEGORY_TAGS: readonly CategoryTag[] = [
@@ -36,6 +37,7 @@ export const FILTER_TAGS: readonly LibraryTag[] = [
 
 /** The filter dialog's sections: each kind widens within itself and narrows the others. */
 export const FILTER_KINDS = [
+  { id: "discover", tags: DISCOVER_TAGS },
   { id: "origin", tags: ORIGIN_TAGS },
   { id: "platform", tags: PLATFORM_TAGS },
   { id: "type", tags: HUB_TAGS },
@@ -128,11 +130,12 @@ export interface IndexedItem {
  * item's strings again, so typing in the search stays cheap with hundreds of recipes.
  */
 export function indexItems(items: readonly LibraryItem[]): IndexedItem[] {
-  const indexed = items.map((item) => ({
-    item,
-    tags: new Set([...item.tags, statusTag(item)]),
-    text: searchText(item),
-  }));
+  const indexed = items.map((item) => {
+    const tags = new Set([...item.tags, statusTag(item)]);
+    if (item.popularRank !== null) tags.add("popular");
+    if (item.isNew) tags.add("new");
+    return { item, tags, text: searchText(item) };
+  });
   const official = indexed.filter((entry) => entry.tags.has("official"));
   const others = indexed.filter((entry) => !entry.tags.has("official"));
   return [...official, ...others];
@@ -147,14 +150,38 @@ const passes = (
   matchesKinds((tag) => entry.tags.has(tag), filter, skip) &&
   words.every((word) => entry.text.includes(word));
 
-/** The indexed items the filter and the search let through, in index order. */
+/**
+ * The indexed items the filter and the search let through, in index order. With the popular chip
+ * on they come in the maintainers' popular order instead.
+ */
 export function visibleIndexed(
   index: readonly IndexedItem[],
   filter: ReadonlySet<LibraryTag>,
   query = "",
 ): IndexedItem[] {
   const words = searchWords(query);
-  return index.filter((entry) => passes(entry, filter, words));
+  const found = index.filter((entry) => passes(entry, filter, words));
+  return filter.has("popular") ? byPopularity(found) : found;
+}
+
+const byPopularity = (entries: readonly IndexedItem[]): IndexedItem[] =>
+  [...entries].sort(
+    (a, b) =>
+      (a.item.popularRank ?? Number.MAX_SAFE_INTEGER) -
+      (b.item.popularRank ?? Number.MAX_SAFE_INTEGER),
+  );
+
+/** How many recipes a discover shelf shows. */
+export const SHELF_SIZE = 10;
+
+/**
+ * The recipes for a discover shelf out of what the list shows: the popular ones in the
+ * maintainers' order, or the ones the latest release added. Recipes already on this device are
+ * left out, since a shelf is for finding something to add.
+ */
+export function shelfOf(shown: readonly IndexedItem[], tag: "popular" | "new"): IndexedItem[] {
+  const open = shown.filter((entry) => entry.tags.has(tag) && entry.tags.has("notAdded"));
+  return (tag === "popular" ? byPopularity(open) : open).slice(0, SHELF_SIZE);
 }
 
 /**

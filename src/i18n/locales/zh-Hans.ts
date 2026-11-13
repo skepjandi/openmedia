@@ -363,6 +363,12 @@ export const zhHans: Messages = {
   "library.tag.added": "Added",
   "library.tag.updatable": "Update available",
   "library.resultCount": "{count} recipes",
+  "library.filterKind.discover": "Discover",
+  "library.tag.popular": "Popular",
+  "library.tag.new": "New",
+  "library.seeAll": "See all",
+  "library.shelfNote":
+    "Popular is the maintainers' pick of widely used sites, not usage data: OpenMedia collects none.",
   "library.removeFilter": "Remove filter: {name}",
   "library.noMatch": "没有符合这些筛选条件的内容。",
   "library.search": "搜索配方",

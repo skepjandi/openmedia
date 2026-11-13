@@ -5,10 +5,10 @@
 
 use std::{
     collections::{HashMap, HashSet},
-    sync::OnceLock,
+    sync::{LazyLock, OnceLock},
 };
 
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 use super::Recipe;
 use super::share::{self, MARKET_PREFIX, Source};
@@ -48,6 +48,43 @@ const CATEGORIES_JSON: &str = include_str!("../../../recipes/categories.json");
 fn category_table() -> &'static HashMap<String, Vec<String>> {
     static TABLE: OnceLock<HashMap<String, Vec<String>>> = OnceLock::new();
     TABLE.get_or_init(|| serde_json::from_str(CATEGORIES_JSON).unwrap_or_default())
+}
+
+const DISCOVER_JSON: &str = include_str!("../../../recipes/discover.json");
+
+/// `recipes/discover.json` as written: an editorial popularity ranking and the recent additions
+/// worth showing.
+#[derive(Debug, Default, Deserialize)]
+struct DiscoverFile {
+    popular: Vec<String>,
+    new: Vec<String>,
+}
+
+struct DiscoverTable {
+    popular: HashMap<String, u32>,
+    new: HashSet<String>,
+}
+
+static DISCOVER: LazyLock<DiscoverTable> = LazyLock::new(|| {
+    let file: DiscoverFile = serde_json::from_str(DISCOVER_JSON).unwrap_or_default();
+    DiscoverTable {
+        popular: (0u32..)
+            .zip(file.popular)
+            .map(|(rank, id)| (id, rank))
+            .collect(),
+        new: file.new.into_iter().collect(),
+    }
+});
+
+/// Where a recipe stands in the editorial popular list, 0 for the first. The list is chosen by the
+/// maintainers from how widely each site is used; the app collects no usage data to rank it.
+pub fn popular_rank(id: &str) -> Option<u32> {
+    DISCOVER.popular.get(id).copied()
+}
+
+/// True when the maintainers list the recipe as a recent addition worth a look.
+pub fn is_new(id: &str) -> bool {
+    DISCOVER.new.contains(id)
 }
 
 const MAX_SEARCH_RESULTS: usize = 8;
@@ -462,6 +499,26 @@ mod tests {
     fn categories_sit_between_the_platforms_and_the_channel() {
         let tags = find("market.official.youtube-music").unwrap().tags();
         assert_eq!(tags, ["desktop", "mobile", "music", "official"]);
+    }
+
+    #[test]
+    fn discover_lists_only_real_recipes_without_repeats() {
+        let file: DiscoverFile = serde_json::from_str(DISCOVER_JSON).expect("discover.json parses");
+        let unique_popular: HashSet<_> = file.popular.iter().collect();
+        assert_eq!(unique_popular.len(), file.popular.len());
+        let unique_new: HashSet<_> = file.new.iter().collect();
+        assert_eq!(unique_new.len(), file.new.len());
+        assert!(file.popular.len() <= 60, "a popular shelf is a short list");
+        for id in file.popular.iter().chain(&file.new) {
+            assert!(
+                find(id).is_some(),
+                "discover.json names unknown recipe {id}"
+            );
+        }
+        assert_eq!(popular_rank("market.official.youtube"), Some(0));
+        assert_eq!(popular_rank("market.official.messages-hub"), None);
+        assert!(is_new("market.official.perplexity"));
+        assert!(!is_new("market.official.instagram"));
     }
 
     #[test]

@@ -6,6 +6,7 @@ import { FILTER_KINDS, facetCounts, type IndexedItem, visibleIndexed } from "./l
 import { TAG_LABELS } from "./tagLabels";
 
 const KIND_LABELS: Record<(typeof FILTER_KINDS)[number]["id"], MessageKey> = {
+  discover: "library.filterKind.discover",
   origin: "library.filterKind.origin",
   platform: "library.filterKind.platform",
   type: "library.filterKind.type",

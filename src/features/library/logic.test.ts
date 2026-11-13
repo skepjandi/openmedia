@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { LibraryItem } from "./ipc";
+import type { LibraryItem, LibraryTag } from "./ipc";
 import {
   activeTags,
   backTarget,
@@ -14,6 +14,8 @@ import {
   toggleTag,
   visibleIndexed,
   visibleItems,
+  SHELF_SIZE,
+  shelfOf,
 } from "./logic";
 
 const item = (id: string, tags: string[]): LibraryItem => ({
@@ -27,6 +29,52 @@ const item = (id: string, tags: string[]): LibraryItem => ({
   updateAvailable: false,
   tags,
   homepage: null,
+  popularRank: null,
+  isNew: false,
+});
+
+describe("discover", () => {
+  const items = [
+    { ...item("c", ["official", "mobile"]), popularRank: 2 },
+    item("plain", ["official", "mobile"]),
+    { ...item("a", ["official", "mobile"]), popularRank: 0, isNew: true },
+    { ...item("b", ["official", "mobile"]), popularRank: 1, installedVersion: "1.0.0" },
+    { ...item("fresh", ["official", "mobile"]), isNew: true },
+    { ...item("other", ["community", "mobile"]), popularRank: 3 },
+  ];
+  const index = indexItems(items);
+  const on = (...tags: LibraryTag[]): ReadonlySet<LibraryTag> => new Set(tags);
+
+  it("filters by the maintainers' popular list and the latest release", () => {
+    const ids = (tags: ReadonlySet<LibraryTag>) =>
+      visibleIndexed(index, tags).map(({ item: entry }) => entry.id);
+    expect(ids(on("new"))).toEqual(["a", "fresh"]);
+    expect(ids(on("popular", "official")).sort()).toEqual(["a", "b", "c"]);
+  });
+
+  it("lists popular recipes in the popular order, not the library's", () => {
+    const order = visibleIndexed(index, on("popular")).map(({ item: entry }) => entry.id);
+    expect(order).toEqual(["a", "b", "c", "other"]);
+  });
+
+  it("builds shelves from what is not added yet, popular first and capped", () => {
+    const shown = visibleIndexed(index, on("official"));
+    expect(shelfOf(shown, "popular").map(({ item: entry }) => entry.id)).toEqual(["a", "c"]);
+    expect(shelfOf(shown, "new").map(({ item: entry }) => entry.id)).toEqual(["a", "fresh"]);
+    const many = indexItems(
+      Array.from({ length: SHELF_SIZE + 5 }, (_, rank) => ({
+        ...item(`r${rank}`, ["official"]),
+        popularRank: rank,
+      })),
+    );
+    expect(shelfOf(many, "popular")).toHaveLength(SHELF_SIZE);
+  });
+
+  it("counts the discover chips like any other", () => {
+    const counts = facetCounts(index, on("official"));
+    expect(counts.get("popular")).toBe(3);
+    expect(counts.get("new")).toBe(2);
+  });
 });
 
 describe("status filter", () => {

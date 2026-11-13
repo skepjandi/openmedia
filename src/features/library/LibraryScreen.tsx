@@ -33,7 +33,9 @@ import {
   knownTags,
   platformTag,
   toggleTag,
+  shelfOf,
   visibleIndexed,
+  type IndexedItem,
   type LibraryView,
 } from "./logic";
 import { FilterDialog } from "./FilterDialog";
@@ -171,6 +173,18 @@ function ListView({
     [shown, rows],
   );
   const active = activeTags(filter);
+  // Shelves are for browsing: they give way to a search, and to the popular or new chip, whose list
+  // is the same recipes in full.
+  const browsing = !deferredQuery.trim() && !filter.has("popular") && !filter.has("new");
+  const shelves = useMemo(
+    () =>
+      browsing
+        ? (["popular", "new"] as const)
+            .map((tag) => ({ tag, entries: shelfOf(shown, tag) }))
+            .filter(({ entries }) => entries.length > 0)
+        : [],
+    [shown, browsing],
+  );
 
   return (
     <div className="flex flex-col gap-4">
@@ -252,6 +266,15 @@ function ListView({
           {t(deferredQuery.trim() ? "library.searchNone" : "library.noMatch")}
         </p>
       )}
+      {shelves.map(({ tag, entries }) => (
+        <Shelf
+          key={tag}
+          tag={tag}
+          entries={entries}
+          onOpen={onOpen}
+          onSeeAll={() => onToggleTag(tag)}
+        />
+      ))}
       {shown.length > 0 && (
         <>
           <p className="px-1 text-xs text-paper/50" aria-live="polite">
@@ -292,6 +315,56 @@ function EndOfPage({ onReach }: { onReach: () => void }) {
 
   return <div ref={marker} aria-hidden="true" className="h-px" />;
 }
+
+interface ShelfProps {
+  tag: "popular" | "new";
+  entries: readonly IndexedItem[];
+  onOpen: (item: LibraryItem) => void;
+  onSeeAll: () => void;
+}
+
+/** A row of recipes to find something new: the popular ones, or what the latest release added. */
+function Shelf({ tag, entries, onOpen, onSeeAll }: ShelfProps) {
+  const t = useT();
+  return (
+    <section aria-label={t(TAG_LABELS[tag])} className="flex flex-col gap-2">
+      <div className="flex items-baseline justify-between px-1">
+        <h3 className="text-xs tracking-[0.15em] text-paper/50 uppercase">{t(TAG_LABELS[tag])}</h3>
+        <button type="button" onClick={onSeeAll} className="text-sm text-accent">
+          {t("library.seeAll")}
+        </button>
+      </div>
+      {tag === "popular" && <p className="px-1 text-xs text-paper/45">{t("library.shelfNote")}</p>}
+      <div className="chip-row -mx-4 flex gap-3 overflow-x-auto px-4">
+        {entries.map(({ item }) => (
+          <ShelfCard key={item.id} item={item} onOpen={onOpen} />
+        ))}
+      </div>
+    </section>
+  );
+}
+
+const ShelfCard = memo(function ShelfCard({
+  item,
+  onOpen,
+}: {
+  item: LibraryItem;
+  onOpen: (item: LibraryItem) => void;
+}) {
+  const iconUrl = item.hosts.map(faviconPageUrlForHost).find(Boolean);
+  const fetched = useIconForUrl(iconUrl ?? "", []);
+  const icon = bundledIconForHosts([item.homepage, ...item.hosts]) ?? fetched;
+  return (
+    <button
+      type="button"
+      onClick={() => onOpen(item)}
+      className="flex w-20 shrink-0 flex-col items-center gap-1.5 text-center active:opacity-70"
+    >
+      <SiteTile name={item.name} icon={icon} />
+      <span className="w-full truncate text-xs text-paper/80">{item.name}</span>
+    </button>
+  );
+});
 
 const ItemRow = memo(function ItemRow({
   item,
@@ -347,6 +420,11 @@ const ItemRow = memo(function ItemRow({
           </span>
         )}
         <span className="mt-1.5 flex flex-wrap items-center gap-1.5">
+          {item.isNew && (
+            <span className="rounded-full border border-accent px-2 py-0.5 text-xs text-accent">
+              {t(TAG_LABELS.new)}
+            </span>
+          )}
           <TagBadges tags={item.tags} />
         </span>
       </span>

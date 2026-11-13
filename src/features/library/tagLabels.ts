@@ -10,6 +10,8 @@ export const TAG_LABELS: Record<LibraryTag, MessageKey> = {
   notAdded: "library.tag.notAdded",
   added: "library.tag.added",
   updatable: "library.tag.updatable",
+  popular: "library.tag.popular",
+  new: "library.tag.new",
   ai: "library.tag.ai",
   archive: "library.tag.archive",
   education: "library.tag.education",

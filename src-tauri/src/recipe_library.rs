@@ -29,6 +29,10 @@ pub struct LibraryItem {
     /// Platform tags, `official` or `community`, and `hub` when the recipe has launcher tabs.
     pub tags: Vec<String>,
     pub homepage: Option<String>,
+    /// Place in the editorial popular list, 0 for the first; none when it is not on the list.
+    pub popular_rank: Option<u32>,
+    /// True for the recipes the latest release added.
+    pub is_new: bool,
     pub installed_version: Option<String>,
     pub update_available: bool,
 }
@@ -76,6 +80,8 @@ fn item_of(bundled: &Bundled, installed_version: Option<String>) -> LibraryItem 
         hosts: bundled.hosts(),
         tags: bundled.tags(),
         homepage: recipe.homepage().map(str::to_owned),
+        popular_rank: bundled::popular_rank(&recipe.id),
+        is_new: bundled::is_new(&recipe.id),
         update_available: installed_version
             .as_deref()
             .is_some_and(|installed| is_newer(&recipe.version, installed)),

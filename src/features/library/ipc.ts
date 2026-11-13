@@ -64,8 +64,9 @@ export type CategoryTag =
 
 /**
  * Platform and origin tags are joined by subject categories and the optional hub listing tag. The
- * status tags (`notAdded`, `added`, `updatable`) are never sent by Rust: the shell derives them
- * from what is installed.
+ * status tags (`notAdded`, `added`, `updatable`) and the discover tags (`popular`, `new`) are never
+ * sent as tags by Rust: the shell derives them from what is installed and from `popularRank` and
+ * `isNew`.
  */
 export type LibraryTag =
   | "official"
@@ -76,6 +77,8 @@ export type LibraryTag =
   | "notAdded"
   | "added"
   | "updatable"
+  | "popular"
+  | "new"
   | CategoryTag;
 
 /** One bundled recipe, as the library lists it. */
@@ -89,6 +92,10 @@ export interface LibraryItem {
   /** Platform tags, subject categories, one origin tag, and `hub` for hub recipes. Unknown tags are ignored by the shell. */
   tags: string[];
   homepage: string | null;
+  /** Place in the maintainers' popular list, 0 for the first; null when it is not on the list. */
+  popularRank: number | null;
+  /** True for the recipes the latest release added. */
+  isNew: boolean;
   installedVersion: string | null;
   updateAvailable: boolean;
 }
