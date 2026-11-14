@@ -125,12 +125,32 @@ export function scopeCovers(scope: string, url: string): boolean {
   return host !== null && (host === scope || host.endsWith(`.${scope}`));
 }
 
+const GENERIC_HOST_PREFIX = /^(www|m|mobile)\./;
+
+/** The host without a generic prefix, so `www.` and `m.` are the same place but `music.` is not. */
+function placeOf(url: string): string | null {
+  const host = hostOf(url);
+  return host === null ? null : host.replace(GENERIC_HOST_PREFIX, "");
+}
+
+/** True when the session was opened on, or is showing, the same place as `url`. */
+function onSamePlace(session: Session, url: string): boolean {
+  const place = placeOf(url);
+  return (
+    place !== null &&
+    (placeOf(session.openedUrl) === place ||
+      (session.url !== null && placeOf(session.url) === place))
+  );
+}
+
 /**
  * The live session a favorite should switch to instead of opening again: one on the favorite's
- * site, preferring sessions that came from a favorite and then the most recently used. A session
- * whose domain is not known yet matches only the exact address it was opened with. Hub pages
- * are sessions of their own: a favorite never switches to one (Instagram must not open the
- * Messages Hub's inbox), and a page of a hub (`hubId`) switches only to a session of that same hub.
+ * site, preferring sessions that came from a favorite and then the most recently used. Sites that
+ * share a domain but live on their own subdomain (`music.` against `www.`) are not the same
+ * favorite; only `www.`/`m.` variants are. A session whose domain is not known yet matches only
+ * the exact address it was opened with. Hub pages are sessions of their own: a favorite never
+ * switches to one (Instagram must not open the Messages Hub's inbox), and a page of a hub
+ * (`hubId`) switches only to a session of that same hub.
  */
 export function findFavoriteSession(
   sessions: Session[],
@@ -139,7 +159,11 @@ export function findFavoriteSession(
 ): Session | undefined {
   return sessions
     .filter((s) => s.hubId === hubId)
-    .filter((s) => (s.scope ? scopeCovers(s.scope, favoriteUrl) : s.openedUrl === favoriteUrl))
+    .filter((s) =>
+      s.scope
+        ? scopeCovers(s.scope, favoriteUrl) && onSamePlace(s, favoriteUrl)
+        : s.openedUrl === favoriteUrl,
+    )
     .sort(
       (a, b) =>
         Number(b.source === "favorite") - Number(a.source === "favorite") ||

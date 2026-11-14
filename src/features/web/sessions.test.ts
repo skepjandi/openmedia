@@ -18,7 +18,8 @@ import {
 const NOW = 10_000_000;
 
 function session(id: string, source: SessionSource, overrides: Partial<Session> = {}): Session {
-  return { ...newSession(id, source, `https://${id}.example/`, NOW), ...overrides };
+  const openedUrl = overrides.scope ? `https://${overrides.scope}/` : `https://${id}.example/`;
+  return { ...newSession(id, source, openedUrl, NOW), ...overrides };
 }
 
 describe("scopeCovers", () => {
@@ -56,6 +57,22 @@ describe("findFavoriteSession", () => {
   it("does not match another site", () => {
     const other = session("a", "favorite", { scope: "reddit.com" });
     expect(findFavoriteSession([other], "https://m.youtube.com/")).toBeUndefined();
+  });
+
+  it("keeps sites on their own subdomain apart from the main site", () => {
+    const main = session("a", "favorite", {
+      scope: "youtube.com",
+      openedUrl: "https://www.youtube.com/",
+      url: "https://www.youtube.com/watch?v=1",
+    });
+    const music = session("b", "favorite", {
+      scope: "youtube.com",
+      openedUrl: "https://music.youtube.com/",
+    });
+    expect(findFavoriteSession([main], "https://music.youtube.com/")).toBeUndefined();
+    expect(findFavoriteSession([music], "https://www.youtube.com/")).toBeUndefined();
+    expect(findFavoriteSession([main, music], "https://music.youtube.com/")).toBe(music);
+    expect(findFavoriteSession([main, music], "https://m.youtube.com/")).toBe(main);
   });
 
   it("keeps a hub page and a favorite on the same site apart", () => {
@@ -287,7 +304,12 @@ describe("a hub's quick-access favorite", () => {
       hub: { tabs: [{ label: "WhatsApp", url: "https://web.whatsapp.com/" }] },
     },
   ];
-  const inbox = () => session("inbox", "hub", { scope: "whatsapp.com", hubId: "messages" });
+  const inbox = () =>
+    session("inbox", "hub", {
+      scope: "whatsapp.com",
+      openedUrl: "https://web.whatsapp.com/",
+      hubId: "messages",
+    });
   const favorites = [{ url: "https://web.whatsapp.com/" }];
 
   it("finds the hub session, not a plain page of the same site", () => {

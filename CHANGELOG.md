@@ -16,6 +16,18 @@ All notable changes to OpenMedia are documented here.
 
 **PR:** n/a
 
+### fix(sessions): a subdomain favorite no longer opens the main site's session
+
+**Area:** `fix(sessions)`
+
+**Problem:** With YouTube as a quick action and open, tapping YouTube Music switched to the YouTube session, because both share the registrable domain `youtube.com`.
+
+**Change:** A favorite now reuses a live session only when it was opened on, or shows, the same host, ignoring a leading `www.`, `m.` or `mobile.`. Other subdomains such as `music.` get their own session.
+
+**Verified:** Vitest (new case in `sessions.test.ts`), `tsc`. **Not verified:** on a device.
+
+**PR:** n/a
+
 ### feat(store): panoramic App Store and Google Play artwork
 
 **Area:** `feat(store)`
