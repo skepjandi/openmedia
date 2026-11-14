@@ -27,6 +27,7 @@
   var LETTERBOX_SHARE = 0.15; // a wide clip covers less, but it is the video if it is on screen
   var LETTERBOX_VISIBLE = 0.6; // of its own box, which then has to be on screen
   var GESTURE_MS = 900; // a pause this soon after a tap or key is the reader's
+  var SETTLED_MS = 600; // a video must have played this long before a pause can be the reader's
   var TAP_SLOP = 10; // px a finger may move and still be a tap, not a swipe
   var ATTEMPT_GAP_MS = 300;
   var MAX_ATTEMPTS = 8;
@@ -42,6 +43,7 @@
     var ownPauses = new WeakSet();
     var attempts = new WeakMap();
     var progress = new WeakMap();
+    var playingSince = new WeakMap();
     var lastTap = 0;
     var touchStart = null;
     var timer = 0;
@@ -99,7 +101,7 @@
     }
 
     // How much of the viewport this video covers. A feed can park a video that is not playing far
-    // off screen (YouTube Shorts leaves it thousands of pixels up until it plays), so that its box
+    // off screen (YouTube Shorts leaves it thousands of pixels up and left until it plays), so its box
     // says nothing: its own wrapper, when that is about screen sized, says where it belongs.
     function cover(video) {
       var covered = boxCover(video.getBoundingClientRect());
@@ -108,7 +110,15 @@
       if (!wrapper) return covered;
       var box = wrapper.getBoundingClientRect();
       var height = window.innerHeight || document.documentElement.clientHeight;
-      return box.height <= height * WRAPPER_MAX ? boxCover(box) : covered;
+      var width = window.innerWidth || document.documentElement.clientWidth;
+      if (box.height > height * WRAPPER_MAX || box.width > width * WRAPPER_MAX) return covered;
+      return boxCover(box.right <= 0 || box.left >= width ? shiftedOnScreen(box) : box);
+    }
+
+    // YouTube parks a paused video far to the left (-9999 px) as well as above the screen; its
+    // wrapper keeps the place the video belongs in, so only the sideways park is undone.
+    function shiftedOnScreen(box) {
+      return { top: box.top, bottom: box.bottom, height: box.height, width: box.width, left: 0, right: box.width };
     }
 
     function share(video) {
@@ -174,7 +184,8 @@
         // Sound needs a gesture when the engine says so, a muted video does not. Any other
         // refusal (a source swap aborting the call, say) is retried by the next settle. The
         // page's own mute button stays the reader's way to bring the sound back.
-        if (!error || error.name !== 'NotAllowedError' || video.muted || video !== current) return;
+        if (!error || error.name !== 'NotAllowedError' || video !== current) return;
+        // A muted video is refused too in low power mode: native play is the way out then.
         if (!askNative()) mutedPlay(video);
       });
     }
@@ -290,16 +301,27 @@
       track(video);
       userPaused.delete(video);
     }, true);
+    // A site pauses and restarts its own video while it loads or after a tap on its tab bar; a
+    // pause only counts as the reader's once the video has really been playing.
+    on(document, 'playing', function (event) {
+      if (event.target instanceof HTMLVideoElement) playingSince.set(event.target, Date.now());
+    }, true);
     on(document, 'pause', function (event) {
       var video = event.target;
       if (!(video instanceof HTMLVideoElement)) return;
       if (ownPauses.has(video)) { ownPauses.delete(video); return; }
       if (window.__openmediaHold) return;
-      if (Date.now() - lastTap < GESTURE_MS && onScreen(video)) userPaused.add(video);
+      var since = playingSince.get(video);
+      playingSince.delete(video);
+      var settled = since !== undefined && Date.now() - since >= SETTLED_MS;
+      if (settled && Date.now() - lastTap < GESTURE_MS && onScreen(video)) userPaused.add(video);
       else if (video === current) schedule();
     }, true);
 
+    // Outside a feed (Instagram's home feed, say) the page mutates constantly and nothing here
+    // is needed: videos reach `track` through their own events, so a mutation costs nothing.
     var observer = new MutationObserver(function (records) {
+      if (!inFeed()) return;
       for (var record of records) record.addedNodes.forEach(scan);
     });
     function start() {

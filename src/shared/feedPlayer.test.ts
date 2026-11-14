@@ -65,6 +65,8 @@ interface Page {
   settle: (advanceMs?: number) => Promise<void>;
   /** The 1.2 s safety tick. */
   tick: () => Promise<void>;
+  /** Reports one added element to the page's mutation observer; returns how often it was searched. */
+  addNode: () => number;
 }
 
 function load(options: {
@@ -74,6 +76,7 @@ function load(options: {
   native?: boolean;
 }): Page {
   const clock = { now: 1_000_000 };
+  let mutate: (records: unknown[]) => void = () => {};
   const timeouts: Array<() => void> = [];
   const intervals: Array<() => void> = [];
   const nativeAsks: number[] = [];
@@ -102,6 +105,9 @@ function load(options: {
     removeEventListener: windowEvents.removeEventListener,
     HTMLVideoElement: FakeVideo,
     MutationObserver: class {
+      constructor(callback: (records: unknown[]) => void) {
+        mutate = callback;
+      }
       observe() {}
       disconnect() {}
     },
@@ -136,6 +142,19 @@ function load(options: {
       intervals.forEach((run) => run());
       await Promise.resolve();
       await Promise.resolve();
+    },
+    addNode() {
+      let searches = 0;
+      const node = {
+        nodeType: 1,
+        localName: "div",
+        querySelectorAll: () => {
+          searches += 1;
+          return [];
+        },
+      };
+      mutate([{ addedNodes: [node] }]);
+      return searches;
     },
   };
 }
@@ -173,12 +192,27 @@ describe("feed player", () => {
     const video = new FakeVideo();
     const page = load({ videos: [video] });
     await page.settle();
+    page.fire("playing", { target: video });
+    await page.settle(700);
     tap(page);
     video.pause();
     page.fire("pause", { target: video });
     await page.settle(100);
     await page.tick();
     expect(video.paused).toBe(true);
+  });
+
+  it("keeps playing a video the site paused moments after it started, as when a tab was tapped", async () => {
+    const video = new FakeVideo();
+    const page = load({ videos: [video] });
+    await page.settle();
+    tap(page);
+    page.fire("playing", { target: video });
+    await page.settle(100);
+    video.pause();
+    page.fire("pause", { target: video });
+    await page.settle(400);
+    expect(video.paused).toBe(false);
   });
 
   it("gives a reused element a fresh budget of attempts when its source changes", async () => {
@@ -211,6 +245,15 @@ describe("feed player", () => {
     const withoutNative = load({ videos: [alone] });
     await withoutNative.settle();
     expect(alone.muted).toBe(true);
+  });
+
+  it("asks native code to play a muted video the engine refuses too", async () => {
+    const muted = new FakeVideo();
+    muted.muted = true;
+    muted.playError = "NotAllowedError";
+    const page = load({ videos: [muted], native: true });
+    await page.settle();
+    expect(page.nativeAsks).toHaveLength(1);
   });
 
   it("treats a wide clip that sits on screen as the video in view", async () => {
@@ -248,6 +291,13 @@ describe("feed player", () => {
     expect(idle.playCalls).toBe(0);
   });
 
+  it("does not search the page for videos on mutations outside a feed", () => {
+    const home = load({ videos: [], hostname: "www.instagram.com", pathname: "/" });
+    expect(home.addNode()).toBe(0);
+    const reels = load({ videos: [], hostname: "www.instagram.com", pathname: "/reels/" });
+    expect(reels.addNode()).toBe(1);
+  });
+
   it("kicks a video that says it plays but never moves", async () => {
     const stuck = new FakeVideo();
     stuck.paused = false;
@@ -268,6 +318,24 @@ describe("feed player", () => {
         height: 800,
         bottom: 800,
         right: 400,
+      }),
+    };
+    const page = load({ videos: [parked] });
+    await page.settle();
+    expect(parked.paused).toBe(false);
+  });
+
+  it("plays a video the site parks 9999 px to the left when its wrapper is on screen height", async () => {
+    const parked = new FakeVideo();
+    parked.box = { top: -2682, left: -9999, width: 400, height: 800, bottom: -1882, right: -9599 };
+    parked.parentElement = {
+      getBoundingClientRect: () => ({
+        top: 0,
+        left: -9999,
+        width: 400,
+        height: 800,
+        bottom: 800,
+        right: -9599,
       }),
     };
     const page = load({ videos: [parked] });

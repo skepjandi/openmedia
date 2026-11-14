@@ -6,6 +6,18 @@ All notable changes to OpenMedia are documented here.
 >
 > **Wiki**: the [GitHub Wiki](https://github.com/skepjandi/openmedia/wiki) is the public-facing main wiki — architecture, recipe format, AI pipeline, security model, roadmap. Source-controlled editing surface is `docs/wiki/` in this repo; CI (`.github/workflows/sync-wiki.yml`) mirrors it to the GitHub Wiki on every merge to `main`. New single-PR changes belong here, not as new wiki pages.
 
+### fix(siteview): Instagram's home feed no longer lags, and Reels and Shorts start without a tap
+
+**Area:** `fix(siteview)`
+
+**Problem:** The home feed stuttered on pages with video. Every page ran two whole-document mutation observers (the feed player's, which searched each added node for videos, and the iOS picture-in-picture guard's), and Instagram changes the DOM constantly while scrolling. Shorts stopped on a still frame after a swipe until a tap: reproduced on the iOS 26.5 simulator, where YouTube now parks the paused video at `left: -9999px` as well as above the screen, and the player, which only undid the vertical park, found no video in view and never played. Reels sometimes stayed still until the reader swiped on and back: a site pause right after a tap on its tab bar was taken for the reader's and kept the video paused. A play refused even when muted (low power mode) was never sent to native play.
+
+**Change:** The player places a parked video by its wrapper whichever way it was parked. The feed player ignores mutations outside a feed (videos still reach it through their own events). The picture-in-picture guard listens for `play` and `loadstart` instead of observing the document. A pause counts as the reader's only once the video has played for 600 ms. A refused muted play also asks native code to play. Pull to refresh is not swapped in or out while the page is still moving or pulled past its top.
+
+**Verified:** Vitest (`feedPlayer.test.ts`: four new tests that fail on the old script; full suite), ESLint, `swiftc -parse`, and on the iOS 26.5 simulator on YouTube Shorts: before, the first swipe left a frozen frame until a tap; after, swipes through Shorts keep playing without a tap. **Not verified:** a device; Instagram (needs a logged-in account); whether the native refresh-control guard removes the snapping.
+
+**PR:** n/a
+
 ### feat(ui): frosted, translucent title card on full-screen pages
 
 **Area:** `feat(ui)`

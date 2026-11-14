@@ -65,14 +65,10 @@ private let pictureInPictureGuardScript = """
         }
       }
     }
-    var queued = false;
-    function schedule() {
-      if (queued) return;
-      queued = true;
-      setTimeout(function () { queued = false; apply(); }, 200);
-    }
     window.__openmediaPipApply = apply;
-    new MutationObserver(schedule).observe(document, { childList: true, subtree: true });
+    // A video announces itself when it loads or plays; watching every mutation of a busy feed
+    // for new ones cost more than it saved.
+    document.addEventListener('play', apply, true);
     document.addEventListener('loadstart', apply, true);
   })();
   """
@@ -1422,7 +1418,12 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
   func setInnerScrolled(_ view: WKWebView, _ scrolled: Bool) {
     guard let session = session(of: view), let refresh = session.refreshControl else { return }
     let target: UIRefreshControl? = scrolled ? nil : refresh
-    if view.scrollView.refreshControl !== target { view.scrollView.refreshControl = target }
+    guard view.scrollView.refreshControl !== target else { return }
+    // Swapping the control while the page is still moving or pulled past its top shifts the
+    // content under the finger: the next touch settles it.
+    let scroll = view.scrollView
+    if scroll.isDecelerating || scroll.isDragging || scroll.contentOffset.y < 0 { return }
+    scroll.refreshControl = target
   }
 
   func reveal(_ view: WKWebView) {
