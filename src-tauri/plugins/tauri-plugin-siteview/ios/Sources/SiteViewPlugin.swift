@@ -1410,13 +1410,14 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
   ) -> WKWebViewConfiguration {
     let configuration = WKWebViewConfiguration()
     configuration.websiteDataStore = WKWebsiteDataStore(forIdentifier: profileId)
-    // iPhone defaults to fullscreen-only video, which covers the shell's controls. Muted video may
-    // autoplay inline; audio still needs a tap.
+    // iPhone defaults to fullscreen-only video, which covers the shell's controls. No playback
+    // needs a tap: with `.audio` here, a Reel or Short that starts with sound is refused and sits
+    // on a still frame until the reader taps.
     // Sign-in with Google or Apple opens a popup from script that runs after the tap; without
     // this WebKit blocks it and the button does nothing.
     configuration.preferences.javaScriptCanOpenWindowsAutomatically = true
     configuration.allowsInlineMediaPlayback = true
-    configuration.mediaTypesRequiringUserActionForPlayback = .audio
+    configuration.mediaTypesRequiringUserActionForPlayback = []
     let controller = WKUserContentController()
     installUserScripts(
       on: controller,

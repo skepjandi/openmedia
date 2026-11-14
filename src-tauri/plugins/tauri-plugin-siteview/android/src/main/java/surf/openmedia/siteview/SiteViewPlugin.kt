@@ -1575,13 +1575,13 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
 
         /** Pauses what plays and remembers which elements it paused, so only those resume. */
         private const val PAUSE_MEDIA_SCRIPT =
-            "(function(){var held=window.__openmediaPaused=window.__openmediaPaused||[];" +
+            "(function(){window.__openmediaHold=true;var held=window.__openmediaPaused=window.__openmediaPaused||[];" +
                 "document.querySelectorAll('video,audio').forEach(function(m){" +
-                "if(!m.paused&&!m.ended){held.push(m);m.pause()}})})()"
+                "if(!m.paused&&!m.ended&&held.indexOf(m)<0){held.push(m);m.pause()}})})()"
         private const val RESUME_MEDIA_SCRIPT =
-            "(function(){var held=window.__openmediaPaused||[];window.__openmediaPaused=[];" +
-                "held.forEach(function(m){try{var p=m.play();if(p&&p.catch)p.catch(function(){})}" +
-                "catch(e){}})})()"
+            "(function(){window.__openmediaHold=false;var held=window.__openmediaPaused||[];window.__openmediaPaused=[];" +
+                "held.forEach(function(m){if(!m.isConnected)return;try{var p=m.play();if(p&&p.catch)p.catch(function(){})}" +
+                "catch(e){}});document.dispatchEvent(new Event('openmedia-resume'))})()"
         private const val PAINT_OBJECT = "openmediaPaint"
         private const val SCROLL_OBJECT = "openmediaScroll"
         private const val OPENER_OBJECT = "openmediaOpener"

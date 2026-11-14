@@ -6,6 +6,16 @@ All notable changes to OpenMedia are documented here.
 >
 > **Wiki**: the [GitHub Wiki](https://github.com/skepjandi/openmedia/wiki) is the public-facing main wiki — architecture, recipe format, AI pipeline, security model, roadmap. Source-controlled editing surface is `docs/wiki/` in this repo; CI (`.github/workflows/sync-wiki.yml`) mirrors it to the GitHub Wiki on every merge to `main`. New single-PR changes belong here, not as new wiki pages.
 
+### fix(siteview): short-video feeds play on their own
+
+**Area:** `fix(siteview)`
+
+**Problem:** In Shorts and Reels some videos sat on a still frame until tapped, and some never played. On iOS the site views required a tap for any playback with sound, so a Short or Reel that starts unmuted was refused. Nothing retried the refused play, and a video the app paused when the page was hidden could resume out of view.
+
+**Change:** iOS site views no longer require a tap for playback. A new page script (`src-tauri/src/feed_player.js`, run on every platform after the accessibility script) finds the video that fills the screen in `/shorts`, `/reel(s)` and TikTok feeds once scrolling settles, plays it (muted if the engine still refuses sound), stops videos that scrolled out of view, retries on `canplay` and when the page returns, and leaves a video the reader paused alone until it leaves the screen. The background pause/resume scripts (Android, macOS) set a hold flag so the feed player does not fight them, resume only elements still on the page, and wake the player on resume. Epilepsy protection (calm mode) still stops autoplay and switches the feed player off.
+
+**Not verified:** on a device. The player was run against a stub DOM only; autoplay on iOS, Android and the live sites still needs a manual check.
+
 ### feat(release): versioned release title and notes generated from commits
 
 **Area:** `feat(release)`

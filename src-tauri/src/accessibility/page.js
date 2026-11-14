@@ -1,6 +1,7 @@
 (function (config) {
   'use strict';
   var KEY = Symbol.for('openmedia.accessibility');
+  var NO_AUTOPLAY = Symbol.for('openmedia.noAutoplay');
   var STYLE_ATTRIBUTE = 'data-openmedia';
   var STILL_ATTRIBUTE = 'data-openmedia-still';
   var GIF = /\.gif(?:[?#]|$)|^data:image\/gif/i;
@@ -52,7 +53,11 @@
         video.pause();
       };
       document.addEventListener('play', onPlay, true);
-      undo.push(function () { document.removeEventListener('play', onPlay, true); });
+      document[NO_AUTOPLAY] = true;
+      undo.push(function () {
+        document.removeEventListener('play', onPlay, true);
+        delete document[NO_AUTOPLAY];
+      });
     }
 
     // An animated GIF is replaced by its first frame, drawn on a canvas that takes its place. The
