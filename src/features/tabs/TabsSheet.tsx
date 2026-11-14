@@ -1,15 +1,16 @@
 import { useEffect, useState } from "react";
 import { selectLocale, useApp } from "../../app/store";
 import { useT } from "../../i18n/useT";
-import { displayHost, quickAccess } from "../../shared/favorites";
+import { QUICK_ACCESS_LIMIT, displayHost, quickAccess } from "../../shared/favorites";
 import { usage, type Favorite, type UsageReport } from "../../shared/ipc";
-import { PlusIcon } from "../../shared/icons";
+import { PlusIcon, ProIcon } from "../../shared/icons";
 import { Screen } from "../../shared/Screen";
 import { useIconForUrl } from "../../shared/siteIcons";
 import { SiteTile } from "../../shared/SiteTile";
 import { describeAddress } from "../history/address";
 import { formatDuration, localDay } from "../stats/format";
 import { Group, GroupLabel, primaryBlockButton, quietButton } from "../settings/ui";
+import { useEntitlementStore } from "../paywall/store";
 import { findFavoriteSession, sessionForFavorite, type Session } from "../web/sessions";
 import { formatMs, orderedTabs, secondsTodayFor } from "./tabs";
 
@@ -28,6 +29,7 @@ export function TabsSheet() {
   const blankTab = useApp((s) => s.blankTab);
   const openNewTab = useApp((s) => s.openNewTab);
   const favorites = useApp((s) => s.state?.favorites) ?? NO_FAVORITES;
+  const isPro = useEntitlementStore((s) => s.status === "pro");
   const history = useApp((s) => s.state?.history) ?? NO_HISTORY;
   const sites = useApp((s) => s.sites);
   const openSession = useApp((s) => s.openSession);
@@ -118,6 +120,36 @@ export function TabsSheet() {
             </Group>
           )}
         </section>
+
+        {favorites.length > QUICK_ACCESS_LIMIT &&
+          (isPro ? (
+            <section>
+              <GroupLabel>
+                {t("favorites.more", { count: favorites.length - QUICK_ACCESS_LIMIT })}
+              </GroupLabel>
+              <Group>
+                {favorites.slice(QUICK_ACCESS_LIMIT).map((favorite) => (
+                  <QuickRow
+                    key={favorite.id}
+                    favorite={favorite}
+                    live={sessionForFavorite(sessions, favorite.url, sites) !== undefined}
+                    onOpen={() => openFavorite(favorite.url)}
+                  />
+                ))}
+              </Group>
+            </section>
+          ) : (
+            <section>
+              <button
+                type="button"
+                onClick={() => openSheet("paywall")}
+                className={`flex w-full items-center gap-2 ${quietButton}`}
+              >
+                <ProIcon size={14} />
+                {t("favorites.moreLocked")}
+              </button>
+            </section>
+          ))}
 
         <section>
           <GroupLabel>{t("tabs.history")}</GroupLabel>
