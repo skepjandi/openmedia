@@ -44,6 +44,7 @@ pub fn run() {
             let library = library::Library::load(data_dir.join("library.json"))?;
             let ad_block_enabled = library.ad_block_enabled()?;
             let background_media = library.background_media_sites()?;
+            let picture_in_picture = library.picture_in_picture_sites()?;
             app.manage(library);
             // Off the setup thread: on iOS the plugin answers from the main thread, which is the
             // thread running this closure, so asking from here would wait for itself.
@@ -51,6 +52,8 @@ pub fn run() {
             tauri::async_runtime::spawn_blocking(move || {
                 // The list reaches the site views once; a failure leaves every site pausing.
                 let _ = commands::push_background_media(&handle, background_media);
+                // Likewise: a failure leaves picture-in-picture off everywhere.
+                let _ = commands::push_picture_in_picture(&handle, picture_in_picture);
             });
             app.manage(incognito::Incognito::default());
             app.manage(recipes::Recipes::load(data_dir.join("recipes"))?);
@@ -133,6 +136,7 @@ pub fn run() {
             commands::set_site_bottom_margin,
             commands::bottom_margin_for,
             commands::set_site_background_media,
+            commands::set_site_picture_in_picture,
             commands::set_back_button,
             commands::set_accessibility,
             commands::ai_state,

@@ -184,6 +184,14 @@ pub struct SetBackgroundMediaRequest {
     pub sites: Vec<String>,
 }
 
+/// The sites whose videos may open in a picture-in-picture window, as registrable domains. Any
+/// other page cannot. Rust-only: it is deliberately not a Tauri command and has no permission, so
+/// no webview can call it.
+#[derive(Debug, Clone, Default, Deserialize)]
+pub struct SetPictureInPictureRequest {
+    pub sites: Vec<String>,
+}
+
 /// A script for the active page. Rust-only: not a Tauri command, never reachable from a webview.
 #[derive(Debug, Clone, Deserialize)]
 pub struct EvaluateRequest {

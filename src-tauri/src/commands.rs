@@ -5,7 +5,7 @@ use tauri::{AppHandle, Emitter, Manager, State, ipc::Channel};
 use tauri_plugin_siteview::{
     ColorScheme, ContentRuleList, EvaluateRequest, FetchFaviconRequest, OpenRequest, Rect,
     SessionRequest, SetBackgroundMediaRequest, SetColorSchemeRequest, SetContentRuleListsRequest,
-    SetDocumentStartScriptRequest, SetRectRequest, SiteviewExt,
+    SetDocumentStartScriptRequest, SetPictureInPictureRequest, SetRectRequest, SiteviewExt,
     validate::{parse_session_id, parse_web_url},
 };
 use url::Url;
@@ -502,6 +502,27 @@ pub async fn set_site_background_media(
 pub(crate) fn push_background_media(app: &AppHandle, sites: Vec<String>) -> Result<()> {
     app.siteview()
         .set_background_media(SetBackgroundMediaRequest { sites })?;
+    Ok(())
+}
+
+/// Lets a site's videos open in a picture-in-picture window, or stops it. Every site is off by
+/// default. `site` is a registrable domain. Async for the reason given at
+/// `set_site_background_media`.
+#[tauri::command]
+pub async fn set_site_picture_in_picture(
+    app: AppHandle,
+    library: State<'_, Library>,
+    site: String,
+    enabled: bool,
+) -> Result<()> {
+    let sites = library.set_picture_in_picture(&site, enabled)?;
+    push_picture_in_picture(&app, sites)
+}
+
+/// Tells the site views which sites may use picture-in-picture; the rest cannot.
+pub(crate) fn push_picture_in_picture(app: &AppHandle, sites: Vec<String>) -> Result<()> {
+    app.siteview()
+        .set_picture_in_picture(SetPictureInPictureRequest { sites })?;
     Ok(())
 }
 

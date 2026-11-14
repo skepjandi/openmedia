@@ -580,6 +580,9 @@ export const en = {
   "favorites.backgroundMedia": "Keep playing in the background",
   "favorites.backgroundMediaNote":
     "Off: audio and video pause when you switch to another site or leave the app. On: this site keeps playing.",
+  "favorites.pictureInPicture": "Picture-in-picture video",
+  "favorites.pictureInPictureNote":
+    "Off: videos stay in the page. On: a playing video floats in a small window when you leave the app, and you can float it from its player.",
   "fab.tabs": "Tabs",
   "fab.show": "Show the floating button",
   "tabs.title": "Tabs",

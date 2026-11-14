@@ -203,6 +203,8 @@ export interface AppStore {
   setSiteBottomMargin: (recipeId: string, pixels: number | null) => Promise<void>;
   /** Whether a site's media keeps playing while hidden or in the background. */
   setSiteBackgroundMedia: (site: string, enabled: boolean) => Promise<void>;
+  /** Whether a site's videos may open in a picture-in-picture window. */
+  setSitePictureInPicture: (site: string, enabled: boolean) => Promise<void>;
   setBackButton: (enabled: boolean) => Promise<void>;
   setFabEdge: (edge: Edge) => void;
   /** Shows the exact payload before it is sent; on by default. */
@@ -867,6 +869,25 @@ export const useApp = create<AppStore>((set, get) => {
       } catch (error) {
         set((current) => ({
           state: current.state && { ...current.state, backgroundMediaSites: previous },
+          error: appError(error),
+        }));
+      }
+    },
+    setSitePictureInPicture: async (site, enabled) => {
+      const previous = get().state?.pictureInPictureSites;
+      if (!previous) return;
+      const without = previous.filter((entry) => entry !== site);
+      set((current) => ({
+        state: current.state && {
+          ...current.state,
+          pictureInPictureSites: enabled ? [...without, site] : without,
+        },
+      }));
+      try {
+        await library.setSitePictureInPicture(site, enabled);
+      } catch (error) {
+        set((current) => ({
+          state: current.state && { ...current.state, pictureInPictureSites: previous },
           error: appError(error),
         }));
       }

@@ -191,6 +191,15 @@ impl<R: Runtime> Siteview<R> {
         )
     }
 
+    /// Names the sites whose videos may open in picture-in-picture. Rust-only: the plugin
+    /// registers no command for it, so neither the shell nor a site view can reach it.
+    pub fn set_picture_in_picture(&self, request: SetPictureInPictureRequest) -> Result<()> {
+        self.run(
+            "setPictureInPicture",
+            serde_json::json!({ "sites": request.sites }),
+        )
+    }
+
     /// Asks the device owner for Face ID, Touch ID or the device passcode and says whether they
     /// passed. Rust-only: the plugin registers no command for it, so neither the shell nor a site
     /// view can raise or answer the prompt.

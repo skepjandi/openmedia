@@ -593,6 +593,9 @@ export const es: Messages = {
   "favorites.backgroundMedia": "Seguir reproduciendo en segundo plano",
   "favorites.backgroundMediaNote":
     "Desactivado: el audio y el vídeo se pausan al cambiar de sitio o salir de la app. Activado: este sitio sigue reproduciéndose.",
+  "favorites.pictureInPicture": "Vídeo en imagen en imagen",
+  "favorites.pictureInPictureNote":
+    "Desactivado: los vídeos se quedan en la página. Activado: un vídeo en reproducción flota en una ventana pequeña al salir de la app, y también puedes hacerlo flotar desde su reproductor.",
   "fab.tabs": "Pestañas",
   "fab.show": "Mostrar el botón flotante",
   "tabs.title": "Pestañas",

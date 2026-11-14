@@ -546,6 +546,9 @@ export const zhHant: Messages = {
   "favorites.backgroundMedia": "在背景繼續播放",
   "favorites.backgroundMediaNote":
     "關閉：切換到其他網站或離開 App 時，音訊和影片會暫停。開啟：此網站繼續播放。",
+  "favorites.pictureInPicture": "子母畫面影片",
+  "favorites.pictureInPictureNote":
+    "關閉：影片留在頁面內。開啟：離開 App 時，正在播放的影片會以小視窗浮動，也可以從播放器中手動浮動。",
   "fab.tabs": "分頁",
   "fab.show": "顯示懸浮按鈕",
   "tabs.title": "分頁",

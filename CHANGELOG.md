@@ -6,6 +6,16 @@ All notable changes to OpenMedia are documented here.
 >
 > **Wiki**: the [GitHub Wiki](https://github.com/skepjandi/openmedia/wiki) is the public-facing main wiki — architecture, recipe format, AI pipeline, security model, roadmap. Source-controlled editing surface is `docs/wiki/` in this repo; CI (`.github/workflows/sync-wiki.yml`) mirrors it to the GitHub Wiki on every merge to `main`. New single-PR changes belong here, not as new wiki pages.
 
+### feat(siteview): picture-in-picture for a favorite's videos, off by default (iOS)
+
+**Area:** `feat(siteview)`
+
+**Change:** A favorite's editor has a new switch, "Picture-in-picture video" (off by default, iOS only, not offered for incognito). When on, the site's video can float in a PiP window from its player, and a playing video with sound floats on its own when you leave the app and returns when you come back, as in YouTube. When off, every `video` on the site gets `disablepictureinpicture`. The list is saved in `library.json` (`pictureInPictureSites`, registrable domains) and passed through a Rust-only plugin method, `set_picture_in_picture`. The iOS app gains the `audio` background mode, which PiP requires. Android and macOS accept the list and do nothing. New strings `favorites.pictureInPicture` and `favorites.pictureInPictureNote` in every locale.
+
+**Verified:** Vitest (`app`, `i18n`), `tsc`, ESLint, Prettier, `cargo test` (`library`), `cargo clippy --workspace -D warnings`, and the Swift plugin compiled for `aarch64-apple-ios-sim` at iOS 17 (`IPHONEOS_DEPLOYMENT_TARGET=17.0`). **Not verified:** on a device or simulator: that WebKit starts PiP when the app resigns active, that the video keeps playing while floating, and App Review's answer on the audio background mode.
+
+**PR:** n/a
+
 ### feat(tabs): reset a tab to its start page
 
 **Area:** `feat(tabs)`

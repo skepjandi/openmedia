@@ -580,6 +580,9 @@ export const hi: Messages = {
   "favorites.backgroundMedia": "बैकग्राउंड में चलते रहें",
   "favorites.backgroundMediaNote":
     "बंद: दूसरी साइट पर जाने या ऐप छोड़ने पर ऑडियो और वीडियो रुक जाते हैं। चालू: यह साइट चलती रहती है।",
+  "favorites.pictureInPicture": "पिक्चर-इन-पिक्चर वीडियो",
+  "favorites.pictureInPictureNote":
+    "बंद: वीडियो पृष्ठ के भीतर ही रहते हैं। चालू: ऐप छोड़ने पर चलता हुआ वीडियो छोटी तैरती विंडो में दिखता है, और आप उसे प्लेयर से भी तैरा सकते हैं।",
   "fab.tabs": "टैब",
   "fab.show": "तैरता हुआ बटन दिखाएँ",
   "tabs.title": "टैब",

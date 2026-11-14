@@ -601,6 +601,9 @@ export const fr: Messages = {
   "favorites.backgroundMedia": "Continuer la lecture en arrière-plan",
   "favorites.backgroundMediaNote":
     "Désactivé : l'audio et la vidéo se mettent en pause quand vous changez de site ou quittez l'app. Activé : ce site continue de jouer.",
+  "favorites.pictureInPicture": "Vidéo en image dans l'image",
+  "favorites.pictureInPictureNote":
+    "Désactivé : les vidéos restent dans la page. Activé : une vidéo en lecture flotte dans une petite fenêtre quand vous quittez l'app, et vous pouvez aussi la faire flotter depuis son lecteur.",
   "fab.tabs": "Onglets",
   "fab.show": "Afficher le bouton flottant",
   "tabs.title": "Onglets",

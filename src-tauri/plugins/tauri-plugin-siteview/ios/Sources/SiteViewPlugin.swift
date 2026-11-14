@@ -24,6 +24,97 @@ private let playFeedVideoScript =
 private let holdMediaScript = "window.__openmediaHold=true"
 private let resumeMediaScript =
   "window.__openmediaHold=false;document.dispatchEvent(new Event('openmedia-resume'))"
+/// The script world of the picture-in-picture guard. It shares the page's DOM and nothing else,
+/// so the page can neither read the list of sites nor call `__openmediaPipApply`.
+private let pictureInPictureWorld = WKContentWorld.world(name: "openmedia.pip")
+/// Keeps a video from offering picture-in-picture unless its page's site is on the list in
+/// `window.__openmediaPip` (registrable domains). WebKit reads the `disablepictureinpicture`
+/// attribute, so every video gets it, and only the ones this script marked lose it again: a page
+/// that sets the attribute itself is left alone. `__openmediaPipApply` re-runs the check when the
+/// list changes. The host is the top page's, so a player in a frame follows the page around it.
+private let pictureInPictureGuardScript = """
+  (function () {
+    if (window.__openmediaPipApply) return;
+    var marked = new WeakSet();
+    function host() {
+      try {
+        var origins = location.ancestorOrigins;
+        if (origins && origins.length) return new URL(origins[origins.length - 1]).hostname;
+      } catch (error) {}
+      return location.hostname;
+    }
+    function allowed() {
+      var name = host().toLowerCase();
+      return window.__openmediaPip.some(function (site) {
+        return name === site || name.endsWith('.' + site);
+      });
+    }
+    function apply() {
+      var ok = allowed();
+      var videos = document.querySelectorAll('video');
+      for (var i = 0; i < videos.length; i++) {
+        var video = videos[i];
+        if (ok) {
+          if (marked.has(video)) {
+            video.removeAttribute('disablepictureinpicture');
+            marked.delete(video);
+          }
+        } else if (!video.hasAttribute('disablepictureinpicture')) {
+          video.setAttribute('disablepictureinpicture', '');
+          marked.add(video);
+        }
+      }
+    }
+    var queued = false;
+    function schedule() {
+      if (queued) return;
+      queued = true;
+      setTimeout(function () { queued = false; apply(); }, 200);
+    }
+    window.__openmediaPipApply = apply;
+    new MutationObserver(schedule).observe(document, { childList: true, subtree: true });
+    document.addEventListener('loadstart', apply, true);
+  })();
+  """
+/// Floats the largest playing video that has sound, as leaving the app would for a player. Answers
+/// true only when this call started it, so a window the reader opened themselves is left alone.
+/// `evaluateJavaScript` runs with a user gesture, which WebKit requires for this.
+private let enterPictureInPictureScript = """
+  (function () {
+    var best = null, area = 0, videos = document.querySelectorAll('video');
+    for (var i = 0; i < videos.length; i++) {
+      var video = videos[i];
+      if (video.paused || video.ended || video.muted || video.volume === 0 || !video.videoWidth) continue;
+      if (video.hasAttribute('disablepictureinpicture')) continue;
+      if (typeof video.webkitSetPresentationMode !== 'function') continue;
+      var size = video.clientWidth * video.clientHeight;
+      if (size > area) { area = size; best = video; }
+    }
+    if (!best || best.webkitPresentationMode === 'picture-in-picture') return false;
+    if (!best.webkitSupportsPresentationMode('picture-in-picture')) return false;
+    best.webkitSetPresentationMode('picture-in-picture');
+    return true;
+  })()
+  """
+private let exitPictureInPictureScript = """
+  (function () {
+    var videos = document.querySelectorAll('video');
+    for (var i = 0; i < videos.length; i++) {
+      if (videos[i].webkitPresentationMode === 'picture-in-picture') {
+        videos[i].webkitSetPresentationMode('inline');
+      }
+    }
+  })()
+  """
+private let inPictureInPictureScript = """
+  (function () {
+    var videos = document.querySelectorAll('video');
+    for (var i = 0; i < videos.length; i++) {
+      if (videos[i].webkitPresentationMode === 'picture-in-picture') return true;
+    }
+    return false;
+  })()
+  """
 private let touchScrollScript = """
   (function () {
     window.addEventListener('touchstart', function (event) {
@@ -164,6 +255,10 @@ class SetBackgroundMediaArgs: Decodable {
   let sites: [String]
 }
 
+class SetPictureInPictureArgs: Decodable {
+  let sites: [String]
+}
+
 class AuthenticateArgs: Decodable {
   let reason: String
 }
@@ -289,6 +384,9 @@ private final class Session {
   var blocked = false
   /// True while the page's media is suspended because the page went out of sight.
   var mediaSuspended = false
+  /// True while a picture-in-picture window is open because the app was left, not because the
+  /// reader opened it; coming back closes it.
+  var autoPictureInPicture = false
   /// The native shield over a closed page. It covers the page and takes every touch.
   var shield: UIView?
   var observations: [NSKeyValueObservation] = []
@@ -374,6 +472,8 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
   private var blockedSessions: [String] = []
   /// The sites (registrable domains) whose media keeps playing while hidden or in the background.
   private var backgroundMediaSites: Set<String> = []
+  /// The sites (registrable domains) whose videos may open in picture-in-picture.
+  private var pictureInPictureSites: Set<String> = []
   /// False from the app entering the background to it coming back.
   private var appForeground = true
 
@@ -401,6 +501,12 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
       self?.appForeground = true
       self?.refreshMedia()
     }
+    NotificationCenter.default.addObserver(
+      forName: UIApplication.willResignActiveNotification, object: nil, queue: .main
+    ) { [weak self] _ in self?.enterPictureInPicture() }
+    NotificationCenter.default.addObserver(
+      forName: UIApplication.didBecomeActiveNotification, object: nil, queue: .main
+    ) { [weak self] _ in self?.exitAutomaticPictureInPicture() }
     UNUserNotificationCenter.current().delegate = self
     DispatchQueue.main.async { self.attachShell() }
   }
@@ -683,13 +789,75 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
     }
   }
 
+  /// Names the sites whose videos may open in picture-in-picture. Rust-only: the plugin registers
+  /// no command for it, so neither the shell nor a site view can reach it. Pages already open
+  /// take the change at once.
+  @objc public func setPictureInPicture(_ invoke: Invoke) throws {
+    let args = try invoke.parseArgs(SetPictureInPictureArgs.self)
+    DispatchQueue.main.async {
+      self.pictureInPictureSites = Set(args.sites)
+      for session in self.sessions.values {
+        self.installUserScripts(
+          on: session.view.configuration.userContentController,
+          recipe: session.recipeScript,
+          adBlockScriptlet: session.adBlockScriptlet,
+          adBlockEnabled: session.adBlockEnabled)
+        session.view.evaluateJavaScript(
+          "\(self.pictureInPictureListScript());window.__openmediaPipApply&&window.__openmediaPipApply()",
+          in: nil, in: pictureInPictureWorld, completionHandler: nil)
+      }
+      invoke.resolve()
+    }
+  }
+
+  /// The statement that hands the page the list of sites that may use picture-in-picture.
+  private func pictureInPictureListScript() -> String {
+    let list = (try? JSONEncoder().encode(pictureInPictureSites.sorted())) ?? Data("[]".utf8)
+    return "window.__openmediaPip=\(String(decoding: list, as: UTF8.self))"
+  }
+
+  /// Leaving the app floats the playing video of the page in front, when its site is on the list,
+  /// as a player does. Only a window opened here is closed again by `exitAutomaticPictureInPicture`.
+  private func enterPictureInPicture() {
+    guard let id = activeId, let session = sessions[id], !session.blocked,
+      pictureInPictureSites.contains(session.scope)
+    else { return }
+    session.view.evaluateJavaScript(enterPictureInPictureScript) { [weak session] result, _ in
+      if (result as? Bool) == true { session?.autoPictureInPicture = true }
+    }
+  }
+
+  /// Coming back to the app puts a video floated by `enterPictureInPicture` back in the page.
+  private func exitAutomaticPictureInPicture() {
+    for session in sessions.values where session.autoPictureInPicture {
+      session.autoPictureInPicture = false
+      session.view.evaluateJavaScript(exitPictureInPictureScript)
+    }
+  }
+
   /// Suspends the media of every page that is out of sight, unless its site may play on, and
   /// resumes what was suspended when the page is shown again. A closed page is left to
   /// `applyBlocked`.
   private func refreshMedia() {
     for session in sessions.values where !session.blocked {
       let shown = appForeground && session.id == activeId
+      if !appForeground && session.id == activeId && pictureInPictureSites.contains(session.scope) {
+        suspendUnlessFloating(session)
+        continue
+      }
       setMediaSuspended(!shown && !backgroundMediaSites.contains(session.scope), in: session)
+    }
+  }
+
+  /// The page in front when the app is left keeps playing only if its video floats in a
+  /// picture-in-picture window; otherwise it is suspended as any page out of sight is. Until the
+  /// page answers, nothing changes, so the window is never cut off.
+  private func suspendUnlessFloating(_ session: Session) {
+    session.view.evaluateJavaScript(inPictureInPictureScript) { [weak self, weak session] result, _ in
+      guard let self, let session, !self.appForeground else { return }
+      let floating = (result as? Bool) == true
+      self.setMediaSuspended(
+        !floating && !self.backgroundMediaSites.contains(session.scope), in: session)
     }
   }
 
@@ -1294,6 +1462,10 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
       controller.addUserScript(
         WKUserScript(source: recipe, injectionTime: .atDocumentStart, forMainFrameOnly: false))
     }
+    controller.addUserScript(
+      WKUserScript(
+        source: "\(pictureInPictureListScript());\n\(pictureInPictureGuardScript)",
+        injectionTime: .atDocumentStart, forMainFrameOnly: false, in: pictureInPictureWorld))
   }
 
   private func installBackdrop() {

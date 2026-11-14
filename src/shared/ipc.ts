@@ -56,6 +56,8 @@ export interface AppState {
   bottomMargin: number;
   /** The sites (registrable domains) whose media keeps playing while hidden or in the background. */
   backgroundMediaSites: string[];
+  /** The sites (registrable domains) whose videos may open in a picture-in-picture window. */
+  pictureInPictureSites: string[];
   backButton: boolean;
   aiPreview: boolean;
   /** The language the user picked, as a BCP 47 tag; null follows the device's language. */
@@ -241,6 +243,9 @@ export const library = {
   /** Lets a site's media keep playing while hidden or in the background; every site pauses by default. */
   setSiteBackgroundMedia: (site: string, enabled: boolean) =>
     command("set_site_background_media", { site, enabled }),
+  /** Lets a site's videos open in a picture-in-picture window; off for every site by default. */
+  setSitePictureInPicture: (site: string, enabled: boolean) =>
+    command("set_site_picture_in_picture", { site, enabled }),
   setBottomMargin: (pixels: number) => command("set_bottom_margin", { pixels }),
   setSiteBottomMargin: (recipeId: string, pixels: number | null) =>
     command("set_site_bottom_margin", { recipeId, pixels }),

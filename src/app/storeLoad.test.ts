@@ -19,6 +19,7 @@ const startup = {
   adBlock: false,
   bottomMargin: 0,
   backgroundMediaSites: [],
+  pictureInPictureSites: [],
   backButton: true,
   aiPreview: true,
   locale: "en",

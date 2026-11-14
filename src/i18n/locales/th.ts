@@ -560,6 +560,9 @@ export const th: Messages = {
   "favorites.backgroundMedia": "เล่นต่อในเบื้องหลัง",
   "favorites.backgroundMediaNote":
     "ปิด: เสียงและวิดีโอจะหยุดชั่วคราวเมื่อสลับไปไซต์อื่นหรือออกจากแอป เปิด: ไซต์นี้เล่นต่อไป",
+  "favorites.pictureInPicture": "วิดีโอภาพซ้อนภาพ",
+  "favorites.pictureInPictureNote":
+    "ปิด: วิดีโออยู่ในหน้าเว็บ เปิด: วิดีโอที่กำลังเล่นจะลอยในหน้าต่างเล็กเมื่อคุณออกจากแอป และคุณสั่งให้ลอยจากเครื่องเล่นได้เช่นกัน",
   "fab.tabs": "แท็บ",
   "fab.show": "แสดงปุ่มลอย",
   "tabs.title": "แท็บ",

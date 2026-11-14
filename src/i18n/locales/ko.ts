@@ -577,6 +577,9 @@ export const ko: Messages = {
   "favorites.backgroundMedia": "백그라운드에서 계속 재생",
   "favorites.backgroundMediaNote":
     "끔: 다른 사이트로 전환하거나 앱을 나가면 오디오와 비디오가 일시 정지됩니다. 켬: 이 사이트는 계속 재생됩니다.",
+  "favorites.pictureInPicture": "화면 속 화면 동영상",
+  "favorites.pictureInPictureNote":
+    "끔: 동영상이 페이지 안에 머뭅니다. 켬: 앱을 나가면 재생 중인 동영상이 작은 창으로 떠 있고, 플레이어에서도 직접 띄울 수 있습니다.",
   "fab.tabs": "탭",
   "fab.show": "플로팅 버튼 표시",
   "tabs.title": "탭",

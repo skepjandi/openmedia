@@ -84,6 +84,11 @@ impl<R: Runtime> Siteview<R> {
         Ok(())
     }
 
+    /// Windows and Linux have no site views, so there is no video to float.
+    pub fn set_picture_in_picture(&self, _request: SetPictureInPictureRequest) -> Result<()> {
+        Ok(())
+    }
+
     pub fn authenticate(&self, _request: AuthenticateRequest) -> Result<bool> {
         Err(Error::DesktopUnsupported("site views"))
     }

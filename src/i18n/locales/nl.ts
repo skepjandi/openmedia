@@ -592,6 +592,9 @@ export const nl: Messages = {
   "favorites.backgroundMedia": "Op de achtergrond blijven afspelen",
   "favorites.backgroundMediaNote":
     "Uit: audio en video pauzeren als je naar een andere site gaat of de app verlaat. Aan: deze site blijft afspelen.",
+  "favorites.pictureInPicture": "Beeld-in-beeld-video",
+  "favorites.pictureInPictureNote":
+    "Uit: video's blijven in de pagina. Aan: een lopende video zweeft in een klein venster als je de app verlaat, en je kunt hem ook via de speler laten zweven.",
   "fab.tabs": "Tabbladen",
   "fab.show": "Zwevende knop tonen",
   "tabs.title": "Tabbladen",

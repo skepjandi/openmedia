@@ -599,6 +599,9 @@ export const de: Messages = {
   "favorites.backgroundMedia": "Im Hintergrund weiterspielen",
   "favorites.backgroundMediaNote":
     "Aus: Audio und Video pausieren, wenn du zu einer anderen Seite wechselst oder die App verlässt. An: Diese Seite spielt weiter.",
+  "favorites.pictureInPicture": "Bild-in-Bild-Video",
+  "favorites.pictureInPictureNote":
+    "Aus: Videos bleiben in der Seite. An: Ein laufendes Video schwebt in einem kleinen Fenster, wenn du die App verlässt, und du kannst es auch über den Player schweben lassen.",
   "fab.tabs": "Tabs",
   "fab.show": "Schwebende Taste anzeigen",
   "tabs.title": "Tabs",

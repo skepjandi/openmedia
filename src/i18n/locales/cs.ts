@@ -585,6 +585,9 @@ export const cs: Messages = {
   "favorites.backgroundMedia": "Přehrávat na pozadí",
   "favorites.backgroundMediaNote":
     "Vypnuto: zvuk a video se pozastaví, když přepnete na jiný web nebo opustíte aplikaci. Zapnuto: tento web hraje dál.",
+  "favorites.pictureInPicture": "Video obraz v obraze",
+  "favorites.pictureInPictureNote":
+    "Vypnuto: videa zůstávají ve stránce. Zapnuto: přehrávané video se při opuštění aplikace zobrazí v malém plovoucím okně a můžete ho tak zobrazit i z přehrávače.",
   "fab.tabs": "Karty",
   "fab.show": "Zobrazit plovoucí tlačítko",
   "tabs.title": "Karty",

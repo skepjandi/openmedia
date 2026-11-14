@@ -578,6 +578,9 @@ export const bn: Messages = {
   "favorites.backgroundMedia": "ব্যাকগ্রাউন্ডে চালানো চালিয়ে যান",
   "favorites.backgroundMediaNote":
     "বন্ধ: অন্য সাইটে গেলে বা অ্যাপ ছাড়লে অডিও ও ভিডিও থেমে যায়। চালু: এই সাইট চলতে থাকে।",
+  "favorites.pictureInPicture": "পিকচার-ইন-পিকচার ভিডিও",
+  "favorites.pictureInPictureNote":
+    "বন্ধ: ভিডিও পেজের মধ্যেই থাকে। চালু: অ্যাপ ছাড়লে চলমান ভিডিও ছোট ভাসমান উইন্ডোতে চলে, আর প্লেয়ার থেকেও আপনি সেটি ভাসাতে পারেন।",
   "fab.tabs": "ট্যাব",
   "fab.show": "ভাসমান বোতাম দেখান",
   "tabs.title": "ট্যাব",

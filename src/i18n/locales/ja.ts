@@ -583,6 +583,9 @@ export const ja: Messages = {
   "favorites.backgroundMedia": "バックグラウンドで再生を続ける",
   "favorites.backgroundMediaNote":
     "オフ：別のサイトに切り替えたりアプリを離れたりすると、音声と動画が一時停止します。オン：このサイトは再生を続けます。",
+  "favorites.pictureInPicture": "ピクチャインピクチャ動画",
+  "favorites.pictureInPictureNote":
+    "オフ：動画はページ内にとどまります。オン：アプリを離れると、再生中の動画が小さなウィンドウで浮かび、プレーヤーからも浮かべられます。",
   "fab.tabs": "タブ",
   "fab.show": "フローティングボタンを表示",
   "tabs.title": "タブ",

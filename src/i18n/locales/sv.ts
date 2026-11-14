@@ -585,6 +585,9 @@ export const sv: Messages = {
   "favorites.backgroundMedia": "Fortsätt spela i bakgrunden",
   "favorites.backgroundMediaNote":
     "Av: ljud och video pausas när du byter webbplats eller lämnar appen. På: den här webbplatsen fortsätter spela.",
+  "favorites.pictureInPicture": "Bild-i-bild-video",
+  "favorites.pictureInPictureNote":
+    "Av: videor stannar på sidan. På: en video som spelas flyter i ett litet fönster när du lämnar appen, och du kan även låta den flyta från spelaren.",
   "fab.tabs": "Flikar",
   "fab.show": "Visa den flytande knappen",
   "tabs.title": "Flikar",

@@ -589,6 +589,9 @@ export const pt: Messages = {
   "favorites.backgroundMedia": "Continuar tocando em segundo plano",
   "favorites.backgroundMediaNote":
     "Desativado: áudio e vídeo pausam ao trocar de site ou sair do app. Ativado: este site continua tocando.",
+  "favorites.pictureInPicture": "Vídeo em picture-in-picture",
+  "favorites.pictureInPictureNote":
+    "Desativado: os vídeos ficam na página. Ativado: um vídeo em reprodução flutua em uma janela pequena ao sair do app, e você também pode fazê-lo flutuar pelo player.",
   "fab.tabs": "Abas",
   "fab.show": "Mostrar o botão flutuante",
   "tabs.title": "Abas",

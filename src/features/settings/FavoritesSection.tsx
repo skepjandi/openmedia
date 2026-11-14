@@ -11,6 +11,7 @@ import { DownIcon, ForwardIcon, ProIcon, PlusIcon, StarIcon, UpIcon } from "../.
 import type { Favorite, FavoriteInput, SiteSettings } from "../../shared/ipc";
 import { SiteTile } from "../../shared/SiteTile";
 import { siteOf } from "../../shared/site";
+import { isIos } from "../../shared/platform";
 import { normalizeWebUrl } from "../../shared/url";
 import { useEntitlementStore } from "../paywall/store";
 import { describeAddress } from "../history/address";
@@ -290,7 +291,7 @@ interface RowProps {
   onOpenRecipe?: () => void;
   /** The recipe whose bottom margin the editor shows; absent for incognito and recipe-less favorites. */
   marginRecipe?: SiteSettings;
-  /** Offers the background playback switch; off for incognito, which must not write its sites to the library. */
+  /** Offers the background playback and picture-in-picture switches; off for incognito, which must not write its sites to the library. */
   playsInBackground?: boolean;
 }
 
@@ -442,6 +443,7 @@ function FavoriteEditor({
         </div>
       )}
       {playsInBackground && <BackgroundMedia url={url} />}
+      {playsInBackground && isIos() && <PictureInPicture url={url} />}
       {(problem ?? hint) && (
         <p className={`text-sm ${problem ? "text-accent" : "text-paper/55"}`}>{problem ?? hint}</p>
       )}
@@ -514,6 +516,27 @@ function BackgroundMedia({ url }: { url: string }) {
         description={t("favorites.backgroundMediaNote")}
         checked={enabled}
         onChange={(next) => void setSiteBackgroundMedia(site, next)}
+      />
+    </div>
+  );
+}
+
+/** Whether the site's videos may float in a picture-in-picture window. It saves at once, not with Save. */
+function PictureInPicture({ url }: { url: string }) {
+  const site = siteOf(url);
+  const enabled = useApp((s) =>
+    site ? (s.state?.pictureInPictureSites.includes(site) ?? false) : false,
+  );
+  const setSitePictureInPicture = useApp((s) => s.setSitePictureInPicture);
+  const t = useT();
+  if (!site) return null;
+  return (
+    <div className="-mx-4">
+      <Switch
+        label={t("favorites.pictureInPicture")}
+        description={t("favorites.pictureInPictureNote")}
+        checked={enabled}
+        onChange={(next) => void setSitePictureInPicture(site, next)}
       />
     </div>
   );

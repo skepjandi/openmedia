@@ -864,6 +864,12 @@ impl<R: Runtime> Siteview<R> {
         Ok(())
     }
 
+    /// macOS child webviews leave picture-in-picture to WebKit's own video controls, so the list
+    /// is accepted and not acted on.
+    pub fn set_picture_in_picture(&self, _request: SetPictureInPictureRequest) -> Result<()> {
+        Ok(())
+    }
+
     /// Touch ID, Apple Watch or the account password, as the system offers. Rust-only: there is
     /// no command for it, so no webview can raise or answer the prompt. Waits for the person.
     pub fn authenticate(&self, request: AuthenticateRequest) -> Result<bool> {

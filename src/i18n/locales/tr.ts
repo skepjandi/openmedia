@@ -585,6 +585,9 @@ export const tr: Messages = {
   "favorites.backgroundMedia": "Arka planda oynatmaya devam et",
   "favorites.backgroundMediaNote":
     "Kapalı: başka bir siteye geçtiğinizde veya uygulamadan çıktığınızda ses ve video duraklar. Açık: bu site oynatmaya devam eder.",
+  "favorites.pictureInPicture": "Pencere içinde pencere video",
+  "favorites.pictureInPictureNote":
+    "Kapalı: videolar sayfanın içinde kalır. Açık: oynayan video, uygulamadan çıktığınızda küçük bir yüzen pencerede kalır; oynatıcısından da yüzdürebilirsiniz.",
   "fab.tabs": "Sekmeler",
   "fab.show": "Yüzen düğmeyi göster",
   "tabs.title": "Sekmeler",

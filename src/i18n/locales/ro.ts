@@ -594,6 +594,9 @@ export const ro: Messages = {
   "favorites.backgroundMedia": "Continuă redarea în fundal",
   "favorites.backgroundMediaNote":
     "Dezactivat: sunetul și videoclipul se opresc când treci la alt site sau părăsești aplicația. Activat: acest site continuă să redea.",
+  "favorites.pictureInPicture": "Videoclip picture-in-picture",
+  "favorites.pictureInPictureNote":
+    "Dezactivat: videoclipurile rămân în pagină. Activat: un videoclip în redare plutește într-o fereastră mică când părăsești aplicația, și îl poți face să plutească și din player.",
   "fab.tabs": "File",
   "fab.show": "Afișează butonul plutitor",
   "tabs.title": "File",

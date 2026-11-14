@@ -586,6 +586,9 @@ export const pl: Messages = {
   "favorites.backgroundMedia": "Odtwarzaj w tle",
   "favorites.backgroundMediaNote":
     "Wyłączone: dźwięk i wideo wstrzymują się po przejściu do innej witryny lub wyjściu z aplikacji. Włączone: ta witryna gra dalej.",
+  "favorites.pictureInPicture": "Wideo obraz w obrazie",
+  "favorites.pictureInPictureNote":
+    "Wyłączone: wideo zostaje na stronie. Włączone: odtwarzane wideo unosi się w małym oknie po wyjściu z aplikacji, a możesz je też unieść z jego odtwarzacza.",
   "fab.tabs": "Karty",
   "fab.show": "Pokaż pływający przycisk",
   "tabs.title": "Karty",

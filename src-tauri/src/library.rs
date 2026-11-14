@@ -141,6 +141,8 @@ pub struct AppState {
     pub bottom_margin: u32,
     /// The sites whose media keeps playing in the background.
     pub background_media_sites: Vec<String>,
+    /// The sites whose videos may open in a picture-in-picture window.
+    pub picture_in_picture_sites: Vec<String>,
     pub back_button: bool,
     /// Show the exact AI payload and ask before sending it.
     pub ai_preview: bool,
@@ -189,6 +191,10 @@ struct LibraryData {
     /// app is in the background. Every other site's media is paused then.
     #[serde(default)]
     background_media_sites: BTreeSet<String>,
+    /// The sites (registrable domains) whose videos may open in picture-in-picture. Off for every
+    /// other site.
+    #[serde(default)]
+    picture_in_picture_sites: BTreeSet<String>,
     /// Off by default; the shell can show a floating back button over the page.
     #[serde(default)]
     back_button: bool,
@@ -271,6 +277,7 @@ impl Library {
             ad_block: data.ad_block,
             bottom_margin: data.bottom_margin,
             background_media_sites: data.background_media_sites.iter().cloned().collect(),
+            picture_in_picture_sites: data.picture_in_picture_sites.iter().cloned().collect(),
             back_button: data.back_button,
             ai_preview: data.ai_preview,
             locale: data.locale.clone(),
@@ -484,6 +491,28 @@ impl Library {
         }
         self.save(&data)?;
         Ok(data.background_media_sites.iter().cloned().collect())
+    }
+
+    pub fn picture_in_picture_sites(&self) -> Result<Vec<String>> {
+        Ok(self
+            .lock()?
+            .picture_in_picture_sites
+            .iter()
+            .cloned()
+            .collect())
+    }
+
+    /// Lets a site's videos open in a picture-in-picture window, or stops it. Returns the whole list.
+    pub fn set_picture_in_picture(&self, site: &str, enabled: bool) -> Result<Vec<String>> {
+        let site = checked_site(site)?;
+        let mut data = self.lock()?;
+        if enabled {
+            data.picture_in_picture_sites.insert(site);
+        } else {
+            data.picture_in_picture_sites.remove(&site);
+        }
+        self.save(&data)?;
+        Ok(data.picture_in_picture_sites.iter().cloned().collect())
     }
 
     pub fn set_back_button(&self, enabled: bool) -> Result<()> {
@@ -777,6 +806,7 @@ fn default_data() -> LibraryData {
         bottom_margin: 0,
         site_bottom_margins: BTreeMap::new(),
         background_media_sites: BTreeSet::new(),
+        picture_in_picture_sites: BTreeSet::new(),
         back_button: false,
         ai_preview: true,
         icons: BTreeMap::new(),
@@ -1547,6 +1577,26 @@ mod tests {
             );
         }
         assert!(library.background_media_sites().unwrap().is_empty());
+    }
+
+    #[test]
+    fn picture_in_picture_is_off_by_default_per_site_and_persists() {
+        let (dir, library) = library();
+        assert!(library.state().unwrap().picture_in_picture_sites.is_empty());
+        library.set_picture_in_picture("YouTube.com", true).unwrap();
+        library.set_picture_in_picture("vimeo.com", true).unwrap();
+        assert_eq!(
+            reload(&dir).picture_in_picture_sites().unwrap(),
+            vec!["vimeo.com".to_string(), "youtube.com".to_string()]
+        );
+        let left = library
+            .set_picture_in_picture("youtube.com", false)
+            .unwrap();
+        assert_eq!(left, vec!["vimeo.com".to_string()]);
+        assert!(matches!(
+            library.set_picture_in_picture("https://a.example/", true),
+            Err(Error::UnknownSite)
+        ));
     }
 
     #[test]

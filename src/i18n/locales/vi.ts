@@ -581,6 +581,9 @@ export const vi: Messages = {
   "favorites.backgroundMedia": "Tiếp tục phát ở chế độ nền",
   "favorites.backgroundMediaNote":
     "Tắt: âm thanh và video tạm dừng khi bạn chuyển sang trang khác hoặc rời ứng dụng. Bật: trang này tiếp tục phát.",
+  "favorites.pictureInPicture": "Video hình trong hình",
+  "favorites.pictureInPictureNote":
+    "Tắt: video ở lại trong trang. Bật: video đang phát nổi trong cửa sổ nhỏ khi bạn rời ứng dụng, và bạn cũng có thể cho nổi từ trình phát.",
   "fab.tabs": "Thẻ",
   "fab.show": "Hiện nút nổi",
   "tabs.title": "Thẻ",

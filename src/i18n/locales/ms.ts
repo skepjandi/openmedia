@@ -587,6 +587,9 @@ export const ms: Messages = {
   "favorites.backgroundMedia": "Teruskan main di latar belakang",
   "favorites.backgroundMediaNote":
     "Mati: audio dan video dijeda apabila anda bertukar ke laman lain atau meninggalkan aplikasi. Hidup: laman ini terus bermain.",
+  "favorites.pictureInPicture": "Video gambar-dalam-gambar",
+  "favorites.pictureInPictureNote":
+    "Mati: video kekal dalam halaman. Hidup: video yang sedang dimainkan terapung dalam tetingkap kecil apabila anda meninggalkan aplikasi, dan anda juga boleh mengapungkannya daripada pemainnya.",
   "fab.tabs": "Tab",
   "fab.show": "Tunjukkan butang terapung",
   "tabs.title": "Tab",

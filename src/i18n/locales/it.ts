@@ -592,6 +592,9 @@ export const it: Messages = {
   "favorites.backgroundMedia": "Continua la riproduzione in background",
   "favorites.backgroundMediaNote":
     "Disattivato: audio e video vanno in pausa quando passi a un altro sito o lasci l'app. Attivato: questo sito continua a riprodurre.",
+  "favorites.pictureInPicture": "Video picture-in-picture",
+  "favorites.pictureInPictureNote":
+    "Disattivato: i video restano nella pagina. Attivato: un video in riproduzione fluttua in una piccola finestra quando lasci l'app, e puoi farlo fluttuare anche dal suo lettore.",
   "fab.tabs": "Schede",
   "fab.show": "Mostra il pulsante flottante",
   "tabs.title": "Schede",

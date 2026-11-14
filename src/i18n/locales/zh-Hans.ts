@@ -544,6 +544,9 @@ export const zhHans: Messages = {
   "favorites.backgroundMedia": "在后台继续播放",
   "favorites.backgroundMediaNote":
     "关闭：切换到其他网站或离开应用时，音频和视频会暂停。开启：此网站继续播放。",
+  "favorites.pictureInPicture": "画中画视频",
+  "favorites.pictureInPictureNote":
+    "关闭：视频留在页面内。开启：离开应用时，正在播放的视频会以小窗悬浮，也可以从播放器中手动悬浮。",
   "fab.tabs": "标签页",
   "fab.show": "显示悬浮按钮",
   "tabs.title": "标签页",

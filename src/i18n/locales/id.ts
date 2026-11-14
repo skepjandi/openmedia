@@ -585,6 +585,9 @@ export const id: Messages = {
   "favorites.backgroundMedia": "Tetap putar di latar belakang",
   "favorites.backgroundMediaNote":
     "Mati: audio dan video berhenti sejenak saat Anda pindah ke situs lain atau meninggalkan aplikasi. Hidup: situs ini terus diputar.",
+  "favorites.pictureInPicture": "Video gambar-dalam-gambar",
+  "favorites.pictureInPictureNote":
+    "Mati: video tetap di dalam halaman. Hidup: video yang sedang diputar mengambang di jendela kecil saat Anda meninggalkan aplikasi, dan Anda juga bisa mengambangkannya dari pemutarnya.",
   "fab.tabs": "Tab",
   "fab.show": "Tampilkan tombol mengambang",
   "tabs.title": "Tab",

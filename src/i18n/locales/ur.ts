@@ -582,6 +582,9 @@ export const ur: Messages = {
   "favorites.backgroundMedia": "پس منظر میں چلانا جاری رکھیں",
   "favorites.backgroundMediaNote":
     "بند: دوسری سائٹ پر جانے یا ایپ چھوڑنے پر آڈیو اور ویڈیو رک جاتے ہیں۔ آن: یہ سائٹ چلتی رہتی ہے۔",
+  "favorites.pictureInPicture": "پکچر اِن پکچر ویڈیو",
+  "favorites.pictureInPictureNote":
+    "بند: ویڈیو صفحے کے اندر رہتے ہیں۔ آن: ایپ چھوڑنے پر چلتی ہوئی ویڈیو ایک چھوٹی تیرتی ونڈو میں آ جاتی ہے، اور آپ اسے پلیئر سے بھی تیرا سکتے ہیں۔",
   "fab.tabs": "ٹیبز",
   "fab.show": "تیرتا ہوا بٹن دکھائیں",
   "tabs.title": "ٹیبز",

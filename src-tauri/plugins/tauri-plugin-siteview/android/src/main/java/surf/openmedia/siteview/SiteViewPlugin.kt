@@ -570,6 +570,17 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
     }
 
     /**
+     * Names the sites whose videos may open in picture-in-picture. Rust-only, like
+     * [setBackgroundMedia]. Android has no picture-in-picture for a page's video yet (the activity
+     * would have to enter it), so the list is accepted and not acted on, and the shell does not
+     * offer the switch there.
+     */
+    @Command
+    fun setPictureInPicture(invoke: Invoke) {
+        invoke.resolve()
+    }
+
+    /**
      * Pauses the media of every page that is out of sight, unless its site may play on, and resumes
      * what was paused when the page is shown again. A closed page is left to [applyBlocked].
      */
