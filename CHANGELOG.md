@@ -6,6 +6,16 @@ All notable changes to OpenMedia are documented here.
 >
 > **Wiki**: the [GitHub Wiki](https://github.com/skepjandi/openmedia/wiki) is the public-facing main wiki — architecture, recipe format, AI pipeline, security model, roadmap. Source-controlled editing surface is `docs/wiki/` in this repo; CI (`.github/workflows/sync-wiki.yml`) mirrors it to the GitHub Wiki on every merge to `main`. New single-PR changes belong here, not as new wiki pages.
 
+### feat(tabs): the Tabs page lists the favorites beyond quick access
+
+**Area:** `feat(tabs)`
+
+**Change:** The Tabs page has a *More favorites* section under Quick access with every favorite past the first six, so all favorites can be opened from it. Without Pro the section is one locked row that opens the paywall, as in Settings. No new strings (`favorites.more`, `favorites.moreLocked` already exist in all locales).
+
+**Verified:** `tsc`, ESLint, Prettier, Vitest `src/features/tabs`. **Not verified:** the layout on a device or simulator.
+
+**PR:** #207
+
 ### feat(release): versioned release title and notes generated from commits
 
 **Area:** `feat(release)`
