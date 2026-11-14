@@ -6,6 +6,16 @@ All notable changes to OpenMedia are documented here.
 >
 > **Wiki**: the [GitHub Wiki](https://github.com/skepjandi/openmedia/wiki) is the public-facing main wiki — architecture, recipe format, AI pipeline, security model, roadmap. Source-controlled editing surface is `docs/wiki/` in this repo; CI (`.github/workflows/sync-wiki.yml`) mirrors it to the GitHub Wiki on every merge to `main`. New single-PR changes belong here, not as new wiki pages.
 
+### feat(release): versioned release title and notes generated from commits
+
+**Area:** `feat(release)`
+
+**Change:** `yarn ota app` creates the `v<version>` release titled `OpenMedia <version>: <newest feature>`, with notes grouped into New / Fixed / Other with PR links and a compare link (`scripts/lib/release-notes.mjs`); the updater's `latest.json` uses the same notes. The rolling `ota` release is retitled and re-noted with the version and changes on every web publish. The app and manifest jobs fetch full git history so the notes can read tags and commits.
+
+**Verified:** `vitest` on `scripts/lib`. **Not verified:** a real `yarn ota app` run.
+
+**PR:** n/a
+
 ### feat(store): panoramic App Store and Google Play artwork
 
 **Area:** `feat(store)`

@@ -45,6 +45,7 @@ import {
   publicKeyOf,
   releaseAssetName,
 } from "./lib/ota-bundle.mjs";
+import { releaseNotes, releaseTitle } from "./lib/release-notes.mjs";
 
 const root = path.resolve(import.meta.dirname, "..");
 const tauriDir = path.join(root, "src-tauri");
@@ -98,6 +99,37 @@ const keyDir = () => env.OPENMEDIA_OTA_KEY_DIR || path.join(os.homedir(), ".open
 
 const gh = (...ghArgs) => run("gh", [...ghArgs, "--repo", repository()]);
 const ghOutput = (...ghArgs) => capture("gh", [...ghArgs, "--repo", repository()]);
+
+function otaRelease(revision) {
+  const { title, notes } = changes();
+  const date = new Date().toISOString().slice(0, 10);
+  return {
+    title: `${title} (web update)`,
+    notes: [
+      `Web update for **OpenMedia ${version}**, revision ${revision}, ${date}.`,
+      "",
+      "The assets here are signed web-layer bundles that installed apps fetch and verify by themselves, so the interface updates without a store release. They are not an app download. Managed by `yarn ota`; do not edit the assets.",
+      "",
+      notes,
+    ].join("\n"),
+  };
+}
+
+/** Title and notes for this version, from the commits since the previous v* release tag. */
+function changes() {
+  const tags = (capture("git", ["tag", "--list", "v*", "--sort=-v:refname"]) ?? "")
+    .split("\n")
+    .filter((tag) => tag && tag !== `v${version}`);
+  const previousTag = tags[0];
+  const range = previousTag ? [`${previousTag}..HEAD`] : ["--max-count=60"];
+  const subjects = (capture("git", ["log", "--no-merges", "--format=%s", ...range]) ?? "")
+    .split("\n")
+    .filter(Boolean);
+  return {
+    title: releaseTitle(version, subjects),
+    notes: releaseNotes({ version, previousTag, subjects, repository: repository() }),
+  };
+}
 
 function ensureRelease(tag, { title, notes, prerelease }) {
   if (ghOutput("release", "view", tag) !== null) return;
@@ -219,12 +251,9 @@ function publishWeb() {
   if (flag("--dry-run"))
     return console.log(`ota: dry run, nothing published (${path.relative(root, out)})`);
 
-  ensureRelease(OTA_TAG, {
-    title: "Over-the-air web bundles",
-    notes:
-      "Signed web-layer bundles the app downloads by itself. Managed by `yarn ota`; do not edit.",
-    prerelease: true,
-  });
+  const { title, notes } = otaRelease(revision);
+  ensureRelease(OTA_TAG, { title, notes, prerelease: true });
+  gh("release", "edit", OTA_TAG, "--title", title, "--notes", notes);
   // The bundle first: the pointer is what makes an app look for it.
   upload(OTA_TAG, [bundleFile]);
   upload(OTA_TAG, [pointerFile]);
@@ -319,10 +348,8 @@ function publishApp() {
   const files = buildApp();
   console.log(`ota: built ${files.map((file) => path.basename(file)).join(", ")}`);
   if (flag("--dry-run")) return console.log("ota: dry run, nothing published");
-  ensureRelease(`v${version}`, {
-    title: `OpenMedia ${version}`,
-    notes: option("--notes") ?? `OpenMedia ${version}`,
-  });
+  const { title, notes } = changes();
+  ensureRelease(`v${version}`, { title, notes: option("--notes") ?? notes });
   upload(`v${version}`, files);
   if (!flag("--no-manifest")) publishManifest();
 }
@@ -345,7 +372,7 @@ function publishManifest() {
 
   const latest = buildLatestJson({
     version,
-    notes: option("--notes") ?? `OpenMedia ${version}`,
+    notes: option("--notes") ?? changes().notes,
     pubDate: new Date().toISOString(),
     downloadBase: `https://github.com/${repository()}/releases/download/${tag}`,
     assetNames,
