@@ -43,18 +43,26 @@ Mac slot (`macos/<size>/`, `APP_DESKTOP`): 8 slides in each of 1280 × 800, 1440
 
 ## Android caveat
 
-The Android site-view implementation and build path exist, but Android has not been verified on a device or emulator. These Android artwork sets reuse iOS captures in a neutral device frame; replace them with Android app captures before submitting to Google Play.
+The Android site-view implementation and build path exist, but Android has not been verified on a device or emulator. These Android artwork sets reuse iOS captures (frameless: Google advises against device art in listings, so there is no device frame, only a thin edge light). Replace them with Android app captures before submitting to Google Play.
+
+## Panoramic layout
+
+Every set is one panorama: a single wide scene sliced into the 8 store images, so the gallery reads as one picture when swiped. The backdrop (ink to royal blue and back, with aurora glows), a twisting ribbon, seam-centred ripples and a particle field cross the seams. The particles are the "noise": thick on the left, gone by the right. Each slice still stands alone: its headline and device sit fully inside it, and only decoration plus one zoom card (the fan menu, from slide 2 into slide 3) cross a seam. App Store search shows the first three portrait slices on their own, so nothing the viewer needs is split.
+
+iOS and iPad devices are drawn in CSS (no Apple bezel assets). The Mac sets use the native window captures. `macos/2880x1800/` is rendered; the other three sizes are exact 16:10 Lanczos downscales of it.
 
 ## Regenerating
 
-`scripts/render-store-assets.mjs` composes the artwork from `captures/`: a themed background, one headline per screen and a device frame drawn in CSS (no Apple bezel assets).
+`scripts/render-store-assets.mjs` composes the artwork from `captures/`.
 
 Needs Node, Google Chrome and ImageMagick (`magick`). Fonts come from `node_modules` (`yarn install` first).
 
 ```bash
 node scripts/render-store-assets.mjs                    # everything
 node scripts/render-store-assets.mjs ios/ipad-13        # one folder
+node scripts/render-store-assets.mjs macos/2880x1800    # Mac, all four sizes
 node scripts/render-store-assets.mjs android/feature-graphic
+node scripts/render-store-assets.mjs ios/iphone-6.9 --panorama   # also writes the full strip to /tmp
 ```
 
-Set `CHROME_BIN` to use a Chrome or Chromium binary other than the macOS default. Headlines and themes are in the `slides` array; set sizes and device placement are in `sets`.
+Set `CHROME_BIN` to use a Chrome or Chromium binary other than the macOS default. Headlines are in the `slides` array, the zoom card in `zoomCards`, set sizes and device placement in `sets`, the palette in `backdropCss`. A full run takes a few minutes; the sets are independent, so run several folders in parallel.

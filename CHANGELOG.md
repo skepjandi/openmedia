@@ -6,6 +6,18 @@ All notable changes to OpenMedia are documented here.
 >
 > **Wiki**: the [GitHub Wiki](https://github.com/skepjandi/openmedia/wiki) is the public-facing main wiki — architecture, recipe format, AI pipeline, security model, roadmap. Source-controlled editing surface is `docs/wiki/` in this repo; CI (`.github/workflows/sync-wiki.yml`) mirrors it to the GitHub Wiki on every merge to `main`. New single-PR changes belong here, not as new wiki pages.
 
+### feat(store): panoramic App Store and Google Play artwork
+
+**Area:** `feat(store)`
+
+**Problem:** The listing images were eight separate cards (a flat colour per slide, a boxed phone), so the gallery looked like a stack of unrelated posters.
+
+**Change:** `scripts/render-store-assets.mjs` now draws each set (iPhone 6.1/6.3/6.9, iPad 13, Android phone and tablet, Mac) as one panorama and slices it into the 8 images: a continuous backdrop, a ribbon and ripples that cross every seam, a particle field that thins from left to right, glass-rimmed devices, a pill eyebrow, and one fan-menu zoom card that reaches from slide 2 into slide 3. Android sets are frameless, as Google advises. The Google Play feature graphic uses the same scene with frameless screenshot cards instead of phones. The Mac sizes other than 2880 × 1800 are downscales of it. Sizes, file names and copy are unchanged. `--panorama` writes the full strip for review.
+
+**Verified:** every output has the store size and no alpha channel; checked by eye on each strip. **Not verified:** how the first three slides look in App Store Connect's preview or on a device.
+
+**PR:** n/a
+
 ### feat(history): clear all and delete single entries on the History page
 
 **Area:** `feat(history)`

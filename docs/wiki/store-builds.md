@@ -135,7 +135,7 @@ The Kotlin Android implementation and AAB build path exist, but Android runtime 
 
 ## Store artwork
 
-Artwork files and sizes are listed in [`assets/store/README.md`](../../assets/store/README.md). The Android images currently use iOS captures in device frames; **replace them with screenshots captured from the Android app before submitting to Google Play**. Usage and Limits screens show synthetic sample data.
+Artwork files and sizes are listed in [`assets/store/README.md`](../../assets/store/README.md); the images are slices of one panorama per set. The Android images currently use iOS captures, frameless; **replace them with screenshots captured from the Android app before submitting to Google Play**. Usage and Limits screens show synthetic sample data.
 
 ## See also
 
