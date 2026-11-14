@@ -4,6 +4,7 @@ import type { VideoControls } from "./ipc";
 export const VIDEO_CONTROLS_DEFAULT: VideoControls = {
   panel: true,
   height: 16,
+  fullVideos: false,
   remember: false,
   loopOff: false,
   autoAdvance: false,

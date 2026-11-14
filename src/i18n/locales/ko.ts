@@ -214,6 +214,9 @@ export const ko: Messages = {
   "settings.videoPanel": "탭하면 컨트롤 표시",
   "settings.videoPanelNote":
     "동영상을 탭하면 사이트 자체 탭 동작 대신 일시정지, 6초 뒤로·앞으로, 음소거, 속도, 탐색 막대가 표시됩니다. 즐겨찾기에서 끄면 사이트 자체 컨트롤로 돌아갑니다.",
+  "settings.videoFull": "전체 동영상에서도 사용",
+  "settings.videoFullNote":
+    "시청 페이지에서도 사이트 자체 컨트롤 대신 이 컨트롤을 사용합니다. 끄면 자막, 화질 등 더 많은 기능이 있는 사이트 자체 플레이어가 유지됩니다.",
   "settings.videoHeight": "컨트롤 높이",
   "settings.videoHeightNote":
     "컨트롤이 하단 가장자리에서 얼마나 위에 놓일지 정합니다. 즐겨찾기별로 따로 설정할 수 있습니다.",
@@ -327,6 +330,9 @@ export const ko: Messages = {
   "favorites.videoControls": "OpenMedia 동영상 컨트롤",
   "favorites.videoControlsNote":
     "동영상을 탭하면 OpenMedia 컨트롤이 표시됩니다. 끄면 사이트 자체 컨트롤로 돌아갑니다.",
+  "favorites.videoFull": "전체 동영상에서도 사용",
+  "favorites.videoFullNote":
+    "이 사이트의 시청 페이지에서도 이 컨트롤을 사용합니다. 끄면 사이트 자체 플레이어가 유지됩니다.",
   "favorites.videoHeight": "동영상 컨트롤 높이",
   "favorites.videoHeightShared":
     "공통 높이를 사용합니다. 슬라이더를 옮기면 이 사이트만 별도의 높이를 갖게 됩니다.",

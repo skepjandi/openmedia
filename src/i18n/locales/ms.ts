@@ -214,6 +214,9 @@ export const ms: Messages = {
   "settings.videoPanel": "Kawalan semasa diketik",
   "settings.videoPanelNote":
     "Ketik video untuk memaparkan jeda, ke belakang dan ke hadapan 6 saat, senyap, kelajuan dan bar carian, menggantikan ketikan asal laman. Kegemaran boleh mematikannya untuk mendapatkan semula kawalan asal laman.",
+  "settings.videoFull": "Juga pada video penuh",
+  "settings.videoFullNote":
+    "Guna kawalan ini pada halaman tonton juga, menggantikan kawalan asal laman. Jika dimatikan, pemain asal laman kekal, yang mempunyai lebih banyak ciri, seperti sari kata dan kualiti.",
   "settings.videoHeight": "Ketinggian kawalan",
   "settings.videoHeightNote":
     "Sejauh mana kawalan berada di atas tepi bawah. Kegemaran boleh menetapkan ketinggiannya sendiri.",
@@ -332,6 +335,9 @@ export const ms: Messages = {
   "favorites.videoControls": "Kawalan video OpenMedia",
   "favorites.videoControlsNote":
     "Ketik video untuk memaparkan kawalan OpenMedia. Jika dimatikan, kawalan asal laman kembali.",
+  "favorites.videoFull": "Juga pada video penuh",
+  "favorites.videoFullNote":
+    "Guna kawalan ini pada halaman tonton laman ini juga. Jika dimatikan, pemain asal laman kekal.",
   "favorites.videoHeight": "Ketinggian kawalan video",
   "favorites.videoHeightShared":
     "Guna ketinggian bersama. Leret peluncur untuk memberi laman ini ketinggian sendiri.",

@@ -213,6 +213,9 @@ export const vi: Messages = {
   "settings.videoPanel": "Điều khiển khi chạm",
   "settings.videoPanelNote":
     "Chạm vào video để hiện tạm dừng, tua lùi và tua tới 6 giây, tắt tiếng, tốc độ và thanh tua, thay cho thao tác chạm của chính trang. Một mục yêu thích có thể tắt để dùng lại điều khiển của trang.",
+  "settings.videoFull": "Cả trên video đầy đủ",
+  "settings.videoFullNote":
+    "Dùng điều khiển cả ở trang xem, thay cho điều khiển của trang. Khi tắt, giữ trình phát của trang, có nhiều hơn, như phụ đề và chất lượng.",
   "settings.videoHeight": "Độ cao điều khiển",
   "settings.videoHeightNote":
     "Điều khiển nằm cao hơn mép dưới bao nhiêu. Một mục yêu thích có thể đặt độ cao riêng.",
@@ -331,6 +334,9 @@ export const vi: Messages = {
   "favorites.videoControls": "Điều khiển video của OpenMedia",
   "favorites.videoControlsNote":
     "Chạm vào video để hiện điều khiển của OpenMedia. Khi tắt, sẽ dùng lại điều khiển của trang.",
+  "favorites.videoFull": "Cả trên video đầy đủ",
+  "favorites.videoFullNote":
+    "Dùng điều khiển cả ở trang xem của trang này. Khi tắt, giữ trình phát riêng của trang.",
   "favorites.videoHeight": "Độ cao điều khiển video",
   "favorites.videoHeightShared":
     "Dùng độ cao chung. Kéo thanh trượt để đặt độ cao riêng cho trang này.",

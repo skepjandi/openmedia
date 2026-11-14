@@ -221,6 +221,9 @@ export const it: Messages = {
   "settings.videoPanel": "Controlli al tocco",
   "settings.videoPanelNote":
     "Tocca un video per mostrare pausa, 6 secondi indietro e avanti, disattiva audio, velocità e una barra di scorrimento, al posto del tocco del sito. Un preferito può disattivarlo per riavere i controlli del sito.",
+  "settings.videoFull": "Anche nei video a schermo intero",
+  "settings.videoFullNote":
+    "Usa i controlli anche nelle pagine di visione, al posto di quelli del sito. Se disattivato, resta il lettore del sito, che offre di più, come sottotitoli e qualità.",
   "settings.videoHeight": "Altezza dei controlli",
   "settings.videoHeightNote":
     "A quale distanza dal bordo inferiore stanno i controlli. Un preferito può averne una propria.",
@@ -337,6 +340,9 @@ export const it: Messages = {
   "favorites.videoControls": "Controlli video di OpenMedia",
   "favorites.videoControlsNote":
     "Tocca un video per mostrare i controlli di OpenMedia. Se disattivato, tornano quelli del sito.",
+  "favorites.videoFull": "Anche nei video a schermo intero",
+  "favorites.videoFullNote":
+    "Usa i controlli anche nelle pagine di visione di questo sito. Se disattivato, resta il lettore del sito.",
   "favorites.videoHeight": "Altezza dei controlli video",
   "favorites.videoHeightShared":
     "Usa l’altezza condivisa. Sposta il cursore per dare a questo sito un’altezza dedicata.",

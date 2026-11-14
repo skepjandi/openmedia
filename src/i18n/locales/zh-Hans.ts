@@ -201,6 +201,9 @@ export const zhHans: Messages = {
   "settings.videoPanel": "点按显示控制",
   "settings.videoPanelNote":
     "点按视频即可显示暂停、后退和快进 6 秒、静音、倍速和进度条，取代网站自己的点按操作。收藏可以关闭此功能，恢复网站自己的控制。",
+  "settings.videoFull": "完整视频也适用",
+  "settings.videoFullNote":
+    "在观看页面也使用这些控制，取代网站自己的控制。关闭后保留网站自己的播放器，功能更多，例如字幕和画质。",
   "settings.videoHeight": "控制高度",
   "settings.videoHeightNote": "控制离底边有多高。收藏可以设置自己的高度。",
   "settings.videoHeightLabel": "视频控制高度",
@@ -310,6 +313,8 @@ export const zhHans: Messages = {
   "favorites.bottomMargin": "底部边距",
   "favorites.videoControls": "OpenMedia 视频控制",
   "favorites.videoControlsNote": "点按视频即可显示 OpenMedia 的控制。关闭后恢复网站自己的控制。",
+  "favorites.videoFull": "完整视频也适用",
+  "favorites.videoFullNote": "在这个网站的观看页面也使用这些控制。关闭后保留网站自己的播放器。",
   "favorites.videoHeight": "视频控制高度",
   "favorites.videoHeightShared": "使用共享高度。拖动滑块可让这个网站使用自己的高度。",
   "favorites.videoHeightOwn": "这个网站有自己的高度。",

@@ -213,6 +213,9 @@ export const de: Messages = {
   "settings.videoPanel": "Steuerung beim Tippen",
   "settings.videoPanelNote":
     "Tippe auf ein Video, um Pause, 6 Sekunden zurück und vor, Stummschaltung, Tempo und eine Suchleiste zu zeigen, statt des eigenen Tippens der Website. Ein Favorit kann das ausschalten, um die Steuerung der Website zurückzubekommen.",
+  "settings.videoFull": "Auch bei vollen Videos",
+  "settings.videoFullNote":
+    "Nutze die Steuerung auch auf Wiedergabeseiten, statt der eigenen der Website. Aus behält den Player der Website, der mehr bietet, etwa Untertitel und Qualität.",
   "settings.videoHeight": "Höhe der Steuerung",
   "settings.videoHeightNote":
     "Wie weit über dem unteren Rand die Steuerung sitzt. Ein Favorit kann eine eigene festlegen.",
@@ -334,6 +337,9 @@ export const de: Messages = {
   "favorites.videoControls": "OpenMedia-Videosteuerung",
   "favorites.videoControlsNote":
     "Tippe auf ein Video, um die Steuerung von OpenMedia zu zeigen. Aus gibt die der Website zurück.",
+  "favorites.videoFull": "Auch bei vollen Videos",
+  "favorites.videoFullNote":
+    "Nutze die Steuerung auch auf den Wiedergabeseiten dieser Website. Aus behält den eigenen Player der Website.",
   "favorites.videoHeight": "Höhe der Videosteuerung",
   "favorites.videoHeightShared":
     "Verwendet die gemeinsame Höhe. Verschiebe den Regler, um dieser Website eine eigene zu geben.",

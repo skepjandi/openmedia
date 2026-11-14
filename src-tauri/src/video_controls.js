@@ -1,8 +1,9 @@
 (function (config) {
   'use strict';
   // OpenMedia's controls for the video in view in a full-screen feed (YouTube Shorts, Reels,
-  // TikTok, or any page the feed player is told about) and for the video of a page that is about
-  // one video (a watch page). They stay hidden; a tap on the video shows a panel in place of the
+  // TikTok, or any page the feed player is told about) and, when the reader asked for it, for the
+  // video of a page that is about one video (a watch page), whose own controls are left alone
+  // otherwise. They stay hidden; a tap on the video shows a panel in place of the
   // site's own tap: pause, back and forward 6 seconds, mute, speed, and a seek bar with the time
   // left. The reader can switch the panel off, or move it, for the whole app or for one site; with
   // it off nothing here touches the page's own controls. Around it: the last speed and sound
@@ -84,7 +85,7 @@
 
     // Where the panel may show: a feed, or a page about one video.
     function panelPage() {
-      return !document.hidden && !window.__openmediaHold && (onFeedPage() || watchPage());
+      return !document.hidden && !window.__openmediaHold && (onFeedPage() || (fullVideosOn() && watchPage()));
     }
 
     // The video the panel works on: the feed player's in a feed, else the biggest one on screen.
@@ -123,7 +124,10 @@
       return outer.height <= height * WRAPPER_MAX ? outer : box;
     }
 
+    // What the reader chose last, put on a new video, only where these controls are in charge: a
+    // watch page that keeps its own player (and its own idea of speed) is left as it is.
     function prefer(video) {
+      if (!panelPage()) return;
       var saved = read();
       if (panelOn() && typeof saved.rate === 'number') {
         try {
@@ -214,6 +218,12 @@
     function panelOn() {
       var site = siteChoice();
       return typeof site.panel === 'boolean' ? site.panel : !!config.panel;
+    }
+
+    // The panel on a watch page too, in place of the site's own player controls: only when asked.
+    function fullVideosOn() {
+      var site = siteChoice();
+      return typeof site.fullVideos === 'boolean' ? site.fullVideos : !!config.fullVideos;
     }
 
     function panelHeight() {

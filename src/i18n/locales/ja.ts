@@ -214,6 +214,9 @@ export const ja: Messages = {
   "settings.videoPanel": "タップでコントロール表示",
   "settings.videoPanelNote":
     "動画をタップすると、サイト標準のタップの代わりに、一時停止、6秒戻る・進む、ミュート、速度、シークバーが表示されます。お気に入りでオフにすると、サイト標準のコントロールに戻せます。",
+  "settings.videoFull": "通常の動画でも使う",
+  "settings.videoFullNote":
+    "視聴ページでも、サイト標準のものの代わりにこのコントロールを使います。オフにするとサイト標準のプレーヤーのままで、字幕や画質の設定など、より多くの機能が使えます。",
   "settings.videoHeight": "コントロールの高さ",
   "settings.videoHeightNote":
     "コントロールを下端からどれだけ上に置くかを設定します。お気に入りごとに個別に設定できます。",
@@ -329,6 +332,9 @@ export const ja: Messages = {
   "favorites.videoControls": "OpenMediaの動画コントロール",
   "favorites.videoControlsNote":
     "動画をタップするとOpenMediaのコントロールが表示されます。オフにするとサイト標準のものに戻ります。",
+  "favorites.videoFull": "通常の動画でも使う",
+  "favorites.videoFullNote":
+    "このサイトの視聴ページでもこのコントロールを使います。オフにするとサイト標準のプレーヤーのままです。",
   "favorites.videoHeight": "動画コントロールの高さ",
   "favorites.videoHeightShared":
     "共通の高さを使います。スライダーを動かすと、このサイト専用の値になります。",

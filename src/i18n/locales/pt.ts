@@ -220,6 +220,9 @@ export const pt: Messages = {
   "settings.videoPanel": "Controlos ao tocar",
   "settings.videoPanelNote":
     "Toca num vídeo para mostrar pausa, recuar e avançar 6 segundos, silenciar, velocidade e uma barra de progresso, em vez do toque do próprio site. Um favorito pode desligar isto para recuperar os controlos do site.",
+  "settings.videoFull": "Também em vídeos completos",
+  "settings.videoFullNote":
+    "Usa os controlos também nas páginas de visualização, em vez dos do próprio site. Desligado, mantém o leitor do site, que tem mais opções, como legendas e qualidade.",
   "settings.videoHeight": "Altura dos controlos",
   "settings.videoHeightNote":
     "A que distância acima do limite inferior ficam os controlos. Um favorito pode definir a sua própria.",
@@ -339,6 +342,9 @@ export const pt: Messages = {
   "favorites.videoControls": "Controlos de vídeo do OpenMedia",
   "favorites.videoControlsNote":
     "Toca num vídeo para mostrar os controlos do OpenMedia. Desligado, volta a ter os do próprio site.",
+  "favorites.videoFull": "Também em vídeos completos",
+  "favorites.videoFullNote":
+    "Usa os controlos também nas páginas de visualização deste site. Desligado, mantém o leitor do próprio site.",
   "favorites.videoHeight": "Altura dos controlos de vídeo",
   "favorites.videoHeightShared":
     "Usa a altura partilhada. Move o controlo deslizante para dar a este site a sua própria.",

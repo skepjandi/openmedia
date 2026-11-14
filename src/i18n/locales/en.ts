@@ -218,6 +218,9 @@ export const en = {
   "settings.videoPanel": "Controls on tap",
   "settings.videoPanelNote":
     "Tap a video to show pause, back and forward 6 seconds, mute, speed and a seek bar, instead of the site's own tap. A favorite can turn this off to get the site's own controls back.",
+  "settings.videoFull": "Also on full videos",
+  "settings.videoFullNote":
+    "Use the controls on watch pages too, in place of the site's own. Off keeps the site's player, which has more, such as captions and quality.",
   "settings.videoHeight": "Controls height",
   "settings.videoHeightNote":
     "How far above the bottom edge the controls sit. A favorite can set its own.",
@@ -334,6 +337,9 @@ export const en = {
   "favorites.videoControls": "OpenMedia video controls",
   "favorites.videoControlsNote":
     "Tap a video to show OpenMedia's controls. Off gives back the site's own.",
+  "favorites.videoFull": "Also on full videos",
+  "favorites.videoFullNote":
+    "Use the controls on this site's watch pages too. Off keeps the site's own player.",
   "favorites.videoHeight": "Video controls height",
   "favorites.videoHeightShared":
     "Uses the shared height. Move the slider to give this site its own.",

@@ -213,6 +213,9 @@ export const id: Messages = {
   "settings.videoPanel": "Kontrol saat diketuk",
   "settings.videoPanelNote":
     "Ketuk video untuk menampilkan jeda, mundur dan maju 6 detik, bisukan, kecepatan, dan bilah geser, menggantikan ketukan bawaan situs. Favorit dapat mematikannya agar kontrol bawaan situs kembali.",
+  "settings.videoFull": "Juga di video penuh",
+  "settings.videoFullNote":
+    "Gunakan kontrol ini juga di halaman tonton, menggantikan kontrol bawaan situs. Jika mati, pemutar bawaan situs tetap dipakai, yang punya lebih banyak fitur, seperti teks dan kualitas.",
   "settings.videoHeight": "Tinggi kontrol",
   "settings.videoHeightNote":
     "Seberapa tinggi kontrol dari tepi bawah. Favorit dapat mengatur sendiri.",
@@ -329,6 +332,9 @@ export const id: Messages = {
   "favorites.videoControls": "Kontrol video OpenMedia",
   "favorites.videoControlsNote":
     "Ketuk video untuk menampilkan kontrol OpenMedia. Jika mati, kontrol bawaan situs kembali.",
+  "favorites.videoFull": "Juga di video penuh",
+  "favorites.videoFullNote":
+    "Gunakan kontrol ini juga di halaman tonton situs ini. Jika mati, pemutar bawaan situs tetap dipakai.",
   "favorites.videoHeight": "Tinggi kontrol video",
   "favorites.videoHeightShared":
     "Memakai tinggi bersama. Geser slider untuk memberi situs ini tinggi sendiri.",

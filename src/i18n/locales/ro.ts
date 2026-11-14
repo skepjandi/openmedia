@@ -218,6 +218,9 @@ export const ro: Messages = {
   "settings.videoPanel": "Comenzi la atingere",
   "settings.videoPanelNote":
     "Atinge un videoclip ca să apară pauza, înapoi și înainte cu 6 secunde, dezactivarea sunetului, viteza și o bară de derulare, în loc de atingerea proprie a site-ului. Un favorit poate dezactiva asta ca să revii la comenzile site-ului.",
+  "settings.videoFull": "Și la videoclipurile complete",
+  "settings.videoFullNote":
+    "Folosește comenzile și pe paginile de vizionare, în locul celor ale site-ului. Dezactivat, păstrează playerul site-ului, care are mai multe opțiuni, precum subtitrări și calitate.",
   "settings.videoHeight": "Înălțimea comenzilor",
   "settings.videoHeightNote":
     "La ce distanță deasupra marginii de jos se află comenzile. Un favorit poate avea propria înălțime.",
@@ -338,6 +341,9 @@ export const ro: Messages = {
   "favorites.videoControls": "Comenzi video OpenMedia",
   "favorites.videoControlsNote":
     "Atinge un videoclip ca să apară comenzile OpenMedia. Dezactivat, revii la cele ale site-ului.",
+  "favorites.videoFull": "Și la videoclipurile complete",
+  "favorites.videoFullNote":
+    "Folosește comenzile și pe paginile de vizionare ale acestui site. Dezactivat, păstrează playerul propriu al site-ului.",
   "favorites.videoHeight": "Înălțimea comenzilor video",
   "favorites.videoHeightShared":
     "Folosește înălțimea comună. Mută glisorul pentru a da acestui site una proprie.",

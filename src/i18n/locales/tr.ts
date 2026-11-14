@@ -217,6 +217,9 @@ export const tr: Messages = {
   "settings.videoPanel": "Dokununca kontroller",
   "settings.videoPanelNote":
     "Duraklatma, 6 saniye geri ve ileri, sessiz, hız ve arama çubuğunu göstermek için bir videoya dokunun; sitenin kendi dokunuşu yerine geçer. Bir favori bunu kapatıp sitenin kendi kontrollerini geri getirebilir.",
+  "settings.videoFull": "Tam videolarda da",
+  "settings.videoFullNote":
+    "Kontrolleri izleme sayfalarında da sitenin kendi kontrollerinin yerine kullanın. Kapalıyken sitenin oynatıcısı kalır; altyazı ve kalite gibi daha fazlasına sahiptir.",
   "settings.videoHeight": "Kontrol yüksekliği",
   "settings.videoHeightNote":
     "Kontrollerin alt kenarın ne kadar üstünde durduğu. Bir favori kendi yüksekliğini belirleyebilir.",
@@ -334,6 +337,9 @@ export const tr: Messages = {
   "favorites.videoControls": "OpenMedia video kontrolleri",
   "favorites.videoControlsNote":
     "OpenMedia'nın kontrollerini göstermek için bir videoya dokunun. Kapalıyken sitenin kendi kontrolleri geri gelir.",
+  "favorites.videoFull": "Tam videolarda da",
+  "favorites.videoFullNote":
+    "Kontrolleri bu sitenin izleme sayfalarında da kullanın. Kapalıyken sitenin kendi oynatıcısı kalır.",
   "favorites.videoHeight": "Video kontrolleri yüksekliği",
   "favorites.videoHeightShared":
     "Paylaşılan yüksekliği kullanır. Bu siteye kendi yüksekliğini vermek için kaydırıcıyı hareket ettirin.",

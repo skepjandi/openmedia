@@ -217,6 +217,9 @@ export const cs: Messages = {
   "settings.videoPanel": "Ovládání klepnutím",
   "settings.videoPanelNote":
     "Klepnutím na video zobrazíte pozastavení, přetočení o 6 sekund zpět a vpřed, ztlumení, rychlost a posuvník přehrávání místo klepnutí samotného webu. Oblíbená stránka to může vypnout a vrátit ovládání webu.",
+  "settings.videoFull": "I u celých videí",
+  "settings.videoFullNote":
+    "Používejte ovládání i na stránkách přehrávání místo ovládání samotného webu. Vypnuto ponechá přehrávač webu, který nabízí více, například titulky a kvalitu.",
   "settings.videoHeight": "Výška ovládání",
   "settings.videoHeightNote":
     "Jak vysoko nad spodním okrajem ovládání leží. Oblíbená stránka může mít vlastní.",
@@ -335,6 +338,9 @@ export const cs: Messages = {
   "favorites.videoControls": "Ovládání videa OpenMedia",
   "favorites.videoControlsNote":
     "Klepnutím na video zobrazíte ovládání OpenMedia. Vypnuto vrátí ovládání samotného webu.",
+  "favorites.videoFull": "I u celých videí",
+  "favorites.videoFullNote":
+    "Používejte ovládání i na stránkách přehrávání tohoto webu. Vypnuto ponechá přehrávač samotného webu.",
   "favorites.videoHeight": "Výška ovládání videa",
   "favorites.videoHeightShared":
     "Používá sdílenou výšku. Posunutím jezdce dáte tomuto webu vlastní.",

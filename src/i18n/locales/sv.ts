@@ -216,6 +216,9 @@ export const sv: Messages = {
   "settings.videoPanel": "Kontroller vid tryck",
   "settings.videoPanelNote":
     "Tryck på en video för att visa paus, 6 sekunder bakåt och framåt, ljud av, hastighet och ett sökfält, i stället för webbplatsens eget tryck. En favorit kan stänga av detta för att få tillbaka webbplatsens egna kontroller.",
+  "settings.videoFull": "Även på hela videor",
+  "settings.videoFullNote":
+    "Använd kontrollerna även på visningssidor, i stället för webbplatsens egna. Av behåller webbplatsens spelare, som har fler funktioner, till exempel undertexter och kvalitet.",
   "settings.videoHeight": "Kontrollernas höjd",
   "settings.videoHeightNote":
     "Hur högt över nedre kanten kontrollerna sitter. En favorit kan ha en egen.",
@@ -335,6 +338,9 @@ export const sv: Messages = {
   "favorites.videoControls": "OpenMedias videokontroller",
   "favorites.videoControlsNote":
     "Tryck på en video för att visa OpenMedias kontroller. Av ger tillbaka webbplatsens egna.",
+  "favorites.videoFull": "Även på hela videor",
+  "favorites.videoFullNote":
+    "Använd kontrollerna även på den här webbplatsens visningssidor. Av behåller webbplatsens egen spelare.",
   "favorites.videoHeight": "Videokontrollernas höjd",
   "favorites.videoHeightShared":
     "Använder den delade höjden. Flytta reglaget för att ge den här webbplatsen en egen.",

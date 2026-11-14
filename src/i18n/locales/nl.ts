@@ -218,6 +218,9 @@ export const nl: Messages = {
   "settings.videoPanel": "Bediening bij tikken",
   "settings.videoPanelNote":
     "Tik op een video om pauzeren, 6 seconden terug en vooruit, dempen, snelheid en een zoekbalk te tonen, in plaats van de eigen tik van de site. Een favoriet kan dit uitzetten om de eigen bediening van de site terug te krijgen.",
+  "settings.videoFull": "Ook bij volledige video’s",
+  "settings.videoFullNote":
+    "Gebruik de bediening ook op kijkpagina’s, in plaats van die van de site zelf. Uit houdt de eigen speler van de site, die meer biedt, zoals ondertiteling en kwaliteit.",
   "settings.videoHeight": "Hoogte van de bediening",
   "settings.videoHeightNote":
     "Hoe ver boven de onderrand de bediening staat. Een favoriet kan een eigen hoogte instellen.",
@@ -334,6 +337,9 @@ export const nl: Messages = {
   "favorites.videoControls": "OpenMedia-videobediening",
   "favorites.videoControlsNote":
     "Tik op een video om de bediening van OpenMedia te tonen. Uit geeft de eigen bediening van de site terug.",
+  "favorites.videoFull": "Ook bij volledige video’s",
+  "favorites.videoFullNote":
+    "Gebruik de bediening ook op de kijkpagina’s van deze site. Uit houdt de eigen speler van de site.",
   "favorites.videoHeight": "Hoogte videobediening",
   "favorites.videoHeightShared":
     "Gebruikt de gedeelde hoogte. Beweeg de schuifregelaar om deze site een eigen hoogte te geven.",

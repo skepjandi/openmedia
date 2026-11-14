@@ -546,6 +546,16 @@ function SiteVideoControls({ url }: { url: string }) {
         />
       </div>
       {panel && (
+        <div className="-mx-4">
+          <Switch
+            label={t("favorites.videoFull")}
+            description={t("favorites.videoFullNote")}
+            checked={own?.fullVideos ?? shared.fullVideos}
+            onChange={(next) => void setSiteVideoControls(site, { ...own, fullVideos: next })}
+          />
+        </div>
+      )}
+      {panel && (
         <>
           <div className="text-sm font-medium">{t("favorites.videoHeight")}</div>
           <p className="text-sm leading-snug text-paper/55">

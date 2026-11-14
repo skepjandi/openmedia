@@ -201,6 +201,9 @@ export const zhHant: Messages = {
   "settings.videoPanel": "點一下顯示控制",
   "settings.videoPanelNote":
     "點一下影片即可顯示暫停、倒退和快轉 6 秒、靜音、倍速和進度列，取代網站自己的點按操作。我的最愛可以關閉此功能，恢復網站自己的控制。",
+  "settings.videoFull": "完整影片也適用",
+  "settings.videoFullNote":
+    "在觀看頁面也使用這些控制，取代網站自己的控制。關閉後保留網站自己的播放器，功能更多，例如字幕和畫質。",
   "settings.videoHeight": "控制高度",
   "settings.videoHeightNote": "控制離底邊有多高。我的最愛可以設定自己的高度。",
   "settings.videoHeightLabel": "影片控制高度",
@@ -311,6 +314,8 @@ export const zhHant: Messages = {
   "favorites.bottomMargin": "底部邊距",
   "favorites.videoControls": "OpenMedia 影片控制",
   "favorites.videoControlsNote": "點一下影片即可顯示 OpenMedia 的控制。關閉後恢復網站自己的控制。",
+  "favorites.videoFull": "完整影片也適用",
+  "favorites.videoFullNote": "在這個網站的觀看頁面也使用這些控制。關閉後保留網站自己的播放器。",
   "favorites.videoHeight": "影片控制高度",
   "favorites.videoHeightShared": "使用共用高度。拖動滑桿可讓這個網站有自己的高度。",
   "favorites.videoHeightOwn": "這個網站有自己的高度。",

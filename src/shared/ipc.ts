@@ -30,6 +30,8 @@ export interface VideoControls {
   panel: boolean;
   /** Pixels between the panel and the bottom of the page. */
   height: number;
+  /** The panel on watch pages too, in place of the site's own player controls. Off by default. */
+  fullVideos: boolean;
   /** The speed and sound last chosen, applied to the next video. */
   remember: boolean;
   /** Stops a video from restarting by itself when it ends. */
@@ -43,6 +45,7 @@ export interface SiteVideo {
   /** `false` gives the site its own controls back. */
   panel?: boolean;
   height?: number;
+  fullVideos?: boolean;
 }
 
 export interface Favorite {

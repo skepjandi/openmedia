@@ -1335,6 +1335,7 @@ mod tests {
         let own = SiteVideo {
             panel: Some(false),
             height: Some(48),
+            full_videos: Some(true),
         };
         library.set_site_video("YouTube.com", own).unwrap();
         assert_eq!(reload(&dir).video_sites().unwrap()["youtube.com"], own);
@@ -1344,7 +1345,8 @@ mod tests {
                     "youtube.com",
                     SiteVideo {
                         height: Some(201),
-                        panel: None
+                        panel: None,
+                        full_videos: None
                     }
                 )
                 .is_err()

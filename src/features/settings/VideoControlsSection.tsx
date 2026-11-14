@@ -21,6 +21,14 @@ export function VideoControlsSection() {
           onChange={(on) => void setVideoControls({ panel: on })}
         />
         {controls.panel && (
+          <Switch
+            label={t("settings.videoFull")}
+            description={t("settings.videoFullNote")}
+            checked={controls.fullVideos}
+            onChange={(on) => void setVideoControls({ fullVideos: on })}
+          />
+        )}
+        {controls.panel && (
           <div className="flex flex-col gap-2 px-4 py-3">
             <div className="text-base">{t("settings.videoHeight")}</div>
             <p className="text-sm leading-snug text-paper/55">{t("settings.videoHeightNote")}</p>

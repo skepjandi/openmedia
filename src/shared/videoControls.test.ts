@@ -363,6 +363,21 @@ describe("video controls", () => {
     expect(video.defaultPlaybackRate).toBe(1.5);
   });
 
+  it("leaves the speed and sound of a page it is not in charge of alone", () => {
+    const video = new FakeVideo();
+    const page = load({
+      controls: { remember: true },
+      feed: false,
+      pathname: "/watch",
+      videos: [video],
+      current: null,
+      saved: { rate: 2, muted: true },
+    });
+    page.fire("loadstart", { target: video });
+    expect(video.playbackRate).toBe(1);
+    expect(video.muted).toBe(false);
+  });
+
   it("stays hidden until the video is tapped, then shows and hides on a tap", () => {
     const video = new FakeVideo();
     const page = load({ videos: [video], current: video });
@@ -465,10 +480,19 @@ describe("video controls", () => {
     expect(sliders(page)).toHaveLength(1);
   });
 
-  it("works on a page about one video, not only in a feed", () => {
+  it("leaves a page about one video, and its own controls, alone unless asked", () => {
+    const watch = new FakeVideo();
+    watch.box = { top: 100, left: 0, width: 400, height: 225, bottom: 325, right: 400 };
+    const off = load({ feed: false, pathname: "/watch", videos: [watch], current: null });
+    expect(off.click(200, 200).kept).toBe(false);
+    expect(off.touch([200, 200]).kept).toBe(false);
+  });
+
+  it("works on a page about one video when full videos are on, for the app or for the site", () => {
     const watch = new FakeVideo();
     watch.box = { top: 100, left: 0, width: 400, height: 225, bottom: 325, right: 400 };
     const byType = load({
+      controls: { fullVideos: true },
       feed: false,
       ogType: "video.other",
       videos: [watch],
@@ -478,19 +502,47 @@ describe("video controls", () => {
     byType.tick();
     expect(shown(byType)).toBe(true);
 
-    const byPath = load({ feed: false, pathname: "/watch", videos: [watch], current: null });
-    expect(byPath.click(200, 200).kept).toBe(true);
+    const byPath = load({
+      feed: false,
+      pathname: "/watch",
+      sites: { "youtube.com": { fullVideos: true } },
+      videos: [watch],
+      current: null,
+    });
+    expect(byPath.touch([200, 200]).kept).toBe(true);
+
+    const siteOff = load({
+      controls: { fullVideos: true },
+      feed: false,
+      pathname: "/watch",
+      sites: { "youtube.com": { fullVideos: false } },
+      videos: [watch],
+      current: null,
+    });
+    expect(siteOff.click(200, 200).kept).toBe(false);
   });
 
   it("leaves other pages alone, and videos too small to be the page's video", () => {
     const watch = new FakeVideo();
     watch.box = { top: 100, left: 0, width: 400, height: 225, bottom: 325, right: 400 };
-    const other = load({ feed: false, pathname: "/home", videos: [watch], current: null });
+    const other = load({
+      controls: { fullVideos: true },
+      feed: false,
+      pathname: "/home",
+      videos: [watch],
+      current: null,
+    });
     expect(other.click(200, 200).kept).toBe(false);
 
     const tiny = new FakeVideo();
     tiny.box = { top: 100, left: 0, width: 100, height: 50, bottom: 150, right: 100 };
-    const small = load({ feed: false, pathname: "/watch", videos: [tiny], current: null });
+    const small = load({
+      controls: { fullVideos: true },
+      feed: false,
+      pathname: "/watch",
+      videos: [tiny],
+      current: null,
+    });
     expect(small.click(50, 120).kept).toBe(false);
   });
 

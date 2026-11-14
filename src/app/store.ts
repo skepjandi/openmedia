@@ -869,7 +869,8 @@ export const useApp = create<AppStore>((set, get) => {
     setSiteVideoControls: async (site, video) => {
       const previous = get().state?.videoSites;
       if (!previous) return;
-      const empty = video.panel === undefined && video.height === undefined;
+      const empty =
+        video.panel === undefined && video.height === undefined && video.fullVideos === undefined;
       const others = Object.fromEntries(Object.entries(previous).filter(([key]) => key !== site));
       const next = empty ? others : { ...others, [site]: video };
       set((current) => ({ state: current.state && { ...current.state, videoSites: next } }));

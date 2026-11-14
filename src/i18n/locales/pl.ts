@@ -218,6 +218,9 @@ export const pl: Messages = {
   "settings.videoPanel": "Sterowanie po stuknięciu",
   "settings.videoPanelNote":
     "Stuknij wideo, aby pokazać pauzę, przewijanie o 6 sekund wstecz i do przodu, wyciszenie, prędkość i pasek postępu zamiast własnego działania witryny. Ulubione może to wyłączyć, aby przywrócić własne sterowanie witryny.",
+  "settings.videoFull": "Także w pełnych filmach",
+  "settings.videoFullNote":
+    "Używaj sterowania także na stronach oglądania, zamiast własnego sterowania witryny. Wyłączone zachowuje odtwarzacz witryny, który ma więcej opcji, takich jak napisy i jakość.",
   "settings.videoHeight": "Wysokość sterowania",
   "settings.videoHeightNote":
     "Jak wysoko nad dolną krawędzią znajduje się sterowanie. Ulubione może mieć własną.",
@@ -336,6 +339,9 @@ export const pl: Messages = {
   "favorites.videoControls": "Sterowanie wideo OpenMedia",
   "favorites.videoControlsNote":
     "Stuknij wideo, aby pokazać sterowanie OpenMedia. Wyłączone przywraca własne sterowanie witryny.",
+  "favorites.videoFull": "Także w pełnych filmach",
+  "favorites.videoFullNote":
+    "Używaj sterowania także na stronach oglądania tej witryny. Wyłączone zachowuje własny odtwarzacz witryny.",
   "favorites.videoHeight": "Wysokość sterowania wideo",
   "favorites.videoHeightShared":
     "Używa wspólnej wysokości. Przesuń suwak, aby ta witryna miała własną.",
