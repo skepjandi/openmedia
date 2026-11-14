@@ -158,6 +158,7 @@
   "market.official.messenger": ["social"],
   "market.official.microsoft": ["tech"],
   "market.official.mirlo": ["music"],
+  "market.official.miruro": ["video"],
   "market.official.mixcloud": ["music"],
   "market.official.mixesdb": ["archive", "music"],
   "market.official.mozilla": ["tech"],

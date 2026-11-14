@@ -1,0 +1,135 @@
+{
+  "schema": 1,
+  "id": "market.official.miruro",
+  "name": "Miruro",
+  "version": "1.0.0",
+  "origin": "user",
+  "tags": ["desktop", "mobile"],
+  "match": ["https://*.miruro.to/*"],
+  "options": [
+    {
+      "id": "domain-banner",
+      "label": "Hide the bookmark banner",
+      "description": "The \"Bookmark miruro.com so you never lose access\" bar under the top bar.",
+      "group": "annoyance",
+      "default": true
+    },
+    {
+      "id": "share-notice",
+      "label": "Hide the Love the Site? card",
+      "description": "The card that asks you to share or bookmark the site and links to its Reddit and social pages.",
+      "group": "annoyance",
+      "default": true
+    },
+    {
+      "id": "hero-carousel",
+      "label": "Hide the featured carousel",
+      "description": "The big rotating banner at the top of the home page.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "genre-strip",
+      "label": "Hide the genre strip",
+      "description": "The scrolling row of genre buttons under the carousel.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "top-airing",
+      "label": "Hide the Top Airing list",
+      "description": "The side list of currently airing shows.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "posters",
+      "label": "Posters and banners",
+      "description": "Show, blur or hide the cover pictures on cards, the side list and the carousel.",
+      "group": "content",
+      "choices": [
+        { "id": "show", "label": "Show" },
+        { "id": "blur", "label": "Blur" },
+        { "id": "hide", "label": "Hide" }
+      ],
+      "default": "show"
+    }
+  ],
+  "rules": [
+    {
+      "id": "bookmark-banner",
+      "label": "Bookmark miruro.com banner",
+      "type": "hide",
+      "option": "domain-banner",
+      "target": {
+        "css": "[class*=\"_stack_\"]:has(> [class*=\"_banner_\"][role=\"status\"])"
+      }
+    },
+    {
+      "id": "love-the-site",
+      "label": "Love the Site? card",
+      "type": "hide",
+      "option": "share-notice",
+      "target": {
+        "css": "section[class*=\"_noticeSection_\"]"
+      }
+    },
+    {
+      "id": "carousel",
+      "label": "Featured carousel",
+      "type": "hide",
+      "option": "hero-carousel",
+      "target": {
+        "css": "[class*=\"_carouselWrapper_\"]"
+      }
+    },
+    {
+      "id": "genres",
+      "label": "Genre strip",
+      "type": "hide",
+      "option": "genre-strip",
+      "target": {
+        "css": "[class*=\"_slider_\"]:has([aria-label=\"Scrollable genres list\"])"
+      }
+    },
+    {
+      "id": "side-list",
+      "label": "Top Airing side list",
+      "type": "hide",
+      "option": "top-airing",
+      "target": {
+        "css": "aside[class*=\"_side_\"]"
+      }
+    },
+    {
+      "id": "posters-blur",
+      "label": "Posters and banners",
+      "type": "css",
+      "option": "posters",
+      "choice": ["blur"],
+      "target": {
+        "css": "[class*=\"_styledCardItem_\"] img, aside[class*=\"_side_\"] img, [class*=\"_carouselWrapper_\"] img"
+      },
+      "declarations": {
+        "filter": "blur(12px)"
+      }
+    },
+    {
+      "id": "posters-hide",
+      "label": "Posters and banners",
+      "type": "hide",
+      "option": "posters",
+      "choice": ["hide"],
+      "target": {
+        "css": "[class*=\"_styledCardItem_\"] img, aside[class*=\"_side_\"] img, [class*=\"_carouselWrapper_\"] img"
+      }
+    }
+  ],
+  "meta": {
+    "author": "OpenMedia",
+    "homepage": "https://www.miruro.to/",
+    "summary": "Hides the bookmark banner and share card; optionally hides the carousel, genres, Top Airing, and blurs or hides posters",
+    "lastVerified": "2026-11-14",
+    "notes": "Checked 2026-11-14 on https://www.miruro.to/ logged out: desktop 1440x900 and an iPhone UA at 393px, headless WebKit. The site is a React single-page app with CSS-module class names whose trailing hash changes per build, so every selector matches the stable name prefix (`[class*=\"_banner_\"]`) and anchors on a role, tag or aria-label where it can. On both viewports the bookmark banner (`[role=status]`), the Love the Site? section, the carousel and the aside were present; the genre strip (18 buttons) and card grid load lazily and were checked on desktop only. Only the home page was inspected; watch and info pages, video ads inside players and logged-in views were not. The fixtures are sanitized excerpts of the capture."
+  }
+}
