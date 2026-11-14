@@ -598,6 +598,7 @@ export const pl: Messages = {
   "tabs.closeNote":
     "Zamknięcie witryny kończy tylko jej otwartą stronę. Ulubione i historia zostają.",
   "tabs.closeOne": "Zamknij {name}",
+  "tabs.resetOne": "Przywróć {name} do strony startowej",
   "tabs.quickAccess": "Szybki dostęp",
   "tabs.history": "Historia",
   "tabs.allHistory": "Cała historia ({count})",

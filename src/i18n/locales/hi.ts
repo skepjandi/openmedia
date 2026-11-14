@@ -592,6 +592,7 @@ export const hi: Messages = {
   "tabs.closeNote":
     "साइट बंद करने से केवल उसका खुला पृष्ठ समाप्त होता है। आपके पसंदीदा और इतिहास बने रहते हैं।",
   "tabs.closeOne": "{name} बंद करें",
+  "tabs.resetOne": "{name} को शुरुआती पृष्ठ पर रीसेट करें",
   "tabs.quickAccess": "त्वरित पहुँच",
   "tabs.history": "इतिहास",
   "tabs.allHistory": "पूरा इतिहास ({count})",

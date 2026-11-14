@@ -605,6 +605,7 @@ export const es: Messages = {
   "tabs.closeNote":
     "Cerrar un sitio solo termina su página abierta. Tus favoritos y tu historial se conservan.",
   "tabs.closeOne": "Cerrar {name}",
+  "tabs.resetOne": "Restablecer {name} a su página inicial",
   "tabs.quickAccess": "Acceso rápido",
   "tabs.history": "Historial",
   "tabs.allHistory": "Todo el historial ({count})",

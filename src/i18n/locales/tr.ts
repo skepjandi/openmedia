@@ -597,6 +597,7 @@ export const tr: Messages = {
   "tabs.closeNote":
     "Bir siteyi kapatmak yalnızca açık sayfasını sonlandırır. Favorileriniz ve geçmişiniz kalır.",
   "tabs.closeOne": "{name} sitesini kapat",
+  "tabs.resetOne": "{name} sitesini başlangıç sayfasına sıfırla",
   "tabs.quickAccess": "Hızlı erişim",
   "tabs.history": "Geçmiş",
   "tabs.allHistory": "Tüm geçmiş ({count})",

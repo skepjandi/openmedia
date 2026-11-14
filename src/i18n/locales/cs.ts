@@ -597,6 +597,7 @@ export const cs: Messages = {
   "tabs.closeNote":
     "Zavřením webu se ukončí jen jeho otevřená stránka. Oblíbené a historie zůstanou.",
   "tabs.closeOne": "Zavřít {name}",
+  "tabs.resetOne": "Obnovit {name} na úvodní stránku",
   "tabs.quickAccess": "Rychlý přístup",
   "tabs.history": "Historie",
   "tabs.allHistory": "Celá historie ({count})",

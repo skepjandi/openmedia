@@ -597,6 +597,7 @@ export const sv: Messages = {
   "tabs.closeNote":
     "Att stänga en webbplats avslutar bara dess öppna sida. Dina favoriter och din historik finns kvar.",
   "tabs.closeOne": "Stäng {name}",
+  "tabs.resetOne": "Återställ {name} till startsidan",
   "tabs.quickAccess": "Snabbåtkomst",
   "tabs.history": "Historik",
   "tabs.allHistory": "All historik ({count})",

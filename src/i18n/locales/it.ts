@@ -604,6 +604,7 @@ export const it: Messages = {
   "tabs.closeNote":
     "Chiudere un sito termina solo la sua pagina aperta. Preferiti e cronologia restano.",
   "tabs.closeOne": "Chiudi {name}",
+  "tabs.resetOne": "Ripristina {name} alla pagina iniziale",
   "tabs.quickAccess": "Accesso rapido",
   "tabs.history": "Cronologia",
   "tabs.allHistory": "Tutta la cronologia ({count})",

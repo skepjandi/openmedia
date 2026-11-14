@@ -588,6 +588,7 @@ export const ko: Messages = {
   "tabs.newTab": "새 탭",
   "tabs.closeNote": "사이트를 닫으면 열려 있는 페이지만 종료됩니다. 즐겨찾기와 기록은 유지됩니다.",
   "tabs.closeOne": "{name} 닫기",
+  "tabs.resetOne": "{name}을(를) 첫 페이지로 초기화",
   "tabs.quickAccess": "빠른 접근",
   "tabs.history": "기록",
   "tabs.allHistory": "전체 기록({count})",

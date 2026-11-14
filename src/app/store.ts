@@ -168,6 +168,8 @@ export interface AppStore {
   /** Back in the page; once it has no history of its own, the page saved from before a restart. */
   goBack: () => Promise<void>;
   closeSession: (id: string) => void;
+  /** Reopens a session on the address it was opened with, dropping its Back history. Works on the only open tab too. */
+  resetSession: (id: string) => void;
   /** Ends every live session but the visible one. */
   closeOtherSessions: () => void;
   setSessionState: (state: SiteViewState) => void;
@@ -601,6 +603,13 @@ export const useApp = create<AppStore>((set, get) => {
             ? { nonce: ++nonce, type: "activate", id: next }
             : current.action,
       }));
+    },
+
+    resetSession: (id) => {
+      const session = get().sessions.find((entry) => entry.id === id);
+      if (!session) return;
+      startSession(session.openedUrl, session.source, undefined, session.hubId);
+      get().closeSession(id);
     },
 
     closeOtherSessions: () => {

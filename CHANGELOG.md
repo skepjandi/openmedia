@@ -6,6 +6,16 @@ All notable changes to OpenMedia are documented here.
 >
 > **Wiki**: the [GitHub Wiki](https://github.com/skepjandi/openmedia/wiki) is the public-facing main wiki — architecture, recipe format, AI pipeline, security model, roadmap. Source-controlled editing surface is `docs/wiki/` in this repo; CI (`.github/workflows/sync-wiki.yml`) mirrors it to the GitHub Wiki on every merge to `main`. New single-PR changes belong here, not as new wiki pages.
 
+### feat(tabs): reset a tab to its start page
+
+**Area:** `feat(tabs)`
+
+**Change:** Each open tab on the Tabs page has a reset button beside close. It reopens the tab on the address it was opened with and drops its Back history, including pages restored from before a restart. It works on the only open tab, which cannot be closed. New string `tabs.resetOne` in every locale.
+
+**Verified:** `tsc`, Vitest (`app`, `i18n`, `tabs`). **Not verified:** on a device.
+
+**PR:** n/a
+
 ### fix(adblock): YouTube video ads no longer leave a black screen, and Shorts ads are removed
 
 **Area:** `fix(adblock)`

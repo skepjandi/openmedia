@@ -609,6 +609,7 @@ export const el: Messages = {
   "tabs.closeNote":
     "Το κλείσιμο ενός ιστοτόπου τερματίζει μόνο την ανοιχτή σελίδα του. Τα αγαπημένα και το ιστορικό σας παραμένουν.",
   "tabs.closeOne": "Κλείσιμο {name}",
+  "tabs.resetOne": "Επαναφορά του {name} στην αρχική σελίδα",
   "tabs.quickAccess": "Γρήγορη πρόσβαση",
   "tabs.history": "Ιστορικό",
   "tabs.allHistory": "Όλο το ιστορικό ({count})",

@@ -611,6 +611,7 @@ export const de: Messages = {
   "tabs.closeNote":
     "Beim Schließen wird nur die geöffnete Seite beendet. Favoriten und Verlauf bleiben erhalten.",
   "tabs.closeOne": "{name} schließen",
+  "tabs.resetOne": "{name} auf Startseite zurücksetzen",
   "tabs.quickAccess": "Schnellzugriff",
   "tabs.history": "Verlauf",
   "tabs.allHistory": "Gesamter Verlauf ({count})",

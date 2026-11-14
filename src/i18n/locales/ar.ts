@@ -573,6 +573,7 @@ export const ar: Messages = {
   "tabs.newTab": "علامة تبويب جديدة",
   "tabs.closeNote": "إغلاق موقع ينهي صفحته المفتوحة فقط. تبقى مفضلاتك وسجلك.",
   "tabs.closeOne": "إغلاق {name}",
+  "tabs.resetOne": "إعادة {name} إلى صفحته الأولى",
   "tabs.quickAccess": "الوصول السريع",
   "tabs.history": "السجل",
   "tabs.allHistory": "كل السجل ({count})",

@@ -555,6 +555,7 @@ export const zhHans: Messages = {
   "tabs.newTab": "新标签页",
   "tabs.closeNote": "关闭网站只会结束它已打开的页面。你的收藏和历史记录会保留。",
   "tabs.closeOne": "关闭{name}",
+  "tabs.resetOne": "将{name}重置到起始页",
   "tabs.quickAccess": "快速访问",
   "tabs.history": "历史记录",
   "tabs.allHistory": "全部历史记录（{count}）",

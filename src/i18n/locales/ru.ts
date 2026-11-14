@@ -602,6 +602,7 @@ export const ru: Messages = {
   "tabs.closeNote":
     "Закрытие сайта завершает только его открытую страницу. Избранное и история сохраняются.",
   "tabs.closeOne": "Закрыть {name}",
+  "tabs.resetOne": "Сбросить {name} на стартовую страницу",
   "tabs.quickAccess": "Быстрый доступ",
   "tabs.history": "История",
   "tabs.allHistory": "Вся история ({count})",

@@ -599,6 +599,7 @@ export const ms: Messages = {
   "tabs.closeNote":
     "Menutup laman hanya menamatkan halamannya yang terbuka. Kegemaran dan sejarah anda kekal.",
   "tabs.closeOne": "Tutup {name}",
+  "tabs.resetOne": "Tetapkan semula {name} ke laman permulaan",
   "tabs.quickAccess": "Akses pantas",
   "tabs.history": "Sejarah",
   "tabs.allHistory": "Semua sejarah ({count})",

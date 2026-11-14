@@ -571,6 +571,7 @@ export const th: Messages = {
   "tabs.newTab": "แท็บใหม่",
   "tabs.closeNote": "การปิดไซต์จะสิ้นสุดเฉพาะหน้าที่เปิดอยู่ รายการโปรดและประวัติของคุณยังอยู่",
   "tabs.closeOne": "ปิด {name}",
+  "tabs.resetOne": "รีเซ็ต {name} เป็นหน้าเริ่มต้น",
   "tabs.quickAccess": "ทางลัด",
   "tabs.history": "ประวัติ",
   "tabs.allHistory": "ประวัติทั้งหมด ({count})",

@@ -593,6 +593,7 @@ export const si: Messages = {
   "tabs.closeNote":
     "අඩවියක් වැසීමෙන් එහි විවෘත පිටුව පමණක් අවසන් වේ. ඔබේ ප්‍රියතම සහ ඉතිහාසය ඉතිරි වේ.",
   "tabs.closeOne": "{name} වසන්න",
+  "tabs.resetOne": "{name} ආරම්භක පිටුවට යළි සකසන්න",
   "tabs.quickAccess": "ඉක්මන් ප්‍රවේශය",
   "tabs.history": "ඉතිහාසය",
   "tabs.allHistory": "සම්පූර්ණ ඉතිහාසය ({count})",

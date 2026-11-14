@@ -557,6 +557,7 @@ export const zhHant: Messages = {
   "tabs.newTab": "新分頁",
   "tabs.closeNote": "關閉網站只會結束它已開啟的頁面。你的最愛和歷史記錄會保留。",
   "tabs.closeOne": "關閉{name}",
+  "tabs.resetOne": "將{name}重設到起始頁",
   "tabs.quickAccess": "快速存取",
   "tabs.history": "歷史記錄",
   "tabs.allHistory": "全部歷史記錄（{count}）",

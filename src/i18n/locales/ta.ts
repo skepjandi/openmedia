@@ -611,6 +611,7 @@ export const ta: Messages = {
   "tabs.closeNote":
     "தளத்தை மூடினால் அதன் திறந்த பக்கம் மட்டுமே முடிகிறது. உங்கள் பிடித்தவை மற்றும் வரலாறு இருக்கும்.",
   "tabs.closeOne": "{name} ஐ மூடு",
+  "tabs.resetOne": "{name} ஐ தொடக்கப் பக்கத்திற்கு மீட்டமை",
   "tabs.quickAccess": "விரைவு அணுகல்",
   "tabs.history": "வரலாறு",
   "tabs.allHistory": "முழு வரலாறு ({count})",

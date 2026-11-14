@@ -604,6 +604,7 @@ export const nl: Messages = {
   "tabs.closeNote":
     "Een site sluiten beëindigt alleen de geopende pagina. Je favorieten en geschiedenis blijven.",
   "tabs.closeOne": "{name} sluiten",
+  "tabs.resetOne": "{name} terugzetten naar de startpagina",
   "tabs.quickAccess": "Snelle toegang",
   "tabs.history": "Geschiedenis",
   "tabs.allHistory": "Alle geschiedenis ({count})",

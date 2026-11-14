@@ -597,6 +597,7 @@ export const id: Messages = {
   "tabs.closeNote":
     "Menutup situs hanya mengakhiri halaman yang terbuka. Favorit dan riwayat Anda tetap ada.",
   "tabs.closeOne": "Tutup {name}",
+  "tabs.resetOne": "Atur ulang {name} ke halaman awal",
   "tabs.quickAccess": "Akses cepat",
   "tabs.history": "Riwayat",
   "tabs.allHistory": "Semua riwayat ({count})",

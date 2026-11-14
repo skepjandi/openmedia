@@ -601,6 +601,7 @@ export const pt: Messages = {
   "tabs.closeNote":
     "Fechar um site só encerra a página aberta. Seus favoritos e o histórico continuam.",
   "tabs.closeOne": "Fechar {name}",
+  "tabs.resetOne": "Redefinir {name} para a página inicial",
   "tabs.quickAccess": "Acesso rápido",
   "tabs.history": "Histórico",
   "tabs.allHistory": "Todo o histórico ({count})",

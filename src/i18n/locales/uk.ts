@@ -602,6 +602,7 @@ export const uk: Messages = {
   "tabs.closeNote":
     "Закриття сайту завершує лише його відкриту сторінку. Обране та історія залишаються.",
   "tabs.closeOne": "Закрити {name}",
+  "tabs.resetOne": "Скинути {name} до початкової сторінки",
   "tabs.quickAccess": "Швидкий доступ",
   "tabs.history": "Історія",
   "tabs.allHistory": "Уся історія ({count})",

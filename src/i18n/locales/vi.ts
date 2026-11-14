@@ -593,6 +593,7 @@ export const vi: Messages = {
   "tabs.closeNote":
     "Đóng một trang chỉ kết thúc trang đang mở của nó. Mục yêu thích và lịch sử vẫn còn.",
   "tabs.closeOne": "Đóng {name}",
+  "tabs.resetOne": "Đặt lại {name} về trang bắt đầu",
   "tabs.quickAccess": "Truy cập nhanh",
   "tabs.history": "Lịch sử",
   "tabs.allHistory": "Toàn bộ lịch sử ({count})",

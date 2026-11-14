@@ -613,6 +613,7 @@ export const fr: Messages = {
   "tabs.closeNote":
     "Fermer un site ne ferme que sa page ouverte. Vos favoris et votre historique restent.",
   "tabs.closeOne": "Fermer {name}",
+  "tabs.resetOne": "Réinitialiser {name} à sa page de départ",
   "tabs.quickAccess": "Accès rapide",
   "tabs.history": "Historique",
   "tabs.allHistory": "Tout l'historique ({count})",

@@ -606,6 +606,7 @@ export const ro: Messages = {
   "tabs.closeNote":
     "Închiderea unui site încheie doar pagina lui deschisă. Favoritele și istoricul rămân.",
   "tabs.closeOne": "Închide {name}",
+  "tabs.resetOne": "Resetează {name} la pagina de start",
   "tabs.quickAccess": "Acces rapid",
   "tabs.history": "Istoric",
   "tabs.allHistory": "Tot istoricul ({count})",

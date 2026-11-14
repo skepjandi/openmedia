@@ -591,6 +591,7 @@ export const en = {
   "tabs.newTab": "New tab",
   "tabs.closeNote": "Closing a site only ends its open page. Your favorites and history stay.",
   "tabs.closeOne": "Close {name}",
+  "tabs.resetOne": "Reset {name} to its start page",
   "tabs.quickAccess": "Quick access",
   "tabs.history": "History",
   "tabs.allHistory": "All history ({count})",

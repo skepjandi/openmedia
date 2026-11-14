@@ -3,7 +3,7 @@ import { selectLocale, selectQuickFavorites, useApp } from "../../app/store";
 import { useT } from "../../i18n/useT";
 import { QUICK_ACCESS_LIMIT, displayHost, quickAccess } from "../../shared/favorites";
 import { usage, type Favorite, type UsageReport } from "../../shared/ipc";
-import { PlusIcon } from "../../shared/icons";
+import { PlusIcon, ReloadIcon } from "../../shared/icons";
 import { Screen } from "../../shared/Screen";
 import { useIconForUrl } from "../../shared/siteIcons";
 import { SiteTile } from "../../shared/SiteTile";
@@ -33,6 +33,7 @@ export function TabsSheet() {
   const openFavorite = useApp((s) => s.openFavorite);
   const openHistory = useApp((s) => s.openHistory);
   const closeSession = useApp((s) => s.closeSession);
+  const resetSession = useApp((s) => s.resetSession);
   const closeOtherSessions = useApp((s) => s.closeOtherSessions);
   const t = useT();
   const [report, setReport] = useState<UsageReport | null>(null);
@@ -88,6 +89,7 @@ export function TabsSheet() {
                   canClose={canClose}
                   onOpen={() => openSession(session.id)}
                   onClose={() => closeSession(session.id)}
+                  onReset={() => resetSession(session.id)}
                 />
               ))}
             </Group>
@@ -178,6 +180,7 @@ interface OpenTabProps {
   canClose: boolean;
   onOpen: () => void;
   onClose: () => void;
+  onReset: () => void;
 }
 
 function OpenTab({
@@ -189,6 +192,7 @@ function OpenTab({
   canClose,
   onOpen,
   onClose,
+  onReset,
 }: OpenTabProps) {
   const t = useT();
   const locale = useApp(selectLocale);
@@ -220,6 +224,14 @@ function OpenTab({
             {session.loading ? t("tabs.loading") : stats.join(" · ")}
           </span>
         </span>
+      </button>
+      <button
+        type="button"
+        aria-label={t("tabs.resetOne", { name: title })}
+        onClick={onReset}
+        className="grid size-12 shrink-0 place-items-center text-paper/55 active:bg-paper/[0.06]"
+      >
+        <ReloadIcon />
       </button>
       {canClose && (
         <button

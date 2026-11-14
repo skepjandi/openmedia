@@ -589,6 +589,7 @@ export const bn: Messages = {
   "tabs.newTab": "নতুন ট্যাব",
   "tabs.closeNote": "সাইট বন্ধ করলে শুধু তার খোলা পেজ শেষ হয়। আপনার প্রিয় ও ইতিহাস থেকে যায়।",
   "tabs.closeOne": "{name} বন্ধ করুন",
+  "tabs.resetOne": "{name} শুরুর পেজে রিসেট করুন",
   "tabs.quickAccess": "দ্রুত অ্যাক্সেস",
   "tabs.history": "ইতিহাস",
   "tabs.allHistory": "সম্পূর্ণ ইতিহাস ({count})",

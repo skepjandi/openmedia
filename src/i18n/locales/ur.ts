@@ -594,6 +594,7 @@ export const ur: Messages = {
   "tabs.closeNote":
     "سائٹ بند کرنے سے صرف اس کا کھلا صفحہ ختم ہوتا ہے۔ آپ کے پسندیدہ اور ہسٹری برقرار رہتے ہیں۔",
   "tabs.closeOne": "{name} بند کریں",
+  "tabs.resetOne": "{name} کو ابتدائی صفحے پر ری سیٹ کریں",
   "tabs.quickAccess": "فوری رسائی",
   "tabs.history": "ہسٹری",
   "tabs.allHistory": "پوری ہسٹری ({count})",

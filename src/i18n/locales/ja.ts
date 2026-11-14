@@ -595,6 +595,7 @@ export const ja: Messages = {
   "tabs.closeNote":
     "サイトを閉じると、開いているページだけが終了します。お気に入りと履歴は残ります。",
   "tabs.closeOne": "{name}を閉じる",
+  "tabs.resetOne": "{name}を最初のページに戻す",
   "tabs.quickAccess": "クイックアクセス",
   "tabs.history": "履歴",
   "tabs.allHistory": "すべての履歴（{count}）",
