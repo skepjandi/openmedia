@@ -180,6 +180,14 @@ All notable changes to OpenMedia are documented here.
 
 **PR:** n/a
 
+## 2026-11-14
+
+### chore(release): version 1.0.3
+
+**Area:** `chore(release)`
+
+**Change:** The app version is `1.0.3` (build 1005) in `package.json` and `src-tauri/tauri.conf.json`.
+
 ## 2026-11-13
 
 ### fix(ui): teach the floating button hide gesture
