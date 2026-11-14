@@ -40,7 +40,12 @@ Toggled by Core. Overlays a highlight on hover/tap, shows a breadcrumb of ancest
 
 ## Feed player
 
-`src-tauri/src/feed_player.js` is appended to the document-start script after the accessibility script, in the top frame only. In full-screen feeds (`/shorts`, `/reel(s)`, TikTok) it picks the video covering at least half the viewport once scrolling settles, plays it (muted if refused with `NotAllowedError`), pauses videos that left the screen and honours a reader's own pause until the video leaves the screen. It is idle while `window.__openmediaHold` is set (the native background pause) or calm mode is on (`Symbol.for('openmedia.noAutoplay')`). iOS site views also set `mediaTypesRequiringUserActionForPlayback = []`; with `.audio` an unmuted feed video needs a tap.
+`src-tauri/src/feed_player.js` is appended to the document-start script after the accessibility script, in the top frame only. It runs in full-screen feeds: `/shorts`, `/reel(s)`, `/<user>/reel(s)`, `/watch/reel(s)` and `/stories` on any site, TikTok, Instagram `/p/` and `/tv/`, and Facebook `/watch`. Once scrolling settles it picks the video in view (one covering at least half the viewport, or a wide clip that sits on screen), plays it, and pauses videos that left the screen.
+
+- **Refusals.** `NotAllowedError` on iOS posts to the native-only `openmediaPlay` handler, and the plugin calls the page's `Symbol.for('openmedia.feedPlayNow')` through `evaluateJavaScript`, which WebKit runs with a user gesture (so sound and low power mode are not obstacles). Without the handler (Android, macOS) the player mutes and plays. Any other refusal is retried on the next settle.
+- **Attempts.** Each element gets 8 attempts, 300 ms apart, then one every 5 s. A new source (`loadstart`, `emptied`) or a new video in view resets the count, because feeds reuse one element for every item. A video that reports playing but does not move for three settles is paused and retried.
+- **Reader's pause.** Only a pause within 900 ms of a tap (a finger that moved at most 10 px), a click or a key, on the video in view, counts as the reader's and is left alone until the video leaves the screen. A swipe never does, and neither does a pause the player makes itself.
+- **Hold.** It is idle while `window.__openmediaHold` is set (the native background pause; iOS sets it too, with an `openmedia-resume` event on resume) or calm mode is on (`Symbol.for('openmedia.noAutoplay')`). iOS site views also set `mediaTypesRequiringUserActionForPlayback = []`.
 
 ## Snapshot
 

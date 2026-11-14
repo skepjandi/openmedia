@@ -15,6 +15,15 @@ private let paintHandlerName = "openmediaPaint"
 /// top. A feed of full-screen videos scrolls inside such a container while the page itself stays at
 /// its top, so without this a swipe down to the previous item pulls to refresh and reloads the page.
 private let scrollHandlerName = "openmediaScroll"
+/// Asks for the video in view to be played natively when the engine refuses the page's own
+/// `play()`; see `playFeedVideo`.
+private let playHandlerName = "openmediaPlay"
+private let playFeedVideoScript =
+  "(function(){var play=document[Symbol.for('openmedia.feedPlayNow')];if(typeof play==='function')play()})()"
+/// The same flag the Android and macOS pause scripts set, which the feed player reads.
+private let holdMediaScript = "window.__openmediaHold=true"
+private let resumeMediaScript =
+  "window.__openmediaHold=false;document.dispatchEvent(new Event('openmedia-resume'))"
 private let touchScrollScript = """
   (function () {
     window.addEventListener('touchstart', function (event) {
@@ -235,6 +244,19 @@ private final class WeakScrollHandler: NSObject, WKScriptMessageHandler {
   func userContentController(_ controller: WKUserContentController, didReceive message: WKScriptMessage) {
     guard message.frameInfo.isMainFrame, let view = message.webView else { return }
     target?.setInnerScrolled(view, (message.body as? Int) == 1)
+  }
+}
+
+private final class WeakPlayHandler: NSObject, WKScriptMessageHandler {
+  weak var target: SiteViewPlugin?
+
+  init(_ target: SiteViewPlugin) {
+    self.target = target
+  }
+
+  func userContentController(_ controller: WKUserContentController, didReceive message: WKScriptMessage) {
+    guard message.frameInfo.isMainFrame, let view = message.webView else { return }
+    target?.playFeedVideo(view)
   }
 }
 
@@ -667,11 +689,30 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
   private func refreshMedia() {
     for session in sessions.values where !session.blocked {
       let shown = appForeground && session.id == activeId
-      let suspend = !shown && !backgroundMediaSites.contains(session.scope)
-      if suspend == session.mediaSuspended { continue }
-      session.mediaSuspended = suspend
-      session.view.setAllMediaPlaybackSuspended(suspend)
+      setMediaSuspended(!shown && !backgroundMediaSites.contains(session.scope), in: session)
     }
+  }
+
+  /// The one place media is suspended or resumed. WebKit counts every suspend and resumes only
+  /// once each has been undone, so a second suspend of an already suspended page would leave it
+  /// silent for good; `mediaSuspended` keeps the two in step. The page is told as well, so its
+  /// feed player neither fights the pause nor waits for a resume that never comes.
+  private func setMediaSuspended(_ suspend: Bool, in session: Session) {
+    if suspend == session.mediaSuspended { return }
+    session.mediaSuspended = suspend
+    session.view.setAllMediaPlaybackSuspended(suspend)
+    session.view.evaluateJavaScript(suspend ? holdMediaScript : resumeMediaScript)
+  }
+
+  /// A page's feed player asks, when the engine refuses its `play()`, for the video in view to be
+  /// played from here: `evaluateJavaScript` runs with a user gesture, which no page script can
+  /// give itself. Only the page in front is served, and the script is fixed: the page sends no
+  /// code and no argument, so all it can do is ask for what it could have done with a tap.
+  func playFeedVideo(_ view: WKWebView) {
+    guard let session = session(of: view), !session.blocked, !session.mediaSuspended,
+      session.id == activeId
+    else { return }
+    view.evaluateJavaScript(playFeedVideoScript)
   }
 
   /// Closes one site for the day, or opens it again. Rust-only: the plugin registers no command
@@ -1053,15 +1094,14 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
       rememberBlocked(session.id)
       session.blocked = true
       session.view.stopLoading()
-      session.view.setAllMediaPlaybackSuspended(true)
+      setMediaSuspended(true, in: session)
       installShield(on: session)
       reveal(session.view)
     } else {
       forgetBlocked(session.id)
       session.blocked = false
       removeShield(from: session)
-      session.view.setAllMediaPlaybackSuspended(false)
-      session.mediaSuspended = false
+      setMediaSuspended(false, in: session)
       refreshMedia()
       if session.view.url == nil { session.needsReload = true }
       if session.id == activeId && session.needsReload { show(session) }
@@ -1428,6 +1468,7 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
     controller.add(WeakMessageHandler(self), name: bridgeHandlerName)
     controller.add(WeakPaintHandler(self), name: paintHandlerName)
     controller.add(WeakScrollHandler(self), name: scrollHandlerName)
+    controller.add(WeakPlayHandler(self), name: playHandlerName)
     configuration.userContentController = controller
     return configuration
   }
@@ -1474,6 +1515,7 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
     view.configuration.userContentController.removeScriptMessageHandler(forName: bridgeHandlerName)
     view.configuration.userContentController.removeScriptMessageHandler(forName: paintHandlerName)
     view.configuration.userContentController.removeScriptMessageHandler(forName: scrollHandlerName)
+    view.configuration.userContentController.removeScriptMessageHandler(forName: playHandlerName)
     view.navigationDelegate = nil
     view.uiDelegate = nil
     view.removeFromSuperview()

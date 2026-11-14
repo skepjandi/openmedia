@@ -246,6 +246,18 @@ All notable changes to OpenMedia are documented here.
 
 ## 2026-11-14
 
+### fix(siteview): Shorts and Reels no longer stall on a still frame
+
+**Area:** `fix(siteview)`
+
+**Problem:** After the first feed player, Shorts still needed a tap and many Reels never played. The player took a site's own pause during a swipe for the reader's and then never retried; a feed that reuses one `<video>` spent its 8 attempts in a few swipes and kept the stale state; wide clips covered under half the viewport and were skipped; and Instagram `/<user>/reel/` pages and Facebook `/watch` were not feeds to it. On iOS the media suspend count could drift (blocking a page already suspended left it silent after unblock), and the page never learned of a suspend or resume.
+
+**Change:** A pause counts as the reader's only after a tap, click or key, never a swipe. A new source resets the attempts and the pause. After 8 attempts one more is tried every 5 s, a video that plays without moving is kicked, and a wide clip on screen counts as in view. On a refusal iOS plays the video natively through `evaluateJavaScript`, which carries a gesture (new native-only `openmediaPlay` handler); other platforms mute. `FEED_PATH` also covers `/<user>/reel(s)`, Instagram `/p/` and `/tv/`, and Facebook `/watch`. iOS suspends and resumes media through one idempotent helper that also sets `__openmediaHold` and fires `openmedia-resume`.
+
+**Verified:** Vitest (`feedPlayer.test.ts`, against a fake DOM), `swiftc -parse`. **Not verified:** on a device. Whether the iOS native play fallback unlocks sound, and how Instagram and Facebook behave on an iPhone, need a TestFlight check.
+
+**PR:** n/a
+
 ### chore(release): version 1.0.3
 
 **Area:** `chore(release)`
