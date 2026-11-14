@@ -1,20 +1,18 @@
 import { useEffect, useState } from "react";
-import { selectLocale, useApp } from "../../app/store";
+import { selectLocale, selectQuickFavorites, useApp } from "../../app/store";
 import { useT } from "../../i18n/useT";
 import { QUICK_ACCESS_LIMIT, displayHost, quickAccess } from "../../shared/favorites";
 import { usage, type Favorite, type UsageReport } from "../../shared/ipc";
-import { PlusIcon, ProIcon } from "../../shared/icons";
+import { PlusIcon } from "../../shared/icons";
 import { Screen } from "../../shared/Screen";
 import { useIconForUrl } from "../../shared/siteIcons";
 import { SiteTile } from "../../shared/SiteTile";
 import { describeAddress } from "../history/address";
 import { formatDuration, localDay } from "../stats/format";
 import { Group, GroupLabel, primaryBlockButton, quietButton } from "../settings/ui";
-import { useEntitlementStore } from "../paywall/store";
 import { findFavoriteSession, sessionForFavorite, type Session } from "../web/sessions";
 import { formatMs, orderedTabs, secondsTodayFor } from "./tabs";
 
-const NO_FAVORITES: Favorite[] = [];
 const NO_HISTORY: string[] = [];
 /** How many recent addresses the Tabs screen shows; the History screen has them all. */
 const HISTORY_PREVIEW = 8;
@@ -28,8 +26,7 @@ export function TabsSheet() {
   const activeId = useApp((s) => s.activeId);
   const blankTab = useApp((s) => s.blankTab);
   const openNewTab = useApp((s) => s.openNewTab);
-  const favorites = useApp((s) => s.state?.favorites) ?? NO_FAVORITES;
-  const isPro = useEntitlementStore((s) => s.status === "pro");
+  const favorites = useApp(selectQuickFavorites);
   const history = useApp((s) => s.state?.history) ?? NO_HISTORY;
   const sites = useApp((s) => s.sites);
   const openSession = useApp((s) => s.openSession);
@@ -119,37 +116,16 @@ export function TabsSheet() {
               ))}
             </Group>
           )}
+          {favorites.length > QUICK_ACCESS_LIMIT && (
+            <button
+              type="button"
+              onClick={() => openSheet("favorites")}
+              className={`mt-3 ${quietButton}`}
+            >
+              {t("favorites.more", { count: favorites.length - QUICK_ACCESS_LIMIT })}
+            </button>
+          )}
         </section>
-
-        {favorites.length > QUICK_ACCESS_LIMIT &&
-          (isPro ? (
-            <section>
-              <GroupLabel>
-                {t("favorites.more", { count: favorites.length - QUICK_ACCESS_LIMIT })}
-              </GroupLabel>
-              <Group>
-                {favorites.slice(QUICK_ACCESS_LIMIT).map((favorite) => (
-                  <QuickRow
-                    key={favorite.id}
-                    favorite={favorite}
-                    live={sessionForFavorite(sessions, favorite.url, sites) !== undefined}
-                    onOpen={() => openFavorite(favorite.url)}
-                  />
-                ))}
-              </Group>
-            </section>
-          ) : (
-            <section>
-              <button
-                type="button"
-                onClick={() => openSheet("paywall")}
-                className={`flex w-full items-center gap-2 ${quietButton}`}
-              >
-                <ProIcon size={14} />
-                {t("favorites.moreLocked")}
-              </button>
-            </section>
-          ))}
 
         <section>
           <GroupLabel>{t("tabs.history")}</GroupLabel>
@@ -198,7 +174,7 @@ interface OpenTabProps {
   active: boolean;
   now: number;
   secondsToday: number | null;
-  favorites: Favorite[];
+  favorites: readonly Favorite[];
   canClose: boolean;
   onOpen: () => void;
   onClose: () => void;
@@ -259,7 +235,7 @@ function OpenTab({
   );
 }
 
-function QuickRow({
+export function QuickRow({
   favorite,
   live,
   onOpen,
@@ -294,7 +270,7 @@ function HistoryRow({
   onOpen,
 }: {
   url: string;
-  favorites: Favorite[];
+  favorites: readonly Favorite[];
   sessions: Session[];
   onOpen: () => void;
 }) {

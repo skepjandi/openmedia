@@ -41,7 +41,7 @@ describe("pages opened from Settings", () => {
     expect(useApp.getState().sheet).toBe("settings");
   });
 
-  it.each(["library", "share-recipe"] as const)(
+  it.each(["library", "share-recipe", "more-favorites", "incognito-more-favorites"] as const)(
     "returns to Settings from the %s page, keeping Settings mounted beneath it",
     (page) => {
       useApp.getState().openSheet("settings");

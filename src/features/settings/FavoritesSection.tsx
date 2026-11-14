@@ -52,6 +52,8 @@ interface EditorListProps {
   recipes?: SiteSettings[];
   /** Opens the matching recipe list so its stars update this favorites list. */
   recipeSheet: "recipes" | "incognito-recipes";
+  /** `more` renders only the favorites past quick access, for the page that lists them. */
+  part?: "all" | "more";
 }
 
 /**
@@ -65,6 +67,7 @@ export function FavoritesEditor({
   emptyText,
   recipes,
   recipeSheet,
+  part = "all",
 }: EditorListProps) {
   const problem = useApp((s) => s.error);
   const openSheet = useApp((s) => s.openSheet);
@@ -126,6 +129,14 @@ export function FavoritesEditor({
     );
   };
 
+  if (part === "more") {
+    return (
+      <Group>
+        {more.map((favorite, index) => renderRow(favorite, index + QUICK_ACCESS_LIMIT))}
+      </Group>
+    );
+  }
+
   return (
     <>
       <GroupLabel>{t("favorites.quickAccess", { count: quick.length, limit })}</GroupLabel>
@@ -152,17 +163,18 @@ export function FavoritesEditor({
 
       {isPro ? (
         more.length > 0 && (
-          <details className="group/more mt-5">
-            <summary className="flex cursor-pointer list-none items-center justify-between px-1 pt-1 pb-2 text-[13px] font-medium text-paper/60">
-              <span>{t("favorites.more", { count: more.length })}</span>
-              <span aria-hidden="true" className="text-paper/45 group-open/more:rotate-180">
-                ⌄
-              </span>
-            </summary>
-            <Group>
-              {more.map((favorite, index) => renderRow(favorite, index + QUICK_ACCESS_LIMIT))}
-            </Group>
-          </details>
+          <button
+            type="button"
+            onClick={() =>
+              openSheet(recipeSheet === "recipes" ? "more-favorites" : "incognito-more-favorites")
+            }
+            className="mt-5 flex w-full items-center justify-between px-1 pt-1 pb-2 text-start text-[13px] font-medium text-paper/60"
+          >
+            <span>{t("favorites.more", { count: more.length })}</span>
+            <span aria-hidden="true" className="text-paper/45 rtl:-scale-x-100">
+              <ForwardIcon />
+            </span>
+          </button>
         )
       ) : (
         <button

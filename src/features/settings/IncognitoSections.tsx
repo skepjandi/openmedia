@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { useApp } from "../../app/store";
+import { useApp, type Sheet } from "../../app/store";
 import { useT } from "../../i18n/useT";
 import { QUICK_ACCESS_LIMIT } from "../../shared/favorites";
 import { ForwardIcon, ProIcon } from "../../shared/icons";
@@ -99,24 +99,21 @@ export function IncognitoRecipesLink() {
   );
 }
 
-/** Incognito recipe switches have their own page, listed like the normal Recipes page. */
-export function IncognitoRecipesScreen() {
-  const open = useApp((s) => s.sheet === "incognito-recipes");
+/**
+ * Lifecycle of a page that shows the incognito set: it loads on open, and is forgotten again when
+ * the page closes or the app goes to the background. Returns whether the page is open.
+ */
+export function useIncognitoPage(
+  sheet: Sheet,
+  load: () => Promise<unknown>,
+  forget: () => void,
+): boolean {
+  const open = useApp((s) => s.sheet === sheet);
   const closeSheet = useApp((s) => s.closeSheet);
-  const sites = useApp((s) => s.incognitoSites);
-  const loadSites = useApp((s) => s.loadIncognitoSites);
-  const loadFavorites = useApp((s) => s.loadIncognitoFavorites);
-  const forgetSites = useApp((s) => s.forgetIncognitoSites);
-  const forgetFavorites = useApp((s) => s.forgetIncognitoFavorites);
-  const forget = useCallback(() => {
-    forgetSites();
-    forgetFavorites();
-  }, [forgetSites, forgetFavorites]);
-  const t = useT();
 
   useEffect(() => {
     if (!open) return;
-    void Promise.all([loadSites(), loadFavorites()]);
+    void load();
     // The incognito set is only on screen while the page is; the background locks it again.
     const lockWhenHidden = () => {
       if (!document.hidden) return;
@@ -127,9 +124,31 @@ export function IncognitoRecipesScreen() {
     return () => {
       document.removeEventListener("visibilitychange", lockWhenHidden);
       // React remounts the page in development; only a real close forgets the set.
-      if (useApp.getState().sheet !== "incognito-recipes") forget();
+      if (useApp.getState().sheet !== sheet) forget();
     };
-  }, [open, loadSites, loadFavorites, forget, closeSheet]);
+  }, [open, sheet, load, forget, closeSheet]);
+
+  return open;
+}
+
+/** Incognito recipe switches have their own page, listed like the normal Recipes page. */
+export function IncognitoRecipesScreen() {
+  const closeSheet = useApp((s) => s.closeSheet);
+  const sites = useApp((s) => s.incognitoSites);
+  const loadSites = useApp((s) => s.loadIncognitoSites);
+  const loadFavorites = useApp((s) => s.loadIncognitoFavorites);
+  const forgetSites = useApp((s) => s.forgetIncognitoSites);
+  const forgetFavorites = useApp((s) => s.forgetIncognitoFavorites);
+  const load = useCallback(
+    () => Promise.all([loadSites(), loadFavorites()]),
+    [loadSites, loadFavorites],
+  );
+  const forget = useCallback(() => {
+    forgetSites();
+    forgetFavorites();
+  }, [forgetSites, forgetFavorites]);
+  const open = useIncognitoPage("incognito-recipes", load, forget);
+  const t = useT();
 
   if (!open) return null;
 

@@ -59,10 +59,13 @@ export type Sheet =
   | "assistant"
   | "history"
   | "tabs"
+  | "favorites"
   | "stats"
   | "settings"
   | "recipes"
   | "incognito-recipes"
+  | "more-favorites"
+  | "incognito-more-favorites"
   | "library"
   | "share-recipe"
   | "paywall";
@@ -71,6 +74,8 @@ export type Sheet =
 const SETTINGS_CHILDREN: readonly Sheet[] = [
   "recipes",
   "incognito-recipes",
+  "more-favorites",
+  "incognito-more-favorites",
   "library",
   "share-recipe",
   "paywall",

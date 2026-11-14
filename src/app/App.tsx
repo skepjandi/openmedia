@@ -4,6 +4,7 @@ import { BackButton } from "../features/back/BackButton";
 import { Fab } from "../features/fab/Fab";
 import { CommandBar } from "../features/sheet/CommandBar";
 import { HistorySheet } from "../features/history/HistorySheet";
+import { FavoritesSheet } from "../features/tabs/FavoritesSheet";
 import { TabsSheet } from "../features/tabs/TabsSheet";
 import { startUsageTracking } from "../features/stats/tracker";
 import { UsageGuard } from "../features/stats/UsageGuard";
@@ -37,6 +38,13 @@ const loadRecipes = () => import("../features/settings/RecipesScreen");
 const loadLibrary = () => import("../features/library/LibraryScreen");
 const loadShareRecipe = () => import("../features/library/ShareRecipeScreen");
 const loadIncognitoRecipes = () => import("../features/settings/IncognitoSections");
+const loadMoreFavorites = () => import("../features/settings/MoreFavoritesScreens");
+const MoreFavoritesScreen = lazy(() =>
+  loadMoreFavorites().then((module) => ({ default: module.MoreFavoritesScreen })),
+);
+const IncognitoMoreFavoritesScreen = lazy(() =>
+  loadMoreFavorites().then((module) => ({ default: module.IncognitoMoreFavoritesScreen })),
+);
 const LibraryScreen = lazy(() =>
   loadLibrary().then((module) => ({ default: module.LibraryScreen })),
 );
@@ -140,11 +148,16 @@ export function App() {
       <AssistantDock />
       <HistorySheet />
       <TabsSheet />
+      <FavoritesSheet />
       {/* One boundary per screen: a page still loading must not hide Settings beneath it, or the site shows through. */}
       <Suspense fallback={null}>{(idle || settingsOpen) && <SettingsScreen />}</Suspense>
       <Suspense fallback={null}>{(idle || sheet === "recipes") && <RecipesScreen />}</Suspense>
       <Suspense fallback={null}>
         {sheet === "incognito-recipes" && <IncognitoRecipesScreen />}
+      </Suspense>
+      <Suspense fallback={null}>{sheet === "more-favorites" && <MoreFavoritesScreen />}</Suspense>
+      <Suspense fallback={null}>
+        {sheet === "incognito-more-favorites" && <IncognitoMoreFavoritesScreen />}
       </Suspense>
       <Suspense fallback={null}>{sheet === "library" && <LibraryScreen />}</Suspense>
       <Suspense fallback={null}>{sheet === "share-recipe" && <ShareRecipeScreen />}</Suspense>

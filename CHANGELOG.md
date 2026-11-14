@@ -6,15 +6,15 @@ All notable changes to OpenMedia are documented here.
 >
 > **Wiki**: the [GitHub Wiki](https://github.com/skepjandi/openmedia/wiki) is the public-facing main wiki — architecture, recipe format, AI pipeline, security model, roadmap. Source-controlled editing surface is `docs/wiki/` in this repo; CI (`.github/workflows/sync-wiki.yml`) mirrors it to the GitHub Wiki on every merge to `main`. New single-PR changes belong here, not as new wiki pages.
 
-### feat(tabs): the Tabs page lists the favorites beyond quick access
+### feat(favorites): the rest of the favorites get pages of their own
 
-**Area:** `feat(tabs)`
+**Area:** `feat(favorites)`
 
-**Change:** The Tabs page has a *More favorites* section under Quick access with every favorite past the first six, so all favorites can be opened from it. Without Pro the section is one locked row that opens the paywall, as in Settings. No new strings (`favorites.more`, `favorites.moreLocked` already exist in all locales).
+**Change:** There is no telling how many favorites someone has, so the lists no longer grow in place. The Tabs page shows quick access and, past the first six, a *More favorites · N* button to a Favorites page that lists every favorite of the set in use (the incognito one while incognito); without Pro the entries past the fourth are locked and open the paywall. In Settings the *More favorites* disclosure became a button to a page with the same editing (reorder, edit, remove), and the incognito favorites section has the same page, which is loaded on open and forgotten on close or when the app goes to the background like the incognito recipes page. The Tabs page now follows the incognito set while incognito. No new strings. Replaces the previous Tabs-page section from #207.
 
-**Verified:** `tsc`, ESLint, Prettier, Vitest `src/features/tabs`. **Not verified:** the layout on a device or simulator.
+**Verified:** `tsc`, ESLint, Prettier, Vitest (459, the sheet-parent test now covers both pages). **Not verified:** layout, and the incognito unlock/forget flow, on a device or simulator.
 
-**PR:** #207
+**PR:** n/a
 
 ### fix(siteview): short-video feeds play on their own
 

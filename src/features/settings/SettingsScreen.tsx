@@ -21,7 +21,9 @@ import { Group, Section, primaryButton, quietButton } from "./ui";
 
 export function SettingsScreen() {
   const open = useApp(selectSettingsOpen);
-  const incognitoRecipesOpen = useApp((s) => s.sheet === "incognito-recipes");
+  const incognitoChildOpen = useApp(
+    (s) => s.sheet === "incognito-recipes" || s.sheet === "incognito-more-favorites",
+  );
   const closeSheet = useApp((s) => s.closeSheet);
   const t = useT();
   if (!open) return null;
@@ -36,7 +38,7 @@ export function SettingsScreen() {
         <FavoritesSection />
         <RecipesLink />
         <LibraryLinks />
-        <IncognitoFavoritesSection key={incognitoRecipesOpen ? "incognito-recipes" : "settings"} />
+        <IncognitoFavoritesSection key={incognitoChildOpen ? "incognito-child" : "settings"} />
         <IncognitoRecipesLink />
         <AiSection />
         <UpdatesSection />
