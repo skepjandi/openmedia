@@ -1,9 +1,9 @@
 (function (config) {
   'use strict';
   // OpenMedia's controls for the video in view in a full-screen feed (YouTube Shorts, Reels,
-  // TikTok, or any page the feed player is told about). They stay hidden; a tap on the video
-  // shows a panel in place of the site's own tap: pause, back and forward 6 seconds, mute (and a
-  // volume bar where the engine lets a page set the volume), speed, and a seek bar with the time
+  // TikTok, or any page the feed player is told about) and for the video of a page that is about
+  // one video (a watch page). They stay hidden; a tap on the video shows a panel in place of the
+  // site's own tap: pause, back and forward 6 seconds, mute, speed, and a seek bar with the time
   // left. The reader can switch the panel off, or move it, for the whole app or for one site; with
   // it off nothing here touches the page's own controls. Around it: the last speed and sound
   // remembered between videos, looping switched off, and, when asked for, moving on to the next
@@ -24,6 +24,11 @@
   var NEXT_GAP = 20; // px below the video in view that counts as the next one
   var DEFAULT_HEIGHT = 16; // px between the panel and the bottom edge, on top of the safe area
   var SKIP_SECONDS = 6;
+  var WATCH_PATH = /^\/(?:watch|video|videos|embed|clip|clips|movie|movies)(?:\/|$)/i;
+  var MIN_VIDEO_SHARE = 0.15; // of the viewport, for the video of a page that is not a feed
+  var TAP_SLOP = 10; // px a finger may move and still be a tap
+  var TAP_MAX_MS = 500;
+  var CLICK_AFTER_TOUCH_MS = 700; // the click a tapped touch would make is swallowed this long
   var HIDE_MS = 3500; // the panel goes away this long after the last touch on it
   var SVG = 'http://www.w3.org/2000/svg';
   var INTERACTIVE = 'a,button,input,textarea,select,summary,[role="button"],[role="link"],' +
@@ -47,7 +52,8 @@
     var shown = false;
     var hideTimer = 0;
     var lastVideo = null;
-    var volumeSettable = null;
+    var touchFrom = null;
+    var touchTapAt = 0;
 
     function read() {
       try { return JSON.parse(localStorage.getItem(STORE) || '{}') || {}; } catch (_) { return {}; }
@@ -64,6 +70,41 @@
 
     function active() {
       return onFeedPage() && !document.hidden && !window.__openmediaHold;
+    }
+
+    // A page that is about one video: it says so (og:type video.*) or its path does.
+    function watchPage() {
+      try {
+        var meta = document.querySelector && document.querySelector('meta[property="og:type"]');
+        var type = meta && meta.getAttribute && meta.getAttribute('content');
+        if (type && /^video/i.test(type)) return true;
+      } catch (_) {}
+      return !!(window.location && WATCH_PATH.test(window.location.pathname || ''));
+    }
+
+    // Where the panel may show: a feed, or a page about one video.
+    function panelPage() {
+      return !document.hidden && !window.__openmediaHold && (onFeedPage() || watchPage());
+    }
+
+    // The video the panel works on: the feed player's in a feed, else the biggest one on screen.
+    function focus() {
+      if (onFeedPage()) return current();
+      var height = window.innerHeight || document.documentElement.clientHeight;
+      var width = window.innerWidth || document.documentElement.clientWidth;
+      var best = null;
+      var bestArea = 0;
+      document.querySelectorAll('video').forEach(function (video) {
+        if (!video.isConnected) return;
+        var box = video.getBoundingClientRect();
+        var seen = (Math.min(box.bottom, height) - Math.max(box.top, 0)) *
+          (Math.min(box.right, width) - Math.max(box.left, 0));
+        if (seen > bestArea && seen >= MIN_VIDEO_SHARE * width * height) {
+          best = video;
+          bestArea = seen;
+        }
+      });
+      return best;
     }
 
     function current() {
@@ -239,11 +280,11 @@
       element.addEventListener('pointerdown', stop);
       element.addEventListener('pointerup', function (event) {
         stop(event);
-        var video = current();
+        var video = focus();
         lastTap = Date.now();
         if (video) action(video);
         keepAlive();
-        paint(current());
+        paint(focus());
       });
       return element;
     }
@@ -298,25 +339,10 @@
       };
     }
 
-    // Some engines (Mobile Safari) ignore a page setting the volume; no volume bar is shown there.
-    function canSetVolume(video) {
-      if (volumeSettable !== null) return volumeSettable;
-      try {
-        var before = video.volume;
-        var probe = before === 1 ? 0.5 : 1;
-        video.volume = probe;
-        volumeSettable = video.volume === probe;
-        video.volume = before;
-      } catch (_) {
-        volumeSettable = false;
-      }
-      return volumeSettable;
-    }
-
-    // The panel: three buttons above a row (mute, volume, time left, speed) above the seek bar,
+    // The panel: three buttons above a row (mute, time left, speed) above the seek bar,
     // fixed above the bottom edge. Everything is made here as plain elements and nothing is read
     // back from the site.
-    function build(video) {
+    function build() {
       if (ui) return ui;
       var parent = document.body || document.documentElement;
       if (!parent) return null;
@@ -356,14 +382,6 @@
         target.muted = !target.muted;
         if (!target.muted && target.volume === 0) target.volume = 1;
       });
-      var volume = canSetVolume(video) ? slider(32, function (ratio) {
-        var target = current();
-        if (!target) return;
-        lastTap = Date.now();
-        target.volume = ratio;
-        target.muted = ratio === 0;
-      }) : null;
-      if (volume) volume.track.style.cssText += ';width:84px';
       var left = make('span', 'margin-left:auto;min-width:48px;text-align:right');
       var pill = make('span',
         'pointer-events:auto;padding:7px 12px;border-radius:999px;background:rgba(255,255,255,.18);' +
@@ -371,7 +389,7 @@
       pill.addEventListener('pointerdown', stop);
       pill.addEventListener('pointerup', function (event) {
         stop(event);
-        var target = current();
+        var target = focus();
         var rate = target ? target.playbackRate : 1;
         var next = RATES[(RATES.indexOf(rate) + 1) % RATES.length];
         write({ rate: next });
@@ -383,11 +401,10 @@
         paint(target);
       });
       row.appendChild(mute);
-      if (volume) row.appendChild(volume.track);
       row.appendChild(left);
       row.appendChild(pill);
       var seek = slider(30, function (ratio) {
-        var target = current();
+        var target = focus();
         if (!target || !isFinite(target.duration) || !target.duration) return;
         target.currentTime = ratio * target.duration;
         paint(target);
@@ -401,7 +418,7 @@
       });
       parent.appendChild(root);
       ui = {
-        root: root, toggle: toggle, mute: mute, volume: volume, left: left, pill: pill, seek: seek
+        root: root, toggle: toggle, mute: mute, left: left, pill: pill, seek: seek
       };
       return ui;
     }
@@ -420,7 +437,6 @@
       ui.pill.textContent = (Math.round(rate * 100) / 100) + '\u00d7';
       setIcon(ui.toggle, video.paused ? 'play' : 'pause');
       setIcon(ui.mute, video.muted || video.volume === 0 ? 'muted' : 'sound');
-      if (ui.volume) ui.volume.set(video.muted ? 0 : video.volume);
     }
 
     function hide() {
@@ -434,18 +450,17 @@
     function keepAlive() {
       clearTimeout(hideTimer);
       hideTimer = setTimeout(function () {
-        var video = current();
+        var video = focus();
         if (video && video.paused) keepAlive();
         else hide();
       }, HIDE_MS);
     }
 
     function tick() {
-      var showing = active();
-      if (showing) {
+      if (active()) {
         document.querySelectorAll('video').forEach(prepare);
       }
-      var video = showing && panelOn() ? current() : null;
+      var video = shown && panelPage() && panelOn() ? focus() : null;
       if (video !== lastVideo) {
         lastVideo = video;
         if (shown) hide();
@@ -454,7 +469,7 @@
         if (ui) ui.root.style.display = 'none';
         return;
       }
-      var parts = build(video);
+      var parts = build();
       if (!parts) return;
       parts.root.style.bottom = 'calc(env(safe-area-inset-bottom,0px) + ' + panelHeight() + 'px)';
       parts.root.style.display = 'block';
@@ -462,29 +477,52 @@
     }
 
     // A tap on the video, anywhere the site has not put a button of its own, shows or hides the
-    // panel and is kept from the site, whose own tap (pause, mute) the panel replaces. A swipe
-    // makes no click, so it still reaches the site untouched.
-    function onClick(event) {
-      if (!active() || !panelOn()) return;
-      var target = event.target;
-      if (target && target.closest && target.closest('[data-openmedia-controls]')) return;
-      var video = current();
-      if (!video) return;
-      if (target && target.closest && target.closest(INTERACTIVE)) return;
+    // panel and is kept from the site, whose own tap (pause, mute) the panel replaces. A swipe is
+    // not a tap and reaches the site untouched. Some players end a touch themselves and cancel the
+    // click that follows it, so a tap is found from the touch, and the click it would have made
+    // is swallowed.
+    function tapAt(x, y, hit, event) {
+      if (!panelPage() || !panelOn()) return false;
+      if (hit && hit.closest && hit.closest('[data-openmedia-controls]')) return false;
+      var video = focus();
+      if (!video) return false;
+      if (hit && hit.closest && hit.closest(INTERACTIVE)) return false;
       var box = boxOf(video);
-      var x = event.clientX;
-      var y = event.clientY;
-      if (!(x >= box.left && x <= box.right && y >= box.top && y <= box.bottom)) return;
+      if (!(x >= box.left && x <= box.right && y >= box.top && y <= box.bottom)) return false;
       event.stopImmediatePropagation();
       if (event.cancelable) event.preventDefault();
       if (shown) {
         hide();
-        return;
+        return true;
       }
       lastVideo = video;
       shown = true;
       keepAlive();
       tick();
+      return true;
+    }
+
+    function onTouchStart(event) {
+      var first = event.touches && event.touches.length === 1 ? event.touches[0] : null;
+      touchFrom = first ? { x: first.clientX, y: first.clientY, time: Date.now() } : null;
+    }
+
+    function onTouchEnd(event) {
+      var from = touchFrom;
+      touchFrom = null;
+      var last = event.changedTouches && event.changedTouches[0];
+      if (!from || !last || Date.now() - from.time > TAP_MAX_MS) return;
+      if (Math.hypot(last.clientX - from.x, last.clientY - from.y) > TAP_SLOP) return;
+      if (tapAt(last.clientX, last.clientY, event.target, event)) touchTapAt = Date.now();
+    }
+
+    function onClick(event) {
+      if (Date.now() - touchTapAt < CLICK_AFTER_TOUCH_MS) {
+        event.stopImmediatePropagation();
+        if (event.cancelable) event.preventDefault();
+        return;
+      }
+      tapAt(event.clientX, event.clientY, event.target, event);
     }
 
     function tapped() { lastTap = Date.now(); }
@@ -496,6 +534,8 @@
 
     on(document, 'touchend', tapped, { capture: true, passive: true });
     on(document, 'click', tapped, { capture: true, passive: true });
+    on(window, 'touchstart', onTouchStart, { capture: true, passive: true });
+    on(window, 'touchend', onTouchEnd, { capture: true });
     on(window, 'click', onClick, { capture: true });
     on(document, 'keydown', tapped, { capture: true, passive: true });
     // A new source is a new video: it gets the remembered speed and sound, once it has started.
@@ -518,7 +558,7 @@
     on(document, 'volumechange', function (event) {
       var video = event.target;
       if (!wantsSound || !(video instanceof HTMLVideoElement)) return;
-      if (!active() || Date.now() - lastTap > TAP_MS) return;
+      if (!panelPage() || Date.now() - lastTap > TAP_MS) return;
       write({ muted: video.muted, volume: video.volume });
     }, true);
     on(document, 'ended', function (event) {

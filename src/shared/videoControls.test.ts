@@ -58,14 +58,6 @@ class FakeVideo {
   }
 }
 
-/** A video whose engine ignores a page setting the volume, as Mobile Safari does. */
-class FixedVolumeVideo extends FakeVideo {
-  constructor() {
-    super();
-    Object.defineProperty(this, "volume", { get: () => 1, set: () => {} });
-  }
-}
-
 class FakeElement {
   style = { cssText: "" } as Record<string, string>;
   children: FakeElement[] = [];
@@ -145,6 +137,8 @@ interface Page {
   tick: () => void;
   /** A click at a point of the page, on a target that is not one of the site's buttons. */
   click: (x?: number, y?: number, target?: Record<string, unknown>) => Tap;
+  /** A touch from one point to another, as a finger makes it; `kept` is true when the page took it. */
+  touch: (from: [number, number], to?: [number, number], target?: Record<string, unknown>) => Tap;
   /** Runs the timers the controls set, as when the panel's few seconds are up. */
   runTimers: () => void;
   /** What the feed player was told about a pause or a play the reader chose. */
@@ -165,6 +159,11 @@ function load(options: {
   controls?: Partial<VideoControls>;
   sites?: Record<string, SiteVideo>;
   hostname?: string;
+  /** False for a page the feed player does not know; default true. */
+  feed?: boolean;
+  /** The page's og:type, if it has one. */
+  ogType?: string;
+  pathname?: string;
   videos: FakeVideo[];
   current: FakeVideo | null;
   saved?: Record<string, unknown>;
@@ -185,6 +184,8 @@ function load(options: {
     documentElement: body,
     createElement: () => new FakeElement(),
     createElementNS: () => new FakeElement(),
+    querySelector: () =>
+      options.ogType === undefined ? null : { getAttribute: () => options.ogType },
     querySelectorAll: () => ({
       forEach: (run: (video: FakeVideo) => void) => options.videos.forEach(run),
     }),
@@ -198,7 +199,7 @@ function load(options: {
       );
     },
   };
-  document[Symbol.for("openmedia.isFeed")] = () => true;
+  document[Symbol.for("openmedia.isFeed")] = () => options.feed !== false;
   document[Symbol.for("openmedia.userPause")] = (video: FakeVideo, paused: boolean) =>
     userPauses.push([video, paused]);
   Object.defineProperty(document, Symbol.for("openmedia.currentVideo"), {
@@ -207,7 +208,7 @@ function load(options: {
   const win: Record<string, unknown> = {
     innerHeight: 800,
     innerWidth: 400,
-    location: { hostname: options.hostname ?? "m.youtube.com" },
+    location: { hostname: options.hostname ?? "m.youtube.com", pathname: options.pathname ?? "/" },
     document,
     HTMLVideoElement: FakeVideo,
     MutationObserver: class {
@@ -265,6 +266,26 @@ function load(options: {
           type: "click",
           clientX: x,
           clientY: y,
+          target,
+          cancelable: true,
+          preventDefault() {},
+          stopPropagation() {},
+          stopImmediatePropagation() {
+            tap.kept = true;
+          },
+        });
+      }
+      return tap;
+    },
+    touch: (from, to = from, target = PLAIN) => {
+      const tap = { kept: false };
+      for (const handler of windowListeners.get("touchstart") ?? []) {
+        handler({ type: "touchstart", touches: [{ clientX: from[0], clientY: from[1] }], target });
+      }
+      for (const handler of windowListeners.get("touchend") ?? []) {
+        handler({
+          type: "touchend",
+          changedTouches: [{ clientX: to[0], clientY: to[1] }],
           target,
           cancelable: true,
           preventDefault() {},
@@ -357,6 +378,26 @@ describe("video controls", () => {
     expect(shown(page)).toBe(false);
   });
 
+  it("finds a tap from the touch when the player cancels the click, and swallows that click", () => {
+    const video = new FakeVideo();
+    const page = load({ videos: [video], current: video });
+    expect(page.touch([200, 400]).kept).toBe(true);
+    page.tick();
+    expect(shown(page)).toBe(true);
+    expect(page.click().kept).toBe(true);
+    page.tick();
+    expect(shown(page)).toBe(true);
+  });
+
+  it("leaves a swipe, and a touch on one of the site's buttons, to the site", () => {
+    const video = new FakeVideo();
+    const page = load({ videos: [video], current: video });
+    expect(page.touch([200, 600], [200, 150]).kept).toBe(false);
+    expect(page.touch([200, 400], [200, 400], SITE_BUTTON).kept).toBe(false);
+    page.tick();
+    expect(shown(page)).toBe(false);
+  });
+
   it("leaves a tap on one of the site's own buttons, or off the video, to the site", () => {
     const video = new FakeVideo();
     const page = load({ videos: [video], current: video });
@@ -417,18 +458,40 @@ describe("video controls", () => {
     expect(video.muted).toBe(false);
   });
 
-  it("sets the volume from its bar, and has none where the engine ignores the page's volume", () => {
+  it("has a mute button and no volume bar, which sites undo", () => {
     const video = new FakeVideo();
     const page = load({ videos: [video], current: video });
     openPanel(page);
-    expect(sliders(page)).toHaveLength(2);
-    sliders(page)[0].fire("pointerdown", { clientX: 100 });
-    expect(video.volume).toBe(0.25);
+    expect(sliders(page)).toHaveLength(1);
+  });
 
-    const fixed = new FixedVolumeVideo();
-    const phone = load({ videos: [fixed], current: fixed });
-    openPanel(phone);
-    expect(sliders(phone)).toHaveLength(1);
+  it("works on a page about one video, not only in a feed", () => {
+    const watch = new FakeVideo();
+    watch.box = { top: 100, left: 0, width: 400, height: 225, bottom: 325, right: 400 };
+    const byType = load({
+      feed: false,
+      ogType: "video.other",
+      videos: [watch],
+      current: null,
+    });
+    expect(byType.click(200, 200).kept).toBe(true);
+    byType.tick();
+    expect(shown(byType)).toBe(true);
+
+    const byPath = load({ feed: false, pathname: "/watch", videos: [watch], current: null });
+    expect(byPath.click(200, 200).kept).toBe(true);
+  });
+
+  it("leaves other pages alone, and videos too small to be the page's video", () => {
+    const watch = new FakeVideo();
+    watch.box = { top: 100, left: 0, width: 400, height: 225, bottom: 325, right: 400 };
+    const other = load({ feed: false, pathname: "/home", videos: [watch], current: null });
+    expect(other.click(200, 200).kept).toBe(false);
+
+    const tiny = new FakeVideo();
+    tiny.box = { top: 100, left: 0, width: 100, height: 50, bottom: 150, right: 100 };
+    const small = load({ feed: false, pathname: "/watch", videos: [tiny], current: null });
+    expect(small.click(50, 120).kept).toBe(false);
   });
 
   it("steps through the speeds when the button is tapped and remembers the choice", () => {
