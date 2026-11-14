@@ -38,7 +38,7 @@ When a hidden quick-access session's count rises, the shell asks the plugin for 
 
 iOS Settings still has the master switch. No push: see [Platform Support](./platform-support.md).
 
-**Opening a site:** a small accent spinner sits in the page area until the active session first paints or finishes loading. It uses the existing native page state, stays out of the touch router, and stops on errors; switching to a ready session shows no loader. Reduced-motion mode keeps the ring still. The startup splash still covers the first load (see [The startup splash](#the-startup-splash)).
+**Opening a site:** a small accent spinner sits in the page area until the active session first paints or finishes loading. It uses the existing native page state, stays out of the touch router, and stops on errors; switching to a ready session shows no loader. The ring spins even under reduced motion, since a still ring reads as a hang. The startup splash still covers the first load (see [The startup splash](#the-startup-splash)).
 
 ## The startup splash
 

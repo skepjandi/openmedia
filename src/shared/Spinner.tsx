@@ -1,8 +1,8 @@
 import type { ReactNode } from "react";
 
 /**
- * The app's one loading ring: an accent arc over a faint track. It stops spinning under reduced
- * motion, where it stays a still ring.
+ * The app's one loading ring: an accent arc over a faint track. It always spins: it is the only
+ * sign that work is in progress, and a still ring reads as a hang.
  */
 export function Spinner({
   label,
@@ -23,7 +23,7 @@ export function Spinner({
       <span
         aria-hidden="true"
         style={{ width: size, height: size }}
-        className="shrink-0 rounded-full border-2 border-paper/15 border-t-accent motion-safe:animate-spin"
+        className="shrink-0 animate-spin rounded-full border-2 border-paper/15 border-t-accent"
       />
       {label}
     </span>
