@@ -77,7 +77,7 @@ describe("closing sites from the Tabs screen", () => {
     lastUsed,
   });
 
-  it("ends only the live session: favorites and history stay, the last site is kept", () => {
+  it("ends only the live session: favorites and history stay, and the last one can be closed too", () => {
     const favorites = [{ id: "f", name: "A", url: "https://a.example/", icon: null, notify: true }];
     useApp.setState({
       state: { favorites, history: ["https://a.example/"] } as never,
@@ -90,7 +90,9 @@ describe("closing sites from the Tabs screen", () => {
     expect(useApp.getState().state?.favorites).toEqual(favorites);
     expect(useApp.getState().state?.history).toEqual(["https://a.example/"]);
     useApp.getState().closeSession("a");
-    expect(useApp.getState().sessions.map((s) => s.id)).toEqual(["a"]);
+    expect(useApp.getState().sessions.map((s) => s.id)).toEqual([]);
+    expect(useApp.getState().activeId).toBeNull();
+    expect(useApp.getState().state?.history).toEqual(["https://a.example/"]);
   });
 
   it("closes the hidden sessions and leaves the visible one", () => {

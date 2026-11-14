@@ -58,7 +58,6 @@ export function TabsSheet() {
   if (!open) return null;
 
   const tabs = orderedTabs(sessions, activeId);
-  const canClose = tabs.length > 1;
 
   return (
     <Screen
@@ -86,7 +85,6 @@ export function TabsSheet() {
                   now={now}
                   secondsToday={secondsTodayFor(report, session.scope)}
                   favorites={favorites}
-                  canClose={canClose}
                   onOpen={() => openSession(session.id)}
                   onClose={() => closeSession(session.id)}
                   onReset={() => resetSession(session.id)}
@@ -177,7 +175,6 @@ interface OpenTabProps {
   now: number;
   secondsToday: number | null;
   favorites: readonly Favorite[];
-  canClose: boolean;
   onOpen: () => void;
   onClose: () => void;
   onReset: () => void;
@@ -189,7 +186,6 @@ function OpenTab({
   now,
   secondsToday,
   favorites,
-  canClose,
   onOpen,
   onClose,
   onReset,
@@ -233,16 +229,14 @@ function OpenTab({
       >
         <ReloadIcon />
       </button>
-      {canClose && (
-        <button
-          type="button"
-          aria-label={t("tabs.closeOne", { name: title })}
-          onClick={onClose}
-          className="grid size-12 shrink-0 place-items-center text-paper/55 active:bg-paper/[0.06]"
-        >
-          <TabsCloseIcon />
-        </button>
-      )}
+      <button
+        type="button"
+        aria-label={t("tabs.closeOne", { name: title })}
+        onClick={onClose}
+        className="grid size-12 shrink-0 place-items-center text-paper/55 active:bg-paper/[0.06]"
+      >
+        <TabsCloseIcon />
+      </button>
     </div>
   );
 }

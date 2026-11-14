@@ -592,7 +592,7 @@ export const useApp = create<AppStore>((set, get) => {
 
     closeSession: (id) => {
       const { sessions, activeId } = get();
-      if (sessions.length <= 1 || !sessions.some((session) => session.id === id)) return;
+      if (!sessions.some((session) => session.id === id)) return;
       const next = id === activeId ? tabAfterClose(sessions, id) : activeId;
       void siteView.close(id).catch(() => {});
       set((current) => ({

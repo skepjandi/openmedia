@@ -10,7 +10,7 @@ All notable changes to OpenMedia are documented here.
 
 **Area:** `feat(tabs)`
 
-**Change:** Each open tab on the Tabs page has a reset button beside close. It reopens the tab on the address it was opened with and drops its Back history, including pages restored from before a restart. It works on the only open tab, which cannot be closed. New string `tabs.resetOne` in every locale.
+**Change:** Each open tab on the Tabs page has a reset button beside close. It reopens the tab on the address it was opened with and drops its Back history, including pages restored from before a restart. The only open tab can now be closed too, leaving the empty page. New string `tabs.resetOne` in every locale.
 
 **Verified:** `tsc`, Vitest (`app`, `i18n`, `tabs`). **Not verified:** on a device.
 
