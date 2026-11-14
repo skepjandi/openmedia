@@ -336,11 +336,6 @@ svg {
   .demo-fan-item {
     opacity: 1;
   }
-
-  .fab[data-hold="charging"] .fab-ring circle {
-    animation: none;
-    stroke-dashoffset: 0;
-  }
 }
 
 /* Full-screen pages rise into place once; nothing else on them animates. */
@@ -514,4 +509,11 @@ svg {
   transition-duration: 1ms !important;
   transition-delay: 0s !important;
   scroll-behavior: auto !important;
+}
+
+/* The hold ring is progress feedback, not decoration: it has to fill over the hold time or the
+   press shows no sign it is charging. It is a slow stroke with no flashing, so it keeps its
+   duration under Reduce Motion and epilepsy protection. */
+:root[data-calm] .fab[data-hold="charging"] .fab-ring circle {
+  animation-duration: 380ms !important;
 }
