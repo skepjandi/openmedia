@@ -10,3 +10,4 @@ CHANGELOG.md
 recipes/fixtures
 shared/public-suffix
 src-tauri/plugins/tauri-plugin-siteview/ios/Sources/PublicSuffixRules.swift
+blocklists/brave-resources.json
