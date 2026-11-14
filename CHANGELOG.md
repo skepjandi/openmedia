@@ -6,6 +6,16 @@ All notable changes to OpenMedia are documented here.
 >
 > **Wiki**: the [GitHub Wiki](https://github.com/skepjandi/openmedia/wiki) is the public-facing main wiki — architecture, recipe format, AI pipeline, security model, roadmap. Source-controlled editing surface is `docs/wiki/` in this repo; CI (`.github/workflows/sync-wiki.yml`) mirrors it to the GitHub Wiki on every merge to `main`. New single-PR changes belong here, not as new wiki pages.
 
+### fix(android): align 64-bit native libraries for 16 KB memory pages
+
+**Area:** `fix(android)`
+
+**Change:** Google Play rejected version code 1009: "Your app does not support 16 KB memory page sizes". NDK r27 links with a 4 KB maximum page size, so `libopenmedia_lib.so` had 4 KB-aligned LOAD segments. `src-tauri/build.rs` now passes `-Wl,-z,max-page-size=16384` when linking the cdylib for `aarch64` and `x86_64` Android (32-bit ABIs are exempt).
+
+**Verified:** Built the arm64 release APK; `llvm-readelf` shows LOAD alignment `0x4000` (was `0x1000`), and `zipalign -c -P 16` passes. **Not verified:** x86_64 build, Play Console re-upload, on a 16 KB device.
+
+**PR:** n/a
+
 ### feat(siteview): picture-in-picture for a favorite's videos, off by default (iOS)
 
 **Area:** `feat(siteview)`

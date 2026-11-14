@@ -12,6 +12,7 @@ fn main() {
     forward_build_keys();
     embed_recipes();
     link_swift_runtime();
+    align_android_pages();
     tauri_build::build()
 }
 
@@ -85,5 +86,18 @@ fn embed_recipes() {
 fn link_swift_runtime() {
     if env::var("CARGO_CFG_TARGET_OS").as_deref() == Ok("macos") {
         println!("cargo:rustc-link-arg=-Wl,-rpath,/usr/lib/swift");
+    }
+}
+
+/// Google Play requires 64-bit Android libraries to be aligned for 16 KB memory pages, and the NDK
+/// links with a 4 KB maximum page size by default. 32-bit ABIs are exempt.
+fn align_android_pages() {
+    let is_android = env::var("CARGO_CFG_TARGET_OS").as_deref() == Ok("android");
+    let is_64_bit = matches!(
+        env::var("CARGO_CFG_TARGET_ARCH").as_deref(),
+        Ok("aarch64" | "x86_64")
+    );
+    if is_android && is_64_bit {
+        println!("cargo:rustc-link-arg-cdylib=-Wl,-z,max-page-size=16384");
     }
 }
