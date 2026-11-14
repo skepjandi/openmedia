@@ -246,6 +246,18 @@ All notable changes to OpenMedia are documented here.
 
 ## 2026-11-14
 
+### fix(siteview): a Short opened from the home feed no longer waits for a tap
+
+**Area:** `fix(siteview)`
+
+**Problem:** On the iOS simulator a Short opened from the YouTube home feed stayed on a black or still frame until tapped. YouTube parks a video that is not playing about three screens above the top (`getBoundingClientRect().top` of -2682 on a 894 px screen), so the feed player saw no video in view and never called `play()`.
+
+**Change:** The feed player measures a video that is off screen by its own wrapper when that wrapper is no taller than 1.5 screens (a taller one is a list, and is ignored). Opening a Short from the home feed now starts playing by itself on the simulator.
+
+**Verified:** Vitest (`feedPlayer.test.ts`), and on the iOS simulator by opening a Short from the home feed (before: frozen, after: moving). **Not verified:** on a device, Instagram and Facebook.
+
+**PR:** n/a
+
 ### fix(siteview): Shorts and Reels no longer stall on a still frame
 
 **Area:** `fix(siteview)`

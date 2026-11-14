@@ -27,6 +27,7 @@
   var ATTEMPT_GAP_MS = 300;
   var MAX_ATTEMPTS = 8;
   var SLOW_RETRY_MS = 5000; // once the attempts are spent, one more this often
+  var WRAPPER_MAX = 1.5; // screens: a wrapper taller than this is a list, not one item
   var STALL_TICKS = 3; // settles with no progress before a "playing" video is kicked
   try {
     if (window.top !== window) return;
@@ -58,10 +59,8 @@
       return inFeed() && !document.hidden && !window.__openmediaHold && !document[NO_AUTOPLAY];
     }
 
-    // How much of the viewport this element covers, and how much of the element is on screen,
-    // both 0 to 1.
-    function cover(video) {
-      var box = video.getBoundingClientRect();
+    // How much of the viewport a box covers, and how much of the box is on screen, both 0 to 1.
+    function boxCover(box) {
       var height = window.innerHeight || document.documentElement.clientHeight;
       var width = window.innerWidth || document.documentElement.clientWidth;
       if (!box.width || !box.height || !height || !width) return { share: 0, own: 0 };
@@ -70,6 +69,19 @@
       if (visibleHeight <= 0 || visibleWidth <= 0) return { share: 0, own: 0 };
       var visible = visibleHeight * visibleWidth;
       return { share: visible / (height * width), own: visible / (box.width * box.height) };
+    }
+
+    // How much of the viewport this video covers. A feed can park a video that is not playing far
+    // off screen (YouTube Shorts leaves it thousands of pixels up until it plays), so that its box
+    // says nothing: its own wrapper, when that is about screen sized, says where it belongs.
+    function cover(video) {
+      var covered = boxCover(video.getBoundingClientRect());
+      if (covered.share > 0 || video.paused === false) return covered;
+      var wrapper = video.parentElement;
+      if (!wrapper) return covered;
+      var box = wrapper.getBoundingClientRect();
+      var height = window.innerHeight || document.documentElement.clientHeight;
+      return box.height <= height * WRAPPER_MAX ? boxCover(box) : covered;
     }
 
     function share(video) {

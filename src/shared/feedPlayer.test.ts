@@ -18,6 +18,7 @@ class FakeVideo {
   playCalls = 0;
   playError: string | null = null;
   box = { top: 0, left: 0, width: 400, height: 800, bottom: 800, right: 400 };
+  parentElement: { getBoundingClientRect: () => FakeVideo["box"] } | null = null;
 
   getBoundingClientRect() {
     return this.box;
@@ -254,5 +255,41 @@ describe("feed player", () => {
     await page.settle();
     for (let round = 0; round < 5; round += 1) await page.tick();
     expect(stuck.playCalls).toBeGreaterThan(0);
+  });
+
+  it("plays a video the site parks far off screen when its wrapper is on screen", async () => {
+    const parked = new FakeVideo();
+    parked.box = { top: -2682, left: 0, width: 400, height: 800, bottom: -1882, right: 400 };
+    parked.parentElement = {
+      getBoundingClientRect: () => ({
+        top: 0,
+        left: 0,
+        width: 400,
+        height: 800,
+        bottom: 800,
+        right: 400,
+      }),
+    };
+    const page = load({ videos: [parked] });
+    await page.settle();
+    expect(parked.paused).toBe(false);
+  });
+
+  it("leaves an off-screen video alone when its wrapper is a list taller than the screen", async () => {
+    const hidden = new FakeVideo();
+    hidden.box = { top: -2682, left: 0, width: 400, height: 800, bottom: -1882, right: 400 };
+    hidden.parentElement = {
+      getBoundingClientRect: () => ({
+        top: -3000,
+        left: 0,
+        width: 400,
+        height: 6000,
+        bottom: 3000,
+        right: 400,
+      }),
+    };
+    const page = load({ videos: [hidden] });
+    await page.settle();
+    expect(hidden.playCalls).toBe(0);
   });
 });
