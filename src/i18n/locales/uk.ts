@@ -214,6 +214,21 @@ export const uk: Messages = {
   "settings.epilepsyProtection": "Захист від епілепсії",
   "settings.epilepsyProtectionNote":
     "Зупиняє анімацію, автовідтворення відео й анімовані GIF у застосунку та на сторінках. Не може виявити спалахи у відео, яке ви запускаєте самі.",
+  "settings.videoControls": "Керування відео",
+  "settings.videoControlsNote":
+    "Для повноекранних відеострічок, як-от Shorts і Reels. Кожна функція вимкнена, доки ви її не ввімкнете.",
+  "settings.videoSeekBar": "Смуга перемотування",
+  "settings.videoSeekBarNote": "Смуга, яку можна перетягувати, із часом, що залишився.",
+  "settings.videoSpeed": "Кнопка швидкості",
+  "settings.videoSpeedNote": "Торкайтеся, щоб перемикати 0.5×, 1×, 1.25×, 1.5× і 2×.",
+  "settings.videoRemember": "Запам’ятовувати швидкість і звук",
+  "settings.videoRememberNote":
+    "Наступне відео почнеться з останньої обраної швидкості та гучності.",
+  "settings.videoLoopOff": "Не повторювати відео",
+  "settings.videoLoopOffNote":
+    "Наприкінці відео залишається на останньому кадрі й не починається знову.",
+  "settings.videoAutoAdvance": "Переходити далі після відео",
+  "settings.videoAutoAdvanceNote": "Саме прокручує до наступного відео. Повтор теж вимикається.",
   "settings.dyslexia": "Дислексія",
   "settings.readingFont": "Шрифт для читання",
   "settings.readingFontOff": "Типовий",

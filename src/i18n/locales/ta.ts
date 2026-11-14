@@ -217,6 +217,22 @@ export const ta: Messages = {
   "settings.epilepsyProtection": "வலிப்பு பாதுகாப்பு",
   "settings.epilepsyProtectionNote":
     "பயன்பாட்டிலும் பக்கங்களிலும் அனிமேஷன்கள், தானாக இயங்கும் வீடியோ மற்றும் அசையும் GIF-களை நிறுத்தும். நீங்களே தொடங்கும் வீடியோவில் ஒளிர்வைக் கண்டறிய இயலாது.",
+  "settings.videoControls": "வீடியோ கட்டுப்பாடுகள்",
+  "settings.videoControlsNote":
+    "Shorts, Reels போன்ற முழுத்திரை வீடியோ ஊட்டங்களுக்கு. நீங்கள் இயக்கும் வரை ஒவ்வொன்றும் அணைந்தே இருக்கும்.",
+  "settings.videoSeekBar": "நகர்த்து பட்டை",
+  "settings.videoSeekBarNote": "இழுத்துச் செல்லும் பட்டை, மீதமுள்ள நேரத்துடன்.",
+  "settings.videoSpeed": "வேகப் பொத்தான்",
+  "settings.videoSpeedNote": "0.5×, 1×, 1.25×, 1.5×, 2× என மாற்ற தட்டவும்.",
+  "settings.videoRemember": "வேகத்தையும் ஒலியையும் நினைவில் கொள்",
+  "settings.videoRememberNote":
+    "அடுத்த வீடியோ நீங்கள் கடைசியாகத் தேர்ந்த வேகத்திலும் ஒலியளவிலும் தொடங்கும்.",
+  "settings.videoLoopOff": "வீடியோக்கள் திரும்பத் திரும்ப இயங்குவதை நிறுத்து",
+  "settings.videoLoopOffNote":
+    "வீடியோ முடிந்ததும் மீண்டும் தொடங்காமல் கடைசி சட்டத்திலேயே நிற்கும்.",
+  "settings.videoAutoAdvance": "வீடியோ முடிந்ததும் அடுத்ததற்குச் செல்",
+  "settings.videoAutoAdvanceNote":
+    "அடுத்த வீடியோவுக்குத் தானாகவே நகரும். இது மீண்டும் இயங்குவதையும் நிறுத்தும்.",
   "settings.dyslexia": "டிஸ்லெக்சியா",
   "settings.readingFont": "வாசிப்பு எழுத்துரு",
   "settings.readingFontOff": "இயல்புநிலை",

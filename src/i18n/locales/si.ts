@@ -206,6 +206,21 @@ export const si: Messages = {
   "settings.epilepsyProtection": "අපස්මාර ආරක්ෂාව",
   "settings.epilepsyProtectionNote":
     "යෙදුමේ සහ පිටුවල සජීවීකරණ, ස්වයංක්‍රීයව ධාවනය වන වීඩියෝ සහ සජීවී GIF නවත්වයි. ඔබම ආරම්භ කරන වීඩියෝවක සැණෙළි හඳුනාගත නොහැක.",
+  "settings.videoControls": "වීඩියෝ පාලන",
+  "settings.videoControlsNote":
+    "Shorts සහ Reels වැනි සම්පූර්ණ තිර වීඩියෝ ප්‍රවාහ සඳහා. ඔබ ක්‍රියාත්මක කරන තුරු සියල්ල අක්‍රියව පවතී.",
+  "settings.videoSeekBar": "සෙවුම් තීරුව",
+  "settings.videoSeekBarNote": "ඇදගෙන යා හැකි තීරුවක්, ඉතිරි කාලය සමඟ.",
+  "settings.videoSpeed": "වේග බොත්තම",
+  "settings.videoSpeedNote": "0.5×, 1×, 1.25×, 1.5× සහ 2× හරහා මාරු වීමට ස්පර්ශ කරන්න.",
+  "settings.videoRemember": "වේගය සහ ශබ්දය මතක තබාගන්න",
+  "settings.videoRememberNote":
+    "ඊළඟ වීඩියෝව ඔබ අවසන් වරට තෝරාගත් වේගයෙන් සහ ශබ්ද මට්ටමෙන් ආරම්භ වේ.",
+  "settings.videoLoopOff": "වීඩියෝ නැවත නැවත ධාවනය නවත්වන්න",
+  "settings.videoLoopOffNote": "වීඩියෝවක් අවසන් වූ විට නැවත ආරම්භ නොවී අවසන් රාමුවේම රැඳී සිටී.",
+  "settings.videoAutoAdvance": "වීඩියෝවක් අවසන් වූ විට ඉදිරියට යන්න",
+  "settings.videoAutoAdvanceNote":
+    "ඊළඟ වීඩියෝවට ස්වයංක්‍රීයව ස්ක්‍රෝල් වේ. මෙයින් නැවත ධාවනයද නතර වේ.",
   "settings.dyslexia": "ඩිස්ලෙක්සියාව",
   "settings.readingFont": "කියවීමේ අකුරු",
   "settings.readingFontOff": "පෙරනිමිය",

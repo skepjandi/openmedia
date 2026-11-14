@@ -214,6 +214,22 @@ export const es: Messages = {
   "settings.epilepsyProtection": "Protección contra la epilepsia",
   "settings.epilepsyProtectionNote":
     "Detiene las animaciones, los vídeos con reproducción automática y los GIF animados en la app y en las páginas. No puede detectar destellos en un vídeo que inicias tú.",
+  "settings.videoControls": "Controles de vídeo",
+  "settings.videoControlsNote":
+    "Para feeds de vídeo a pantalla completa como Shorts y Reels. Cada opción sigue desactivada hasta que la actives.",
+  "settings.videoSeekBar": "Barra de progreso",
+  "settings.videoSeekBarNote": "Una barra para arrastrar, con el tiempo restante.",
+  "settings.videoSpeed": "Botón de velocidad",
+  "settings.videoSpeedNote": "Toca para pasar por 0.5×, 1×, 1.25×, 1.5× y 2×.",
+  "settings.videoRemember": "Recordar velocidad y sonido",
+  "settings.videoRememberNote":
+    "El siguiente vídeo empieza con la velocidad y el volumen que elegiste por última vez.",
+  "settings.videoLoopOff": "Evitar que los vídeos se repitan",
+  "settings.videoLoopOffNote":
+    "Al terminar, el vídeo se queda en su último fotograma en vez de empezar de nuevo.",
+  "settings.videoAutoAdvance": "Pasar al siguiente al terminar un vídeo",
+  "settings.videoAutoAdvanceNote":
+    "Se desplaza solo al siguiente vídeo. Esto también detiene la repetición.",
   "settings.dyslexia": "Dislexia",
   "settings.readingFont": "Fuente de lectura",
   "settings.readingFontOff": "Predeterminada",

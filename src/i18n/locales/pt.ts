@@ -215,6 +215,21 @@ export const pt: Messages = {
   "settings.epilepsyProtection": "Proteção contra epilepsia",
   "settings.epilepsyProtectionNote":
     "Interrompe animações, vídeos com reprodução automática e GIFs animados no app e nas páginas. Não consegue detectar flashes em um vídeo que você inicia.",
+  "settings.videoControls": "Controlos de vídeo",
+  "settings.videoControlsNote":
+    "Para feeds de vídeo em ecrã inteiro, como Shorts e Reels. Cada opção fica desligada até a ativares.",
+  "settings.videoSeekBar": "Barra de progresso",
+  "settings.videoSeekBarNote": "Uma barra para arrastar, com o tempo restante.",
+  "settings.videoSpeed": "Botão de velocidade",
+  "settings.videoSpeedNote": "Toca para alternar entre 0.5×, 1×, 1.25×, 1.5× e 2×.",
+  "settings.videoRemember": "Lembrar velocidade e som",
+  "settings.videoRememberNote":
+    "O vídeo seguinte começa com a velocidade e o volume que escolheste por último.",
+  "settings.videoLoopOff": "Impedir que os vídeos se repitam",
+  "settings.videoLoopOffNote": "No fim, o vídeo fica no último fotograma em vez de recomeçar.",
+  "settings.videoAutoAdvance": "Avançar quando um vídeo termina",
+  "settings.videoAutoAdvanceNote":
+    "Passa sozinho para o vídeo seguinte. Isto também impede a repetição.",
   "settings.dyslexia": "Dislexia",
   "settings.readingFont": "Fonte de leitura",
   "settings.readingFontOff": "Padrão",

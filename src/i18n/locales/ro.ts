@@ -213,6 +213,22 @@ export const ro: Messages = {
   "settings.epilepsyProtection": "Protecție împotriva epilepsiei",
   "settings.epilepsyProtectionNote":
     "Oprește animațiile, videoclipurile cu redare automată și GIF-urile animate în aplicație și pe pagini. Nu poate detecta luminile intermitente dintr-un videoclip pornit de tine.",
+  "settings.videoControls": "Comenzi video",
+  "settings.videoControlsNote":
+    "Pentru fluxurile video pe ecran complet, precum Shorts și Reels. Fiecare opțiune rămâne dezactivată până o activezi.",
+  "settings.videoSeekBar": "Bară de derulare",
+  "settings.videoSeekBarNote": "O bară de tras, cu timpul rămas.",
+  "settings.videoSpeed": "Buton de viteză",
+  "settings.videoSpeedNote": "Atinge pentru a trece prin 0.5×, 1×, 1.25×, 1.5× și 2×.",
+  "settings.videoRemember": "Ține minte viteza și sunetul",
+  "settings.videoRememberNote":
+    "Următorul videoclip începe cu viteza și volumul alese ultima dată.",
+  "settings.videoLoopOff": "Oprește repetarea videoclipurilor",
+  "settings.videoLoopOffNote":
+    "La final, videoclipul rămâne pe ultimul cadru în loc să înceapă din nou.",
+  "settings.videoAutoAdvance": "Treci mai departe când se termină un videoclip",
+  "settings.videoAutoAdvanceNote":
+    "Derulează singur la următorul videoclip. Aceasta oprește și repetarea.",
   "settings.dyslexia": "Dislexie",
   "settings.readingFont": "Font de citire",
   "settings.readingFontOff": "Implicit",

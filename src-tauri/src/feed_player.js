@@ -11,12 +11,16 @@
   var KEY = Symbol.for('openmedia.feedPlayer');
   var NO_AUTOPLAY = Symbol.for('openmedia.noAutoplay');
   var PLAY_NOW = Symbol.for('openmedia.feedPlayNow');
+  var IS_FEED = Symbol.for('openmedia.isFeed');
+  var CURRENT = Symbol.for('openmedia.currentVideo');
+  var FEED_PATHS = Symbol.for('openmedia.feedPaths');
   var FEED_PATH = /^\/(?:(?:[^/]+\/)?(?:shorts|reels?)|watch\/reels?|stories)(?:\/|$)/i;
   var TIKTOK = /(?:^|\.)tiktok\.com$/i;
   var INSTAGRAM = /(?:^|\.)instagram\.com$/i;
   var INSTAGRAM_POST = /^\/(?:p|tv)\//i;
   var FACEBOOK = /(?:^|\.)facebook\.com$/i;
   var FACEBOOK_WATCH = /^\/watch(?:\/|$)/i;
+  var MAX_FEED_PATHS = 8; // path patterns a page's own script may add
   var SETTLE_MS = 120;
   var SAFETY_MS = 1200;
   var MIN_SHARE = 0.5; // of the viewport a video must cover to be "the" video
@@ -45,6 +49,28 @@
     var current = null;
     var teardown = [];
 
+    // Paths a script in a recipe adds with `document[Symbol.for('openmedia.feedPaths')] = ['^/clips/']`:
+    // the way to tell the app that a page is a full-screen video feed it does not know. Each
+    // entry is a case-insensitive pattern for the path.
+    var customPatterns = new Map();
+
+    function inCustomFeed(path) {
+      var list = document[FEED_PATHS];
+      if (!Array.isArray(list)) return false;
+      for (var index = 0; index < list.length && index < MAX_FEED_PATHS; index += 1) {
+        var source = list[index];
+        if (typeof source !== 'string' || source.length > 200) continue;
+        if (!customPatterns.has(source)) {
+          var pattern = null;
+          try { pattern = new RegExp(source, 'i'); } catch (_) {}
+          customPatterns.set(source, pattern);
+        }
+        var compiled = customPatterns.get(source);
+        if (compiled && compiled.test(path)) return true;
+      }
+      return false;
+    }
+
     function inFeed() {
       var location = window.location;
       var path = location.pathname;
@@ -52,7 +78,8 @@
       return FEED_PATH.test(path) ||
         TIKTOK.test(host) ||
         (INSTAGRAM.test(host) && INSTAGRAM_POST.test(path)) ||
-        (FACEBOOK.test(host) && FACEBOOK_WATCH.test(path));
+        (FACEBOOK.test(host) && FACEBOOK_WATCH.test(path)) ||
+        inCustomFeed(path);
     }
 
     function active() {
@@ -291,6 +318,8 @@
     safety = setInterval(function () { if (inFeed()) { scan(document.documentElement); settle(); } }, SAFETY_MS);
 
     Object.defineProperty(document, PLAY_NOW, { configurable: true, value: playNow });
+    Object.defineProperty(document, IS_FEED, { configurable: true, value: inFeed });
+    Object.defineProperty(document, CURRENT, { configurable: true, get: function () { return current; } });
     Object.defineProperty(document, KEY, {
       configurable: true,
       value: function () {
@@ -299,6 +328,8 @@
         clearInterval(safety);
         teardown.forEach(function (step) { try { step(); } catch (_) {} });
         delete document[PLAY_NOW];
+        delete document[IS_FEED];
+        delete document[CURRENT];
         delete document[KEY];
       }
     });

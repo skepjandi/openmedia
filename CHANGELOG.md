@@ -246,6 +246,16 @@ All notable changes to OpenMedia are documented here.
 
 ## 2026-11-14
 
+### feat(siteview): video controls for Shorts, Reels and other feeds
+
+**Area:** `feat(siteview)`
+
+**Change:** Settings > Video controls adds a seek bar with the time left, a speed button, the last speed and sound remembered, no looping, and moving on when a video ends (scrolls; never clicks the site's own buttons). All are off until chosen. They run on the feeds the feed player knows, and the assistant can add another site's feed with one script rule naming its paths (`Symbol.for('openmedia.feedPaths')`); the prompt version is 4. The idea comes from browser extensions such as Better YouTube Shorts and Instagram Reels Controls; no code was copied from them.
+
+**Verified:** Rust tests (`video_controls`, `library`, `ai::prompt`), Vitest (`videoControls.test.ts`, the i18n catalog), and on the iOS simulator on YouTube Shorts: the seek bar, the time left, the speed button, tap-to-seek, and looping off. **Not verified:** on a device; Instagram and Facebook feeds; moving on at the end does nothing on m.youtube.com Shorts, which swipes with touch handlers instead of scrolling (a scroll cannot move it, and the app never clicks or fakes touches); the translations are machine drafts.
+
+**PR:** n/a
+
 ### fix(siteview): a Short opened from the home feed no longer waits for a tap
 
 **Area:** `fix(siteview)`

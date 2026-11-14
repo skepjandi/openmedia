@@ -217,6 +217,22 @@ export const fr: Messages = {
   "settings.epilepsyProtection": "Protection contre l’épilepsie",
   "settings.epilepsyProtectionNote":
     "Arrête les animations, les vidéos à lecture automatique et les GIF animés dans l’app et sur les pages. Elle ne peut pas détecter les flashs d’une vidéo que vous lancez vous-même.",
+  "settings.videoControls": "Commandes vidéo",
+  "settings.videoControlsNote":
+    "Pour les fils vidéo en plein écran comme Shorts et Reels. Chaque option reste désactivée jusqu’à ce que vous l’activiez.",
+  "settings.videoSeekBar": "Barre de progression",
+  "settings.videoSeekBarNote": "Une barre à faire glisser, avec le temps restant.",
+  "settings.videoSpeed": "Bouton de vitesse",
+  "settings.videoSpeedNote": "Touchez pour passer de 0.5× à 1×, 1.25×, 1.5× et 2×.",
+  "settings.videoRemember": "Mémoriser vitesse et son",
+  "settings.videoRememberNote":
+    "La vidéo suivante démarre à la vitesse et au volume choisis en dernier.",
+  "settings.videoLoopOff": "Empêcher la lecture en boucle",
+  "settings.videoLoopOffNote":
+    "À la fin, la vidéo reste sur sa dernière image au lieu de recommencer.",
+  "settings.videoAutoAdvance": "Passer à la suite à la fin d’une vidéo",
+  "settings.videoAutoAdvanceNote":
+    "Défile tout seul jusqu’à la vidéo suivante. Cela arrête aussi la boucle.",
   "settings.dyslexia": "Dyslexie",
   "settings.readingFont": "Police de lecture",
   "settings.readingFontOff": "Par défaut",

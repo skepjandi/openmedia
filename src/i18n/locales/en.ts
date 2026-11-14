@@ -213,6 +213,20 @@ export const en = {
   "settings.epilepsyProtection": "Epilepsy protection",
   "settings.epilepsyProtectionNote":
     "Stops animations, autoplaying video and animated GIFs in the app and on pages. It cannot detect flashing in a video you start yourself.",
+  "settings.videoControls": "Video controls",
+  "settings.videoControlsNote":
+    "For full-screen video feeds such as Shorts and Reels. Each one stays off until you turn it on.",
+  "settings.videoSeekBar": "Seek bar",
+  "settings.videoSeekBarNote": "A bar to drag along, with the time left.",
+  "settings.videoSpeed": "Speed button",
+  "settings.videoSpeedNote": "Tap to step through 0.5×, 1×, 1.25×, 1.5× and 2×.",
+  "settings.videoRemember": "Remember speed and sound",
+  "settings.videoRememberNote": "The next video starts at the speed and volume you last chose.",
+  "settings.videoLoopOff": "Stop videos from looping",
+  "settings.videoLoopOffNote":
+    "A video stays on its last frame when it ends instead of starting again.",
+  "settings.videoAutoAdvance": "Move on when a video ends",
+  "settings.videoAutoAdvanceNote": "Scrolls to the next video by itself. This also stops looping.",
   "settings.dyslexia": "Dyslexia",
   "settings.readingFont": "Reading font",
   "settings.readingFontOff": "Default",

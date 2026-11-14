@@ -213,6 +213,21 @@ export const pl: Messages = {
   "settings.epilepsyProtection": "Ochrona przed epilepsją",
   "settings.epilepsyProtectionNote":
     "Zatrzymuje animacje, automatycznie odtwarzane wideo i animowane GIF-y w aplikacji i na stronach. Nie wykryje migotania w filmie uruchomionym samodzielnie.",
+  "settings.videoControls": "Sterowanie wideo",
+  "settings.videoControlsNote":
+    "Dla pełnoekranowych kanałów wideo, takich jak Shorts i Reels. Każda opcja pozostaje wyłączona, dopóki jej nie włączysz.",
+  "settings.videoSeekBar": "Pasek postępu",
+  "settings.videoSeekBarNote": "Pasek do przeciągania, z czasem do końca.",
+  "settings.videoSpeed": "Przycisk prędkości",
+  "settings.videoSpeedNote": "Stuknij, aby przełączać 0.5×, 1×, 1.25×, 1.5× i 2×.",
+  "settings.videoRemember": "Zapamiętaj prędkość i dźwięk",
+  "settings.videoRememberNote":
+    "Następne wideo zaczyna się z ostatnio wybraną prędkością i głośnością.",
+  "settings.videoLoopOff": "Nie zapętlaj filmów",
+  "settings.videoLoopOffNote":
+    "Po zakończeniu wideo zostaje na ostatniej klatce zamiast zaczynać od nowa.",
+  "settings.videoAutoAdvance": "Przejdź dalej po zakończeniu wideo",
+  "settings.videoAutoAdvanceNote": "Samo przewija do następnego wideo. To też wyłącza zapętlanie.",
   "settings.dyslexia": "Dysleksja",
   "settings.readingFont": "Czcionka do czytania",
   "settings.readingFontOff": "Domyślna",

@@ -211,6 +211,21 @@ export const sv: Messages = {
   "settings.epilepsyProtection": "Epilepsiskydd",
   "settings.epilepsyProtectionNote":
     "Stoppar animationer, automatiskt spelande video och animerade GIF-filer i appen och på sidor. Det kan inte upptäcka blinkningar i en video du startar själv.",
+  "settings.videoControls": "Videokontroller",
+  "settings.videoControlsNote":
+    "För helskärmsflöden med video som Shorts och Reels. Varje funktion förblir avstängd tills du slår på den.",
+  "settings.videoSeekBar": "Sökfält",
+  "settings.videoSeekBarNote": "Ett fält att dra i, med återstående tid.",
+  "settings.videoSpeed": "Hastighetsknapp",
+  "settings.videoSpeedNote": "Tryck för att stega mellan 0.5×, 1×, 1.25×, 1.5× och 2×.",
+  "settings.videoRemember": "Kom ihåg hastighet och ljud",
+  "settings.videoRememberNote": "Nästa video startar med den hastighet och volym du valde senast.",
+  "settings.videoLoopOff": "Sluta loopa videor",
+  "settings.videoLoopOffNote":
+    "En video stannar på sista bildrutan när den slutar i stället för att börja om.",
+  "settings.videoAutoAdvance": "Gå vidare när en video slutar",
+  "settings.videoAutoAdvanceNote":
+    "Rullar till nästa video av sig själv. Det stoppar också loopning.",
   "settings.dyslexia": "Dyslexi",
   "settings.readingFont": "Läsetypsnitt",
   "settings.readingFontOff": "Standard",

@@ -208,6 +208,22 @@ export const de: Messages = {
   "settings.epilepsyProtection": "Epilepsieschutz",
   "settings.epilepsyProtectionNote":
     "Stoppt Animationen, automatisch startende Videos und animierte GIFs in der App und auf Seiten. Blitzen in einem selbst gestarteten Video kann nicht erkannt werden.",
+  "settings.videoControls": "Videosteuerung",
+  "settings.videoControlsNote":
+    "Für Vollbild-Videofeeds wie Shorts und Reels. Jede Option bleibt aus, bis du sie einschaltest.",
+  "settings.videoSeekBar": "Suchleiste",
+  "settings.videoSeekBarNote": "Eine Leiste zum Ziehen, mit der verbleibenden Zeit.",
+  "settings.videoSpeed": "Tempo-Taste",
+  "settings.videoSpeedNote": "Tippen, um 0.5×, 1×, 1.25×, 1.5× und 2× durchzuschalten.",
+  "settings.videoRemember": "Tempo und Ton merken",
+  "settings.videoRememberNote":
+    "Das nächste Video startet mit dem zuletzt gewählten Tempo und der Lautstärke.",
+  "settings.videoLoopOff": "Videos nicht wiederholen",
+  "settings.videoLoopOffNote":
+    "Ein Video bleibt am Ende auf dem letzten Bild stehen, statt neu zu starten.",
+  "settings.videoAutoAdvance": "Nach dem Videoende weiter",
+  "settings.videoAutoAdvanceNote":
+    "Scrollt von selbst zum nächsten Video. Das stoppt auch die Wiederholung.",
   "settings.dyslexia": "Legasthenie",
   "settings.readingFont": "Leseschrift",
   "settings.readingFontOff": "Standard",

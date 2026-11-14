@@ -24,6 +24,20 @@ export interface Accessibility {
   tint: Tint;
 }
 
+/** The controls for the video in view in a full-screen feed; all off until chosen. */
+export interface VideoControls {
+  /** A bar to seek along, with the time left. */
+  seekBar: boolean;
+  /** A button that steps through the playback speeds. */
+  speed: boolean;
+  /** The speed and sound last chosen, applied to the next video. */
+  remember: boolean;
+  /** Stops a video from restarting by itself when it ends. */
+  loopOff: boolean;
+  /** Scrolls on to the next video when one ends. */
+  autoAdvance: boolean;
+}
+
 export interface Favorite {
   id: string;
   name: string;
@@ -62,6 +76,7 @@ export interface AppState {
   locale: string | null;
   searchEngine: SearchEngine;
   accessibility: Accessibility;
+  videoControls: VideoControls;
 }
 
 /** The page Rust already started loading at launch; the shell takes it over. */
@@ -267,6 +282,8 @@ export const library = {
   setBackButton: (enabled: boolean) => command("set_back_button", { enabled }),
   setAccessibility: (accessibility: Accessibility) =>
     command("set_accessibility", { accessibility }),
+  setVideoControls: (videoControls: VideoControls) =>
+    command("set_video_controls", { videoControls }),
 };
 
 export interface SectionUsage {

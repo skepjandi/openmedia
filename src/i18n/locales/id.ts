@@ -208,6 +208,21 @@ export const id: Messages = {
   "settings.epilepsyProtection": "Perlindungan epilepsi",
   "settings.epilepsyProtectionNote":
     "Menghentikan animasi, video yang diputar otomatis, dan GIF animasi di aplikasi dan di halaman. Tidak dapat mendeteksi kilatan pada video yang Anda putar sendiri.",
+  "settings.videoControls": "Kontrol video",
+  "settings.videoControlsNote":
+    "Untuk umpan video layar penuh seperti Shorts dan Reels. Setiap opsi tetap mati sampai Anda menyalakannya.",
+  "settings.videoSeekBar": "Bilah geser",
+  "settings.videoSeekBarNote": "Bilah untuk digeser, lengkap dengan sisa waktu.",
+  "settings.videoSpeed": "Tombol kecepatan",
+  "settings.videoSpeedNote": "Ketuk untuk beralih antara 0.5×, 1×, 1.25×, 1.5×, dan 2×.",
+  "settings.videoRemember": "Ingat kecepatan dan suara",
+  "settings.videoRememberNote":
+    "Video berikutnya dimulai dengan kecepatan dan volume yang terakhir Anda pilih.",
+  "settings.videoLoopOff": "Hentikan video mengulang",
+  "settings.videoLoopOffNote": "Video berhenti di bingkai terakhir saat selesai, tidak mulai lagi.",
+  "settings.videoAutoAdvance": "Lanjut saat video selesai",
+  "settings.videoAutoAdvanceNote":
+    "Menggulir ke video berikutnya secara otomatis. Ini juga menghentikan pengulangan.",
   "settings.dyslexia": "Disleksia",
   "settings.readingFont": "Font baca",
   "settings.readingFontOff": "Bawaan",

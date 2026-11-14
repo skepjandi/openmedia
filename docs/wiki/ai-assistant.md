@@ -123,6 +123,10 @@ Status: Design (2026-11-13). The assistant may propose `script` rules ([Recipe F
 
 Sharing such a recipe goes through the normal checks: a script with powers is refused by the app before anything is sent, and the Worker and CI refuse it again.
 
+### Video feeds
+
+The app plays and controls the video in view in full-screen feeds ([Video controls](./site-runtime.md#video-controls)); the user switches the controls on in Settings. For a feed of a site the app does not know, the prompt (`VIDEO_FEEDS`, prompt version 4) tells the assistant to write one script rule that names the feed's paths, `document[Symbol.for("openmedia.feedPaths")] = ["^/path"]`, and to use ordinary `hide` rules for the rest of a feed's overlays. Because it uses `Symbol`, that script has powers in the policy's terms and cannot be shared.
+
 ## Generate → preview → verify → accept
 
 1. Core requests a snapshot (`SNAPSHOT_SCRIPT`), parses and redacts it, optionally shows the preview, sends.

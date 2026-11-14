@@ -47,6 +47,18 @@ Toggled by Core. Overlays a highlight on hover/tap, shows a breadcrumb of ancest
 - **Reader's pause.** Only a pause within 900 ms of a tap (a finger that moved at most 10 px), a click or a key, on the video in view, counts as the reader's and is left alone until the video leaves the screen. A swipe never does, and neither does a pause the player makes itself.
 - **Hold.** It is idle while `window.__openmediaHold` is set (the native background pause; iOS sets it too, with an `openmedia-resume` event on resume) or calm mode is on (`Symbol.for('openmedia.noAutoplay')`). iOS site views also set `mediaTypesRequiringUserActionForPlayback = []`.
 
+## Video controls
+
+`src-tauri/src/video_controls.js` is appended after the feed player and takes its choices from Settings > Video controls (`VideoControls` in `src-tauri/src/video_controls.rs`, saved in `library.json` as `videoControls`, all off until chosen). It runs in the top frame, only on a feed page (the feed player's `Symbol.for('openmedia.isFeed')`) and on the video the feed player has in view (`Symbol.for('openmedia.currentVideo')`), and is idle while `window.__openmediaHold` is set. It never clicks a page element.
+
+- **Seek bar** (`seekBar`): a fixed bar at the bottom of the page with the time left; a pointer on it seeks (pointer events, `touch-action: none`, stopped before they reach the site so a drag is not a swipe).
+- **Speed button** (`speed`): steps `0.5×, 1×, 1.25×, 1.5×, 2×`.
+- **Remember** (`remember`): the last speed and the mute and volume the reader chose (a change within 900 ms of a tap or key) are kept in the page's `localStorage` under `openmedia.video` and applied to each new video source (`loadstart`).
+- **Loop off** (`loopOff`): sets `loop = false` and watches the attribute, because sites put it back.
+- **Move on** (`autoAdvance`, which implies loop off): on `ended` it scrolls, as a swipe would: `scrollIntoView` to the next video below, or one screen down inside the feed's scroller. It never clicks the site's own next button, and does nothing in calm mode. A feed that swipes with touch handlers instead of scrolling (m.youtube.com Shorts) cannot be moved this way, so it stays on the last frame.
+
+The feed pages are the ones the feed player knows. A page it does not know is added by a script rule from the assistant, `document[Symbol.for('openmedia.feedPaths')] = ['^/clips/']` (up to 8 case-insensitive path patterns), which also turns on the autoplay of the feed player there. Hiding parts of a feed (title, channel, buttons) is ordinary `hide` rules.
+
 ## Snapshot
 
 `__om.snapshot(opts)` returns a pruned tree used by the [AI Assistant](./ai-assistant.md).

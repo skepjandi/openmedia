@@ -212,6 +212,20 @@ export const tr: Messages = {
   "settings.epilepsyProtection": "Epilepsi koruması",
   "settings.epilepsyProtectionNote":
     "Uygulamada ve sayfalarda animasyonları, otomatik oynayan videoları ve hareketli GIF’leri durdurur. Kendi başlattığınız bir videodaki yanıp sönmeyi algılayamaz.",
+  "settings.videoControls": "Video kontrolleri",
+  "settings.videoControlsNote":
+    "Shorts ve Reels gibi tam ekran video akışları için. Her biri siz açana kadar kapalı kalır.",
+  "settings.videoSeekBar": "Arama çubuğu",
+  "settings.videoSeekBarNote": "Sürüklemek için bir çubuk; kalan süreyi de gösterir.",
+  "settings.videoSpeed": "Hız düğmesi",
+  "settings.videoSpeedNote": "0.5×, 1×, 1.25×, 1.5× ve 2× arasında geçmek için dokunun.",
+  "settings.videoRemember": "Hızı ve sesi hatırla",
+  "settings.videoRememberNote": "Sonraki video, en son seçtiğiniz hız ve ses düzeyiyle başlar.",
+  "settings.videoLoopOff": "Videoların tekrarlanmasını durdur",
+  "settings.videoLoopOffNote": "Video bittiğinde yeniden başlamak yerine son karede kalır.",
+  "settings.videoAutoAdvance": "Video bitince devam et",
+  "settings.videoAutoAdvanceNote":
+    "Sonraki videoya kendiliğinden kayar. Bu, tekrarlamayı da durdurur.",
   "settings.dyslexia": "Disleksi",
   "settings.readingFont": "Okuma yazı tipi",
   "settings.readingFontOff": "Varsayılan",

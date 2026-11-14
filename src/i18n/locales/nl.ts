@@ -213,6 +213,22 @@ export const nl: Messages = {
   "settings.epilepsyProtection": "Epilepsiebescherming",
   "settings.epilepsyProtectionNote":
     "Stopt animaties, automatisch afspelende video’s en geanimeerde GIF’s in de app en op pagina’s. Het kan geen flitsen herkennen in een video die je zelf start.",
+  "settings.videoControls": "Videobediening",
+  "settings.videoControlsNote":
+    "Voor videofeeds op volledig scherm, zoals Shorts en Reels. Elke optie blijft uit tot je hem aanzet.",
+  "settings.videoSeekBar": "Zoekbalk",
+  "settings.videoSeekBarNote": "Een balk om te slepen, met de resterende tijd.",
+  "settings.videoSpeed": "Snelheidsknop",
+  "settings.videoSpeedNote": "Tik om door 0.5×, 1×, 1.25×, 1.5× en 2× te gaan.",
+  "settings.videoRemember": "Snelheid en geluid onthouden",
+  "settings.videoRememberNote":
+    "De volgende video start met de snelheid en het volume die je het laatst koos.",
+  "settings.videoLoopOff": "Video’s niet laten herhalen",
+  "settings.videoLoopOffNote":
+    "Een video blijft aan het einde op het laatste beeld staan in plaats van opnieuw te beginnen.",
+  "settings.videoAutoAdvance": "Doorgaan als een video eindigt",
+  "settings.videoAutoAdvanceNote":
+    "Scrolt vanzelf naar de volgende video. Dit stopt ook het herhalen.",
   "settings.dyslexia": "Dyslexie",
   "settings.readingFont": "Leeslettertype",
   "settings.readingFontOff": "Standaard",

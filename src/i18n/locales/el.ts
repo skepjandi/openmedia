@@ -216,6 +216,22 @@ export const el: Messages = {
   "settings.epilepsyProtection": "Προστασία από επιληψία",
   "settings.epilepsyProtectionNote":
     "Σταματά τα κινούμενα στοιχεία, τα βίντεο με αυτόματη αναπαραγωγή και τα κινούμενα GIF στην εφαρμογή και στις σελίδες. Δεν μπορεί να εντοπίσει αναλαμπές σε βίντεο που ξεκινάτε εσείς.",
+  "settings.videoControls": "Στοιχεία ελέγχου βίντεο",
+  "settings.videoControlsNote":
+    "Για ροές βίντεο πλήρους οθόνης όπως τα Shorts και τα Reels. Κάθε επιλογή μένει ανενεργή μέχρι να την ενεργοποιήσετε.",
+  "settings.videoSeekBar": "Γραμμή αναζήτησης",
+  "settings.videoSeekBarNote": "Μια γραμμή για σύρσιμο, με τον χρόνο που απομένει.",
+  "settings.videoSpeed": "Κουμπί ταχύτητας",
+  "settings.videoSpeedNote": "Πατήστε για εναλλαγή μεταξύ 0.5×, 1×, 1.25×, 1.5× και 2×.",
+  "settings.videoRemember": "Απομνημόνευση ταχύτητας και ήχου",
+  "settings.videoRememberNote":
+    "Το επόμενο βίντεο ξεκινά με την ταχύτητα και την ένταση που επιλέξατε τελευταία.",
+  "settings.videoLoopOff": "Να μην επαναλαμβάνονται τα βίντεο",
+  "settings.videoLoopOffNote":
+    "Όταν τελειώνει, το βίντεο μένει στο τελευταίο καρέ αντί να ξεκινά ξανά.",
+  "settings.videoAutoAdvance": "Μετάβαση όταν τελειώνει ένα βίντεο",
+  "settings.videoAutoAdvanceNote":
+    "Κάνει μόνο του κύλιση στο επόμενο βίντεο. Σταματά και την επανάληψη.",
   "settings.dyslexia": "Δυσλεξία",
   "settings.readingFont": "Γραμματοσειρά ανάγνωσης",
   "settings.readingFontOff": "Προεπιλογή",

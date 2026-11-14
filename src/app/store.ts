@@ -29,6 +29,7 @@ import {
   library,
   siteView,
   type Accessibility,
+  type VideoControls,
   type AiState,
   type AppState,
   type Favorite,
@@ -194,6 +195,8 @@ export interface AppStore {
   setAdBlock: (enabled: boolean) => Promise<void>;
   /** Changes some of the accessibility choices; the rest keep their value. */
   setAccessibility: (changes: Partial<Accessibility>) => Promise<void>;
+  /** Changes some of the video controls; the rest keep their value. */
+  setVideoControls: (changes: Partial<VideoControls>) => Promise<void>;
   loadSites: () => Promise<void>;
   /** Re-reads the favorites after Rust changed them on its own, as the guide's quick-access pick does. */
   reloadFavorites: () => Promise<void>;
@@ -838,6 +841,21 @@ export const useApp = create<AppStore>((set, get) => {
       } catch (error) {
         set((current) => ({
           state: current.state && { ...current.state, accessibility: previous },
+          error: appError(error),
+        }));
+      }
+    },
+
+    setVideoControls: async (changes) => {
+      const previous = get().state?.videoControls;
+      if (!previous) return;
+      const next = { ...previous, ...changes };
+      set((current) => ({ state: current.state && { ...current.state, videoControls: next } }));
+      try {
+        await library.setVideoControls(next);
+      } catch (error) {
+        set((current) => ({
+          state: current.state && { ...current.state, videoControls: previous },
           error: appError(error),
         }));
       }

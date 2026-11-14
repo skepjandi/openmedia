@@ -208,6 +208,21 @@ export const hi: Messages = {
   "settings.epilepsyProtection": "मिर्गी से सुरक्षा",
   "settings.epilepsyProtectionNote":
     "ऐप और पेजों में एनिमेशन, अपने-आप चलने वाले वीडियो और एनिमेटेड GIF रोक देता है। आपके खुद शुरू किए वीडियो में चमक का पता नहीं लगा सकता।",
+  "settings.videoControls": "वीडियो नियंत्रण",
+  "settings.videoControlsNote":
+    "Shorts और Reels जैसी फ़ुल-स्क्रीन वीडियो फ़ीड के लिए। हर विकल्प तब तक बंद रहता है जब तक आप उसे चालू न करें।",
+  "settings.videoSeekBar": "सीक बार",
+  "settings.videoSeekBarNote": "खींचने के लिए एक बार, जिसमें बचा हुआ समय दिखता है।",
+  "settings.videoSpeed": "स्पीड बटन",
+  "settings.videoSpeedNote": "0.5×, 1×, 1.25×, 1.5× और 2× के बीच बदलने के लिए टैप करें।",
+  "settings.videoRemember": "स्पीड और आवाज़ याद रखें",
+  "settings.videoRememberNote": "अगला वीडियो आपकी पिछली चुनी हुई स्पीड और वॉल्यूम पर शुरू होता है।",
+  "settings.videoLoopOff": "वीडियो को दोबारा चलने से रोकें",
+  "settings.videoLoopOffNote":
+    "वीडियो खत्म होने पर दोबारा शुरू होने के बजाय आखिरी फ़्रेम पर रुका रहता है।",
+  "settings.videoAutoAdvance": "वीडियो खत्म होने पर आगे बढ़ें",
+  "settings.videoAutoAdvanceNote":
+    "अपने आप अगले वीडियो पर स्क्रोल हो जाता है। इससे लूप भी बंद हो जाता है।",
   "settings.dyslexia": "डिस्लेक्सिया",
   "settings.readingFont": "पढ़ने का फ़ॉन्ट",
   "settings.readingFontOff": "डिफ़ॉल्ट",

@@ -209,6 +209,22 @@ export const ms: Messages = {
   "settings.epilepsyProtection": "Perlindungan epilepsi",
   "settings.epilepsyProtectionNote":
     "Menghentikan animasi, video main automatik dan GIF beranimasi dalam aplikasi dan pada laman. Tidak dapat mengesan kelipan dalam video yang anda mulakan sendiri.",
+  "settings.videoControls": "Kawalan video",
+  "settings.videoControlsNote":
+    "Untuk suapan video skrin penuh seperti Shorts dan Reels. Setiap satu kekal mati sehingga anda menghidupkannya.",
+  "settings.videoSeekBar": "Bar carian",
+  "settings.videoSeekBarNote": "Bar untuk diseret, dengan masa yang berbaki.",
+  "settings.videoSpeed": "Butang kelajuan",
+  "settings.videoSpeedNote": "Ketik untuk beralih antara 0.5×, 1×, 1.25×, 1.5× dan 2×.",
+  "settings.videoRemember": "Ingat kelajuan dan bunyi",
+  "settings.videoRememberNote":
+    "Video seterusnya bermula pada kelajuan dan kelantangan yang anda pilih kali terakhir.",
+  "settings.videoLoopOff": "Hentikan video daripada berulang",
+  "settings.videoLoopOffNote":
+    "Video kekal pada bingkai terakhir apabila tamat, bukannya bermula semula.",
+  "settings.videoAutoAdvance": "Teruskan apabila video tamat",
+  "settings.videoAutoAdvanceNote":
+    "Tatal ke video seterusnya secara automatik. Ini juga menghentikan pengulangan.",
   "settings.dyslexia": "Disleksia",
   "settings.readingFont": "Fon bacaan",
   "settings.readingFontOff": "Lalai",

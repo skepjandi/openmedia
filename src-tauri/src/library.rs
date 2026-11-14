@@ -17,6 +17,7 @@ use crate::accessibility::Accessibility;
 use crate::ai::{AiSettings, MAX_PROVIDERS, ProviderConfig, ProviderInput};
 use crate::error::{Error, Result};
 use crate::recipes::{OptionChoices, OptionValue};
+use crate::video_controls::VideoControls;
 use tauri_plugin_siteview::site::site_of_host;
 
 const FORMAT_VERSION: u32 = 4;
@@ -149,6 +150,7 @@ pub struct AppState {
     /// The engine the command bar searches with.
     pub search_engine: SearchEngine,
     pub accessibility: Accessibility,
+    pub video_controls: VideoControls,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -214,6 +216,9 @@ struct LibraryData {
     /// Epilepsy protection and the reading aids for dyslexia; all off until chosen.
     #[serde(default)]
     accessibility: Accessibility,
+    /// The controls for full-screen video feeds; all off until chosen.
+    #[serde(default)]
+    video_controls: VideoControls,
 }
 
 /// The user's favorites, page, theme and provider settings, persisted as one JSON file. Holds no
@@ -276,6 +281,7 @@ impl Library {
             locale: data.locale.clone(),
             search_engine: data.search_engine,
             accessibility: data.accessibility,
+            video_controls: data.video_controls,
         })
     }
 
@@ -499,6 +505,16 @@ impl Library {
     pub fn set_accessibility(&self, accessibility: Accessibility) -> Result<()> {
         let mut data = self.lock()?;
         data.accessibility = accessibility;
+        self.save(&data)
+    }
+
+    pub fn video_controls(&self) -> Result<VideoControls> {
+        Ok(self.lock()?.video_controls)
+    }
+
+    pub fn set_video_controls(&self, video_controls: VideoControls) -> Result<()> {
+        let mut data = self.lock()?;
+        data.video_controls = video_controls;
         self.save(&data)
     }
 
@@ -785,6 +801,7 @@ fn default_data() -> LibraryData {
         locale: None,
         search_engine: SearchEngine::Google,
         accessibility: Accessibility::default(),
+        video_controls: VideoControls::default(),
         incognito_site_options: OptionChoices::new(),
         incognito_favorites: None,
     }
@@ -1188,6 +1205,51 @@ mod tests {
         assert_eq!(
             reload(&dir).state().unwrap().accessibility,
             Accessibility::default()
+        );
+    }
+
+    #[test]
+    fn video_controls_are_off_by_default_and_the_choices_persist() {
+        let (dir, library) = library();
+        assert_eq!(
+            library.state().unwrap().video_controls,
+            VideoControls::default()
+        );
+        let chosen = VideoControls {
+            seek_bar: true,
+            speed: true,
+            auto_advance: true,
+            ..VideoControls::default()
+        };
+        library.set_video_controls(chosen).unwrap();
+        assert_eq!(library.video_controls().unwrap(), chosen);
+        assert_eq!(reload(&dir).state().unwrap().video_controls, chosen);
+    }
+
+    #[test]
+    fn a_library_saved_before_video_controls_existed_loads_with_them_off() {
+        let (dir, library) = library();
+        library
+            .set_video_controls(VideoControls {
+                speed: true,
+                ..VideoControls::default()
+            })
+            .unwrap();
+        let path = dir.path().join("library.json");
+        let mut saved: serde_json::Value =
+            serde_json::from_str(&fs::read_to_string(&path).unwrap()).unwrap();
+        assert!(
+            saved
+                .as_object_mut()
+                .unwrap()
+                .remove("videoControls")
+                .is_some()
+        );
+        fs::write(&path, saved.to_string()).unwrap();
+        drop(library);
+        assert_eq!(
+            reload(&dir).state().unwrap().video_controls,
+            VideoControls::default()
         );
     }
 
@@ -1636,7 +1698,10 @@ mod tests {
         let history = library.remove_history("https://b.example/").unwrap();
         assert_eq!(history, ["https://c.example/", "https://a.example/"]);
         assert_eq!(reload(&dir).state().unwrap().history, history);
-        assert_eq!(library.remove_history("https://zzz.example/").unwrap(), history);
+        assert_eq!(
+            library.remove_history("https://zzz.example/").unwrap(),
+            history
+        );
     }
 
     #[test]

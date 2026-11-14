@@ -212,6 +212,20 @@ export const cs: Messages = {
   "settings.epilepsyProtection": "Ochrana před epilepsií",
   "settings.epilepsyProtectionNote":
     "Zastaví animace, automaticky spuštěná videa a animované GIFy v aplikaci i na stránkách. Nezjistí blikání ve videu, které spustíte sami.",
+  "settings.videoControls": "Ovládání videa",
+  "settings.videoControlsNote":
+    "Pro celoobrazovková videa, například Shorts a Reels. Každá volba zůstane vypnutá, dokud ji nezapnete.",
+  "settings.videoSeekBar": "Posuvník přehrávání",
+  "settings.videoSeekBarNote": "Lišta k tažení s zobrazením zbývajícího času.",
+  "settings.videoSpeed": "Tlačítko rychlosti",
+  "settings.videoSpeedNote": "Klepnutím procházíte rychlosti 0.5×, 1×, 1.25×, 1.5× a 2×.",
+  "settings.videoRemember": "Pamatovat si rychlost a zvuk",
+  "settings.videoRememberNote":
+    "Další video začne s rychlostí a hlasitostí, které jste naposledy zvolili.",
+  "settings.videoLoopOff": "Nezačínat videa znovu dokola",
+  "settings.videoLoopOffNote": "Po skončení video zůstane na posledním snímku a nezačne znovu.",
+  "settings.videoAutoAdvance": "Přejít dál po skončení videa",
+  "settings.videoAutoAdvanceNote": "Samo přejde na další video. Tím se také vypne opakování.",
   "settings.dyslexia": "Dyslexie",
   "settings.readingFont": "Písmo pro čtení",
   "settings.readingFontOff": "Výchozí",

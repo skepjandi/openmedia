@@ -214,6 +214,20 @@ export const ru: Messages = {
   "settings.epilepsyProtection": "Защита при эпилепсии",
   "settings.epilepsyProtectionNote":
     "Останавливает анимацию, автовоспроизведение видео и анимированные GIF в приложении и на страницах. Не может обнаружить вспышки в видео, которое вы запускаете сами.",
+  "settings.videoControls": "Управление видео",
+  "settings.videoControlsNote":
+    "Для полноэкранных видеолент, таких как Shorts и Reels. Каждая функция выключена, пока вы её не включите.",
+  "settings.videoSeekBar": "Полоса перемотки",
+  "settings.videoSeekBarNote": "Полоса, которую можно перетаскивать, с оставшимся временем.",
+  "settings.videoSpeed": "Кнопка скорости",
+  "settings.videoSpeedNote": "Нажимайте, чтобы переключать 0.5×, 1×, 1.25×, 1.5× и 2×.",
+  "settings.videoRemember": "Запоминать скорость и звук",
+  "settings.videoRememberNote":
+    "Следующее видео начнётся с последней выбранной скорости и громкости.",
+  "settings.videoLoopOff": "Не повторять видео",
+  "settings.videoLoopOffNote": "В конце видео остаётся на последнем кадре и не начинается заново.",
+  "settings.videoAutoAdvance": "Переходить дальше после видео",
+  "settings.videoAutoAdvanceNote": "Само прокручивает к следующему видео. Повтор тоже отключается.",
   "settings.dyslexia": "Дислексия",
   "settings.readingFont": "Шрифт для чтения",
   "settings.readingFontOff": "По умолчанию",

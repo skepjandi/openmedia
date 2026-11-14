@@ -216,6 +216,22 @@ export const it: Messages = {
   "settings.epilepsyProtection": "Protezione dall’epilessia",
   "settings.epilepsyProtectionNote":
     "Ferma animazioni, video a riproduzione automatica e GIF animate nell’app e nelle pagine. Non può rilevare i lampi in un video che avvii tu.",
+  "settings.videoControls": "Controlli video",
+  "settings.videoControlsNote":
+    "Per i feed video a schermo intero come Shorts e Reels. Ogni opzione resta disattivata finché non la attivi.",
+  "settings.videoSeekBar": "Barra di scorrimento",
+  "settings.videoSeekBarNote": "Una barra da trascinare, con il tempo rimanente.",
+  "settings.videoSpeed": "Pulsante velocità",
+  "settings.videoSpeedNote": "Tocca per passare tra 0.5×, 1×, 1.25×, 1.5× e 2×.",
+  "settings.videoRemember": "Ricorda velocità e audio",
+  "settings.videoRememberNote":
+    "Il video successivo parte con la velocità e il volume scelti l’ultima volta.",
+  "settings.videoLoopOff": "Evita la riproduzione in loop",
+  "settings.videoLoopOffNote":
+    "Alla fine il video resta sull’ultimo fotogramma invece di ripartire.",
+  "settings.videoAutoAdvance": "Passa oltre alla fine di un video",
+  "settings.videoAutoAdvanceNote":
+    "Scorre da solo al video successivo. Questo interrompe anche il loop.",
   "settings.dyslexia": "Dislessia",
   "settings.readingFont": "Carattere di lettura",
   "settings.readingFontOff": "Predefinito",

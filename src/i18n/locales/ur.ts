@@ -212,6 +212,21 @@ export const ur: Messages = {
   "settings.epilepsyProtection": "مرگی سے تحفظ",
   "settings.epilepsyProtectionNote":
     "ایپ اور صفحات میں اینیمیشن، خودکار طور پر چلنے والی ویڈیو اور متحرک GIF روک دیتا ہے۔ آپ کی خود شروع کی ہوئی ویڈیو میں چمک کا پتا نہیں لگا سکتا۔",
+  "settings.videoControls": "ویڈیو کنٹرولز",
+  "settings.videoControlsNote":
+    "Shorts اور Reels جیسی فل اسکرین ویڈیو فیڈز کے لیے۔ ہر آپشن آپ کے آن کرنے تک بند رہتا ہے۔",
+  "settings.videoSeekBar": "سیک بار",
+  "settings.videoSeekBarNote": "گھسیٹنے کے لیے ایک بار، جس میں باقی وقت دکھایا جاتا ہے۔",
+  "settings.videoSpeed": "رفتار کا بٹن",
+  "settings.videoSpeedNote": "0.5×، 1×، 1.25×، 1.5× اور 2× میں بدلنے کے لیے ٹیپ کریں۔",
+  "settings.videoRemember": "رفتار اور آواز یاد رکھیں",
+  "settings.videoRememberNote": "اگلی ویڈیو آپ کی آخری منتخب کردہ رفتار اور آواز پر شروع ہوتی ہے۔",
+  "settings.videoLoopOff": "ویڈیوز کو دہرانے سے روکیں",
+  "settings.videoLoopOffNote":
+    "ویڈیو ختم ہونے پر دوبارہ شروع ہونے کے بجائے آخری فریم پر رکی رہتی ہے۔",
+  "settings.videoAutoAdvance": "ویڈیو ختم ہونے پر آگے بڑھیں",
+  "settings.videoAutoAdvanceNote":
+    "خود بخود اگلی ویڈیو پر اسکرول ہو جاتا ہے۔ اس سے دہرانا بھی بند ہو جاتا ہے۔",
   "settings.dyslexia": "ڈسلیکسیا",
   "settings.readingFont": "پڑھنے کا فونٹ",
   "settings.readingFontOff": "ڈیفالٹ",

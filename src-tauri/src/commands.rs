@@ -41,6 +41,7 @@ use crate::recipes::{
 use crate::secrets::SecretStore;
 use crate::sites::{self, SiteSettings};
 use crate::usage::{Usage, UsageReport};
+use crate::video_controls::VideoControls;
 
 /// The secret store, behind a trait so tests can swap it.
 pub struct Secrets(pub Box<dyn SecretStore>);
@@ -433,12 +434,13 @@ pub(crate) fn current_script(
 const FEED_PLAYER_SCRIPT: &str = include_str!("feed_player.js");
 
 /// The page script for `mode`. The accessibility choices follow the recipes and apply in both sets,
-/// then the feed player.
+/// then the feed player and the video controls.
 pub(crate) fn script_for(library: &Library, recipes: &Recipes, mode: Mode) -> Result<String> {
     let recipe_script = recipes.script(&library.site_options(mode)?)?;
     Ok(format!(
-        "{recipe_script}\n{}\n{FEED_PLAYER_SCRIPT}",
-        library.accessibility()?.page_script()
+        "{recipe_script}\n{}\n{FEED_PLAYER_SCRIPT}\n{}",
+        library.accessibility()?.page_script(),
+        library.video_controls()?.page_script()
     ))
 }
 
@@ -521,6 +523,18 @@ pub async fn set_accessibility(
     accessibility: Accessibility,
 ) -> Result<()> {
     library.set_accessibility(accessibility)?;
+    reload_script(&app, &library, &recipes)
+}
+
+/// Saves the choices for the video controls in full-screen feeds. Open pages take them at once.
+#[tauri::command]
+pub async fn set_video_controls(
+    app: AppHandle,
+    library: State<'_, Library>,
+    recipes: State<'_, Recipes>,
+    video_controls: VideoControls,
+) -> Result<()> {
+    library.set_video_controls(video_controls)?;
     reload_script(&app, &library, &recipes)
 }
 

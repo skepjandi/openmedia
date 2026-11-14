@@ -208,6 +208,20 @@ export const vi: Messages = {
   "settings.epilepsyProtection": "Bảo vệ chống động kinh",
   "settings.epilepsyProtectionNote":
     "Dừng hoạt ảnh, video tự phát và ảnh GIF động trong ứng dụng và trên các trang. Không thể phát hiện ánh sáng nhấp nháy trong video do bạn tự bắt đầu phát.",
+  "settings.videoControls": "Điều khiển video",
+  "settings.videoControlsNote":
+    "Dành cho nguồn cấp video toàn màn hình như Shorts và Reels. Mỗi tùy chọn đều tắt cho đến khi bạn bật.",
+  "settings.videoSeekBar": "Thanh tua",
+  "settings.videoSeekBarNote": "Một thanh để kéo, kèm thời gian còn lại.",
+  "settings.videoSpeed": "Nút tốc độ",
+  "settings.videoSpeedNote": "Chạm để chuyển qua 0.5×, 1×, 1.25×, 1.5× và 2×.",
+  "settings.videoRemember": "Nhớ tốc độ và âm thanh",
+  "settings.videoRememberNote":
+    "Video tiếp theo bắt đầu với tốc độ và âm lượng bạn chọn lần gần nhất.",
+  "settings.videoLoopOff": "Ngừng lặp lại video",
+  "settings.videoLoopOffNote": "Khi kết thúc, video dừng ở khung hình cuối thay vì bắt đầu lại.",
+  "settings.videoAutoAdvance": "Chuyển tiếp khi video kết thúc",
+  "settings.videoAutoAdvanceNote": "Tự cuộn đến video tiếp theo. Việc này cũng dừng lặp lại.",
   "settings.dyslexia": "Chứng khó đọc",
   "settings.readingFont": "Phông chữ đọc",
   "settings.readingFontOff": "Mặc định",
