@@ -14,6 +14,14 @@ All notable changes to OpenMedia are documented here.
 
 **Verified:** `tsc`, ESLint, Prettier, Vitest. **Not verified:** how it looks on a device (iOS, Android, desktop), including Android's `backdrop-filter` and the light theme.
 
+### chore(recipes): trim the official library from 320 to 142 recipes
+
+**Area:** `chore(recipes)`
+
+**Change:** Dropped the long tail: niche archives, regional news, obscure radio/music directories, free-TV aggregators, dev/productivity and tech-brand sites. Kept what people open daily: video and anime streaming, music, radio, podcasts, social, shopping/e-commerce, search, AI, major news, maps/travel. Removed the recipe, fixtures, bundled icon, category and discover entries for each; the Popular shelf now leads with media and shopping.
+
+**Verified:** see PR. **Not verified:** on device.
+
 **PR:** n/a
 
 ### fix(android): align 64-bit native libraries for 16 KB memory pages
