@@ -69,8 +69,8 @@ const SAFARI_USER_AGENT: &str = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)
 const MAX_REMEMBERED_BLOCKED: usize = 32;
 /// Pauses what is playing in a page that went out of sight and remembers which elements it
 /// paused, so showing the page again resumes exactly those and nothing the visitor had paused.
-const PAUSE_MEDIA_SCRIPT: &str = "(function(){var held=window.__openmediaPaused=window.__openmediaPaused||[];document.querySelectorAll('video,audio').forEach(function(m){if(!m.paused&&!m.ended){held.push(m);m.pause()}})})()";
-const RESUME_MEDIA_SCRIPT: &str = "(function(){var held=window.__openmediaPaused||[];window.__openmediaPaused=[];held.forEach(function(m){try{var p=m.play();if(p&&p.catch)p.catch(function(){})}catch(e){}})})()";
+const PAUSE_MEDIA_SCRIPT: &str = "(function(){window.__openmediaHold=true;var held=window.__openmediaPaused=window.__openmediaPaused||[];document.querySelectorAll('video,audio').forEach(function(m){if(!m.paused&&!m.ended&&held.indexOf(m)<0){held.push(m);m.pause()}})})()";
+const RESUME_MEDIA_SCRIPT: &str = "(function(){window.__openmediaHold=false;var held=window.__openmediaPaused||[];window.__openmediaPaused=[];held.forEach(function(m){if(!m.isConnected)return;try{var p=m.play();if(p&&p.catch)p.catch(function(){})}catch(e){}});document.dispatchEvent(new Event('openmedia-resume'))})()";
 const STOP_MEDIA_SCRIPT: &str =
     "document.querySelectorAll('video,audio').forEach(function(m){m.pause()});window.stop();";
 

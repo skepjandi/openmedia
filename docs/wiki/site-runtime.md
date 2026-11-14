@@ -38,6 +38,10 @@ Evaluated on load and on virtual navigation. Same-origin only. Uses `location.re
 
 Toggled by Core. Overlays a highlight on hover/tap, shows a breadcrumb of ancestors so the user can widen/narrow the selection, and returns a **proposed target** rather than a raw selector. Target synthesis prefers `ariaLabel`/`href`/`role`/`text` over `css`, and never emits hashed-class selectors. The user confirms; Core creates a `hide` rule. This path works with no AI key.
 
+## Feed player
+
+`src-tauri/src/feed_player.js` is appended to the document-start script after the accessibility script, in the top frame only. In full-screen feeds (`/shorts`, `/reel(s)`, TikTok) it picks the video covering at least half the viewport once scrolling settles, plays it (muted if refused with `NotAllowedError`), pauses videos that left the screen and honours a reader's own pause until the video leaves the screen. It is idle while `window.__openmediaHold` is set (the native background pause) or calm mode is on (`Symbol.for('openmedia.noAutoplay')`). iOS site views also set `mediaTypesRequiringUserActionForPlayback = []`; with `.audio` an unmuted feed video needs a tap.
+
 ## Snapshot
 
 `__om.snapshot(opts)` returns a pruned tree used by the [AI Assistant](./ai-assistant.md).

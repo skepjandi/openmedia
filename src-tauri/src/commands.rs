@@ -429,11 +429,15 @@ pub(crate) fn current_script(
     script_for(library, recipes, app.state::<Incognito>().mode())
 }
 
-/// The page script for `mode`. The accessibility choices follow the recipes and apply in both sets.
+/// Keeps the video in view playing in full-screen feeds; see the file for what it does and spares.
+const FEED_PLAYER_SCRIPT: &str = include_str!("feed_player.js");
+
+/// The page script for `mode`. The accessibility choices follow the recipes and apply in both sets,
+/// then the feed player.
 pub(crate) fn script_for(library: &Library, recipes: &Recipes, mode: Mode) -> Result<String> {
     let recipe_script = recipes.script(&library.site_options(mode)?)?;
     Ok(format!(
-        "{recipe_script}\n{}",
+        "{recipe_script}\n{}\n{FEED_PLAYER_SCRIPT}",
         library.accessibility()?.page_script()
     ))
 }
