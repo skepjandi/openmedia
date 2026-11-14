@@ -89,6 +89,7 @@ pub fn run() {
             commands::set_last_url,
             commands::add_history,
             commands::clear_history,
+            commands::remove_history,
             commands::record_usage,
             commands::get_usage,
             commands::clear_usage,

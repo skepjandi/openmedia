@@ -6,6 +6,16 @@ All notable changes to OpenMedia are documented here.
 >
 > **Wiki**: the [GitHub Wiki](https://github.com/skepjandi/openmedia/wiki) is the public-facing main wiki — architecture, recipe format, AI pipeline, security model, roadmap. Source-controlled editing surface is `docs/wiki/` in this repo; CI (`.github/workflows/sync-wiki.yml`) mirrors it to the GitHub Wiki on every merge to `main`. New single-PR changes belong here, not as new wiki pages.
 
+### feat(history): clear all and delete single entries on the History page
+
+**Area:** `feat(history)`
+
+**Change:** The History page has a Clear button (with a Cancel / Clear confirmation) and a remove button on each row. Single removal is a new `remove_history` command (`Library::remove_history`) that returns the remaining history and prunes unused icons. No new strings: it reuses `common.clear`, `common.cancel` and `common.remove`.
+
+**Verified:** `tsc`, ESLint, Prettier, `cargo test --lib library` (65/65, new test for removing one entry). **Not verified:** the layout on a device or simulator.
+
+**PR:** n/a
+
 ### fix(fab): the arrow on the collapsed button's tab is visible on light pages
 
 **Area:** `fix(fab)`

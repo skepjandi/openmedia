@@ -120,6 +120,12 @@ pub fn add_history(
     library.add_history(&url)
 }
 
+/// Forgets one searched address; returns the history that remains, newest first.
+#[tauri::command]
+pub fn remove_history(library: State<'_, Library>, url: String) -> Result<Vec<String>> {
+    library.remove_history(&url)
+}
+
 /// Forgets every searched address and the remembered last page.
 #[tauri::command]
 pub fn clear_history(library: State<'_, Library>) -> Result<()> {

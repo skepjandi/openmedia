@@ -260,6 +260,8 @@ export const library = {
     command("adopt_boot_session", { session, url, rect }),
   /** Remembers a typed address and returns the history, newest first. */
   addHistory: (url: string) => invoke<string[]>("add_history", { url }),
+  /** Forgets one typed address and returns the history that remains, newest first. */
+  removeHistory: (url: string) => invoke<string[]>("remove_history", { url }),
   /** Forgets the typed addresses and the remembered last page. */
   clearHistory: () => command("clear_history"),
   setBackButton: (enabled: boolean) => command("set_back_button", { enabled }),

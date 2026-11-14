@@ -1,7 +1,8 @@
+import { useState } from "react";
 import { useApp } from "../../app/store";
 import { useT } from "../../i18n/useT";
 import { displayHost, isFavoriteSite, toggleSiteFavorite } from "../../shared/favorites";
-import { ArrowIcon, HistoryIcon, StarIcon } from "../../shared/icons";
+import { ArrowIcon, CloseIcon, HistoryIcon, StarIcon } from "../../shared/icons";
 import { useIconForUrl } from "../../shared/siteIcons";
 import type { Favorite } from "../../shared/ipc";
 import { Screen } from "../../shared/Screen";
@@ -9,6 +10,8 @@ import { SiteTile } from "../../shared/SiteTile";
 import { describeAddress } from "./address";
 
 const NO_HISTORY: string[] = [];
+const buttonClass =
+  "rounded-full bg-paper/[0.08] px-4 py-2 text-sm font-medium active:bg-paper/[0.16]";
 
 /** Addresses the user typed, newest first. */
 export function HistorySheet() {
@@ -18,6 +21,9 @@ export function HistorySheet() {
   const closeSheet = useApp((s) => s.closeSheet);
   const openHistory = useApp((s) => s.openHistory);
   const saveFavorites = useApp((s) => s.saveFavorites);
+  const removeHistory = useApp((s) => s.removeHistory);
+  const clearHistory = useApp((s) => s.clearHistory);
+  const [confirming, setConfirming] = useState(false);
   const t = useT();
   const favoriteList = favorites ?? [];
   if (!open) return null;
@@ -39,17 +45,43 @@ export function HistorySheet() {
           <p className="max-w-xs text-sm leading-relaxed text-paper/55">{t("history.emptyBody")}</p>
         </div>
       ) : (
-        <ul className="divide-y divide-hair overflow-hidden rounded-2xl border border-hair bg-paper/[0.04]">
-          {history.map((url) => (
-            <HistoryRow
-              key={url}
-              url={url}
-              favorites={favoriteList}
-              onOpen={() => openHistory(url)}
-              onToggle={() => void saveFavorites(toggleSiteFavorite(favoriteList, url))}
-            />
-          ))}
-        </ul>
+        <>
+          <div className="mb-3 flex items-center justify-end gap-2">
+            {confirming ? (
+              <>
+                <button type="button" onClick={() => setConfirming(false)} className={buttonClass}>
+                  {t("common.cancel")}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setConfirming(false);
+                    void clearHistory();
+                  }}
+                  className={`${buttonClass} text-accent`}
+                >
+                  {t("common.clear")}
+                </button>
+              </>
+            ) : (
+              <button type="button" onClick={() => setConfirming(true)} className={buttonClass}>
+                {t("common.clear")}
+              </button>
+            )}
+          </div>
+          <ul className="divide-y divide-hair overflow-hidden rounded-2xl border border-hair bg-paper/[0.04]">
+            {history.map((url) => (
+              <HistoryRow
+                key={url}
+                url={url}
+                favorites={favoriteList}
+                onOpen={() => openHistory(url)}
+                onToggle={() => void saveFavorites(toggleSiteFavorite(favoriteList, url))}
+                onRemove={() => void removeHistory(url)}
+              />
+            ))}
+          </ul>
+        </>
       )}
     </Screen>
   );
@@ -60,10 +92,11 @@ interface RowProps {
   favorites: Favorite[];
   onOpen: () => void;
   onToggle: () => void;
+  onRemove: () => void;
 }
 
 /** One address: the row opens it, and the star beside it is a button of its own. */
-function HistoryRow({ url, favorites, onOpen, onToggle }: RowProps) {
+function HistoryRow({ url, favorites, onOpen, onToggle, onRemove }: RowProps) {
   const { host, rest } = describeAddress(url);
   const site = displayHost(url);
   const favorited = isFavoriteSite(favorites, url);
@@ -101,6 +134,14 @@ function HistoryRow({ url, favorites, onOpen, onToggle }: RowProps) {
         }`}
       >
         <StarIcon filled={favorited} />
+      </button>
+      <button
+        type="button"
+        aria-label={`${t("common.remove")}: ${site}`}
+        onClick={onRemove}
+        className="grid size-12 shrink-0 place-items-center text-paper/45 active:bg-paper/[0.06]"
+      >
+        <CloseIcon />
       </button>
     </li>
   );

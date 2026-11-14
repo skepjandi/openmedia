@@ -363,6 +363,15 @@ impl Library {
         Ok(data.history.clone())
     }
 
+    /// Forgets one searched address; returns the history that remains, newest first.
+    pub fn remove_history(&self, url: &str) -> Result<Vec<String>> {
+        let mut data = self.lock()?;
+        data.history.retain(|seen| seen != url);
+        prune_icons(&mut data);
+        self.save(&data)?;
+        Ok(data.history.clone())
+    }
+
     /// Forgets the searched addresses and the remembered last page, like a browser's "clear
     /// history". Favorites, cookies and settings are untouched.
     pub fn clear_history(&self) -> Result<()> {
@@ -1616,6 +1625,18 @@ mod tests {
         library.add_history("https://a.example/").unwrap();
         assert!(library.add_history("javascript:alert(1)").is_err());
         assert_eq!(library.state().unwrap().history, ["https://a.example/"]);
+    }
+
+    #[test]
+    fn removing_a_history_entry_keeps_the_others_in_order() {
+        let (dir, library) = library();
+        library.add_history("https://a.example/").unwrap();
+        library.add_history("https://b.example/").unwrap();
+        library.add_history("https://c.example/").unwrap();
+        let history = library.remove_history("https://b.example/").unwrap();
+        assert_eq!(history, ["https://c.example/", "https://a.example/"]);
+        assert_eq!(reload(&dir).state().unwrap().history, history);
+        assert_eq!(library.remove_history("https://zzz.example/").unwrap(), history);
     }
 
     #[test]

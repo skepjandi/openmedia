@@ -177,6 +177,8 @@ export interface AppStore {
   /** Adds a recipe's site to the favorites, or removes every favorite that opens it. */
   setSiteFavorite: (recipeId: string, favorite: boolean) => Promise<void>;
   clearHistory: () => Promise<void>;
+  /** Forgets one history entry. */
+  removeHistory: (url: string) => Promise<void>;
   setTheme: (theme: Theme) => Promise<void>;
   /** Picks the language the app is in; null puts it back on the device's language. */
   setLocale: (locale: string | null) => Promise<void>;
@@ -667,6 +669,15 @@ export const useApp = create<AppStore>((set, get) => {
         adoptFavorites(await library.setSiteFavorite(recipeId, favorite));
       } catch (error) {
         set({ sites: before, error: appError(error) });
+      }
+    },
+
+    removeHistory: async (url) => {
+      try {
+        const history = await library.removeHistory(url);
+        set((current) => ({ state: current.state && { ...current.state, history } }));
+      } catch (error) {
+        set({ error: appError(error) });
       }
     },
 
