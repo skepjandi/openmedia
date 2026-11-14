@@ -43,12 +43,26 @@ flowchart LR
 - **Android.** The same converted JSON is read by `BlockingRules` (`android/src/main/java/surf/openmedia/siteview/BlockingRules.kt`) and matched in `shouldInterceptRequest`. WebView's URL filter is an unanchored regex; each rule is a `java.util.regex.Pattern`, with domain and resource conditions interpreted against the top document. Scriptlets are independent of request interception and require AndroidX document-start support.
 - **Failure.** If blocker data cannot be built or a native list fails, browsing remains available and the failure is reported; `set_ad_block` does not persist a failed setting.
 
+## YouTube ads
+
+Why the earlier setup left a black screen: the ad **media** come from the same `googlevideo.com` hosts as the video, so the only network rule that can hit them (Brave iOS Specific, `ctier=L`) leaves the player holding an ad it can never play. The uBlock Origin scriptlets that Brave's lists use to remove the ad from the player response (`json-prune`, `set`, `trusted-replace-xhr-response`) were also inert: the bundled Brave resource bundle holds only Brave's own scriptlets, and a rule naming a scriptlet the engine does not have injects nothing. Android bundles no YouTube rules at all.
+
+`blocklists/openmedia-specific.txt` names one scriptlet, `openmedia-youtube-ads`, for `youtube.com` hosts; `ad_block.rs` registers its code (`openmedia-youtube-ads.js`) as an engine resource. In the page's main world it:
+
+- deletes `adPlacements`, `playerAds` and `adSlots` from every player response, so no ad is scheduled and nothing is left to block (`JSON.parse`, the `ytInitialPlayerResponse` and `ytInitialData` globals, `fetch` and `XMLHttpRequest` on `/youtubei/v1/`);
+- drops ad tiles from feed, search and watch-next data (`adSlotRenderer`, `promotedSparklesWebRenderer`, ... see the file) and ad entries from the Shorts sequence (`reelWatchEndpoint.adClientParams.isAd`);
+- runs a watchdog every 500 ms: while the player has `.ad-showing` it mutes the video and seeks to its end; after about 3 s it reloads the same video once, which fetches a pruned player response. It never clicks anything.
+
+`scriptlets_for_url` also matches the other forms of the starting host (`example.com`, `www.`, `m.`), each under its own exact-origin guard: a phone is redirected from the bare host to `m.`, and the start URL's origin alone would leave every scriptlet inert after that.
+
+Sources for the target keys: uBlock Origin `filters/filters.txt` and `quick-fixes.txt` (`json-prune`, `json-prune-fetch-response ... reel_watch_sequence`, `json-edit-fetch-response ... get_watch`), Brave iOS Specific (the same keys). **Not verified:** on a device against live YouTube ads; the scriptlet's logic is covered by `src/shared/youtubeAds.test.ts` against recorded-shape JSON only, and the `XMLHttpRequest` path and the watchdog have no test.
+
 ## What it cannot do
 
 Filter conversion and scriptlet resources cover only supported parts of the upstream lists. This is not Brave Browser parity:
 
 - Unsupported procedural cosmetic filters, `$redirect`, resource replacement, `$removeparam`, `$csp`, and scriptlet names missing from the bundled Brave resource set do not run. Only default, zero permissions are used; privileged scriptlets are disabled.
-- **First-party and in-stream ads are not guaranteed to be blocked.** Brave iOS Specific includes a YouTube `googlevideo.com` fallback rule, but that rule is narrow; same-origin ad delivery and site changes can bypass filter rules. The YouTube recipe still hides companion/promoted page slots, not video ad playback.
+- **First-party and in-stream ads are not guaranteed to be blocked.** YouTube is handled by `blocklists/openmedia-youtube-ads.js` (see [YouTube ads](#youtube-ads)); it removes ads by editing the page's data, which Google can change at any time. An ad stitched into the video stream itself is only skipped by a watchdog that mutes it and seeks to its end, which needs the video to have loaded.
 - Scriptlets match the session's starting URL. They are main-frame and origin guarded, but are not re-matched for same-origin navigation within that session.
 - Android without document-start support gets network/CSS filtering but no blocker scriptlets.
 - Anything past WebKit's per-list rule cap.

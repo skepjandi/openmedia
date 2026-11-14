@@ -15,8 +15,9 @@ use adblock::{
     Engine,
     content_blocking::CbRule,
     lists::{FilterSet, ParseOptions},
-    resources::Resource,
+    resources::{MimeType, Resource, ResourceType},
 };
+use base64::{Engine as _, prelude::BASE64_STANDARD};
 use sha2::{Digest, Sha256};
 use tauri_plugin_siteview::ContentRuleList;
 
@@ -140,6 +141,10 @@ impl AdBlock {
         Ok(lists)
     }
     /// Scriptlet code matched to the page's opening URL. Native integration owns activation and timing.
+    ///
+    /// Sites move between `example.com`, `www.example.com` and `m.example.com` on their own (a
+    /// phone user agent is sent to `m.`), so the same site's other forms are matched too, each
+    /// under its own exact-origin guard.
     pub fn scriptlets_for_url(&self, url: &str) -> Result<String> {
         let page_url = url::Url::parse(url)
             .map_err(|error| Error::AdBlock(format!("invalid scriptlet URL: {error}")))?;
@@ -154,17 +159,22 @@ impl AdBlock {
         let engine = cached
             .as_ref()
             .ok_or_else(|| Error::AdBlock("the scriptlet engine is unavailable".into()))?;
-        let script = engine
-            .url_cosmetic_resources(page_url.as_str())
-            .injected_script;
-        if script.is_empty() {
-            return Ok(script);
+        let mut guarded: Vec<String> = Vec::new();
+        for url in site_forms(&page_url) {
+            let script = engine.url_cosmetic_resources(url.as_str()).injected_script;
+            if script.is_empty() {
+                continue;
+            }
+            let origin = serde_json::to_string(&url.origin().ascii_serialization())
+                .map_err(|error| Error::AdBlock(format!("invalid scriptlet origin: {error}")))?;
+            let wrapped = format!(
+                "(function(){{if(window.top!==window||location.origin!=={origin})return;{script}}})();"
+            );
+            if !guarded.contains(&wrapped) {
+                guarded.push(wrapped);
+            }
         }
-        let origin = serde_json::to_string(&page_url.origin().ascii_serialization())
-            .map_err(|error| Error::AdBlock(format!("invalid scriptlet origin: {error}")))?;
-        Ok(format!(
-            "(function(){{if(window.top!==window||location.origin!=={origin})return;{script}}})();"
-        ))
+        Ok(guarded.concat())
     }
 
     fn remove_stale_files(&self) -> Result<()> {
@@ -188,14 +198,55 @@ impl AdBlock {
             })
     }
 }
+/// The page's own URL first, then the same site with and without a leading `www.` or `m.`.
+fn site_forms(page_url: &url::Url) -> Vec<url::Url> {
+    let mut forms = vec![page_url.clone()];
+    let Some(host) = page_url.host_str() else {
+        return forms;
+    };
+    let bare = ["www.", "m."]
+        .iter()
+        .find_map(|prefix| host.strip_prefix(prefix))
+        .unwrap_or(host);
+    // A bare label such as `localhost` or an IP address has no other forms.
+    if !bare.contains('.') || bare.parse::<std::net::IpAddr>().is_ok() {
+        return forms;
+    }
+    for candidate in [bare.to_owned(), format!("www.{bare}"), format!("m.{bare}")] {
+        let mut form = page_url.clone();
+        if candidate != host && form.set_host(Some(&candidate)).is_ok() {
+            forms.push(form);
+        }
+    }
+    forms
+}
+
+/// Scriptlets OpenMedia writes itself, by the name its own list uses.
+const OWN_RESOURCES: [(&str, &str); 1] = [(
+    "openmedia-youtube-ads.js",
+    include_str!("../../blocklists/openmedia-youtube-ads.js"),
+)];
+
+/// OpenMedia's own scriptlet rules. Scriptlets only, so it is not converted for WebKit.
+const OWN_SCRIPTLET_RULES: &str = include_str!("../../blocklists/openmedia-specific.txt");
+
 fn scriptlet_engine() -> Result<Engine> {
     let mut filters = FilterSet::new(false);
     for (_, text) in BUNDLED {
         filters.add_filter_list(text.to_owned(), ParseOptions::default());
     }
-    let resources: Vec<Resource> =
+    filters.add_filter_list(OWN_SCRIPTLET_RULES.to_owned(), ParseOptions::default());
+    let mut resources: Vec<Resource> =
         serde_json::from_str(include_str!("../../blocklists/brave-resources.json"))
             .map_err(|error| Error::AdBlock(format!("invalid Brave resource bundle: {error}")))?;
+    resources.extend(OWN_RESOURCES.iter().map(|(name, code)| Resource {
+        name: (*name).to_owned(),
+        aliases: Vec::new(),
+        kind: ResourceType::Mime(MimeType::ApplicationJavascript),
+        content: BASE64_STANDARD.encode(code),
+        dependencies: Vec::new(),
+        permission: Default::default(),
+    }));
     let mut engine = Engine::new_with_filter_set(filters);
     engine.use_resources(resources);
     Ok(engine)
@@ -388,6 +439,36 @@ mod tests {
         assert!(youtube.contains("location.origin!==\"https://www.youtube.com\""));
         assert!(!youtube.is_empty());
         assert!(other_site.is_empty());
+    }
+
+    #[test]
+    fn youtube_ad_removal_follows_the_site_across_its_hosts() {
+        let dir = tempfile::tempdir().expect("tempdir");
+        let ad_block = AdBlock::bundled(dir.path().to_owned());
+        // A phone is sent from the bare host to `m.`, a desktop to `www.`: the start URL's
+        // origin alone would leave the scriptlet inert after the redirect.
+        for start in [
+            "https://youtube.com/",
+            "https://www.youtube.com/watch?v=x",
+            "https://m.youtube.com/",
+        ] {
+            let script = ad_block.scriptlets_for_url(start).expect("scriptlets");
+            assert!(script.contains("__openmediaYoutubeAds"), "{start}");
+            for origin in [
+                "https://youtube.com",
+                "https://www.youtube.com",
+                "https://m.youtube.com",
+            ] {
+                assert!(
+                    script.contains(&format!("location.origin!==\"{origin}\"")),
+                    "{start} lacks a guard for {origin}"
+                );
+            }
+        }
+        let other = ad_block
+            .scriptlets_for_url("https://example.org/")
+            .expect("scriptlets");
+        assert!(!other.contains("__openmediaYoutubeAds"));
     }
 
     fn ad_block_with(dir: &Path, text: &'static str) -> AdBlock {

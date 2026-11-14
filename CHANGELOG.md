@@ -6,6 +6,18 @@ All notable changes to OpenMedia are documented here.
 >
 > **Wiki**: the [GitHub Wiki](https://github.com/skepjandi/openmedia/wiki) is the public-facing main wiki — architecture, recipe format, AI pipeline, security model, roadmap. Source-controlled editing surface is `docs/wiki/` in this repo; CI (`.github/workflows/sync-wiki.yml`) mirrors it to the GitHub Wiki on every merge to `main`. New single-PR changes belong here, not as new wiki pages.
 
+### fix(adblock): YouTube video ads no longer leave a black screen, and Shorts ads are removed
+
+**Area:** `fix(adblock)`
+
+**Problem:** On YouTube the ad's video request was blocked but the ad stayed scheduled, so long videos showed a black screen. Shorts and feeds still carried ads. The uBlock Origin scriptlets in Brave's lists that remove ads from the player data never ran: the bundled resource set does not contain them, and Android had no YouTube rules.
+
+**Change:** New scriptlet `openmedia-youtube-ads` (`blocklists/openmedia-youtube-ads.js`, enabled by `blocklists/openmedia-specific.txt`) strips ad lists and ad items from player, feed, search and Shorts responses on every platform, and a watchdog skips or reloads an ad that is already in the stream. Scriptlets now also match `www.`/`m.` forms of the starting host. YouTube recipe 2.2.0 hides ad slots in phone feeds and between Shorts.
+
+**Verified:** `cargo test` (`ad_block`, `recipes`), Vitest (`youtubeAds.test.ts`). **Not verified:** on a device against live YouTube ads.
+
+**PR:** n/a
+
 ### fix(siteview): short-video feeds play on their own
 
 **Area:** `fix(siteview)`
