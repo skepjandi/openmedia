@@ -9,6 +9,8 @@ Filter lists compiled into the app binary and converted to Safari content-blocki
 | `easyprivacy.txt`          | [EasyPrivacy](https://easylist.to/)                                   | Trackers, analytics, tags                           |
 | `brave-specific.txt`       | [Brave Specific](https://github.com/brave/adblock-lists)              | Brave-authored network and scriptlet rules          |
 | `brave-ios-specific.txt`   | [Brave iOS Specific](https://github.com/brave/adblock-lists)          | iOS fixes, including YouTube ad fallback rules      |
+| `openmedia-specific.txt`   | OpenMedia                                                            | Scriptlet rules for our own resources (not converted for WebKit) |
+| `openmedia-youtube-ads.js` | OpenMedia                                                            | Removes YouTube ads from player, feed and Shorts data |
 | `brave-resources.json`     | [Brave adblock resources](https://github.com/brave/adblock-resources) | Scriptlet code referenced by filter rules            |
 
 The iOS-specific list is bundled only for iOS. The Brave Specific snapshot is pinned to

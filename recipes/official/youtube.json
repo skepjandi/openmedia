@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "market.official.youtube",
   "name": "YouTube",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "origin": "user",
   "tags": ["desktop", "mobile"],
   "match": ["https://www.youtube.com/*", "https://m.youtube.com/*", "https://youtube.com/*"],
@@ -24,7 +24,7 @@
     {
       "id": "ads",
       "label": "Hide ad slots",
-      "description": "Hides separate companion and promoted ad slots when present; it cannot block ads playing inside videos.",
+      "description": "Hides ad slots in feeds, Shorts and beside videos. Ads inside videos are removed by the Ad blocking setting.",
       "group": "annoyance",
       "default": true
     },
@@ -319,6 +319,33 @@
       "option": "ads",
       "target": {
         "css": "ytm-promoted-sparkles-web-renderer, ytm-promoted-video-renderer, ytm-ad-slot-renderer, ytm-masthead-ad-renderer"
+      }
+    },
+    {
+      "id": "ad-slot-feed-mobile",
+      "label": "Ad slots in phone feeds and lists",
+      "type": "hide",
+      "option": "ads",
+      "target": {
+        "css": "ad-slot-renderer, ytm-rich-item-renderer:has(> ad-slot-renderer), ytm-item-section-renderer:has(> ad-slot-renderer)"
+      }
+    },
+    {
+      "id": "ad-shorts-mobile",
+      "label": "Ads between Shorts on a phone",
+      "type": "hide",
+      "option": "ads",
+      "target": {
+        "css": "ytm-reel-video-renderer:has(ad-slot-renderer, ytm-ad-slot-renderer)"
+      }
+    },
+    {
+      "id": "ad-shorts-desktop",
+      "label": "Ads between Shorts on desktop",
+      "type": "hide",
+      "option": "ads",
+      "target": {
+        "css": "ytd-reel-video-renderer:has(ytd-ad-slot-renderer), #shorts-inner-container > .ytd-shorts:has(ytd-ad-slot-renderer)"
       }
     },
     {

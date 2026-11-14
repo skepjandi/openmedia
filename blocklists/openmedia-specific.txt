@@ -1,0 +1,5 @@
+! Title: OpenMedia Specific
+! Scriptlet rules for OpenMedia's own resources (openmedia-*.js in this directory). Scriptlets
+! only: this list has nothing to convert for WebKit and is not one of the content-rule lists.
+! YouTube ads: removes them from player, feed, search and Shorts data. See openmedia-youtube-ads.js.
+youtube.com,youtube-nocookie.com##+js(openmedia-youtube-ads)
