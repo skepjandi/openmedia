@@ -17,6 +17,7 @@
   var ADVANCE_GAP_MS = 1500;
   var WRAPPER_MAX = 1.5; // screens, as in the feed player
   var NEXT_GAP = 20; // px below the video in view that counts as the next one
+  var EDGE_GAP = 16; // px between the controls and the bottom edge, on top of the safe area
   try {
     if (window.top !== window) return;
     if (typeof document[KEY] === 'function') document[KEY]();
@@ -156,7 +157,8 @@
       var parent = document.body || document.documentElement;
       if (!parent) return null;
       var root = make('div',
-        'position:fixed;left:0;right:0;bottom:0;z-index:2147483646;display:none;' +
+        'position:fixed;left:0;right:0;bottom:calc(env(safe-area-inset-bottom,0px) + ' + EDGE_GAP + 'px);' +
+        'z-index:2147483646;display:none;' +
         'pointer-events:none;font:600 13px/1 -apple-system,system-ui,sans-serif;color:#fff;' +
         'text-shadow:0 1px 3px rgba(0,0,0,.7);-webkit-user-select:none;user-select:none');
       root.setAttribute('data-openmedia-controls', '');

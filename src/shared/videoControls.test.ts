@@ -244,6 +244,14 @@ describe("video controls", () => {
     expect(video.currentTime).toBe(15);
   });
 
+  it("keeps the controls off the bottom edge and out of the home indicator", () => {
+    const video = new FakeVideo();
+    const page = load({ controls: { seekBar: true }, videos: [video], current: video });
+    page.tick();
+    const root = page.body.children[0];
+    expect(root.style.cssText).toContain("bottom:calc(env(safe-area-inset-bottom,0px) + 16px)");
+  });
+
   it("shows nothing when the page is not a feed or the video is not in view", () => {
     const video = new FakeVideo();
     const page = load({ controls: { seekBar: true }, videos: [video], current: null });

@@ -6,6 +6,18 @@ All notable changes to OpenMedia are documented here.
 >
 > **Wiki**: the [GitHub Wiki](https://github.com/skepjandi/openmedia/wiki) is the public-facing main wiki — architecture, recipe format, AI pipeline, security model, roadmap. Source-controlled editing surface is `docs/wiki/` in this repo; CI (`.github/workflows/sync-wiki.yml`) mirrors it to the GitHub Wiki on every merge to `main`. New single-PR changes belong here, not as new wiki pages.
 
+### fix(siteview): the seek bar sits clear of the bottom edge
+
+**Area:** `fix(siteview)`
+
+**Problem:** The seek bar and its time-left and speed row were fixed at `bottom: 0` of the page, so on iOS they sat under the home indicator and on Android against the gesture bar.
+
+**Change:** The controls are now 16 px above the bottom edge plus the page's bottom safe area (`env(safe-area-inset-bottom)`).
+
+**Verified:** Vitest (`videoControls.test.ts`), the iOS 26.5 simulator (iPhone 17 Pro Max) and an Android API 36 emulator on YouTube Shorts: the bar sits above the home indicator and the gesture bar. **Not verified:** a physical device; a three-button Android navigation bar.
+
+**PR:** n/a
+
 ### fix(ui): the loading spinner always spins
 
 **Area:** `fix(ui)`
