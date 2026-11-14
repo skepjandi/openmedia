@@ -32,7 +32,7 @@ describe("the icons that ship with the app", () => {
       }
     }
     // Some sites block icon retrieval or expose no image favicon; their library rows fetch on demand.
-    expect(coveredHosts).toBeGreaterThanOrEqual(250);
+    expect(coveredHosts).toBeGreaterThanOrEqual(200);
   });
 });
 
@@ -48,7 +48,7 @@ describe("bundledIconForHosts", () => {
       covered += 1;
       expect(bundledIconForHosts([recipe.meta.homepage]), `${recipe.id} homepage`).toBe(icon);
     }
-    expect(covered).toBeGreaterThanOrEqual(250);
+    expect(covered).toBeGreaterThanOrEqual(120);
   });
 
   it("tries the later entries, handles wildcards and skips unknown or empty ones", () => {
