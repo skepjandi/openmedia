@@ -13,7 +13,10 @@ interface ScreenProps {
   children: ReactNode;
 }
 
-/** A full-screen page: a large title over a scrolling body, so nothing from the site shows through. */
+/**
+ * A full-screen page: a large title over a scrolling body, so nothing from the site shows through.
+ * The title card is frosted glass pinned to the top; the body scrolls underneath it.
+ */
 export function Screen({
   title,
   subtitle,
@@ -42,8 +45,12 @@ export function Screen({
     </button>
   );
   return (
-    <div ref={root} data-hit="" className="screen fixed inset-0 z-50 flex flex-col bg-ink">
-      <header className="flex items-end gap-4 border-b border-hair px-5 pt-[calc(var(--safe-top)+16px)] pb-4">
+    <div
+      ref={root}
+      data-hit=""
+      className="screen fixed inset-0 z-50 scroll-pt-[calc(var(--safe-top)+88px)] overflow-y-auto overscroll-contain bg-ink"
+    >
+      <header className="sticky top-0 z-10 flex items-end gap-4 border-b border-hair bg-ink/60 px-5 pt-[calc(var(--safe-top)+16px)] pb-4 backdrop-blur-xl backdrop-saturate-150">
         {back && button}
         <div className="min-w-0 flex-1">
           <h1 className="text-[2rem] leading-none font-semibold tracking-tight">{title}</h1>
@@ -51,9 +58,7 @@ export function Screen({
         </div>
         {!back && button}
       </header>
-      <div className="flex-1 overflow-y-auto overscroll-contain px-4 pt-6 pb-[calc(var(--safe-bottom)+96px)]">
-        {children}
-      </div>
+      <div className="px-4 pt-6 pb-[calc(var(--safe-bottom)+96px)]">{children}</div>
     </div>
   );
 }

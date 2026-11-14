@@ -6,6 +6,16 @@ All notable changes to OpenMedia are documented here.
 >
 > **Wiki**: the [GitHub Wiki](https://github.com/skepjandi/openmedia/wiki) is the public-facing main wiki — architecture, recipe format, AI pipeline, security model, roadmap. Source-controlled editing surface is `docs/wiki/` in this repo; CI (`.github/workflows/sync-wiki.yml`) mirrors it to the GitHub Wiki on every merge to `main`. New single-PR changes belong here, not as new wiki pages.
 
+### feat(ui): frosted, translucent title card on full-screen pages
+
+**Area:** `feat(ui)`
+
+**Change:** `Screen` (settings, favorites, tabs, history, library, stats, paywall and the other full-screen pages) now pins its title card to the top as translucent glass (`bg-ink/60`, `backdrop-blur-xl`, saturated) and the page scrolls underneath it. The page itself is the scroller and the header is `sticky`, so the body starts below the card and no height is measured; `scroll-padding-top` keeps `scrollIntoView` targets clear of the card.
+
+**Verified:** `tsc`, ESLint, Prettier, Vitest. **Not verified:** how it looks on a device (iOS, Android, desktop), including Android's `backdrop-filter` and the light theme.
+
+**PR:** n/a
+
 ### fix(android): align 64-bit native libraries for 16 KB memory pages
 
 **Area:** `fix(android)`
