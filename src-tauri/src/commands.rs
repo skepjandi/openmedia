@@ -482,8 +482,9 @@ pub fn bottom_margin_for(
 
 /// Lets a site's media keep playing while its page is hidden or the app is in the background, or
 /// pauses it again. Every site pauses by default. `site` is a registrable domain.
+/// Async so it never runs on the main thread: the iOS plugin answers from there and would wait for itself.
 #[tauri::command]
-pub fn set_site_background_media(
+pub async fn set_site_background_media(
     app: AppHandle,
     library: State<'_, Library>,
     site: String,
