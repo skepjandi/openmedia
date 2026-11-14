@@ -218,12 +218,14 @@ export const fr: Messages = {
   "settings.epilepsyProtectionNote":
     "Arrête les animations, les vidéos à lecture automatique et les GIF animés dans l’app et sur les pages. Elle ne peut pas détecter les flashs d’une vidéo que vous lancez vous-même.",
   "settings.videoControls": "Commandes vidéo",
-  "settings.videoControlsNote":
-    "Pour les fils vidéo en plein écran comme Shorts et Reels. Chaque option reste désactivée jusqu’à ce que vous l’activiez.",
-  "settings.videoSeekBar": "Barre de progression",
-  "settings.videoSeekBarNote": "Une barre à faire glisser, avec le temps restant.",
-  "settings.videoSpeed": "Bouton de vitesse",
-  "settings.videoSpeedNote": "Touchez pour passer de 0.5× à 1×, 1.25×, 1.5× et 2×.",
+  "settings.videoControlsNote": "Pour les fils vidéo en plein écran comme Shorts et Reels.",
+  "settings.videoPanel": "Commandes au toucher",
+  "settings.videoPanelNote":
+    "Touchez une vidéo pour afficher pause, retour et avance de 6 secondes, sourdine, vitesse et une barre de progression, à la place du toucher propre au site. Un favori peut le désactiver pour retrouver les commandes du site.",
+  "settings.videoHeight": "Hauteur des commandes",
+  "settings.videoHeightNote":
+    "À quelle distance du bord inférieur se trouvent les commandes. Un favori peut définir la sienne.",
+  "settings.videoHeightLabel": "Hauteur des commandes vidéo",
   "settings.videoRemember": "Mémoriser vitesse et son",
   "settings.videoRememberNote":
     "La vidéo suivante démarre à la vitesse et au volume choisis en dernier.",
@@ -338,6 +340,15 @@ export const fr: Messages = {
   "recipes.hubNote":
     "Un hub ouvre plusieurs sites à la fois. Chaque page est un site à part entière, avec ses propres cookies.",
   "favorites.bottomMargin": "Marge inférieure",
+  "favorites.videoControls": "Commandes vidéo OpenMedia",
+  "favorites.videoControlsNote":
+    "Touchez une vidéo pour afficher les commandes d’OpenMedia. Désactivé, vous retrouvez celles du site.",
+  "favorites.videoHeight": "Hauteur des commandes vidéo",
+  "favorites.videoHeightShared":
+    "Utilise la hauteur partagée. Déplacez le curseur pour donner à ce site la sienne.",
+  "favorites.videoHeightOwn": "Ce site a sa propre hauteur.",
+  "favorites.videoHeightLabel": "Hauteur des commandes vidéo de {site}",
+  "favorites.videoUseShared": "Utiliser les réglages vidéo partagés",
   "recipes.sharedMargin":
     "Utilise la marge partagée. Déplacez le curseur pour donner à ce site sa propre marge.",
   "recipes.ownMargin": "Ce site a sa propre marge.",

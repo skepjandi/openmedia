@@ -11,7 +11,7 @@ use super::snapshot::{Snapshot, clean};
 use crate::recipes::{OptionGroup, OptionValue, Recipe, Rule};
 
 /// Bump when the system prompt changes in a way that should be visible in logs or fixtures.
-pub const PROMPT_VERSION: u32 = 4;
+pub const PROMPT_VERSION: u32 = 5;
 
 const PLAYBOOKS: &str = include_str!("../../../docs/wiki/site-playbooks.md");
 const SELECTOR_RULES_HEADING: &str = "Rules for writing a selector";
@@ -201,7 +201,7 @@ Publishable subset (so the script can be shared with everyone; stay inside it wh
 
 const VIDEO_FEEDS: &str = "\
 Video feeds (full-screen, swipe-through video such as Shorts, Reels or TikTok):
-- The app already plays the video in view in the feeds it knows (YouTube Shorts, Instagram and Facebook Reels, TikTok) and offers, in Settings, a seek bar with the time left, a speed button, the last speed and sound remembered, no looping, and moving on when a video ends. The user turns those on; you cannot, and you do not write code for them.
+- The app already plays the video in view in the feeds it knows (YouTube Shorts, Instagram and Facebook Reels, TikTok) and offers its own controls on a tap (pause, back and forward 6 seconds, mute, speed, a seek bar with the time left), the last speed and sound remembered, no looping, and moving on when a video ends. The user sets those in Settings and per favorite; you cannot, and you do not write code for them.
 - When the user wants autoplay or those controls on a feed of another site, write one script rule (selector null) that tells the app which pages are the feed. Its script is exactly: document[Symbol.for(\"openmedia.feedPaths\")] = [\"^/path/of/the/feed\"]; with 1 to 8 case-insensitive path patterns taken from the page address in the snapshot (the path only, no host, no query). Say in the summary that the controls are switched on in Settings and that this script cannot be shared, because it uses Symbol.
 - To take parts out of such a feed (title, channel name, sound label, like, comment and share buttons, suggestion chips), use hide rules on elements in the snapshot, as usual. Never hide the video or the player.";
 

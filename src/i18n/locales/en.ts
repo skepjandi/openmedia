@@ -214,12 +214,14 @@ export const en = {
   "settings.epilepsyProtectionNote":
     "Stops animations, autoplaying video and animated GIFs in the app and on pages. It cannot detect flashing in a video you start yourself.",
   "settings.videoControls": "Video controls",
-  "settings.videoControlsNote":
-    "For full-screen video feeds such as Shorts and Reels. Each one stays off until you turn it on.",
-  "settings.videoSeekBar": "Seek bar",
-  "settings.videoSeekBarNote": "A bar to drag along, with the time left.",
-  "settings.videoSpeed": "Speed button",
-  "settings.videoSpeedNote": "Tap to step through 0.5×, 1×, 1.25×, 1.5× and 2×.",
+  "settings.videoControlsNote": "For full-screen video feeds such as Shorts and Reels.",
+  "settings.videoPanel": "Controls on tap",
+  "settings.videoPanelNote":
+    "Tap a video to show pause, back and forward 6 seconds, mute, speed and a seek bar, instead of the site's own tap. A favorite can turn this off to get the site's own controls back.",
+  "settings.videoHeight": "Controls height",
+  "settings.videoHeightNote":
+    "How far above the bottom edge the controls sit. A favorite can set its own.",
+  "settings.videoHeightLabel": "Video controls height",
   "settings.videoRemember": "Remember speed and sound",
   "settings.videoRememberNote": "The next video starts at the speed and volume you last chose.",
   "settings.videoLoopOff": "Stop videos from looping",
@@ -329,6 +331,15 @@ export const en = {
   "recipes.hubNote":
     "A hub opens several sites at once. Each page is a site of its own, with its own cookies.",
   "favorites.bottomMargin": "Bottom margin",
+  "favorites.videoControls": "OpenMedia video controls",
+  "favorites.videoControlsNote":
+    "Tap a video to show OpenMedia's controls. Off gives back the site's own.",
+  "favorites.videoHeight": "Video controls height",
+  "favorites.videoHeightShared":
+    "Uses the shared height. Move the slider to give this site its own.",
+  "favorites.videoHeightOwn": "This site has its own height.",
+  "favorites.videoHeightLabel": "{site} video controls height",
+  "favorites.videoUseShared": "Use the shared video settings",
   "recipes.sharedMargin": "Uses the shared margin. Move the slider to give this site its own.",
   "recipes.ownMargin": "This site has its own margin.",
   "recipes.siteMarginLabel": "{name} bottom margin",

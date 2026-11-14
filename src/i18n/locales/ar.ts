@@ -205,12 +205,14 @@ export const ar: Messages = {
   "settings.epilepsyProtectionNote":
     "توقف الرسوم المتحركة والفيديو الذي يعمل تلقائيًا وصور GIF المتحركة في التطبيق وعلى الصفحات. لا يمكنها اكتشاف الومضات في فيديو تشغّله بنفسك.",
   "settings.videoControls": "عناصر تحكم الفيديو",
-  "settings.videoControlsNote":
-    "لخلاصات الفيديو بملء الشاشة مثل Shorts وReels. يبقى كل خيار متوقفًا حتى تشغّله.",
-  "settings.videoSeekBar": "شريط التقدم",
-  "settings.videoSeekBarNote": "شريط تسحبه للتنقل، مع عرض الوقت المتبقي.",
-  "settings.videoSpeed": "زر السرعة",
-  "settings.videoSpeedNote": "اضغط للتنقل بين 0.5× و1× و1.25× و1.5× و2×.",
+  "settings.videoControlsNote": "لخلاصات الفيديو بملء الشاشة مثل Shorts وReels.",
+  "settings.videoPanel": "عناصر التحكم عند النقر",
+  "settings.videoPanelNote":
+    "انقر على فيديو لإظهار الإيقاف المؤقت والرجوع والتقديم 6 ثوانٍ وكتم الصوت والسرعة وشريط التقدم، بدلًا من نقرة الموقع نفسه. يمكن للمفضلة إيقاف هذا لاستعادة عناصر تحكم الموقع نفسه.",
+  "settings.videoHeight": "ارتفاع عناصر التحكم",
+  "settings.videoHeightNote":
+    "المسافة بين عناصر التحكم والحافة السفلية. يمكن للمفضلة تعيين ارتفاع خاص بها.",
+  "settings.videoHeightLabel": "ارتفاع عناصر تحكم الفيديو",
   "settings.videoRemember": "تذكّر السرعة والصوت",
   "settings.videoRememberNote": "يبدأ الفيديو التالي بآخر سرعة ومستوى صوت اخترتهما.",
   "settings.videoLoopOff": "إيقاف تكرار الفيديوهات",
@@ -317,6 +319,15 @@ export const ar: Messages = {
   "recipes.hubNote":
     "يفتح المركز عدة مواقع في وقت واحد. كل صفحة موقع خاص بها بملفات تعريف الارتباط الخاصة به.",
   "favorites.bottomMargin": "الهامش السفلي",
+  "favorites.videoControls": "عناصر تحكم الفيديو من OpenMedia",
+  "favorites.videoControlsNote":
+    "انقر على فيديو لإظهار عناصر تحكم OpenMedia. الإيقاف يعيد عناصر تحكم الموقع نفسه.",
+  "favorites.videoHeight": "ارتفاع عناصر تحكم الفيديو",
+  "favorites.videoHeightShared":
+    "يستخدم الارتفاع المشترك. حرّك المؤشر ليمنح هذا الموقع ارتفاعًا خاصًا به.",
+  "favorites.videoHeightOwn": "لهذا الموقع ارتفاع خاص به.",
+  "favorites.videoHeightLabel": "ارتفاع عناصر تحكم الفيديو في {site}",
+  "favorites.videoUseShared": "استخدام إعدادات الفيديو المشتركة",
   "recipes.sharedMargin": "يستخدم الهامش المشترك. حرّك المؤشر ليمنح هذا الموقع هامشًا خاصًا به.",
   "recipes.ownMargin": "لهذا الموقع هامش خاص به.",
   "recipes.siteMarginLabel": "الهامش السفلي لـ {name}",

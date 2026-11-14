@@ -216,12 +216,14 @@ export const pt: Messages = {
   "settings.epilepsyProtectionNote":
     "Interrompe animações, vídeos com reprodução automática e GIFs animados no app e nas páginas. Não consegue detectar flashes em um vídeo que você inicia.",
   "settings.videoControls": "Controlos de vídeo",
-  "settings.videoControlsNote":
-    "Para feeds de vídeo em ecrã inteiro, como Shorts e Reels. Cada opção fica desligada até a ativares.",
-  "settings.videoSeekBar": "Barra de progresso",
-  "settings.videoSeekBarNote": "Uma barra para arrastar, com o tempo restante.",
-  "settings.videoSpeed": "Botão de velocidade",
-  "settings.videoSpeedNote": "Toca para alternar entre 0.5×, 1×, 1.25×, 1.5× e 2×.",
+  "settings.videoControlsNote": "Para feeds de vídeo em ecrã inteiro, como Shorts e Reels.",
+  "settings.videoPanel": "Controlos ao tocar",
+  "settings.videoPanelNote":
+    "Toca num vídeo para mostrar pausa, recuar e avançar 6 segundos, silenciar, velocidade e uma barra de progresso, em vez do toque do próprio site. Um favorito pode desligar isto para recuperar os controlos do site.",
+  "settings.videoHeight": "Altura dos controlos",
+  "settings.videoHeightNote":
+    "A que distância acima do limite inferior ficam os controlos. Um favorito pode definir a sua própria.",
+  "settings.videoHeightLabel": "Altura dos controlos de vídeo",
   "settings.videoRemember": "Lembrar velocidade e som",
   "settings.videoRememberNote":
     "O vídeo seguinte começa com a velocidade e o volume que escolheste por último.",
@@ -334,6 +336,15 @@ export const pt: Messages = {
   "recipes.hubNote":
     "Um hub abre vários sites ao mesmo tempo. Cada página é um site próprio, com os seus próprios cookies.",
   "favorites.bottomMargin": "Margem inferior",
+  "favorites.videoControls": "Controlos de vídeo do OpenMedia",
+  "favorites.videoControlsNote":
+    "Toca num vídeo para mostrar os controlos do OpenMedia. Desligado, volta a ter os do próprio site.",
+  "favorites.videoHeight": "Altura dos controlos de vídeo",
+  "favorites.videoHeightShared":
+    "Usa a altura partilhada. Move o controlo deslizante para dar a este site a sua própria.",
+  "favorites.videoHeightOwn": "Este site tem a sua própria altura.",
+  "favorites.videoHeightLabel": "Altura dos controlos de vídeo de {site}",
+  "favorites.videoUseShared": "Usar as definições de vídeo partilhadas",
   "recipes.sharedMargin":
     "Usa a margem compartilhada. Mova o controle deslizante para dar a este site sua própria margem.",
   "recipes.ownMargin": "Este site tem sua própria margem.",

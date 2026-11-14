@@ -65,6 +65,8 @@ interface Page {
   settle: (advanceMs?: number) => Promise<void>;
   /** The 1.2 s safety tick. */
   tick: () => Promise<void>;
+  /** What the video controls call when the reader pauses or plays with their own buttons. */
+  userPause: (video: FakeVideo, paused: boolean) => void;
   /** Reports one added element to the page's mutation observer; returns how often it was searched. */
   addNode: () => number;
 }
@@ -143,6 +145,11 @@ function load(options: {
       await Promise.resolve();
       await Promise.resolve();
     },
+    userPause(video, paused) {
+      (document as Record<symbol, (video: FakeVideo, paused: boolean) => void>)[
+        Symbol.for("openmedia.userPause")
+      ](video, paused);
+    },
     addNode() {
       let searches = 0;
       const node = {
@@ -211,6 +218,23 @@ describe("feed player", () => {
     await page.settle(100);
     video.pause();
     page.fire("pause", { target: video });
+    await page.settle(400);
+    expect(video.paused).toBe(false);
+  });
+
+  it("keeps a video paused that the video controls paused, until they play it again", async () => {
+    const video = new FakeVideo();
+    const page = load({ videos: [video] });
+    await page.settle();
+    page.userPause(video, true);
+    video.pause();
+    page.fire("pause", { target: video });
+    await page.settle(400);
+    await page.tick();
+    expect(video.paused).toBe(true);
+
+    page.userPause(video, false);
+    page.fire("scroll");
     await page.settle(400);
     expect(video.paused).toBe(false);
   });

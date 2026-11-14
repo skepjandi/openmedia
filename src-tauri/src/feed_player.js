@@ -13,6 +13,7 @@
   var PLAY_NOW = Symbol.for('openmedia.feedPlayNow');
   var IS_FEED = Symbol.for('openmedia.isFeed');
   var CURRENT = Symbol.for('openmedia.currentVideo');
+  var USER_PAUSE = Symbol.for('openmedia.userPause');
   var FEED_PATHS = Symbol.for('openmedia.feedPaths');
   var FEED_PATH = /^\/(?:(?:[^/]+\/)?(?:shorts|reels?)|watch\/reels?|stories)(?:\/|$)/i;
   var TIKTOK = /(?:^|\.)tiktok\.com$/i;
@@ -341,6 +342,14 @@
 
     Object.defineProperty(document, PLAY_NOW, { configurable: true, value: playNow });
     Object.defineProperty(document, IS_FEED, { configurable: true, value: inFeed });
+    // The video controls pause and play on the reader's behalf; the player must not undo that.
+    Object.defineProperty(document, USER_PAUSE, {
+      configurable: true,
+      value: function (video, paused) {
+        if (paused) userPaused.add(video);
+        else userPaused.delete(video);
+      }
+    });
     Object.defineProperty(document, CURRENT, { configurable: true, get: function () { return current; } });
     Object.defineProperty(document, KEY, {
       configurable: true,
@@ -352,6 +361,7 @@
         delete document[PLAY_NOW];
         delete document[IS_FEED];
         delete document[CURRENT];
+        delete document[USER_PAUSE];
         delete document[KEY];
       }
     });

@@ -201,12 +201,13 @@ export const th: Messages = {
   "settings.epilepsyProtectionNote":
     "หยุดภาพเคลื่อนไหว วิดีโอที่เล่นอัตโนมัติ และ GIF แบบเคลื่อนไหวในแอปและบนหน้าเว็บ ตรวจจับแสงกะพริบในวิดีโอที่คุณเริ่มเล่นเองไม่ได้",
   "settings.videoControls": "ตัวควบคุมวิดีโอ",
-  "settings.videoControlsNote":
-    "สำหรับฟีดวิดีโอเต็มหน้าจอ เช่น Shorts และ Reels แต่ละตัวเลือกจะปิดอยู่จนกว่าคุณจะเปิด",
-  "settings.videoSeekBar": "แถบเลื่อนเวลา",
-  "settings.videoSeekBarNote": "แถบสำหรับลาก พร้อมแสดงเวลาที่เหลือ",
-  "settings.videoSpeed": "ปุ่มความเร็ว",
-  "settings.videoSpeedNote": "แตะเพื่อสลับระหว่าง 0.5×, 1×, 1.25×, 1.5× และ 2×",
+  "settings.videoControlsNote": "สำหรับฟีดวิดีโอเต็มหน้าจอ เช่น Shorts และ Reels",
+  "settings.videoPanel": "แตะเพื่อใช้ตัวควบคุม",
+  "settings.videoPanelNote":
+    "แตะวิดีโอเพื่อแสดงปุ่มหยุดชั่วคราว ย้อนกลับและข้าม 6 วินาที ปิดเสียง ความเร็ว และแถบเลื่อนเวลา แทนการแตะของเว็บไซต์เอง รายการโปรดปิดส่วนนี้ได้ เพื่อใช้ตัวควบคุมของเว็บไซต์เอง",
+  "settings.videoHeight": "ความสูงของตัวควบคุม",
+  "settings.videoHeightNote": "ตัวควบคุมอยู่เหนือขอบล่างเท่าไร รายการโปรดกำหนดค่าของตัวเองได้",
+  "settings.videoHeightLabel": "ความสูงของตัวควบคุมวิดีโอ",
   "settings.videoRemember": "จำความเร็วและเสียง",
   "settings.videoRememberNote": "วิดีโอถัดไปจะเริ่มด้วยความเร็วและระดับเสียงที่คุณเลือกล่าสุด",
   "settings.videoLoopOff": "หยุดไม่ให้วิดีโอเล่นซ้ำ",
@@ -314,6 +315,14 @@ export const th: Messages = {
   "recipes.hubNote":
     "ฮับเปิดหลายเว็บไซต์พร้อมกัน แต่ละหน้าเป็นเว็บไซต์ของตัวเอง พร้อมคุกกี้ของตัวเอง",
   "favorites.bottomMargin": "ขอบล่าง",
+  "favorites.videoControls": "ตัวควบคุมวิดีโอของ OpenMedia",
+  "favorites.videoControlsNote":
+    "แตะวิดีโอเพื่อแสดงตัวควบคุมของ OpenMedia เมื่อปิดจะใช้ตัวควบคุมของเว็บไซต์เอง",
+  "favorites.videoHeight": "ความสูงของตัวควบคุมวิดีโอ",
+  "favorites.videoHeightShared": "ใช้ความสูงร่วมกัน เลื่อนแถบเพื่อกำหนดความสูงของเว็บไซต์นี้เอง",
+  "favorites.videoHeightOwn": "เว็บไซต์นี้มีความสูงของตัวเอง",
+  "favorites.videoHeightLabel": "ความสูงของตัวควบคุมวิดีโอ {site}",
+  "favorites.videoUseShared": "ใช้การตั้งค่าวิดีโอร่วมกัน",
   "recipes.sharedMargin": "ใช้ขอบล่างร่วมกัน เลื่อนแถบเพื่อกำหนดขอบของเว็บไซต์นี้เอง",
   "recipes.ownMargin": "เว็บไซต์นี้มีขอบล่างของตัวเอง",
   "recipes.siteMarginLabel": "ขอบล่างของ {name}",

@@ -209,12 +209,14 @@ export const vi: Messages = {
   "settings.epilepsyProtectionNote":
     "Dừng hoạt ảnh, video tự phát và ảnh GIF động trong ứng dụng và trên các trang. Không thể phát hiện ánh sáng nhấp nháy trong video do bạn tự bắt đầu phát.",
   "settings.videoControls": "Điều khiển video",
-  "settings.videoControlsNote":
-    "Dành cho nguồn cấp video toàn màn hình như Shorts và Reels. Mỗi tùy chọn đều tắt cho đến khi bạn bật.",
-  "settings.videoSeekBar": "Thanh tua",
-  "settings.videoSeekBarNote": "Một thanh để kéo, kèm thời gian còn lại.",
-  "settings.videoSpeed": "Nút tốc độ",
-  "settings.videoSpeedNote": "Chạm để chuyển qua 0.5×, 1×, 1.25×, 1.5× và 2×.",
+  "settings.videoControlsNote": "Dành cho nguồn cấp video toàn màn hình như Shorts và Reels.",
+  "settings.videoPanel": "Điều khiển khi chạm",
+  "settings.videoPanelNote":
+    "Chạm vào video để hiện tạm dừng, tua lùi và tua tới 6 giây, tắt tiếng, tốc độ và thanh tua, thay cho thao tác chạm của chính trang. Một mục yêu thích có thể tắt để dùng lại điều khiển của trang.",
+  "settings.videoHeight": "Độ cao điều khiển",
+  "settings.videoHeightNote":
+    "Điều khiển nằm cao hơn mép dưới bao nhiêu. Một mục yêu thích có thể đặt độ cao riêng.",
+  "settings.videoHeightLabel": "Độ cao điều khiển video",
   "settings.videoRemember": "Nhớ tốc độ và âm thanh",
   "settings.videoRememberNote":
     "Video tiếp theo bắt đầu với tốc độ và âm lượng bạn chọn lần gần nhất.",
@@ -326,6 +328,15 @@ export const vi: Messages = {
   "recipes.hubNote":
     "Một hub mở nhiều trang web cùng lúc. Mỗi trang là một trang web riêng, với cookie riêng.",
   "favorites.bottomMargin": "Lề dưới",
+  "favorites.videoControls": "Điều khiển video của OpenMedia",
+  "favorites.videoControlsNote":
+    "Chạm vào video để hiện điều khiển của OpenMedia. Khi tắt, sẽ dùng lại điều khiển của trang.",
+  "favorites.videoHeight": "Độ cao điều khiển video",
+  "favorites.videoHeightShared":
+    "Dùng độ cao chung. Kéo thanh trượt để đặt độ cao riêng cho trang này.",
+  "favorites.videoHeightOwn": "Trang này có độ cao riêng.",
+  "favorites.videoHeightLabel": "Độ cao điều khiển video của {site}",
+  "favorites.videoUseShared": "Dùng cài đặt video chung",
   "recipes.sharedMargin": "Dùng lề dưới chung. Kéo thanh trượt để đặt lề riêng cho trang này.",
   "recipes.ownMargin": "Trang này có lề dưới riêng.",
   "recipes.siteMarginLabel": "Lề dưới của {name}",

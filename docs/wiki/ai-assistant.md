@@ -125,7 +125,7 @@ Sharing such a recipe goes through the normal checks: a script with powers is re
 
 ### Video feeds
 
-The app plays and controls the video in view in full-screen feeds ([Video controls](./site-runtime.md#video-controls)); the user switches the controls on in Settings. For a feed of a site the app does not know, the prompt (`VIDEO_FEEDS`, prompt version 4) tells the assistant to write one script rule that names the feed's paths, `document[Symbol.for("openmedia.feedPaths")] = ["^/path"]`, and to use ordinary `hide` rules for the rest of a feed's overlays. Because it uses `Symbol`, that script has powers in the policy's terms and cannot be shared.
+The app plays and controls the video in view in full-screen feeds ([Video controls](./site-runtime.md#video-controls)); the user can switch the tap controls off, or move them, in Settings or per favorite. For a feed of a site the app does not know, the prompt (`VIDEO_FEEDS`, prompt version 5) tells the assistant to write one script rule that names the feed's paths, `document[Symbol.for("openmedia.feedPaths")] = ["^/path"]`, and to use ordinary `hide` rules for the rest of a feed's overlays. Because it uses `Symbol`, that script has powers in the policy's terms and cannot be shared.
 
 ## Generate → preview → verify → accept
 

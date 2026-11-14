@@ -11,6 +11,7 @@ import { DownIcon, ForwardIcon, ProIcon, PlusIcon, StarIcon, UpIcon } from "../.
 import type { Favorite, FavoriteInput, SiteSettings } from "../../shared/ipc";
 import { SiteTile } from "../../shared/SiteTile";
 import { siteOf } from "../../shared/site";
+import { VIDEO_CONTROLS_DEFAULT } from "../../shared/videoControls";
 import { isIos } from "../../shared/platform";
 import { normalizeWebUrl } from "../../shared/url";
 import { useEntitlementStore } from "../paywall/store";
@@ -444,6 +445,7 @@ function FavoriteEditor({
       )}
       {playsInBackground && <BackgroundMedia url={url} />}
       {playsInBackground && isIos() && <PictureInPicture url={url} />}
+      {playsInBackground && <SiteVideoControls url={url} />}
       {(problem ?? hint) && (
         <p className={`text-sm ${problem ? "text-accent" : "text-paper/55"}`}>{problem ?? hint}</p>
       )}
@@ -517,6 +519,56 @@ function BackgroundMedia({ url }: { url: string }) {
         checked={enabled}
         onChange={(next) => void setSiteBackgroundMedia(site, next)}
       />
+    </div>
+  );
+}
+
+/**
+ * This site's own video controls: whether OpenMedia's tap panel replaces the site's, and how high
+ * it sits. A site with no choice follows the shared one in Settings. It saves at once, not with Save.
+ */
+function SiteVideoControls({ url }: { url: string }) {
+  const site = siteOf(url);
+  const shared = useApp((s) => s.state?.videoControls ?? VIDEO_CONTROLS_DEFAULT);
+  const own = useApp((s) => (site ? s.state?.videoSites[site] : undefined));
+  const setSiteVideoControls = useApp((s) => s.setSiteVideoControls);
+  const t = useT();
+  if (!site) return null;
+  const panel = own?.panel ?? shared.panel;
+  return (
+    <div className="flex flex-col gap-2">
+      <div className="-mx-4">
+        <Switch
+          label={t("favorites.videoControls")}
+          description={t("favorites.videoControlsNote")}
+          checked={panel}
+          onChange={(next) => void setSiteVideoControls(site, { ...own, panel: next })}
+        />
+      </div>
+      {panel && (
+        <>
+          <div className="text-sm font-medium">{t("favorites.videoHeight")}</div>
+          <p className="text-sm leading-snug text-paper/55">
+            {own?.height === undefined
+              ? t("favorites.videoHeightShared")
+              : t("favorites.videoHeightOwn")}
+          </p>
+          <MarginSlider
+            label={t("favorites.videoHeightLabel", { site })}
+            value={own?.height ?? shared.height}
+            onCommit={(pixels) => void setSiteVideoControls(site, { ...own, height: pixels })}
+          />
+        </>
+      )}
+      {own && (
+        <button
+          type="button"
+          onClick={() => void setSiteVideoControls(site, {})}
+          className={`self-start ${quietButton}`}
+        >
+          {t("favorites.videoUseShared")}
+        </button>
+      )}
     </div>
   );
 }

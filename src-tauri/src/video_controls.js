@@ -1,15 +1,20 @@
 (function (config) {
   'use strict';
-  // Controls for the video in view in a full-screen feed (YouTube Shorts, Reels, TikTok, or any
-  // page the feed player is told about): a seek bar with the time left, a speed button, the last
-  // speed and sound remembered between videos, looping switched off, and, when the reader asked
-  // for it, moving on to the next video when one ends. Each is a choice in Settings, off until
-  // chosen. It runs in the top frame, after the feed player, whose idea of "a feed page" and of
-  // "the video in view" it shares. It never clicks anything on the page: moving on scrolls.
+  // OpenMedia's controls for the video in view in a full-screen feed (YouTube Shorts, Reels,
+  // TikTok, or any page the feed player is told about). They stay hidden; a tap on the video
+  // shows a panel in place of the site's own tap: pause, back and forward 6 seconds, mute (and a
+  // volume bar where the engine lets a page set the volume), speed, and a seek bar with the time
+  // left. The reader can switch the panel off, or move it, for the whole app or for one site; with
+  // it off nothing here touches the page's own controls. Around it: the last speed and sound
+  // remembered between videos, looping switched off, and, when asked for, moving on to the next
+  // video when one ends. It runs in the top frame, after the feed player, whose idea of "a feed
+  // page" and of "the video in view" it shares. It never clicks anything on the page: moving on
+  // scrolls.
   var KEY = Symbol.for('openmedia.videoControls');
   var IS_FEED = Symbol.for('openmedia.isFeed');
   var CURRENT = Symbol.for('openmedia.currentVideo');
   var NO_AUTOPLAY = Symbol.for('openmedia.noAutoplay');
+  var USER_PAUSE = Symbol.for('openmedia.userPause');
   var STORE = 'openmedia.video';
   var RATES = [0.5, 1, 1.25, 1.5, 2];
   var TICK_MS = 100;
@@ -17,13 +22,16 @@
   var ADVANCE_GAP_MS = 1500;
   var WRAPPER_MAX = 1.5; // screens, as in the feed player
   var NEXT_GAP = 20; // px below the video in view that counts as the next one
-  var EDGE_GAP = 16; // px between the controls and the bottom edge, on top of the safe area
+  var DEFAULT_HEIGHT = 16; // px between the panel and the bottom edge, on top of the safe area
+  var SKIP_SECONDS = 6;
+  var HIDE_MS = 3500; // the panel goes away this long after the last touch on it
+  var SVG = 'http://www.w3.org/2000/svg';
+  var INTERACTIVE = 'a,button,input,textarea,select,summary,[role="button"],[role="link"],' +
+    '[role="slider"],[role="menuitem"],[role="tab"],[role="switch"],[contenteditable="true"]';
   try {
     if (window.top !== window) return;
     if (typeof document[KEY] === 'function') document[KEY]();
 
-    var wantsBar = !!config.seekBar;
-    var wantsSpeed = !!config.speed;
     var wantsSound = !!config.remember;
     var wantsLoopOff = !!(config.loopOff || config.autoAdvance);
     var wantsAdvance = !!config.autoAdvance;
@@ -36,6 +44,10 @@
     var lastAdvance = 0;
     var dragging = false;
     var ui = null;
+    var shown = false;
+    var hideTimer = 0;
+    var lastVideo = null;
+    var volumeSettable = null;
 
     function read() {
       try { return JSON.parse(localStorage.getItem(STORE) || '{}') || {}; } catch (_) { return {}; }
@@ -72,7 +84,7 @@
 
     function prefer(video) {
       var saved = read();
-      if (wantsSpeed && typeof saved.rate === 'number') {
+      if (panelOn() && typeof saved.rate === 'number') {
         try {
           video.defaultPlaybackRate = saved.rate;
           video.playbackRate = saved.rate;
@@ -144,33 +156,103 @@
       return minutes + ':' + (rest < 10 ? '0' : '') + rest;
     }
 
+    // What the reader chose for this site, if anything: the entry for the longest registrable
+    // domain the page's host belongs to.
+    function siteChoice() {
+      var host = ((window.location && window.location.hostname) || '').toLowerCase();
+      var sites = config.sites || {};
+      var best = null;
+      var length = -1;
+      Object.keys(sites).forEach(function (key) {
+        var inside = host === key || host.slice(-key.length - 1) === '.' + key;
+        if (inside && key.length > length) { best = sites[key]; length = key.length; }
+      });
+      return best || {};
+    }
+
+    function panelOn() {
+      var site = siteChoice();
+      return typeof site.panel === 'boolean' ? site.panel : !!config.panel;
+    }
+
+    function panelHeight() {
+      var site = siteChoice();
+      var height = typeof site.height === 'number' ? site.height : config.height;
+      return typeof height === 'number' ? height : DEFAULT_HEIGHT;
+    }
+
     function make(tag, css) {
       var element = document.createElement(tag);
       element.style.cssText = css;
       return element;
     }
 
-    // The controls: one row (time left, speed) above one thin bar, fixed to the bottom of the
-    // page. Everything is made here as plain elements and nothing is read back from the site.
-    function build() {
-      if (ui || (!wantsBar && !wantsSpeed)) return ui;
-      var parent = document.body || document.documentElement;
-      if (!parent) return null;
-      var root = make('div',
-        'position:fixed;left:0;right:0;bottom:calc(env(safe-area-inset-bottom,0px) + ' + EDGE_GAP + 'px);' +
-        'z-index:2147483646;display:none;' +
-        'pointer-events:none;font:600 13px/1 -apple-system,system-ui,sans-serif;color:#fff;' +
-        'text-shadow:0 1px 3px rgba(0,0,0,.7);-webkit-user-select:none;user-select:none');
-      root.setAttribute('data-openmedia-controls', '');
-      var row = make('div',
-        'display:flex;justify-content:space-between;align-items:center;padding:0 14px 2px');
-      var left = make('span', 'min-width:48px');
-      var pill = make('span',
-        'pointer-events:auto;padding:7px 12px;border-radius:999px;background:rgba(0,0,0,.55);' +
-        'touch-action:manipulation');
+    function icon(paths, extra) {
+      var svg = document.createElementNS(SVG, 'svg');
+      svg.setAttribute('viewBox', '0 0 24 24');
+      svg.setAttribute('width', '100%');
+      svg.setAttribute('height', '100%');
+      svg.setAttribute('fill', 'currentColor');
+      paths.forEach(function (definition) {
+        var path = document.createElementNS(SVG, 'path');
+        path.setAttribute('d', definition);
+        svg.appendChild(path);
+      });
+      if (extra) svg.appendChild(extra);
+      return svg;
+    }
+
+    function digit(text) {
+      var label = document.createElementNS(SVG, 'text');
+      label.setAttribute('x', '12');
+      label.setAttribute('y', '15.2');
+      label.setAttribute('text-anchor', 'middle');
+      label.setAttribute('font-size', '7');
+      label.setAttribute('font-weight', '700');
+      label.textContent = text;
+      return label;
+    }
+
+    var ICONS = {
+      play: ['M8 5v14l11-7z'],
+      pause: ['M6 5h4v14H6z', 'M14 5h4v14h-4z'],
+      back: ['M12 5V1L7 6l5 5V7a6 6 0 1 1-6 6H4a8 8 0 1 0 8-8z'],
+      forward: ['M12 5V1l5 5-5 5V7a6 6 0 1 0 6 6h2a8 8 0 1 1-8-8z'],
+      sound: ['M3 9v6h4l5 5V4L7 9H3z', 'M14 8.5a4.5 4.5 0 0 1 0 7z'],
+      muted: ['M3 9v6h4l5 5V4L7 9H3z', 'M14.5 9.4l1.4-1.4 2.1 2.1 2.1-2.1 1.4 1.4-2.1 2.1 2.1 2.1-1.4 1.4-2.1-2.1-2.1 2.1-1.4-1.4 2.1-2.1z']
+    };
+
+    function setIcon(button, name) {
+      if (button.__icon === name) return;
+      button.__icon = name;
+      button.textContent = '';
+      var extra = name === 'back' || name === 'forward' ? digit(String(SKIP_SECONDS)) : null;
+      button.appendChild(icon(ICONS[name], extra));
+    }
+
+    function button(size, name, action) {
+      var element = make('div',
+        'pointer-events:auto;display:flex;align-items:center;justify-content:center;' +
+        'width:' + size + 'px;height:' + size + 'px;color:#fff;border-radius:50%;' +
+        'touch-action:manipulation;cursor:pointer');
+      setIcon(element, name);
+      element.addEventListener('pointerdown', stop);
+      element.addEventListener('pointerup', function (event) {
+        stop(event);
+        var video = current();
+        lastTap = Date.now();
+        if (video) action(video);
+        keepAlive();
+        paint(current());
+      });
+      return element;
+    }
+
+    // A thin bar the reader drags along; `onRatio` gets where on it the finger is, 0 to 1.
+    function slider(height, onRatio) {
       var track = make('div',
-        'pointer-events:auto;height:30px;display:flex;align-items:flex-end;touch-action:none;' +
-        'padding:0 0 6px');
+        'pointer-events:auto;height:' + height + 'px;display:flex;align-items:center;' +
+        'touch-action:none;cursor:pointer');
       var line = make('div', 'position:relative;width:100%;height:4px;background:rgba(255,255,255,.35)');
       var fill = make('div', 'position:absolute;left:0;top:0;bottom:0;width:0;background:#fff');
       var knob = make('div',
@@ -179,13 +261,148 @@
       line.appendChild(fill);
       line.appendChild(knob);
       track.appendChild(line);
-      if (wantsBar) row.appendChild(left);
-      if (wantsSpeed) row.appendChild(pill);
-      root.appendChild(row);
-      if (wantsBar) root.appendChild(track);
+      var drag = false;
+      function at(event) {
+        var box = line.getBoundingClientRect();
+        onRatio(Math.min(1, Math.max(0, (event.clientX - box.left) / (box.width || 1))));
+      }
+      track.addEventListener('pointerdown', function (event) {
+        stop(event);
+        drag = true;
+        dragging = true;
+        try { track.setPointerCapture(event.pointerId); } catch (_) {}
+        at(event);
+        keepAlive();
+      });
+      track.addEventListener('pointermove', function (event) {
+        if (!drag) return;
+        stop(event);
+        at(event);
+        keepAlive();
+      });
+      var release = function (event) {
+        if (!drag) return;
+        stop(event);
+        drag = false;
+        dragging = false;
+      };
+      track.addEventListener('pointerup', release);
+      track.addEventListener('pointercancel', release);
+      return {
+        track: track,
+        line: line,
+        set: function (ratio) {
+          fill.style.width = ratio * 100 + '%';
+          knob.style.left = ratio * 100 + '%';
+        }
+      };
+    }
+
+    // Some engines (Mobile Safari) ignore a page setting the volume; no volume bar is shown there.
+    function canSetVolume(video) {
+      if (volumeSettable !== null) return volumeSettable;
+      try {
+        var before = video.volume;
+        var probe = before === 1 ? 0.5 : 1;
+        video.volume = probe;
+        volumeSettable = video.volume === probe;
+        video.volume = before;
+      } catch (_) {
+        volumeSettable = false;
+      }
+      return volumeSettable;
+    }
+
+    // The panel: three buttons above a row (mute, volume, time left, speed) above the seek bar,
+    // fixed above the bottom edge. Everything is made here as plain elements and nothing is read
+    // back from the site.
+    function build(video) {
+      if (ui) return ui;
+      var parent = document.body || document.documentElement;
+      if (!parent) return null;
+      var root = make('div',
+        'position:fixed;left:0;right:0;z-index:2147483646;display:none;pointer-events:none;' +
+        'font:600 13px/1 -apple-system,system-ui,sans-serif;color:#fff;' +
+        '-webkit-user-select:none;user-select:none');
+      root.setAttribute('data-openmedia-controls', '');
+      var card = make('div',
+        'margin:0 12px;padding:10px 14px 2px;border-radius:18px;background:rgba(0,0,0,.62);' +
+        '-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)');
+      var transport = make('div',
+        'display:flex;align-items:center;justify-content:center;gap:30px;padding-bottom:6px');
+      var back = button(40, 'back', function (target) {
+        target.currentTime = Math.max(0, target.currentTime - SKIP_SECONDS);
+      });
+      var toggle = button(56, 'pause', function (target) {
+        var feed = document[USER_PAUSE];
+        if (target.paused) {
+          if (typeof feed === 'function') feed(target, false);
+          try { target.play().catch(function () {}); } catch (_) {}
+        } else {
+          if (typeof feed === 'function') feed(target, true);
+          target.pause();
+        }
+      });
+      toggle.style.background = 'rgba(255,255,255,.18)';
+      var forward = button(40, 'forward', function (target) {
+        var end = isFinite(target.duration) && target.duration > 0 ? target.duration : Infinity;
+        target.currentTime = Math.min(end, target.currentTime + SKIP_SECONDS);
+      });
+      transport.appendChild(back);
+      transport.appendChild(toggle);
+      transport.appendChild(forward);
+      var row = make('div', 'display:flex;align-items:center;gap:10px;padding:2px 0');
+      var mute = button(32, 'sound', function (target) {
+        target.muted = !target.muted;
+        if (!target.muted && target.volume === 0) target.volume = 1;
+      });
+      var volume = canSetVolume(video) ? slider(32, function (ratio) {
+        var target = current();
+        if (!target) return;
+        lastTap = Date.now();
+        target.volume = ratio;
+        target.muted = ratio === 0;
+      }) : null;
+      if (volume) volume.track.style.cssText += ';width:84px';
+      var left = make('span', 'margin-left:auto;min-width:48px;text-align:right');
+      var pill = make('span',
+        'pointer-events:auto;padding:7px 12px;border-radius:999px;background:rgba(255,255,255,.18);' +
+        'touch-action:manipulation;cursor:pointer');
+      pill.addEventListener('pointerdown', stop);
+      pill.addEventListener('pointerup', function (event) {
+        stop(event);
+        var target = current();
+        var rate = target ? target.playbackRate : 1;
+        var next = RATES[(RATES.indexOf(rate) + 1) % RATES.length];
+        write({ rate: next });
+        if (target) {
+          target.defaultPlaybackRate = next;
+          target.playbackRate = next;
+        }
+        keepAlive();
+        paint(target);
+      });
+      row.appendChild(mute);
+      if (volume) row.appendChild(volume.track);
+      row.appendChild(left);
+      row.appendChild(pill);
+      var seek = slider(30, function (ratio) {
+        var target = current();
+        if (!target || !isFinite(target.duration) || !target.duration) return;
+        target.currentTime = ratio * target.duration;
+        paint(target);
+      });
+      card.appendChild(transport);
+      card.appendChild(row);
+      card.appendChild(seek.track);
+      root.appendChild(card);
+      ['click', 'touchstart', 'touchmove', 'touchend'].forEach(function (name) {
+        root.addEventListener(name, function (event) { event.stopPropagation(); });
+      });
       parent.appendChild(root);
-      ui = { root: root, left: left, pill: pill, track: track, fill: fill, knob: knob, line: line };
-      wire(ui);
+      ui = {
+        root: root, toggle: toggle, mute: mute, volume: volume, left: left, pill: pill, seek: seek
+      };
       return ui;
     }
 
@@ -194,59 +411,33 @@
       if (event.cancelable) event.preventDefault();
     }
 
-    function seekTo(event) {
-      var video = current();
-      if (!video || !isFinite(video.duration) || !video.duration) return;
-      var box = ui.line.getBoundingClientRect();
-      var ratio = Math.min(1, Math.max(0, (event.clientX - box.left) / (box.width || 1)));
-      video.currentTime = ratio * video.duration;
-      paint(video);
-    }
-
-    function wire(parts) {
-      parts.track.addEventListener('pointerdown', function (event) {
-        stop(event);
-        dragging = true;
-        try { parts.track.setPointerCapture(event.pointerId); } catch (_) {}
-        seekTo(event);
-      });
-      parts.track.addEventListener('pointermove', function (event) {
-        if (!dragging) return;
-        stop(event);
-        seekTo(event);
-      });
-      var release = function (event) {
-        if (!dragging) return;
-        stop(event);
-        dragging = false;
-      };
-      parts.track.addEventListener('pointerup', release);
-      parts.track.addEventListener('pointercancel', release);
-      parts.pill.addEventListener('pointerdown', stop);
-      parts.pill.addEventListener('pointerup', function (event) {
-        stop(event);
-        var video = current();
-        var rate = video ? video.playbackRate : 1;
-        var index = RATES.indexOf(rate);
-        var next = RATES[(index + 1) % RATES.length];
-        write({ rate: next });
-        if (video) {
-          video.defaultPlaybackRate = next;
-          video.playbackRate = next;
-        }
-        paint(video);
-      });
-    }
-
     function paint(video) {
-      if (!ui) return;
-      var known = video && isFinite(video.duration) && video.duration > 0;
-      var ratio = known ? Math.min(1, video.currentTime / video.duration) : 0;
-      ui.fill.style.width = ratio * 100 + '%';
-      ui.knob.style.left = ratio * 100 + '%';
+      if (!ui || !video) return;
+      var known = isFinite(video.duration) && video.duration > 0;
+      if (!dragging) ui.seek.set(known ? Math.min(1, video.currentTime / video.duration) : 0);
       ui.left.textContent = known ? '-' + clock(video.duration - video.currentTime) : '';
-      var rate = video ? video.playbackRate : 1;
+      var rate = video.playbackRate || 1;
       ui.pill.textContent = (Math.round(rate * 100) / 100) + '\u00d7';
+      setIcon(ui.toggle, video.paused ? 'play' : 'pause');
+      setIcon(ui.mute, video.muted || video.volume === 0 ? 'muted' : 'sound');
+      if (ui.volume) ui.volume.set(video.muted ? 0 : video.volume);
+    }
+
+    function hide() {
+      shown = false;
+      clearTimeout(hideTimer);
+      if (ui) ui.root.style.display = 'none';
+    }
+
+    // The panel goes away a few seconds after the last touch on it, but not off a paused video:
+    // there it is the way to start it again.
+    function keepAlive() {
+      clearTimeout(hideTimer);
+      hideTimer = setTimeout(function () {
+        var video = current();
+        if (video && video.paused) keepAlive();
+        else hide();
+      }, HIDE_MS);
     }
 
     function tick() {
@@ -254,15 +445,46 @@
       if (showing) {
         document.querySelectorAll('video').forEach(prepare);
       }
-      var video = showing ? current() : null;
-      if (!video) {
+      var video = showing && panelOn() ? current() : null;
+      if (video !== lastVideo) {
+        lastVideo = video;
+        if (shown) hide();
+      }
+      if (!video || !shown) {
         if (ui) ui.root.style.display = 'none';
         return;
       }
-      var parts = build();
+      var parts = build(video);
       if (!parts) return;
+      parts.root.style.bottom = 'calc(env(safe-area-inset-bottom,0px) + ' + panelHeight() + 'px)';
       parts.root.style.display = 'block';
-      if (!dragging) paint(video);
+      paint(video);
+    }
+
+    // A tap on the video, anywhere the site has not put a button of its own, shows or hides the
+    // panel and is kept from the site, whose own tap (pause, mute) the panel replaces. A swipe
+    // makes no click, so it still reaches the site untouched.
+    function onClick(event) {
+      if (!active() || !panelOn()) return;
+      var target = event.target;
+      if (target && target.closest && target.closest('[data-openmedia-controls]')) return;
+      var video = current();
+      if (!video) return;
+      if (target && target.closest && target.closest(INTERACTIVE)) return;
+      var box = boxOf(video);
+      var x = event.clientX;
+      var y = event.clientY;
+      if (!(x >= box.left && x <= box.right && y >= box.top && y <= box.bottom)) return;
+      event.stopImmediatePropagation();
+      if (event.cancelable) event.preventDefault();
+      if (shown) {
+        hide();
+        return;
+      }
+      lastVideo = video;
+      shown = true;
+      keepAlive();
+      tick();
     }
 
     function tapped() { lastTap = Date.now(); }
@@ -274,6 +496,7 @@
 
     on(document, 'touchend', tapped, { capture: true, passive: true });
     on(document, 'click', tapped, { capture: true, passive: true });
+    on(window, 'click', onClick, { capture: true });
     on(document, 'keydown', tapped, { capture: true, passive: true });
     // A new source is a new video: it gets the remembered speed and sound, once it has started.
     on(document, 'loadstart', function (event) {
@@ -312,6 +535,7 @@
       configurable: true,
       value: function () {
         clearInterval(timer);
+        clearTimeout(hideTimer);
         observers.forEach(function (observer) { observer.disconnect(); });
         teardown.forEach(function (step) { try { step(); } catch (_) {} });
         if (ui && ui.root.parentNode) ui.root.parentNode.removeChild(ui.root);

@@ -17,7 +17,7 @@ use crate::accessibility::Accessibility;
 use crate::ai::{AiSettings, MAX_PROVIDERS, ProviderConfig, ProviderInput};
 use crate::error::{Error, Result};
 use crate::recipes::{OptionChoices, OptionValue};
-use crate::video_controls::VideoControls;
+use crate::video_controls::{MAX_HEIGHT as MAX_VIDEO_HEIGHT, SiteVideo, VideoControls};
 use tauri_plugin_siteview::site::site_of_host;
 
 const FORMAT_VERSION: u32 = 4;
@@ -153,6 +153,8 @@ pub struct AppState {
     pub search_engine: SearchEngine,
     pub accessibility: Accessibility,
     pub video_controls: VideoControls,
+    /// What the user chose for one site's video controls, by registrable domain.
+    pub video_sites: BTreeMap<String, SiteVideo>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -222,9 +224,13 @@ struct LibraryData {
     /// Epilepsy protection and the reading aids for dyslexia; all off until chosen.
     #[serde(default)]
     accessibility: Accessibility,
-    /// The controls for full-screen video feeds; all off until chosen.
+    /// The controls for full-screen video feeds: the panel on a tap is on until switched off.
     #[serde(default)]
     video_controls: VideoControls,
+    /// Per-site video controls choices by registrable domain; a site without an entry follows
+    /// `video_controls`.
+    #[serde(default)]
+    video_sites: BTreeMap<String, SiteVideo>,
 }
 
 /// The user's favorites, page, theme and provider settings, persisted as one JSON file. Holds no
@@ -289,6 +295,7 @@ impl Library {
             search_engine: data.search_engine,
             accessibility: data.accessibility,
             video_controls: data.video_controls,
+            video_sites: data.video_sites.clone(),
         })
     }
 
@@ -542,8 +549,29 @@ impl Library {
     }
 
     pub fn set_video_controls(&self, video_controls: VideoControls) -> Result<()> {
+        checked_video_height(video_controls.height)?;
         let mut data = self.lock()?;
         data.video_controls = video_controls;
+        self.save(&data)
+    }
+
+    pub fn video_sites(&self) -> Result<BTreeMap<String, SiteVideo>> {
+        Ok(self.lock()?.video_sites.clone())
+    }
+
+    /// Saves what the user chose for one site's video controls; a choice with nothing in it
+    /// returns the site to the shared one.
+    pub fn set_site_video(&self, site: &str, video: SiteVideo) -> Result<()> {
+        let site = checked_site(site)?;
+        if let Some(height) = video.height {
+            checked_video_height(height)?;
+        }
+        let mut data = self.lock()?;
+        if video.is_empty() {
+            data.video_sites.remove(&site);
+        } else {
+            data.video_sites.insert(site, video);
+        }
         self.save(&data)
     }
 
@@ -691,6 +719,13 @@ fn checked_margin(pixels: u32) -> Result<u32> {
     Ok(pixels)
 }
 
+fn checked_video_height(pixels: u32) -> Result<()> {
+    if pixels > MAX_VIDEO_HEIGHT {
+        return Err(Error::InvalidMargin(MAX_VIDEO_HEIGHT));
+    }
+    Ok(())
+}
+
 /// A site as a registrable domain: letters, digits, dots and hyphens only, as the shell sends it.
 fn checked_site(site: &str) -> Result<String> {
     let site = site.trim().to_ascii_lowercase();
@@ -832,6 +867,7 @@ fn default_data() -> LibraryData {
         search_engine: SearchEngine::Google,
         accessibility: Accessibility::default(),
         video_controls: VideoControls::default(),
+        video_sites: BTreeMap::new(),
         incognito_site_options: OptionChoices::new(),
         incognito_favorites: None,
     }
@@ -1239,29 +1275,38 @@ mod tests {
     }
 
     #[test]
-    fn video_controls_are_off_by_default_and_the_choices_persist() {
+    fn the_video_panel_is_on_by_default_and_the_choices_persist() {
         let (dir, library) = library();
         assert_eq!(
             library.state().unwrap().video_controls,
             VideoControls::default()
         );
+        assert!(library.state().unwrap().video_controls.panel);
         let chosen = VideoControls {
-            seek_bar: true,
-            speed: true,
+            panel: false,
+            height: 40,
             auto_advance: true,
             ..VideoControls::default()
         };
         library.set_video_controls(chosen).unwrap();
         assert_eq!(library.video_controls().unwrap(), chosen);
         assert_eq!(reload(&dir).state().unwrap().video_controls, chosen);
+        assert!(
+            library
+                .set_video_controls(VideoControls {
+                    height: 201,
+                    ..VideoControls::default()
+                })
+                .is_err()
+        );
     }
 
     #[test]
-    fn a_library_saved_before_video_controls_existed_loads_with_them_off() {
+    fn a_library_saved_before_video_controls_existed_loads_with_the_defaults() {
         let (dir, library) = library();
         library
             .set_video_controls(VideoControls {
-                speed: true,
+                panel: false,
                 ..VideoControls::default()
             })
             .unwrap();
@@ -1281,6 +1326,34 @@ mod tests {
             reload(&dir).state().unwrap().video_controls,
             VideoControls::default()
         );
+    }
+
+    #[test]
+    fn a_site_keeps_its_own_video_choice_until_it_has_none() {
+        let (dir, library) = library();
+        assert!(library.state().unwrap().video_sites.is_empty());
+        let own = SiteVideo {
+            panel: Some(false),
+            height: Some(48),
+        };
+        library.set_site_video("YouTube.com", own).unwrap();
+        assert_eq!(reload(&dir).video_sites().unwrap()["youtube.com"], own);
+        assert!(
+            library
+                .set_site_video(
+                    "youtube.com",
+                    SiteVideo {
+                        height: Some(201),
+                        panel: None
+                    }
+                )
+                .is_err()
+        );
+        assert!(library.set_site_video("https://a.example/", own).is_err());
+        library
+            .set_site_video("youtube.com", SiteVideo::default())
+            .unwrap();
+        assert!(reload(&dir).video_sites().unwrap().is_empty());
     }
 
     #[test]

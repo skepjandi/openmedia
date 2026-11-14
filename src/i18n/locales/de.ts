@@ -209,12 +209,14 @@ export const de: Messages = {
   "settings.epilepsyProtectionNote":
     "Stoppt Animationen, automatisch startende Videos und animierte GIFs in der App und auf Seiten. Blitzen in einem selbst gestarteten Video kann nicht erkannt werden.",
   "settings.videoControls": "Videosteuerung",
-  "settings.videoControlsNote":
-    "Für Vollbild-Videofeeds wie Shorts und Reels. Jede Option bleibt aus, bis du sie einschaltest.",
-  "settings.videoSeekBar": "Suchleiste",
-  "settings.videoSeekBarNote": "Eine Leiste zum Ziehen, mit der verbleibenden Zeit.",
-  "settings.videoSpeed": "Tempo-Taste",
-  "settings.videoSpeedNote": "Tippen, um 0.5×, 1×, 1.25×, 1.5× und 2× durchzuschalten.",
+  "settings.videoControlsNote": "Für Vollbild-Videofeeds wie Shorts und Reels.",
+  "settings.videoPanel": "Steuerung beim Tippen",
+  "settings.videoPanelNote":
+    "Tippe auf ein Video, um Pause, 6 Sekunden zurück und vor, Stummschaltung, Tempo und eine Suchleiste zu zeigen, statt des eigenen Tippens der Website. Ein Favorit kann das ausschalten, um die Steuerung der Website zurückzubekommen.",
+  "settings.videoHeight": "Höhe der Steuerung",
+  "settings.videoHeightNote":
+    "Wie weit über dem unteren Rand die Steuerung sitzt. Ein Favorit kann eine eigene festlegen.",
+  "settings.videoHeightLabel": "Höhe der Videosteuerung",
   "settings.videoRemember": "Tempo und Ton merken",
   "settings.videoRememberNote":
     "Das nächste Video startet mit dem zuletzt gewählten Tempo und der Lautstärke.",
@@ -329,6 +331,15 @@ export const de: Messages = {
   "recipes.hubNote":
     "Ein Hub öffnet mehrere Websites auf einmal. Jede Seite ist eine eigene Website mit eigenen Cookies.",
   "favorites.bottomMargin": "Unterer Rand",
+  "favorites.videoControls": "OpenMedia-Videosteuerung",
+  "favorites.videoControlsNote":
+    "Tippe auf ein Video, um die Steuerung von OpenMedia zu zeigen. Aus gibt die der Website zurück.",
+  "favorites.videoHeight": "Höhe der Videosteuerung",
+  "favorites.videoHeightShared":
+    "Verwendet die gemeinsame Höhe. Verschiebe den Regler, um dieser Website eine eigene zu geben.",
+  "favorites.videoHeightOwn": "Diese Website hat eine eigene Höhe.",
+  "favorites.videoHeightLabel": "Höhe der Videosteuerung für {site}",
+  "favorites.videoUseShared": "Die gemeinsamen Videoeinstellungen verwenden",
   "recipes.sharedMargin":
     "Verwendet den gemeinsamen Rand. Verschiebe den Regler, um dieser Website einen eigenen zu geben.",
   "recipes.ownMargin": "Diese Website hat einen eigenen unteren Rand.",

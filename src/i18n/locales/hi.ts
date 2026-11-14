@@ -209,12 +209,14 @@ export const hi: Messages = {
   "settings.epilepsyProtectionNote":
     "ऐप और पेजों में एनिमेशन, अपने-आप चलने वाले वीडियो और एनिमेटेड GIF रोक देता है। आपके खुद शुरू किए वीडियो में चमक का पता नहीं लगा सकता।",
   "settings.videoControls": "वीडियो नियंत्रण",
-  "settings.videoControlsNote":
-    "Shorts और Reels जैसी फ़ुल-स्क्रीन वीडियो फ़ीड के लिए। हर विकल्प तब तक बंद रहता है जब तक आप उसे चालू न करें।",
-  "settings.videoSeekBar": "सीक बार",
-  "settings.videoSeekBarNote": "खींचने के लिए एक बार, जिसमें बचा हुआ समय दिखता है।",
-  "settings.videoSpeed": "स्पीड बटन",
-  "settings.videoSpeedNote": "0.5×, 1×, 1.25×, 1.5× और 2× के बीच बदलने के लिए टैप करें।",
+  "settings.videoControlsNote": "Shorts और Reels जैसी फ़ुल-स्क्रीन वीडियो फ़ीड के लिए।",
+  "settings.videoPanel": "टैप पर नियंत्रण",
+  "settings.videoPanelNote":
+    "किसी वीडियो पर टैप करें तो साइट के अपने टैप की जगह रोकना, 6 सेकंड पीछे और आगे, म्यूट, स्पीड और सीक बार दिखते हैं। पसंदीदा में इसे बंद करके साइट के अपने नियंत्रण वापस पाए जा सकते हैं।",
+  "settings.videoHeight": "नियंत्रण की ऊँचाई",
+  "settings.videoHeightNote":
+    "नियंत्रण निचले किनारे से कितना ऊपर रहें। पसंदीदा अपनी अलग ऊँचाई रख सकता है।",
+  "settings.videoHeightLabel": "वीडियो नियंत्रण की ऊँचाई",
   "settings.videoRemember": "स्पीड और आवाज़ याद रखें",
   "settings.videoRememberNote": "अगला वीडियो आपकी पिछली चुनी हुई स्पीड और वॉल्यूम पर शुरू होता है।",
   "settings.videoLoopOff": "वीडियो को दोबारा चलने से रोकें",
@@ -322,6 +324,15 @@ export const hi: Messages = {
   "recipes.openHubPage": "{label} खोलें",
   "recipes.hubNote": "हब एक साथ कई साइट खोलता है। हर पेज अपनी अलग साइट है, अपने कुकीज़ के साथ।",
   "favorites.bottomMargin": "निचली मार्जिन",
+  "favorites.videoControls": "OpenMedia वीडियो नियंत्रण",
+  "favorites.videoControlsNote":
+    "वीडियो पर टैप करने से OpenMedia के नियंत्रण दिखते हैं। बंद करने पर साइट के अपने नियंत्रण वापस आ जाते हैं।",
+  "favorites.videoHeight": "वीडियो नियंत्रण की ऊँचाई",
+  "favorites.videoHeightShared":
+    "साझा ऊँचाई का उपयोग हो रहा है। इस साइट को अलग ऊँचाई देने के लिए स्लाइडर हिलाएँ।",
+  "favorites.videoHeightOwn": "इस साइट की अपनी ऊँचाई है।",
+  "favorites.videoHeightLabel": "{site} के वीडियो नियंत्रण की ऊँचाई",
+  "favorites.videoUseShared": "साझा वीडियो सेटिंग इस्तेमाल करें",
   "recipes.sharedMargin":
     "साझा निचली मार्जिन का उपयोग हो रहा है। इस साइट को अलग मार्जिन देने के लिए स्लाइडर हिलाएँ।",
   "recipes.ownMargin": "इस साइट की अपनी निचली मार्जिन है।",

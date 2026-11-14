@@ -1,12 +1,13 @@
 import { useApp } from "../../app/store";
 import { useT } from "../../i18n/useT";
-import { VIDEO_CONTROLS_OFF } from "../../shared/videoControls";
+import { VIDEO_CONTROLS_DEFAULT } from "../../shared/videoControls";
+import { MarginSlider } from "./MarginSlider";
 import { Switch } from "./Switch";
 import { Group, Section } from "./ui";
 
 /** The controls for the video in view in a full-screen feed: Shorts, Reels and the like. */
 export function VideoControlsSection() {
-  const controls = useApp((s) => s.state?.videoControls ?? VIDEO_CONTROLS_OFF);
+  const controls = useApp((s) => s.state?.videoControls ?? VIDEO_CONTROLS_DEFAULT);
   const setVideoControls = useApp((s) => s.setVideoControls);
   const t = useT();
 
@@ -14,17 +15,22 @@ export function VideoControlsSection() {
     <Section title={t("settings.videoControls")} note={t("settings.videoControlsNote")}>
       <Group>
         <Switch
-          label={t("settings.videoSeekBar")}
-          description={t("settings.videoSeekBarNote")}
-          checked={controls.seekBar}
-          onChange={(on) => void setVideoControls({ seekBar: on })}
+          label={t("settings.videoPanel")}
+          description={t("settings.videoPanelNote")}
+          checked={controls.panel}
+          onChange={(on) => void setVideoControls({ panel: on })}
         />
-        <Switch
-          label={t("settings.videoSpeed")}
-          description={t("settings.videoSpeedNote")}
-          checked={controls.speed}
-          onChange={(on) => void setVideoControls({ speed: on })}
-        />
+        {controls.panel && (
+          <div className="flex flex-col gap-2 px-4 py-3">
+            <div className="text-base">{t("settings.videoHeight")}</div>
+            <p className="text-sm leading-snug text-paper/55">{t("settings.videoHeightNote")}</p>
+            <MarginSlider
+              label={t("settings.videoHeightLabel")}
+              value={controls.height}
+              onCommit={(pixels) => void setVideoControls({ height: pixels })}
+            />
+          </div>
+        )}
         <Switch
           label={t("settings.videoRemember")}
           description={t("settings.videoRememberNote")}

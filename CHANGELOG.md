@@ -6,6 +6,16 @@ All notable changes to OpenMedia are documented here.
 >
 > **Wiki**: the [GitHub Wiki](https://github.com/skepjandi/openmedia/wiki) is the public-facing main wiki — architecture, recipe format, AI pipeline, security model, roadmap. Source-controlled editing surface is `docs/wiki/` in this repo; CI (`.github/workflows/sync-wiki.yml`) mirrors it to the GitHub Wiki on every merge to `main`. New single-PR changes belong here, not as new wiki pages.
 
+### feat(siteview): tap a video for OpenMedia's own controls, with a height per favorite
+
+**Area:** `feat(siteview)`
+
+**Change:** In full-screen feeds (Shorts, Reels, TikTok) the controls are hidden until the video is tapped. A tap now shows OpenMedia's panel in place of the site's own tap: pause and play, back and forward 6 seconds, mute (with a volume bar where the engine lets a page set the volume; not on iPhone), speed, the time left and a seek bar. It goes away after a few seconds, but stays on a paused video. A tap on a button of the site's own is left to the site. The panel is on by default; Settings > Video controls can turn it off and sets how high it sits (16 px by default). Each favorite's edit form has the same two choices for that site alone: turn the panel off to get the site's own controls back, or give it its own height. The old always-visible seek bar and speed button switches are gone (their choices are not kept; the panel has both). The page script gets the per-site choices by registrable domain, so no site is named in the engine. A double tap to like no longer reaches a site while the panel is on there; turn the panel off for that favorite to get it back.
+
+**Verified:** Vitest (`videoControls.test.ts`, `feedPlayer.test.ts`, the i18n catalog), `cargo test --lib`, clippy, ESLint, `tsc`; on the iOS 26.5 simulator and an Android API 36 emulator on YouTube Shorts: the panel shows on a tap and the site's own tap is kept from the site, pause, play, skip, mute and speed work, it hides after a few seconds and on a second tap, a per-site height moves it, a per-site off gives the site's own controls back, and the Settings and favorite forms save to `library.json`. **Not verified:** a physical device; Instagram, Reels and TikTok (no account); the volume bar on a real iPhone (the engine ignores a page's volume there, so it is left out; the simulator allows it); the translations are machine-made.
+
+**PR:** n/a
+
 ### fix(siteview): the seek bar sits clear of the bottom edge
 
 **Area:** `fix(siteview)`

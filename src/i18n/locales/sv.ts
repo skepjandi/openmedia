@@ -212,12 +212,14 @@ export const sv: Messages = {
   "settings.epilepsyProtectionNote":
     "Stoppar animationer, automatiskt spelande video och animerade GIF-filer i appen och på sidor. Det kan inte upptäcka blinkningar i en video du startar själv.",
   "settings.videoControls": "Videokontroller",
-  "settings.videoControlsNote":
-    "För helskärmsflöden med video som Shorts och Reels. Varje funktion förblir avstängd tills du slår på den.",
-  "settings.videoSeekBar": "Sökfält",
-  "settings.videoSeekBarNote": "Ett fält att dra i, med återstående tid.",
-  "settings.videoSpeed": "Hastighetsknapp",
-  "settings.videoSpeedNote": "Tryck för att stega mellan 0.5×, 1×, 1.25×, 1.5× och 2×.",
+  "settings.videoControlsNote": "För helskärmsflöden med video som Shorts och Reels.",
+  "settings.videoPanel": "Kontroller vid tryck",
+  "settings.videoPanelNote":
+    "Tryck på en video för att visa paus, 6 sekunder bakåt och framåt, ljud av, hastighet och ett sökfält, i stället för webbplatsens eget tryck. En favorit kan stänga av detta för att få tillbaka webbplatsens egna kontroller.",
+  "settings.videoHeight": "Kontrollernas höjd",
+  "settings.videoHeightNote":
+    "Hur högt över nedre kanten kontrollerna sitter. En favorit kan ha en egen.",
+  "settings.videoHeightLabel": "Videokontrollernas höjd",
   "settings.videoRemember": "Kom ihåg hastighet och ljud",
   "settings.videoRememberNote": "Nästa video startar med den hastighet och volym du valde senast.",
   "settings.videoLoopOff": "Sluta loopa videor",
@@ -330,6 +332,15 @@ export const sv: Messages = {
   "recipes.hubNote":
     "En hubb öppnar flera webbplatser samtidigt. Varje sida är en egen webbplats med egna cookies.",
   "favorites.bottomMargin": "Nedre marginal",
+  "favorites.videoControls": "OpenMedias videokontroller",
+  "favorites.videoControlsNote":
+    "Tryck på en video för att visa OpenMedias kontroller. Av ger tillbaka webbplatsens egna.",
+  "favorites.videoHeight": "Videokontrollernas höjd",
+  "favorites.videoHeightShared":
+    "Använder den delade höjden. Flytta reglaget för att ge den här webbplatsen en egen.",
+  "favorites.videoHeightOwn": "Den här webbplatsen har en egen höjd.",
+  "favorites.videoHeightLabel": "Videokontrollernas höjd för {site}",
+  "favorites.videoUseShared": "Använd de delade videoinställningarna",
   "recipes.sharedMargin":
     "Använder den delade marginalen. Flytta reglaget för att ge den här webbplatsen en egen.",
   "recipes.ownMargin": "Den här webbplatsen har en egen marginal.",

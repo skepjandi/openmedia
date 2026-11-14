@@ -210,12 +210,14 @@ export const ms: Messages = {
   "settings.epilepsyProtectionNote":
     "Menghentikan animasi, video main automatik dan GIF beranimasi dalam aplikasi dan pada laman. Tidak dapat mengesan kelipan dalam video yang anda mulakan sendiri.",
   "settings.videoControls": "Kawalan video",
-  "settings.videoControlsNote":
-    "Untuk suapan video skrin penuh seperti Shorts dan Reels. Setiap satu kekal mati sehingga anda menghidupkannya.",
-  "settings.videoSeekBar": "Bar carian",
-  "settings.videoSeekBarNote": "Bar untuk diseret, dengan masa yang berbaki.",
-  "settings.videoSpeed": "Butang kelajuan",
-  "settings.videoSpeedNote": "Ketik untuk beralih antara 0.5×, 1×, 1.25×, 1.5× dan 2×.",
+  "settings.videoControlsNote": "Untuk suapan video skrin penuh seperti Shorts dan Reels.",
+  "settings.videoPanel": "Kawalan semasa diketik",
+  "settings.videoPanelNote":
+    "Ketik video untuk memaparkan jeda, ke belakang dan ke hadapan 6 saat, senyap, kelajuan dan bar carian, menggantikan ketikan asal laman. Kegemaran boleh mematikannya untuk mendapatkan semula kawalan asal laman.",
+  "settings.videoHeight": "Ketinggian kawalan",
+  "settings.videoHeightNote":
+    "Sejauh mana kawalan berada di atas tepi bawah. Kegemaran boleh menetapkan ketinggiannya sendiri.",
+  "settings.videoHeightLabel": "Ketinggian kawalan video",
   "settings.videoRemember": "Ingat kelajuan dan bunyi",
   "settings.videoRememberNote":
     "Video seterusnya bermula pada kelajuan dan kelantangan yang anda pilih kali terakhir.",
@@ -327,6 +329,15 @@ export const ms: Messages = {
   "recipes.hubNote":
     "Hab membuka beberapa laman sekali gus. Setiap halaman ialah laman sendiri, dengan cookie sendiri.",
   "favorites.bottomMargin": "Margin bawah",
+  "favorites.videoControls": "Kawalan video OpenMedia",
+  "favorites.videoControlsNote":
+    "Ketik video untuk memaparkan kawalan OpenMedia. Jika dimatikan, kawalan asal laman kembali.",
+  "favorites.videoHeight": "Ketinggian kawalan video",
+  "favorites.videoHeightShared":
+    "Guna ketinggian bersama. Leret peluncur untuk memberi laman ini ketinggian sendiri.",
+  "favorites.videoHeightOwn": "Laman ini mempunyai ketinggian sendiri.",
+  "favorites.videoHeightLabel": "Ketinggian kawalan video {site}",
+  "favorites.videoUseShared": "Guna tetapan video bersama",
   "recipes.sharedMargin":
     "Guna margin bersama. Leret peluncur untuk memberi laman ini margin sendiri.",
   "recipes.ownMargin": "Laman ini mempunyai margin sendiri.",

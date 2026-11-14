@@ -207,12 +207,14 @@ export const si: Messages = {
   "settings.epilepsyProtectionNote":
     "යෙදුමේ සහ පිටුවල සජීවීකරණ, ස්වයංක්‍රීයව ධාවනය වන වීඩියෝ සහ සජීවී GIF නවත්වයි. ඔබම ආරම්භ කරන වීඩියෝවක සැණෙළි හඳුනාගත නොහැක.",
   "settings.videoControls": "වීඩියෝ පාලන",
-  "settings.videoControlsNote":
-    "Shorts සහ Reels වැනි සම්පූර්ණ තිර වීඩියෝ ප්‍රවාහ සඳහා. ඔබ ක්‍රියාත්මක කරන තුරු සියල්ල අක්‍රියව පවතී.",
-  "settings.videoSeekBar": "සෙවුම් තීරුව",
-  "settings.videoSeekBarNote": "ඇදගෙන යා හැකි තීරුවක්, ඉතිරි කාලය සමඟ.",
-  "settings.videoSpeed": "වේග බොත්තම",
-  "settings.videoSpeedNote": "0.5×, 1×, 1.25×, 1.5× සහ 2× හරහා මාරු වීමට ස්පර්ශ කරන්න.",
+  "settings.videoControlsNote": "Shorts සහ Reels වැනි සම්පූර්ණ තිර වීඩියෝ ප්‍රවාහ සඳහා.",
+  "settings.videoPanel": "ස්පර්ශයෙන් පාලන",
+  "settings.videoPanelNote":
+    "විරාමය, තත්පර 6ක් ආපසු සහ ඉදිරියට, නිශ්ශබ්ද කිරීම, වේගය සහ සෙවුම් තීරුවක් පෙන්වීමට අඩවියේම ස්පර්ශය වෙනුවට වීඩියෝවක් ස්පර්ශ කරන්න. ප්‍රියතමයකට මෙය අක්‍රිය කර අඩවියේම පාලන නැවත ලබාගත හැක.",
+  "settings.videoHeight": "පාලන උස",
+  "settings.videoHeightNote":
+    "පාලන පහළ දාරයට ඉහළින් කොපමණ දුරින් තබන්නේද යන්න. ප්‍රියතමයකට තමන්ගේම එකක් සැකසිය හැක.",
+  "settings.videoHeightLabel": "වීඩියෝ පාලන උස",
   "settings.videoRemember": "වේගය සහ ශබ්දය මතක තබාගන්න",
   "settings.videoRememberNote":
     "ඊළඟ වීඩියෝව ඔබ අවසන් වරට තෝරාගත් වේගයෙන් සහ ශබ්ද මට්ටමෙන් ආරම්භ වේ.",
@@ -324,6 +326,15 @@ export const si: Messages = {
   "recipes.hubNote":
     "හබ් එකවර බහ සටහන් විවෘත කරයි. හැම පිටුවක්ම එකම සටහනක් පරිදි එයි, එහි පුනර්ය කුකීස් සමඟ.",
   "favorites.bottomMargin": "පහළ දුරස්ථය",
+  "favorites.videoControls": "OpenMedia වීඩියෝ පාලන",
+  "favorites.videoControlsNote":
+    "OpenMedia පාලන පෙන්වීමට වීඩියෝවක් ස්පර්ශ කරන්න. අක්‍රිය කළ විට අඩවියේම පාලන නැවත ලැබේ.",
+  "favorites.videoHeight": "වීඩියෝ පාලන උස",
+  "favorites.videoHeightShared":
+    "මූලික උස භාවිතයෙන්. මෙම අඩවියට එකම උසක් ලබා දීමට ස්ලයිඩරය ගමන් කරන්න.",
+  "favorites.videoHeightOwn": "මෙම අඩවියට එකම උසක් ඇත.",
+  "favorites.videoHeightLabel": "{site} වීඩියෝ පාලන උස",
+  "favorites.videoUseShared": "මූලික වීඩියෝ සැකසුම් භාවිතය කරන්න",
   "recipes.sharedMargin":
     "මූලික දුරස්ථය භාවිතයෙන්. මෙම අඩවියට එකම දුරස්ථයක් ලබා දීමට ස්ලයිඩරය ගමන් කරන්න.",
   "recipes.ownMargin": "මෙම අඩවියට එකම දුරස්ථයක් ඇත.",

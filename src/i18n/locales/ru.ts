@@ -215,12 +215,14 @@ export const ru: Messages = {
   "settings.epilepsyProtectionNote":
     "Останавливает анимацию, автовоспроизведение видео и анимированные GIF в приложении и на страницах. Не может обнаружить вспышки в видео, которое вы запускаете сами.",
   "settings.videoControls": "Управление видео",
-  "settings.videoControlsNote":
-    "Для полноэкранных видеолент, таких как Shorts и Reels. Каждая функция выключена, пока вы её не включите.",
-  "settings.videoSeekBar": "Полоса перемотки",
-  "settings.videoSeekBarNote": "Полоса, которую можно перетаскивать, с оставшимся временем.",
-  "settings.videoSpeed": "Кнопка скорости",
-  "settings.videoSpeedNote": "Нажимайте, чтобы переключать 0.5×, 1×, 1.25×, 1.5× и 2×.",
+  "settings.videoControlsNote": "Для полноэкранных видеолент, таких как Shorts и Reels.",
+  "settings.videoPanel": "Управление по нажатию",
+  "settings.videoPanelNote":
+    "Нажмите на видео, чтобы показать паузу, перемотку на 6 секунд назад и вперёд, отключение звука, скорость и полосу перемотки вместо собственного нажатия сайта. В избранном это можно выключить, чтобы вернуть управление сайта.",
+  "settings.videoHeight": "Высота управления",
+  "settings.videoHeightNote":
+    "Насколько высоко над нижним краем находится управление. В избранном можно задать свою.",
+  "settings.videoHeightLabel": "Высота управления видео",
   "settings.videoRemember": "Запоминать скорость и звук",
   "settings.videoRememberNote":
     "Следующее видео начнётся с последней выбранной скорости и громкости.",
@@ -332,6 +334,15 @@ export const ru: Messages = {
   "recipes.hubNote":
     "Хаб открывает несколько сайтов сразу. Каждая страница — отдельный сайт со своими cookie.",
   "favorites.bottomMargin": "Нижнее поле",
+  "favorites.videoControls": "Управление видео OpenMedia",
+  "favorites.videoControlsNote":
+    "Нажмите на видео, чтобы показать управление OpenMedia. Если выключено, возвращается управление самого сайта.",
+  "favorites.videoHeight": "Высота управления видео",
+  "favorites.videoHeightShared":
+    "Использует общую высоту. Сдвиньте ползунок, чтобы дать этому сайту свою.",
+  "favorites.videoHeightOwn": "У этого сайта своя высота.",
+  "favorites.videoHeightLabel": "Высота управления видео для {site}",
+  "favorites.videoUseShared": "Использовать общие настройки видео",
   "recipes.sharedMargin": "Использует общее поле. Сдвиньте ползунок, чтобы дать этому сайту своё.",
   "recipes.ownMargin": "У этого сайта своё нижнее поле.",
   "recipes.siteMarginLabel": "Нижнее поле для {name}",

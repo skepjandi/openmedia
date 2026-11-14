@@ -215,12 +215,14 @@ export const uk: Messages = {
   "settings.epilepsyProtectionNote":
     "Зупиняє анімацію, автовідтворення відео й анімовані GIF у застосунку та на сторінках. Не може виявити спалахи у відео, яке ви запускаєте самі.",
   "settings.videoControls": "Керування відео",
-  "settings.videoControlsNote":
-    "Для повноекранних відеострічок, як-от Shorts і Reels. Кожна функція вимкнена, доки ви її не ввімкнете.",
-  "settings.videoSeekBar": "Смуга перемотування",
-  "settings.videoSeekBarNote": "Смуга, яку можна перетягувати, із часом, що залишився.",
-  "settings.videoSpeed": "Кнопка швидкості",
-  "settings.videoSpeedNote": "Торкайтеся, щоб перемикати 0.5×, 1×, 1.25×, 1.5× і 2×.",
+  "settings.videoControlsNote": "Для повноекранних відеострічок, як-от Shorts і Reels.",
+  "settings.videoPanel": "Керування дотиком",
+  "settings.videoPanelNote":
+    "Торкніться відео, щоб показати паузу, перемотування на 6 секунд назад і вперед, вимкнення звуку, швидкість і смугу перемотування замість власного дотику сайту. Улюблений сайт може це вимкнути, щоб повернути власне керування сайту.",
+  "settings.videoHeight": "Висота керування",
+  "settings.videoHeightNote":
+    "На якій відстані від нижнього краю розташоване керування. Улюблений сайт може мати власну.",
+  "settings.videoHeightLabel": "Висота керування відео",
   "settings.videoRemember": "Запам’ятовувати швидкість і звук",
   "settings.videoRememberNote":
     "Наступне відео почнеться з останньої обраної швидкості та гучності.",
@@ -332,6 +334,15 @@ export const uk: Messages = {
   "recipes.hubNote":
     "Хаб відкриває кілька сайтів одразу. Кожна сторінка — окремий сайт із власними cookie.",
   "favorites.bottomMargin": "Нижнє поле",
+  "favorites.videoControls": "Керування відео OpenMedia",
+  "favorites.videoControlsNote":
+    "Торкніться відео, щоб показати керування OpenMedia. Якщо вимкнено, повертається власне керування сайту.",
+  "favorites.videoHeight": "Висота керування відео",
+  "favorites.videoHeightShared":
+    "Використовує спільну висоту. Посуньте повзунок, щоб дати цьому сайту власну.",
+  "favorites.videoHeightOwn": "Цей сайт має власну висоту.",
+  "favorites.videoHeightLabel": "Висота керування відео для {site}",
+  "favorites.videoUseShared": "Використовувати спільні налаштування відео",
   "recipes.sharedMargin":
     "Використовує спільне поле. Посуньте повзунок, щоб дати цьому сайту власне.",
   "recipes.ownMargin": "Цей сайт має власне нижнє поле.",

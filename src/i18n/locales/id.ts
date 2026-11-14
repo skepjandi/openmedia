@@ -209,12 +209,14 @@ export const id: Messages = {
   "settings.epilepsyProtectionNote":
     "Menghentikan animasi, video yang diputar otomatis, dan GIF animasi di aplikasi dan di halaman. Tidak dapat mendeteksi kilatan pada video yang Anda putar sendiri.",
   "settings.videoControls": "Kontrol video",
-  "settings.videoControlsNote":
-    "Untuk umpan video layar penuh seperti Shorts dan Reels. Setiap opsi tetap mati sampai Anda menyalakannya.",
-  "settings.videoSeekBar": "Bilah geser",
-  "settings.videoSeekBarNote": "Bilah untuk digeser, lengkap dengan sisa waktu.",
-  "settings.videoSpeed": "Tombol kecepatan",
-  "settings.videoSpeedNote": "Ketuk untuk beralih antara 0.5×, 1×, 1.25×, 1.5×, dan 2×.",
+  "settings.videoControlsNote": "Untuk umpan video layar penuh seperti Shorts dan Reels.",
+  "settings.videoPanel": "Kontrol saat diketuk",
+  "settings.videoPanelNote":
+    "Ketuk video untuk menampilkan jeda, mundur dan maju 6 detik, bisukan, kecepatan, dan bilah geser, menggantikan ketukan bawaan situs. Favorit dapat mematikannya agar kontrol bawaan situs kembali.",
+  "settings.videoHeight": "Tinggi kontrol",
+  "settings.videoHeightNote":
+    "Seberapa tinggi kontrol dari tepi bawah. Favorit dapat mengatur sendiri.",
+  "settings.videoHeightLabel": "Tinggi kontrol video",
   "settings.videoRemember": "Ingat kecepatan dan suara",
   "settings.videoRememberNote":
     "Video berikutnya dimulai dengan kecepatan dan volume yang terakhir Anda pilih.",
@@ -324,6 +326,15 @@ export const id: Messages = {
   "recipes.hubNote":
     "Hub membuka beberapa situs sekaligus. Setiap halaman adalah situsnya sendiri, dengan cookie sendiri.",
   "favorites.bottomMargin": "Margin bawah",
+  "favorites.videoControls": "Kontrol video OpenMedia",
+  "favorites.videoControlsNote":
+    "Ketuk video untuk menampilkan kontrol OpenMedia. Jika mati, kontrol bawaan situs kembali.",
+  "favorites.videoHeight": "Tinggi kontrol video",
+  "favorites.videoHeightShared":
+    "Memakai tinggi bersama. Geser slider untuk memberi situs ini tinggi sendiri.",
+  "favorites.videoHeightOwn": "Situs ini punya tinggi sendiri.",
+  "favorites.videoHeightLabel": "Tinggi kontrol video {site}",
+  "favorites.videoUseShared": "Pakai pengaturan video bersama",
   "recipes.sharedMargin":
     "Memakai margin bersama. Geser slider untuk memberi situs ini margin sendiri.",
   "recipes.ownMargin": "Situs ini punya margin sendiri.",

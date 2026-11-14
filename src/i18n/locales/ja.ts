@@ -210,12 +210,14 @@ export const ja: Messages = {
   "settings.epilepsyProtectionNote":
     "アプリとページ内のアニメーション、自動再生の動画、動くGIFを停止します。自分で再生した動画の点滅は検出できません。",
   "settings.videoControls": "動画コントロール",
-  "settings.videoControlsNote":
-    "ShortsやReelsなどの全画面動画フィード向けです。どの項目も、オンにするまでオフのままです。",
-  "settings.videoSeekBar": "シークバー",
-  "settings.videoSeekBarNote": "ドラッグして動かせるバーで、残り時間も表示します。",
-  "settings.videoSpeed": "速度ボタン",
-  "settings.videoSpeedNote": "タップすると 0.5×、1×、1.25×、1.5×、2× の順に切り替わります。",
+  "settings.videoControlsNote": "ShortsやReelsなどの全画面動画フィード向けです。",
+  "settings.videoPanel": "タップでコントロール表示",
+  "settings.videoPanelNote":
+    "動画をタップすると、サイト標準のタップの代わりに、一時停止、6秒戻る・進む、ミュート、速度、シークバーが表示されます。お気に入りでオフにすると、サイト標準のコントロールに戻せます。",
+  "settings.videoHeight": "コントロールの高さ",
+  "settings.videoHeightNote":
+    "コントロールを下端からどれだけ上に置くかを設定します。お気に入りごとに個別に設定できます。",
+  "settings.videoHeightLabel": "動画コントロールの高さ",
   "settings.videoRemember": "速度と音量を記憶",
   "settings.videoRememberNote": "次の動画は、最後に選んだ速度と音量で始まります。",
   "settings.videoLoopOff": "動画のループを止める",
@@ -324,6 +326,15 @@ export const ja: Messages = {
   "recipes.hubNote":
     "ハブは複数のサイトを一度に開きます。各ページはそれぞれ独立したサイトで、Cookieも別々です。",
   "favorites.bottomMargin": "下余白",
+  "favorites.videoControls": "OpenMediaの動画コントロール",
+  "favorites.videoControlsNote":
+    "動画をタップするとOpenMediaのコントロールが表示されます。オフにするとサイト標準のものに戻ります。",
+  "favorites.videoHeight": "動画コントロールの高さ",
+  "favorites.videoHeightShared":
+    "共通の高さを使います。スライダーを動かすと、このサイト専用の値になります。",
+  "favorites.videoHeightOwn": "このサイトは専用の高さを使っています。",
+  "favorites.videoHeightLabel": "{site}の動画コントロールの高さ",
+  "favorites.videoUseShared": "共通の動画設定を使う",
   "recipes.sharedMargin":
     "共通の下余白を使います。スライダーを動かすと、このサイト専用の値になります。",
   "recipes.ownMargin": "このサイトには独自の下余白があります。",

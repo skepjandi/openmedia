@@ -213,12 +213,14 @@ export const tr: Messages = {
   "settings.epilepsyProtectionNote":
     "Uygulamada ve sayfalarda animasyonları, otomatik oynayan videoları ve hareketli GIF’leri durdurur. Kendi başlattığınız bir videodaki yanıp sönmeyi algılayamaz.",
   "settings.videoControls": "Video kontrolleri",
-  "settings.videoControlsNote":
-    "Shorts ve Reels gibi tam ekran video akışları için. Her biri siz açana kadar kapalı kalır.",
-  "settings.videoSeekBar": "Arama çubuğu",
-  "settings.videoSeekBarNote": "Sürüklemek için bir çubuk; kalan süreyi de gösterir.",
-  "settings.videoSpeed": "Hız düğmesi",
-  "settings.videoSpeedNote": "0.5×, 1×, 1.25×, 1.5× ve 2× arasında geçmek için dokunun.",
+  "settings.videoControlsNote": "Shorts ve Reels gibi tam ekran video akışları için.",
+  "settings.videoPanel": "Dokununca kontroller",
+  "settings.videoPanelNote":
+    "Duraklatma, 6 saniye geri ve ileri, sessiz, hız ve arama çubuğunu göstermek için bir videoya dokunun; sitenin kendi dokunuşu yerine geçer. Bir favori bunu kapatıp sitenin kendi kontrollerini geri getirebilir.",
+  "settings.videoHeight": "Kontrol yüksekliği",
+  "settings.videoHeightNote":
+    "Kontrollerin alt kenarın ne kadar üstünde durduğu. Bir favori kendi yüksekliğini belirleyebilir.",
+  "settings.videoHeightLabel": "Video kontrolleri yüksekliği",
   "settings.videoRemember": "Hızı ve sesi hatırla",
   "settings.videoRememberNote": "Sonraki video, en son seçtiğiniz hız ve ses düzeyiyle başlar.",
   "settings.videoLoopOff": "Videoların tekrarlanmasını durdur",
@@ -329,6 +331,15 @@ export const tr: Messages = {
   "recipes.hubNote":
     "Bir hub aynı anda birkaç siteyi açar. Her sayfa kendi site'ıdır ve kendi çerezleri vardır.",
   "favorites.bottomMargin": "Alt kenar boşluğu",
+  "favorites.videoControls": "OpenMedia video kontrolleri",
+  "favorites.videoControlsNote":
+    "OpenMedia'nın kontrollerini göstermek için bir videoya dokunun. Kapalıyken sitenin kendi kontrolleri geri gelir.",
+  "favorites.videoHeight": "Video kontrolleri yüksekliği",
+  "favorites.videoHeightShared":
+    "Paylaşılan yüksekliği kullanır. Bu siteye kendi yüksekliğini vermek için kaydırıcıyı hareket ettirin.",
+  "favorites.videoHeightOwn": "Bu sitenin kendi yüksekliği var.",
+  "favorites.videoHeightLabel": "{site} video kontrolleri yüksekliği",
+  "favorites.videoUseShared": "Paylaşılan video ayarlarını kullan",
   "recipes.sharedMargin":
     "Paylaşılan boşluğu kullanır. Bu siteye kendi boşluğunu vermek için kaydırıcıyı hareket ettirin.",
   "recipes.ownMargin": "Bu sitenin kendi alt kenar boşluğu var.",

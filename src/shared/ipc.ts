@@ -24,18 +24,25 @@ export interface Accessibility {
   tint: Tint;
 }
 
-/** The controls for the video in view in a full-screen feed; all off until chosen. */
+/** What the user chose for the video in view in a full-screen feed, for every site without a choice of its own. */
 export interface VideoControls {
-  /** A bar to seek along, with the time left. */
-  seekBar: boolean;
-  /** A button that steps through the playback speeds. */
-  speed: boolean;
+  /** OpenMedia's panel on a tap (pause, skip 6 s, mute, speed, seek bar) in place of the site's own tap. On until switched off. */
+  panel: boolean;
+  /** Pixels between the panel and the bottom of the page. */
+  height: number;
   /** The speed and sound last chosen, applied to the next video. */
   remember: boolean;
   /** Stops a video from restarting by itself when it ends. */
   loopOff: boolean;
   /** Scrolls on to the next video when one ends. */
   autoAdvance: boolean;
+}
+
+/** One site's own choice (by registrable domain); a field that is missing follows the shared one. */
+export interface SiteVideo {
+  /** `false` gives the site its own controls back. */
+  panel?: boolean;
+  height?: number;
 }
 
 export interface Favorite {
@@ -79,6 +86,8 @@ export interface AppState {
   searchEngine: SearchEngine;
   accessibility: Accessibility;
   videoControls: VideoControls;
+  /** Per-site video controls choices by registrable domain. */
+  videoSites: Record<string, SiteVideo>;
 }
 
 /** The page Rust already started loading at launch; the shell takes it over. */
@@ -261,6 +270,9 @@ export const library = {
   /** Lets a site's videos open in a picture-in-picture window; off for every site by default. */
   setSitePictureInPicture: (site: string, enabled: boolean) =>
     command("set_site_picture_in_picture", { site, enabled }),
+  /** Saves one site's video controls choice; an empty choice returns the site to the shared one. */
+  setSiteVideoControls: (site: string, video: SiteVideo) =>
+    command("set_site_video_controls", { site, video }),
   setBottomMargin: (pixels: number) => command("set_bottom_margin", { pixels }),
   setSiteBottomMargin: (recipeId: string, pixels: number | null) =>
     command("set_site_bottom_margin", { recipeId, pixels }),

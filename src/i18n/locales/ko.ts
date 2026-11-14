@@ -210,12 +210,14 @@ export const ko: Messages = {
   "settings.epilepsyProtectionNote":
     "앱과 페이지에서 애니메이션, 자동 재생 동영상, 움직이는 GIF를 멈춥니다. 직접 재생한 동영상의 깜박임은 감지할 수 없습니다.",
   "settings.videoControls": "동영상 컨트롤",
-  "settings.videoControlsNote":
-    "Shorts, Reels 같은 전체 화면 동영상 피드용입니다. 켜기 전까지 각 항목은 꺼져 있습니다.",
-  "settings.videoSeekBar": "탐색 막대",
-  "settings.videoSeekBarNote": "드래그해서 이동하는 막대이며 남은 시간이 표시됩니다.",
-  "settings.videoSpeed": "속도 버튼",
-  "settings.videoSpeedNote": "탭하면 0.5×, 1×, 1.25×, 1.5×, 2× 순서로 바뀝니다.",
+  "settings.videoControlsNote": "Shorts, Reels 같은 전체 화면 동영상 피드용입니다.",
+  "settings.videoPanel": "탭하면 컨트롤 표시",
+  "settings.videoPanelNote":
+    "동영상을 탭하면 사이트 자체 탭 동작 대신 일시정지, 6초 뒤로·앞으로, 음소거, 속도, 탐색 막대가 표시됩니다. 즐겨찾기에서 끄면 사이트 자체 컨트롤로 돌아갑니다.",
+  "settings.videoHeight": "컨트롤 높이",
+  "settings.videoHeightNote":
+    "컨트롤이 하단 가장자리에서 얼마나 위에 놓일지 정합니다. 즐겨찾기별로 따로 설정할 수 있습니다.",
+  "settings.videoHeightLabel": "동영상 컨트롤 높이",
   "settings.videoRemember": "속도와 소리 기억",
   "settings.videoRememberNote": "다음 동영상은 마지막으로 고른 속도와 음량으로 시작합니다.",
   "settings.videoLoopOff": "동영상 반복 재생 중지",
@@ -322,6 +324,15 @@ export const ko: Messages = {
   "recipes.hubNote":
     "허브는 여러 사이트를 한 번에 엽니다. 각 페이지는 별도의 사이트이며 자체 쿠키를 사용합니다.",
   "favorites.bottomMargin": "하단 여백",
+  "favorites.videoControls": "OpenMedia 동영상 컨트롤",
+  "favorites.videoControlsNote":
+    "동영상을 탭하면 OpenMedia 컨트롤이 표시됩니다. 끄면 사이트 자체 컨트롤로 돌아갑니다.",
+  "favorites.videoHeight": "동영상 컨트롤 높이",
+  "favorites.videoHeightShared":
+    "공통 높이를 사용합니다. 슬라이더를 옮기면 이 사이트만 별도의 높이를 갖게 됩니다.",
+  "favorites.videoHeightOwn": "이 사이트는 별도의 높이를 사용합니다.",
+  "favorites.videoHeightLabel": "{site} 동영상 컨트롤 높이",
+  "favorites.videoUseShared": "공통 동영상 설정 사용",
   "recipes.sharedMargin":
     "공통 여백을 사용합니다. 슬라이더를 옮기면 이 사이트만 별도의 여백을 갖게 됩니다.",
   "recipes.ownMargin": "이 사이트에는 자체 여백이 있습니다.",

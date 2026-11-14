@@ -214,12 +214,14 @@ export const ro: Messages = {
   "settings.epilepsyProtectionNote":
     "Oprește animațiile, videoclipurile cu redare automată și GIF-urile animate în aplicație și pe pagini. Nu poate detecta luminile intermitente dintr-un videoclip pornit de tine.",
   "settings.videoControls": "Comenzi video",
-  "settings.videoControlsNote":
-    "Pentru fluxurile video pe ecran complet, precum Shorts și Reels. Fiecare opțiune rămâne dezactivată până o activezi.",
-  "settings.videoSeekBar": "Bară de derulare",
-  "settings.videoSeekBarNote": "O bară de tras, cu timpul rămas.",
-  "settings.videoSpeed": "Buton de viteză",
-  "settings.videoSpeedNote": "Atinge pentru a trece prin 0.5×, 1×, 1.25×, 1.5× și 2×.",
+  "settings.videoControlsNote": "Pentru fluxurile video pe ecran complet, precum Shorts și Reels.",
+  "settings.videoPanel": "Comenzi la atingere",
+  "settings.videoPanelNote":
+    "Atinge un videoclip ca să apară pauza, înapoi și înainte cu 6 secunde, dezactivarea sunetului, viteza și o bară de derulare, în loc de atingerea proprie a site-ului. Un favorit poate dezactiva asta ca să revii la comenzile site-ului.",
+  "settings.videoHeight": "Înălțimea comenzilor",
+  "settings.videoHeightNote":
+    "La ce distanță deasupra marginii de jos se află comenzile. Un favorit poate avea propria înălțime.",
+  "settings.videoHeightLabel": "Înălțimea comenzilor video",
   "settings.videoRemember": "Ține minte viteza și sunetul",
   "settings.videoRememberNote":
     "Următorul videoclip începe cu viteza și volumul alese ultima dată.",
@@ -333,6 +335,15 @@ export const ro: Messages = {
   "recipes.hubNote":
     "Un hub deschide mai multe site-uri deodată. Fiecare pagină este un site propriu, cu cookie-urile proprii.",
   "favorites.bottomMargin": "Margine inferioară",
+  "favorites.videoControls": "Comenzi video OpenMedia",
+  "favorites.videoControlsNote":
+    "Atinge un videoclip ca să apară comenzile OpenMedia. Dezactivat, revii la cele ale site-ului.",
+  "favorites.videoHeight": "Înălțimea comenzilor video",
+  "favorites.videoHeightShared":
+    "Folosește înălțimea comună. Mută glisorul pentru a da acestui site una proprie.",
+  "favorites.videoHeightOwn": "Acest site are propria înălțime.",
+  "favorites.videoHeightLabel": "Înălțimea comenzilor video pentru {site}",
+  "favorites.videoUseShared": "Folosește setările video comune",
   "recipes.sharedMargin":
     "Folosește marginea comună. Mută glisorul pentru a da acestui site una proprie.",
   "recipes.ownMargin": "Acest site are propria margine.",

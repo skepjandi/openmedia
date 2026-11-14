@@ -213,12 +213,14 @@ export const ur: Messages = {
   "settings.epilepsyProtectionNote":
     "ایپ اور صفحات میں اینیمیشن، خودکار طور پر چلنے والی ویڈیو اور متحرک GIF روک دیتا ہے۔ آپ کی خود شروع کی ہوئی ویڈیو میں چمک کا پتا نہیں لگا سکتا۔",
   "settings.videoControls": "ویڈیو کنٹرولز",
-  "settings.videoControlsNote":
-    "Shorts اور Reels جیسی فل اسکرین ویڈیو فیڈز کے لیے۔ ہر آپشن آپ کے آن کرنے تک بند رہتا ہے۔",
-  "settings.videoSeekBar": "سیک بار",
-  "settings.videoSeekBarNote": "گھسیٹنے کے لیے ایک بار، جس میں باقی وقت دکھایا جاتا ہے۔",
-  "settings.videoSpeed": "رفتار کا بٹن",
-  "settings.videoSpeedNote": "0.5×، 1×، 1.25×، 1.5× اور 2× میں بدلنے کے لیے ٹیپ کریں۔",
+  "settings.videoControlsNote": "Shorts اور Reels جیسی فل اسکرین ویڈیو فیڈز کے لیے۔",
+  "settings.videoPanel": "ٹیپ پر کنٹرولز",
+  "settings.videoPanelNote":
+    "ویڈیو پر ٹیپ کریں تاکہ سائٹ کے اپنے ٹیپ کی جگہ توقف، 6 سیکنڈ پیچھے اور آگے، خاموش، رفتار اور سیک بار دکھائی دے۔ پسندیدہ اسے بند کر سکتا ہے تاکہ سائٹ کے اپنے کنٹرولز واپس آ جائیں۔",
+  "settings.videoHeight": "کنٹرولز کی اونچائی",
+  "settings.videoHeightNote":
+    "کنٹرولز نیچے کے کنارے سے کتنے اوپر ہوں۔ پسندیدہ اپنی اونچائی طے کر سکتا ہے۔",
+  "settings.videoHeightLabel": "ویڈیو کنٹرولز کی اونچائی",
   "settings.videoRemember": "رفتار اور آواز یاد رکھیں",
   "settings.videoRememberNote": "اگلی ویڈیو آپ کی آخری منتخب کردہ رفتار اور آواز پر شروع ہوتی ہے۔",
   "settings.videoLoopOff": "ویڈیوز کو دہرانے سے روکیں",
@@ -330,6 +332,15 @@ export const ur: Messages = {
   "recipes.hubNote":
     "ہب ایک وقت میں کئی سائٹس کھولتا ہے۔ ہر صفحہ اپنی سائٹ ہے، اپنے کوکیز کے ساتھ۔",
   "favorites.bottomMargin": "نیچے کا مارجن",
+  "favorites.videoControls": "OpenMedia ویڈیو کنٹرولز",
+  "favorites.videoControlsNote":
+    "ویڈیو پر ٹیپ کریں تاکہ OpenMedia کے کنٹرولز دکھائی دیں۔ بند ہونے پر سائٹ کے اپنے کنٹرولز واپس آ جاتے ہیں۔",
+  "favorites.videoHeight": "ویڈیو کنٹرولز کی اونچائی",
+  "favorites.videoHeightShared":
+    "مشترکہ اونچائی استعمال ہوتی ہے۔ سلائیڈر کو ہلائیں تاکہ اس سائٹ کی اپنی اونچائی ہو۔",
+  "favorites.videoHeightOwn": "اس سائٹ کی اپنی اونچائی ہے۔",
+  "favorites.videoHeightLabel": "{site} ویڈیو کنٹرولز کی اونچائی",
+  "favorites.videoUseShared": "مشترکہ ویڈیو سیٹنگز استعمال کریں",
   "recipes.sharedMargin":
     "مشترکہ مارجن استعمال ہوتا ہے۔ سلائیڈر کو ہلائیں تاکہ اس سائٹ کا اپنا مارجن ہو۔",
   "recipes.ownMargin": "اس سائٹ کا اپنا مارجن ہے۔",

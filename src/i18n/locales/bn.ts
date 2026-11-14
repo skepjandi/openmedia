@@ -206,12 +206,14 @@ export const bn: Messages = {
   "settings.epilepsyProtectionNote":
     "অ্যাপ ও পেজে অ্যানিমেশন, নিজে থেকে চলা ভিডিও এবং অ্যানিমেটেড GIF থামিয়ে দেয়। আপনার নিজে চালু করা ভিডিওর ঝলকানি শনাক্ত করতে পারে না।",
   "settings.videoControls": "ভিডিও নিয়ন্ত্রণ",
-  "settings.videoControlsNote":
-    "শর্টস ও রিলসের মতো ফুল-স্ক্রিন ভিডিও ফিডের জন্য। চালু না করা পর্যন্ত প্রতিটি বন্ধ থাকে।",
-  "settings.videoSeekBar": "সিক বার",
-  "settings.videoSeekBarNote": "টেনে সরানোর একটি বার, সঙ্গে বাকি সময়।",
-  "settings.videoSpeed": "গতির বোতাম",
-  "settings.videoSpeedNote": "0.5×, 1×, 1.25×, 1.5× ও 2× গতিতে পরপর যেতে ট্যাপ করুন।",
+  "settings.videoControlsNote": "শর্টস ও রিলসের মতো ফুল-স্ক্রিন ভিডিও ফিডের জন্য।",
+  "settings.videoPanel": "ট্যাপ করলে নিয়ন্ত্রণ",
+  "settings.videoPanelNote":
+    "সাইটের নিজের ট্যাপের বদলে, ভিডিওতে ট্যাপ করলে বিরতি, ৬ সেকেন্ড পিছনে ও সামনে, মিউট, গতি এবং সিক বার দেখাবে। একটি পছন্দের সাইট এটি বন্ধ করে সাইটের নিজের নিয়ন্ত্রণ ফিরিয়ে আনতে পারে।",
+  "settings.videoHeight": "নিয়ন্ত্রণের উচ্চতা",
+  "settings.videoHeightNote":
+    "নিচের প্রান্ত থেকে নিয়ন্ত্রণ কতটা ওপরে থাকবে। একটি পছন্দের সাইট নিজের উচ্চতা ঠিক করতে পারে।",
+  "settings.videoHeightLabel": "ভিডিও নিয়ন্ত্রণের উচ্চতা",
   "settings.videoRemember": "গতি ও শব্দ মনে রাখুন",
   "settings.videoRememberNote": "পরের ভিডিও আপনার সর্বশেষ বেছে নেওয়া গতি ও ভলিউমে শুরু হয়।",
   "settings.videoLoopOff": "ভিডিও লুপ করা বন্ধ করুন",
@@ -321,6 +323,15 @@ export const bn: Messages = {
   "recipes.hubNote":
     "একটি হাব একসাথে কয়েকটি সাইট খোলে। প্রতিটি পৃষ্ঠা নিজস্ব সাইট, নিজস্ব কুকি সহ।",
   "favorites.bottomMargin": "নিচের মার্জিন",
+  "favorites.videoControls": "OpenMedia ভিডিও নিয়ন্ত্রণ",
+  "favorites.videoControlsNote":
+    "ভিডিওতে ট্যাপ করলে OpenMedia-র নিয়ন্ত্রণ দেখাবে। বন্ধ থাকলে সাইটের নিজের নিয়ন্ত্রণ ফিরে আসে।",
+  "favorites.videoHeight": "ভিডিও নিয়ন্ত্রণের উচ্চতা",
+  "favorites.videoHeightShared":
+    "সাধারণ উচ্চতা ব্যবহার করে। এই সাইটের নিজস্ব উচ্চতা দিতে স্লাইডারটি সরান।",
+  "favorites.videoHeightOwn": "এই সাইটের নিজস্ব উচ্চতা আছে।",
+  "favorites.videoHeightLabel": "{site}-এর ভিডিও নিয়ন্ত্রণের উচ্চতা",
+  "favorites.videoUseShared": "সাধারণ ভিডিও সেটিংস ব্যবহার করুন",
   "recipes.sharedMargin":
     "সাধারণ মার্জিন ব্যবহার করে। এই সাইটের নিজস্ব মার্জিন দিতে স্লাইডারটি সরান।",
   "recipes.ownMargin": "এই সাইটের নিজস্ব মার্জিন আছে।",

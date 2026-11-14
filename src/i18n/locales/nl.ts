@@ -214,12 +214,14 @@ export const nl: Messages = {
   "settings.epilepsyProtectionNote":
     "Stopt animaties, automatisch afspelende video’s en geanimeerde GIF’s in de app en op pagina’s. Het kan geen flitsen herkennen in een video die je zelf start.",
   "settings.videoControls": "Videobediening",
-  "settings.videoControlsNote":
-    "Voor videofeeds op volledig scherm, zoals Shorts en Reels. Elke optie blijft uit tot je hem aanzet.",
-  "settings.videoSeekBar": "Zoekbalk",
-  "settings.videoSeekBarNote": "Een balk om te slepen, met de resterende tijd.",
-  "settings.videoSpeed": "Snelheidsknop",
-  "settings.videoSpeedNote": "Tik om door 0.5×, 1×, 1.25×, 1.5× en 2× te gaan.",
+  "settings.videoControlsNote": "Voor videofeeds op volledig scherm, zoals Shorts en Reels.",
+  "settings.videoPanel": "Bediening bij tikken",
+  "settings.videoPanelNote":
+    "Tik op een video om pauzeren, 6 seconden terug en vooruit, dempen, snelheid en een zoekbalk te tonen, in plaats van de eigen tik van de site. Een favoriet kan dit uitzetten om de eigen bediening van de site terug te krijgen.",
+  "settings.videoHeight": "Hoogte van de bediening",
+  "settings.videoHeightNote":
+    "Hoe ver boven de onderrand de bediening staat. Een favoriet kan een eigen hoogte instellen.",
+  "settings.videoHeightLabel": "Hoogte videobediening",
   "settings.videoRemember": "Snelheid en geluid onthouden",
   "settings.videoRememberNote":
     "De volgende video start met de snelheid en het volume die je het laatst koos.",
@@ -329,6 +331,15 @@ export const nl: Messages = {
   "recipes.hubNote":
     "Een hub opent meerdere sites tegelijk. Elke pagina is een eigen site, met eigen cookies.",
   "favorites.bottomMargin": "Ondermarge",
+  "favorites.videoControls": "OpenMedia-videobediening",
+  "favorites.videoControlsNote":
+    "Tik op een video om de bediening van OpenMedia te tonen. Uit geeft de eigen bediening van de site terug.",
+  "favorites.videoHeight": "Hoogte videobediening",
+  "favorites.videoHeightShared":
+    "Gebruikt de gedeelde hoogte. Beweeg de schuifregelaar om deze site een eigen hoogte te geven.",
+  "favorites.videoHeightOwn": "Deze site heeft een eigen hoogte.",
+  "favorites.videoHeightLabel": "Hoogte videobediening van {site}",
+  "favorites.videoUseShared": "Gedeelde video-instellingen gebruiken",
   "recipes.sharedMargin":
     "Gebruikt de gedeelde marge. Beweeg de schuifregelaar om deze site een eigen marge te geven.",
   "recipes.ownMargin": "Deze site heeft een eigen marge.",
