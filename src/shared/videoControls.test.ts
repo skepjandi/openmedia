@@ -235,6 +235,8 @@ interface Page {
   setCalm: () => void;
   setCurrent: (video: FakeVideo | null) => void;
   teardown: () => void;
+  /** What the page told the app about the small player. */
+  posts: unknown[];
   /** Callbacks of the mutation observers the controls made, as the browser would call them. */
   observers: Array<() => void>;
 }
@@ -268,6 +270,7 @@ function load(options: {
   const intervals: Array<() => void> = [];
   const timeouts = new Map<number, () => void>();
   const observers: Array<() => void> = [];
+  const posts: unknown[] = [];
   let timeoutId = 0;
   const documentListeners = new Map<string, Listener[]>();
   const windowListeners = new Map<string, Listener[]>();
@@ -357,6 +360,9 @@ function load(options: {
       );
     },
     scrollBy: (by: Record<string, unknown>) => scrolls.push(by),
+    webkit: {
+      messageHandlers: { openmediaMini: { postMessage: (body: unknown) => posts.push(body) } },
+    },
   };
   win.window = win;
   win.top = win;
@@ -514,6 +520,7 @@ function load(options: {
     },
     teardown: () => (document[Symbol.for("openmedia.videoControls")] as () => void)(),
     observers,
+    posts,
   };
 }
 
@@ -764,6 +771,33 @@ describe("video controls", () => {
     expect(page.body.children.includes(box as FakeElement)).toBe(false);
     expect(video.style.cssText).toBe("");
     expect(video.listenerCount()).toBe(0);
+  });
+
+  it("asks the app to move the page to the corner when the player goes up, and not when it comes down", () => {
+    const home = new FakeElement();
+    const video = new PlacedVideo();
+    home.appendChild(video as unknown as FakeElement);
+    const page = load({ videos: [video], current: video });
+    openPanel(page);
+    buttonWith(page, "pip").fire("pointerup");
+    expect(page.posts).toEqual([true, { float: true }]);
+    const box = page.body.children.find((child) => "data-openmedia-mini" in child.attributes);
+    box?.children.find((child) => child.__icon === "close")?.fire("pointerup");
+    expect(page.posts).toEqual([true, { float: true }, false]);
+  });
+
+  it("closes a small player whose video the site's player took out of the box", () => {
+    const home = new FakeElement();
+    const video = new PlacedVideo();
+    home.appendChild(video as unknown as FakeElement);
+    const page = load({ videos: [video], current: video });
+    openPanel(page);
+    buttonWith(page, "pip").fire("pointerup");
+    const box = page.body.children.find((child) => "data-openmedia-mini" in child.attributes);
+    box?.removeChild(video as unknown as FakeElement);
+    video.parentNode = null;
+    page.tick();
+    expect(page.body.children.includes(box as FakeElement)).toBe(false);
   });
 
   it("keeps playing a video that was playing, and pauses and plays from its own button", () => {

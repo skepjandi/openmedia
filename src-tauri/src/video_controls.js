@@ -490,6 +490,12 @@
       });
       watch.observe(video, { attributes: true, attributeFilter: ['style'] });
       state.stops.push(function () { watch.disconnect(); clearTimeout(checking); });
+      // A site that disposes its player (YouTube, navigating inside the page) takes the video out of
+      // the player's box: a box without its video is closed, not left black and silent.
+      var watchdog = setInterval(function () {
+        if (!video.isConnected || video.parentNode !== root) miniOff();
+      }, 500);
+      state.stops.push(function () { clearInterval(watchdog); });
       mini = state;
       tellApp(true);
       if (state.playing && video.paused) { try { video.play().catch(function () {}); } catch (_) {} }
@@ -586,7 +592,14 @@
         if (!target.muted && target.volume === 0) target.volume = 1;
       });
       var floatButton = button(32, 'pip', function (target) {
-        if (mini) miniOff(); else miniOn(target);
+        if (mini) {
+          miniOff();
+        } else {
+          miniOn(target);
+          // The app moves this page to the corner as it is and opens the page again in its place.
+          // Without an app to do that, the player stays over this page.
+          try { window.webkit.messageHandlers.openmediaMini.postMessage({ float: true }); } catch (_) {}
+        }
         hide();
       });
       var left = make('span', 'margin-left:auto;min-width:48px;text-align:right');

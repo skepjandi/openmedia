@@ -120,21 +120,6 @@ private let floatForNavigationScript = """
     return true;
   })()
   """
-/// True when the page has a playing video of its own that is not the one floating.
-private let ownVideoPlayingScript = """
-  (function () {
-    var videos = document.querySelectorAll('video');
-    for (var i = 0; i < videos.length; i++) {
-      var video = videos[i];
-      if (video.webkitPresentationMode === 'picture-in-picture') continue;
-      if (video.closest && video.closest('[data-openmedia-mini]')) continue;
-      // A muted video is a feed's preview, not one the reader is watching: it does not end the player.
-      if (video.muted || video.volume === 0) continue;
-      if (!video.paused && !video.ended && video.readyState > 2 && video.videoWidth > 0) return true;
-    }
-    return false;
-  })()
-  """
 private let floatCheckEvery: TimeInterval = 2
 /// How long a page gets to answer before the next one is shown anyway.
 private let floatAnswerWait: TimeInterval = 0.6
@@ -416,6 +401,10 @@ private final class WeakMiniHandler: NSObject, WKScriptMessageHandler {
 
   func userContentController(_ controller: WKUserContentController, didReceive message: WKScriptMessage) {
     guard message.frameInfo.isMainFrame, let view = message.webView else { return }
+    if let body = message.body as? [String: Any], body["float"] != nil {
+      target?.floatToCorner(view)
+      return
+    }
     target?.setMiniUp(view, (message.body as? Bool) == true)
   }
 }
@@ -993,7 +982,7 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
 
   /// Puts a fresh view in the session, loading `request`, and keeps the old one alive, hidden, for
   /// its picture-in-picture window. The old view has no session any more, so it cannot navigate;
-  /// it goes when its window closes or the page in front plays a video of its own.
+  /// it goes when its window closes.
   private func swapForFloatingVideo(_ old: Session, loading request: URLRequest) {
     guard let profileId = old.profileId, sessions[old.id] === old else {
       old.view.load(request)
@@ -1112,19 +1101,13 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
     }
   }
 
-  /// A floating page ends when its window is closed, or when the page in front plays a video of
-  /// its own.
+  /// A floating page ends when its window is closed (a small player that was closed or ended).
   private func checkFloats() {
     for session in floatingSessions {
       session.view.evaluateJavaScript(inPictureInPictureScript) { [weak self, weak session] result, _ in
         guard let self, let session, (result as? Bool) != true else { return }
         self.endFloat(session)
       }
-    }
-    guard let id = activeId, let front = sessions[id], !front.floatedForNavigation else { return }
-    front.view.evaluateJavaScript(ownVideoPlayingScript) { [weak self] result, _ in
-      guard let self, (result as? Bool) == true else { return }
-      for session in self.floatingSessions { self.endFloat(session) }
     }
   }
 
@@ -1196,6 +1179,27 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
   /// played from here: `evaluateJavaScript` runs with a user gesture, which no page script can
   /// give itself. Only the page in front is served, and the script is fixed: the page sends no
   /// code and no argument, so all it can do is ask for what it could have done with a tap.
+  /// The panel's float button: the page in front becomes the small player in the corner, as it is,
+  /// and the reader is taken to the page before it (else the site's start page) in a fresh view.
+  /// Nothing in the kept page navigates or restyles its player, so a site that disposes its player
+  /// when it navigates inside the page (YouTube) cannot take the video away, and the reader can go
+  /// anywhere in the fresh view. It is not the same page again: a second player of the same site
+  /// starting makes the site pause the first (YouTube does). The fresh view has no history.
+  func floatToCorner(_ view: WKWebView) {
+    guard let session = session(of: view), session.id == activeId, session.miniUp, appForeground,
+      !session.blocked, !session.floatedForNavigation, session.profileId != nil
+    else { return }
+    // One small player at a time: the one up already is closed.
+    for other in floatingSessions where other.inCorner { endFloat(other) }
+    let here = view.url ?? session.initialURL
+    var start = URLComponents(url: here, resolvingAgainstBaseURL: false)
+    start?.path = "/"
+    start?.query = nil
+    start?.fragment = nil
+    let target = view.backForwardList.backItem?.url ?? start?.url ?? session.initialURL
+    swapForFloatingVideo(session, loading: URLRequest(url: target))
+  }
+
   func setMiniUp(_ view: WKWebView, _ up: Bool) {
     session(of: view)?.miniUp = up
   }
@@ -1382,18 +1386,6 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
       isMainFrame: isMainFrame, userInitiated: userInitiated)
     {
     case .allow:
-      // A link tapped while the small player is up: the page is kept, with the player in the
-      // corner, and the link opens in a fresh view.
-      if session.miniUp, isMainFrame, navigationAction.navigationType == .linkActivated,
-        navigationAction.request.httpMethod?.uppercased() == "GET", !session.floatedForNavigation
-      {
-        decisionHandler(.cancel)
-        let request = navigationAction.request
-        DispatchQueue.main.async { [weak self] in
-          self?.navigateKeepingVideo(session, to: request) { session.view.load(request) }
-        }
-        return
-      }
       decisionHandler(.allow)
     case .cancel:
       decisionHandler(.cancel)

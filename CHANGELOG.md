@@ -12,6 +12,12 @@ All notable changes to OpenMedia are documented here.
 
 **Change:** Over a page that plays a video of its own (YouTube's home page autoplays previews), the corner window drew torn or black: a page moved to the corner was hidden and shown again on the way, and the page in front drew its video layers over it. It is now placed in the corner at once, never hidden first, and sits above the page in front. A muted video in the front page (a feed's preview) no longer ends the player; a video playing with sound still does. Checked on the simulator over YouTube's home page. Removing the regenerable `src-tauri/target` caches for the device and Android targets was needed to build (disk full).
 
+### fix(video): the small player survives any navigation, including YouTube's own (iOS)
+
+**Area:** `fix(video)`
+
+**Change:** Navigating inside a YouTube page (its logo, Home, another video) disposes YouTube's player and removes its video element, wherever the small player had put it, so the player was left up empty: a black box with a pause icon. Logged on the simulator; handing the navigation to the app did not help, because YouTube disposed the player anyway. Now the float button moves the whole page to the corner as it is, untouched, and opens the page before it (else the site's start page) in a fresh view: nothing in the kept page navigates, and the reader can go anywhere. A small player whose video is taken out of its box closes instead of staying black. The player no longer ends when the page in front plays a video of its own: the two share the system's one audio, so the one started last pauses the other, and the corner's play button starts it again. Checked on the simulator with YouTube: float, YouTube's own navigation in the fresh view, open a video there, and the corner player kept its place and played again on its play button. Not verified on a device; the fresh view has no back history.
+
 ### feat(video): the small player becomes a system window when the app is minimized (iOS)
 
 **Area:** `feat(video)`
