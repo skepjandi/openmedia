@@ -279,6 +279,13 @@ Tracked in [Roadmap](./roadmap.md#phase-0--feasibility-spikes). Each needs a rec
 
 [Architecture](./architecture.md) · [Site Runtime](./site-runtime.md) · [Security](./security.md) · [Roadmap](./roadmap.md)
 
-## Mini player on leaving a page (iOS)
+## Floating video (iOS)
 
-When a page that is playing a video with sound is left for another (Back, an address, a favorite, Home), `SiteViewPlugin.swift` floats that video in a picture-in-picture window before the next page shows (`floatForNavigationScript`, run through `evaluateJavaScript` so WebKit counts it as a gesture; it lifts the guard's `disablepictureinpicture` for that one video). A page replaced in its own session stays alive, hidden (`floatingSessions`), until the window closes or the page in front plays a video of its own (`ownVideoPlayingScript`), checked every 2 s. Unlike leaving the app, this does not depend on the per-favorite picture-in-picture switch. The iOS Simulator reports no picture-in-picture support, so only a device shows the window. Android and desktop have no equivalent.
+Two ways a video floats in a picture-in-picture window, both in `SiteViewPlugin.swift`, neither on Android or desktop:
+
+- **The panel's float button** (`video_controls.js`): the page lifts the guard's `disablepictureinpicture` for that video and calls `webkitSetPresentationMode('picture-in-picture')`; if the mode did not change within 300 ms it posts to the `openmediaPip` handler, and the app runs `document[Symbol.for('openmedia.popOut')]()` through `evaluateJavaScript`, which WebKit counts as a gesture. The button is drawn only when the video has `webkitSetPresentationMode`.
+- **Leaving a page that plays a video with sound** (`floatForNavigationScript`): a video already floating counts too, so one opened from the button is kept.
+
+Leaving the page by Back or an address (`goBack`, `navigate`) cannot reuse the web view, whose load destroys the document and its window. `navigateKeepingVideo` asks the page to float its video; when it does, `swapForFloatingVideo` puts a fresh `WKWebView` in the session (same data store, scripts and rule lists, kept on `Session`) and loads the target in it, and the old page becomes a floating session: hidden, out of `sessions` (so it has no navigation and its bridge messages are ignored), in `floatingSessions`. Switching to another session (`show`, `open`) floats the page in front the same way. `checkFloats` runs every 2 s: a floating page ends when its window is closed or when the page in front plays a video of its own. A fresh view has no back list, so Back is unavailable until the reader navigates again. Unlike leaving the app, none of this depends on the per-favorite picture-in-picture switch.
+
+The iOS Simulator reports no picture-in-picture support, so only a device shows the window; the lifecycle (swap, hidden page kept alive, end on a video of the new page) was checked there with the float answer forced on.

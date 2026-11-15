@@ -6,6 +6,18 @@ All notable changes to OpenMedia are documented here.
 >
 > **Wiki**: the [GitHub Wiki](https://github.com/skepjandi/openmedia/wiki) is the public-facing main wiki — architecture, recipe format, AI pipeline, security model, roadmap. Source-controlled editing surface is `docs/wiki/` in this repo; CI (`.github/workflows/sync-wiki.yml`) mirrors it to the GitHub Wiki on every merge to `main`. New single-PR changes belong here, not as new wiki pages.
 
+### feat(siteview): a float button in the video controls, and a floating video that survives Back (iOS)
+
+**Area:** `feat(siteview)`
+
+**Change:** The video controls panel has a new button beside mute (a picture-in-picture icon). It takes the video out of the page into a floating player that plays until the reader closes it; pressed again, it puts the video back. The page tries first; if the engine refuses without a gesture it recognises, it asks the app, which runs the request from outside the page, where WebKit counts it as one. The button is shown only where the engine can float a video (iOS Safari's engine), so it is not there on Android or desktop.
+
+A floating video now survives leaving its page. Before, Back and an address typed in the command bar loaded the next page in the same web view, which destroys the page and the window with it (only a favorite's Home kept it, by switching to another view). Now, when the page in front has a video floating (opened from the button, or a video with sound playing), the app puts a fresh view in the session for the next page and keeps the old page alive, hidden, for the window. The hidden page cannot navigate and sends the app nothing. It is dropped when its window is closed, or when the page in front plays a video of its own. One cost: the fresh view has no history, so the Back arrow is dim until the reader navigates again.
+
+**Verified:** Vitest (`videoControls.test.ts`: the button, the page's own try, the app's fallback, no button where the engine cannot float), ESLint, `tsc`, `swiftc -parse`; on the iOS 26.5 simulator, with the float answer forced on because the simulator reports no picture-in-picture support (`webkitSupportsPresentationMode` is false): an address change swapped in a fresh view and the old page kept running (its log kept ticking), Back showed the earlier page, and opening a page that plays its own video ended the float. The button shows beside mute and the panel steps aside when it is pressed; the page reports the app's handler is present. **Not verified:** the floating window itself and any of this with real picture-in-picture, on a device; Android.
+
+**PR:** n/a
+
 ### fix(siteview): no mute icon pops on a tap in Reels
 
 **Area:** `fix(siteview)`

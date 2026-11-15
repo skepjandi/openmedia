@@ -18,6 +18,11 @@ private let scrollHandlerName = "openmediaScroll"
 /// Asks for the video in view to be played natively when the engine refuses the page's own
 /// `play()`; see `playFeedVideo`.
 private let playHandlerName = "openmediaPlay"
+private let floatHandlerName = "openmediaPip"
+/// The panel asks for its video to float when the page's own try changed nothing; this runs from
+/// outside the page, where WebKit counts it as a gesture.
+private let popOutVideoScript =
+  "(function(){var f=document[Symbol.for('openmedia.popOut')];if(typeof f==='function')f()})()"
 private let playFeedVideoScript =
   "(function(){var play=document[Symbol.for('openmedia.feedPlayNow')];if(typeof play==='function')play()})()"
 /// The same flag the Android and macOS pause scripts set, which the feed player reads.
@@ -98,6 +103,10 @@ private let enterPictureInPictureScript = """
 private let floatForNavigationScript = """
   (function () {
     var best = null, area = 0, videos = document.querySelectorAll('video');
+    // A video the reader already floated, from the panel's button, is the one to keep.
+    for (var j = 0; j < videos.length; j++) {
+      if (videos[j].webkitPresentationMode === 'picture-in-picture') return true;
+    }
     for (var i = 0; i < videos.length; i++) {
       var video = videos[i];
       if (video.paused || video.ended || video.muted || video.volume === 0 || !video.videoWidth) continue;
@@ -124,8 +133,6 @@ private let ownVideoPlayingScript = """
     return false;
   })()
   """
-/// How long a page gets, once loaded, to start a video of its own before the floating one stays.
-private let ownVideoWait: TimeInterval = 2.5
 private let floatCheckEvery: TimeInterval = 2
 /// How long a page gets to answer before the next one is shown anyway.
 private let floatAnswerWait: TimeInterval = 0.6
@@ -375,6 +382,19 @@ private final class WeakScrollHandler: NSObject, WKScriptMessageHandler {
   }
 }
 
+private final class WeakFloatHandler: NSObject, WKScriptMessageHandler {
+  weak var target: SiteViewPlugin?
+
+  init(_ target: SiteViewPlugin) {
+    self.target = target
+  }
+
+  func userContentController(_ controller: WKUserContentController, didReceive message: WKScriptMessage) {
+    guard message.frameInfo.isMainFrame, let view = message.webView else { return }
+    target?.floatVideoFromPanel(view)
+  }
+}
+
 private final class WeakPlayHandler: NSObject, WKScriptMessageHandler {
   weak var target: SiteViewPlugin?
 
@@ -412,6 +432,9 @@ private final class Session {
   var needsReload = false
   /// Ids of the content rule lists attached to this view, so a late compile attaches each once.
   var ruleListIds: Set<String> = []
+  /// The lists themselves and the profile, kept so the page can be replaced by a fresh view.
+  var ruleLists: [WKContentRuleList] = []
+  var profileId: UUID?
   /// True while the app has closed this site. The block lives in the native layer: the page
   /// cannot lift it, and switching to another session does not clear it.
   var blocked = false
@@ -424,7 +447,6 @@ private final class Session {
   var floatedForNavigation = false
   /// True when the page was replaced in its session: only its picture-in-picture window is left.
   var floatDetached = false
-  var settlingFloat = false
   /// The native shield over a closed page. It covers the page and takes every touch.
   var shield: UIView?
   var observations: [NSKeyValueObservation] = []
@@ -590,23 +612,12 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
         }
       }
       if let rect = args.rect { self.pageRect = rect.cgRect }
-      let view = WKWebView(
-        frame: .zero,
-        configuration: self.makeConfiguration(
-          profileId: profileId,
-          script: args.documentStartScript,
-          adBlockScriptlet: args.adBlockScriptlet,
-          adBlockEnabled: args.adBlockEnabled,
-          ruleLists: cached))
-      view.allowsBackForwardNavigationGestures = true
-      view.customUserAgent = safariUserAgent
-      view.navigationDelegate = self
-      view.uiDelegate = self
-      view.overrideUserInterfaceStyle = self.colorScheme
-      view.alpha = 0
-      let refresh = UIRefreshControl()
-      refresh.addAction(UIAction { [weak view] _ in view?.reload() }, for: .valueChanged)
-      view.scrollView.refreshControl = refresh
+      let view = self.makeSessionView(
+        profileId: profileId,
+        recipe: args.documentStartScript,
+        adBlockScriptlet: args.adBlockScriptlet,
+        adBlockEnabled: args.adBlockEnabled,
+        ruleLists: cached)
 
       let session = Session(
         id: args.session,
@@ -617,6 +628,8 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
         adBlockScriptlet: args.adBlockScriptlet,
         adBlockEnabled: args.adBlockEnabled)
       session.ruleListIds = Set(cached.map(\.identifier))
+      session.ruleLists = cached
+      session.profileId = profileId
       self.sessions[session.id] = session
       self.activeId = session.id
       self.events = args.onEvent
@@ -682,7 +695,8 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
       return
     }
     onActiveSession(invoke) { [weak self] session in
-      self?.floatPlayingVideo(of: session) { session.view.load(URLRequest(url: url)) }
+      let request = URLRequest(url: url)
+      self?.navigateKeepingVideo(session, to: request) { session.view.load(request) }
     }
   }
 
@@ -694,7 +708,11 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
         self.closeSignInWindow()
         return
       }
-      self.floatPlayingVideo(of: session) { session.view.goBack() }
+      guard let item = session.view.backForwardList.backItem else {
+        session.view.goBack()
+        return
+      }
+      self.navigateKeepingVideo(session, to: URLRequest(url: item.url)) { session.view.goBack() }
     }
   }
 
@@ -888,22 +906,74 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
     }
   }
 
-  /// Leaving a page for another (Back, an address, a favorite's home) keeps its playing video going
-  /// in a picture-in-picture window, as a player's mini view does, and `then` runs once it floats.
-  /// The new page gets `ownVideoWait` to start a video of its own; if it does, the floating one is
-  /// put back (see `settleFloatedVideo`). A page with nothing playing just navigates.
-  private func floatPlayingVideo(of session: Session, then navigate: @escaping () -> Void) {
-    guard !session.blocked, !session.floatedForNavigation else {
-      navigate()
+  /// Leaving a page for another in its own session (Back, an address) while it plays a video with
+  /// sound: the video floats, and the page, which a load in the same view would destroy together
+  /// with its window, stays alive in a hidden view of its own while a fresh view takes the session
+  /// and loads `request`. Without a playing video it is the ordinary navigation, `inPlace`.
+  private func navigateKeepingVideo(
+    _ session: Session, to request: URLRequest, inPlace: @escaping () -> Void
+  ) {
+    guard appForeground, !session.blocked, !session.floatedForNavigation, session.profileId != nil
+    else {
+      inPlace()
       return
     }
-    session.view.evaluateJavaScript(floatForNavigationScript) { [weak session] result, _ in
-      if (result as? Bool) == true {
-        session?.autoPictureInPicture = true
-        session?.floatedForNavigation = true
-      }
-      navigate()
+    var answered = false
+    let finish = { [weak self, weak session] (floated: Bool) in
+      guard !answered else { return }
+      answered = true
+      guard let self, let session else { return }
+      if floated { self.swapForFloatingVideo(session, loading: request) } else { inPlace() }
     }
+    session.view.evaluateJavaScript(floatForNavigationScript) { result, _ in
+      finish((result as? Bool) == true)
+    }
+    // A page that never answers must not keep the navigation from happening.
+    DispatchQueue.main.asyncAfter(deadline: .now() + floatAnswerWait) { finish(false) }
+  }
+
+  /// Puts a fresh view in the session, loading `request`, and keeps the old one alive, hidden, for
+  /// its picture-in-picture window. The old view has no session any more, so it cannot navigate;
+  /// it goes when its window closes or the page in front plays a video of its own.
+  private func swapForFloatingVideo(_ old: Session, loading request: URLRequest) {
+    guard let profileId = old.profileId, sessions[old.id] === old else {
+      old.view.load(request)
+      return
+    }
+    let url = request.url ?? old.initialURL
+    let view = makeSessionView(
+      profileId: profileId,
+      recipe: old.recipeScript,
+      adBlockScriptlet: old.adBlockScriptlet,
+      adBlockEnabled: old.adBlockEnabled,
+      ruleLists: old.ruleLists)
+    let session = Session(
+      id: old.id,
+      view: view,
+      scope: DomainScope.registrableDomain(of: url.host ?? ""),
+      initialURL: url,
+      recipeScript: old.recipeScript,
+      adBlockScriptlet: old.adBlockScriptlet,
+      adBlockEnabled: old.adBlockEnabled)
+    session.ruleListIds = old.ruleListIds
+    session.ruleLists = old.ruleLists
+    session.profileId = profileId
+    // The shell already showed this session: it must not put its splash back up.
+    session.painted = true
+
+    old.floatedForNavigation = true
+    old.floatDetached = true
+    old.autoPictureInPicture = true
+    old.observations.removeAll()
+    old.view.isHidden = true
+    floatingSessions.append(old)
+    watchFloats()
+
+    sessions[session.id] = session
+    activeId = session.id
+    observe(session)
+    mount(session)
+    session.view.load(request)
   }
 
   /// Floats the page's playing video, when it has one with sound, and keeps the page out of the
@@ -973,24 +1043,6 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
     }
   }
 
-  /// After a page loads under a floating video: if the page plays a video of its own, the floating
-  /// one goes back where it came from; otherwise it keeps playing.
-  private func settleFloatedVideo(of session: Session) {
-    guard session.floatedForNavigation, !session.settlingFloat else { return }
-    session.settlingFloat = true
-    DispatchQueue.main.asyncAfter(deadline: .now() + ownVideoWait) { [weak session] in
-      guard let session else { return }
-      session.settlingFloat = false
-      guard session.floatedForNavigation else { return }
-      session.view.evaluateJavaScript(ownVideoPlayingScript) { [weak session] result, _ in
-        guard let session, (result as? Bool) == true else { return }
-        session.floatedForNavigation = false
-        session.autoPictureInPicture = false
-        session.view.evaluateJavaScript(exitPictureInPictureScript)
-      }
-    }
-  }
-
   /// Coming back to the app puts a video floated by `enterPictureInPicture` back in the page.
   private func exitAutomaticPictureInPicture() {
     for session in sessions.values where session.autoPictureInPicture {
@@ -1034,6 +1086,14 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
     session.mediaSuspended = suspend
     session.view.setAllMediaPlaybackSuspended(suspend)
     session.view.evaluateJavaScript(suspend ? holdMediaScript : resumeMediaScript)
+  }
+
+  /// The panel's float button, when the page could not float the video itself: only the page in
+  /// front is served, and the script is fixed, so all a page can do is ask for what the reader's
+  /// own tap on the button would do.
+  func floatVideoFromPanel(_ view: WKWebView) {
+    guard let session = session(of: view), !session.blocked, session.id == activeId else { return }
+    view.evaluateJavaScript(popOutVideoScript)
   }
 
   /// A page's feed player asks, when the engine refuses its `play()`, for the video in view to be
@@ -1155,6 +1215,8 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
 
   func receiveBridgeMessage(_ message: WKScriptMessage) {
     guard message.frameInfo.isMainFrame, JSONSerialization.isValidJSONObject(message.body) else { return }
+    // A page kept alive only for its picture-in-picture window is not the session's page.
+    guard let sender = message.webView, session(of: sender) != nil else { return }
     guard
       let data = try? JSONSerialization.data(withJSONObject: message.body),
       let body = String(data: data, encoding: .utf8)
@@ -1791,6 +1853,7 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
     let controller = session.view.configuration.userContentController
     for list in ruleLists where session.ruleListIds.insert(list.identifier).inserted {
       controller.add(list)
+      session.ruleLists.append(list)
     }
   }
 
@@ -1840,6 +1903,7 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
     controller.add(WeakPaintHandler(self), name: paintHandlerName)
     controller.add(WeakScrollHandler(self), name: scrollHandlerName)
     controller.add(WeakPlayHandler(self), name: playHandlerName)
+    controller.add(WeakFloatHandler(self), name: floatHandlerName)
     configuration.userContentController = controller
     return configuration
   }
@@ -1856,8 +1920,6 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
   }
 
   private func sendState(_ session: Session) {
-    // The page changed (a load, or a pushState a site makes itself): see what it plays.
-    settleFloatedVideo(of: session)
     let view = session.view
     if !view.isLoading { view.scrollView.refreshControl?.endRefreshing() }
     send(
@@ -1890,6 +1952,32 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
     }
   }
 
+  /// A web view for a session: its data store, scripts and rule lists, hidden until it paints.
+  @MainActor
+  private func makeSessionView(
+    profileId: UUID, recipe: String?, adBlockScriptlet: String?, adBlockEnabled: Bool,
+    ruleLists: [WKContentRuleList]
+  ) -> WKWebView {
+    let view = WKWebView(
+      frame: .zero,
+      configuration: makeConfiguration(
+        profileId: profileId,
+        script: recipe,
+        adBlockScriptlet: adBlockScriptlet,
+        adBlockEnabled: adBlockEnabled,
+        ruleLists: ruleLists))
+    view.allowsBackForwardNavigationGestures = true
+    view.customUserAgent = safariUserAgent
+    view.navigationDelegate = self
+    view.uiDelegate = self
+    view.overrideUserInterfaceStyle = colorScheme
+    view.alpha = 0
+    let refresh = UIRefreshControl()
+    refresh.addAction(UIAction { [weak view] _ in view?.reload() }, for: .valueChanged)
+    view.scrollView.refreshControl = refresh
+    return view
+  }
+
   /// Takes a web view apart: nothing it loads or posts reaches the app any more.
   private func teardownView(_ view: WKWebView) {
     view.stopLoading()
@@ -1898,6 +1986,7 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
     view.configuration.userContentController.removeScriptMessageHandler(forName: paintHandlerName)
     view.configuration.userContentController.removeScriptMessageHandler(forName: scrollHandlerName)
     view.configuration.userContentController.removeScriptMessageHandler(forName: playHandlerName)
+    view.configuration.userContentController.removeScriptMessageHandler(forName: floatHandlerName)
     view.navigationDelegate = nil
     view.uiDelegate = nil
     view.removeFromSuperview()

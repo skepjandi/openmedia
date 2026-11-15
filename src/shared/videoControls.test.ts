@@ -58,6 +58,25 @@ class FakeVideo {
   }
 }
 
+/** A video whose engine can float it, as Mobile Safari's can. */
+class FloatableVideo extends FakeVideo {
+  mode = "inline";
+  attributes = new Set(["disablepictureinpicture"]);
+  allowed = true;
+
+  get webkitPresentationMode() {
+    return this.mode;
+  }
+
+  webkitSetPresentationMode(mode: string) {
+    if (this.allowed) this.mode = mode;
+  }
+
+  removeAttribute(name: string) {
+    this.attributes.delete(name);
+  }
+}
+
 class FakeElement {
   style = { cssText: "" } as Record<string, string>;
   children: FakeElement[] = [];
@@ -149,6 +168,10 @@ interface Page {
   pointerWith: (at: [number, number], between: () => void) => Tap;
   /** Fires one event at the page's window listeners; true when a listener kept it from the site. */
   win: (type: string, event?: Record<string, unknown>) => boolean;
+  /** How often the app was asked to float the video from outside the page. */
+  asks: number[];
+  /** The app's own call into the page to float the video in view. */
+  floatFromApp: () => void;
   /** Runs the timers the controls set, as when the panel's few seconds are up. */
   runTimers: () => void;
   /** What the feed player was told about a pause or a play the reader chose. */
@@ -186,7 +209,8 @@ function load(options: {
   saved?: Record<string, unknown>;
 }): Page {
   const intervals: Array<() => void> = [];
-  const timeouts: Array<() => void> = [];
+  const timeouts = new Map<number, () => void>();
+  let timeoutId = 0;
   const documentListeners = new Map<string, Listener[]>();
   const windowListeners = new Map<string, Listener[]>();
   const storage = new Map<string, string>();
@@ -194,6 +218,7 @@ function load(options: {
   const body = new FakeElement();
   const scrolls: Array<Record<string, unknown>> = [];
   const userPauses: Array<[FakeVideo, boolean]> = [];
+  const asks: number[] = [];
   let current = options.current;
   let stack: unknown[] = [];
   const document: Record<string | symbol, unknown> = {
@@ -255,8 +280,12 @@ function load(options: {
     },
     setInterval: (run: () => void) => intervals.push(run),
     clearInterval: () => intervals.splice(0),
-    setTimeout: (run: () => void) => timeouts.push(run),
-    clearTimeout: () => timeouts.splice(0),
+    setTimeout: (run: () => void) => {
+      timeoutId += 1;
+      timeouts.set(timeoutId, run);
+      return timeoutId;
+    },
+    clearTimeout: (id: number) => timeouts.delete(id),
     addEventListener: (type: string, handler: Listener) => {
       windowListeners.set(type, [...(windowListeners.get(type) ?? []), handler]);
     },
@@ -267,6 +296,11 @@ function load(options: {
       );
     },
     scrollBy: (by: Record<string, unknown>) => scrolls.push(by),
+    webkit: {
+      messageHandlers: {
+        openmediaPip: { postMessage: () => asks.push(1) },
+      },
+    },
   };
   win.window = win;
   win.top = win;
@@ -411,7 +445,13 @@ function load(options: {
       }
       return kept;
     },
-    runTimers: () => timeouts.splice(0).forEach((run) => run()),
+    asks,
+    floatFromApp: () => (document[Symbol.for("openmedia.popOut")] as () => void)(),
+    runTimers: () => {
+      const due = [...timeouts.values()];
+      timeouts.clear();
+      due.forEach((run) => run());
+    },
     setCalm: () => {
       document[Symbol.for("openmedia.noAutoplay")] = true;
     },
@@ -644,6 +684,44 @@ describe("video controls", () => {
     expect(style.has("opacity")).toBe(false);
     page.runTimers();
     expect(style.has("opacity")).toBe(false);
+  });
+
+  it("floats the video from the panel, and puts it back with the same button", () => {
+    const video = new FloatableVideo();
+    const page = load({ videos: [video], current: video });
+    openPanel(page);
+    buttonWith(page, "pip").fire("pointerup");
+    expect(video.mode).toBe("picture-in-picture");
+    expect(video.attributes.has("disablepictureinpicture")).toBe(false);
+    page.runTimers();
+    expect(page.asks).toHaveLength(0);
+    // The panel steps aside once the video has left the page.
+    page.tick();
+    expect(shown(page)).toBe(false);
+
+    openPanel(page);
+    buttonWith(page, "pip").fire("pointerup");
+    expect(video.mode).toBe("inline");
+  });
+
+  it("asks the app to float the video when the page's own try changes nothing", () => {
+    const video = new FloatableVideo();
+    video.allowed = false;
+    const page = load({ videos: [video], current: video });
+    openPanel(page);
+    buttonWith(page, "pip").fire("pointerup");
+    page.runTimers();
+    expect(page.asks).toHaveLength(1);
+    video.allowed = true;
+    page.floatFromApp();
+    expect(video.mode).toBe("picture-in-picture");
+  });
+
+  it("has no float button where the engine cannot float a video", () => {
+    const video = new FakeVideo();
+    const page = load({ videos: [video], current: video });
+    openPanel(page);
+    expect(() => buttonWith(page, "pip")).toThrow();
   });
 
   it("always shows the site the press, so a drag or a swipe reaches it whole", () => {

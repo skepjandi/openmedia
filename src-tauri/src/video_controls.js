@@ -16,6 +16,7 @@
   var CURRENT = Symbol.for('openmedia.currentVideo');
   var NO_AUTOPLAY = Symbol.for('openmedia.noAutoplay');
   var USER_PAUSE = Symbol.for('openmedia.userPause');
+  var POP_OUT = Symbol.for('openmedia.popOut');
   var STORE = 'openmedia.video';
   var RATES = [0.5, 1, 1.25, 1.5, 2];
   var TICK_MS = 100;
@@ -34,6 +35,7 @@
   var POP_STEP_MS = 60;
   var POP_MIN = 16; // px: smaller is not an icon's badge or picture
   var POP_SCAN = 8000; // elements looked at per step, at most
+  var POP_ASK_MS = 300; // the app is asked to float the video if the page's own try changed nothing
   var HIDE_MS = 3500; // the panel goes away this long after the last touch on it
   var SVG = 'http://www.w3.org/2000/svg';
   var INTERACTIVE = 'a,button,input,textarea,select,summary,[role="button"],[role="link"],' +
@@ -279,6 +281,7 @@
       back: ['M12 5V1L7 6l5 5V7a6 6 0 1 1-6 6H4a8 8 0 1 0 8-8z'],
       forward: ['M12 5V1l5 5-5 5V7a6 6 0 1 0 6 6h2a8 8 0 1 1-8-8z'],
       sound: ['M3 9v6h4l5 5V4L7 9H3z', 'M14 8.5a4.5 4.5 0 0 1 0 7z'],
+      pip: ['M19 7h-8v6h8V7z', 'M21 3H3c-1.1 0-2 .9-2 2v14c0 1.1.9 1.98 2 1.98h18c1.1 0 2-.88 2-1.98V5c0-1.1-.9-2-2-2zm0 16.01H3V4.98h18v14.03z'],
       muted: ['M3 9v6h4l5 5V4L7 9H3z', 'M14.5 9.4l1.4-1.4 2.1 2.1 2.1-2.1 1.4 1.4-2.1 2.1 2.1 2.1-1.4 1.4-2.1-2.1-2.1 2.1-1.4-1.4 2.1-2.1z']
     };
 
@@ -358,10 +361,32 @@
       };
     }
 
+    // Takes the video out of the page into a floating player that plays until the reader closes
+    // it, or puts it back. A page may not be allowed to ask for that without a gesture it
+    // recognises; if the window did not change, the app is asked to do it from outside the page,
+    // where it counts as one.
+    function inWindow(video) {
+      return video.webkitPresentationMode === 'picture-in-picture';
+    }
+
+    function popOutNow(video) {
+      try { video.removeAttribute('disablepictureinpicture'); } catch (_) {}
+      try { video.webkitSetPresentationMode(inWindow(video) ? 'inline' : 'picture-in-picture'); } catch (_) {}
+    }
+
+    function popOut(video) {
+      var floating = inWindow(video);
+      popOutNow(video);
+      setTimeout(function () {
+        if (inWindow(video) !== floating) return;
+        try { window.webkit.messageHandlers.openmediaPip.postMessage(1); } catch (_) {}
+      }, POP_ASK_MS);
+    }
+
     // The panel: three buttons above a row (mute, time left, speed) above the seek bar,
     // fixed above the bottom edge. Everything is made here as plain elements and nothing is read
     // back from the site.
-    function build() {
+    function build(video) {
       if (ui) return ui;
       var parent = document.body || document.documentElement;
       if (!parent) return null;
@@ -401,6 +426,8 @@
         target.muted = !target.muted;
         if (!target.muted && target.volume === 0) target.volume = 1;
       });
+      var floatButton = typeof video.webkitSetPresentationMode === 'function' ?
+        button(32, 'pip', function (target) { popOut(target); hide(); }) : null;
       var left = make('span', 'margin-left:auto;min-width:48px;text-align:right');
       var pill = make('span',
         'pointer-events:auto;padding:7px 12px;border-radius:999px;background:rgba(255,255,255,.18);' +
@@ -420,6 +447,7 @@
         paint(target);
       });
       row.appendChild(mute);
+      if (floatButton) row.appendChild(floatButton);
       row.appendChild(left);
       row.appendChild(pill);
       var seek = slider(30, function (ratio) {
@@ -488,7 +516,7 @@
         if (ui) ui.root.style.display = 'none';
         return;
       }
-      var parts = build();
+      var parts = build(video);
       if (!parts) return;
       parts.root.style.bottom = 'calc(env(safe-area-inset-bottom,0px) + ' + panelHeight() + 'px)';
       parts.root.style.display = 'block';
@@ -815,6 +843,15 @@
     var timer = setInterval(tick, TICK_MS);
     tick();
 
+    // The app asks for the video in view to float, from outside the page (see `popOut`).
+    Object.defineProperty(document, POP_OUT, {
+      configurable: true,
+      value: function () {
+        var video = focus();
+        if (video && typeof video.webkitSetPresentationMode === 'function') popOutNow(video);
+      }
+    });
+
     Object.defineProperty(document, KEY, {
       configurable: true,
       value: function () {
@@ -823,6 +860,7 @@
         observers.forEach(function (observer) { observer.disconnect(); });
         teardown.forEach(function (step) { try { step(); } catch (_) {} });
         if (ui && ui.root.parentNode) ui.root.parentNode.removeChild(ui.root);
+        delete document[POP_OUT];
         delete document[KEY];
       }
     });
