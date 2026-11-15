@@ -36,6 +36,7 @@
   var POP_MIN = 16; // px: smaller is not an icon's badge or picture
   var POP_SCAN = 8000; // elements looked at per step, at most
   var POP_ASK_MS = 300; // the app is asked to float the video if the page's own try changed nothing
+  var NOTE_MS = 9000;
   var HIDE_MS = 3500; // the panel goes away this long after the last touch on it
   var SVG = 'http://www.w3.org/2000/svg';
   var INTERACTIVE = 'a,button,input,textarea,select,summary,[role="button"],[role="link"],' +
@@ -58,6 +59,7 @@
     var ui = null;
     var shown = false;
     var hideTimer = 0;
+    var noteTimer = 0;
     var lastVideo = null;
     var touchFrom = null;
     var touchTarget = null;
@@ -374,12 +376,31 @@
       try { video.webkitSetPresentationMode(inWindow(video) ? 'inline' : 'picture-in-picture'); } catch (_) {}
     }
 
+    // Why a video would not float, for the line the panel shows when it did not.
+    function noFloat(video, error) {
+      var supported = 'n/a';
+      try { supported = String(video.webkitSupportsPresentationMode('picture-in-picture')); } catch (_) {}
+      return 'Could not float this video (supported: ' + supported + ', mode: ' +
+        video.webkitPresentationMode + (error ? ', ' + error : '') + ')';
+    }
+
     function popOut(video) {
       var floating = inWindow(video);
-      popOutNow(video);
+      var error = '';
+      try { video.removeAttribute('disablepictureinpicture'); } catch (_) {}
+      try {
+        video.webkitSetPresentationMode(floating ? 'inline' : 'picture-in-picture');
+      } catch (thrown) {
+        error = String((thrown && thrown.message) || thrown);
+      }
+      var changed = function () { return inWindow(video) !== floating; };
       setTimeout(function () {
-        if (inWindow(video) !== floating) return;
+        if (changed()) { hide(); return; }
         try { window.webkit.messageHandlers.openmediaPip.postMessage(1); } catch (_) {}
+        setTimeout(function () {
+          if (changed()) { hide(); return; }
+          say(noFloat(video, error));
+        }, POP_ASK_MS);
       }, POP_ASK_MS);
     }
 
@@ -398,6 +419,8 @@
       var card = make('div',
         'pointer-events:auto;margin:0 12px;padding:10px 14px 2px;border-radius:18px;background:rgba(0,0,0,.62);' +
         '-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)');
+      var note = make('div',
+        'display:none;padding:0 0 8px;font:500 11px/1.35 -apple-system,system-ui,sans-serif;color:#ffd9a0');
       var transport = make('div',
         'display:flex;align-items:center;justify-content:center;gap:30px;padding-bottom:6px');
       var back = button(40, 'back', function (target) {
@@ -427,7 +450,7 @@
         if (!target.muted && target.volume === 0) target.volume = 1;
       });
       var floatButton = typeof video.webkitSetPresentationMode === 'function' ?
-        button(32, 'pip', function (target) { popOut(target); hide(); }) : null;
+        button(32, 'pip', function (target) { popOut(target); }) : null;
       var left = make('span', 'margin-left:auto;min-width:48px;text-align:right');
       var pill = make('span',
         'pointer-events:auto;padding:7px 12px;border-radius:999px;background:rgba(255,255,255,.18);' +
@@ -456,6 +479,7 @@
         target.currentTime = ratio * target.duration;
         paint(target);
       });
+      card.appendChild(note);
       card.appendChild(transport);
       card.appendChild(row);
       card.appendChild(seek.track);
@@ -465,7 +489,7 @@
       });
       parent.appendChild(root);
       ui = {
-        root: root, toggle: toggle, mute: mute, left: left, pill: pill, seek: seek
+        root: root, note: note, toggle: toggle, mute: mute, left: left, pill: pill, seek: seek
       };
       return ui;
     }
@@ -486,10 +510,24 @@
       setIcon(ui.mute, video.muted || video.volume === 0 ? 'muted' : 'sound');
     }
 
+    // A line above the controls, for a few seconds: what went wrong, in the reader's own words
+    // where there are any, so it can be told to someone.
+    function say(text) {
+      if (!ui) return;
+      ui.note.textContent = text;
+      ui.note.style.display = 'block';
+      clearTimeout(noteTimer);
+      noteTimer = setTimeout(function () { if (ui) ui.note.style.display = 'none'; }, NOTE_MS);
+      keepAlive();
+    }
+
     function hide() {
       shown = false;
       clearTimeout(hideTimer);
-      if (ui) ui.root.style.display = 'none';
+      if (ui) {
+        ui.root.style.display = 'none';
+        ui.note.style.display = 'none';
+      }
     }
 
     // The panel goes away a few seconds after the last touch on it, but not off a paused video:

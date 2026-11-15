@@ -445,6 +445,9 @@ private final class Session {
   var autoPictureInPicture = false
   /// True while a video floats because the page it played on was left for another.
   var floatedForNavigation = false
+  /// True while one of the page's videos is in a picture-in-picture window, as last seen when the
+  /// app was left: the window has to keep playing while the app is minimized, whatever the site.
+  var windowOpen = false
   /// True when the page was replaced in its session: only its picture-in-picture window is left.
   var floatDetached = false
   /// The native shield over a closed page. It covers the page and takes every touch.
@@ -564,11 +567,15 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
       forName: UIApplication.willEnterForegroundNotification, object: nil, queue: .main
     ) { [weak self] _ in
       self?.appForeground = true
+      self?.sessions.values.forEach { $0.windowOpen = false }
       self?.refreshMedia()
     }
     NotificationCenter.default.addObserver(
       forName: UIApplication.willResignActiveNotification, object: nil, queue: .main
-    ) { [weak self] _ in self?.enterPictureInPicture() }
+    ) { [weak self] _ in
+      self?.noteWindowOpen()
+      self?.enterPictureInPicture()
+    }
     NotificationCenter.default.addObserver(
       forName: UIApplication.didBecomeActiveNotification, object: nil, queue: .main
     ) { [weak self] _ in self?.exitAutomaticPictureInPicture() }
@@ -906,6 +913,15 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
     }
   }
 
+  /// Just before the app is left: is the page in front floating a video? Read while the page can
+  /// still answer, so minimizing never suspends it.
+  private func noteWindowOpen() {
+    guard let id = activeId, let session = sessions[id], !session.blocked else { return }
+    session.view.evaluateJavaScript(inPictureInPictureScript) { [weak session] result, _ in
+      session?.windowOpen = (result as? Bool) == true
+    }
+  }
+
   /// Leaving a page for another in its own session (Back, an address) while it plays a video with
   /// sound: the video floats, and the page, which a load in the same view would destroy together
   /// with its window, stays alive in a hidden view of its own while a fresh view takes the session
@@ -1057,7 +1073,10 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
   private func refreshMedia() {
     for session in sessions.values where !session.blocked && !session.floatedForNavigation {
       let shown = appForeground && session.id == activeId
-      if !appForeground && session.id == activeId && pictureInPictureSites.contains(session.scope) {
+      if !appForeground && session.id == activeId {
+        // A window the reader opened (the panel's button, or an automatic one) keeps playing while
+        // the app is minimized, on any site. Without one the page is suspended as usual.
+        if session.windowOpen { continue }
         suspendUnlessFloating(session)
         continue
       }
@@ -1072,6 +1091,7 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
     session.view.evaluateJavaScript(inPictureInPictureScript) { [weak self, weak session] result, _ in
       guard let self, let session, !self.appForeground else { return }
       let floating = (result as? Bool) == true
+      session.windowOpen = floating
       self.setMediaSuspended(
         !floating && !self.backgroundMediaSites.contains(session.scope), in: session)
     }

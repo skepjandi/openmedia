@@ -72,6 +72,10 @@ class FloatableVideo extends FakeVideo {
     if (this.allowed) this.mode = mode;
   }
 
+  webkitSupportsPresentationMode() {
+    return this.allowed;
+  }
+
   removeAttribute(name: string) {
     this.attributes.delete(name);
   }
@@ -686,7 +690,7 @@ describe("video controls", () => {
     expect(style.has("opacity")).toBe(false);
   });
 
-  it("floats the video from the panel, and puts it back with the same button", () => {
+  it("floats the video from the panel, steps aside, and puts it back with the same button", () => {
     const video = new FloatableVideo();
     const page = load({ videos: [video], current: video });
     openPanel(page);
@@ -695,7 +699,6 @@ describe("video controls", () => {
     expect(video.attributes.has("disablepictureinpicture")).toBe(false);
     page.runTimers();
     expect(page.asks).toHaveLength(0);
-    // The panel steps aside once the video has left the page.
     page.tick();
     expect(shown(page)).toBe(false);
 
@@ -715,6 +718,26 @@ describe("video controls", () => {
     video.allowed = true;
     page.floatFromApp();
     expect(video.mode).toBe("picture-in-picture");
+  });
+
+  it("says why when the video would not float, and keeps the panel up", () => {
+    const video = new FloatableVideo();
+    video.allowed = false;
+    // The panel stays on a paused video, as the real timers would leave it for these 600 ms.
+    video.paused = true;
+    const page = load({ videos: [video], current: video });
+    openPanel(page);
+    buttonWith(page, "pip").fire("pointerup");
+    page.runTimers();
+    page.runTimers();
+    page.tick();
+    expect(shown(page)).toBe(true);
+    const lines = page.body
+      .descendants()
+      .filter((element) => element.textContent.startsWith("Could not float this video"));
+    expect(lines).toHaveLength(1);
+    expect(lines[0].textContent).toContain("mode: inline");
+    expect(lines[0].style.display).toBe("block");
   });
 
   it("has no float button where the engine cannot float a video", () => {

@@ -6,6 +6,12 @@ All notable changes to OpenMedia are documented here.
 >
 > **Wiki**: the [GitHub Wiki](https://github.com/skepjandi/openmedia/wiki) is the public-facing main wiki — architecture, recipe format, AI pipeline, security model, roadmap. Source-controlled editing surface is `docs/wiki/` in this repo; CI (`.github/workflows/sync-wiki.yml`) mirrors it to the GitHub Wiki on every merge to `main`. New single-PR changes belong here, not as new wiki pages.
 
+### fix(siteview): a floating video keeps playing when the app is minimized, and the panel says why a video would not float (iOS)
+
+**Area:** `fix(siteview)`
+
+**Change:** Leaving the app now opens a floating window for the playing video on any site, not only those in the picture-in-picture list; the page stays alive (not suspended) while its window is open, and the flag resets when the app returns. When the float button cannot float a video, the panel shows a line (supported, mode, error) for nine seconds instead of closing silently. Not verified on hardware: the simulator has no picture-in-picture window.
+
 ### feat(siteview): a float button in the video controls, and a floating video that survives Back (iOS)
 
 **Area:** `feat(siteview)`
