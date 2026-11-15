@@ -38,6 +38,8 @@
   var MINI_MAX = 240; // px: widest the small player gets
   var MINI_SHARE = 0.48; // of the screen's width
   var MINI_EDGE = 12; // px from the right edge
+  var MINI_RECHECK_MS = 250; // a site's restyling of the lifted video is answered after this
+  var MINI_FIGHTS = 40; // and this many times, then the site wins
   var MINI_BOTTOM = 96; // px from the bottom edge, clear of the browser's own buttons
   var HIDE_MS = 3500; // the panel goes away this long after the last touch on it
   var SVG = 'http://www.w3.org/2000/svg';
@@ -464,12 +466,30 @@
       root.appendChild(close);
       root.appendChild(toggle);
       (document.documentElement || document.body).appendChild(root);
-      // The site's player keeps styling its video: put the box's styles back whenever it does.
+      // The site's player keeps styling its video: the box's styles are put back when it does, at
+      // most a few times a second and a limited number of times. Putting them back on every
+      // change would make this and a player that restyles on every change feed each other
+      // without end, which hangs the page.
+      var checking = 0;
+      var fights = 0;
+      var kept = function () {
+        var style = video.style;
+        return typeof style.getPropertyPriority !== 'function' ||
+          (style.getPropertyPriority('position') === 'important' &&
+            style.getPropertyPriority('width') === 'important' &&
+            style.getPropertyPriority('height') === 'important');
+      };
       var watch = new MutationObserver(function () {
-        if (video.style.cssText !== MINI_VIDEO_CSS) video.style.cssText = MINI_VIDEO_CSS;
+        if (checking || fights >= MINI_FIGHTS) return;
+        checking = setTimeout(function () {
+          checking = 0;
+          if (kept()) return;
+          fights += 1;
+          video.style.cssText = MINI_VIDEO_CSS;
+        }, MINI_RECHECK_MS);
       });
       watch.observe(video, { attributes: true, attributeFilter: ['style'] });
-      state.stops.push(function () { watch.disconnect(); });
+      state.stops.push(function () { watch.disconnect(); clearTimeout(checking); });
       mini = state;
       tellApp(true);
       if (state.playing && video.paused) { try { video.play().catch(function () {}); } catch (_) {} }

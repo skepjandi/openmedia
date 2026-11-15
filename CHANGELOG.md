@@ -6,6 +6,12 @@ All notable changes to OpenMedia are documented here.
 >
 > **Wiki**: the [GitHub Wiki](https://github.com/skepjandi/openmedia/wiki) is the public-facing main wiki — architecture, recipe format, AI pipeline, security model, roadmap. Source-controlled editing surface is `docs/wiki/` in this repo; CI (`.github/workflows/sync-wiki.yml`) mirrors it to the GitHub Wiki on every merge to `main`. New single-PR changes belong here, not as new wiki pages.
 
+### fix(video): the small player no longer hangs a page that restyles its video (YouTube)
+
+**Area:** `fix(video)`
+
+**Change:** The small player re-applied its styles to the lifted video on every change of the video's style. YouTube's player restyles its video on every change too, so the two fed each other without end: the page's content process sat at 96% CPU and the page, and with it the app, stopped responding after a tap on another video. The re-apply now waits 250 ms, runs only when the box's styles are gone, and gives up after 40 times. Found by sampling the spinning process on the simulator.
+
 ### feat(video): the float button opens a small player in the bottom right corner
 
 **Area:** `feat(video)`

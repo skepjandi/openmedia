@@ -59,13 +59,34 @@ class FakeVideo {
 }
 
 /** A video that sits in a page: it has a parent to leave and return to, a style and events. */
+/** A video's inline style that counts the page's writes, and can be wiped of priorities by a site. */
+class CountedStyle {
+  writes = 0;
+  wiped = false;
+  private css = "";
+
+  get cssText() {
+    return this.css;
+  }
+
+  set cssText(value: string) {
+    this.css = value;
+    this.writes += 1;
+    this.wiped = false;
+  }
+
+  getPropertyPriority() {
+    return this.wiped ? "" : "important";
+  }
+}
+
 class PlacedVideo extends FakeVideo {
   parentNode: FakeElement | null = null;
   videoWidth = 1280;
   videoHeight = 720;
   currentSrc = "blob:one";
   ended = false;
-  style = { cssText: "" } as Record<string, string>;
+  style = new CountedStyle();
   private attrs = new Map<string, string>();
   private listeners = new Map<string, Array<() => void>>();
 
@@ -214,6 +235,8 @@ interface Page {
   setCalm: () => void;
   setCurrent: (video: FakeVideo | null) => void;
   teardown: () => void;
+  /** Callbacks of the mutation observers the controls made, as the browser would call them. */
+  observers: Array<() => void>;
 }
 
 const SITE_BUTTON = { closest: (selector: string) => (selector.includes("button") ? {} : null) };
@@ -244,6 +267,7 @@ function load(options: {
 }): Page {
   const intervals: Array<() => void> = [];
   const timeouts = new Map<number, () => void>();
+  const observers: Array<() => void> = [];
   let timeoutId = 0;
   const documentListeners = new Map<string, Listener[]>();
   const windowListeners = new Map<string, Listener[]>();
@@ -287,6 +311,9 @@ function load(options: {
     document,
     HTMLVideoElement: FakeVideo,
     MutationObserver: class {
+      constructor(callback: () => void) {
+        observers.push(callback);
+      }
       observe() {}
       disconnect() {}
     },
@@ -486,6 +513,7 @@ function load(options: {
       current = video;
     },
     teardown: () => (document[Symbol.for("openmedia.videoControls")] as () => void)(),
+    observers,
   };
 }
 
@@ -784,6 +812,23 @@ describe("video controls", () => {
       video.emit(ending);
       expect(video.parentNode).toBe(home);
     }
+  });
+
+  it("answers a site that keeps restyling the lifted video a limited number of times, not without end", () => {
+    const home = new FakeElement();
+    const video = new PlacedVideo();
+    home.appendChild(video as unknown as FakeElement);
+    const page = load({ videos: [video], current: video });
+    openPanel(page);
+    buttonWith(page, "pip").fire("pointerup");
+    const before = video.style.writes;
+    for (let round = 0; round < 500; round += 1) {
+      video.style.wiped = true;
+      for (const callback of page.observers) callback();
+      page.runTimers();
+    }
+    expect(video.style.writes - before).toBeGreaterThan(0);
+    expect(video.style.writes - before).toBeLessThanOrEqual(40);
   });
 
   it("does not end for a load of the same video", () => {
