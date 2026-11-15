@@ -54,6 +54,7 @@
     var hideTimer = 0;
     var lastVideo = null;
     var touchFrom = null;
+    var touchTarget = null;
     var touchTapAt = 0;
 
     function read() {
@@ -362,7 +363,7 @@
         '-webkit-user-select:none;user-select:none');
       root.setAttribute('data-openmedia-controls', '');
       var card = make('div',
-        'margin:0 12px;padding:10px 14px 2px;border-radius:18px;background:rgba(0,0,0,.62);' +
+        'pointer-events:auto;margin:0 12px;padding:10px 14px 2px;border-radius:18px;background:rgba(0,0,0,.62);' +
         '-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)');
       var transport = make('div',
         'display:flex;align-items:center;justify-content:center;gap:30px;padding-bottom:6px');
@@ -491,12 +492,27 @@
     // not a tap and reaches the site untouched. Some players end a touch themselves and cancel the
     // click that follows it, so a tap is found from the touch, and the click it would have made
     // is swallowed.
+    // Whether the tap landed on a button of the site's own. A player that puts one transparent
+    // button over the whole video to catch taps (Instagram does) is not one: the element has to be
+    // small next to the video.
+    function onSiteButton(hit, video) {
+      var button = hit && hit.closest && hit.closest(INTERACTIVE);
+      if (!button) return false;
+      if (!button.getBoundingClientRect) return true;
+      var own = button.getBoundingClientRect();
+      var box = boxOf(video);
+      var wide = Math.min(own.right, box.right) - Math.max(own.left, box.left);
+      var tall = Math.min(own.bottom, box.bottom) - Math.max(own.top, box.top);
+      var area = (box.right - box.left) * (box.bottom - box.top);
+      return !(area > 0 && wide > 0 && tall > 0 && (wide * tall) / area >= 0.5);
+    }
+
     function tapAt(x, y, hit, event) {
       if (!panelPage() || !panelOn()) return false;
       if (hit && hit.closest && hit.closest('[data-openmedia-controls]')) return false;
       var video = focus();
       if (!video) return false;
-      if (hit && hit.closest && hit.closest(INTERACTIVE)) return false;
+      if (onSiteButton(hit, video)) return false;
       var box = boxOf(video);
       if (!(x >= box.left && x <= box.right && y >= box.top && y <= box.bottom)) return false;
       event.stopImmediatePropagation();
@@ -512,7 +528,43 @@
       return true;
     }
 
+    function inPanel(hit) {
+      return !!(hit && hit.closest && hit.closest('[data-openmedia-controls]'));
+    }
+
+    // A touch on the panel is the panel's alone: the site's own handlers, which may work out what
+    // was tapped from where the finger is, never see it. The panel's buttons listen to pointer
+    // events, which this leaves alone.
+    function keepFromSite(event) {
+      if (!inPanel(event.target)) return false;
+      event.stopImmediatePropagation();
+      if (event.type !== 'touchstart' && event.type !== 'touchmove' && event.cancelable) {
+        event.preventDefault();
+      }
+      return true;
+    }
+
+    // The site saw the touch begin and is not allowed to see it end, so it is told it was
+    // cancelled: a player waits on that to drop its hold timer, or a press that stays down opens
+    // its long-press menu (a sheet on Shorts, hold for 2x on a watch page) under the panel.
+    function cancelForSite(event) {
+      try {
+        var at = touchTarget;
+        if (typeof TouchEvent !== 'function' || !at || !at.dispatchEvent) return;
+        at.dispatchEvent(new TouchEvent('touchcancel', {
+          bubbles: true,
+          touches: [],
+          targetTouches: [],
+          changedTouches: Array.prototype.slice.call(event.changedTouches || [])
+        }));
+      } catch (_) {}
+    }
+
     function onTouchStart(event) {
+      touchFrom = null;
+      touchTarget = null;
+      if (keepFromSite(event)) return;
+      touchTarget = event.target;
       var first = event.touches && event.touches.length === 1 ? event.touches[0] : null;
       touchFrom = first ? { x: first.clientX, y: first.clientY, time: Date.now() } : null;
     }
@@ -520,13 +572,21 @@
     function onTouchEnd(event) {
       var from = touchFrom;
       touchFrom = null;
+      if (keepFromSite(event)) return;
       var last = event.changedTouches && event.changedTouches[0];
       if (!from || !last || Date.now() - from.time > TAP_MAX_MS) return;
       if (Math.hypot(last.clientX - from.x, last.clientY - from.y) > TAP_SLOP) return;
-      if (tapAt(last.clientX, last.clientY, event.target, event)) touchTapAt = Date.now();
+      if (tapAt(last.clientX, last.clientY, event.target, event)) {
+        touchTapAt = Date.now();
+        cancelForSite(event);
+      }
     }
 
     function onClick(event) {
+      if (inPanel(event.target)) {
+        event.stopImmediatePropagation();
+        return;
+      }
       if (Date.now() - touchTapAt < CLICK_AFTER_TOUCH_MS) {
         event.stopImmediatePropagation();
         if (event.cancelable) event.preventDefault();
@@ -545,6 +605,7 @@
     on(document, 'touchend', tapped, { capture: true, passive: true });
     on(document, 'click', tapped, { capture: true, passive: true });
     on(window, 'touchstart', onTouchStart, { capture: true, passive: true });
+    on(window, 'touchmove', keepFromSite, { capture: true, passive: true });
     on(window, 'touchend', onTouchEnd, { capture: true });
     on(window, 'click', onClick, { capture: true });
     on(document, 'keydown', tapped, { capture: true, passive: true });

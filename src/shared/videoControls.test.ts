@@ -150,6 +150,13 @@ interface Page {
 }
 
 const SITE_BUTTON = { closest: (selector: string) => (selector.includes("button") ? {} : null) };
+/** One transparent button over the whole video that catches taps, as Instagram's player has. */
+const TAP_CATCHER = {
+  closest: (selector: string) =>
+    selector.includes("button")
+      ? { getBoundingClientRect: () => ({ top: 0, left: 0, right: 400, bottom: 800 }) }
+      : null,
+};
 const PANEL_PART = {
   closest: (selector: string) => (selector.includes("data-openmedia-controls") ? {} : null),
 };
@@ -214,6 +221,12 @@ function load(options: {
     MutationObserver: class {
       observe() {}
       disconnect() {}
+    },
+    TouchEvent: class {
+      type: string;
+      constructor(type: string) {
+        this.type = type;
+      }
     },
     Date,
     JSON,
@@ -404,6 +417,18 @@ describe("video controls", () => {
     expect(shown(page)).toBe(true);
   });
 
+  it("tells the site the touch was cancelled when it keeps the tap, so no hold menu opens", () => {
+    const video = new FakeVideo();
+    const page = load({ videos: [video], current: video });
+    const events: string[] = [];
+    const target = {
+      ...PLAIN,
+      dispatchEvent: (event: { type: string }) => events.push(event.type),
+    };
+    expect(page.touch([200, 400], [200, 400], target).kept).toBe(true);
+    expect(events).toEqual(["touchcancel"]);
+  });
+
   it("leaves a swipe, and a touch on one of the site's buttons, to the site", () => {
     const video = new FakeVideo();
     const page = load({ videos: [video], current: video });
@@ -420,6 +445,22 @@ describe("video controls", () => {
     expect(page.click(200, 900).kept).toBe(false);
     page.tick();
     expect(shown(page)).toBe(false);
+  });
+
+  it("takes a tap on a transparent button the size of the video, which is the site's tap catcher", () => {
+    const video = new FakeVideo();
+    const page = load({ videos: [video], current: video });
+    expect(page.touch([200, 400], [200, 400], TAP_CATCHER).kept).toBe(true);
+    page.tick();
+    expect(shown(page)).toBe(true);
+  });
+
+  it("catches a tap on the panel's blank parts, so it cannot reach a site button beneath", () => {
+    const video = new FakeVideo();
+    const page = load({ videos: [video], current: video });
+    openPanel(page);
+    const card = panelOf(page).children[0];
+    expect(card.style.cssText).toContain("pointer-events:auto");
   });
 
   it("keeps a tap on its own panel from the site without closing it", () => {

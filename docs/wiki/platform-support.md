@@ -278,3 +278,7 @@ Tracked in [Roadmap](./roadmap.md#phase-0--feasibility-spikes). Each needs a rec
 ## See Also
 
 [Architecture](./architecture.md) · [Site Runtime](./site-runtime.md) · [Security](./security.md) · [Roadmap](./roadmap.md)
+
+## Mini player on leaving a page (iOS)
+
+When a page that is playing a video with sound is left for another (Back, an address, a favorite, Home), `SiteViewPlugin.swift` floats that video in a picture-in-picture window before the next page shows (`floatForNavigationScript`, run through `evaluateJavaScript` so WebKit counts it as a gesture; it lifts the guard's `disablepictureinpicture` for that one video). A page replaced in its own session stays alive, hidden (`floatingSessions`), until the window closes or the page in front plays a video of its own (`ownVideoPlayingScript`), checked every 2 s. Unlike leaving the app, this does not depend on the per-favorite picture-in-picture switch. The iOS Simulator reports no picture-in-picture support, so only a device shows the window. Android and desktop have no equivalent.

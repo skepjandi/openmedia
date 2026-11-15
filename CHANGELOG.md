@@ -6,6 +6,18 @@ All notable changes to OpenMedia are documented here.
 >
 > **Wiki**: the [GitHub Wiki](https://github.com/skepjandi/openmedia/wiki) is the public-facing main wiki — architecture, recipe format, AI pipeline, security model, roadmap. Source-controlled editing surface is `docs/wiki/` in this repo; CI (`.github/workflows/sync-wiki.yml`) mirrors it to the GitHub Wiki on every merge to `main`. New single-PR changes belong here, not as new wiki pages.
 
+### fix(siteview): the panel no longer opens a site's menu, takes Instagram's tap catcher, and a leaving page's video floats (iOS)
+
+**Area:** `fix(siteview)`
+
+**Problem:** On Shorts a tap that showed the panel also opened YouTube's long-press menu (Description, Save to playlist, Captions, Playback speed) under it. The page saw the touch begin and never saw it end, so its hold timer ran out. (The same thing made a watch page show its hold-for-2× badge.) Taps on the panel's empty parts fell through to the site's buttons beneath it. On Instagram Reels a tap only muted, because the player puts one transparent `role=button` over the whole video and that was taken for one of the site's buttons.
+
+**Change:** A tap the panel keeps is now followed by a `touchcancel` to the site, so no hold timer fires. The panel's card catches touches, and touches on it are kept from the site's handlers. A button that covers at least half the video is the site's tap catcher, not a button. On iOS, leaving a page that is playing a video with sound (Back, an address, a favorite, Home) floats the video in a picture-in-picture window instead of suspending the page; the page stays alive, hidden, until the window is closed or the page in front plays a video of its own. This applies to every site, not only those with the picture-in-picture switch on (that switch still decides leaving the app).
+
+**Verified:** Vitest (`videoControls.test.ts`), ESLint, `tsc`, `swiftc -parse`; on the iOS 26.5 simulator on YouTube Shorts: a tap shows the panel and no menu opens, and a tap on the panel over the Comments button does nothing; switching favorites and opening addresses still works with the float attempt in the path. **Not verified:** the floating window itself (the simulator reports no picture-in-picture support, so the attempt always answers no there), Instagram Reels (no account), Android (no mini player is built there).
+
+**PR:** n/a
+
 ### feat(siteview): tap a video for OpenMedia's own controls, with a height per favorite
 
 **Area:** `feat(siteview)`

@@ -92,6 +92,43 @@ private let enterPictureInPictureScript = """
     return true;
   })()
   """
+/// Floats the playing video that has sound as a page is left for another, whatever its site: the
+/// page's own guard keeps picture-in-picture off videos of sites the reader did not list, and the
+/// attribute is lifted for this one video only.
+private let floatForNavigationScript = """
+  (function () {
+    var best = null, area = 0, videos = document.querySelectorAll('video');
+    for (var i = 0; i < videos.length; i++) {
+      var video = videos[i];
+      if (video.paused || video.ended || video.muted || video.volume === 0 || !video.videoWidth) continue;
+      if (typeof video.webkitSetPresentationMode !== 'function') continue;
+      var size = video.clientWidth * video.clientHeight;
+      if (size > area) { area = size; best = video; }
+    }
+    if (!best || best.webkitPresentationMode === 'picture-in-picture') return false;
+    best.removeAttribute('disablepictureinpicture');
+    if (!best.webkitSupportsPresentationMode('picture-in-picture')) return false;
+    best.webkitSetPresentationMode('picture-in-picture');
+    return true;
+  })()
+  """
+/// True when the page has a playing video of its own that is not the one floating.
+private let ownVideoPlayingScript = """
+  (function () {
+    var videos = document.querySelectorAll('video');
+    for (var i = 0; i < videos.length; i++) {
+      var video = videos[i];
+      if (video.webkitPresentationMode === 'picture-in-picture') continue;
+      if (!video.paused && !video.ended && video.readyState > 2 && video.videoWidth > 0) return true;
+    }
+    return false;
+  })()
+  """
+/// How long a page gets, once loaded, to start a video of its own before the floating one stays.
+private let ownVideoWait: TimeInterval = 2.5
+private let floatCheckEvery: TimeInterval = 2
+/// How long a page gets to answer before the next one is shown anyway.
+private let floatAnswerWait: TimeInterval = 0.6
 private let exitPictureInPictureScript = """
   (function () {
     var videos = document.querySelectorAll('video');
@@ -383,6 +420,11 @@ private final class Session {
   /// True while a picture-in-picture window is open because the app was left, not because the
   /// reader opened it; coming back closes it.
   var autoPictureInPicture = false
+  /// True while a video floats because the page it played on was left for another.
+  var floatedForNavigation = false
+  /// True when the page was replaced in its session: only its picture-in-picture window is left.
+  var floatDetached = false
+  var settlingFloat = false
   /// The native shield over a closed page. It covers the page and takes every touch.
   var shield: UIView?
   var observations: [NSKeyValueObservation] = []
@@ -472,6 +514,11 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
   private var pictureInPictureSites: Set<String> = []
   /// False from the app entering the background to it coming back.
   private var appForeground = true
+  /// Pages that were left for another while their video played: the page stays alive, hidden, so
+  /// its picture-in-picture window keeps playing, until the window is closed or the page in front
+  /// plays a video of its own.
+  private var floatingSessions: [Session] = []
+  private var watchingFloats = false
 
   override func load(webview: WKWebView) {
     shell = webview
@@ -525,7 +572,23 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
     Task { @MainActor in
       let lists = args.contentRuleLists ?? []
       let (cached, missing) = await self.lookUpRuleLists(lists)
-      if let existing = self.sessions[args.session] { self.dispose(existing) }
+      // The page in front when another is opened keeps its video going in a window, when it has one
+      // playing; a page replaced in its own session stays alive, hidden, for the window's sake.
+      if let previous = self.activeId.flatMap({ self.sessions[$0] }), previous.id != args.session,
+        self.appForeground
+      {
+        _ = await self.floatIfPlaying(previous)
+      }
+      if let existing = self.sessions[args.session] {
+        if self.appForeground, await self.floatIfPlaying(existing) {
+          existing.floatDetached = true
+          existing.view.isHidden = true
+          existing.observations.removeAll()
+          self.sessions[existing.id] = nil
+        } else {
+          self.dispose(existing)
+        }
+      }
       if let rect = args.rect { self.pageRect = rect.cgRect }
       let view = WKWebView(
         frame: .zero,
@@ -618,7 +681,9 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
       invoke.reject("only http and https urls can be opened")
       return
     }
-    onActiveSession(invoke) { $0.view.load(URLRequest(url: url)) }
+    onActiveSession(invoke) { [weak self] session in
+      self?.floatPlayingVideo(of: session) { session.view.load(URLRequest(url: url)) }
+    }
   }
 
   @objc public func goBack(_ invoke: Invoke) {
@@ -629,7 +694,7 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
         self.closeSignInWindow()
         return
       }
-      session.view.goBack()
+      self.floatPlayingVideo(of: session) { session.view.goBack() }
     }
   }
 
@@ -823,6 +888,109 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
     }
   }
 
+  /// Leaving a page for another (Back, an address, a favorite's home) keeps its playing video going
+  /// in a picture-in-picture window, as a player's mini view does, and `then` runs once it floats.
+  /// The new page gets `ownVideoWait` to start a video of its own; if it does, the floating one is
+  /// put back (see `settleFloatedVideo`). A page with nothing playing just navigates.
+  private func floatPlayingVideo(of session: Session, then navigate: @escaping () -> Void) {
+    guard !session.blocked, !session.floatedForNavigation else {
+      navigate()
+      return
+    }
+    session.view.evaluateJavaScript(floatForNavigationScript) { [weak session] result, _ in
+      if (result as? Bool) == true {
+        session?.autoPictureInPicture = true
+        session?.floatedForNavigation = true
+      }
+      navigate()
+    }
+  }
+
+  /// Floats the page's playing video, when it has one with sound, and keeps the page out of the
+  /// media suspension while the window is up. True when a window opened.
+  @MainActor
+  private func floatIfPlaying(_ session: Session) async -> Bool {
+    guard !session.blocked, !session.floatedForNavigation else { return false }
+    let floated: Bool = await withCheckedContinuation { continuation in
+      var answered = false
+      let answer = { (value: Bool) in
+        guard !answered else { return }
+        answered = true
+        continuation.resume(returning: value)
+      }
+      session.view.evaluateJavaScript(floatForNavigationScript) { result, _ in
+        answer((result as? Bool) == true)
+      }
+      // A page that never answers must not keep the next one from opening.
+      DispatchQueue.main.asyncAfter(deadline: .now() + floatAnswerWait) { answer(false) }
+    }
+    guard floated else { return false }
+    session.floatedForNavigation = true
+    floatingSessions.append(session)
+    watchFloats()
+    return true
+  }
+
+  private func watchFloats() {
+    guard !watchingFloats else { return }
+    watchingFloats = true
+    DispatchQueue.main.asyncAfter(deadline: .now() + floatCheckEvery) { [weak self] in
+      guard let self else { return }
+      self.watchingFloats = false
+      guard !self.floatingSessions.isEmpty else { return }
+      self.checkFloats()
+      self.watchFloats()
+    }
+  }
+
+  /// A floating page ends when its window is closed, or when the page in front plays a video of
+  /// its own.
+  private func checkFloats() {
+    for session in floatingSessions {
+      session.view.evaluateJavaScript(inPictureInPictureScript) { [weak self, weak session] result, _ in
+        guard let self, let session, (result as? Bool) != true else { return }
+        self.endFloat(session)
+      }
+    }
+    guard let id = activeId, let front = sessions[id], !front.floatedForNavigation else { return }
+    front.view.evaluateJavaScript(ownVideoPlayingScript) { [weak self] result, _ in
+      guard let self, (result as? Bool) == true else { return }
+      for session in self.floatingSessions { self.endFloat(session) }
+    }
+  }
+
+  private func endFloat(_ session: Session) {
+    session.floatedForNavigation = false
+    session.autoPictureInPicture = false
+    session.view.evaluateJavaScript(exitPictureInPictureScript)
+    if let index = floatingSessions.firstIndex(where: { $0 === session }) {
+      floatingSessions.remove(at: index)
+    }
+    if session.floatDetached {
+      teardownView(session.view)
+    } else {
+      refreshMedia()
+    }
+  }
+
+  /// After a page loads under a floating video: if the page plays a video of its own, the floating
+  /// one goes back where it came from; otherwise it keeps playing.
+  private func settleFloatedVideo(of session: Session) {
+    guard session.floatedForNavigation, !session.settlingFloat else { return }
+    session.settlingFloat = true
+    DispatchQueue.main.asyncAfter(deadline: .now() + ownVideoWait) { [weak session] in
+      guard let session else { return }
+      session.settlingFloat = false
+      guard session.floatedForNavigation else { return }
+      session.view.evaluateJavaScript(ownVideoPlayingScript) { [weak session] result, _ in
+        guard let session, (result as? Bool) == true else { return }
+        session.floatedForNavigation = false
+        session.autoPictureInPicture = false
+        session.view.evaluateJavaScript(exitPictureInPictureScript)
+      }
+    }
+  }
+
   /// Coming back to the app puts a video floated by `enterPictureInPicture` back in the page.
   private func exitAutomaticPictureInPicture() {
     for session in sessions.values where session.autoPictureInPicture {
@@ -835,7 +1003,7 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
   /// resumes what was suspended when the page is shown again. A closed page is left to
   /// `applyBlocked`.
   private func refreshMedia() {
-    for session in sessions.values where !session.blocked {
+    for session in sessions.values where !session.blocked && !session.floatedForNavigation {
       let shown = appForeground && session.id == activeId
       if !appForeground && session.id == activeId && pictureInPictureSites.contains(session.scope) {
         suspendUnlessFloating(session)
@@ -1338,7 +1506,37 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
   }
 
   /// Makes `session` the one visible page. The others stay alive underneath, hidden.
+  /// Makes `session` the one visible page. A page that is playing a video with sound when another
+  /// takes the screen (Back to a favorite, Home, another site) is not suspended: its video floats
+  /// in a picture-in-picture window first, as a mini player does.
   private func show(_ session: Session) {
+    guard let id = activeId, let previous = sessions[id], previous !== session, appForeground,
+      !previous.blocked, !previous.floatedForNavigation
+    else {
+      showNow(session)
+      return
+    }
+    var shown = false
+    let proceed = { [weak self] in
+      guard !shown else { return }
+      shown = true
+      self?.showNow(session)
+    }
+    previous.view.evaluateJavaScript(floatForNavigationScript) { [weak self, weak previous] result, _ in
+      if (result as? Bool) == true, let self, let previous {
+        previous.floatedForNavigation = true
+        self.floatingSessions.append(previous)
+        self.watchFloats()
+      }
+      proceed()
+    }
+    // A page that never answers must not keep the next one from showing.
+    DispatchQueue.main.asyncAfter(deadline: .now() + floatAnswerWait) { proceed() }
+  }
+
+  private func showNow(_ session: Session) {
+    // Coming back to a page whose video floats puts the video back in it.
+    if session.floatedForNavigation { endFloat(session) }
     // A sign-in window belongs to the page that opened it; another page takes the screen.
     if let owner = signInOwner, owner != session.id { closeSignInWindow() }
     for other in sessions.values where other !== session { other.view.isHidden = true }
@@ -1658,6 +1856,8 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
   }
 
   private func sendState(_ session: Session) {
+    // The page changed (a load, or a pushState a site makes itself): see what it plays.
+    settleFloatedVideo(of: session)
     let view = session.view
     if !view.isLoading { view.scrollView.refreshControl?.endRefreshing() }
     send(
@@ -1682,7 +1882,16 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
     if signInOwner == session.id { closeSignInWindow() }
     session.observations.removeAll()
     removeShield(from: session)
-    let view = session.view
+    teardownView(session.view)
+    sessions[session.id] = nil
+    if activeId == session.id {
+      activeId = nil
+      router?.siteView = nil
+    }
+  }
+
+  /// Takes a web view apart: nothing it loads or posts reaches the app any more.
+  private func teardownView(_ view: WKWebView) {
     view.stopLoading()
     view.configuration.userContentController.removeAllUserScripts()
     view.configuration.userContentController.removeScriptMessageHandler(forName: bridgeHandlerName)
@@ -1692,11 +1901,6 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
     view.navigationDelegate = nil
     view.uiDelegate = nil
     view.removeFromSuperview()
-    sessions[session.id] = nil
-    if activeId == session.id {
-      activeId = nil
-      router?.siteView = nil
-    }
   }
 
   private func onActiveSession(_ invoke: Invoke, _ action: @escaping (Session) -> Void) {
