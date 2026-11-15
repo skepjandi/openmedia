@@ -323,7 +323,7 @@ function load(options: {
       return tap;
     },
     pointer: (from, to = from, target = PLAIN) => {
-      const tap = { kept: false };
+      const tap: Tap = { kept: false };
       for (const handler of windowListeners.get("pointerdown") ?? []) {
         handler({
           type: "pointerdown",
