@@ -1,0 +1,102 @@
+name: Blocklists
+
+# Filter lists are bundled in the app and only change with a release, so they need a person (or
+# this job) to refresh them. Weekly, this moves the pinned upstream revisions, re-downloads the
+# lists, checks them the way a device would and opens a pull request. Nothing is merged or
+# released by it. Every change to the lists, by this job or by hand, is compiled with WebKit.
+
+on:
+  schedule:
+    - cron: "17 5 * * 1"
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "blocklists/**"
+      - "scripts/update-blocklists.sh"
+      - "scripts/check-blocklists-webkit.sh"
+      - "scripts/webkit-rule-check/**"
+      - "src-tauri/src/ad_block.rs"
+      - "src-tauri/src/link_clean.rs"
+      - "src/shared/linkCleaner.test.ts"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: blocklists-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    if: github.event_name == 'pull_request'
+    runs-on: macos-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: yarn
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri
+      - run: yarn install --frozen-lockfile
+      - run: cargo test --manifest-path src-tauri/Cargo.toml -p openmedia --lib -- ad_block:: link_clean::
+      - run: yarn vitest run src/shared/linkCleaner.test.ts src/shared/youtubeAds.test.ts
+      - run: scripts/check-blocklists-webkit.sh
+
+  refresh:
+    if: github.event_name != 'pull_request'
+    runs-on: macos-latest
+    timeout-minutes: 60
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: yarn
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri
+      - run: yarn install --frozen-lockfile
+      - name: Refresh the lists
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          scripts/bump-blocklist-pins.sh
+          scripts/update-blocklists.sh
+      - name: Stop when nothing changed
+        id: changed
+        run: |
+          if git diff --quiet; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Check the refreshed lists
+        if: steps.changed.outputs.changed == 'true'
+        run: |
+          cargo test --manifest-path src-tauri/Cargo.toml -p openmedia --lib -- ad_block:: link_clean::
+          yarn vitest run src/shared/linkCleaner.test.ts src/shared/youtubeAds.test.ts
+          scripts/check-blocklists-webkit.sh
+      - name: Open the pull request
+        if: steps.changed.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          branch="chore/blocklists-$(date -u +%Y-%m-%d)"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$branch"
+          git add blocklists scripts/update-blocklists.sh
+          git commit -m "chore(blocklists): refresh bundled filter lists"
+          git push --force origin "$branch"
+          gh pr create --base main --head "$branch" \
+            --title "chore(blocklists): refresh bundled filter lists" \
+            --body "Scheduled refresh by the Blocklists workflow: pinned upstream revisions moved to the latest commit and every list downloaded again. The Rust conversion tests, the link-cleaner tests and a WebKit compile of every converted list passed. Review the diff of the list data and of the pins in scripts/update-blocklists.sh. Not checked: behavior on a device or on live sites." \
+            || gh pr edit "$branch" --body "Refreshed again by the Blocklists workflow."
