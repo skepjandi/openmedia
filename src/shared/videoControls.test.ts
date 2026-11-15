@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs";
 import vm from "node:vm";
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import type { SiteVideo, VideoControls } from "./ipc";
 import { VIDEO_CONTROLS_DEFAULT } from "./videoControls";
 
@@ -142,6 +142,8 @@ interface Page {
   /** A touch from one point to another, as a finger makes it; `kept` is true when the page took it. */
   touch: (from: [number, number], to?: [number, number], target?: Record<string, unknown>) => Tap;
   /** A pointer pressed and released, as a finger or mouse makes it before the touch or click. */
+  /** What sits under a point of the page, top first: the elements `elementsFromPoint` answers. */
+  stack: (elements: unknown[]) => void;
   pointer: (from: [number, number], to?: [number, number], target?: Record<string, unknown>) => Tap;
   /** A pointer tap where `between` runs after the press and before the release. */
   pointerWith: (at: [number, number], between: () => void) => Tap;
@@ -193,6 +195,7 @@ function load(options: {
   const scrolls: Array<Record<string, unknown>> = [];
   const userPauses: Array<[FakeVideo, boolean]> = [];
   let current = options.current;
+  let stack: unknown[] = [];
   const document: Record<string | symbol, unknown> = {
     hidden: false,
     body,
@@ -201,9 +204,7 @@ function load(options: {
     createElementNS: () => new FakeElement(),
     querySelector: () =>
       options.ogType === undefined ? null : { getAttribute: () => options.ogType },
-    querySelectorAll: () => ({
-      forEach: (run: (video: FakeVideo) => void) => options.videos.forEach(run),
-    }),
+    querySelectorAll: (selector: string) => (selector === "video" ? options.videos : stack),
     addEventListener: (type: string, handler: Listener) => {
       documentListeners.set(type, [...(documentListeners.get(type) ?? []), handler]);
     },
@@ -323,6 +324,9 @@ function load(options: {
         });
       }
       return tap;
+    },
+    stack: (elements) => {
+      stack = elements;
     },
     pointer: (from, to = from, target = PLAIN) => {
       const tap: Tap = { kept: false };
@@ -551,6 +555,95 @@ describe("video controls", () => {
     expect(second.win("click", { clientX: 200, clientY: 400, target })).toBe(true);
     // Only once: the next click is the site's again.
     expect(second.win("click", { clientX: 200, clientY: 900, target })).toBe(false);
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it("hides a small icon at the video's centre after a press on it, then gives it back", () => {
+    vi.useFakeTimers({ toFake: ["Date"] });
+    const video = new FakeVideo();
+    const page = load({ videos: [video], current: video });
+    const style = new Map<string, string>();
+    const icon = {
+      closest: (selector: string) => (selector.includes("button") ? {} : null),
+      matches: () => false,
+      contains: () => false,
+      parentElement: null,
+      getBoundingClientRect: () => ({
+        top: 380,
+        left: 165,
+        right: 235,
+        bottom: 450,
+        width: 70,
+        height: 70,
+      }),
+      style: {
+        getPropertyValue: (name: string) => style.get(name) ?? "",
+        getPropertyPriority: () => "",
+        setProperty: (name: string, value: string) => style.set(name, value),
+        removeProperty: (name: string) => style.delete(name),
+      },
+    };
+    const big = {
+      closest: () => null,
+      matches: () => false,
+      contains: () => false,
+      parentElement: null,
+      getBoundingClientRect: () => ({
+        top: 0,
+        left: 0,
+        right: 400,
+        bottom: 800,
+        width: 400,
+        height: 800,
+      }),
+      style: { ...icon.style, setProperty: () => expect.unreachable("a big element was hidden") },
+    };
+    page.stack([big, icon]);
+    page.win("pointerdown", { clientX: 200, clientY: 400 });
+    expect(style.get("opacity")).toBe("0");
+    expect(style.get("visibility")).toBe("hidden");
+    // The cancel this script sends the site after a tap is not the browser's: nothing is given back.
+    page.win("pointercancel", { isTrusted: false });
+    expect(style.get("opacity")).toBe("0");
+    vi.setSystemTime(Date.now() + 2000);
+    page.runTimers();
+    expect(style.has("opacity")).toBe(false);
+    expect(style.has("visibility")).toBe(false);
+  });
+
+  it("stops hiding at once when the press turns into a swipe", () => {
+    const video = new FakeVideo();
+    const page = load({ videos: [video], current: video });
+    const style = new Map<string, string>();
+    const icon = {
+      closest: () => null,
+      matches: () => false,
+      contains: () => false,
+      getBoundingClientRect: () => ({
+        top: 380,
+        left: 165,
+        right: 235,
+        bottom: 450,
+        width: 70,
+        height: 70,
+      }),
+      style: {
+        getPropertyValue: (name: string) => style.get(name) ?? "",
+        getPropertyPriority: () => "",
+        setProperty: (name: string, value: string) => style.set(name, value),
+        removeProperty: (name: string) => style.delete(name),
+      },
+    };
+    page.stack([icon]);
+    page.win("pointerdown", { clientX: 200, clientY: 600 });
+    expect(style.get("opacity")).toBe("0");
+    page.win("pointermove", { clientX: 200, clientY: 300 });
+    expect(style.has("opacity")).toBe(false);
+    page.runTimers();
+    expect(style.has("opacity")).toBe(false);
   });
 
   it("always shows the site the press, so a drag or a swipe reaches it whole", () => {

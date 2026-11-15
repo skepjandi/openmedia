@@ -6,6 +6,18 @@ All notable changes to OpenMedia are documented here.
 >
 > **Wiki**: the [GitHub Wiki](https://github.com/skepjandi/openmedia/wiki) is the public-facing main wiki — architecture, recipe format, AI pipeline, security model, roadmap. Source-controlled editing surface is `docs/wiki/` in this repo; CI (`.github/workflows/sync-wiki.yml`) mirrors it to the GitHub Wiki on every merge to `main`. New single-PR changes belong here, not as new wiki pages.
 
+### fix(siteview): no mute icon pops on a tap in Reels
+
+**Area:** `fix(siteview)`
+
+**Problem:** Since the press was given back to the site (so swiping works), Instagram's Reels showed their sound badge (a dark circle with a speaker) on every tap.
+
+**Change:** After a press on the video, whatever small, visible thing sits near the video's centre (at most 35% of the video, 16 px or more) gets `opacity: 0` and `visibility: hidden` for 1.5 s, then its own values back. It is found by scanning the page, not by where it is hit or what it is made of: the badge takes no pointer and sits inside the site's big tap-catching button. The scan runs every 60 ms for that time and stops, giving everything back, the moment the press moves (a swipe) or the browser cancels it, so a swipe is never slowed or left with things hidden. The cancel this script sends the site after a tap is ignored.
+
+**Verified:** Vitest (`videoControls.test.ts`), ESLint, `tsc`; on the iOS 26.5 simulator on Instagram Reels: 0.12 s and 0.3 s after a tap the badge is not shown (it was before this change), and three taps each followed by a swipe still landed on a new Reel. **Not verified:** other sites' tap icons; Android; a device; the cost of the scan on a very large page.
+
+**PR:** n/a
+
 ### fix(siteview): swiping and dragging a Short or Reel works again
 
 **Area:** `fix(siteview)`

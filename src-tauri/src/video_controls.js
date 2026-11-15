@@ -29,6 +29,11 @@
   var MIN_VIDEO_SHARE = 0.15; // of the viewport, for the video of a page that is not a feed
   var TAP_SLOP = 10; // px a finger may move and still be a tap
   var TAP_MAX_MS = 500;
+  var POP_MS = 1500; // a press on the video keeps small things at its centre out of sight this long
+  var POP_SHARE = 0.35; // of the video's width or height: bigger is not a pop-up icon
+  var POP_STEP_MS = 60;
+  var POP_MIN = 16; // px: smaller is not an icon's badge or picture
+  var POP_SCAN = 8000; // elements looked at per step, at most
   var HIDE_MS = 3500; // the panel goes away this long after the last touch on it
   var SVG = 'http://www.w3.org/2000/svg';
   var INTERACTIVE = 'a,button,input,textarea,select,summary,[role="button"],[role="link"],' +
@@ -55,6 +60,7 @@
     var touchFrom = null;
     var touchTarget = null;
     var pointerFrom = null;
+    var popStop = null;
     var awaitTapEnd = false;
     var awaitTapClick = false;
     var mutedAtDown = null;
@@ -597,13 +603,97 @@
     // A tap is also found from the pointer, which players that act on its release see before the
     // touch ends. The press itself is always the site's: a drag, a hold or a swipe needs it whole,
     // and a player that does something on it (toggles the sound) is undone by `restoreMute`.
+    // A press on the video makes some players flash an icon at its centre (Instagram's sound badge
+    // on every tap). The press is theirs, so the icon is hidden instead: whatever small, visible
+    // thing sits near the video's centre for the next moment gets no opacity, then its own back.
+    // (It cannot be found by what it is made of or by where it is hit: it is a plain badge that
+    // takes no pointer.)
+    function quietPop(video) {
+      var hidden = [];
+      var until = Date.now() + POP_MS;
+      var stopped = false;
+      var restore = function () {
+        hidden.forEach(function (entry) {
+          try {
+            if (entry.value) entry.el.style.setProperty('opacity', entry.value, entry.priority);
+            else entry.el.style.removeProperty('opacity');
+            if (entry.seen) entry.el.style.setProperty('visibility', entry.seen, entry.seenPriority);
+            else entry.el.style.removeProperty('visibility');
+          } catch (_) {}
+        });
+        hidden = [];
+      };
+      var step = function () {
+        if (stopped) return;
+        try {
+          var box = boxOf(video);
+          var width = box.right - box.left;
+          var height = box.bottom - box.top;
+          var cx = (Math.max(box.left, 0) + Math.min(box.right, window.innerWidth || box.right)) / 2;
+          var cy = (Math.max(box.top, 0) + Math.min(box.bottom, window.innerHeight || box.bottom)) / 2;
+          var all = document.querySelectorAll('body *');
+          for (var i = 0; i < all.length && i < POP_SCAN; i++) {
+            var el = all[i];
+            if (el === video || (el.contains && el.contains(video))) continue;
+            var rect = el.getBoundingClientRect();
+            if (rect.width < POP_MIN || rect.width > width * POP_SHARE || rect.height > height * POP_SHARE) continue;
+            if (Math.abs((rect.left + rect.right) / 2 - cx) > width * 0.2) continue;
+            if (Math.abs((rect.top + rect.bottom) / 2 - cy) > height * 0.2) continue;
+            if (inPanel(el)) continue;
+            if (hidden.some(function (entry) { return entry.el === el; })) continue;
+            var look = getComputedStyle(el);
+            if (Number(look.opacity) < 0.02 || look.visibility === 'hidden') continue;
+            hidden.push({
+              el: el,
+              value: el.style.getPropertyValue('opacity'),
+              priority: el.style.getPropertyPriority('opacity'),
+              seen: el.style.getPropertyValue('visibility'),
+              seenPriority: el.style.getPropertyPriority('visibility')
+            });
+            el.style.setProperty('opacity', '0', 'important');
+            el.style.setProperty('visibility', 'hidden', 'important');
+          }
+        } catch (_) {}
+        if (Date.now() < until) {
+          setTimeout(step, POP_STEP_MS);
+          return;
+        }
+        restore();
+      };
+      step();
+      // A press that turns into a swipe stops it at once: nothing is left hidden, nothing scanned.
+      return function () {
+        stopped = true;
+        restore();
+      };
+    }
+
     function onPointerDown(event) {
       pointerFrom = null;
       awaitTapEnd = false;
       awaitTapClick = false;
       if (event.isPrimary === false || inPanel(event.target)) return;
       noteMute(true);
+      var pressed = videoAt(event.clientX, event.clientY, event.target);
+      if (popStop) popStop();
+      popStop = pressed ? quietPop(pressed) : null;
       pointerFrom = { x: event.clientX, y: event.clientY, time: Date.now(), target: event.target };
+    }
+
+    function onPointerMove(event) {
+      var from = pointerFrom;
+      if (!from || !popStop) return;
+      if (Math.hypot(event.clientX - from.x, event.clientY - from.y) > TAP_SLOP) {
+        popStop();
+        popStop = null;
+      }
+    }
+
+    function onPointerCancel(event) {
+      // Not the one this script sends to the site after a tap.
+      if (event.isTrusted === false) return;
+      if (popStop) popStop();
+      popStop = null;
     }
 
     function onPointerUp(event) {
@@ -684,6 +774,8 @@
     on(document, 'touchend', tapped, { capture: true, passive: true });
     on(document, 'click', tapped, { capture: true, passive: true });
     on(window, 'pointerdown', onPointerDown, { capture: true, passive: true });
+    on(window, 'pointermove', onPointerMove, { capture: true, passive: true });
+    on(window, 'pointercancel', onPointerCancel, { capture: true, passive: true });
     on(window, 'pointerup', onPointerUp, { capture: true });
     on(window, 'touchstart', onTouchStart, { capture: true, passive: true });
     on(window, 'touchmove', keepFromSite, { capture: true, passive: true });
