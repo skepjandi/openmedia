@@ -6,6 +6,12 @@ All notable changes to OpenMedia are documented here.
 >
 > **Wiki**: the [GitHub Wiki](https://github.com/skepjandi/openmedia/wiki) is the public-facing main wiki — architecture, recipe format, AI pipeline, security model, roadmap. Source-controlled editing surface is `docs/wiki/` in this repo; CI (`.github/workflows/sync-wiki.yml`) mirrors it to the GitHub Wiki on every merge to `main`. New single-PR changes belong here, not as new wiki pages.
 
+### feat(video): the small player becomes a system window when the app is minimized (iOS)
+
+**Area:** `feat(video)`
+
+**Change:** The small player is part of the app, so minimizing the app took it away. Leaving the app now opens the system's picture-in-picture window for the small player's video, whether the player is over its own page or in the corner over another (`enterMiniPictureInPicture`), and coming back puts the video back in the small player. Not verifiable in the iOS Simulator, which reports no picture-in-picture support (nothing outside the app can be drawn there); a device is needed.
+
 ### fix(video): the small player in the corner no longer shows black, and follows an address to another site (iOS)
 
 **Area:** `fix(video)`

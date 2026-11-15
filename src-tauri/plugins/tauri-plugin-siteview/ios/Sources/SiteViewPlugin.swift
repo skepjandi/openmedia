@@ -156,6 +156,21 @@ private let inPictureInPictureScript = """
     return false;
   })()
   """
+/// Floats the small player's video in the system's picture-in-picture window, for a minimized app:
+/// the small player is part of the app, so it goes with it. Answers true only when this call
+/// started the window. `evaluateJavaScript` runs with a user gesture, which WebKit requires.
+private let enterMiniPictureInPictureScript = """
+  (function () {
+    var root = document.querySelector('[data-openmedia-mini]');
+    var video = root && root.querySelector('video');
+    if (!video || video.paused || video.ended || typeof video.webkitSetPresentationMode !== 'function') return false;
+    if (video.webkitPresentationMode === 'picture-in-picture') return false;
+    video.removeAttribute('disablepictureinpicture');
+    if (!video.webkitSupportsPresentationMode('picture-in-picture')) return false;
+    video.webkitSetPresentationMode('picture-in-picture');
+    return true;
+  })()
+  """
 /// True while the page has its small player up.
 private let miniActiveScript = "!!document.querySelector('[data-openmedia-mini]')"
 /// Makes the small player fill the whole page (a page that is itself a small window in a corner of
@@ -912,9 +927,23 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
     return "window.__openmediaPip=\(String(decoding: list, as: UTF8.self))"
   }
 
+  /// A small player up, in the page in front or in the corner, becomes a system window when the app
+  /// is left, so it keeps playing outside the app. One window at a time: the front page's first.
+  private func enterMiniPictureInPicture() -> Bool {
+    var candidates: [Session] = []
+    if let id = activeId, let front = sessions[id], front.miniUp, !front.blocked { candidates.append(front) }
+    candidates += floatingSessions.filter { other in !other.blocked && !candidates.contains(where: { $0 === other }) }
+    guard let session = candidates.first else { return false }
+    session.view.evaluateJavaScript(enterMiniPictureInPictureScript) { [weak session] result, _ in
+      if (result as? Bool) == true { session?.autoPictureInPicture = true }
+    }
+    return true
+  }
+
   /// Leaving the app floats the playing video of the page in front, when its site is on the list,
   /// as a player does. Only a window opened here is closed again by `exitAutomaticPictureInPicture`.
   private func enterPictureInPicture() {
+    if enterMiniPictureInPicture() { return }
     guard let id = activeId, let session = sessions[id], !session.blocked,
       pictureInPictureSites.contains(session.scope)
     else { return }
@@ -1105,7 +1134,7 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
 
   /// Coming back to the app puts a video floated by `enterPictureInPicture` back in the page.
   private func exitAutomaticPictureInPicture() {
-    for session in sessions.values where session.autoPictureInPicture {
+    for session in Array(sessions.values) + floatingSessions where session.autoPictureInPicture {
       session.autoPictureInPicture = false
       session.view.evaluateJavaScript(exitPictureInPictureScript)
     }
