@@ -833,6 +833,25 @@ describe("video controls", () => {
     expect(video.paused).toBe(true);
   });
 
+  it("does not let the click after a button press reach the page that is under the finger now", () => {
+    const home = new FakeElement();
+    const video = new PlacedVideo();
+    home.appendChild(video as unknown as FakeElement);
+    const page = load({ videos: [video], current: video });
+    openPanel(page);
+    buttonWith(page, "pip").fire("pointerup");
+    // The click that follows the release, on whatever is there now.
+    expect(page.win("click", { target: { closest: () => null }, clientX: 200, clientY: 700 })).toBe(
+      true,
+    );
+    const box = page.body.children.find((child) => "data-openmedia-mini" in child.attributes);
+    box?.children.find((child) => child.__icon === "close")?.fire("pointerup");
+    expect(video.parentNode).toBe(home);
+    expect(page.win("click", { target: { closest: () => null }, clientX: 540, clientY: 700 })).toBe(
+      true,
+    );
+  });
+
   it("closes a small player whose video the site's player took out of the box", () => {
     const home = new FakeElement();
     const video = new PlacedVideo();

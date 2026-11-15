@@ -42,6 +42,7 @@
   var MINI_RECHECK_MS = 250; // a site's restyling of the lifted video is answered after this
   var MINI_UNDO_MAX = 4; // times a site's pause is undone within the window below
   var MINI_UNDO_WINDOW_MS = 3000;
+  var GHOST_MS = 500; // a touch's click comes this late at most, after its release
   var MINI_FIGHTS = 40; // and this many times, then the site wins
   var MINI_BOTTOM = 96; // px from the bottom edge, clear of the browser's own buttons
   var HIDE_MS = 3500; // the panel goes away this long after the last touch on it
@@ -67,6 +68,7 @@
     var shown = false;
     var hideTimer = 0;
     var mini = null; // the small player, while one is up
+    var ghostUntil = 0; // clicks before this are the tail of a press on a button that has gone since
     var miniWindowed = false; // the page is itself the small window, in the corner of the screen
     var lastVideo = null;
     var touchFrom = null;
@@ -314,6 +316,7 @@
       element.addEventListener('pointerdown', stop);
       element.addEventListener('pointerup', function (event) {
         stop(event);
+        ghostUntil = Date.now() + GHOST_MS;
         var video = focus();
         lastTap = Date.now();
         if (video) action(video);
@@ -391,6 +394,7 @@
       element.addEventListener('pointerdown', stop);
       element.addEventListener('pointerup', function (event) {
         stop(event);
+        ghostUntil = Date.now() + GHOST_MS;
         action();
       });
       return element;
@@ -993,6 +997,14 @@
     }
 
     function onClick(event) {
+      // A touch ends with a click a moment after the release, at the same spot. A button that took
+      // the release and went away (the player closing, the panel hiding) leaves that click to
+      // whatever is under the finger now: a link, a thumbnail, the next video.
+      if (Date.now() < ghostUntil) {
+        event.stopImmediatePropagation();
+        if (event.cancelable) event.preventDefault();
+        return;
+      }
       if (inPanel(event.target)) {
         event.stopImmediatePropagation();
         return;

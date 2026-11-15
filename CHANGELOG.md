@@ -6,6 +6,12 @@ All notable changes to OpenMedia are documented here.
 >
 > **Wiki**: the [GitHub Wiki](https://github.com/skepjandi/openmedia/wiki) is the public-facing main wiki — architecture, recipe format, AI pipeline, security model, roadmap. Source-controlled editing surface is `docs/wiki/` in this repo; CI (`.github/workflows/sync-wiki.yml`) mirrors it to the GitHub Wiki on every merge to `main`. New single-PR changes belong here, not as new wiki pages.
 
+### fix(video): a press on the small player's or panel's button no longer clicks the page under it (Android, desktop)
+
+**Area:** `fix(video)`
+
+**Change:** On Android, pressing the small player's expand or close button (or the panel's float button) acted on the page beneath: the button took the release and went away, and the click a touch ends with, a moment later at the same spot, landed on whatever was there now. With the expand button over a related video's thumbnail, the page navigated to that video. The click that follows a press on one of these buttons is now swallowed (500 ms). Found by a full test on the Android emulator and the native Mac build; checked on the emulator: the expand button now puts the video back on the same page. iOS is not affected (the corner window is its own view).
+
 ### fix(video): the small player keeps playing when a feed pauses its video (Reels)
 
 **Area:** `fix(video)`
