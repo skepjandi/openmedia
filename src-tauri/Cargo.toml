@@ -79,7 +79,8 @@ codegen-units = 1
 lto = true
 opt-level = 3
 panic = "abort"
-strip = true
+strip = false
+debug = "line-tables-only"
 
 # AGENTS.md: no `unwrap()`/`expect()` outside tests; errors propagate as typed errors.
 [workspace.lints.clippy]
