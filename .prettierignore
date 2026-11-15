@@ -11,3 +11,6 @@ recipes/fixtures
 shared/public-suffix
 src-tauri/plugins/tauri-plugin-siteview/ios/Sources/PublicSuffixRules.swift
 blocklists/brave-resources.json
+blocklists/brave-clean-urls.json
+blocklists/brave-debounce.json
+blocklists/brave-query-filter.json
