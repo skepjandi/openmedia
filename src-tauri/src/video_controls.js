@@ -57,6 +57,7 @@
     var touchTarget = null;
     var touchTapAt = 0;
     var pointerFrom = null;
+    var mutedAtDown = null;
     var pointerTapAt = 0;
 
     function read() {
@@ -519,6 +520,7 @@
       if (!(x >= box.left && x <= box.right && y >= box.top && y <= box.bottom)) return false;
       event.stopImmediatePropagation();
       if (event.cancelable) event.preventDefault();
+      restoreMute();
       if (shown) {
         hide();
         return true;
@@ -528,6 +530,26 @@
       keepAlive();
       tick();
       return true;
+    }
+
+    // A tap on the video is the panel's and never mutes or unmutes: players that do so on the
+    // press (Instagram's Reels) have it undone, now and once more after they have acted.
+    function noteMute(fresh) {
+      var now = Date.now();
+      if (!fresh && mutedAtDown && now - mutedAtDown.at < 300) return;
+      var video = panelPage() && panelOn() ? focus() : null;
+      mutedAtDown = video ? { video: video, muted: video.muted, at: now } : null;
+    }
+
+    function restoreMute() {
+      var kept = mutedAtDown;
+      if (!kept) return;
+      var undo = function () {
+        try { if (kept.video.muted !== kept.muted) kept.video.muted = kept.muted; } catch (_) {}
+      };
+      undo();
+      setTimeout(undo, 80);
+      setTimeout(undo, 400);
     }
 
     function inPanel(hit) {
@@ -568,6 +590,7 @@
     function onPointerDown(event) {
       pointerFrom = null;
       if (event.isPrimary === false || inPanel(event.target)) return;
+      noteMute(true);
       pointerFrom = { x: event.clientX, y: event.clientY, time: Date.now(), target: event.target };
     }
 
@@ -595,6 +618,7 @@
       touchTarget = null;
       if (keepFromSite(event)) return;
       touchTarget = event.target;
+      noteMute(false);
       var first = event.touches && event.touches.length === 1 ? event.touches[0] : null;
       touchFrom = first ? { x: first.clientX, y: first.clientY, time: Date.now() } : null;
     }

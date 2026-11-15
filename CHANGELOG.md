@@ -6,6 +6,18 @@ All notable changes to OpenMedia are documented here.
 >
 > **Wiki**: the [GitHub Wiki](https://github.com/skepjandi/openmedia/wiki) is the public-facing main wiki — architecture, recipe format, AI pipeline, security model, roadmap. Source-controlled editing surface is `docs/wiki/` in this repo; CI (`.github/workflows/sync-wiki.yml`) mirrors it to the GitHub Wiki on every merge to `main`. New single-PR changes belong here, not as new wiki pages.
 
+### fix(siteview): a tap never mutes or unmutes a Reel, and Instagram's "Continue watching in the app" wall is hidden
+
+**Area:** `fix(siteview)`
+
+**Problem:** On Instagram Reels a tap showed the panel and also unmuted, and the tap that closed the panel muted the Reel again: Instagram toggles the sound on the press, before the app knows the touch is a tap. Separately, "Continue watching in the app" (with Sign up for Instagram and Open app) sometimes covered a Reel and nothing hid it: it is not a dialog, so the existing app-prompts rule missed it.
+
+**Change:** The sound is noted on the press and put back when the touch turns out to be a tap (at once and twice more shortly after), so only the panel's mute button changes it. The Instagram recipe (2.0.2) gets `reel-app-wall` under the on-by-default app-prompts option: it hides the `div[role=group]` that holds the backdrop and the card, found by its `a[href*="/accounts/signup"]`. Found by driving headless Chrome with an iPhone user agent over CDP, logged out, on `/reels/` after scrolling to the next reel (it appears on some loads only); a fixture (`logged-out-reel-wall.html`) covers the rule.
+
+**Verified:** Vitest (`videoControls.test.ts`), `cargo test --lib` (the fixture test), ESLint, `tsc`; on the iOS 26.5 simulator on a Reel: the sound state is the same after a tap, a second tap and a third. **Not verified:** that the wall is hidden on a device (the simulator's Instagram is logged in; it showed in headless Chrome only).
+
+**PR:** n/a
+
 ### fix(siteview): the panel no longer opens a site's menu, takes Instagram's tap catcher, and a leaving page's video floats (iOS)
 
 **Area:** `fix(siteview)`

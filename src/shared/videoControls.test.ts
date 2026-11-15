@@ -141,6 +141,8 @@ interface Page {
   touch: (from: [number, number], to?: [number, number], target?: Record<string, unknown>) => Tap;
   /** A pointer pressed and released, as a finger or mouse makes it before the touch or click. */
   pointer: (from: [number, number], to?: [number, number], target?: Record<string, unknown>) => Tap;
+  /** A pointer tap where `between` runs after the press and before the release. */
+  pointerWith: (at: [number, number], between: () => void) => Tap;
   /** Runs the timers the controls set, as when the panel's few seconds are up. */
   runTimers: () => void;
   /** What the feed player was told about a pause or a play the reader chose. */
@@ -347,6 +349,36 @@ function load(options: {
       }
       return tap;
     },
+    pointerWith: (at, between) => {
+      const tap = { kept: false };
+      for (const handler of windowListeners.get("pointerdown") ?? []) {
+        handler({
+          type: "pointerdown",
+          clientX: at[0],
+          clientY: at[1],
+          isPrimary: true,
+          target: PLAIN,
+        });
+      }
+      between();
+      for (const handler of windowListeners.get("pointerup") ?? []) {
+        handler({
+          type: "pointerup",
+          clientX: at[0],
+          clientY: at[1],
+          pointerId: 1,
+          pointerType: "touch",
+          target: PLAIN,
+          cancelable: true,
+          preventDefault() {},
+          stopPropagation() {},
+          stopImmediatePropagation() {
+            tap.kept = true;
+          },
+        });
+      }
+      return tap;
+    },
     runTimers: () => timeouts.splice(0).forEach((run) => run()),
     setCalm: () => {
       document[Symbol.for("openmedia.noAutoplay")] = true;
@@ -484,6 +516,25 @@ describe("video controls", () => {
     expect(page.click().kept).toBe(true);
     page.tick();
     expect(shown(page)).toBe(true);
+  });
+
+  it("puts the sound back when the press changed it, so a tap never mutes or unmutes", () => {
+    const muted = new FakeVideo();
+    muted.muted = true;
+    const page = load({ videos: [muted], current: muted });
+    // The site unmutes on the press, after the page script has noted the sound and before the release.
+    const tap = page.pointerWith([200, 400], () => {
+      muted.muted = false;
+    });
+    expect(tap.kept).toBe(true);
+    expect(muted.muted).toBe(true);
+
+    const sounding = new FakeVideo();
+    const other = load({ videos: [sounding], current: sounding });
+    other.pointerWith([200, 400], () => {
+      sounding.muted = true;
+    });
+    expect(sounding.muted).toBe(false);
   });
 
   it("leaves a moved pointer, and one on a site button, to the site", () => {

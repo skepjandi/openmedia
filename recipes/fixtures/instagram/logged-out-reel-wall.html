@@ -1,0 +1,24 @@
+<!doctype html>
+<!-- Structure observed on a logged-out /reels/ page after scrolling to the next reel, iPhone UA 390x844, 2026-11-15: a reel item (relative) holding the video and, over it, an absolute div[role=group] the size of the reel that carries a 0.7 black backdrop and the "Continue watching in the app" card. Text and links are placeholders. data-keep marks what no rule may hide. -->
+<html><body>
+<div id="react-root">
+  <header>
+    <a href="/">Instagram</a>
+    <a data-keep href="/accounts/login/">Log In</a>
+  </header>
+  <div style="position: relative">
+    <div data-keep><video src="/reel.mp4"></video></div>
+    <div data-keep>
+      <a href="/reel/CODE/comments/">22</a>
+      <a href="/reels/audio/1/">Original audio</a>
+    </div>
+    <div role="group" style="position: absolute">
+      <div style="position: absolute; background: rgba(0, 0, 0, 0.7)">
+        <div><div><div><h3>Continue watching in the app</h3></div></div></div>
+        <div><a href="/accounts/signup/phone">Sign up for Instagram</a></div>
+        <div>Open app</div>
+      </div>
+    </div>
+  </div>
+</div>
+</body></html>
