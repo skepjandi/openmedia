@@ -18,11 +18,8 @@ private let scrollHandlerName = "openmediaScroll"
 /// Asks for the video in view to be played natively when the engine refuses the page's own
 /// `play()`; see `playFeedVideo`.
 private let playHandlerName = "openmediaPlay"
-private let floatHandlerName = "openmediaPip"
-/// The panel asks for its video to float when the page's own try changed nothing; this runs from
-/// outside the page, where WebKit counts it as a gesture.
-private let popOutVideoScript =
-  "(function(){var f=document[Symbol.for('openmedia.popOut')];if(typeof f==='function')f()})()"
+/// The page says whether its small player is up (true) or gone (false).
+private let miniHandlerName = "openmediaMini"
 private let playFeedVideoScript =
   "(function(){var play=document[Symbol.for('openmedia.feedPlayNow')];if(typeof play==='function')play()})()"
 /// The same flag the Android and macOS pause scripts set, which the feed player reads.
@@ -102,6 +99,8 @@ private let enterPictureInPictureScript = """
 /// attribute is lifted for this one video only.
 private let floatForNavigationScript = """
   (function () {
+    // The small player is the page's own: it stays up as it is, and the app moves the page.
+    if (document.querySelector('[data-openmedia-mini]')) return true;
     var best = null, area = 0, videos = document.querySelectorAll('video');
     // A video the reader already floated, from the panel's button, is the one to keep.
     for (var j = 0; j < videos.length; j++) {
@@ -128,6 +127,7 @@ private let ownVideoPlayingScript = """
     for (var i = 0; i < videos.length; i++) {
       var video = videos[i];
       if (video.webkitPresentationMode === 'picture-in-picture') continue;
+      if (video.closest && video.closest('[data-openmedia-mini]')) continue;
       if (!video.paused && !video.ended && video.readyState > 2 && video.videoWidth > 0) return true;
     }
     return false;
@@ -148,6 +148,7 @@ private let exitPictureInPictureScript = """
   """
 private let inPictureInPictureScript = """
   (function () {
+    if (document.querySelector('[data-openmedia-mini]')) return true;
     var videos = document.querySelectorAll('video');
     for (var i = 0; i < videos.length; i++) {
       if (videos[i].webkitPresentationMode === 'picture-in-picture') return true;
@@ -155,6 +156,13 @@ private let inPictureInPictureScript = """
     return false;
   })()
   """
+/// True while the page has its small player up.
+private let miniActiveScript = "!!document.querySelector('[data-openmedia-mini]')"
+/// Makes the small player fill the whole page (a page that is itself a small window in a corner of
+/// the screen), or puts it back as a box over the page.
+private func miniWindowScript(_ on: Bool) -> String {
+  "(function(){var f=document[Symbol.for('openmedia.miniWindow')];if(typeof f==='function')f(\(on))})()"
+}
 private let touchScrollScript = """
   (function () {
     window.addEventListener('touchstart', function (event) {
@@ -382,7 +390,7 @@ private final class WeakScrollHandler: NSObject, WKScriptMessageHandler {
   }
 }
 
-private final class WeakFloatHandler: NSObject, WKScriptMessageHandler {
+private final class WeakMiniHandler: NSObject, WKScriptMessageHandler {
   weak var target: SiteViewPlugin?
 
   init(_ target: SiteViewPlugin) {
@@ -391,7 +399,7 @@ private final class WeakFloatHandler: NSObject, WKScriptMessageHandler {
 
   func userContentController(_ controller: WKUserContentController, didReceive message: WKScriptMessage) {
     guard message.frameInfo.isMainFrame, let view = message.webView else { return }
-    target?.floatVideoFromPanel(view)
+    target?.setMiniUp(view, (message.body as? Bool) == true)
   }
 }
 
@@ -430,6 +438,8 @@ private final class Session {
   var refreshControl: UIRefreshControl?
   /// A hidden session whose content rule lists changed reloads when it is shown again.
   var needsReload = false
+  /// True while the page has its small player up, as the page last said.
+  var miniUp = false
   /// Ids of the content rule lists attached to this view, so a late compile attaches each once.
   var ruleListIds: Set<String> = []
   /// The lists themselves and the profile, kept so the page can be replaced by a fresh view.
@@ -984,6 +994,7 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
     old.view.isHidden = true
     floatingSessions.append(old)
     watchFloats()
+    cornerIfMini(old)
 
     sessions[session.id] = session
     activeId = session.id
@@ -1017,6 +1028,41 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
     return true
   }
 
+  /// Puts a page that has its small player up in the bottom right corner of the screen, as a
+  /// small window of its own above the app, so the player outlives the page the reader left. The
+  /// page keeps running in it; its player fills it.
+  private func placeCorner(_ session: Session) {
+    guard let host = shell?.superview, session.view.superview != nil else { return }
+    let width = min(240, host.bounds.width * 0.48)
+    let height = (width * 9 / 16).rounded()
+    let bottomInset = host.window?.safeAreaInsets.bottom ?? host.safeAreaInsets.bottom
+    session.view.frame = CGRect(
+      x: host.bounds.width - width - 12,
+      y: host.bounds.height - height - 96 - bottomInset,
+      width: width,
+      height: height)
+    session.view.layer.cornerRadius = 12
+    session.view.clipsToBounds = true
+    session.view.isHidden = false
+    host.addSubview(session.view)
+    session.view.evaluateJavaScript(miniWindowScript(true))
+  }
+
+  /// Puts the small player of a page that was moved to the corner back over its own page.
+  private func leaveCorner(_ session: Session) {
+    session.view.layer.cornerRadius = 0
+    session.view.clipsToBounds = false
+    session.view.evaluateJavaScript(miniWindowScript(false))
+  }
+
+  /// A page left with its small player up goes to the corner; one without stays hidden.
+  private func cornerIfMini(_ session: Session) {
+    session.view.evaluateJavaScript(miniActiveScript) { [weak self, weak session] result, _ in
+      guard let self, let session, (result as? Bool) == true, session.floatedForNavigation else { return }
+      self.placeCorner(session)
+    }
+  }
+
   private func watchFloats() {
     guard !watchingFloats else { return }
     watchingFloats = true
@@ -1048,6 +1094,7 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
   private func endFloat(_ session: Session) {
     session.floatedForNavigation = false
     session.autoPictureInPicture = false
+    leaveCorner(session)
     session.view.evaluateJavaScript(exitPictureInPictureScript)
     if let index = floatingSessions.firstIndex(where: { $0 === session }) {
       floatingSessions.remove(at: index)
@@ -1108,18 +1155,14 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
     session.view.evaluateJavaScript(suspend ? holdMediaScript : resumeMediaScript)
   }
 
-  /// The panel's float button, when the page could not float the video itself: only the page in
-  /// front is served, and the script is fixed, so all a page can do is ask for what the reader's
-  /// own tap on the button would do.
-  func floatVideoFromPanel(_ view: WKWebView) {
-    guard let session = session(of: view), !session.blocked, session.id == activeId else { return }
-    view.evaluateJavaScript(popOutVideoScript)
-  }
-
   /// A page's feed player asks, when the engine refuses its `play()`, for the video in view to be
   /// played from here: `evaluateJavaScript` runs with a user gesture, which no page script can
   /// give itself. Only the page in front is served, and the script is fixed: the page sends no
   /// code and no argument, so all it can do is ask for what it could have done with a tap.
+  func setMiniUp(_ view: WKWebView, _ up: Bool) {
+    session(of: view)?.miniUp = up
+  }
+
   func playFeedVideo(_ view: WKWebView) {
     guard let session = session(of: view), !session.blocked, !session.mediaSuspended,
       session.id == activeId
@@ -1302,6 +1345,18 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
       isMainFrame: isMainFrame, userInitiated: userInitiated)
     {
     case .allow:
+      // A link tapped while the small player is up: the page is kept, with the player in the
+      // corner, and the link opens in a fresh view.
+      if session.miniUp, isMainFrame, navigationAction.navigationType == .linkActivated,
+        navigationAction.request.httpMethod?.uppercased() == "GET", !session.floatedForNavigation
+      {
+        decisionHandler(.cancel)
+        let request = navigationAction.request
+        DispatchQueue.main.async { [weak self] in
+          self?.navigateKeepingVideo(session, to: request) { session.view.load(request) }
+        }
+        return
+      }
       decisionHandler(.allow)
     case .cancel:
       decisionHandler(.cancel)
@@ -1615,6 +1670,9 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
         previous.floatedForNavigation = true
         self.floatingSessions.append(previous)
         self.watchFloats()
+        proceed()
+        self.cornerIfMini(previous)
+        return
       }
       proceed()
     }
@@ -1933,7 +1991,7 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
     controller.add(WeakPaintHandler(self), name: paintHandlerName)
     controller.add(WeakScrollHandler(self), name: scrollHandlerName)
     controller.add(WeakPlayHandler(self), name: playHandlerName)
-    controller.add(WeakFloatHandler(self), name: floatHandlerName)
+    controller.add(WeakMiniHandler(self), name: miniHandlerName)
     configuration.userContentController = controller
     return configuration
   }
@@ -2016,7 +2074,7 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
     view.configuration.userContentController.removeScriptMessageHandler(forName: paintHandlerName)
     view.configuration.userContentController.removeScriptMessageHandler(forName: scrollHandlerName)
     view.configuration.userContentController.removeScriptMessageHandler(forName: playHandlerName)
-    view.configuration.userContentController.removeScriptMessageHandler(forName: floatHandlerName)
+    view.configuration.userContentController.removeScriptMessageHandler(forName: miniHandlerName)
     view.navigationDelegate = nil
     view.uiDelegate = nil
     view.removeFromSuperview()

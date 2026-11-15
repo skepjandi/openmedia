@@ -15,8 +15,8 @@
   var IS_FEED = Symbol.for('openmedia.isFeed');
   var CURRENT = Symbol.for('openmedia.currentVideo');
   var NO_AUTOPLAY = Symbol.for('openmedia.noAutoplay');
+  var MINI_WINDOW = Symbol.for('openmedia.miniWindow');
   var USER_PAUSE = Symbol.for('openmedia.userPause');
-  var POP_OUT = Symbol.for('openmedia.popOut');
   var STORE = 'openmedia.video';
   var RATES = [0.5, 1, 1.25, 1.5, 2];
   var TICK_MS = 100;
@@ -35,8 +35,10 @@
   var POP_STEP_MS = 60;
   var POP_MIN = 16; // px: smaller is not an icon's badge or picture
   var POP_SCAN = 8000; // elements looked at per step, at most
-  var POP_ASK_MS = 900; // the app is asked to float the video if the page's own try changed nothing; a real window takes this long to open
-  var NOTE_MS = 9000;
+  var MINI_MAX = 240; // px: widest the small player gets
+  var MINI_SHARE = 0.48; // of the screen's width
+  var MINI_EDGE = 12; // px from the right edge
+  var MINI_BOTTOM = 96; // px from the bottom edge, clear of the browser's own buttons
   var HIDE_MS = 3500; // the panel goes away this long after the last touch on it
   var SVG = 'http://www.w3.org/2000/svg';
   var INTERACTIVE = 'a,button,input,textarea,select,summary,[role="button"],[role="link"],' +
@@ -59,7 +61,8 @@
     var ui = null;
     var shown = false;
     var hideTimer = 0;
-    var noteTimer = 0;
+    var mini = null; // the small player, while one is up
+    var miniWindowed = false; // the page is itself the small window, in the corner of the screen
     var lastVideo = null;
     var touchFrom = null;
     var touchTarget = null;
@@ -109,7 +112,7 @@
       var best = null;
       var bestArea = 0;
       document.querySelectorAll('video').forEach(function (video) {
-        if (!video.isConnected) return;
+        if (!video.isConnected || (mini && video === mini.video)) return;
         var box = video.getBoundingClientRect();
         var seen = (Math.min(box.bottom, height) - Math.max(box.top, 0)) *
           (Math.min(box.right, width) - Math.max(box.left, 0));
@@ -283,6 +286,7 @@
       back: ['M12 5V1L7 6l5 5V7a6 6 0 1 1-6 6H4a8 8 0 1 0 8-8z'],
       forward: ['M12 5V1l5 5-5 5V7a6 6 0 1 0 6 6h2a8 8 0 1 1-8-8z'],
       sound: ['M3 9v6h4l5 5V4L7 9H3z', 'M14 8.5a4.5 4.5 0 0 1 0 7z'],
+      close: ['M19 6.4L17.6 5 12 10.6 6.4 5 5 6.4 10.6 12 5 17.6 6.4 19 12 13.4 17.6 19 19 17.6 13.4 12z'],
       pip: ['M19 7h-8v6h8V7z', 'M21 3H3c-1.1 0-2 .9-2 2v14c0 1.1.9 1.98 2 1.98h18c1.1 0 2-.88 2-1.98V5c0-1.1-.9-2-2-2zm0 16.01H3V4.98h18v14.03z'],
       muted: ['M3 9v6h4l5 5V4L7 9H3z', 'M14.5 9.4l1.4-1.4 2.1 2.1 2.1-2.1 1.4 1.4-2.1 2.1 2.1 2.1-1.4 1.4-2.1-2.1-2.1 2.1-1.4-1.4 2.1-2.1z']
     };
@@ -363,48 +367,159 @@
       };
     }
 
-    // Takes the video out of the page into a floating player that plays until the reader closes
-    // it, or puts it back. A page may not be allowed to ask for that without a gesture it
-    // recognises; if the window did not change, the app is asked to do it from outside the page,
-    // where it counts as one.
-    function inWindow(video) {
-      return video.webkitPresentationMode === 'picture-in-picture';
+    // The small player: the video is lifted out of the page into a box in the bottom right corner
+    // that stays above everything, with its own close and play buttons, and goes back where it
+    // was when the reader closes it. The page's own player is left empty meanwhile. It ends with
+    // the video, or when the site loads another into the same player.
+    var MINI_VIDEO_CSS = 'position:absolute!important;left:0!important;top:0!important;' +
+      'width:100%!important;height:100%!important;max-width:none!important;max-height:none!important;' +
+      'margin:0!important;padding:0!important;transform:none!important;object-fit:contain!important;' +
+      'background:#000!important;opacity:1!important;visibility:visible!important;display:block!important';
+
+    function miniButton(name, size, place, action) {
+      var element = make('div',
+        'position:absolute;display:flex;align-items:center;justify-content:center;box-sizing:border-box;' +
+        'width:' + size + 'px;height:' + size + 'px;padding:6px;border-radius:50%;background:rgba(0,0,0,.6);' +
+        'color:#fff;touch-action:manipulation;cursor:pointer;' + place);
+      setIcon(element, name);
+      element.addEventListener('pointerdown', stop);
+      element.addEventListener('pointerup', function (event) {
+        stop(event);
+        action();
+      });
+      return element;
     }
 
-    // The app's request only ever opens the window: one that is already open (or opening) is
-    // left alone, because toggling it here would close the window the page's own try just opened.
-    function popOutNow(video) {
-      if (inWindow(video)) return;
-      try { video.removeAttribute('disablepictureinpicture'); } catch (_) {}
-      try { video.webkitSetPresentationMode('picture-in-picture'); } catch (_) {}
+    // Tells the app whether the small player is up, so it can keep the page when a link is tapped.
+    function tellApp(up) {
+      try { window.webkit.messageHandlers.openmediaMini.postMessage(up); } catch (_) {}
     }
 
-    // Why a video would not float, for the line the panel shows when it did not.
-    function noFloat(video, error) {
-      var supported = 'n/a';
-      try { supported = String(video.webkitSupportsPresentationMode('picture-in-picture')); } catch (_) {}
-      return 'Could not float this video (supported: ' + supported + ', mode: ' +
-        video.webkitPresentationMode + (error ? ', ' + error : '') + ')';
+    function miniOn(video) {
+      if (mini || !video.parentNode) return;
+      var screenWidth = window.innerWidth || document.documentElement.clientWidth || 400;
+      var screenHeight = window.innerHeight || document.documentElement.clientHeight || 800;
+      var width = Math.round(Math.min(MINI_MAX, screenWidth * MINI_SHARE));
+      var ratio = video.videoWidth > 0 && video.videoHeight > 0 ? video.videoWidth / video.videoHeight : 16 / 9;
+      var height = Math.round(Math.min(screenHeight * 0.32, Math.max(90, width / ratio)));
+      var root = make('div',
+        'position:fixed;right:' + MINI_EDGE + 'px;bottom:' + MINI_BOTTOM + 'px;width:' + width + 'px;height:' +
+        height + 'px;z-index:2147483647;background:#000;border-radius:12px;overflow:hidden;' +
+        'box-shadow:0 6px 24px rgba(0,0,0,.5);touch-action:none;-webkit-user-select:none;user-select:none');
+      root.setAttribute('data-openmedia-mini', '');
+      var state = {
+        video: video,
+        root: root,
+        marker: document.createComment('openmedia-mini'),
+        style: video.getAttribute('style'),
+        src: video.currentSrc,
+        playing: !video.paused,
+        right: MINI_EDGE,
+        bottom: MINI_BOTTOM,
+        width: width,
+        height: height,
+        stops: []
+      };
+      var close = miniButton('close', 28, 'top:6px;right:6px', function () { miniOff(); });
+      var toggle = miniButton(video.paused ? 'play' : 'pause', 34, 'left:6px;bottom:6px', function () {
+        if (video.paused) { try { video.play().catch(function () {}); } catch (_) {} } else video.pause();
+      });
+      var sync = function () { setIcon(toggle, video.paused ? 'play' : 'pause'); };
+      var listen = function (name, handler) {
+        video.addEventListener(name, handler);
+        state.stops.push(function () { video.removeEventListener(name, handler); });
+      };
+      listen('play', sync);
+      listen('pause', sync);
+      listen('ended', function () { miniOff(); });
+      // A site that reuses its player for the next video loads it into this one.
+      listen('loadstart', function () { if (video.currentSrc !== state.src) miniOff(); });
+      // Dragged by any part that is not a button.
+      var from = null;
+      root.addEventListener('pointerdown', function (event) {
+        stop(event);
+        if (miniWindowed) return;
+        from = { x: event.clientX, y: event.clientY, right: state.right, bottom: state.bottom };
+        try { root.setPointerCapture(event.pointerId); } catch (_) {}
+      });
+      root.addEventListener('pointermove', function (event) {
+        if (!from) return;
+        stop(event);
+        state.right = Math.max(0, Math.min(screenWidth - width, from.right - (event.clientX - from.x)));
+        state.bottom = Math.max(0, Math.min(screenHeight - height, from.bottom - (event.clientY - from.y)));
+        root.style.right = state.right + 'px';
+        root.style.bottom = state.bottom + 'px';
+      });
+      var release = function (event) {
+        if (!from) return;
+        stop(event);
+        from = null;
+      };
+      root.addEventListener('pointerup', release);
+      root.addEventListener('pointercancel', release);
+
+      video.parentNode.insertBefore(state.marker, video);
+      root.appendChild(video);
+      video.style.cssText = MINI_VIDEO_CSS;
+      root.appendChild(close);
+      root.appendChild(toggle);
+      (document.documentElement || document.body).appendChild(root);
+      // The site's player keeps styling its video: put the box's styles back whenever it does.
+      var watch = new MutationObserver(function () {
+        if (video.style.cssText !== MINI_VIDEO_CSS) video.style.cssText = MINI_VIDEO_CSS;
+      });
+      watch.observe(video, { attributes: true, attributeFilter: ['style'] });
+      state.stops.push(function () { watch.disconnect(); });
+      mini = state;
+      tellApp(true);
+      if (state.playing && video.paused) { try { video.play().catch(function () {}); } catch (_) {} }
     }
 
-    function popOut(video) {
-      var floating = inWindow(video);
-      var error = '';
-      try { video.removeAttribute('disablepictureinpicture'); } catch (_) {}
-      try {
-        video.webkitSetPresentationMode(floating ? 'inline' : 'picture-in-picture');
-      } catch (thrown) {
-        error = String((thrown && thrown.message) || thrown);
+    // The app moved this page into a small window of its own in the corner: the player fills it.
+    var MINI_WINDOW_STYLE = 'html,body{background:#000!important}body{visibility:hidden!important}';
+    function miniWindow(on) {
+      miniWindowed = !!on;
+      if (!on) document.documentElement.style.visibility = '';
+      var sheet = document.getElementById('openmedia-mini-window');
+      if (on && !sheet) {
+        sheet = make('style', '');
+        sheet.id = 'openmedia-mini-window';
+        sheet.textContent = MINI_WINDOW_STYLE;
+        (document.head || document.documentElement).appendChild(sheet);
+      } else if (!on && sheet && sheet.parentNode) {
+        sheet.parentNode.removeChild(sheet);
       }
-      var changed = function () { return inWindow(video) !== floating; };
-      setTimeout(function () {
-        if (changed()) { hide(); return; }
-        try { window.webkit.messageHandlers.openmediaPip.postMessage(1); } catch (_) {}
-        setTimeout(function () {
-          if (changed()) { hide(); return; }
-          say(noFloat(video, error));
-        }, POP_ASK_MS);
-      }, POP_ASK_MS);
+      if (!mini) return;
+      var css = on ?
+        'right:0;bottom:0;width:100%;height:100%;border-radius:0;box-shadow:none' :
+        'right:' + mini.right + 'px;bottom:' + mini.bottom + 'px;width:' + mini.width + 'px;height:' + mini.height + 'px;border-radius:12px;box-shadow:0 6px 24px rgba(0,0,0,.5)';
+      var parts = css.split(';');
+      parts.forEach(function (part) {
+        var pair = part.split(/:(.+)/);
+        mini.root.style.setProperty(pair[0], pair[1]);
+      });
+    }
+
+    function miniOff() {
+      var state = mini;
+      if (!state) return;
+      mini = null;
+      tellApp(false);
+      state.stops.forEach(function (step) { try { step(); } catch (_) {} });
+      var video = state.video;
+      var home = state.marker.parentNode;
+      if (state.style === null) video.removeAttribute('style'); else video.setAttribute('style', state.style);
+      if (home) {
+        home.insertBefore(video, state.marker);
+        home.removeChild(state.marker);
+      } else {
+        video.pause();
+      }
+      if (state.root.parentNode) state.root.parentNode.removeChild(state.root);
+      if (miniWindowed) document.documentElement.style.visibility = 'hidden';
+      if (home && state.playing && video.paused && !video.ended) {
+        try { video.play().catch(function () {}); } catch (_) {}
+      }
     }
 
     // The panel: three buttons above a row (mute, time left, speed) above the seek bar,
@@ -422,8 +537,6 @@
       var card = make('div',
         'pointer-events:auto;margin:0 12px;padding:10px 14px 2px;border-radius:18px;background:rgba(0,0,0,.62);' +
         '-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)');
-      var note = make('div',
-        'display:none;padding:0 0 8px;font:500 11px/1.35 -apple-system,system-ui,sans-serif;color:#ffd9a0');
       var transport = make('div',
         'display:flex;align-items:center;justify-content:center;gap:30px;padding-bottom:6px');
       var back = button(40, 'back', function (target) {
@@ -452,8 +565,10 @@
         target.muted = !target.muted;
         if (!target.muted && target.volume === 0) target.volume = 1;
       });
-      var floatButton = typeof video.webkitSetPresentationMode === 'function' ?
-        button(32, 'pip', function (target) { popOut(target); }) : null;
+      var floatButton = button(32, 'pip', function (target) {
+        if (mini) miniOff(); else miniOn(target);
+        hide();
+      });
       var left = make('span', 'margin-left:auto;min-width:48px;text-align:right');
       var pill = make('span',
         'pointer-events:auto;padding:7px 12px;border-radius:999px;background:rgba(255,255,255,.18);' +
@@ -482,7 +597,6 @@
         target.currentTime = ratio * target.duration;
         paint(target);
       });
-      card.appendChild(note);
       card.appendChild(transport);
       card.appendChild(row);
       card.appendChild(seek.track);
@@ -492,7 +606,7 @@
       });
       parent.appendChild(root);
       ui = {
-        root: root, note: note, toggle: toggle, mute: mute, left: left, pill: pill, seek: seek
+        root: root, toggle: toggle, mute: mute, left: left, pill: pill, seek: seek
       };
       return ui;
     }
@@ -513,23 +627,11 @@
       setIcon(ui.mute, video.muted || video.volume === 0 ? 'muted' : 'sound');
     }
 
-    // A line above the controls, for a few seconds: what went wrong, in the reader's own words
-    // where there are any, so it can be told to someone.
-    function say(text) {
-      if (!ui) return;
-      ui.note.textContent = text;
-      ui.note.style.display = 'block';
-      clearTimeout(noteTimer);
-      noteTimer = setTimeout(function () { if (ui) ui.note.style.display = 'none'; }, NOTE_MS);
-      keepAlive();
-    }
-
     function hide() {
       shown = false;
       clearTimeout(hideTimer);
       if (ui) {
         ui.root.style.display = 'none';
-        ui.note.style.display = 'none';
       }
     }
 
@@ -635,7 +737,7 @@
     }
 
     function inPanel(hit) {
-      return !!(hit && hit.closest && hit.closest('[data-openmedia-controls]'));
+      return !!(hit && hit.closest && hit.closest('[data-openmedia-controls],[data-openmedia-mini]'));
     }
 
     // A touch on the panel is the panel's alone: the site's own handlers, which may work out what
@@ -884,13 +986,9 @@
     var timer = setInterval(tick, TICK_MS);
     tick();
 
-    // The app asks for the video in view to float, from outside the page (see `popOut`).
-    Object.defineProperty(document, POP_OUT, {
+    Object.defineProperty(document, MINI_WINDOW, {
       configurable: true,
-      value: function () {
-        var video = focus();
-        if (video && typeof video.webkitSetPresentationMode === 'function') popOutNow(video);
-      }
+      value: miniWindow
     });
 
     Object.defineProperty(document, KEY, {
@@ -898,10 +996,11 @@
       value: function () {
         clearInterval(timer);
         clearTimeout(hideTimer);
+        miniOff();
+        delete document[MINI_WINDOW];
         observers.forEach(function (observer) { observer.disconnect(); });
         teardown.forEach(function (step) { try { step(); } catch (_) {} });
         if (ui && ui.root.parentNode) ui.root.parentNode.removeChild(ui.root);
-        delete document[POP_OUT];
         delete document[KEY];
       }
     });

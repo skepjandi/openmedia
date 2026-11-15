@@ -6,11 +6,11 @@ All notable changes to OpenMedia are documented here.
 >
 > **Wiki**: the [GitHub Wiki](https://github.com/skepjandi/openmedia/wiki) is the public-facing main wiki — architecture, recipe format, AI pipeline, security model, roadmap. Source-controlled editing surface is `docs/wiki/` in this repo; CI (`.github/workflows/sync-wiki.yml`) mirrors it to the GitHub Wiki on every merge to `main`. New single-PR changes belong here, not as new wiki pages.
 
-### fix(siteview): the float button no longer closes the window it just opened (iOS)
+### feat(video): the float button opens a small player in the bottom right corner
 
-**Area:** `fix(siteview)`
+**Area:** `feat(video)`
 
-**Change:** A real floating window takes about a second to open. The panel asked the app for help after 0.3 s, and the app's request toggled the window, so on a device it closed the window the page's own try was opening and the video flapped while the page ignored touches. The app's request now only opens a window, never closes one, and the page waits 0.9 s before asking. Not verified on hardware.
+**Change:** The float button in the video controls no longer asks the system for a picture-in-picture window (which on a device froze the page and on the simulator showed nothing). It lifts the video out of the page into a small player in the bottom right corner, above everything, with its own close and play/pause buttons and a drag anywhere else on it; the page's own player is left empty. Close, the end of the video, or a site loading another video into the same player puts the video back where it was. It works on every platform. On iOS, tapping a link, Back or the address bar while it is up keeps the page alive as a small window of its own in the corner, so the video plays on over the next page until it is closed (`placeCorner`, `miniWindow`); a minimized app keeps the page out of suspension while the player is up. The failure line and the app-side float request are gone with the system window.
 
 ### fix(siteview): a cold start whose last page cannot load no longer sticks on the logo (iOS)
 
