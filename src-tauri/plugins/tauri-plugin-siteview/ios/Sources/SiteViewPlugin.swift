@@ -1025,6 +1025,7 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
     session.floatedForNavigation = true
     floatingSessions.append(session)
     watchFloats()
+    cornerIfMini(session)
     return true
   }
 
@@ -1041,8 +1042,6 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
       y: host.bounds.height - height - 96 - bottomInset,
       width: width,
       height: height)
-    session.view.layer.cornerRadius = 12
-    session.view.clipsToBounds = true
     session.view.isHidden = false
     host.addSubview(session.view)
     session.view.evaluateJavaScript(miniWindowScript(true))
@@ -1050,8 +1049,6 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
 
   /// Puts the small player of a page that was moved to the corner back over its own page.
   private func leaveCorner(_ session: Session) {
-    session.view.layer.cornerRadius = 0
-    session.view.clipsToBounds = false
     session.view.evaluateJavaScript(miniWindowScript(false))
   }
 

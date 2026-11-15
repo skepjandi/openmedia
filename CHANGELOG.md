@@ -6,6 +6,12 @@ All notable changes to OpenMedia are documented here.
 >
 > **Wiki**: the [GitHub Wiki](https://github.com/skepjandi/openmedia/wiki) is the public-facing main wiki — architecture, recipe format, AI pipeline, security model, roadmap. Source-controlled editing surface is `docs/wiki/` in this repo; CI (`.github/workflows/sync-wiki.yml`) mirrors it to the GitHub Wiki on every merge to `main`. New single-PR changes belong here, not as new wiki pages.
 
+### fix(video): the small player in the corner no longer shows black, and follows an address to another site (iOS)
+
+**Area:** `fix(video)`
+
+**Change:** The page moved to the corner was clipped to rounded corners with a native layer mask (`cornerRadius` and `clipsToBounds` on its `WKWebView`); WebKit draws an accelerated video (YouTube's) black under such a mask while the sound plays on. The rounding is now done inside the page. Opening an address on another site (a new session, not Back or a link) also left the player behind; that path now puts the old page in the corner too. Found by logging the corner page's video (decoding, visible, 211 x 119) and by testing with and without the mask on the simulator.
+
 ### fix(video): the small player no longer hangs a page that restyles its video (YouTube)
 
 **Area:** `fix(video)`

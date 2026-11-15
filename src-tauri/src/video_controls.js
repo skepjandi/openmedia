@@ -496,7 +496,7 @@
     }
 
     // The app moved this page into a small window of its own in the corner: the player fills it.
-    var MINI_WINDOW_STYLE = 'html,body{background:#000!important}body{visibility:hidden!important}';
+    var MINI_WINDOW_STYLE = 'html,body{background:transparent!important}body{visibility:hidden!important}';
     function miniWindow(on) {
       miniWindowed = !!on;
       if (!on) document.documentElement.style.visibility = '';
@@ -511,7 +511,7 @@
       }
       if (!mini) return;
       var css = on ?
-        'right:0;bottom:0;width:100%;height:100%;border-radius:0;box-shadow:none' :
+        'right:0;bottom:0;width:100%;height:100%;border-radius:12px;box-shadow:none' :
         'right:' + mini.right + 'px;bottom:' + mini.bottom + 'px;width:' + mini.width + 'px;height:' + mini.height + 'px;border-radius:12px;box-shadow:0 6px 24px rgba(0,0,0,.5)';
       var parts = css.split(';');
       parts.forEach(function (part) {
