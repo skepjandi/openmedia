@@ -16,6 +16,7 @@
   var CURRENT = Symbol.for('openmedia.currentVideo');
   var NO_AUTOPLAY = Symbol.for('openmedia.noAutoplay');
   var MINI_WINDOW = Symbol.for('openmedia.miniWindow');
+  var MINI_CLOSE = Symbol.for('openmedia.miniClose');
   var USER_PAUSE = Symbol.for('openmedia.userPause');
   var STORE = 'openmedia.video';
   var RATES = [0.5, 1, 1.25, 1.5, 2];
@@ -288,6 +289,7 @@
       back: ['M12 5V1L7 6l5 5V7a6 6 0 1 1-6 6H4a8 8 0 1 0 8-8z'],
       forward: ['M12 5V1l5 5-5 5V7a6 6 0 1 0 6 6h2a8 8 0 1 1-8-8z'],
       sound: ['M3 9v6h4l5 5V4L7 9H3z', 'M14 8.5a4.5 4.5 0 0 1 0 7z'],
+      expand: ['M9 5v2H6.4l4.3 4.3-1.4 1.4L5 8.4V11H3V5h6zm6 14v-2h2.6l-4.3-4.3 1.4-1.4 4.3 4.3V13h2v6h-6z'],
       close: ['M19 6.4L17.6 5 12 10.6 6.4 5 5 6.4 10.6 12 5 17.6 6.4 19 12 13.4 17.6 19 19 17.6 13.4 12z'],
       pip: ['M19 7h-8v6h8V7z', 'M21 3H3c-1.1 0-2 .9-2 2v14c0 1.1.9 1.98 2 1.98h18c1.1 0 2-.88 2-1.98V5c0-1.1-.9-2-2-2zm0 16.01H3V4.98h18v14.03z'],
       muted: ['M3 9v6h4l5 5V4L7 9H3z', 'M14.5 9.4l1.4-1.4 2.1 2.1 2.1-2.1 1.4 1.4-2.1 2.1 2.1 2.1-1.4 1.4-2.1-2.1-2.1 2.1-1.4-1.4 2.1-2.1z']
@@ -423,6 +425,11 @@
         stops: []
       };
       var close = miniButton('close', 28, 'top:6px;right:6px', function () { miniOff(); });
+      // Back to the page as it was: the app puts the page in front again (the page it opened in its
+      // place is closed) and the video back in it. Without an app, the video goes back to its place.
+      var expand = miniButton('expand', 28, 'top:6px;left:6px', function () {
+        try { window.webkit.messageHandlers.openmediaMini.postMessage({ expand: true }); } catch (_) { miniOff(); }
+      });
       var toggle = miniButton(video.paused ? 'play' : 'pause', 34, 'left:6px;bottom:6px', function () {
         if (video.paused) { try { video.play().catch(function () {}); } catch (_) {} } else video.pause();
       });
@@ -464,6 +471,7 @@
       root.appendChild(video);
       video.style.cssText = MINI_VIDEO_CSS;
       root.appendChild(close);
+      root.appendChild(expand);
       root.appendChild(toggle);
       (document.documentElement || document.body).appendChild(root);
       // The site's player keeps styling its video: the box's styles are put back when it does, at
@@ -1019,6 +1027,11 @@
     var timer = setInterval(tick, TICK_MS);
     tick();
 
+    Object.defineProperty(document, MINI_CLOSE, {
+      configurable: true,
+      value: miniOff
+    });
+
     Object.defineProperty(document, MINI_WINDOW, {
       configurable: true,
       value: miniWindow
@@ -1031,6 +1044,7 @@
         clearTimeout(hideTimer);
         miniOff();
         delete document[MINI_WINDOW];
+        delete document[MINI_CLOSE];
         observers.forEach(function (observer) { observer.disconnect(); });
         teardown.forEach(function (step) { try { step(); } catch (_) {} });
         if (ui && ui.root.parentNode) ui.root.parentNode.removeChild(ui.root);

@@ -12,6 +12,12 @@ All notable changes to OpenMedia are documented here.
 
 **Change:** Over a page that plays a video of its own (YouTube's home page autoplays previews), the corner window drew torn or black: a page moved to the corner was hidden and shown again on the way, and the page in front drew its video layers over it. It is now placed in the corner at once, never hidden first, and sits above the page in front. A muted video in the front page (a feed's preview) no longer ends the player; a video playing with sound still does. Checked on the simulator over YouTube's home page. Removing the regenerable `src-tauri/target` caches for the device and Android targets was needed to build (disk full).
 
+### feat(video): an expand button on the corner player; clear corners; no minimize window (iOS)
+
+**Area:** `feat(video)`
+
+**Change:** The corner player has an expand button (top left): it puts the page back in front as it was, with the video back in its place, and closes the page that took its place. The corner window's corners showed white (an opaque web view behind the page's rounded box); the view is now non-opaque. The system picture-in-picture window the small player opened when the app was minimized is removed again (`enterMiniPictureInPicture`): it could only be tested on a device, which is not reachable from here. Checked on the simulator with YouTube: float, expand, and the original watch page came back playing.
+
 ### fix(video): the small player survives any navigation, including YouTube's own (iOS)
 
 **Area:** `fix(video)`

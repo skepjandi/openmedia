@@ -786,6 +786,20 @@ describe("video controls", () => {
     expect(page.posts).toEqual([true, { float: true }, false]);
   });
 
+  it("asks the app to put the page back as it was from the player's expand button", () => {
+    const home = new FakeElement();
+    const video = new PlacedVideo();
+    home.appendChild(video as unknown as FakeElement);
+    const page = load({ videos: [video], current: video });
+    openPanel(page);
+    buttonWith(page, "pip").fire("pointerup");
+    const box = page.body.children.find((child) => "data-openmedia-mini" in child.attributes);
+    box?.children.find((child) => child.__icon === "expand")?.fire("pointerup");
+    expect(page.posts).toContainEqual({ expand: true });
+    // The page's own copy of the player stays up until the app answers.
+    expect(video.parentNode).toBe(box);
+  });
+
   it("closes a small player whose video the site's player took out of the box", () => {
     const home = new FakeElement();
     const video = new PlacedVideo();

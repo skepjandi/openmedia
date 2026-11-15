@@ -143,21 +143,9 @@ private let inPictureInPictureScript = """
     return false;
   })()
   """
-/// Floats the small player's video in the system's picture-in-picture window, for a minimized app:
-/// the small player is part of the app, so it goes with it. Answers true only when this call
-/// started the window. `evaluateJavaScript` runs with a user gesture, which WebKit requires.
-private let enterMiniPictureInPictureScript = """
-  (function () {
-    var root = document.querySelector('[data-openmedia-mini]');
-    var video = root && root.querySelector('video');
-    if (!video || video.paused || video.ended || typeof video.webkitSetPresentationMode !== 'function') return false;
-    if (video.webkitPresentationMode === 'picture-in-picture') return false;
-    video.removeAttribute('disablepictureinpicture');
-    if (!video.webkitSupportsPresentationMode('picture-in-picture')) return false;
-    video.webkitSetPresentationMode('picture-in-picture');
-    return true;
-  })()
-  """
+/// Puts the small player's video back in its place in its own page.
+private let miniCloseScript =
+  "(function(){var f=document[Symbol.for('openmedia.miniClose')];if(typeof f==='function')f()})()"
 /// True while the page has its small player up.
 private let miniActiveScript = "!!document.querySelector('[data-openmedia-mini]')"
 /// Makes the small player fill the whole page (a page that is itself a small window in a corner of
@@ -403,6 +391,10 @@ private final class WeakMiniHandler: NSObject, WKScriptMessageHandler {
     guard message.frameInfo.isMainFrame, let view = message.webView else { return }
     if let body = message.body as? [String: Any], body["float"] != nil {
       target?.floatToCorner(view)
+      return
+    }
+    if let body = message.body as? [String: Any], body["expand"] != nil {
+      target?.expandFromCorner(view)
       return
     }
     target?.setMiniUp(view, (message.body as? Bool) == true)
@@ -920,23 +912,9 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
     return "window.__openmediaPip=\(String(decoding: list, as: UTF8.self))"
   }
 
-  /// A small player up, in the page in front or in the corner, becomes a system window when the app
-  /// is left, so it keeps playing outside the app. One window at a time: the front page's first.
-  private func enterMiniPictureInPicture() -> Bool {
-    var candidates: [Session] = []
-    if let id = activeId, let front = sessions[id], front.miniUp, !front.blocked { candidates.append(front) }
-    candidates += floatingSessions.filter { other in !other.blocked && !candidates.contains(where: { $0 === other }) }
-    guard let session = candidates.first else { return false }
-    session.view.evaluateJavaScript(enterMiniPictureInPictureScript) { [weak session] result, _ in
-      if (result as? Bool) == true { session?.autoPictureInPicture = true }
-    }
-    return true
-  }
-
   /// Leaving the app floats the playing video of the page in front, when its site is on the list,
   /// as a player does. Only a window opened here is closed again by `exitAutomaticPictureInPicture`.
   private func enterPictureInPicture() {
-    if enterMiniPictureInPicture() { return }
     guard let id = activeId, let session = sessions[id], !session.blocked,
       pictureInPictureSites.contains(session.scope)
     else { return }
@@ -1070,6 +1048,11 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
       y: host.bounds.height - height - 96 - bottomInset,
       width: width,
       height: height)
+    // The window's corners are rounded by the page; what is behind them must show through.
+    session.view.isOpaque = false
+    session.view.backgroundColor = .clear
+    session.view.scrollView.backgroundColor = .clear
+    session.view.underPageBackgroundColor = .clear
     session.view.isHidden = false
     host.addSubview(session.view)
     session.view.evaluateJavaScript(miniWindowScript(true))
@@ -1128,7 +1111,7 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
 
   /// Coming back to the app puts a video floated by `enterPictureInPicture` back in the page.
   private func exitAutomaticPictureInPicture() {
-    for session in Array(sessions.values) + floatingSessions where session.autoPictureInPicture {
+    for session in sessions.values where session.autoPictureInPicture {
       session.autoPictureInPicture = false
       session.view.evaluateJavaScript(exitPictureInPictureScript)
     }
@@ -1198,6 +1181,31 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
     start?.fragment = nil
     let target = view.backForwardList.backItem?.url ?? start?.url ?? session.initialURL
     swapForFloatingVideo(session, loading: URLRequest(url: target))
+  }
+
+  /// The corner player's expand button: the page in the corner is the page in front again, as it
+  /// was, with its video back in it, and the page that took its place is closed.
+  func expandFromCorner(_ view: WKWebView) {
+    guard let old = floatingSessions.first(where: { $0.view === view }), old.inCorner,
+      let shell, let host = shell.superview
+    else {
+      // Not a corner window (the player is still over its own page): the video goes back.
+      view.evaluateJavaScript(miniCloseScript)
+      return
+    }
+    if let current = sessions[old.id], current !== old { dispose(current) }
+    floatingSessions.removeAll { $0 === old }
+    old.floatedForNavigation = false
+    old.floatDetached = false
+    old.autoPictureInPicture = false
+    old.miniUp = false
+    leaveCorner(old)
+    old.view.layer.zPosition = 0
+    old.view.evaluateJavaScript(miniCloseScript)
+    host.insertSubview(old.view, belowSubview: shell)
+    sessions[old.id] = old
+    observe(old)
+    showNow(old)
   }
 
   func setMiniUp(_ view: WKWebView, _ up: Bool) {
