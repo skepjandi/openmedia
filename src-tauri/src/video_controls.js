@@ -29,7 +29,6 @@
   var MIN_VIDEO_SHARE = 0.15; // of the viewport, for the video of a page that is not a feed
   var TAP_SLOP = 10; // px a finger may move and still be a tap
   var TAP_MAX_MS = 500;
-  var CLICK_AFTER_TOUCH_MS = 700; // the click a tapped touch would make is swallowed this long
   var HIDE_MS = 3500; // the panel goes away this long after the last touch on it
   var SVG = 'http://www.w3.org/2000/svg';
   var INTERACTIVE = 'a,button,input,textarea,select,summary,[role="button"],[role="link"],' +
@@ -55,10 +54,10 @@
     var lastVideo = null;
     var touchFrom = null;
     var touchTarget = null;
-    var touchTapAt = 0;
     var pointerFrom = null;
+    var awaitTapEnd = false;
+    var awaitTapClick = false;
     var mutedAtDown = null;
-    var pointerTapAt = 0;
 
     function read() {
       try { return JSON.parse(localStorage.getItem(STORE) || '{}') || {}; } catch (_) { return {}; }
@@ -595,14 +594,15 @@
     // Players that act on the pointer (Instagram mutes on the pointer's release) see it before the
     // touch ends, so a tap is also found from the pointer, which is cancelled for the site the
     // same way, and the touch and click that follow are then only swallowed.
+    // A tap is also found from the pointer, which players that act on its release see before the
+    // touch ends. The press itself is always the site's: a drag, a hold or a swipe needs it whole,
+    // and a player that does something on it (toggles the sound) is undone by `restoreMute`.
     function onPointerDown(event) {
       pointerFrom = null;
+      awaitTapEnd = false;
+      awaitTapClick = false;
       if (event.isPrimary === false || inPanel(event.target)) return;
       noteMute(true);
-      // A press on the video is not shown to the site: players that toggle the sound on it
-      // (Instagram's Reels, with an icon that pops in) would do so before the tap is known. A
-      // touch that turns out to be a swipe reaches the page through its own touch events.
-      if (videoAt(event.clientX, event.clientY, event.target)) event.stopImmediatePropagation();
       pointerFrom = { x: event.clientX, y: event.clientY, time: Date.now(), target: event.target };
     }
 
@@ -612,7 +612,8 @@
       if (!from || inPanel(event.target) || Date.now() - from.time > TAP_MAX_MS) return;
       if (Math.hypot(event.clientX - from.x, event.clientY - from.y) > TAP_SLOP) return;
       if (!tapAt(event.clientX, event.clientY, event.target, event)) return;
-      pointerTapAt = Date.now();
+      awaitTapEnd = true;
+      awaitTapClick = true;
       try {
         if (typeof PointerEvent === 'function' && from.target && from.target.dispatchEvent) {
           from.target.dispatchEvent(new PointerEvent('pointercancel', {
@@ -628,6 +629,8 @@
     function onTouchStart(event) {
       touchFrom = null;
       touchTarget = null;
+      awaitTapEnd = false;
+      awaitTapClick = false;
       if (keepFromSite(event)) return;
       touchTarget = event.target;
       noteMute(false);
@@ -639,8 +642,9 @@
       var from = touchFrom;
       touchFrom = null;
       if (keepFromSite(event)) return;
-      if (Date.now() - pointerTapAt < CLICK_AFTER_TOUCH_MS) {
-        touchTapAt = Date.now();
+      // The touch of a tap the pointer already took only gets swallowed, once.
+      if (awaitTapEnd) {
+        awaitTapEnd = false;
         event.stopImmediatePropagation();
         if (event.cancelable) event.preventDefault();
         cancelForSite(event);
@@ -650,7 +654,7 @@
       if (!from || !last || Date.now() - from.time > TAP_MAX_MS) return;
       if (Math.hypot(last.clientX - from.x, last.clientY - from.y) > TAP_SLOP) return;
       if (tapAt(last.clientX, last.clientY, event.target, event)) {
-        touchTapAt = Date.now();
+        awaitTapClick = true;
         cancelForSite(event);
       }
     }
@@ -660,7 +664,9 @@
         event.stopImmediatePropagation();
         return;
       }
-      if (Date.now() - touchTapAt < CLICK_AFTER_TOUCH_MS || Date.now() - pointerTapAt < CLICK_AFTER_TOUCH_MS) {
+      // The click a tap the panel took would have made is swallowed, once.
+      if (awaitTapClick) {
+        awaitTapClick = false;
         event.stopImmediatePropagation();
         if (event.cancelable) event.preventDefault();
         return;

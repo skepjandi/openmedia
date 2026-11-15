@@ -6,6 +6,18 @@ All notable changes to OpenMedia are documented here.
 >
 > **Wiki**: the [GitHub Wiki](https://github.com/skepjandi/openmedia/wiki) is the public-facing main wiki — architecture, recipe format, AI pipeline, security model, roadmap. Source-controlled editing surface is `docs/wiki/` in this repo; CI (`.github/workflows/sync-wiki.yml`) mirrors it to the GitHub Wiki on every merge to `main`. New single-PR changes belong here, not as new wiki pages.
 
+### fix(siteview): swiping and dragging a Short or Reel works again
+
+**Area:** `fix(siteview)`
+
+**Problem:** After the tap-controls change, sliding to the next video or dragging one often did nothing in Shorts and Reels, and a Reel sometimes stopped with the next one showing a little at the bottom. A press on the video was hidden from the site until the touch was known to be a tap, so a page that drags with pointer events never saw the drag begin (and a replay of the press, tried as a fix, gave it a wrong start time, so its snap overshot). Separately, the touch of a swipe made within 0.7 s of a tap was swallowed with the tap's.
+
+**Change:** The press is always the site's again. A tap is still found from the pointer and the touch and kept from the site (pointer release, touch end and click, once each); the sound is still put back if the press changed it. What a tap leaves waiting (its touch end and click) is dropped when the next press begins, so a swipe after a tap is never swallowed, and a site button tapped soon after a tap gets its click. A Reel's mute icon may flash on a tap again: that is the price of letting the site have the press.
+
+**Verified:** Vitest (`videoControls.test.ts`), ESLint, `tsc`; on the iOS 26.5 simulator on Instagram Reels, six swipes (plain and right after a tap) each landed on a new, fully snapped Reel. **Not verified:** YouTube Shorts after this change (the run did not finish), Android, a device.
+
+**PR:** n/a
+
 ### fix(siteview): a tap never mutes or unmutes a Reel, and Instagram's "Continue watching in the app" wall is hidden
 
 **Area:** `fix(siteview)`

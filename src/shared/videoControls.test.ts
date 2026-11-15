@@ -145,6 +145,8 @@ interface Page {
   pointer: (from: [number, number], to?: [number, number], target?: Record<string, unknown>) => Tap;
   /** A pointer tap where `between` runs after the press and before the release. */
   pointerWith: (at: [number, number], between: () => void) => Tap;
+  /** Fires one event at the page's window listeners; true when a listener kept it from the site. */
+  win: (type: string, event?: Record<string, unknown>) => boolean;
   /** Runs the timers the controls set, as when the panel's few seconds are up. */
   runTimers: () => void;
   /** What the feed player was told about a pause or a play the reader chose. */
@@ -385,6 +387,26 @@ function load(options: {
       }
       return tap;
     },
+    win: (type, event = {}) => {
+      let kept = false;
+      for (const handler of windowListeners.get(type) ?? []) {
+        handler({
+          type,
+          cancelable: true,
+          target: PLAIN,
+          isPrimary: true,
+          pointerId: 1,
+          pointerType: "touch",
+          preventDefault() {},
+          stopPropagation() {},
+          stopImmediatePropagation() {
+            kept = true;
+          },
+          ...event,
+        });
+      }
+      return kept;
+    },
     runTimers: () => timeouts.splice(0).forEach((run) => run()),
     setCalm: () => {
       document[Symbol.for("openmedia.noAutoplay")] = true;
@@ -517,38 +539,25 @@ describe("video controls", () => {
     page.tick();
     expect(shown(page)).toBe(true);
 
-    // The touch and the click that follow only get swallowed: the panel stays, nothing toggles.
-    expect(page.touch([200, 400]).kept).toBe(true);
-    expect(page.click().kept).toBe(true);
-    page.tick();
-    expect(shown(page)).toBe(true);
+    // The touch and the click that follow only get swallowed, once. The touch began before the
+    // pointer went up, as it does on a phone.
+    const second = load({ videos: [video], current: video });
+    second.win("pointerdown", { clientX: 200, clientY: 400, target });
+    second.win("touchstart", { touches: [{ clientX: 200, clientY: 400 }], target });
+    expect(second.win("pointerup", { clientX: 200, clientY: 400, target })).toBe(true);
+    expect(
+      second.win("touchend", { changedTouches: [{ clientX: 200, clientY: 400 }], target }),
+    ).toBe(true);
+    expect(second.win("click", { clientX: 200, clientY: 400, target })).toBe(true);
+    // Only once: the next click is the site's again.
+    expect(second.win("click", { clientX: 200, clientY: 900, target })).toBe(false);
   });
 
-  it("puts the sound back when the press changed it, so a tap never mutes or unmutes", () => {
-    const muted = new FakeVideo();
-    muted.muted = true;
-    const page = load({ videos: [muted], current: muted });
-    // The site unmutes on the press, after the page script has noted the sound and before the release.
-    const tap = page.pointerWith([200, 400], () => {
-      muted.muted = false;
-    });
-    expect(tap.kept).toBe(true);
-    expect(muted.muted).toBe(true);
-
-    const sounding = new FakeVideo();
-    const other = load({ videos: [sounding], current: sounding });
-    other.pointerWith([200, 400], () => {
-      sounding.muted = true;
-    });
-    expect(sounding.muted).toBe(false);
-  });
-
-  it("does not show the site the press on the video, but does show it a press on its own button", () => {
+  it("always shows the site the press, so a drag or a swipe reaches it whole", () => {
     const video = new FakeVideo();
     const page = load({ videos: [video], current: video });
-    expect(page.pointer([200, 400]).pressKept).toBe(true);
-    expect(page.pointer([200, 400], [200, 400], SITE_BUTTON).pressKept).toBeUndefined();
-    expect(page.pointer([200, 900]).pressKept).toBeUndefined();
+    expect(page.pointer([200, 400]).pressKept).toBeUndefined();
+    expect(page.win("pointerdown", { clientX: 200, clientY: 600 })).toBe(false);
   });
 
   it("leaves a moved pointer, and one on a site button, to the site", () => {
