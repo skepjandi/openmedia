@@ -2,10 +2,10 @@
 //!
 //! Network and CSS rules are converted to WebKit content-rule lists. A separate cached Brave
 //! engine returns URL-matched scriptlets for the native plugin to inject at document start.
-//! Neither path downloads filter data at runtime.
+//! Neither path downloads filter data at runtime. Tracking-parameter and redirect-tracker data is
+//! compiled into a link-cleaning script that rides with the scriptlets (`link_clean`).
 
 use std::{
-    borrow::Cow,
     fs,
     path::{Path, PathBuf},
     sync::{Arc, Mutex},
@@ -23,6 +23,7 @@ use tauri_plugin_siteview::ContentRuleList;
 
 use crate::error::{Error, Result};
 use crate::library::write_atomically;
+use crate::link_clean;
 
 /// WebKit refuses to compile a list with more rules than this.
 const MAX_RULES_PER_LIST: usize = 150_000;
@@ -31,48 +32,93 @@ const MAX_RULES_PER_LIST: usize = 150_000;
 /// produced are rebuilt instead of reused from WebKit's store.
 const CONVERTER_REVISION: &str = "adblock-0.13.5";
 
-/// One list per file keeps each far below WebKit's limit and lets a list change independently.
+const EASYLIST: &str = include_str!("../../blocklists/easylist.txt");
+const EASYPRIVACY: &str = include_str!("../../blocklists/easyprivacy.txt");
+const PETER_LOWE: &str = include_str!("../../blocklists/peter-lowe.txt");
+const ADGUARD_MOBILE: &str = include_str!("../../blocklists/adguard-mobile.txt");
+const UBLOCK_FILTERS: &str = include_str!("../../blocklists/ublock-filters.txt");
+const UBLOCK_PRIVACY: &str = include_str!("../../blocklists/ublock-privacy.txt");
+const UBLOCK_BADWARE: &str = include_str!("../../blocklists/ublock-badware.txt");
+const UBLOCK_UNBREAK: &str = include_str!("../../blocklists/ublock-unbreak.txt");
+const UBLOCK_QUICK_FIXES: &str = include_str!("../../blocklists/ublock-quick-fixes.txt");
+const UBLOCK_RESOURCE_ABUSE: &str = include_str!("../../blocklists/ublock-resource-abuse.txt");
+const BRAVE_SPECIFIC: &str = include_str!("../../blocklists/brave-specific.txt");
 #[cfg(target_os = "ios")]
-const BUNDLED: [(&str, &str); 4] = [
-    ("easylist", include_str!("../../blocklists/easylist.txt")),
-    (
-        "easyprivacy",
-        include_str!("../../blocklists/easyprivacy.txt"),
-    ),
-    (
-        "brave-specific",
-        include_str!("../../blocklists/brave-specific.txt"),
-    ),
-    (
-        "brave-ios-specific",
-        include_str!("../../blocklists/brave-ios-specific.txt"),
-    ),
-];
-
+const BRAVE_IOS_SPECIFIC: &str = include_str!("../../blocklists/brave-ios-specific.txt");
+/// Lists bundled on iOS only: Brave's iOS fixes, which include its YouTube ad fallback rules.
+#[cfg(target_os = "ios")]
+const IOS_ONLY: [&str; 1] = [BRAVE_IOS_SPECIFIC];
 #[cfg(not(target_os = "ios"))]
-const BUNDLED: [(&str, &str); 3] = [
-    ("easylist", include_str!("../../blocklists/easylist.txt")),
-    (
-        "easyprivacy",
-        include_str!("../../blocklists/easyprivacy.txt"),
-    ),
-    (
-        "brave-specific",
-        include_str!("../../blocklists/brave-specific.txt"),
-    ),
-];
+const IOS_ONLY: [&str; 0] = [];
+const BRAVE_FIRSTPARTY: &str = include_str!("../../blocklists/brave-firstparty.txt");
+const BRAVE_FIRSTPARTY_CNAME: &str = include_str!("../../blocklists/brave-firstparty-cname.txt");
+const BRAVE_FIRSTPARTY_REGIONAL: &str =
+    include_str!("../../blocklists/brave-firstparty-regional.txt");
+
+/// An exception (`@@`, `#@#`) only overrides rules in the same WebKit content-rule list, so the
+/// uBlock lists that exist to undo breakage ride in every group instead of being a list of their
+/// own, where they would override nothing. The few blocks they carry are duplicated, which is
+/// harmless.
+const SHARED_EXCEPTIONS: [&str; 2] = [UBLOCK_UNBREAK, UBLOCK_QUICK_FIXES];
+
+/// One content-rule list. Its source lists convert together, so exceptions in one list apply to
+/// the blocks of another in the same group.
+struct Group {
+    name: &'static str,
+    lists: Vec<&'static str>,
+}
+
+/// Groups keep each list far below WebKit's rule limit and let one change without recompiling
+/// the rest. The sources of a group are chosen by what they pair with, not by size.
+fn groups() -> Vec<Group> {
+    let brave = [BRAVE_SPECIFIC, BRAVE_FIRSTPARTY, BRAVE_FIRSTPARTY_REGIONAL]
+        .into_iter()
+        .chain(IOS_ONLY)
+        .collect();
+    let named: [(&'static str, Vec<&'static str>); 6] = [
+        ("easylist", vec![EASYLIST]),
+        ("easyprivacy", vec![EASYPRIVACY, UBLOCK_PRIVACY]),
+        (
+            "ublock",
+            vec![UBLOCK_FILTERS, UBLOCK_BADWARE, UBLOCK_RESOURCE_ABUSE],
+        ),
+        ("brave", brave),
+        ("brave-cname", vec![BRAVE_FIRSTPARTY_CNAME]),
+        ("mobile", vec![ADGUARD_MOBILE, PETER_LOWE]),
+    ];
+    named
+        .into_iter()
+        .map(|(name, mut lists)| {
+            lists.extend(SHARED_EXCEPTIONS);
+            Group { name, lists }
+        })
+        .collect()
+}
+
+/// Every distinct bundled list, for the scriptlet engine, which sees them all at once.
+fn all_lists() -> Vec<&'static str> {
+    let mut all: Vec<&'static str> = Vec::new();
+    for list in groups().into_iter().flat_map(|group| group.lists) {
+        if !all.contains(&list) {
+            all.push(list);
+        }
+    }
+    all
+}
 
 struct Source {
     id: String,
-    text: Cow<'static, str>,
+    lists: Vec<&'static str>,
 }
 
 impl Source {
-    fn new(name: &str, text: Cow<'static, str>) -> Self {
+    fn new(name: &str, lists: Vec<&'static str>) -> Self {
         let mut hasher = Sha256::new();
         hasher.update(CONVERTER_REVISION.as_bytes());
-        hasher.update([0]);
-        hasher.update(text.as_bytes());
+        for list in &lists {
+            hasher.update([0]);
+            hasher.update(list.as_bytes());
+        }
         // The first 8 bytes, as 16 lowercase hex characters. sha2 0.11 digests no longer implement `LowerHex`.
         let short: String = hasher
             .finalize()
@@ -82,7 +128,7 @@ impl Source {
             .collect();
         Self {
             id: format!("openmedia-{name}-{short}"),
-            text,
+            lists,
         }
     }
 }
@@ -102,9 +148,9 @@ pub struct AdBlock(Arc<Inner>);
 
 impl AdBlock {
     pub fn bundled(dir: PathBuf) -> Self {
-        let sources = BUNDLED
-            .iter()
-            .map(|(name, text)| Source::new(name, Cow::Borrowed(*text)))
+        let sources = groups()
+            .into_iter()
+            .map(|group| Source::new(group.name, group.lists))
             .collect();
         Self(Arc::new(Inner {
             dir,
@@ -127,7 +173,7 @@ impl AdBlock {
         for source in &inner.sources {
             let path = inner.dir.join(format!("{}.json", source.id));
             if !path.exists() {
-                write_atomically(&path, content_rules_json(&source.text)?.as_bytes())?;
+                write_atomically(&path, content_rules_json(&source.lists)?.as_bytes())?;
             }
             lists.push(ContentRuleList {
                 id: source.id.clone(),
@@ -175,6 +221,14 @@ impl AdBlock {
             }
         }
         Ok(guarded.concat())
+    }
+
+    /// Everything the page gets at document start for a page opened at `url`: the matched
+    /// scriptlets, then the link cleaner, which every page gets.
+    pub fn page_script_for_url(&self, url: &str) -> Result<String> {
+        let mut script = self.scriptlets_for_url(url)?;
+        script.push_str(link_clean::script()?);
+        Ok(script)
     }
 
     fn remove_stale_files(&self) -> Result<()> {
@@ -232,8 +286,8 @@ const OWN_SCRIPTLET_RULES: &str = include_str!("../../blocklists/openmedia-speci
 
 fn scriptlet_engine() -> Result<Engine> {
     let mut filters = FilterSet::new(false);
-    for (_, text) in BUNDLED {
-        filters.add_filter_list(text.to_owned(), ParseOptions::default());
+    for list in all_lists() {
+        filters.add_filter_list(list.to_owned(), ParseOptions::default());
     }
     filters.add_filter_list(OWN_SCRIPTLET_RULES.to_owned(), ParseOptions::default());
     let mut resources: Vec<Resource> =
@@ -260,12 +314,15 @@ fn is_cache_file(path: &Path) -> bool {
     name.starts_with("openmedia-") && (name.ends_with(".json") || name.ends_with(".tmp"))
 }
 
-/// Converts an ABP-syntax list to WebKit's content-blocking JSON. Network rules become `block`
-/// and exceptions; element-hiding rules become `css-display-none`. Rules WebKit cannot express
-/// (scriptlets, procedural cosmetics, `$redirect`) are dropped by the converter.
-fn content_rules_json(list_text: &str) -> Result<String> {
+/// Converts ABP-syntax lists to WebKit's content-blocking JSON as one rule list. Network rules
+/// become `block` and exceptions; element-hiding rules become `css-display-none`. Rules WebKit
+/// cannot express (scriptlets, procedural cosmetics, `$redirect`) are dropped by the converter.
+/// The lists are converted together so an exception in one applies to the blocks of another.
+fn content_rules_json(lists: &[&str]) -> Result<String> {
     let mut set = FilterSet::new(true);
-    set.add_filter_list(list_text.to_owned(), ParseOptions::default());
+    for list in lists {
+        set.add_filter_list((*list).to_owned(), ParseOptions::default());
+    }
     let (mut rules, _converted) = set
         .into_content_blocking()
         .map_err(|()| Error::AdBlock("the filter list could not be converted".into()))?;
@@ -302,7 +359,11 @@ mod tests {
     use super::*;
 
     fn rules(list: &str) -> Vec<Value> {
-        let json = content_rules_json(list).expect("list converts");
+        group_rules(&[list])
+    }
+
+    fn group_rules(lists: &[&str]) -> Vec<Value> {
+        let json = content_rules_json(lists).expect("lists convert");
         serde_json::from_str(&json).expect("output is a JSON array")
     }
 
@@ -368,19 +429,51 @@ mod tests {
     #[test]
     fn a_list_with_no_usable_rules_is_an_error_not_an_empty_file() {
         assert!(matches!(
-            content_rules_json("! only a comment\n"),
+            content_rules_json(&["! only a comment\n"]),
             Err(Error::AdBlock(_))
         ));
     }
 
     #[test]
-    fn every_bundled_list_converts_within_webkits_rule_limit() {
-        for (name, text) in BUNDLED {
-            let count = rules(text).len();
-            let minimum = if name.starts_with("brave") { 1 } else { 1_000 };
+    fn every_group_converts_within_webkits_rule_limit() {
+        for group in groups() {
+            let count = group_rules(&group.lists).len();
             assert!(
-                (minimum..=MAX_RULES_PER_LIST).contains(&count),
-                "{name} produced {count} rules"
+                (1_000..=MAX_RULES_PER_LIST).contains(&count),
+                "{} produced {count} rules",
+                group.name
+            );
+        }
+    }
+
+    #[test]
+    fn an_exception_in_one_list_overrides_a_block_in_another_of_the_same_group() {
+        let converted = group_rules(&[
+            "||ads.example.com^\n",
+            "@@||ads.example.com^$domain=shop.example.org\n",
+        ]);
+        let kinds: Vec<&Value> = converted
+            .iter()
+            .map(|rule| &rule["action"]["type"])
+            .collect();
+        assert!(kinds.contains(&&Value::from("block")), "{kinds:?}");
+        assert!(
+            kinds.contains(&&Value::from("ignore-previous-rules")),
+            "{kinds:?}"
+        );
+    }
+
+    #[test]
+    fn every_group_carries_the_breakage_exceptions() {
+        let unbreak = of_type(&rules(UBLOCK_UNBREAK), "ignore-previous-rules").len();
+        assert!(unbreak > 500, "only {unbreak} unbreak exceptions");
+        for group in groups() {
+            let converted = group_rules(&group.lists);
+            let exceptions = of_type(&converted, "ignore-previous-rules").len();
+            assert!(
+                exceptions >= unbreak,
+                "{} has {exceptions} exceptions, fewer than the {unbreak} in the unbreak list",
+                group.name
             );
         }
     }
@@ -407,11 +500,7 @@ mod tests {
     #[cfg(target_os = "ios")]
     #[test]
     fn ios_uses_braves_youtube_fallback_rules() {
-        let ios_rules = BUNDLED
-            .iter()
-            .find(|(name, _)| *name == "brave-ios-specific")
-            .map(|(_, text)| *text)
-            .expect("Brave iOS Specific is bundled");
+        let ios_rules = BRAVE_IOS_SPECIFIC;
         assert!(ios_rules.contains(
             "||googlevideo.com/videoplayback*ctier=L&*%2Cxpc%2Cctier%2C$domain=m.youtube.com|music.youtube.com"
         ));
@@ -422,11 +511,7 @@ mod tests {
     fn brave_youtube_scriptlets_match_only_youtube_pages() {
         let dir = tempfile::tempdir().expect("tempdir");
         let ad_block = AdBlock::bundled(dir.path().to_owned());
-        let brave_rules = BUNDLED
-            .iter()
-            .find(|(name, _)| *name == "brave-specific")
-            .map(|(_, text)| *text)
-            .expect("Brave Specific is bundled");
+        let brave_rules = BRAVE_SPECIFIC;
         assert!(brave_rules.contains("youtube.*##+js(brave-youtube-theater-fix)"));
 
         let youtube = ad_block
@@ -474,7 +559,7 @@ mod tests {
     fn ad_block_with(dir: &Path, text: &'static str) -> AdBlock {
         AdBlock(Arc::new(Inner {
             dir: dir.to_owned(),
-            sources: vec![Source::new("test", Cow::Borrowed(text))],
+            sources: vec![Source::new("test", vec![text])],
             conversion: Mutex::new(()),
             scriptlet_engine: Mutex::new(None),
         }))
@@ -514,5 +599,201 @@ mod tests {
         assert!(!Path::new(&old[0].path).exists());
         assert!(Path::new(&new[0].path).exists());
         assert!(unrelated.exists(), "files this module did not write stay");
+    }
+
+    /// Writes every converted list to `$OPENMEDIA_RULE_DIR` for `scripts/check-blocklists-webkit.sh`.
+    #[test]
+    #[ignore = "run by scripts/check-blocklists-webkit.sh"]
+    fn write_rule_lists() {
+        let dir = std::env::var("OPENMEDIA_RULE_DIR").expect("OPENMEDIA_RULE_DIR is set");
+        let lists = AdBlock::bundled(PathBuf::from(dir))
+            .rule_lists()
+            .expect("lists convert");
+        assert!(!lists.is_empty());
+    }
+
+    /// A request as WebKit's content blocker sees it.
+    struct Probe<'a> {
+        url: &'a str,
+        page: &'a str,
+        resource: &'a str,
+        third_party: bool,
+    }
+
+    const fn script(url: &'static str) -> Probe<'static> {
+        Probe {
+            url,
+            page: "news.example.org",
+            resource: "script",
+            third_party: true,
+        }
+    }
+
+    /// The part of WebKit's content-rule matching the converter's output uses: URL regex, resource
+    /// and load type, page-domain conditions, and `ignore-previous-rules` undoing earlier blocks
+    /// within one list.
+    struct Matcher {
+        pattern: regex::Regex,
+        resources: Option<Vec<String>>,
+        third_party: Option<bool>,
+        if_domain: Option<Vec<String>>,
+        unless_domain: Option<Vec<String>>,
+        exception: bool,
+    }
+
+    fn strings(value: &Value) -> Option<Vec<String>> {
+        value.as_array().map(|items| {
+            items
+                .iter()
+                .filter_map(|item| item.as_str().map(str::to_owned))
+                .collect()
+        })
+    }
+
+    fn matcher(rule: &Value) -> Option<Matcher> {
+        let exception = match rule["action"]["type"].as_str()? {
+            "block" => false,
+            "ignore-previous-rules" => true,
+            _ => return None,
+        };
+        let trigger = &rule["trigger"];
+        let pattern = regex::RegexBuilder::new(trigger["url-filter"].as_str()?)
+            .case_insensitive(trigger["url-filter-is-case-sensitive"] != true)
+            .build()
+            .ok()?;
+        let third_party = trigger["load-type"].as_array().and_then(|types| {
+            match types.iter().filter_map(Value::as_str).collect::<Vec<_>>()[..] {
+                ["third-party"] => Some(true),
+                ["first-party"] => Some(false),
+                _ => None,
+            }
+        });
+        Some(Matcher {
+            pattern,
+            resources: strings(&trigger["resource-type"]),
+            third_party,
+            if_domain: strings(&trigger["if-domain"]),
+            unless_domain: strings(&trigger["unless-domain"]),
+            exception,
+        })
+    }
+
+    fn domain_matches(page: &str, domain: &str) -> bool {
+        match domain.strip_prefix('*') {
+            Some(suffix) => page == suffix || page.ends_with(&format!(".{suffix}")),
+            None => page == domain,
+        }
+    }
+
+    impl Matcher {
+        fn matches(&self, probe: &Probe<'_>) -> bool {
+            self.resources
+                .as_ref()
+                .is_none_or(|kinds| kinds.iter().any(|kind| kind == probe.resource))
+                && self
+                    .third_party
+                    .is_none_or(|third| third == probe.third_party)
+                && self
+                    .if_domain
+                    .as_ref()
+                    .is_none_or(|ds| ds.iter().any(|d| domain_matches(probe.page, d)))
+                && self
+                    .unless_domain
+                    .as_ref()
+                    .is_none_or(|ds| !ds.iter().any(|d| domain_matches(probe.page, d)))
+                && self.pattern.is_match(probe.url)
+        }
+    }
+
+    /// Whether any list blocks the request: within a list the last matching rule decides.
+    fn blocked(lists: &[Vec<Matcher>], probe: &Probe<'_>) -> bool {
+        lists.iter().any(|list| {
+            list.iter().fold(false, |blocked, rule| {
+                match (rule.matches(probe), rule.exception) {
+                    (true, exception) => !exception,
+                    (false, _) => blocked,
+                }
+            })
+        })
+    }
+
+    fn compiled_groups() -> Vec<Vec<Matcher>> {
+        groups()
+            .iter()
+            .map(|group| {
+                group_rules(&group.lists)
+                    .iter()
+                    .filter_map(matcher)
+                    .collect()
+            })
+            .collect()
+    }
+
+    /// The first `||host^` rule of a plain host list: some host the list is there to block.
+    fn first_listed_host(list: &str) -> &str {
+        list.lines()
+            .find_map(|line| line.strip_prefix("||")?.strip_suffix('^'))
+            .expect("the list has a host rule")
+    }
+
+    #[test]
+    fn known_trackers_are_blocked_and_common_libraries_still_load() {
+        let lists = compiled_groups();
+        let cname = format!(
+            "https://{}/pixel.js",
+            first_listed_host(BRAVE_FIRSTPARTY_CNAME)
+        );
+        let lowe = format!("https://{}/a.js", first_listed_host(PETER_LOWE));
+        let badware = format!("https://{}/a.js", first_listed_host(UBLOCK_BADWARE));
+        let must_block = [
+            script("https://www.google-analytics.com/analytics.js"),
+            script("https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"),
+            script("https://securepubads.g.doubleclick.net/tag/js/gpt.js"),
+            script("https://connect.facebook.net/en_US/fbevents.js"),
+            script("https://static.ads-twitter.com/uwt.js"),
+            script("https://bat.bing.com/bat.js"),
+            script("https://cdn.taboola.com/libtrc/example/loader.js"),
+            script("https://cdn.segment.com/analytics.js/v1/key/analytics.min.js"),
+            script("https://static.hotjar.com/c/hotjar-1.js"),
+        ];
+        for probe in &must_block {
+            assert!(blocked(&lists, probe), "{} is not blocked", probe.url);
+        }
+        // Hosts taken from the lists themselves, one for each list that holds only host rules.
+        for url in [&cname, &lowe, &badware] {
+            let probe = Probe {
+                url: url.as_str(),
+                page: "news.example.org",
+                resource: "script",
+                third_party: true,
+            };
+            assert!(blocked(&lists, &probe), "{url} is not blocked");
+        }
+        let must_load = [
+            script("https://cdn.jsdelivr.net/npm/vue@3/dist/vue.global.js"),
+            script("https://code.jquery.com/jquery-3.7.1.min.js"),
+            script(
+                "https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js",
+            ),
+            Probe {
+                resource: "style-sheet",
+                ..script("https://fonts.googleapis.com/css2?family=Inter")
+            },
+            Probe {
+                url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+                page: "www.youtube.com",
+                resource: "document",
+                third_party: false,
+            },
+            Probe {
+                url: "https://en.wikipedia.org/wiki/Main_Page",
+                page: "en.wikipedia.org",
+                resource: "document",
+                third_party: false,
+            },
+        ];
+        for probe in &must_load {
+            assert!(!blocked(&lists, probe), "{} is blocked", probe.url);
+        }
     }
 }

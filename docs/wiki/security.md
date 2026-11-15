@@ -86,6 +86,10 @@ It adds no path from a site to native code:
 - Scriptlets intentionally run in the page's JS realm and are visible to page code. They are derived
   from bundled filter data, restricted to the main frame and guarded by the starting origin. They
   are not a sandbox or a guarantee against a hostile site overriding them.
+- The link cleaner (`openmedia-link-cleaner.js`) runs the same way, in the main frame on every
+  page. It only rewrites the `href` of a link the user is following, using bundled data, and has
+  no way to navigate, click, request or reach native code. A hostile page can read the cleaned
+  link, which it could read anyway.
 - The site view gets no new message, event or capability. The plugin commands that swap content
   rules (`set_content_rule_lists`) and recipe scripts (`set_document_start_script`) are registered
   but absent from `siteview:default`; only Rust calls them. The shell never supplies adblock script

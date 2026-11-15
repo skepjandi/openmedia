@@ -9,6 +9,7 @@ mod entitlement;
 pub mod error;
 mod incognito;
 mod library;
+mod link_clean;
 mod ota;
 mod recipe_library;
 pub mod recipes;

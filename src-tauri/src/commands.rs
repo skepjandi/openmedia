@@ -247,9 +247,9 @@ async fn build_rule_lists(ad_block: &AdBlock) -> Result<Vec<ContentRuleList>> {
         .map_err(|e| Error::AdBlock(e.to_string()))?
 }
 
-async fn build_scriptlets(ad_block: &AdBlock, url: String) -> Result<String> {
+async fn build_page_script(ad_block: &AdBlock, url: String) -> Result<String> {
     let ad_block = AdBlock::clone(ad_block);
-    tauri::async_runtime::spawn_blocking(move || ad_block.scriptlets_for_url(&url))
+    tauri::async_runtime::spawn_blocking(move || ad_block.page_script_for_url(&url))
         .await
         .map_err(|error| Error::AdBlock(error.to_string()))?
 }
@@ -283,7 +283,7 @@ pub(crate) async fn open_session(
     } else {
         Vec::new()
     };
-    let ad_block_scriptlet = match build_scriptlets(&ad_block, url.clone()).await {
+    let ad_block_scriptlet = match build_page_script(&ad_block, url.clone()).await {
         Ok(scriptlet) => Some(scriptlet),
         Err(error) => {
             blocking_failures.push(error.to_string());

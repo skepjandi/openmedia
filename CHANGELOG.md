@@ -6,6 +6,12 @@ All notable changes to OpenMedia are documented here.
 >
 > **Wiki**: the [GitHub Wiki](https://github.com/skepjandi/openmedia/wiki) is the public-facing main wiki — architecture, recipe format, AI pipeline, security model, roadmap. Source-controlled editing surface is `docs/wiki/` in this repo; CI (`.github/workflows/sync-wiki.yml`) mirrors it to the GitHub Wiki on every merge to `main`. New single-PR changes belong here, not as new wiki pages.
 
+### feat(adblock): more filter lists, exceptions that apply, link cleaning, weekly list refresh
+
+**Area:** `feat(adblock)`
+
+**Change:** Bundled lists grew from three sources (four on iOS) to fourteen in six WebKit rule lists: uBlock (filters, privacy, badware, resource abuse), Brave first-party, regional and CNAME lists, AdGuard Mobile and Peter Lowe's list join EasyList, EasyPrivacy and Brave. The uBlock Unbreak and Quick fixes exceptions are copied into every list, because WebKit applies an exception only inside its own list; before, exceptions never reached another list's blocks. Following a link now removes tracking parameters (`fbclid`, `gclid`, per-site ones) and replaces redirect-tracker addresses with their destination (Brave's query-filter, clean-urls and debounce data, `openmedia-link-cleaner.js`). `scripts/update-blocklists.sh` validates every download and `.github/workflows/blocklists.yml` refreshes the lists weekly as a pull request and compiles them with WebKit (`scripts/check-blocklists-webkit.sh`). Brave resource bundle updated from 17 to 24 resources. Verified: Rust conversion and rule-behavior tests, 16 link-cleaner vitest cases, all six groups compiled by macOS WebKit. Not verified: simulator, device or Android behavior, live-site breakage; there is no per-site allowlist yet. The `src-tauri/target` build cache of the main checkout was reused because the disk was full.
+
 ### fix(video): the corner player no longer tears or goes black over a page that plays a video (iOS)
 
 **Area:** `fix(video)`

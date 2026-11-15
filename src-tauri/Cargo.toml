@@ -73,6 +73,14 @@ tempfile = "3"
 [profile.dev]
 debug = "line-tables-only"
 
+# The blocklist test compiles about 190,000 URL patterns; unoptimized that takes over a minute.
+[profile.dev.package.regex-automata]
+opt-level = 3
+[profile.dev.package.regex-syntax]
+opt-level = 3
+[profile.dev.package.regex]
+opt-level = 3
+
 # Read the optimization guideline for more details: https://tauri.app/concept/size/#cargo-configuration
 [profile.release]
 codegen-units = 1

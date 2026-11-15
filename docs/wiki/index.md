@@ -25,7 +25,7 @@ OpenMedia is a Tauri v2 app for browsing websites in native web views and custom
 | [Site Playbooks](./site-playbooks.md) | Per-site options for the official recipes, what every selector matched and how it was checked, what CSS cannot do, and the selector-writing rules for the in-app assistant |
 | [Internationalization](./i18n.md) | 29 UI languages, message catalog, plurals, right-to-left, adding a language |
 | [Accessibility](./accessibility.md) | Epilepsy protection and the dyslexia aids (reading font, text spacing, page tint): what they change in the app and on pages, and what they cannot do |
-| [Ad Blocking](./ad-blocking.md) | Bundled EasyList and EasyPrivacy as WebKit content rule lists: engine choice, caching, limits |
+| [Ad Blocking](./ad-blocking.md) | Bundled filter lists as WebKit content rule lists, link cleaning: engine choice, caching, limits |
 | [Prior Art](./prior-art.md) | SocialLite and others: what they do, what we copy, where we differ |
 | [Roadmap](./roadmap.md) | Phased build plan with exit criteria, spikes, decision log, risks |
 | [Recipe Library and Sharing](./recipe-library.md) | The bundled recipes, adding and updating them, and sharing a recipe as a GitHub pull request through the Worker: flow, limits, privacy, threat model |
