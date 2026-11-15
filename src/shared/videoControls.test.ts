@@ -139,6 +139,8 @@ interface Page {
   click: (x?: number, y?: number, target?: Record<string, unknown>) => Tap;
   /** A touch from one point to another, as a finger makes it; `kept` is true when the page took it. */
   touch: (from: [number, number], to?: [number, number], target?: Record<string, unknown>) => Tap;
+  /** A pointer pressed and released, as a finger or mouse makes it before the touch or click. */
+  pointer: (from: [number, number], to?: [number, number], target?: Record<string, unknown>) => Tap;
   /** Runs the timers the controls set, as when the panel's few seconds are up. */
   runTimers: () => void;
   /** What the feed player was told about a pause or a play the reader chose. */
@@ -222,6 +224,12 @@ function load(options: {
       observe() {}
       disconnect() {}
     },
+    PointerEvent: class {
+      type: string;
+      constructor(type: string) {
+        this.type = type;
+      }
+    },
     TouchEvent: class {
       type: string;
       constructor(type: string) {
@@ -299,6 +307,35 @@ function load(options: {
         handler({
           type: "touchend",
           changedTouches: [{ clientX: to[0], clientY: to[1] }],
+          target,
+          cancelable: true,
+          preventDefault() {},
+          stopPropagation() {},
+          stopImmediatePropagation() {
+            tap.kept = true;
+          },
+        });
+      }
+      return tap;
+    },
+    pointer: (from, to = from, target = PLAIN) => {
+      const tap = { kept: false };
+      for (const handler of windowListeners.get("pointerdown") ?? []) {
+        handler({
+          type: "pointerdown",
+          clientX: from[0],
+          clientY: from[1],
+          isPrimary: true,
+          target,
+        });
+      }
+      for (const handler of windowListeners.get("pointerup") ?? []) {
+        handler({
+          type: "pointerup",
+          clientX: to[0],
+          clientY: to[1],
+          pointerId: 1,
+          pointerType: "touch",
           target,
           cancelable: true,
           preventDefault() {},
@@ -427,6 +464,35 @@ describe("video controls", () => {
     };
     expect(page.touch([200, 400], [200, 400], target).kept).toBe(true);
     expect(events).toEqual(["touchcancel"]);
+  });
+
+  it("keeps the pointer's release from the site, which mutes on it, and cancels the pointer", () => {
+    const video = new FakeVideo();
+    const page = load({ videos: [video], current: video });
+    const events: string[] = [];
+    const target = {
+      ...PLAIN,
+      dispatchEvent: (event: { type: string }) => events.push(event.type),
+    };
+    expect(page.pointer([200, 400], [200, 400], target).kept).toBe(true);
+    expect(events).toEqual(["pointercancel"]);
+    page.tick();
+    expect(shown(page)).toBe(true);
+
+    // The touch and the click that follow only get swallowed: the panel stays, nothing toggles.
+    expect(page.touch([200, 400]).kept).toBe(true);
+    expect(page.click().kept).toBe(true);
+    page.tick();
+    expect(shown(page)).toBe(true);
+  });
+
+  it("leaves a moved pointer, and one on a site button, to the site", () => {
+    const video = new FakeVideo();
+    const page = load({ videos: [video], current: video });
+    expect(page.pointer([200, 600], [200, 150]).kept).toBe(false);
+    expect(page.pointer([200, 400], [200, 400], SITE_BUTTON).kept).toBe(false);
+    page.tick();
+    expect(shown(page)).toBe(false);
   });
 
   it("leaves a swipe, and a touch on one of the site's buttons, to the site", () => {

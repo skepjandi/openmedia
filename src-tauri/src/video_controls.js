@@ -56,6 +56,8 @@
     var touchFrom = null;
     var touchTarget = null;
     var touchTapAt = 0;
+    var pointerFrom = null;
+    var pointerTapAt = 0;
 
     function read() {
       try { return JSON.parse(localStorage.getItem(STORE) || '{}') || {}; } catch (_) { return {}; }
@@ -560,6 +562,34 @@
       } catch (_) {}
     }
 
+    // Players that act on the pointer (Instagram mutes on the pointer's release) see it before the
+    // touch ends, so a tap is also found from the pointer, which is cancelled for the site the
+    // same way, and the touch and click that follow are then only swallowed.
+    function onPointerDown(event) {
+      pointerFrom = null;
+      if (event.isPrimary === false || inPanel(event.target)) return;
+      pointerFrom = { x: event.clientX, y: event.clientY, time: Date.now(), target: event.target };
+    }
+
+    function onPointerUp(event) {
+      var from = pointerFrom;
+      pointerFrom = null;
+      if (!from || inPanel(event.target) || Date.now() - from.time > TAP_MAX_MS) return;
+      if (Math.hypot(event.clientX - from.x, event.clientY - from.y) > TAP_SLOP) return;
+      if (!tapAt(event.clientX, event.clientY, event.target, event)) return;
+      pointerTapAt = Date.now();
+      try {
+        if (typeof PointerEvent === 'function' && from.target && from.target.dispatchEvent) {
+          from.target.dispatchEvent(new PointerEvent('pointercancel', {
+            bubbles: true,
+            pointerId: event.pointerId,
+            pointerType: event.pointerType,
+            isPrimary: true
+          }));
+        }
+      } catch (_) {}
+    }
+
     function onTouchStart(event) {
       touchFrom = null;
       touchTarget = null;
@@ -573,6 +603,13 @@
       var from = touchFrom;
       touchFrom = null;
       if (keepFromSite(event)) return;
+      if (Date.now() - pointerTapAt < CLICK_AFTER_TOUCH_MS) {
+        touchTapAt = Date.now();
+        event.stopImmediatePropagation();
+        if (event.cancelable) event.preventDefault();
+        cancelForSite(event);
+        return;
+      }
       var last = event.changedTouches && event.changedTouches[0];
       if (!from || !last || Date.now() - from.time > TAP_MAX_MS) return;
       if (Math.hypot(last.clientX - from.x, last.clientY - from.y) > TAP_SLOP) return;
@@ -587,7 +624,7 @@
         event.stopImmediatePropagation();
         return;
       }
-      if (Date.now() - touchTapAt < CLICK_AFTER_TOUCH_MS) {
+      if (Date.now() - touchTapAt < CLICK_AFTER_TOUCH_MS || Date.now() - pointerTapAt < CLICK_AFTER_TOUCH_MS) {
         event.stopImmediatePropagation();
         if (event.cancelable) event.preventDefault();
         return;
@@ -604,6 +641,8 @@
 
     on(document, 'touchend', tapped, { capture: true, passive: true });
     on(document, 'click', tapped, { capture: true, passive: true });
+    on(window, 'pointerdown', onPointerDown, { capture: true, passive: true });
+    on(window, 'pointerup', onPointerUp, { capture: true });
     on(window, 'touchstart', onTouchStart, { capture: true, passive: true });
     on(window, 'touchmove', keepFromSite, { capture: true, passive: true });
     on(window, 'touchend', onTouchEnd, { capture: true });
