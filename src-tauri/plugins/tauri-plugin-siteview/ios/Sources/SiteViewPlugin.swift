@@ -1342,12 +1342,18 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
   func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
     session(of: webView)?.settled = true
     finishHandoff(of: webView)
+    // A page that never committed never paints, so nothing else would take the launch logo down:
+    // the error would sit over a dead logo screen. The blank page stays hidden (it would be white).
+    dropLaunchLogo()
     reportFailure(error)
   }
 
   func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
     session(of: webView)?.settled = true
     finishHandoff(of: webView)
+    // A page that never committed never paints, so nothing else would take the launch logo down:
+    // the error would sit over a dead logo screen. The blank page stays hidden (it would be white).
+    dropLaunchLogo()
     reportFailure(error)
   }
 
@@ -1706,10 +1712,14 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
     scroll.refreshControl = target
   }
 
-  func reveal(_ view: WKWebView) {
-    guard view.alpha == 0, view.superview != nil else { return }
+  private func dropLaunchLogo() {
     launchLogo?.removeFromSuperview()
     launchLogo = nil
+  }
+
+  func reveal(_ view: WKWebView) {
+    guard view.alpha == 0, view.superview != nil else { return }
+    dropLaunchLogo()
     UIView.animate(withDuration: revealDuration, delay: 0, options: [.beginFromCurrentState, .allowUserInteraction]) {
       view.alpha = 1
     }

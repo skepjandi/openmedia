@@ -6,6 +6,12 @@ All notable changes to OpenMedia are documented here.
 >
 > **Wiki**: the [GitHub Wiki](https://github.com/skepjandi/openmedia/wiki) is the public-facing main wiki — architecture, recipe format, AI pipeline, security model, roadmap. Source-controlled editing surface is `docs/wiki/` in this repo; CI (`.github/workflows/sync-wiki.yml`) mirrors it to the GitHub Wiki on every merge to `main`. New single-PR changes belong here, not as new wiki pages.
 
+### fix(siteview): a cold start whose last page cannot load no longer sticks on the logo (iOS)
+
+**Area:** `fix(siteview)`
+
+**Change:** The launch logo came down only when a page painted. When the page restored at launch failed before it committed (offline, server down), nothing painted, so the logo stayed under the error with no spinner and no way forward. A failed load now takes the logo down, so the app shows its dark backdrop, the controls and the error.
+
 ### fix(siteview): a floating video keeps playing when the app is minimized, and the panel says why a video would not float (iOS)
 
 **Area:** `fix(siteview)`
