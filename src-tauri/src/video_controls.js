@@ -35,7 +35,7 @@
   var POP_STEP_MS = 60;
   var POP_MIN = 16; // px: smaller is not an icon's badge or picture
   var POP_SCAN = 8000; // elements looked at per step, at most
-  var POP_ASK_MS = 300; // the app is asked to float the video if the page's own try changed nothing
+  var POP_ASK_MS = 900; // the app is asked to float the video if the page's own try changed nothing; a real window takes this long to open
   var NOTE_MS = 9000;
   var HIDE_MS = 3500; // the panel goes away this long after the last touch on it
   var SVG = 'http://www.w3.org/2000/svg';
@@ -371,9 +371,12 @@
       return video.webkitPresentationMode === 'picture-in-picture';
     }
 
+    // The app's request only ever opens the window: one that is already open (or opening) is
+    // left alone, because toggling it here would close the window the page's own try just opened.
     function popOutNow(video) {
+      if (inWindow(video)) return;
       try { video.removeAttribute('disablepictureinpicture'); } catch (_) {}
-      try { video.webkitSetPresentationMode(inWindow(video) ? 'inline' : 'picture-in-picture'); } catch (_) {}
+      try { video.webkitSetPresentationMode('picture-in-picture'); } catch (_) {}
     }
 
     // Why a video would not float, for the line the panel shows when it did not.

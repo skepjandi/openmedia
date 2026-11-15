@@ -6,6 +6,12 @@ All notable changes to OpenMedia are documented here.
 >
 > **Wiki**: the [GitHub Wiki](https://github.com/skepjandi/openmedia/wiki) is the public-facing main wiki — architecture, recipe format, AI pipeline, security model, roadmap. Source-controlled editing surface is `docs/wiki/` in this repo; CI (`.github/workflows/sync-wiki.yml`) mirrors it to the GitHub Wiki on every merge to `main`. New single-PR changes belong here, not as new wiki pages.
 
+### fix(siteview): the float button no longer closes the window it just opened (iOS)
+
+**Area:** `fix(siteview)`
+
+**Change:** A real floating window takes about a second to open. The panel asked the app for help after 0.3 s, and the app's request toggled the window, so on a device it closed the window the page's own try was opening and the video flapped while the page ignored touches. The app's request now only opens a window, never closes one, and the page waits 0.9 s before asking. Not verified on hardware.
+
 ### fix(siteview): a cold start whose last page cannot load no longer sticks on the logo (iOS)
 
 **Area:** `fix(siteview)`

@@ -720,6 +720,16 @@ describe("video controls", () => {
     expect(video.mode).toBe("picture-in-picture");
   });
 
+  it("does not close a window the page already opened when the app asks to float", () => {
+    const video = new FloatableVideo();
+    const page = load({ videos: [video], current: video });
+    openPanel(page);
+    buttonWith(page, "pip").fire("pointerup");
+    expect(video.mode).toBe("picture-in-picture");
+    page.floatFromApp();
+    expect(video.mode).toBe("picture-in-picture");
+  });
+
   it("says why when the video would not float, and keeps the panel up", () => {
     const video = new FloatableVideo();
     video.allowed = false;
