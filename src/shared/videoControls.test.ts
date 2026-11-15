@@ -800,6 +800,39 @@ describe("video controls", () => {
     expect(video.parentNode).toBe(box);
   });
 
+  it("keeps playing when the site pauses its video, and pauses only from its own button", () => {
+    const home = new FakeElement();
+    const video = new PlacedVideo();
+    home.appendChild(video as unknown as FakeElement);
+    const page = load({ videos: [video], current: video });
+    openPanel(page);
+    buttonWith(page, "pip").fire("pointerup");
+    const box = page.body.children.find((child) => "data-openmedia-mini" in child.attributes);
+    // A feed pausing what it thinks is out of view.
+    video.pause();
+    expect(video.paused).toBe(false);
+    // A pause that goes round the page's own method is undone a moment later.
+    FakeVideo.prototype.pause.call(video);
+    video.emit("pause");
+    expect(video.paused).toBe(true);
+    page.runTimers();
+    expect(video.paused).toBe(false);
+    // The reader's pause stays, and so does the play after it.
+    const toggle = () =>
+      box?.children.find((child) => child.__icon === "pause" || child.__icon === "play");
+    toggle()?.fire("pointerup");
+    expect(video.paused).toBe(true);
+    video.emit("pause");
+    page.runTimers();
+    expect(video.paused).toBe(true);
+    toggle()?.fire("pointerup");
+    expect(video.paused).toBe(false);
+    // Closed, the page's own pause works again.
+    box?.children.find((child) => child.__icon === "close")?.fire("pointerup");
+    video.pause();
+    expect(video.paused).toBe(true);
+  });
+
   it("closes a small player whose video the site's player took out of the box", () => {
     const home = new FakeElement();
     const video = new PlacedVideo();

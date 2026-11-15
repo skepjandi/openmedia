@@ -40,6 +40,8 @@
   var MINI_SHARE = 0.48; // of the screen's width
   var MINI_EDGE = 12; // px from the right edge
   var MINI_RECHECK_MS = 250; // a site's restyling of the lifted video is answered after this
+  var MINI_UNDO_MAX = 4; // times a site's pause is undone within the window below
+  var MINI_UNDO_WINDOW_MS = 3000;
   var MINI_FIGHTS = 40; // and this many times, then the site wins
   var MINI_BOTTOM = 96; // px from the bottom edge, clear of the browser's own buttons
   var HIDE_MS = 3500; // the panel goes away this long after the last touch on it
@@ -430,8 +432,26 @@
       var expand = miniButton('expand', 28, 'top:6px;left:6px', function () {
         try { window.webkit.messageHandlers.openmediaMini.postMessage({ expand: true }); } catch (_) { miniOff(); }
       });
+      // The player plays until the reader pauses it: a site's own pausing (a feed pausing what it
+      // thinks is out of view, Instagram's Reels) is refused, and a pause that gets past that is
+      // undone a few times. Only this button pauses it.
+      state.wantsPlay = !video.paused;
+      state.allowPause = false;
+      state.undone = [];
+      var nativePause = video.pause;
+      video.pause = function () {
+        if (state.allowPause) return nativePause.apply(video, arguments);
+      };
+      state.stops.push(function () { delete video.pause; });
       var toggle = miniButton(video.paused ? 'play' : 'pause', 34, 'left:6px;bottom:6px', function () {
-        if (video.paused) { try { video.play().catch(function () {}); } catch (_) {} } else video.pause();
+        if (video.paused) {
+          state.wantsPlay = true;
+          try { video.play().catch(function () {}); } catch (_) {}
+        } else {
+          state.wantsPlay = false;
+          state.allowPause = true;
+          try { nativePause.call(video); } finally { state.allowPause = false; }
+        }
       });
       var sync = function () { setIcon(toggle, video.paused ? 'play' : 'pause'); };
       var listen = function (name, handler) {
@@ -440,6 +460,17 @@
       };
       listen('play', sync);
       listen('pause', sync);
+      listen('pause', function () {
+        var now = Date.now();
+        state.undone = state.undone.filter(function (at) { return now - at < MINI_UNDO_WINDOW_MS; });
+        if (!state.wantsPlay || video.ended || state.undone.length >= MINI_UNDO_MAX) return;
+        state.undone.push(now);
+        setTimeout(function () {
+          if (mini === state && state.wantsPlay && video.paused && !video.ended) {
+            try { video.play().catch(function () {}); } catch (_) {}
+          }
+        }, 50);
+      });
       listen('ended', function () { miniOff(); });
       // A site that reuses its player for the next video loads it into this one.
       listen('loadstart', function () { if (video.currentSrc !== state.src) miniOff(); });

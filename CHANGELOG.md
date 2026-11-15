@@ -6,6 +6,12 @@ All notable changes to OpenMedia are documented here.
 >
 > **Wiki**: the [GitHub Wiki](https://github.com/skepjandi/openmedia/wiki) is the public-facing main wiki — architecture, recipe format, AI pipeline, security model, roadmap. Source-controlled editing surface is `docs/wiki/` in this repo; CI (`.github/workflows/sync-wiki.yml`) mirrors it to the GitHub Wiki on every merge to `main`. New single-PR changes belong here, not as new wiki pages.
 
+### fix(video): the small player keeps playing when a feed pauses its video (Reels)
+
+**Area:** `fix(video)`
+
+**Change:** On Instagram Reels the small player paused by itself, and pressing play paused it again at once: the page's feed logic still treated the lifted video as a feed item, and the site pauses what it thinks is out of view. While the small player is up, the feed player leaves the videos alone, a pause the site makes through the video's own `pause()` is refused, and one that gets past that (called on the prototype) is undone up to four times in three seconds. Only the player's own button pauses it; closed, the page's own pause works again. Checked on the simulator with YouTube Shorts (pause stays, play resumes); Instagram could not be tested, since its sign-in is not on the simulator. Unit tests cover both pause paths and the feed player standing down.
+
 ### fix(adblock): the lists no longer hide every SVG on every page
 
 **Area:** `fix(adblock)`

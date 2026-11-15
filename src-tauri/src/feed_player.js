@@ -86,7 +86,10 @@
     }
 
     function active() {
-      return inFeed() && !document.hidden && !window.__openmediaHold && !document[NO_AUTOPLAY];
+      // Not while the small player is up: its video is not a feed item, and the feed's idea of what
+      // plays and what is out of view is not for it.
+      return inFeed() && !document.hidden && !window.__openmediaHold && !document[NO_AUTOPLAY] &&
+        !document.querySelector('[data-openmedia-mini]');
     }
 
     // How much of the viewport a box covers, and how much of the box is on screen, both 0 to 1.

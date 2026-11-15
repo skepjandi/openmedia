@@ -58,6 +58,8 @@ function listeners() {
 }
 
 interface Page {
+  /** Puts the small player up or takes it down. */
+  setMini: (up: boolean) => void;
   clock: { now: number };
   nativeAsks: number[];
   fire: (type: string, event?: Record<string, unknown>) => void;
@@ -86,6 +88,11 @@ function load(options: {
   const windowEvents = listeners();
   const document = {
     hidden: false,
+    /** True while the page has its small player up. */
+    miniUp: false,
+    querySelector(selector: string) {
+      return selector.includes("data-openmedia-mini") && this.miniUp ? {} : null;
+    },
     documentElement: {
       nodeType: 1,
       localName: "html",
@@ -144,6 +151,9 @@ function load(options: {
       intervals.forEach((run) => run());
       await Promise.resolve();
       await Promise.resolve();
+    },
+    setMini(up) {
+      document.miniUp = up;
     },
     userPause(video, paused) {
       (document as Record<symbol, (video: FakeVideo, paused: boolean) => void>)[
@@ -297,6 +307,19 @@ describe("feed player", () => {
     await page.settle();
     expect(outgoing.paused).toBe(true);
     expect(incoming.paused).toBe(false);
+  });
+
+  it("leaves the videos alone while the small player is up", async () => {
+    const outgoing = new FakeVideo();
+    const incoming = new FakeVideo();
+    const page = load({ videos: [outgoing, incoming] });
+    page.setMini(true);
+    outgoing.box = { top: -800, left: 0, width: 400, height: 800, bottom: 0, right: 400 };
+    outgoing.paused = false;
+    incoming.paused = true;
+    await page.settle();
+    expect(outgoing.paused).toBe(false);
+    expect(incoming.playCalls).toBe(0);
   });
 
   it("runs on Instagram reels opened from a profile but not on its home feed", async () => {
