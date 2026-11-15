@@ -6,6 +6,12 @@ All notable changes to OpenMedia are documented here.
 >
 > **Wiki**: the [GitHub Wiki](https://github.com/skepjandi/openmedia/wiki) is the public-facing main wiki — architecture, recipe format, AI pipeline, security model, roadmap. Source-controlled editing surface is `docs/wiki/` in this repo; CI (`.github/workflows/sync-wiki.yml`) mirrors it to the GitHub Wiki on every merge to `main`. New single-PR changes belong here, not as new wiki pages.
 
+### fix(video): the corner player no longer tears or goes black over a page that plays a video (iOS)
+
+**Area:** `fix(video)`
+
+**Change:** Over a page that plays a video of its own (YouTube's home page autoplays previews), the corner window drew torn or black: a page moved to the corner was hidden and shown again on the way, and the page in front drew its video layers over it. It is now placed in the corner at once, never hidden first, and sits above the page in front. A muted video in the front page (a feed's preview) no longer ends the player; a video playing with sound still does. Checked on the simulator over YouTube's home page. Removing the regenerable `src-tauri/target` caches for the device and Android targets was needed to build (disk full).
+
 ### feat(video): the small player becomes a system window when the app is minimized (iOS)
 
 **Area:** `feat(video)`

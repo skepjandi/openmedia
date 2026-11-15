@@ -128,6 +128,8 @@ private let ownVideoPlayingScript = """
       var video = videos[i];
       if (video.webkitPresentationMode === 'picture-in-picture') continue;
       if (video.closest && video.closest('[data-openmedia-mini]')) continue;
+      // A muted video is a feed's preview, not one the reader is watching: it does not end the player.
+      if (video.muted || video.volume === 0) continue;
       if (!video.paused && !video.ended && video.readyState > 2 && video.videoWidth > 0) return true;
     }
     return false;
@@ -455,6 +457,8 @@ private final class Session {
   var needsReload = false
   /// True while the page has its small player up, as the page last said.
   var miniUp = false
+  /// True while the page is shown as a small window in the corner.
+  var inCorner = false
   /// Ids of the content rule lists attached to this view, so a late compile attaches each once.
   var ruleListIds: Set<String> = []
   /// The lists themselves and the profile, kept so the page can be replaced by a fresh view.
@@ -636,7 +640,7 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
       if let existing = self.sessions[args.session] {
         if self.appForeground, await self.floatIfPlaying(existing) {
           existing.floatDetached = true
-          existing.view.isHidden = true
+          if !existing.miniUp { existing.view.isHidden = true }
           existing.observations.removeAll()
           self.sessions[existing.id] = nil
         } else {
@@ -704,7 +708,7 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
       self.pageRect = args.rect.cgRect
       if let shell = self.shell, let host = shell.superview {
         let frame = shell.convert(args.rect.cgRect, to: host)
-        self.sessions.values.forEach { $0.view.frame = frame }
+        self.sessions.values.forEach { if !($0.floatedForNavigation && $0.miniUp) { $0.view.frame = frame } }
         self.signInWindow?.frame = frame
       }
       invoke.resolve()
@@ -1020,7 +1024,9 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
     old.floatDetached = true
     old.autoPictureInPicture = true
     old.observations.removeAll()
-    old.view.isHidden = true
+    // A page with its small player up goes to the corner at once, never hidden on the way: a view
+    // hidden and shown again draws its video torn or black.
+    if old.miniUp { placeCorner(old) } else { old.view.isHidden = true }
     floatingSessions.append(old)
     watchFloats()
     cornerIfMini(old)
@@ -1054,6 +1060,7 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
     session.floatedForNavigation = true
     floatingSessions.append(session)
     watchFloats()
+    if session.miniUp { placeCorner(session) }
     cornerIfMini(session)
     return true
   }
@@ -1062,7 +1069,10 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
   /// small window of its own above the app, so the player outlives the page the reader left. The
   /// page keeps running in it; its player fills it.
   private func placeCorner(_ session: Session) {
-    guard let host = shell?.superview, session.view.superview != nil else { return }
+    guard !session.inCorner, let host = shell?.superview, session.view.superview != nil else { return }
+    session.inCorner = true
+    // Above the page in front: its video layers otherwise draw over and tear the corner window.
+    session.view.layer.zPosition = 1000
     let width = min(240, host.bounds.width * 0.48)
     let height = (width * 9 / 16).rounded()
     let bottomInset = host.window?.safeAreaInsets.bottom ?? host.safeAreaInsets.bottom
@@ -1078,6 +1088,7 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
 
   /// Puts the small player of a page that was moved to the corner back over its own page.
   private func leaveCorner(_ session: Session) {
+    session.inCorner = false
     session.view.evaluateJavaScript(miniWindowScript(false))
   }
 
@@ -1697,6 +1708,7 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
         self.floatingSessions.append(previous)
         self.watchFloats()
         proceed()
+        if previous.miniUp { self.placeCorner(previous) }
         self.cornerIfMini(previous)
         return
       }
@@ -1711,7 +1723,9 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
     if session.floatedForNavigation { endFloat(session) }
     // A sign-in window belongs to the page that opened it; another page takes the screen.
     if let owner = signInOwner, owner != session.id { closeSignInWindow() }
-    for other in sessions.values where other !== session { other.view.isHidden = true }
+    for other in sessions.values where other !== session && !(other.floatedForNavigation && other.miniUp) {
+      other.view.isHidden = true
+    }
     session.view.isHidden = false
     activeId = session.id
     if let host = shell?.superview { session.view.frame = pageFrame(in: host) }
