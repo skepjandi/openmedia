@@ -13,7 +13,7 @@ use std::{
 
 use adblock::{
     Engine,
-    content_blocking::CbRule,
+    content_blocking::{CbRule, CbType},
     lists::{FilterSet, ParseOptions},
     resources::{MimeType, Resource, ResourceType},
 };
@@ -28,9 +28,10 @@ use crate::link_clean;
 /// WebKit refuses to compile a list with more rules than this.
 const MAX_RULES_PER_LIST: usize = 150_000;
 
-/// Part of every list id. Bump it when the `adblock` crate is upgraded, so lists the old converter
-/// produced are rebuilt instead of reused from WebKit's store.
-const CONVERTER_REVISION: &str = "adblock-0.13.5";
+/// Part of every list id. Bump it when the `adblock` crate is upgraded or this file changes what
+/// the conversion produces, so lists the old conversion made are rebuilt instead of reused from
+/// WebKit's store.
+const CONVERTER_REVISION: &str = "adblock-0.13.5-lone-exceptions";
 
 const EASYLIST: &str = include_str!("../../blocklists/easylist.txt");
 const EASYPRIVACY: &str = include_str!("../../blocklists/easyprivacy.txt");
@@ -332,8 +333,36 @@ fn content_rules_json(lists: &[&str]) -> Result<String> {
             rules.len()
         )));
     }
+    drop_hides_made_from_lone_exceptions(&mut rules, lists);
     include_subdomains(&mut rules);
     serde_json::to_string(&rules).map_err(|e| Error::AdBlock(e.to_string()))
+}
+
+/// The converter turns an element-hiding exception (`example.org#@#svg`) into a hide of that
+/// selector on every site but `example.org`, which is right only where a generic `##svg` exists
+/// for it to be an exception to. uBlock's unbreak list has exceptions with no such rule (its
+/// `redtube.com#@#svg` came out as "hide every `svg` on the web", which removed every icon and
+/// logo from every page). A hide that applies everywhere but a few domains is kept only if the
+/// lists have the generic rule behind it.
+fn drop_hides_made_from_lone_exceptions(rules: &mut Vec<CbRule>, lists: &[&str]) {
+    let generic: std::collections::HashSet<&str> = lists
+        .iter()
+        .flat_map(|list| list.lines())
+        .filter_map(|line| line.strip_prefix("##"))
+        .collect();
+    rules.retain(|rule| {
+        let lone = rule.action.typ == CbType::CssDisplayNone
+            && rule.trigger.unless_domain.is_some()
+            && rule.trigger.if_domain.is_none();
+        if !lone {
+            return true;
+        }
+        let selector = rule.action.selector.as_deref().unwrap_or_default();
+        generic.contains(selector)
+            || selector
+                .split(',')
+                .any(|part| generic.contains(part.trim()))
+    });
 }
 
 /// ABP's `example.org##.ad` applies on `www.example.org` too, but WebKit matches a bare domain
@@ -395,6 +424,32 @@ mod tests {
         assert_eq!(hides.len(), 1);
         assert_eq!(hides[0]["action"]["selector"], ".sponsored");
         assert_eq!(hides[0]["trigger"]["if-domain"][0], "*example.org");
+    }
+
+    #[test]
+    fn an_exception_with_no_generic_hide_behind_it_does_not_hide_anything() {
+        // uBlock's unbreak list has `redtube.com#@#svg`; the converter made it hide every svg.
+        let lone = group_rules(&["redtube.com#@#svg\n||tracker.example^\n"]);
+        assert!(of_type(&lone, "css-display-none").is_empty());
+        let paired = group_rules(&["##.banner\nexample.org#@#.banner\n"]);
+        let hides = of_type(&paired, "css-display-none");
+        assert!(!hides.is_empty());
+        assert!(
+            hides
+                .iter()
+                .all(|rule| rule["action"]["selector"] == ".banner")
+        );
+    }
+
+    #[test]
+    fn no_bundled_group_hides_svg_everywhere() {
+        for group in groups() {
+            let converted = group_rules(&group.lists);
+            let hides_svg = of_type(&converted, "css-display-none")
+                .into_iter()
+                .any(|rule| rule["action"]["selector"] == "svg");
+            assert!(!hides_svg, "{} hides every svg", group.name);
+        }
     }
 
     #[test]

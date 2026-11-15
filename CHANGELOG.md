@@ -6,6 +6,12 @@ All notable changes to OpenMedia are documented here.
 >
 > **Wiki**: the [GitHub Wiki](https://github.com/skepjandi/openmedia/wiki) is the public-facing main wiki — architecture, recipe format, AI pipeline, security model, roadmap. Source-controlled editing surface is `docs/wiki/` in this repo; CI (`.github/workflows/sync-wiki.yml`) mirrors it to the GitHub Wiki on every merge to `main`. New single-PR changes belong here, not as new wiki pages.
 
+### fix(adblock): the lists no longer hide every SVG on every page
+
+**Area:** `fix(adblock)`
+
+**Change:** With the wider lists (#241), every page lost its icons and logos: YouTube's header and like buttons, the video controls' own icons, anything drawn as an `svg`. uBlock's unbreak list has `redtube.com#@#svg`, an exception for a hide that no list has; the converter turned it into "hide `svg` everywhere except redtube.com" and every group carried it. Found by turning ad blocking off (icons came back), then scanning the generated rule files. A hide that applies everywhere but a few domains is now kept only when the lists have the generic rule behind it, and the converter revision changed so installs rebuild their cached rule lists. Two tests: a lone exception hides nothing, and no bundled group hides `svg`.
+
 ### feat(adblock): more filter lists, exceptions that apply, link cleaning, weekly list refresh
 
 **Area:** `feat(adblock)`
