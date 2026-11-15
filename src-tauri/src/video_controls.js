@@ -510,14 +510,22 @@
       return !(area > 0 && wide > 0 && tall > 0 && (wide * tall) / area >= 0.5);
     }
 
-    function tapAt(x, y, hit, event) {
-      if (!panelPage() || !panelOn()) return false;
-      if (hit && hit.closest && hit.closest('[data-openmedia-controls]')) return false;
+    // The video a press at this point is on, when the panel is in charge of it: not on the panel,
+    // not on a button of the site's own, inside the video.
+    function videoAt(x, y, hit) {
+      if (!panelPage() || !panelOn()) return null;
+      if (inPanel(hit)) return null;
       var video = focus();
-      if (!video) return false;
-      if (onSiteButton(hit, video)) return false;
+      if (!video) return null;
+      if (onSiteButton(hit, video)) return null;
       var box = boxOf(video);
-      if (!(x >= box.left && x <= box.right && y >= box.top && y <= box.bottom)) return false;
+      if (!(x >= box.left && x <= box.right && y >= box.top && y <= box.bottom)) return null;
+      return video;
+    }
+
+    function tapAt(x, y, hit, event) {
+      var video = videoAt(x, y, hit);
+      if (!video) return false;
       event.stopImmediatePropagation();
       if (event.cancelable) event.preventDefault();
       restoreMute();
@@ -591,6 +599,10 @@
       pointerFrom = null;
       if (event.isPrimary === false || inPanel(event.target)) return;
       noteMute(true);
+      // A press on the video is not shown to the site: players that toggle the sound on it
+      // (Instagram's Reels, with an icon that pops in) would do so before the tap is known. A
+      // touch that turns out to be a swipe reaches the page through its own touch events.
+      if (videoAt(event.clientX, event.clientY, event.target)) event.stopImmediatePropagation();
       pointerFrom = { x: event.clientX, y: event.clientY, time: Date.now(), target: event.target };
     }
 

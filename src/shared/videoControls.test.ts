@@ -127,6 +127,8 @@ class FakeElement {
 interface Tap {
   /** True when the page kept the tap from the site. */
   kept: boolean;
+  /** True when the page kept the press (the pointer going down) from the site. */
+  pressKept?: boolean;
 }
 
 interface Page {
@@ -329,6 +331,9 @@ function load(options: {
           clientY: from[1],
           isPrimary: true,
           target,
+          stopImmediatePropagation() {
+            tap.pressKept = true;
+          },
         });
       }
       for (const handler of windowListeners.get("pointerup") ?? []) {
@@ -358,6 +363,7 @@ function load(options: {
           clientY: at[1],
           isPrimary: true,
           target: PLAIN,
+          stopImmediatePropagation() {},
         });
       }
       between();
@@ -535,6 +541,14 @@ describe("video controls", () => {
       sounding.muted = true;
     });
     expect(sounding.muted).toBe(false);
+  });
+
+  it("does not show the site the press on the video, but does show it a press on its own button", () => {
+    const video = new FakeVideo();
+    const page = load({ videos: [video], current: video });
+    expect(page.pointer([200, 400]).pressKept).toBe(true);
+    expect(page.pointer([200, 400], [200, 400], SITE_BUTTON).pressKept).toBeUndefined();
+    expect(page.pointer([200, 900]).pressKept).toBeUndefined();
   });
 
   it("leaves a moved pointer, and one on a site button, to the site", () => {
