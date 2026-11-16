@@ -298,6 +298,8 @@ function load(options: {
   videos: FakeVideo[];
   current: FakeVideo | null;
   saved?: Record<string, unknown>;
+  /** Globals the page has, such as a player library's. */
+  win?: Record<string, unknown>;
 }): Page {
   const intervals: Array<() => void> = [];
   const timeouts = new Map<number, () => void>();
@@ -403,6 +405,7 @@ function load(options: {
     },
   };
   win.window = win;
+  Object.defineProperties(win, Object.getOwnPropertyDescriptors(options.win ?? {}));
   const parentPosts: unknown[] = [];
   const parent = { postMessage: (message: unknown) => parentPosts.push(message) };
   win.parent = parent;
@@ -872,6 +875,323 @@ describe("video controls", () => {
     };
     openPanel(page);
     expect(() => buttonWith(page, "gear")).toThrow();
+    expect(shown(page)).toBe(true);
+  });
+
+  describe("options of a player library", () => {
+    const OPTIONS = Symbol.for("openmedia.videoOptions");
+
+    /** Opens the panel and the menu of the gear button; the rows' text, or null when there is no gear. */
+    function menuOf(page: Page, icon = "gear") {
+      openPanel(page);
+      const opener = page.body.descendants().find((element) => element.__icon === icon);
+      if (!opener || opener.style.display === "none") return null;
+      opener.fire("pointerup");
+      const menu = page.body
+        .descendants()
+        .find((element) => element.style.display === "block" && element.children.length > 1);
+      return { menu, rows: menu?.children.map((row) => row.textContent) };
+    }
+
+    const hlsOf = (video: FakeVideo, extra: Record<string, unknown> = {}) => ({
+      levels: [{ height: 360 }, { height: 720 }, { bitrate: 2_500_000 }],
+      currentLevel: 1,
+      autoLevelEnabled: false,
+      attachMedia() {},
+      media: video,
+      ...extra,
+    });
+
+    it("offers hls.js levels found by the video it is attached to, and sets the level picked", () => {
+      const video = new FakeVideo();
+      const hls = hlsOf(video);
+      const page = load({ videos: [video], current: video, win: { player: { inner: 1 }, hls } });
+      const opened = menuOf(page);
+      expect(opened?.rows).toEqual(["\u2003Auto", "\u2003360p", "\u2713 720p", "\u20032500 kbps"]);
+      opened?.menu?.children[3]?.fire("pointerup");
+      expect(hls.currentLevel).toBe(2);
+      vi.useFakeTimers({ toFake: ["Date"] });
+      vi.setSystemTime(Date.now() + 2000);
+      hls.autoLevelEnabled = true;
+      expect(menuOf(page)?.rows?.[0]).toBe("\u2713 Auto");
+    });
+
+    it("sets hls.js back to automatic with its first item", () => {
+      const video = new FakeVideo();
+      const hls = hlsOf(video);
+      const page = load({ videos: [video], current: video, win: { hls } });
+      menuOf(page)?.menu?.children[0]?.fire("pointerup");
+      expect(hls.currentLevel).toBe(-1);
+    });
+
+    it("ignores an hls.js attached to another video, and one with a single level", () => {
+      const video = new FakeVideo();
+      const other = hlsOf(new FakeVideo());
+      const single = hlsOf(video, { levels: [{ height: 720 }] });
+      const page = load({ videos: [video], current: video, win: { other, single } });
+      expect(menuOf(page)).toBeNull();
+      expect(shown(page)).toBe(true);
+    });
+
+    it("survives a library object that throws on any access, and keeps the others", () => {
+      const video = new FakeVideo();
+      const hostile = new Proxy(
+        {},
+        {
+          get() {
+            throw new Error("no");
+          },
+          ownKeys() {
+            throw new Error("no");
+          },
+        },
+      );
+      const hls = hlsOf(video);
+      const page = load({
+        videos: [video],
+        current: video,
+        win: {
+          hostile,
+          videojs: hostile,
+          get trap() {
+            throw new Error("no");
+          },
+          hls,
+        },
+      });
+      expect(menuOf(page)?.rows).toHaveLength(4);
+      expect(shown(page)).toBe(true);
+    });
+
+    it("shows nothing when a library's own reading throws", () => {
+      const video = new FakeVideo();
+      const hls = hlsOf(video);
+      Object.defineProperty(hls, "levels", {
+        get() {
+          throw new Error("torn down");
+        },
+      });
+      const page = load({ videos: [video], current: video, win: { hls } });
+      expect(menuOf(page)).toBeNull();
+      expect(shown(page)).toBe(true);
+    });
+
+    it("lets a recipe's group of the same kind win over the library's, and adds other kinds", () => {
+      const video = new FakeVideo();
+      const page = load({ videos: [video], current: video, win: { hls: hlsOf(video) } });
+      page.document[OPTIONS] = () => [
+        {
+          kind: "quality",
+          label: "Mine",
+          items: [{ label: "Only" }, { label: "Two" }],
+          select: () => {},
+        },
+        { kind: "other", label: "Speed", items: [{ label: "x" }], select: () => {} },
+      ];
+      const opened = menuOf(page);
+      expect(opened?.rows).toEqual(["\u2003Only", "\u2003Two"]);
+      const gears = page.body.descendants().filter((element) => element.__icon === "gear");
+      expect(gears.filter((element) => element.style.display !== "none")).toHaveLength(2);
+
+      const captions = load({ videos: [video], current: video, win: { hls: hlsOf(video) } });
+      captions.document[OPTIONS] = () => [
+        { kind: "captions", label: "CC", items: [{ label: "En" }], select: () => {} },
+      ];
+      openPanel(captions);
+      expect(
+        captions.body.descendants().filter((element) => element.__icon === "gear"),
+      ).toHaveLength(1);
+      expect(buttonWith(captions, "cc")).toBeDefined();
+    });
+
+    it("looks for the library again only after a few seconds", () => {
+      vi.useFakeTimers({ toFake: ["Date"] });
+      const video = new FakeVideo();
+      const hls = hlsOf(video);
+      const page = load({ videos: [video], current: video, win: { hls } });
+      expect(menuOf(page)).not.toBeNull();
+      hls.media = new FakeVideo();
+      vi.setSystemTime(Date.now() + 1000);
+      page.tick();
+      expect(menuOf(page)).not.toBeNull();
+      vi.setSystemTime(Date.now() + 4000);
+      page.tick();
+      expect(menuOf(page)).toBeNull();
+    });
+
+    it("offers video.js quality levels of the player that holds the video", () => {
+      const video = new FakeVideo();
+      const levels = Object.assign(
+        [
+          { height: 360, enabled: true },
+          { height: 720, enabled: true },
+        ],
+        {},
+      );
+      const player = {
+        el: () => ({ contains: (node: unknown) => node === video }),
+        qualityLevels: () => levels,
+      };
+      const stranger = {
+        el: () => ({ contains: () => false }),
+        tech_: { el: () => null },
+        qualityLevels: () => [],
+      };
+      const videojs = { getAllPlayers: () => [stranger, player] };
+      const page = load({ videos: [video], current: video, win: { videojs } });
+      const opened = menuOf(page);
+      expect(opened?.rows).toEqual(["\u2713 Auto", "\u2003360p", "\u2003720p"]);
+      opened?.menu?.children[2]?.fire("pointerup");
+      expect(levels.map((level) => level.enabled)).toEqual([false, true]);
+      vi.useFakeTimers({ toFake: ["Date"] });
+      vi.setSystemTime(Date.now() + 2000);
+      page.tick();
+      expect(menuOf(page)?.rows).toEqual(["\u2003Auto", "\u2003360p", "\u2713 720p"]);
+      opened?.menu?.children[0]?.fire("pointerup");
+      expect(levels.map((level) => level.enabled)).toEqual([true, true]);
+    });
+
+    it("finds a video.js player in videojs.players by its tech element", () => {
+      const video = new FakeVideo();
+      const levels = [
+        { height: 480, enabled: true },
+        { height: 1080, enabled: true },
+      ];
+      const videojs = {
+        players: {
+          a: {
+            el: () => ({ contains: () => false }),
+            tech: () => ({ el: () => video }),
+            qualityLevels: () => levels,
+          },
+        },
+      };
+      const page = load({ videos: [video], current: video, win: { videojs } });
+      expect(menuOf(page)?.rows).toEqual(["\u2713 Auto", "\u2003480p", "\u20031080p"]);
+    });
+
+    it("offers dash.js levels and turns automatic switching off for a fixed one", () => {
+      const video = new FakeVideo();
+      const calls: unknown[] = [];
+      const dash = {
+        getVideoElement: () => video,
+        getBitrateInfoListFor: () => [{ height: 360 }, { height: 720 }],
+        getQualityFor: () => 1,
+        getSettings: () => ({ streaming: { abr: { autoSwitchBitrate: { video: false } } } }),
+        updateSettings: (settings: unknown) => calls.push(["settings", settings]),
+        setQualityFor: (type: string, index: number) => calls.push(["quality", type, index]),
+      };
+      const page = load({ videos: [video], current: video, win: { dash } });
+      const opened = menuOf(page);
+      expect(opened?.rows).toEqual(["\u2003Auto", "\u2003360p", "\u2713 720p"]);
+      opened?.menu?.children[1]?.fire("pointerup");
+      expect(calls).toEqual([
+        ["settings", { streaming: { abr: { autoSwitchBitrate: { video: false } } } }],
+        ["quality", "video", 0],
+      ]);
+      calls.length = 0;
+      vi.useFakeTimers({ toFake: ["Date"] });
+      vi.setSystemTime(Date.now() + 2000);
+      menuOf(page)?.menu?.children[0]?.fire("pointerup");
+      expect(calls).toEqual([
+        ["settings", { streaming: { abr: { autoSwitchBitrate: { video: true } } } }],
+      ]);
+    });
+
+    it("offers Shaka's video heights, one per height, and selects its track with abr off", () => {
+      const video = new FakeVideo();
+      const calls: unknown[] = [];
+      const tracks = [
+        { id: 1, height: 360, bandwidth: 500, active: false },
+        { id: 2, height: 720, bandwidth: 900, active: true },
+        { id: 3, height: 720, bandwidth: 1500, active: false },
+        { id: 4, height: null, bandwidth: 100, active: false },
+      ];
+      const shaka = {
+        getMediaElement: () => video,
+        getVariantTracks: () => tracks,
+        getConfiguration: () => ({ abr: { enabled: false } }),
+        configure: (config: unknown) => calls.push(["configure", config]),
+        selectVariantTrack: (track: unknown, clear: boolean) =>
+          calls.push(["select", track, clear]),
+      };
+      const page = load({ videos: [video], current: video, win: { shaka } });
+      const opened = menuOf(page);
+      expect(opened?.rows).toEqual(["\u2003Auto", "\u2713 720p", "\u2003360p"]);
+      opened?.menu?.children[1]?.fire("pointerup");
+      expect(calls).toEqual([
+        ["configure", { abr: { enabled: false } }],
+        ["select", tracks[2], true],
+      ]);
+      calls.length = 0;
+      vi.useFakeTimers({ toFake: ["Date"] });
+      vi.setSystemTime(Date.now() + 2000);
+      menuOf(page)?.menu?.children[0]?.fire("pointerup");
+      expect(calls).toEqual([["configure", { abr: { enabled: true } }]]);
+    });
+
+    it("offers Plyr's qualities from the video's plyr, and nothing for fewer than two", () => {
+      const video = new FakeVideo() as FakeVideo & { plyr?: unknown };
+      const plyr = { options: { quality: [1080, 720, 360] }, quality: 720 };
+      video.plyr = plyr;
+      const page = load({ videos: [video], current: video });
+      const opened = menuOf(page);
+      expect(opened?.rows).toEqual(["\u20031080p", "\u2713 720p", "\u2003360p"]);
+      opened?.menu?.children[2]?.fire("pointerup");
+      expect(plyr.quality).toBe(360);
+
+      const lone = new FakeVideo() as FakeVideo & { plyr?: unknown };
+      lone.plyr = { options: { quality: [720] }, quality: 720 };
+      expect(menuOf(load({ videos: [lone], current: lone }))).toBeNull();
+    });
+
+    it("offers a player object's quality levels from the element that holds the video", () => {
+      const video = new FakeVideo();
+      const calls: unknown[] = [];
+      const player = {
+        contains: (node: unknown) => node === video,
+        getAvailableQualityLevels: () => ["hd1080", "hd720", "large", "medium", "tiny"],
+        getPlaybackQuality: () => "hd720",
+        setPlaybackQualityRange: (low: string, high: string) => calls.push(["range", low, high]),
+        setPlaybackQuality: (id: string) => calls.push(["quality", id]),
+      };
+      const page = load({ videos: [video], current: video });
+      page.document.getElementById = (id: string) => (id === "movie_player" ? player : null);
+      const opened = menuOf(page);
+      expect(opened?.rows).toEqual([
+        "\u2003Auto",
+        "\u20031080p",
+        "\u2713 720p",
+        "\u2003480p",
+        "\u2003360p",
+        "\u2003144p",
+      ]);
+      opened?.menu?.children[1]?.fire("pointerup");
+      expect(calls).toEqual([
+        ["range", "hd1080", "hd1080"],
+        ["quality", "hd1080"],
+      ]);
+
+      const elsewhere = new FakeVideo();
+      const other = load({ videos: [elsewhere], current: elsewhere });
+      other.document.querySelector = () => player;
+      expect(menuOf(other)).toBeNull();
+    });
+  });
+
+  it("is not moved by presses a script makes, only by the reader's", () => {
+    const video = new FakeVideo();
+    const page = load({ videos: [video], current: video });
+    const press = { clientX: 200, clientY: 400, target: PLAIN };
+    page.win("click", { ...press, isTrusted: false });
+    page.win("pointerdown", { ...press, isTrusted: false });
+    page.win("pointerup", { ...press, isTrusted: false });
+    page.tick();
+    expect(shown(page)).toBe(false);
+    openPanel(page);
+    expect(shown(page)).toBe(true);
+    page.win("click", { ...press, isTrusted: false });
+    page.tick();
     expect(shown(page)).toBe(true);
   });
 

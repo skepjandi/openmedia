@@ -10,9 +10,10 @@ use serde_json::{Value, json};
 
 use crate::error::{Error, Result};
 use crate::recipes::{
-    CSS_PROPERTIES, Meta, OptionGroup, OptionValue, Origin, Recipe, Rule, SiteOption, Target,
-    current_platform_tag, is_script_text, script_policy, targets_page_root, validate_declarations,
-    validate_selector,
+    CSS_PROPERTIES, MENU_SELECTED_ATTRS, Meta, OptionGroup, OptionValue, Origin, Recipe, Rule,
+    Selected, SiteOption, Target, VideoMenuKind, current_platform_tag, is_script_text,
+    script_policy, targets_page_root, validate_declarations, validate_selector,
+    validate_video_menu,
 };
 use tauri_plugin_siteview::site::registrable_domain;
 
@@ -34,12 +35,25 @@ pub enum PatchRule {
     },
     /// The body of a function. Nothing restricts what it does; the user sees it before accepting.
     Script { label: String, code: String },
+    /// An option list of the site's own player for the video controls: clicks on the site's menu
+    /// and reads its entries. Previewed by counting the first thing it clicks.
+    VideoMenu {
+        label: String,
+        kind: VideoMenuKind,
+        title: String,
+        open: Vec<Target>,
+        items: Target,
+        selected: Selected,
+        close: Option<Target>,
+    },
 }
 
 impl PatchRule {
     pub fn label(&self) -> &str {
         match self {
-            Self::Style { label, .. } | Self::Script { label, .. } => label,
+            Self::Style { label, .. }
+            | Self::Script { label, .. }
+            | Self::VideoMenu { label, .. } => label,
         }
     }
 }
@@ -126,11 +140,26 @@ pub fn patch_schema() -> Value {
                 "items": {
                     "type": "object",
                     "additionalProperties": false,
-                    "required": ["label", "selector", "declarations", "script"],
+                    "required": ["label", "selector", "declarations", "script", "menu"],
                     "properties": {
                         "label": { "type": "string", "description": "What this rule changes, at most 60 characters." },
                         "selector": { "type": ["string", "null"], "description": "Style rules: one CSS selector (comma list allowed): at most 300 characters, at most 2 uses of :has(, none of { } ; \\ < @. null for a script rule." },
                         "script": { "type": ["string", "null"], "description": "Script rules only, when CSS cannot do what the user asked: the body of a function (no wrapper, return allowed), at most 16384 bytes. null for a style rule." },
+                        "menu": {
+                            "type": ["object", "null"],
+                            "description": "Video menu rules only: an option list (quality, captions, audio) of the site's own player for the app's video controls. null for every other rule.",
+                            "additionalProperties": false,
+                            "required": ["kind", "title", "open", "items", "selectedAttr", "selectedClass", "close"],
+                            "properties": {
+                                "kind": { "type": "string", "enum": ["quality", "captions", "audio", "other"] },
+                                "title": { "type": "string", "description": "The list's name, at most 24 characters." },
+                                "open": { "type": "array", "items": { "type": "string" }, "description": "CSS selectors of what to click, in order, to open the site's menu (at most 3); empty when its entries are always on the page." },
+                                "items": { "type": "string", "description": "One CSS selector matching every entry of the menu; each entry's text is its label." },
+                                "selectedAttr": { "type": ["string", "null"], "enum": MENU_SELECTED_ATTRS.iter().map(|attr| json!(attr)).chain([Value::Null]).collect::<Vec<_>>(), "description": "The attribute an entry has when it is the one in use. Set this or selectedClass, not both." },
+                                "selectedClass": { "type": ["string", "null"], "description": "The class an entry has when it is the one in use. null when selectedAttr is set." },
+                                "close": { "type": ["string", "null"], "description": "A CSS selector to click to close the menu after a pick; null when picking an entry closes it." }
+                            }
+                        },
                         "declarations": {
                             "type": ["array", "null"],
                             "description": "Style rules: null to hide the selected elements; otherwise 1 or more safe CSS declaration pairs to restyle them. null for a script rule.",
@@ -180,6 +209,24 @@ struct RawRule {
     declarations: Option<Vec<RawDeclaration>>,
     #[serde(default)]
     script: Option<String>,
+    #[serde(default)]
+    menu: Option<RawMenu>,
+}
+
+#[derive(Deserialize)]
+#[serde(deny_unknown_fields, rename_all = "camelCase")]
+struct RawMenu {
+    kind: VideoMenuKind,
+    title: String,
+    #[serde(default)]
+    open: Vec<String>,
+    items: String,
+    #[serde(default)]
+    selected_attr: Option<String>,
+    #[serde(default)]
+    selected_class: Option<String>,
+    #[serde(default)]
+    close: Option<String>,
 }
 
 #[derive(Deserialize)]
@@ -224,6 +271,14 @@ fn plain(text: &str, what: &str, max: usize, allow_empty: bool) -> Result<String
 fn checked_rule(rule: RawRule) -> Result<PatchRule> {
     let label = plain(&rule.label, "a rule label", MAX_LABEL_CHARS, false)?;
     let selector = rule.selector.as_deref().map(str::trim).unwrap_or_default();
+    if let Some(menu) = rule.menu {
+        if !selector.is_empty() || rule.script.is_some() || rule.declarations.is_some() {
+            return Err(reject(
+                "a video menu rule has no selector, script or declarations",
+            ));
+        }
+        return checked_menu(label, menu);
+    }
     match (selector.is_empty(), rule.script) {
         (false, Some(_)) => Err(reject("a rule has both a selector and a script")),
         (true, None) => Err(reject("a rule has neither a selector nor a script")),
@@ -235,6 +290,37 @@ fn checked_rule(rule: RawRule) -> Result<PatchRule> {
         }
         (false, None) => checked_style(label, selector, rule.declarations),
     }
+}
+
+fn checked_menu(label: String, menu: RawMenu) -> Result<PatchRule> {
+    let target = |css: String| Target {
+        css: css.trim().to_owned(),
+    };
+    let selected = Selected {
+        attr: menu.selected_attr.filter(|attr| !attr.trim().is_empty()),
+        class: menu.selected_class.filter(|class| !class.trim().is_empty()),
+    };
+    let open: Vec<Target> = menu.open.into_iter().map(target).collect();
+    let items = target(menu.items);
+    let close = menu.close.filter(|css| !css.trim().is_empty()).map(target);
+    validate_video_menu(
+        "the assistant's",
+        &menu.title,
+        &open,
+        &items,
+        &selected,
+        close.as_ref(),
+    )
+    .map_err(|error| reject(error.to_string()))?;
+    Ok(PatchRule::VideoMenu {
+        label,
+        kind: menu.kind,
+        title: menu.title.trim().to_owned(),
+        open,
+        items,
+        selected,
+        close,
+    })
 }
 
 fn checked_script(label: String, code: String) -> Result<PatchRule> {
@@ -304,7 +390,7 @@ fn check_script_totals(rules: &[PatchRule], recipe: Option<&Recipe>) -> Result<(
         });
     let added = rules.iter().filter_map(|rule| match rule {
         PatchRule::Script { code, .. } => Some(code.len()),
-        PatchRule::Style { .. } => None,
+        PatchRule::Style { .. } | PatchRule::VideoMenu { .. } => None,
     });
     let (count, bytes) = existing
         .chain(added)
@@ -556,6 +642,27 @@ pub fn apply_patch(base: Option<&Recipe>, host_domain: &str, patch: &Patch) -> R
                 on: None,
                 code: code.clone(),
             },
+            PatchRule::VideoMenu {
+                label,
+                kind,
+                title,
+                open,
+                items,
+                selected,
+                close,
+            } => Rule::VideoMenu {
+                id,
+                label: label.clone(),
+                option,
+                choice: None,
+                on: None,
+                kind: *kind,
+                title: title.clone(),
+                open: open.clone(),
+                items: items.clone(),
+                selected: selected.clone(),
+                close: close.clone(),
+            },
         };
         recipe.rules.push(rule);
     }
@@ -634,7 +741,7 @@ pub fn option_css(recipe: &Recipe, option_id: &str, choice: Option<&str>) -> Str
                 declarations,
                 ..
             } => append_rule_css(&mut css, &target.css, Some(declarations)),
-            Rule::Script { .. } => {}
+            Rule::Script { .. } | Rule::VideoMenu { .. } => {}
         }
     }
     css
@@ -982,6 +1089,56 @@ mod tests {
         );
     }
 
+    fn menu_rule(menu: Value) -> Value {
+        json!([{ "label": "Quality list", "selector": null, "declarations": null, "script": null, "menu": menu }])
+    }
+
+    fn quality_menu() -> Value {
+        json!({
+            "kind": "quality", "title": "Quality",
+            "open": ["button[aria-label=\"Settings\"]", "li.quality"],
+            "items": "ul.levels > li", "selectedAttr": "aria-checked", "selectedClass": null, "close": null
+        })
+    }
+
+    #[test]
+    fn a_video_menu_rule_is_checked_and_becomes_a_recipe_rule() {
+        let patch = parse_patch(&new_option(menu_rule(quality_menu())), None).unwrap();
+        assert!(matches!(
+            patch.rules().first(),
+            Some(PatchRule::VideoMenu { title, open, .. }) if title == "Quality" && open.len() == 2
+        ));
+        assert_eq!(preview_css(&patch), "");
+        let recipe = apply_patch(None, "example.com", &patch).unwrap();
+        assert!(matches!(
+            &recipe.rules[0],
+            Rule::VideoMenu { kind: VideoMenuKind::Quality, items, .. } if items.css == "ul.levels > li"
+        ));
+        let again = Recipe::parse(&serde_json::to_string(&recipe).unwrap()).unwrap();
+        assert_eq!(again, recipe);
+    }
+
+    #[test]
+    fn a_video_menu_rule_that_is_not_plainly_one_is_refused() {
+        let with = |change: fn(&mut Value)| {
+            let mut menu = quality_menu();
+            change(&mut menu);
+            parse_patch(&new_option(menu_rule(menu)), None)
+                .unwrap_err()
+                .to_string()
+        };
+        assert!(with(|m| m["selectedAttr"] = json!("onclick")).contains("rejected"));
+        assert!(with(|m| m["selectedClass"] = json!("on")).contains("rejected"));
+        assert!(with(|m| m["selectedAttr"] = Value::Null).contains("rejected"));
+        assert!(with(|m| m["selectedClass"] = json!("a b")).contains("rejected"));
+        assert!(with(|m| m["items"] = json!("body")).contains("rejected"));
+        assert!(with(|m| m["items"] = json!("li{x}")).contains("rejected"));
+        assert!(with(|m| m["open"] = json!(["a", "b", "c", "d"])).contains("rejected"));
+        assert!(with(|m| m["title"] = json!("")).contains("rejected"));
+        let both = json!([{ "label": "Both", "selector": "div.x", "declarations": null, "script": null, "menu": quality_menu() }]);
+        assert!(parse_patch(&new_option(both), None).is_err());
+    }
+
     #[test]
     fn a_switch_for_an_installed_recipe_goes_into_a_new_custom_recipe_beside_it() {
         let base = youtube();
@@ -1175,7 +1332,11 @@ mod tests {
         let item = &patch_schema()["properties"]["rules"]["items"];
         assert_eq!(
             item["required"],
-            json!(["label", "selector", "declarations", "script"])
+            json!(["label", "selector", "declarations", "script", "menu"])
+        );
+        assert_eq!(
+            item["properties"]["menu"]["type"],
+            json!(["object", "null"])
         );
         assert_eq!(
             item["properties"]["script"]["type"],

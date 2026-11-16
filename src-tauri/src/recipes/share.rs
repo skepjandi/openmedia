@@ -174,7 +174,10 @@ fn check_shared(recipe: &Recipe) -> Result<()> {
             .chain(option.choices.iter().map(|choice| &choice.label))
     });
     let rule_labels = recipe.rules.iter().map(|rule| match rule {
-        Rule::Hide { label, .. } | Rule::Css { label, .. } | Rule::Script { label, .. } => label,
+        Rule::Hide { label, .. }
+        | Rule::Css { label, .. }
+        | Rule::Script { label, .. }
+        | Rule::VideoMenu { label, .. } => label,
     });
     let tab_labels = recipe
         .hub
@@ -282,7 +285,7 @@ pub fn preview(recipe: &Recipe, installed_version: Option<&str>) -> RecipePrevie
         runs_code: recipe
             .rules
             .iter()
-            .any(|rule| matches!(rule, Rule::Script { .. })),
+            .any(|rule| matches!(rule, Rule::Script { .. } | Rule::VideoMenu { .. })),
         tabs: tab_previews(recipe),
         replaces: installed_version.map(str::to_owned),
     }
@@ -319,6 +322,22 @@ fn rule_preview(rule: &Rule) -> RulePreview {
             selector: String::new(),
             declarations: BTreeMap::new(),
             code: Some(code.clone()),
+        },
+        Rule::VideoMenu {
+            label, open, items, ..
+        } => RulePreview {
+            label: label.clone(),
+            kind: "script",
+            selector: String::new(),
+            declarations: BTreeMap::new(),
+            code: Some(format!(
+                "Clicks {} and reads the entries {} in the site's player menu.",
+                open.iter()
+                    .map(|target| target.css.as_str())
+                    .collect::<Vec<_>>()
+                    .join(", then "),
+                items.css
+            )),
         },
         Rule::Css {
             label,

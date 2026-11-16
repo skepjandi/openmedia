@@ -23,6 +23,19 @@ pub const MAX_HUB_LABEL_CHARS: usize = 20;
 const MAX_HUB_URL_CHARS: usize = 300;
 const MAX_SHOWN_FINDINGS: usize = 3;
 const MAX_FINDING_CHARS: usize = 160;
+const MAX_VIDEO_MENUS: usize = 4;
+const MAX_MENU_STEPS: usize = 3;
+const MAX_MENU_TITLE_CHARS: usize = 24;
+/// The attributes a site's menu may use to mark the entry in use.
+pub const MENU_SELECTED_ATTRS: [&str; 7] = [
+    "aria-checked",
+    "aria-selected",
+    "aria-current",
+    "data-checked",
+    "data-selected",
+    "data-active",
+    "data-state",
+];
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -172,6 +185,27 @@ pub struct Target {
     pub css: String,
 }
 
+/// What a video menu offers: the browser's own panel groups these.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub enum VideoMenuKind {
+    Quality,
+    Captions,
+    Audio,
+    Other,
+}
+
+/// How an entry of a site's menu shows that it is the one in use: an attribute that is set (and not
+/// `false`) or a class it has. Exactly one of the two.
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct Selected {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub attr: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub class: Option<String>,
+}
+
 /// One page of a hub: a label for its tab and the address it opens.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -232,37 +266,71 @@ pub enum Rule {
         on: Option<Vec<String>>,
         code: String,
     },
+    /// An option list of the site's own player (quality, captions, audio) shown in the app's video
+    /// controls. The app opens the site's menu by clicking `open` in order, reads the entries
+    /// `items` matches (their text is the label), and picks one by clicking it. No code runs.
+    VideoMenu {
+        id: String,
+        label: String,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        option: Option<String>,
+        /// For a rule on a choice option: the choices in which it applies.
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        choice: Option<Vec<String>>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        on: Option<Vec<String>>,
+        kind: VideoMenuKind,
+        /// The group's name in the controls.
+        title: String,
+        /// Clicked in order to open the menu (the settings button, then the submenu); empty when the
+        /// entries are always on the page.
+        #[serde(default)]
+        open: Vec<Target>,
+        items: Target,
+        selected: Selected,
+        /// Clicked to close the menu again after a pick; none when picking an entry closes it.
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        close: Option<Target>,
+    },
 }
 
 impl Rule {
     pub fn id(&self) -> &str {
         match self {
-            Self::Hide { id, .. } | Self::Css { id, .. } | Self::Script { id, .. } => id,
+            Self::Hide { id, .. }
+            | Self::Css { id, .. }
+            | Self::Script { id, .. }
+            | Self::VideoMenu { id, .. } => id,
         }
     }
 
     /// The toggle this rule belongs to; a rule with none always applies.
     pub fn option(&self) -> Option<&str> {
         match self {
-            Self::Hide { option, .. } | Self::Css { option, .. } | Self::Script { option, .. } => {
-                option.as_deref()
-            }
+            Self::Hide { option, .. }
+            | Self::Css { option, .. }
+            | Self::Script { option, .. }
+            | Self::VideoMenu { option, .. } => option.as_deref(),
         }
     }
 
     /// The choices of its option in which this rule applies; `None` for a rule on a switch.
     pub fn choice(&self) -> Option<&[String]> {
         match self {
-            Self::Hide { choice, .. } | Self::Css { choice, .. } | Self::Script { choice, .. } => {
-                choice.as_deref()
-            }
+            Self::Hide { choice, .. }
+            | Self::Css { choice, .. }
+            | Self::Script { choice, .. }
+            | Self::VideoMenu { choice, .. } => choice.as_deref(),
         }
     }
 
     /// The `match` patterns this rule is limited to; `None` means all of the recipe's.
     pub fn on(&self) -> Option<&[String]> {
         match self {
-            Self::Hide { on, .. } | Self::Css { on, .. } | Self::Script { on, .. } => on.as_deref(),
+            Self::Hide { on, .. }
+            | Self::Css { on, .. }
+            | Self::Script { on, .. }
+            | Self::VideoMenu { on, .. } => on.as_deref(),
         }
     }
 }
@@ -362,6 +430,7 @@ impl Recipe {
         self.validate_hub()?;
         self.validate_homepage()?;
         self.validate_script_totals()?;
+        self.validate_video_menus()?;
         let mut seen = HashSet::new();
         for rule in &self.rules {
             if !seen.insert(rule.id()) {
@@ -409,6 +478,22 @@ impl Recipe {
                     }
                 }
                 Rule::Script { id, code, .. } => self.validate_script(id, code)?,
+                Rule::VideoMenu {
+                    id,
+                    title,
+                    open,
+                    items,
+                    selected,
+                    close,
+                    ..
+                } => {
+                    if self.origin == Origin::Imported {
+                        return Err(Error::Recipe(format!(
+                            "video menu {id} clicks the site's own controls, which a shared recipe cannot"
+                        )));
+                    }
+                    validate_video_menu(id, title, open, items, selected, close.as_ref())?;
+                }
             }
         }
         Ok(())
@@ -432,6 +517,21 @@ impl Recipe {
             }
         } else if let Some(finding) = script_policy::check_shape(code) {
             return Err(refuse(&format!("is refused: {}", describe(&[finding]))));
+        }
+        Ok(())
+    }
+
+    fn validate_video_menus(&self) -> Result<()> {
+        let count = self
+            .rules
+            .iter()
+            .filter(|rule| matches!(rule, Rule::VideoMenu { .. }))
+            .count();
+        if count > MAX_VIDEO_MENUS {
+            return Err(Error::Recipe(format!(
+                "recipe {} has too many video menus",
+                self.id
+            )));
         }
         Ok(())
     }
@@ -640,4 +740,47 @@ fn hides_content(declarations: &BTreeMap<String, String>) -> bool {
         || value("pointer-events").as_deref() == Some("none")
         || matches!(value("height").as_deref(), Some("0" | "0px"))
         || matches!(value("max-height").as_deref(), Some("0" | "0px"))
+}
+
+/// A video menu is made of selectors and one way to read the entry in use; nothing in it can run.
+pub fn validate_video_menu(
+    id: &str,
+    title: &str,
+    open: &[Target],
+    items: &Target,
+    selected: &Selected,
+    close: Option<&Target>,
+) -> Result<()> {
+    let refuse = |reason: &str| Error::Recipe(format!("video menu {id} {reason}"));
+    let title = title.trim();
+    if title.is_empty()
+        || title.chars().count() > MAX_MENU_TITLE_CHARS
+        || title.chars().any(char::is_control)
+    {
+        return Err(refuse("needs a short plain title"));
+    }
+    if open.len() > MAX_MENU_STEPS {
+        return Err(refuse("opens through too many steps"));
+    }
+    for target in open.iter().chain(std::iter::once(items)).chain(close) {
+        validate_selector(&target.css)?;
+        if targets_page_root(&target.css) {
+            return Err(refuse("would act on the whole page"));
+        }
+    }
+    match (&selected.attr, &selected.class) {
+        (Some(attr), None) if MENU_SELECTED_ATTRS.contains(&attr.as_str()) => Ok(()),
+        (None, Some(class))
+            if !class.is_empty()
+                && class.chars().count() <= 40
+                && class
+                    .chars()
+                    .all(|c| c.is_ascii_alphanumeric() || c == '-' || c == '_') =>
+        {
+            Ok(())
+        }
+        _ => Err(refuse(
+            "must say which entry is in use by one known attribute or one plain class name",
+        )),
+    }
 }

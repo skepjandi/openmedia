@@ -10,8 +10,10 @@ pub use compile::{OptionChoices, page_script};
 pub(crate) use schema::is_script_text;
 pub use schema::{
     Hub, HubTab, MAX_HUB_LABEL_CHARS, MAX_HUB_TABS, MIN_HUB_TABS, Meta, OptionChoice, OptionGroup,
-    OptionValue, Origin, Recipe, Rule, SiteOption, Target, current_platform_tag,
+    OptionValue, Origin, Recipe, Rule, Selected, SiteOption, Target, VideoMenuKind,
+    current_platform_tag,
 };
+pub(crate) use schema::{MENU_SELECTED_ATTRS, validate_video_menu};
 pub(crate) use selector::{
     CSS_PROPERTIES, targets_page_root, validate_declarations, validate_selector,
 };
@@ -534,6 +536,35 @@ mod tests {
         assert!(script.contains(".nag{display:none!important}"));
         assert!(!script.contains(".feed"));
     }
+    #[test]
+    fn video_menus_are_carried_with_their_runtime_only_when_a_recipe_has_one() {
+        let without =
+            page_script(&[Recipe::parse(TOGGLED).unwrap()], &OptionChoices::new()).unwrap();
+        assert!(without.contains("const menuRuntime = null;"));
+        let menu = TOGGLED.replace(
+            "\"rules\":[",
+            "\"rules\":[{\"id\":\"q\",\"label\":\"Quality\",\"type\":\"videoMenu\",\"kind\":\"quality\",\"title\":\"Quality\",\"open\":[{\"css\":\"button.gear\"}],\"items\":{\"css\":\"li.level\"},\"selected\":{\"attr\":\"aria-checked\"}},",
+        );
+        let with = page_script(&[Recipe::parse(&menu).unwrap()], &OptionChoices::new()).unwrap();
+        assert!(with.contains("openmedia.videoMenus"));
+        assert!(with.contains("li.level"));
+        assert!(!with.contains("const menuRuntime = null;"));
+    }
+
+    #[test]
+    fn a_video_menu_clicks_the_sites_controls_so_an_imported_recipe_cannot_have_one() {
+        let menu = |origin: &str| {
+            TOGGLED
+                .replace("\"origin\":\"user\"", &format!("\"origin\":\"{origin}\""))
+                .replace(
+                    "\"rules\":[",
+                    "\"rules\":[{\"id\":\"q\",\"label\":\"Quality\",\"type\":\"videoMenu\",\"kind\":\"quality\",\"title\":\"Quality\",\"items\":{\"css\":\"li.level\"},\"selected\":{\"class\":\"on\"}},",
+                )
+        };
+        assert!(Recipe::parse(&menu("user")).is_ok());
+        assert!(Recipe::parse(&menu("imported")).is_err());
+    }
+
     #[test]
     fn scoped_rules_are_serialized_only_for_their_matching_sites() {
         let json = TOGGLED

@@ -16,13 +16,15 @@ use uuid::Uuid;
 use super::{
     ProviderConfig,
     activity::{Activity, StepKind, StepStatus},
+    inspect,
     patch::{self, Patch, PatchRule},
     prompt::{self, EarlierTurn, Prompt, PromptInput, RepairNote, RuleFailure},
+    provider::ToolDefinition,
     redact,
     snapshot::{self, Snapshot},
 };
 use crate::error::{Error, Result};
-use crate::recipes::{OptionGroup, OptionValue, Recipe, Rule, script_policy};
+use crate::recipes::{OptionGroup, OptionValue, Recipe, Rule, Target, script_policy};
 
 const MAX_REQUEST_CHARS: usize = 500;
 const MAX_JOBS: usize = 8;
@@ -70,6 +72,18 @@ pub trait Model {
         prompt: &Prompt,
         schema: &Value,
     ) -> impl Future<Output = Result<String>> + Send;
+
+    /// Lets the model look closer at the page's players with the read-only tools, run through
+    /// `run`; returns what it found as plain text, empty when there is nothing. A model that
+    /// cannot call tools keeps this default.
+    fn investigate(
+        &self,
+        _prompt: &Prompt,
+        _tools: &[ToolDefinition],
+        _run: &(dyn Fn(&str, &Value) -> Result<String> + Sync),
+    ) -> impl Future<Output = Result<String>> + Send {
+        async { Ok(String::new()) }
+    }
 }
 
 /// What the shell shows before anything is sent.
@@ -283,7 +297,12 @@ fn snapshot_of(page: &impl Page) -> Result<Snapshot> {
     Ok(snapshot)
 }
 
-fn build_prompt(job: &Job, snapshot: &Snapshot, repair: Option<RepairNote<'_>>) -> Prompt {
+fn build_prompt(
+    job: &Job,
+    snapshot: &Snapshot,
+    repair: Option<RepairNote<'_>>,
+    findings: Option<&str>,
+) -> Prompt {
     prompt::build(&PromptInput {
         request: &job.request,
         host: &snapshot.host,
@@ -294,6 +313,7 @@ fn build_prompt(job: &Job, snapshot: &Snapshot, repair: Option<RepairNote<'_>>) 
         playbook: prompt::site_section(&snapshot.host),
         repair,
         earlier: &job.earlier,
+        findings,
     })
 }
 
@@ -327,7 +347,7 @@ pub fn prepare<F: FnOnce(&str, &str) -> RecipeContext>(
         page_token,
         created: Instant::now(),
     };
-    let prompt = build_prompt(&job, &job.snapshot, None);
+    let prompt = build_prompt(&job, &job.snapshot, None, None);
     let prepared = |id| PreparedRequest {
         id,
         provider_name: job.provider.name.clone(),
@@ -342,6 +362,13 @@ pub fn prepare<F: FnOnce(&str, &str) -> RecipeContext>(
     Ok(prepared(id))
 }
 
+/// What a video menu is counted by: the first thing it clicks, or its entries when it clicks nothing.
+fn menu_selector(open: &[Target], items: &Target) -> String {
+    open.first()
+        .map_or(&items.css, |target| &target.css)
+        .clone()
+}
+
 /// The style rules the page is asked to count, and the css that previews them. Script rules are
 /// neither counted nor previewed: they run only after the user accepts.
 fn selectors_and_css(patch: &Patch, base: Option<&Recipe>) -> (Vec<(String, String)>, String) {
@@ -353,6 +380,9 @@ fn selectors_and_css(patch: &Patch, base: Option<&Recipe>) -> (Vec<(String, Stri
                     PatchRule::Style {
                         label, selector, ..
                     } => Some((label.clone(), selector.clone())),
+                    PatchRule::VideoMenu {
+                        label, open, items, ..
+                    } => Some((label.clone(), menu_selector(open, items))),
                     PatchRule::Script { .. } => None,
                 })
                 .collect(),
@@ -408,7 +438,7 @@ fn shown_rules(
         Patch::NewOption { rules, .. } => rules
             .iter()
             .filter_map(|rule| match rule {
-                PatchRule::Style { .. } => counted.next(),
+                PatchRule::Style { .. } | PatchRule::VideoMenu { .. } => counted.next(),
                 PatchRule::Script { label, code } => {
                     Some(ProposalRule::script(label.clone(), code.clone()))
                 }
@@ -476,13 +506,31 @@ fn proposal_for(id: Uuid, job: &Job, patch: &Patch, rules: Vec<ProposalRule>) ->
     }
 }
 
+/// What the model found by looking closer at the page's players, when the page has any worth a
+/// look. Best effort: a model without tool support, a failure, or a page that moved on just means
+/// no findings, and the request goes on without them.
+async fn look_closer(page: &(impl Page + Sync), model: &impl Model, job: &Job) -> Option<String> {
+    if !inspect::worth_a_look(page) {
+        return None;
+    }
+    let prompt = build_prompt(job, &job.snapshot, None, None);
+    let tools = inspect::tool_definitions();
+    let found = model
+        .investigate(&prompt, &tools, &|name, args| {
+            inspect::run(page, name, args)
+        })
+        .await
+        .ok()?;
+    (!found.is_empty()).then_some(found)
+}
+
 /// Sends the prepared request, previews the answer on the page, and repairs rules that matched
 /// nothing (at most [`MAX_REPAIRS`] more rounds). The preview stays on the page until the user
 /// accepts or rejects. `progress` hears every step as it starts and ends, so the shell can show
 /// what is happening while the model thinks.
 pub async fn send(
     agent: &Agent,
-    page: &impl Page,
+    page: &(impl Page + Sync),
     model: &impl Model,
     progress: &(impl Fn(Activity) + Sync),
     id: Uuid,
@@ -493,6 +541,11 @@ pub async fn send(
     let mut previous: Option<String> = None;
     let mut failures: Vec<(String, String, i64)> = Vec::new();
     let mut validation_error: Option<String> = None;
+    let findings = look_closer(page, model, &job).await;
+    // Cancel while the model looked around: stop before the main request is paid for.
+    if !agent.is_live(id) {
+        return Err(Error::Connection(MSG_CANCELLED.to_owned()));
+    }
 
     for round in 0..=MAX_REPAIRS {
         let borrowed: Vec<RuleFailure<'_>> = failures
@@ -517,7 +570,7 @@ pub async fn send(
                 step.with_total(failures.len())
             });
         }
-        let prompt = build_prompt(&job, &snapshot, repair);
+        let prompt = build_prompt(&job, &snapshot, repair, findings.as_deref());
         progress(Activity::new(
             StepKind::AskModel,
             StepStatus::Running,
@@ -677,6 +730,8 @@ mod tests {
         log: Mutex<Vec<String>>,
         /// The user switched to another page: this one no longer carries the job's token.
         moved: std::sync::atomic::AtomicBool,
+        /// What `list_media` answers; a page without media says `null`.
+        media: Option<&'static str>,
     }
 
     impl FakePage {
@@ -685,7 +740,12 @@ mod tests {
                 counts: Mutex::new(counts),
                 log: Mutex::new(Vec::new()),
                 moved: std::sync::atomic::AtomicBool::new(false),
+                media: None,
             }
+        }
+        fn with_media(mut self, media: &'static str) -> Self {
+            self.media = Some(media);
+            self
         }
         fn log(&self) -> Vec<String> {
             self.log.lock().unwrap().clone()
@@ -694,7 +754,10 @@ mod tests {
 
     impl Page for FakePage {
         fn evaluate(&self, script: String) -> Result<String> {
-            self.log.lock().unwrap().push(script.clone());
+            // The read-only media probe is not what the log is asked about.
+            if script != inspect::list_media_script() {
+                self.log.lock().unwrap().push(script.clone());
+            }
             if script == snapshot::SNAPSHOT_SCRIPT {
                 Ok(SNAPSHOT.to_owned())
             } else if script.starts_with(PAGE_CHECK_PREFIX) {
@@ -703,6 +766,8 @@ mod tests {
             } else if script.starts_with(snapshot::COUNT_SCRIPT_PREFIX) {
                 let mut counts = self.counts.lock().unwrap();
                 Ok(serde_json::to_string(&counts.remove(0)).unwrap())
+            } else if script == inspect::list_media_script() {
+                Ok(self.media.unwrap_or("null").to_owned())
             } else {
                 Ok("null".to_owned())
             }
@@ -891,6 +956,118 @@ mod tests {
             assert_eq!(steps[4].total, Some(1));
             assert_eq!(steps[5].total, Some(1), "one rule matched nothing");
             assert_eq!(steps[10].matched, Some(1));
+        });
+    }
+
+    const VIDEO_PAGE: &str = r#"{"media":[{"tag":"video","big":true}]}"#;
+
+    /// Looks closer with the canned outcome and then answers like `FakeModel`.
+    struct Looks {
+        inner: FakeModel,
+        outcome: std::result::Result<&'static str, ()>,
+        looked: Mutex<usize>,
+    }
+
+    impl Looks {
+        fn new(outcome: std::result::Result<&'static str, ()>) -> Self {
+            Self {
+                inner: FakeModel::new(&[&new_option("div")]),
+                outcome,
+                looked: Mutex::new(0),
+            }
+        }
+    }
+
+    impl Model for Looks {
+        async fn complete(&self, prompt: &Prompt, schema: &Value) -> Result<String> {
+            self.inner.complete(prompt, schema).await
+        }
+        async fn investigate(
+            &self,
+            _: &Prompt,
+            tools: &[ToolDefinition],
+            run: &(dyn Fn(&str, &Value) -> Result<String> + Sync),
+        ) -> Result<String> {
+            *self.looked.lock().unwrap() += 1;
+            assert_eq!(tools.len(), 3);
+            assert!(run("list_media", &json!({})).is_ok());
+            self.outcome
+                .map(str::to_owned)
+                .map_err(|()| Error::Connection("no tools".into()))
+        }
+    }
+
+    fn send_with(page: &FakePage, model: &Looks) -> Result<Proposal> {
+        run(async {
+            let agent = Agent::default();
+            let prepared = prepare(&agent, page, input(None)).unwrap();
+            send(&agent, page, model, &|_| {}, prepared.id).await
+        })
+    }
+
+    #[test]
+    fn what_the_players_showed_goes_into_the_prompt_fenced() {
+        let page = FakePage::new(vec![vec![1]]).with_media(VIDEO_PAGE);
+        let model = Looks::new(Ok("The player is `hls`."));
+        send_with(&page, &model).unwrap();
+        let prompt = &model.inner.prompts()[0];
+        assert!(prompt.contains(
+            "=== PLAYER FINDINGS START ===\nThe player is `hls`.\n=== PLAYER FINDINGS END ==="
+        ));
+    }
+
+    #[test]
+    fn empty_findings_and_a_failed_look_leave_the_prompt_alone() {
+        let page = FakePage::new(vec![vec![1]]).with_media(VIDEO_PAGE);
+        let model = Looks::new(Ok(""));
+        send_with(&page, &model).unwrap();
+        assert!(!model.inner.prompts()[0].contains("PLAYER FINDINGS"));
+        let page = FakePage::new(vec![vec![1]]).with_media(VIDEO_PAGE);
+        let model = Looks::new(Err(()));
+        assert!(
+            send_with(&page, &model).is_ok(),
+            "the failed look does not fail the request"
+        );
+        assert!(!model.inner.prompts()[0].contains("PLAYER FINDINGS"));
+    }
+
+    #[test]
+    fn a_page_without_media_is_not_looked_at() {
+        let page = FakePage::new(vec![vec![1]]);
+        let model = Looks::new(Ok("never"));
+        send_with(&page, &model).unwrap();
+        assert_eq!(*model.looked.lock().unwrap(), 0);
+        assert!(!model.inner.prompts()[0].contains("never"));
+    }
+
+    #[test]
+    fn a_video_menu_is_counted_by_its_first_click_and_shown_as_a_counted_rule() {
+        let answer = json!({"kind":"newOption","summary":"Quality list","optionId":null,
+          "label":"Quality","description":"The player's quality list.","group":"content",
+          "rules":[{"label":"Quality menu","selector":null,"declarations":null,"script":null,
+            "menu":{"kind":"quality","title":"Quality","open":[".gear",".quality-row"],
+              "items":".quality-item","selectedAttr":null,"selectedClass":"active","close":null}}]})
+        .to_string();
+        run(async {
+            let agent = Agent::default();
+            let page = FakePage::new(vec![vec![0], vec![0], vec![0]]);
+            let prepared = prepare(&agent, &page, input(None)).unwrap();
+            let model = FakeModel::new(&[&answer, &answer, &answer]);
+            let proposal = send(&agent, &page, &model, &|_| {}, prepared.id)
+                .await
+                .unwrap();
+            assert_eq!(proposal.rules.len(), 1);
+            assert_eq!(proposal.rules[0].selector, ".gear");
+            assert_eq!(proposal.rules[0].matches, 0);
+            assert_eq!(proposal.unmatched, 1);
+            let repair = &model.prompts()[1];
+            assert!(repair.contains("Rule \"Quality menu\" with selector `.gear` matched nothing"));
+            let script = page
+                .log()
+                .into_iter()
+                .find(|s| s.starts_with(snapshot::COUNT_SCRIPT_PREFIX))
+                .unwrap();
+            assert!(script.contains("[\".gear\"]"));
         });
     }
 
