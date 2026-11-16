@@ -4,7 +4,7 @@ use std::fmt::Write;
 use serde::Serialize;
 
 use super::matcher::Matcher;
-use super::schema::{OptionValue, Recipe, Rule};
+use super::schema::{OptionValue, Recipe, Rule, Selected, VideoMenuKind};
 use super::script_policy::wrap;
 use crate::error::{Error, Result};
 
@@ -18,7 +18,23 @@ struct PageRecipe {
     matchers: Vec<Matcher>,
     css: String,
     scripts: Vec<usize>,
+    menus: Vec<PageMenu>,
 }
+
+/// A `videoMenu` rule as the page's runtime reads it (`video_menu.js`): selectors and one way to
+/// tell the entry in use, nothing that runs.
+#[derive(Serialize)]
+struct PageMenu {
+    kind: VideoMenuKind,
+    title: String,
+    open: Vec<String>,
+    items: String,
+    selected: Selected,
+    close: Option<String>,
+}
+
+/// The runtime of the `videoMenu` rules, embedded only in a page script that has some.
+const MENU_RUNTIME: &str = include_str!("../video_menu.js");
 
 /// CSS for the rules of one recipe that currently apply. Hiding is `display: none`, so the
 /// element stays in the DOM and the site's own scripts keep working.
@@ -38,7 +54,7 @@ fn css_of<'a>(rules: impl Iterator<Item = &'a Rule>) -> String {
     for rule in rules {
         let _ = match rule {
             Rule::Hide { target, .. } => writeln!(css, "{}{{display:none!important}}", target.css),
-            Rule::Script { .. } => Ok(()),
+            Rule::Script { .. } | Rule::VideoMenu { .. } => Ok(()),
             Rule::Css {
                 target,
                 declarations,
@@ -98,11 +114,33 @@ fn page_recipes(
                     scripts.len() - 1
                 })
                 .collect();
+            let menus = scoped()
+                .filter_map(|rule| match rule {
+                    Rule::VideoMenu {
+                        kind,
+                        title,
+                        open,
+                        items,
+                        selected,
+                        close,
+                        ..
+                    } => Some(PageMenu {
+                        kind: *kind,
+                        title: title.trim().to_owned(),
+                        open: open.iter().map(|target| target.css.clone()).collect(),
+                        items: items.css.clone(),
+                        selected: selected.clone(),
+                        close: close.as_ref().map(|target| target.css.clone()),
+                    }),
+                    _ => None,
+                })
+                .collect();
             Ok(PageRecipe {
                 id: recipe.id.clone(),
                 matchers: matchers_of(scope.unwrap_or(&recipe.matches))?,
                 css: css_of(scoped()),
                 scripts: indices,
+                menus,
             })
         })
         .collect()
@@ -122,6 +160,11 @@ pub fn page_script(recipes: &[Recipe], choices: &OptionChoices) -> Result<String
         .flatten()
         .collect();
     let json = serde_json::to_string(&page).map_err(|e| Error::Recipe(e.to_string()))?;
+    let menu_runtime = if page.iter().any(|recipe| !recipe.menus.is_empty()) {
+        MENU_RUNTIME.trim()
+    } else {
+        "null"
+    };
     let scripts = scripts.join(",\n");
     Ok(format!(
         r#"(() => {{
@@ -134,6 +177,11 @@ pub fn page_script(recipes: &[Recipe], choices: &OptionChoices) -> Result<String
       new RegExp(m.host).test(here.hostname) &&
       new RegExp(m.path).test(here.pathname)));
     const css = found.map((recipe) => recipe.css).join("\n");
+    const menuRuntime = {menu_runtime};
+    const menus = found.reduce((all, recipe) => all.concat(recipe.menus), []);
+    if (menuRuntime && menus.length) {{
+      try {{ menuRuntime(menus); }} catch (_) {{}}
+    }}
     const run = (index) => {{
       try {{ scripts[index].call(undefined); }} catch (_) {{}}
     }};

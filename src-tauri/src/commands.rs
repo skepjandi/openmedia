@@ -23,6 +23,7 @@ use crate::ai::{
     chats::{ChatSession, Chats},
     connection::{list_models, models_request},
     hub::{self, HubProposal, SavedHub},
+    inspect,
     prompt::{EarlierTurn, Prompt},
     provider::{self, ModelReply, ToolDefinition, Turn},
     validate_key,
@@ -726,6 +727,26 @@ struct LiveModel {
 impl Model for LiveModel {
     async fn complete(&self, prompt: &Prompt, schema: &serde_json::Value) -> Result<String> {
         provider::complete(&self.config, &self.key, prompt, schema).await
+    }
+
+    async fn investigate(
+        &self,
+        prompt: &Prompt,
+        tools: &[ToolDefinition],
+        run: &(dyn Fn(&str, &serde_json::Value) -> Result<String> + Sync),
+    ) -> Result<String> {
+        inspect::investigate(self, prompt, tools, run).await
+    }
+}
+
+impl hub::Model for LiveModel {
+    async fn complete_with_tools(
+        &self,
+        system: &str,
+        tools: &[ToolDefinition],
+        turns: &[Turn],
+    ) -> Result<ModelReply> {
+        provider::complete_with_tools(&self.config, &self.key, system, tools, turns).await
     }
 }
 

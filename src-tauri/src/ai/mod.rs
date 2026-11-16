@@ -4,6 +4,7 @@ pub mod anthropic;
 pub mod chats;
 pub mod connection;
 pub mod hub;
+pub mod inspect;
 pub mod openai;
 pub mod patch;
 pub mod prompt;

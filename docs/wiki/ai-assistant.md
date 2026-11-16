@@ -127,6 +127,14 @@ Sharing such a recipe goes through the normal checks: a script with powers is re
 
 The app plays and controls the video in view in full-screen feeds ([Video controls](./site-runtime.md#video-controls)); the user can switch the tap controls off, or move them, in Settings or per favorite. For a feed of a site the app does not know, the prompt (`VIDEO_FEEDS`, prompt version 5) tells the assistant to write one script rule that names the feed's paths, `document[Symbol.for("openmedia.feedPaths")] = ["^/path"]`, and to use ordinary `hide` rules for the rest of a feed's overlays. Because it uses `Symbol`, that script has powers in the policy's terms and cannot be shared.
 
+### Video player options
+
+To find and write what a request needs, the assistant has three read-only inspection tools in a short bounded investigation before it answers (`ai/inspect.rs`; only when the page has a video or a big frame; any failure there is ignored): `list_media` (videos and frames, with sizes and playing state, shadow roots included), `inspect(selector)` (a redacted outline of what a selector matches) and `player_api` (the names, never values, of what a page's player objects expose). What it found goes into the request as a fenced block of untrusted data.
+
+The cheapest answer is a **menu rule** (`videoMenu`, see [Recipe Format](./recipe-format.md#rule-types-v1)): data only, counted and repaired like a selector, with no code. Only when that cannot do it does the assistant write the script described next.
+
+The panel of the video controls offers on every site what the browser knows of a video (`textTracks`, Safari's `audioTracks`). What a site's player keeps to itself (the quality levels of a stream, captions the site draws, other settings) has no browser API, so it is site knowledge and belongs in a recipe: the assistant (prompt version 6, `VIDEO_OPTIONS`) writes one script rule that sets `document[Symbol.for("openmedia.videoOptions")] = function (video) { return [group, ...]; }`. A group is `{ kind: "quality" | "captions" | "audio" | "other", label, items: [{ label, selected }], select(index) }`; at most 4 groups of 40 items, labels cut to text. The panel (`video_controls.js`, `syncOptions`) calls the function about once a second while it is open, shows a button per group (a gear for quality and other) that opens a list, and calls `select(index)` for the item picked; a group of kind captions or audio replaces the panel's own button of that kind. The function runs in every frame of a matching page, so a player in a frame gets its own panel with it. The script uses `Symbol` and clicks the site's own controls, so it is for the user's own recipe and cannot be shared ([Script policy](./script-policy.md)).
+
 ## Generate → preview → verify → accept
 
 1. Core requests a snapshot (`SNAPSHOT_SCRIPT`), parses and redacts it, optionally shows the preview, sends.

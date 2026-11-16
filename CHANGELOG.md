@@ -6,6 +6,18 @@ All notable changes to OpenMedia are documented here.
 >
 > **Wiki**: the [GitHub Wiki](https://github.com/skepjandi/openmedia/wiki) is the public-facing main wiki — architecture, recipe format, AI pipeline, security model, roadmap. Source-controlled editing surface is `docs/wiki/` in this repo; CI (`.github/workflows/sync-wiki.yml`) mirrors it to the GitHub Wiki on every merge to `main`. New single-PR changes belong here, not as new wiki pages.
 
+### feat(ai): tools for the assistant and the video controls to offer a site's own player options (quality, captions, audio)
+
+**Area:** `feat(ai)`, `feat(video)`, `feat(recipes)`
+
+**Change:** Site knowledge belongs in recipes, so what only a site's own player knows is not hard-coded. Four pieces:
+- **Detectors (no recipe, no AI):** the panel finds the quality levels of players built with video.js, hls.js, dash.js, Shaka, Plyr and YouTube's player object from the video element itself, on any site (`libraryGroups` in `video_controls.js`). Checked on an hls.js page on the Android emulator: the list (Auto, 144p to 1080p) appears and picking 480p moved `hls.currentLevel` to that level. Not run against the other libraries (fake objects in unit tests).
+- **`videoMenu` rule (no code):** `{type:"videoMenu", kind, title, open:[{css}], items:{css}, selected:{attr|class}, close?}`. The app clicks the site's own menu open (`open`, in order), reads the entries `items` matches, and picks one by clicking (`video_menu.js`, embedded in the page script only when a recipe has one). Validated in Rust like selectors; refused in imported recipes, since it clicks the site's controls (invariant 7); the assistant counts its first `open` selector like a style rule's, so a menu with no way in is repaired. Checked on a test page on the iPhone 17 Pro Max simulator and the Android emulator: the group appears in the panel, picking 720p drove the page's own menu.
+- **Script hook:** `document[Symbol.for("openmedia.videoOptions")]` for what a rule cannot do; prompt version 6 teaches the assistant to prefer a menu rule and to write the script otherwise.
+- **Inspection tools for the assistant** (`ai/inspect.rs`): before it answers, on a page with video or a big frame, it may run up to 3 rounds of read-only tools, `list_media`, `inspect(selector)` and `player_api` (names, never values), and what it found goes into the request as a fenced block of untrusted data, redacted like the snapshot. The preview shows the system message that says so, but not the findings, which exist only at send time. Any failure there is ignored. The probe scripts were run in headless Chrome against a test DOM (videos, a shadow root, an iframe, a `window.hls`): shapes as intended. Not run: a real model with real tool calls.
+- Found on the way: the panel treated a click a script made (the menu rule's own) as the reader's tap, so it never stayed up; presses with `isTrusted === false` are now ignored by the controls.
+- Limit: the assistant sees only the redacted snapshot and what the tools return; a player that builds its menu only when opened may need the user to open it first.
+
 ### fix(video): the video controls and the drag work on any page with a big video, in a frame or a web component too
 
 **Area:** `fix(video)`
