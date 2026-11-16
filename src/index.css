@@ -109,6 +109,18 @@ input {
     0 0 0 1px rgb(2 22 105 / 0.12);
 }
 
+/* Android's view of the shell drew the wide soft shadow of the button and the fan items as a
+   lighter rectangle around each, with the dark scrim missing inside it. A tight shadow keeps them
+   readable on a white page without it. */
+:root[data-platform="android"] .fab,
+:root[data-platform="android"] .fab-glass {
+  box-shadow:
+    inset 0 1px 1px rgb(255 255 255 / 0.85),
+    inset 0 -1px 2px rgb(255 255 255 / 0.25),
+    0 2px 4px rgb(0 0 0 / 0.3),
+    0 0 0 1px rgb(2 22 105 / 0.12);
+}
+
 /* The hidden button's tab: it sticks out of the screen edge and slides in from it. Its glass rim
    is dropped on the edge side so it reads as growing out of the edge. */
 .fab-peek {

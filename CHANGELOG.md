@@ -6,6 +6,12 @@ All notable changes to OpenMedia are documented here.
 >
 > **Wiki**: the [GitHub Wiki](https://github.com/skepjandi/openmedia/wiki) is the public-facing main wiki — architecture, recipe format, AI pipeline, security model, roadmap. Source-controlled editing surface is `docs/wiki/` in this repo; CI (`.github/workflows/sync-wiki.yml`) mirrors it to the GitHub Wiki on every merge to `main`. New single-PR changes belong here, not as new wiki pages.
 
+### fix(fab): no square shadow around the floating button and its fan on Android
+
+**Area:** `fix(fab)`
+
+**Change:** With the fan open on Android, each button had a lighter rectangle around it where the dark scrim did not show: the wide soft shadow (`0 6px 20px`) was drawn as a rectangle. Found on the emulator by switching rules off live through the WebView's remote debugging: layer settings made no difference, removing the shadow did, and a `drop-shadow` filter was worse (a white outline). On Android the button and the fan items now use a tight shadow (`0 2px 4px`), which stays visible on a white page. Checked live in a running emulator, idle and open; not on a real phone. iOS keeps the soft shadow.
+
 ### fix(fab): the open fan on Android is drawn whole, not as stale copies
 
 **Area:** `fix(fab)`
