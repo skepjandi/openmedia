@@ -57,6 +57,17 @@ describe("incognito mode", () => {
     expect(names(selectQuickFavorites(useApp.getState()))).toEqual(["Reddit"]);
   });
 
+  it("covers the open page with a blank one when the mode changes either way", async () => {
+    invoke.mockImplementation(async (name: string) => (name === "enter_incognito" ? secret : null));
+    useApp.setState({ blankTab: false });
+    await useApp.getState().enterIncognito();
+    expect(useApp.getState().blankTab).toBe(true);
+
+    useApp.setState({ blankTab: false });
+    await useApp.getState().exitIncognito();
+    expect(useApp.getState().blankTab).toBe(true);
+  });
+
   it("drops an open assistant turn when the mode changes, so it cannot be seen in the other mode", async () => {
     invoke.mockImplementation(async (name: string) => (name === "enter_incognito" ? secret : null));
     await useApp.getState().enterIncognito();

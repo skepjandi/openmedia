@@ -1046,7 +1046,7 @@ export const useApp = create<AppStore>((set, get) => {
           setIncognitoBusy(false);
           return;
         }
-        set({ incognito: { active: true, favorites, busy: false }, error: null });
+        set({ incognito: { active: true, favorites, busy: false }, error: null, blankTab: true });
         resetChats();
         get().trimSessions("routine");
         applyIcons();
@@ -1062,7 +1062,11 @@ export const useApp = create<AppStore>((set, get) => {
       setIncognitoBusy(true);
       try {
         await incognitoIpc.exit();
-        set({ incognito: { active: false, favorites: [], busy: false }, incognitoSites: [] });
+        set({
+          incognito: { active: false, favorites: [], busy: false },
+          incognitoSites: [],
+          blankTab: true,
+        });
         resetChats();
         get().trimSessions("routine");
       } catch (error) {

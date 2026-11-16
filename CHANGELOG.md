@@ -6,6 +6,12 @@ All notable changes to OpenMedia are documented here.
 >
 > **Wiki**: the [GitHub Wiki](https://github.com/skepjandi/openmedia/wiki) is the public-facing main wiki — architecture, recipe format, AI pipeline, security model, roadmap. Source-controlled editing surface is `docs/wiki/` in this repo; CI (`.github/workflows/sync-wiki.yml`) mirrors it to the GitHub Wiki on every merge to `main`. New single-PR changes belong here, not as new wiki pages.
 
+### fix(incognito): switching mode shows a blank page
+
+**Area:** `fix(incognito)`
+
+**Change:** Turning incognito on or off left the page that was showing on screen, so a page from one mode stayed visible in the other. Both switches now put up the blank page (`blankTab`, the same cover a new tab uses); the open sessions stay open underneath and are reachable from Tabs and the fan. Covered by a store test; not checked on a device.
+
 ### fix(video): the tap panel is put back when a page swaps its body, and shown over a site's full screen
 
 **Area:** `fix(video)`
