@@ -4,9 +4,11 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { SiteVideo, VideoControls } from "./ipc";
 import { VIDEO_CONTROLS_DEFAULT } from "./videoControls";
 
-const SOURCE = readFileSync(
-  new URL("../../src-tauri/src/video_controls.js", import.meta.url),
-  "utf8",
+const read = (name: string) =>
+  readFileSync(new URL(`../../src-tauri/src/${name}`, import.meta.url), "utf8");
+const SOURCE = read("video_controls.js").replace(
+  "/*@DETECTORS@*/",
+  () => read("video_detectors.js"),
 );
 
 type Listener = (event: Record<string, unknown>) => void;

@@ -6,6 +6,12 @@ All notable changes to OpenMedia are documented here.
 >
 > **Wiki**: the [GitHub Wiki](https://github.com/skepjandi/openmedia/wiki) is the public-facing main wiki — architecture, recipe format, AI pipeline, security model, roadmap. Source-controlled editing surface is `docs/wiki/` in this repo; CI (`.github/workflows/sync-wiki.yml`) mirrors it to the GitHub Wiki on every merge to `main`. New single-PR changes belong here, not as new wiki pages.
 
+### refactor(video): the player detectors live in their own file; two stale wiki paragraphs removed
+
+**Area:** `refactor(video)`, `docs(wiki)`
+
+**Change:** The detectors for players built with a common library (video.js, hls.js, dash.js, Shaka, Plyr, JW Player, Vidstack, YouTube) moved from `video_controls.js` to `video_detectors.js`, spliced in at the `/*@DETECTORS@*/` marker when the page script is built (`VideoControls::page_script`, and the same replace in `videoControls.test.ts`). The injected script is unchanged. A Rust test fails if the marker is left in. The wiki no longer says the small player opens no system picture-in-picture window and then that it does (`enterMiniPictureInPicture` was removed in #240), and lists JW Player and Vidstack among the detectors.
+
 ### fix(fab): nothing of the held floating button is cut off on Android
 
 **Area:** `fix(fab)`

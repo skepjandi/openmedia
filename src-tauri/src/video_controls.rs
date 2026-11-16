@@ -9,6 +9,9 @@ use std::collections::BTreeMap;
 use serde::{Deserialize, Serialize};
 
 const PAGE_SCRIPT: &str = include_str!("video_controls.js");
+/// The detectors for players built with a common library, spliced into the page script.
+const DETECTORS: &str = include_str!("video_detectors.js");
+const DETECTORS_MARKER: &str = "/*@DETECTORS@*/";
 
 /// Pixels between the panel and the bottom of the page, before the device's safe area.
 pub const DEFAULT_HEIGHT: u32 = 16;
@@ -93,13 +96,21 @@ impl VideoControls {
             sites,
         })
         .unwrap_or_else(|_| "{}".into());
-        format!("({PAGE_SCRIPT})({config});")
+        let script = PAGE_SCRIPT.replace(DETECTORS_MARKER, DETECTORS);
+        format!("({script})({config});")
     }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn the_detectors_are_spliced_in_and_the_marker_is_gone() {
+        let script = VideoControls::default().page_script(&BTreeMap::new());
+        assert!(script.contains("function libraryGroups("));
+        assert!(!script.contains(DETECTORS_MARKER));
+    }
 
     #[test]
     fn the_panel_is_on_until_switched_off_and_the_rest_is_off_until_chosen() {
