@@ -6,6 +6,12 @@ All notable changes to OpenMedia are documented here.
 >
 > **Wiki**: the [GitHub Wiki](https://github.com/skepjandi/openmedia/wiki) is the public-facing main wiki — architecture, recipe format, AI pipeline, security model, roadmap. Source-controlled editing surface is `docs/wiki/` in this repo; CI (`.github/workflows/sync-wiki.yml`) mirrors it to the GitHub Wiki on every merge to `main`. New single-PR changes belong here, not as new wiki pages.
 
+### feat(ai): the assistant can give the video controls a site's own player options (quality, captions, audio)
+
+**Area:** `feat(ai)`, `feat(video)`
+
+**Change:** Site knowledge belongs in recipes, so what only a site's own player knows (stream quality levels, captions the site draws) is not hard-coded: the assistant (prompt version 6) writes a script rule that sets `document[Symbol.for("openmedia.videoOptions")]` to a function returning option groups (`kind`, `label`, `items`, `select(index)`). The video controls' panel shows a button per group that opens a list and runs `select`. A group of kind captions or audio replaces the panel's own button of that kind. Cut to size (4 groups, 40 items, text only) and wrapped in `try`, so a script that breaks or a site that changes cannot break the panel. Documented in `docs/wiki/ai-assistant.md` ("Video player options"). Checked on the iPhone 17 Pro Max simulator with a throwaway provider on YouTube: the button, the list, the selection mark and closing. Not checked: the assistant writing such a script against a real site with a real model, nor the same on Android.
+
 ### fix(video): the video controls and the drag work on any page with a big video, in a frame or a web component too
 
 **Area:** `fix(video)`

@@ -826,6 +826,55 @@ describe("video controls", () => {
     expect(buttonWith(other, "audio").style.display).toBe("none");
   });
 
+  it("shows the options a recipe's script offers for its site's player, and runs the one picked", () => {
+    const video = new FakeVideo();
+    const page = load({ videos: [video], current: video });
+    const picked: number[] = [];
+    let level = 1;
+    (page.document as Record<symbol, unknown>)[Symbol.for("openmedia.videoOptions")] = () => [
+      {
+        kind: "quality",
+        label: "Quality",
+        items: [
+          { label: "Auto", selected: level === 0 },
+          { label: "720p", selected: level === 1 },
+          { label: "1080p", selected: level === 2 },
+        ],
+        select: (index: number) => {
+          picked.push(index);
+          level = index;
+        },
+      },
+      { kind: "quality", items: [], select: () => {} },
+      { kind: "other", items: [{ label: "x" }], select: "not a function" },
+    ];
+    openPanel(page);
+    const gear = buttonWith(page, "gear");
+    gear.fire("pointerup");
+    const menu = page.body
+      .descendants()
+      .find((element) => element.style.display === "block" && element.children.length === 3);
+    expect(menu?.children.map((row) => row.textContent)).toEqual([
+      "\u2003Auto",
+      "\u2713 720p",
+      "\u2003" + "1080p",
+    ]);
+    menu?.children[2]?.fire("pointerup");
+    expect(picked).toEqual([2]);
+    expect(menu?.style.display).toBe("none");
+  });
+
+  it("offers no option buttons when no script provides any, and survives one that throws", () => {
+    const video = new FakeVideo();
+    const page = load({ videos: [video], current: video });
+    (page.document as Record<symbol, unknown>)[Symbol.for("openmedia.videoOptions")] = () => {
+      throw new Error("the site changed");
+    };
+    openPanel(page);
+    expect(() => buttonWith(page, "gear")).toThrow();
+    expect(shown(page)).toBe(true);
+  });
+
   it("takes the video full screen with the panel's button, in the phone's own player when there is one", () => {
     const video = new FakeVideo() as FakeVideo & {
       webkitEnterFullscreen?: () => void;

@@ -17,6 +17,9 @@
   var NO_AUTOPLAY = Symbol.for('openmedia.noAutoplay');
   var MINI_WINDOW = Symbol.for('openmedia.miniWindow');
   var REFRESH_HOLD = Symbol.for('openmedia.holdRefresh');
+  // A recipe's script offers the options of its site's player (quality, captions, audio) with
+  // `document[Symbol.for('openmedia.videoOptions')] = function (video) { return [group, ...]; }`.
+  var VIDEO_OPTIONS = Symbol.for('openmedia.videoOptions');
   var MINI_CLOSE = Symbol.for('openmedia.miniClose');
   var USER_PAUSE = Symbol.for('openmedia.userPause');
   var STORE = 'openmedia.video';
@@ -338,6 +341,7 @@
       fullscreen: ['M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z'],
       cc: ['M19 4H5c-1.11 0-2 .9-2 2v12c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm-8 7H9.5v-.5h-2v3h2V13H11v1c0 .55-.45 1-1 1H7c-.55 0-1-.45-1-1v-4c0-.55.45-1 1-1h3c.55 0 1 .45 1 1v1zm7 0h-1.5v-.5h-2v3h2V13H18v1c0 .55-.45 1-1 1h-3c-.55 0-1-.45-1-1v-4c0-.55.45-1 1-1h3c.55 0 1 .45 1 1v1z'],
       audio: ['M12 3a9 9 0 0 0-9 9v7a2 2 0 0 0 2 2h3v-8H5v-1a7 7 0 0 1 14 0v1h-3v8h3a2 2 0 0 0 2-2v-7a9 9 0 0 0-9-9z'],
+      gear: ['M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 0 0 .12-.61l-1.92-3.32a.488.488 0 0 0-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.484.484 0 0 0-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58a.49.49 0 0 0-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z'],
       muted: ['M3 9v6h4l5 5V4L7 9H3z', 'M14.5 9.4l1.4-1.4 2.1 2.1 2.1-2.1 1.4 1.4-2.1 2.1 2.1 2.1-1.4 1.4-2.1-2.1-2.1 2.1-1.4-1.4 2.1-2.1z']
     };
 
@@ -399,6 +403,82 @@
       tracks.forEach(function (track, index) {
         if (index === next) track.mode = 'showing';
         else if (track.mode === 'showing') track.mode = 'disabled';
+      });
+    }
+
+    // The options a recipe's script offers for its site's player. Each group is
+    // { kind: 'quality' | 'captions' | 'audio' | 'other', label, items: [{ label, selected }],
+    //   select(index) }. What the script returns is the site's, so it is cut to size and to text.
+    var optionGroups = { at: 0, groups: [], signature: '' };
+
+    function readOptions(video) {
+      var provider = document[VIDEO_OPTIONS];
+      if (typeof provider !== 'function') return [];
+      try {
+        var groups = provider(video);
+        if (!Array.isArray(groups)) return [];
+        return groups.slice(0, 4).map(function (group) {
+          var items = Array.isArray(group && group.items) ? group.items.slice(0, 40) : [];
+          return {
+            kind: /^(quality|captions|audio)$/.test(String(group.kind)) ? String(group.kind) : 'other',
+            label: String(group.label == null ? '' : group.label).slice(0, 24),
+            items: items.map(function (item) {
+              return { label: String(item && item.label != null ? item.label : '').slice(0, 60), selected: !!(item && item.selected) };
+            }),
+            select: typeof group.select === 'function' ? group.select : null
+          };
+        }).filter(function (group) { return group.items.length && group.select; });
+      } catch (_) { return []; }
+    }
+
+    function closeMenu() {
+      if (ui && ui.menu) { ui.menu.style.display = 'none'; ui.menu.textContent = ''; }
+      ui && (ui.menu.__group = -1);
+    }
+
+    function openMenu(index) {
+      var group = optionGroups.groups[index];
+      if (!ui || !group) return;
+      if (ui.menu.style.display === 'block' && ui.menu.__group === index) { closeMenu(); return; }
+      ui.menu.textContent = '';
+      ui.menu.__group = index;
+      group.items.forEach(function (item, at) {
+        var row = make('div', 'padding:10px 14px;white-space:nowrap;cursor:pointer;touch-action:manipulation;' +
+          (item.selected ? 'font-weight:600' : 'opacity:.85'));
+        row.textContent = (item.selected ? '\u2713 ' : '\u2003') + item.label;
+        row.addEventListener('pointerdown', stop);
+        row.addEventListener('pointerup', function (event) {
+          stop(event);
+          ghostUntil = Date.now() + GHOST_MS;
+          try { group.select(at); } catch (_) {}
+          closeMenu();
+          optionGroups.at = 0;
+          keepAlive();
+        });
+        ui.menu.appendChild(row);
+      });
+      ui.menu.style.display = 'block';
+    }
+
+    // Buttons for the groups, made again only when the groups change.
+    function syncOptions(video) {
+      var now = Date.now();
+      if (now - optionGroups.at < 700) return;
+      optionGroups.at = now;
+      var groups = readOptions(video);
+      var signature = JSON.stringify(groups.map(function (group) {
+        return [group.kind, group.label, group.items];
+      }));
+      if (signature === optionGroups.signature) return;
+      optionGroups.signature = signature;
+      optionGroups.groups = groups;
+      ui.extras.textContent = '';
+      closeMenu();
+      groups.forEach(function (group, index) {
+        var icon = group.kind === 'captions' ? 'cc' : group.kind === 'audio' ? 'audio' : 'gear';
+        var opener = button(32, icon, function () { openMenu(index); });
+        if (group.label) opener.title = group.label;
+        ui.extras.appendChild(opener);
       });
     }
 
@@ -1125,6 +1205,7 @@
         keepAlive();
         paint(target);
       });
+      var extras = make('span', 'display:flex;align-items:center;gap:10px');
       var cc = button(32, 'cc', function (target) { cycleCaptions(target); });
       var audio = button(32, 'audio', function (target) { cycleAudio(target); });
       var note = make('span',
@@ -1135,6 +1216,7 @@
       row.appendChild(cc);
       row.appendChild(audio);
       row.appendChild(note);
+      row.appendChild(extras);
       row.appendChild(left);
       row.appendChild(pill);
       var seek = slider(30, function (ratio) {
@@ -1148,6 +1230,13 @@
       fullButton.style.cssText += ';position:absolute;top:8px;right:10px';
       card.appendChild(floatButton);
       card.appendChild(fullButton);
+      // The list a group's button opens, above the panel.
+      var menu = make('div',
+        'display:none;position:absolute;right:0;bottom:calc(100% + 8px);max-height:40vh;overflow-y:auto;' +
+        'border-radius:14px;background:rgba(0,0,0,.85);color:#fff;pointer-events:auto;' +
+        '-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)');
+      menu.__group = -1;
+      card.appendChild(menu);
       card.appendChild(transport);
       card.appendChild(row);
       card.appendChild(seek.track);
@@ -1157,7 +1246,7 @@
       });
       parent.appendChild(root);
       ui = {
-        root: root, toggle: toggle, mute: mute, cc: cc, audio: audio, note: note, left: left, pill: pill, seek: seek
+        root: root, toggle: toggle, mute: mute, cc: cc, audio: audio, note: note, extras: extras, menu: menu, left: left, pill: pill, seek: seek
       };
       return ui;
     }
@@ -1178,16 +1267,19 @@
       setIcon(ui.mute, video.muted || video.volume === 0 ? 'muted' : 'sound');
       var texts = textTracksOf(video);
       var showing = texts.filter(function (track) { return track.mode === 'showing'; })[0];
-      ui.cc.style.display = texts.length ? 'flex' : 'none';
+      syncOptions(video);
+      var kinds = optionGroups.groups.map(function (group) { return group.kind; });
+      ui.cc.style.display = texts.length && kinds.indexOf('captions') < 0 ? 'flex' : 'none';
       ui.cc.style.opacity = showing ? '1' : '.45';
       var audios = audioTracksOf(video);
       var heard = audios.filter(function (track) { return track.enabled; })[0];
-      ui.audio.style.display = audios.length ? 'flex' : 'none';
+      ui.audio.style.display = audios.length && kinds.indexOf('audio') < 0 ? 'flex' : 'none';
       ui.note.textContent = (showing && showing.label) || (heard && heard.label) || '';
     }
 
     function hide() {
       shown = false;
+      closeMenu();
       clearTimeout(hideTimer);
       if (ui) {
         ui.root.style.display = 'none';
