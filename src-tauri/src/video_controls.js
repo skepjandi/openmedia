@@ -336,6 +336,8 @@
       close: ['M19 6.4L17.6 5 12 10.6 6.4 5 5 6.4 10.6 12 5 17.6 6.4 19 12 13.4 17.6 19 19 17.6 13.4 12z'],
       pip: ['M19 7h-8v6h8V7z', 'M21 3H3c-1.1 0-2 .9-2 2v14c0 1.1.9 1.98 2 1.98h18c1.1 0 2-.88 2-1.98V5c0-1.1-.9-2-2-2zm0 16.01H3V4.98h18v14.03z'],
       fullscreen: ['M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z'],
+      cc: ['M19 4H5c-1.11 0-2 .9-2 2v12c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm-8 7H9.5v-.5h-2v3h2V13H11v1c0 .55-.45 1-1 1H7c-.55 0-1-.45-1-1v-4c0-.55.45-1 1-1h3c.55 0 1 .45 1 1v1zm7 0h-1.5v-.5h-2v3h2V13H18v1c0 .55-.45 1-1 1h-3c-.55 0-1-.45-1-1v-4c0-.55.45-1 1-1h3c.55 0 1 .45 1 1v1z'],
+      audio: ['M12 3a9 9 0 0 0-9 9v7a2 2 0 0 0 2 2h3v-8H5v-1a7 7 0 0 1 14 0v1h-3v8h3a2 2 0 0 0 2-2v-7a9 9 0 0 0-9-9z'],
       muted: ['M3 9v6h4l5 5V4L7 9H3z', 'M14.5 9.4l1.4-1.4 2.1 2.1 2.1-2.1 1.4 1.4-2.1 2.1 2.1 2.1-1.4 1.4-2.1-2.1-2.1 2.1-1.4-1.4 2.1-2.1z']
     };
 
@@ -366,6 +368,47 @@
         else if (video.requestFullscreen) video.requestFullscreen();
         else if (video.webkitRequestFullscreen) video.webkitRequestFullscreen();
       } catch (_) {}
+    }
+
+    // What the browser itself knows of a video's options, whatever the site: its subtitle and
+    // caption tracks, and (Safari) its audio tracks. A site that draws its own captions or picks its
+    // own quality keeps them to itself: nothing here can read those.
+    function textTracksOf(video) {
+      var found = [];
+      var list = video.textTracks;
+      for (var i = 0; list && i < list.length; i++) {
+        if (list[i].kind === 'subtitles' || list[i].kind === 'captions') found.push(list[i]);
+      }
+      return found;
+    }
+
+    function audioTracksOf(video) {
+      var found = [];
+      var list = video.audioTracks;
+      for (var i = 0; list && i < list.length; i++) found.push(list[i]);
+      return found.length > 1 ? found : [];
+    }
+
+    // Off, then each track in turn, then off again.
+    function cycleCaptions(video) {
+      var tracks = textTracksOf(video);
+      if (!tracks.length) return;
+      var on = -1;
+      tracks.forEach(function (track, index) { if (track.mode === 'showing') on = index; });
+      var next = on + 1;
+      tracks.forEach(function (track, index) {
+        if (index === next) track.mode = 'showing';
+        else if (track.mode === 'showing') track.mode = 'disabled';
+      });
+    }
+
+    function cycleAudio(video) {
+      var tracks = audioTracksOf(video);
+      if (!tracks.length) return;
+      var on = 0;
+      tracks.forEach(function (track, index) { if (track.enabled) on = index; });
+      var next = (on + 1) % tracks.length;
+      tracks.forEach(function (track, index) { track.enabled = index === next; });
     }
 
     function button(size, name, action) {
@@ -1082,7 +1125,16 @@
         keepAlive();
         paint(target);
       });
+      var cc = button(32, 'cc', function (target) { cycleCaptions(target); });
+      var audio = button(32, 'audio', function (target) { cycleAudio(target); });
+      var note = make('span',
+        'font-size:12px;opacity:.85;max-width:96px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap');
+      cc.style.display = 'none';
+      audio.style.display = 'none';
       row.appendChild(mute);
+      row.appendChild(cc);
+      row.appendChild(audio);
+      row.appendChild(note);
       row.appendChild(left);
       row.appendChild(pill);
       var seek = slider(30, function (ratio) {
@@ -1105,7 +1157,7 @@
       });
       parent.appendChild(root);
       ui = {
-        root: root, toggle: toggle, mute: mute, left: left, pill: pill, seek: seek
+        root: root, toggle: toggle, mute: mute, cc: cc, audio: audio, note: note, left: left, pill: pill, seek: seek
       };
       return ui;
     }
@@ -1124,6 +1176,14 @@
       ui.pill.textContent = (Math.round(rate * 100) / 100) + '\u00d7';
       setIcon(ui.toggle, video.paused ? 'play' : 'pause');
       setIcon(ui.mute, video.muted || video.volume === 0 ? 'muted' : 'sound');
+      var texts = textTracksOf(video);
+      var showing = texts.filter(function (track) { return track.mode === 'showing'; })[0];
+      ui.cc.style.display = texts.length ? 'flex' : 'none';
+      ui.cc.style.opacity = showing ? '1' : '.45';
+      var audios = audioTracksOf(video);
+      var heard = audios.filter(function (track) { return track.enabled; })[0];
+      ui.audio.style.display = audios.length ? 'flex' : 'none';
+      ui.note.textContent = (showing && showing.label) || (heard && heard.label) || '';
     }
 
     function hide() {

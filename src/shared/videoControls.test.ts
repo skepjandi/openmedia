@@ -794,6 +794,38 @@ describe("video controls", () => {
     expect(style.has("opacity")).toBe(false);
   });
 
+  it("offers the video's own caption and audio tracks, and nothing when it has none", () => {
+    const track = (label: string, mode: string) => ({ kind: "subtitles", label, mode });
+    const video = new FakeVideo() as FakeVideo & {
+      textTracks?: Array<{ kind: string; label: string; mode: string }>;
+      audioTracks?: Array<{ label: string; enabled: boolean }>;
+    };
+    video.textTracks = [track("English", "disabled"), track("Fran\u00e7ais", "disabled")];
+    video.audioTracks = [
+      { label: "Original", enabled: true },
+      { label: "Dub", enabled: false },
+    ];
+    const page = load({ videos: [video], current: video });
+    openPanel(page);
+    const cc = buttonWith(page, "cc");
+    expect(cc.style.display).toBe("flex");
+    expect(cc.style.opacity).toBe(".45");
+    cc.fire("pointerup");
+    expect(video.textTracks.map((item) => item.mode)).toEqual(["showing", "disabled"]);
+    cc.fire("pointerup");
+    expect(video.textTracks.map((item) => item.mode)).toEqual(["disabled", "showing"]);
+    cc.fire("pointerup");
+    expect(video.textTracks.map((item) => item.mode)).toEqual(["disabled", "disabled"]);
+    buttonWith(page, "audio").fire("pointerup");
+    expect(video.audioTracks.map((item) => item.enabled)).toEqual([false, true]);
+
+    const bare = new FakeVideo();
+    const other = load({ videos: [bare], current: bare });
+    openPanel(other);
+    expect(buttonWith(other, "cc").style.display).toBe("none");
+    expect(buttonWith(other, "audio").style.display).toBe("none");
+  });
+
   it("takes the video full screen with the panel's button, in the phone's own player when there is one", () => {
     const video = new FakeVideo() as FakeVideo & {
       webkitEnterFullscreen?: () => void;
