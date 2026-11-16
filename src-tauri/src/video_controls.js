@@ -49,6 +49,7 @@
   var DRAG_COMMIT = 0.2; // of that: letting go past it keeps the small player, short of it puts the video back
   var DRAG_FLICK = 0.5; // px/ms: a flick this fast down keeps it too
   var DRAG_SETTLE_MS = 200;
+  var HOLD_RATE_MS = 800; // how long after a drag the speed it started with is kept
   var MINI_FIGHTS = 40; // and this many times, then the site wins
   var MINI_BOTTOM = 96; // px from the bottom edge, clear of the browser's own buttons
   var HIDE_MS = 3500; // the panel goes away this long after the last touch on it
@@ -858,6 +859,21 @@
     function touchX(touch) { return framed && typeof touch.screenX === 'number' ? touch.screenX : touch.clientX; }
     function touchY(touch) { return framed && typeof touch.screenY === 'number' ? touch.screenY : touch.clientY; }
 
+    // A site's press and hold for double speed (YouTube's) starts with the touch, and since the page
+    // keeps the rest of a drag from the site, the touch never ends for it: the speed would stay
+    // doubled. The speed the video had is kept while the drag lasts, and a little after.
+    function holdRate(video, rate) {
+      var back = function () { if (video.playbackRate !== rate) video.playbackRate = rate; };
+      video.addEventListener('ratechange', back);
+      back();
+      return function (after) {
+        setTimeout(function () {
+          video.removeEventListener('ratechange', back);
+          back();
+        }, after);
+      };
+    }
+
     function dragStart(event) {
       drag = null;
       if (mini || !event.touches || event.touches.length !== 1 || document.hidden || window.__openmediaHold) return;
@@ -875,7 +891,7 @@
       if (!(touch.clientX >= box.left && touch.clientX <= box.right && touch.clientY >= box.top && touch.clientY <= box.bottom)) return;
       if (video && onSiteButton(event.target, video)) return;
       drag = {
-        video: video, frame: frame, x: touchX(touch), y: touchY(touch), engaged: false,
+        video: video, frame: frame, rate: video ? video.playbackRate : 1, x: touchX(touch), y: touchY(touch), engaged: false,
         box: { left: box.left, right: box.right, top: box.top, bottom: box.bottom },
         last: { y: touchY(touch), at: Date.now() }, speed: 0, ok: false
       };
@@ -901,6 +917,7 @@
           if (!mini) { drag = null; return; }
         }
         drag.engaged = true;
+        if (drag.video) drag.release = holdRate(drag.video, drag.rate);
       }
       event.stopImmediatePropagation();
       if (event.cancelable) event.preventDefault();
@@ -919,6 +936,7 @@
     function dragEnd(event, cancelled) {
       var held = drag;
       drag = null;
+      if (held && held.release) held.release(HOLD_RATE_MS);
       if (!held || !held.engaged || (!framed && !mini)) return;
       event.stopImmediatePropagation();
       if (event.cancelable) event.preventDefault();

@@ -972,6 +972,24 @@ describe("video controls", () => {
       expect(video.parentNode).toBe(box);
     });
 
+    it("keeps the speed the video had when the site's press and hold sets double speed during the drag", () => {
+      const { video, page } = watch();
+      page.win("touchstart", touch(100));
+      page.win("touchmove", touch(140));
+      video.playbackRate = 2;
+      video.emit("ratechange");
+      expect(video.playbackRate).toBe(1);
+      page.win("touchmove", touch(300));
+      page.win("touchend", touch(300));
+      video.playbackRate = 2;
+      video.emit("ratechange");
+      expect(video.playbackRate).toBe(1);
+      page.runTimers();
+      video.playbackRate = 2;
+      video.emit("ratechange");
+      expect(video.playbackRate).toBe(2);
+    });
+
     it("puts the video back when let go short of the way", () => {
       const { home, video, page } = watch();
       page.win("touchstart", touch(100));
