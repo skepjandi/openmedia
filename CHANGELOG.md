@@ -6,6 +6,12 @@ All notable changes to OpenMedia are documented here.
 >
 > **Wiki**: the [GitHub Wiki](https://github.com/skepjandi/openmedia/wiki) is the public-facing main wiki — architecture, recipe format, AI pipeline, security model, roadmap. Source-controlled editing surface is `docs/wiki/` in this repo; CI (`.github/workflows/sync-wiki.yml`) mirrors it to the GitHub Wiki on every merge to `main`. New single-PR changes belong here, not as new wiki pages.
 
+### fix(video): the video controls and the drag work on any page with a big video, not only on known watch paths
+
+**Area:** `fix(video)`
+
+**Change:** `watchPage()` in `video_controls.js` counted a page as a watch page only when it had `og:type` `video.*` or a path like `/watch`, `/video`, `/embed`; any other site's player got neither the panel (with "full videos" on), the float button, nor the drag to the small player. A page that is not a feed and has a visible video over 15 % of the screen now counts too. Checked on the iPhone 17 Pro Max simulator on a bare `.mp4` page (drag to the small player works; its native controls take a tap, as before). Not covered: players inside an iframe (archive.org's, many embeds): the controls run in the top frame only (`window.top !== window`), so they see no video there. A site whose own player has no `<video>` (a canvas or plugin) is out of reach as well.
+
 ### feat(video): drag the player down to shrink it into the small player, as in the YouTube app
 
 **Area:** `feat(video)`

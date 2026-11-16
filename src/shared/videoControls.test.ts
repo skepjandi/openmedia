@@ -1206,17 +1206,25 @@ describe("video controls", () => {
     expect(siteOff.click(200, 200).kept).toBe(false);
   });
 
-  it("leaves other pages alone, and videos too small to be the page's video", () => {
+  it("treats any page with a video taking a good part of the screen as a watch page, and leaves others alone", () => {
     const watch = new FakeVideo();
     watch.box = { top: 100, left: 0, width: 400, height: 225, bottom: 325, right: 400 };
-    const other = load({
+    const player = load({
       controls: { fullVideos: true },
       feed: false,
       pathname: "/home",
       videos: [watch],
       current: null,
     });
-    expect(other.click(200, 200).kept).toBe(false);
+    expect(player.click(200, 200).kept).toBe(true);
+    const none = load({
+      controls: { fullVideos: true },
+      feed: false,
+      pathname: "/home",
+      videos: [],
+      current: null,
+    });
+    expect(none.click(200, 200).kept).toBe(false);
 
     const tiny = new FakeVideo();
     tiny.box = { top: 100, left: 0, width: 100, height: 50, bottom: 150, right: 100 };

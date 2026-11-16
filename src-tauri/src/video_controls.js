@@ -102,14 +102,16 @@
       return onFeedPage() && !document.hidden && !window.__openmediaHold;
     }
 
-    // A page that is about one video: it says so (og:type video.*) or its path does.
+    // A page that is about one video: it says so (og:type video.*), its path does, or it is a page
+    // with a video taking a good part of the screen, whatever the site (a player of its own, a file).
     function watchPage() {
       try {
         var meta = document.querySelector && document.querySelector('meta[property="og:type"]');
         var type = meta && meta.getAttribute && meta.getAttribute('content');
         if (type && /^video/i.test(type)) return true;
       } catch (_) {}
-      return !!(window.location && WATCH_PATH.test(window.location.pathname || ''));
+      if (window.location && WATCH_PATH.test(window.location.pathname || '')) return true;
+      return !onFeedPage() && !!focus();
     }
 
     // Where the panel may show: a feed, or a page about one video.
