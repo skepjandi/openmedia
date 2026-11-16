@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs";
 import vm from "node:vm";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { SiteVideo, VideoControls } from "./ipc";
 import { VIDEO_CONTROLS_DEFAULT } from "./videoControls";
 
@@ -202,6 +202,28 @@ class FakeElement {
   }
 }
 
+/** A frame of the page: another site's player, which the page cannot reach into. */
+class FakeFrame extends FakeElement {
+  isConnected = true;
+  sent: unknown[] = [];
+  contentWindow = { postMessage: (message: unknown) => this.sent.push(message) };
+  styles = new Map<string, string>();
+  constructor() {
+    super();
+    this.style = {
+      cssText: "",
+      setProperty: (name: string, value: string) => this.styles.set(name, value),
+    } as unknown as Record<string, string>;
+  }
+  getAttribute() {
+    return null;
+  }
+  removeAttribute() {}
+  getBoundingClientRect() {
+    return { top: 100, left: 0, width: 400, height: 225, bottom: 325, right: 400 };
+  }
+}
+
 interface Tap {
   /** True when the page kept the tap from the site. */
   kept: boolean;
@@ -237,6 +259,10 @@ interface Page {
   teardown: () => void;
   /** What the page told the app about the small player. */
   posts: unknown[];
+  /** What a frame told its page. */
+  parentPosts: unknown[];
+  /** The page the frame is in, as the source of its messages. */
+  parent: unknown;
   /** The page's document, for what the controls leave on it. */
   document: Record<string | symbol, unknown>;
   /** Callbacks of the mutation observers the controls made, as the browser would call them. */
@@ -265,6 +291,10 @@ function load(options: {
   /** The page's og:type, if it has one. */
   ogType?: string;
   pathname?: string;
+  /** True when the script runs inside a frame of the page, as another site's player does. */
+  frame?: boolean;
+  /** The frames the page has. */
+  frames?: FakeFrame[];
   videos: FakeVideo[];
   current: FakeVideo | null;
   saved?: Record<string, unknown>;
@@ -292,7 +322,12 @@ function load(options: {
     createComment: () => new FakeElement(),
     querySelector: () =>
       options.ogType === undefined ? null : { getAttribute: () => options.ogType },
-    querySelectorAll: (selector: string) => (selector === "video" ? options.videos : stack),
+    querySelectorAll: (selector: string) =>
+      selector === "video"
+        ? options.videos
+        : selector === "iframe"
+          ? (options.frames ?? [])
+          : stack,
     addEventListener: (type: string, handler: Listener) => {
       documentListeners.set(type, [...(documentListeners.get(type) ?? []), handler]);
     },
@@ -367,7 +402,12 @@ function load(options: {
     },
   };
   win.window = win;
-  win.top = win;
+  const parentPosts: unknown[] = [];
+  const parent = { postMessage: (message: unknown) => parentPosts.push(message) };
+  win.parent = parent;
+  win.screen = { width: 400, height: 800 };
+  win.top = options.frame ? parent : win;
+  win.__parent = parent;
   const context = vm.createContext(win);
   const config = JSON.stringify({
     ...VIDEO_CONTROLS_DEFAULT,
@@ -523,6 +563,8 @@ function load(options: {
     teardown: () => (document[Symbol.for("openmedia.videoControls")] as () => void)(),
     observers,
     posts,
+    parentPosts,
+    parent,
     document,
   };
 }
@@ -751,6 +793,44 @@ describe("video controls", () => {
     expect(style.has("opacity")).toBe(false);
   });
 
+  it("takes the video full screen with the panel's button, in the phone's own player when there is one", () => {
+    const video = new FakeVideo() as FakeVideo & {
+      webkitEnterFullscreen?: () => void;
+      requestFullscreen?: () => void;
+    };
+    const entered: string[] = [];
+    video.webkitEnterFullscreen = () => entered.push("webkit");
+    video.requestFullscreen = () => entered.push("standard");
+    const page = load({ videos: [video], current: video });
+    openPanel(page);
+    buttonWith(page, "fullscreen").fire("pointerup");
+    expect(entered).toEqual(["webkit"]);
+
+    const plain = new FakeVideo() as FakeVideo & { requestFullscreen?: () => void };
+    plain.requestFullscreen = () => entered.push("standard");
+    const other = load({ videos: [plain], current: plain });
+    openPanel(other);
+    buttonWith(other, "fullscreen").fire("pointerup");
+    expect(entered).toEqual(["webkit", "standard"]);
+  });
+
+  it("counts a frame or video that is off the screen as no area, not a positive one", () => {
+    const hidden = new FakeFrame();
+    hidden.getBoundingClientRect = () => ({
+      top: -1000,
+      left: -1000,
+      width: 0,
+      height: 0,
+      bottom: -1000,
+      right: -1000,
+    });
+    const page = load({ feed: false, videos: [], current: null, frames: [hidden], pathname: "/x" });
+    page.tick();
+    page.win("touchstart", { touches: [{ clientX: 10, clientY: 10 }], target: PLAIN });
+    expect(page.win("touchmove", { touches: [{ clientX: 10, clientY: 60 }] })).toBe(false);
+    expect(page.document[Symbol.for("openmedia.holdRefresh")]).toBeFalsy();
+  });
+
   it("lifts the video into a small player in the corner and puts it back with its close button", () => {
     const home = new FakeElement();
     const video = new PlacedVideo();
@@ -856,6 +936,13 @@ describe("video controls", () => {
   });
 
   describe("dragging the player down on a watch page", () => {
+    // A drag's speed is taken from the clock: a still clock makes it nothing, not a flick.
+    beforeEach(() => {
+      vi.spyOn(Date, "now").mockReturnValue(1000);
+    });
+    afterEach(() => {
+      vi.restoreAllMocks();
+    });
     const watch = () => {
       const home = new FakeElement();
       const video = new PlacedVideo();
@@ -935,6 +1022,95 @@ describe("video controls", () => {
       expect(
         (feed.document as Record<symbol, unknown>)[Symbol.for("openmedia.holdRefresh")],
       ).toBeFalsy();
+    });
+
+    it("in a frame, asks the page and never the app, and drags once the page says yes", () => {
+      const video = new PlacedVideo();
+      const page = load({
+        frame: true,
+        feed: false,
+        videos: [video],
+        current: video,
+        pathname: "/embed/one",
+      });
+      const touch = (y: number) => ({
+        touches: [{ clientX: 200, clientY: y, screenX: 200, screenY: y }],
+      });
+      page.win("touchstart", touch(100));
+      expect(page.parentPosts).toEqual([{ om: "drag-start" }]);
+      // Until the page answers, a drag down is the site's.
+      expect(page.win("touchmove", touch(160))).toBe(false);
+      page.win("message", { source: page.parent, data: { om: "drag-ok", ok: true } });
+      expect(page.win("touchmove", touch(200))).toBe(true);
+      expect(page.parentPosts).toContainEqual({ om: "drag-move", dy: 100 });
+      page.win("touchend", touch(200));
+      expect(page.parentPosts.at(-1)).toMatchObject({ om: "drag-end", cancelled: false });
+      expect(page.posts).toEqual([]);
+    });
+
+    it("in a frame, ignores what is not from its page and shows no panel once the page has made it the small player", () => {
+      const video = new PlacedVideo();
+      const page = load({
+        frame: true,
+        feed: false,
+        videos: [video],
+        current: video,
+        pathname: "/embed/one",
+      });
+      page.win("message", { source: {}, data: { om: "drag-ok", ok: true } });
+      page.win("message", { source: page.parent, data: { om: "mini", on: true } });
+      page.win("touchstart", {
+        touches: [{ clientX: 200, clientY: 100, screenX: 200, screenY: 100 }],
+      });
+      expect(page.parentPosts).toEqual([]);
+    });
+
+    it("moves a frame the page has to the corner when its player is dragged down, and the app is told by the page", () => {
+      const frame = new FakeFrame();
+      const home = new FakeElement();
+      home.appendChild(frame);
+      const page = load({
+        feed: false,
+        videos: [],
+        current: null,
+        frames: [frame],
+        pathname: "/watch/one",
+      });
+      const frameMessage = (data: Record<string, unknown>) =>
+        page.win("message", { source: frame.contentWindow, data: { om: "x", ...data } });
+      frameMessage({ om: "drag-start" });
+      expect(frame.sent).toContainEqual({ om: "drag-ok", ok: true });
+      frameMessage({ om: "drag-move", dy: 300 });
+      expect(frame.styles.get("position")).toBe("fixed");
+      expect(
+        page.body.descendants().some((child) => "data-openmedia-mini" in child.attributes),
+      ).toBe(true);
+      frameMessage({ om: "drag-end", speed: 0, cancelled: false });
+      page.runTimers();
+      expect(page.posts).toContainEqual({ float: true });
+      expect(frame.sent).toContainEqual({ om: "mini", on: true });
+    });
+
+    it("puts a frame back when its drag is let go short of the way", () => {
+      const frame = new FakeFrame();
+      const home = new FakeElement();
+      home.appendChild(frame);
+      const page = load({
+        feed: false,
+        videos: [],
+        current: null,
+        frames: [frame],
+        pathname: "/watch/one",
+      });
+      const frameMessage = (data: Record<string, unknown>) =>
+        page.win("message", { source: frame.contentWindow, data });
+      frameMessage({ om: "drag-start" });
+      frameMessage({ om: "drag-move", dy: 40 });
+      frameMessage({ om: "drag-end", speed: 0, cancelled: false });
+      page.runTimers();
+      expect(page.posts).not.toContainEqual({ float: true });
+      expect(frame.sent).toContainEqual({ om: "mini", on: false });
+      expect(home.children).toContain(frame);
     });
 
     it("does nothing in a feed, where the swipe is the way to the next video", () => {

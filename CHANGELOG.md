@@ -6,11 +6,18 @@ All notable changes to OpenMedia are documented here.
 >
 > **Wiki**: the [GitHub Wiki](https://github.com/skepjandi/openmedia/wiki) is the public-facing main wiki — architecture, recipe format, AI pipeline, security model, roadmap. Source-controlled editing surface is `docs/wiki/` in this repo; CI (`.github/workflows/sync-wiki.yml`) mirrors it to the GitHub Wiki on every merge to `main`. New single-PR changes belong here, not as new wiki pages.
 
-### fix(video): the video controls and the drag work on any page with a big video, not only on known watch paths
+### fix(video): the video controls and the drag work on any page with a big video, in a frame or a web component too
 
 **Area:** `fix(video)`
 
-**Change:** `watchPage()` in `video_controls.js` counted a page as a watch page only when it had `og:type` `video.*` or a path like `/watch`, `/video`, `/embed`; any other site's player got neither the panel (with "full videos" on), the float button, nor the drag to the small player. A page that is not a feed and has a visible video over 15 % of the screen now counts too. Checked on the iPhone 17 Pro Max simulator on a bare `.mp4` page (drag to the small player works; its native controls take a tap, as before). Not covered: players inside an iframe (archive.org's, many embeds): the controls run in the top frame only (`window.top !== window`), so they see no video there. A site whose own player has no `<video>` (a canvas or plugin) is out of reach as well.
+**Change:** The controls ran only for pages that said they were watch pages (`og:type` `video.*`, or a path like `/watch`) and only in the top frame, on videos found by `querySelectorAll('video')`. Reported on Miruro: no panel and no drag. Its player is a `<strmcx-embed>` web component whose shadow root holds an iframe, which holds the `<video>`. Now:
+- A non-feed page with a visible video over 15 % of the screen, or such a frame, counts as a watch page (`watchPage()`).
+- Videos inside shadow roots are found (`allVideos()`; `attachShadow` is wrapped once per page to note the roots, open or closed).
+- The controls also run inside a frame that is over 15 % of the screen (`framed`): the panel works on the video there, and a drag down or the float button messages the page (`postMessage`, `om` messages), which moves the frame itself to the corner with `position: fixed` (moving it in the document would load it again), shows the close/expand/pause buttons over it, and tells the app (only the top page talks to the app). The page also holds the app's pull to refresh while such a frame is at its top. Touch positions in a frame use screen coordinates, because the frame moves under the finger.
+- The panel has a full screen button next to the small-player button (`toggleFullscreen`): iOS's own player for a video (`webkitEnterFullscreen`), else the browser's full screen; pressing it again leaves it.
+- A frame or video that is off the screen counted as a positive area (two negative sides multiplied), so a hidden 0x0 frame at -1000,-1000 beat the real player in `playerFrame()` and `focus()`; found on the Android emulator. Fixed.
+- Checked on the iPhone 17 Pro Max simulator: Miruro (iframe in a shadow root: drag to the small player, corner window, video keeps playing), a bare `.mp4` page, archive.org (panel works in the frame; after the drag the small player vanishes again, the site seems to replace its frame when the window shrinks), YouTube (drag, full screen button), Wikipedia (no video: untouched). Android emulator: Miruro (drag moves the frame to the corner), YouTube (drag), Wikipedia (untouched).
+- Not covered: a player with no `<video>` (canvas, plugin), and a frame whose player the site sizes small until played.
 
 ### feat(video): drag the player down to shrink it into the small player, as in the YouTube app
 
