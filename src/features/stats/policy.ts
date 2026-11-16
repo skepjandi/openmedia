@@ -87,6 +87,30 @@ export function limitReached(policy: UsagePolicy | undefined, seconds: number): 
   return policy?.limitSeconds != null && seconds >= policy.limitSeconds;
 }
 
+/** What closes a page today: its whole site's limit, or the limit of the part it is in. */
+export type PageLock = { kind: "site" | "part"; spent: number };
+
+/**
+ * The limit that has closed the page at `target`, if any. A part's limit closes only that part;
+ * the rest of the site stays open.
+ */
+export function pageLock(
+  limits: UsageLimits,
+  seconds: Record<string, number>,
+  sectionSeconds: Record<string, Record<string, number>>,
+  target: { host: string; section: string },
+): PageLock | null {
+  const site = usageSeconds(seconds, target.host);
+  if (limitReached(policyForHost(limits.sites, target.host), site)) {
+    return { kind: "site", spent: site };
+  }
+  const part = sectionUsageSeconds(sectionSeconds, target.host, target.section);
+  if (limitReached(policyForSection(limits.sections, target.host, target.section), part)) {
+    return { kind: "part", spent: part };
+  }
+  return null;
+}
+
 /** Includes a native domain's totals before a newly opened subdomain reports its scope. */
 export function usageSeconds(seconds: Record<string, number>, host: string): number {
   let total = 0;

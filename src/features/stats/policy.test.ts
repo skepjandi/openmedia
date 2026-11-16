@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it } from "vitest";
 import {
   isUsageBlocked,
+  pageLock,
   limitReached,
   policyForHost,
   policyForSection,
@@ -90,5 +91,35 @@ describe("daily part limits", () => {
     expect(
       limitReached(policyForSection(sectionPolicies, "example.com", "/shorts"), spent("/shorts")),
     ).toBe(false);
+  });
+});
+
+describe("pageLock", () => {
+  const limits = {
+    sites: { "example.com": { warnSeconds: null, limitSeconds: 100 } },
+    sections: { "example.com": { "/reels": { warnSeconds: null, limitSeconds: 10 } } },
+  };
+  const sectionSeconds = { "example.com": { "/reels": 12, "/": 5 } };
+
+  it("closes only the part that is over its own limit", () => {
+    const seconds = { "example.com": 17 };
+    expect(
+      pageLock(limits, seconds, sectionSeconds, { host: "example.com", section: "/reels" }),
+    ).toEqual({
+      kind: "part",
+      spent: 12,
+    });
+    expect(
+      pageLock(limits, seconds, sectionSeconds, { host: "example.com", section: "/" }),
+    ).toBeNull();
+  });
+
+  it("closes every part once the whole site is over", () => {
+    expect(
+      pageLock(limits, { "example.com": 100 }, sectionSeconds, {
+        host: "example.com",
+        section: "/",
+      }),
+    ).toEqual({ kind: "site", spent: 100 });
   });
 });

@@ -6,6 +6,14 @@ All notable changes to OpenMedia are documented here.
 >
 > **Wiki**: the [GitHub Wiki](https://github.com/skepjandi/openmedia/wiki) is the public-facing main wiki — architecture, recipe format, AI pipeline, security model, roadmap. Source-controlled editing surface is `docs/wiki/` in this repo; CI (`.github/workflows/sync-wiki.yml`) mirrors it to the GitHub Wiki on every merge to `main`. New single-PR changes belong here, not as new wiki pages.
 
+### fix(stats): a usage limit closes only what hit it
+
+**Area:** `fix(stats)`
+
+**Change:** A part of a site over its own daily limit (a first path segment such as `/reels`) now closes that page, natively as well as on screen, instead of only stopping the clock. The cover is drawn inside the page's own rectangle rather than over the whole screen, so the hub bar, the floating button and its fan, and every other site stay usable; other parts of the same site open normally from them. A site limit still closes every part.
+
+**Verified:** `yarn ts:check`, ESLint, Prettier and the stats tests, including a new `pageLock` test. **Not verified:** on a device.
+
 ### fix(fab): no square shadow around the floating button and its fan on Android
 
 **Area:** `fix(fab)`

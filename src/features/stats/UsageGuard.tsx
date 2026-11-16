@@ -6,12 +6,13 @@ import { primaryButton, quietButton } from "../settings/ui";
 import { formatDuration, sectionLabel } from "./format";
 import { limitStatus, secondsUntilMidnight } from "./limits";
 import {
-  limitReached,
+  pageLock,
   policyForHost,
   policyForSection,
   sectionUsageSeconds,
   usageSeconds,
   useUsageControl,
+  type PageLock,
   type UsagePolicy,
 } from "./policy";
 import { usageTargetOf } from "./section";
@@ -117,17 +118,18 @@ function TimeCheck({ host, section, spent, policy, reached }: NoticeProps) {
   );
 }
 
-/** Covers the paused site's page and says when it opens again. */
-function LimitReached({ host, seconds }: { host: string; seconds: number }) {
+/** Covers the closed page, and only the page, and says when it opens again. */
+function LimitReached({ host, lock, part }: { host: string; lock: PageLock; part: string | null }) {
   const t = useT();
   const favorites = useFavorites();
   const openSheet = useApp((state) => state.openSheet);
   const now = useNow(30_000);
-  const name = nameForHost(host, favorites);
+  const site = nameForHost(host, favorites);
+  const name = lock.kind === "part" && part ? `${part} · ${site}` : site;
   return (
     <div
       data-hit=""
-      className="fixed inset-0 z-10 grid place-items-center bg-ink/45 p-8 backdrop-blur-xl"
+      className="absolute inset-0 z-10 grid place-items-center bg-ink/45 p-8 backdrop-blur-xl pointer-events-auto"
     >
       <section
         aria-label={t("usage.limitReachedLabel")}
@@ -135,13 +137,13 @@ function LimitReached({ host, seconds }: { host: string; seconds: number }) {
         className="w-full max-w-sm rounded-3xl border border-hair bg-ink/90 p-6 text-center"
       >
         <div className="flex justify-center">
-          <SiteBadge host={host} name={name} />
+          <SiteBadge host={host} name={site} />
         </div>
         <h1 className="mt-4 text-xl font-semibold">{t("usage.limitReached")}</h1>
         <p className="mt-2 break-words text-sm leading-relaxed text-paper/70">
           {t("usage.pausedNotice", {
             name,
-            value: formatDuration(Math.floor(seconds), t),
+            value: formatDuration(Math.floor(lock.spent), t),
             left: formatDuration(secondsUntilMidnight(now), t),
           })}
         </p>
@@ -166,30 +168,50 @@ function LimitReached({ host, seconds }: { host: string; seconds: number }) {
   );
 }
 
-/** Whether today's limit has closed the page in front, and the figures that decided it. */
+/** Whether a limit has closed the page in front, and the figures that decided it. */
 export function useLimitBlock() {
   const control = useUsageControl();
   const page = useApp(selectPage);
   const isPro = useEntitlementStore((state) => state.status === "pro");
-  const host = page ? usageTargetOf(page.url ?? page.openedUrl, page.scope)?.host : undefined;
+  const target = page ? usageTargetOf(page.url ?? page.openedUrl, page.scope) : null;
+  const host = target?.host;
   const seconds = host ? usageSeconds(control.seconds, host) : 0;
   const policy = host ? policyForHost(control.limits.sites, host) : undefined;
-  const blocked = isPro && control.ready && limitReached(policy, seconds);
-  return { control, isPro, host, seconds, policy, blocked };
+  const lock =
+    isPro && control.ready && target
+      ? pageLock(control.limits, control.seconds, control.sectionSeconds, target)
+      : null;
+  return { control, isPro, host, target, seconds, policy, lock, blocked: lock !== null };
+}
+
+/**
+ * Rendered inside the page's own rectangle, so the hub bar, the fan and every other control stay
+ * usable while a site or a part of it is closed.
+ */
+export function LimitCover() {
+  const { host, target, lock } = useLimitBlock();
+  const sheet = useApp((state) => state.sheet);
+  const t = useT();
+  if (!lock || !host || sheet !== "none") return null;
+  return (
+    <LimitReached
+      host={host}
+      lock={lock}
+      part={lock.kind === "part" && target ? sectionLabel(target.section, t) : null}
+    />
+  );
 }
 
 export function UsageGuard() {
-  const { control, isPro, host, seconds, policy, blocked } = useLimitBlock();
+  const { control, isPro, seconds, policy, target, blocked } = useLimitBlock();
   const sessions = useApp((state) => state.sessions);
   const sheet = useApp((state) => state.sheet);
   const onboarding = useApp((state) => state.onboardingOpen);
   const reportError = useApp((state) => state.reportError);
-  const page = useApp(selectPage);
   const requested = useRef(new Map<string, boolean>());
   const queues = useRef(new Map<string, Promise<unknown>>());
   const warned = useRef(new Set<string>());
 
-  const target = page?.url ? usageTargetOf(page.url ?? page.openedUrl, page.scope) : null;
   const partPolicy = target
     ? policyForSection(control.limits.sections, target.host, target.section)
     : undefined;
@@ -211,10 +233,7 @@ export function UsageGuard() {
       const shouldBlock =
         isPro &&
         !!sessionTarget &&
-        limitReached(
-          policyForHost(control.limits.sites, sessionTarget.host),
-          usageSeconds(control.seconds, sessionTarget.host),
-        );
+        pageLock(control.limits, control.seconds, control.sectionSeconds, sessionTarget) !== null;
       const previous = requested.current.get(session.id);
       if (previous === shouldBlock || (previous === undefined && !shouldBlock)) continue;
       requested.current.set(session.id, shouldBlock);
@@ -305,7 +324,6 @@ export function UsageGuard() {
           reached={warning.reached}
         />
       )}
-      {blocked && sheet === "none" && host && <LimitReached host={host} seconds={seconds} />}
     </>
   );
 }
