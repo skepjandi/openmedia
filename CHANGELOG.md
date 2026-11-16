@@ -12,6 +12,14 @@ All notable changes to OpenMedia are documented here.
 
 **Change:** While the floating button is held, the ring that fills around it was clipped flat at the top, bottom and sides on Android: its stroke ends exactly on the edge of the SVG it is drawn in, and the SVG clips what is outside. The ring's SVG now has `overflow: visible`. Checked live in a running emulator, held for a moment: the ring is a whole circle. Not on a real phone.
 
+### fix(stats): the closed-part cover returns after a minute
+
+**Area:** `fix(stats)`
+
+**Change:** "Browse other parts" now sets the cover aside for one minute. If the page is still in the closed part when the minute ends, the cover comes back; moving to another part cancels it.
+
+**Verified:** `yarn ts:check`, ESLint, Prettier and the frontend tests. **Not verified:** on a device.
+
 ### fix(stats): a closed part no longer freezes the page
 
 **Area:** `fix(stats)`

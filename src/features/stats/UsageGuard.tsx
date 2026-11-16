@@ -118,6 +118,8 @@ function TimeCheck({ host, section, spent, policy, reached }: NoticeProps) {
   );
 }
 
+const BROWSE_MINUTE_MS = 60_000;
+
 /** Covers the closed page, and only the page, and says when it opens again. */
 function LimitReached({
   host,
@@ -208,10 +210,17 @@ export function LimitCover() {
   const sheet = useApp((state) => state.sheet);
   const t = useT();
   // A closed part is not frozen (the site's own navigation is the way out of it), so the cover can
-  // be set aside until the page moves to another part. It returns when the part is entered again.
+  // be set aside while the user looks for a way out. It returns a minute later if the page is still
+  // in the closed part, and when the part is entered again.
   const [browsing, setBrowsing] = useState<string | null>(null);
   const key = lock?.kind === "part" && target ? `${target.host}${target.section}` : null;
   if (key === null && browsing !== null) setBrowsing(null);
+  // Staying in the closed part brings the cover back after a minute.
+  useEffect(() => {
+    if (browsing === null) return;
+    const timer = window.setTimeout(() => setBrowsing(null), BROWSE_MINUTE_MS);
+    return () => window.clearTimeout(timer);
+  }, [browsing]);
   if (!lock || !host || sheet !== "none" || (key !== null && browsing === key)) return null;
   return (
     <LimitReached
