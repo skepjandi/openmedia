@@ -197,7 +197,8 @@ input {
   opacity: 0;
 }
 
-.fab[data-hold="charging"] .fab-ring circle {
+.fab[data-hold="charging"] .fab-ring circle,
+.fan-item[data-hold="charging"] .fab-ring circle {
   opacity: 1;
   animation: ring-fill 380ms linear forwards;
 }
@@ -563,6 +564,7 @@ svg {
 /* The hold ring is progress feedback, not decoration: it has to fill over the hold time or the
    press shows no sign it is charging. It is a slow stroke with no flashing, so it keeps its
    duration under Reduce Motion and epilepsy protection. */
-:root[data-calm] .fab[data-hold="charging"] .fab-ring circle {
+:root[data-calm] .fab[data-hold="charging"] .fab-ring circle,
+:root[data-calm] .fan-item[data-hold="charging"] .fab-ring circle {
   animation-duration: 380ms !important;
 }

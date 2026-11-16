@@ -95,6 +95,11 @@ export function Fab() {
 
   const [position, setPosition] = useState<FabPosition>(loadPosition);
   const [gesture, setGesture] = useState<GestureState>(idle);
+  const [controlsCharging, setControlsCharging] = useState(false);
+  const stopControlsHold = () => {
+    clearTimeout(controlsHold.current);
+    setControlsCharging(false);
+  };
   const gestureRef = useRef<GestureState>(idle);
   const holdTimer = useRef(0);
   const ignorePress = useRef(false);
@@ -423,17 +428,20 @@ export function Fab() {
         aria-label={t("fab.videoControls")}
         aria-pressed={controlsOn}
         tabIndex={fanOpen ? 0 : -1}
+        data-hold={controlsCharging ? "charging" : "idle"}
         onPointerDown={() => {
           controlsHeld.current = false;
+          setControlsCharging(true);
           controlsHold.current = window.setTimeout(() => {
             controlsHeld.current = true;
+            setControlsCharging(false);
             openSheet("video-controls");
             dispatch({ type: "dismiss" });
           }, HOLD_MS);
         }}
-        onPointerUp={() => clearTimeout(controlsHold.current)}
-        onPointerLeave={() => clearTimeout(controlsHold.current)}
-        onPointerCancel={() => clearTimeout(controlsHold.current)}
+        onPointerUp={stopControlsHold}
+        onPointerLeave={stopControlsHold}
+        onPointerCancel={stopControlsHold}
         onContextMenu={(event) => event.preventDefault()}
         onClick={() => {
           if (controlsHeld.current) {
@@ -455,6 +463,9 @@ export function Fab() {
         }`}
       >
         <VideoControlsIcon on={controlsOn} />
+        <svg className="fab-ring" viewBox="0 0 64 64" aria-hidden="true">
+          <circle cx="32" cy="32" r="31" pathLength="1" />
+        </svg>
       </button>
 
       <button
