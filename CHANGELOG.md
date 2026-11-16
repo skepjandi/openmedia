@@ -6,6 +6,12 @@ All notable changes to OpenMedia are documented here.
 >
 > **Wiki**: the [GitHub Wiki](https://github.com/skepjandi/openmedia/wiki) is the public-facing main wiki — architecture, recipe format, AI pipeline, security model, roadmap. Source-controlled editing surface is `docs/wiki/` in this repo; CI (`.github/workflows/sync-wiki.yml`) mirrors it to the GitHub Wiki on every merge to `main`. New single-PR changes belong here, not as new wiki pages.
 
+### fix(fab): no ghost ring behind the held floating button on Android
+
+**Area:** `fix(fab)`
+
+**Change:** Since the held button is moved in to stay on screen, it travels as it grows, and Android left a frame of the ring of the moment before behind it: a second, half-filled ring and a grey square beside the open button. The button now has a layer of its own (`will-change: transform`), as the fan items have. Checked live on the emulator, three times open and once held: no ghost, the ring whole, the button inside the screen, the idle button unchanged. Not on a real phone.
+
 ### fix(fab): the enlarged floating button stays inside the screen
 
 **Area:** `fix(fab)`

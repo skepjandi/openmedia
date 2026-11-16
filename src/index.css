@@ -209,6 +209,12 @@ input {
   will-change: transform, opacity;
 }
 
+/* The button itself moves and grows too (it is moved in to stay on screen while held): without a
+   layer of its own Android left the ring of the moment before behind it, with a grey square. */
+.fab {
+  will-change: transform;
+}
+
 .fan-item,
 .fan-scrim {
   backface-visibility: hidden;
