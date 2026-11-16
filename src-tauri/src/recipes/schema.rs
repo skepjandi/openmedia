@@ -396,6 +396,13 @@ impl Recipe {
     }
 
     pub(super) fn validate(&self) -> Result<()> {
+        self.validate_with(false)
+    }
+
+    /// `official`: the recipe is one the maintainers ship (reviewed in a pull request), which may
+    /// carry `videoMenu` rules; every other imported recipe may not, since they click the site's
+    /// own controls.
+    pub(super) fn validate_with(&self, official: bool) -> Result<()> {
         if self.schema != SCHEMA_VERSION {
             return Err(Error::Recipe(format!(
                 "recipe {} uses unsupported schema {}",
@@ -487,7 +494,7 @@ impl Recipe {
                     close,
                     ..
                 } => {
-                    if self.origin == Origin::Imported {
+                    if self.origin == Origin::Imported && !official {
                         return Err(Error::Recipe(format!(
                             "video menu {id} clicks the site's own controls, which a shared recipe cannot"
                         )));

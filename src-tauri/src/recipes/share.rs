@@ -34,6 +34,9 @@ pub enum Source {
     /// A recipe of the bundled library (official or community), or one about to be shared: the id
     /// must be `market.` and is kept.
     Bundled,
+    /// A recipe of the official bundled library: the maintainers' own, which may carry `videoMenu`
+    /// rules. Only the bundled loader uses this.
+    Official,
     /// One of our own saved files: the id must already be under `imported.` (written by an
     /// earlier version) or `market.`.
     Stored,
@@ -105,7 +108,10 @@ fn parse_value(value: serde_json::Value, source: Source) -> Result<Recipe> {
         serde_json::from_value(value).map_err(|e| Error::Recipe(e.to_string()))?;
     recipe.origin = Origin::Imported;
     recipe.id = shared_id(source, &recipe.id)?;
-    recipe.validate()?;
+    // Installed copies of official recipes are ones this app wrote from its own bundle.
+    let official = source == Source::Official
+        || (source == Source::Stored && recipe.id.starts_with(super::bundled::OFFICIAL_ID_PREFIX));
+    recipe.validate_with(official)?;
     check_shared(&recipe)?;
     Ok(recipe)
 }
@@ -113,9 +119,9 @@ fn parse_value(value: serde_json::Value, source: Source) -> Result<Recipe> {
 fn shared_id(source: Source, id: &str) -> Result<String> {
     let has_prefix = id.starts_with(IMPORTED_PREFIX) || id.starts_with(MARKET_PREFIX);
     let id = match source {
-        Source::Bundled if id.starts_with(MARKET_PREFIX) => id.to_owned(),
+        Source::Bundled | Source::Official if id.starts_with(MARKET_PREFIX) => id.to_owned(),
         Source::Stored if has_prefix => id.to_owned(),
-        Source::Bundled | Source::Stored => {
+        Source::Bundled | Source::Official | Source::Stored => {
             return Err(Error::Recipe(format!("recipe id {id} is not allowed here")));
         }
     };
@@ -356,6 +362,30 @@ fn rule_preview(rule: &Rule) -> RulePreview {
 
 #[cfg(test)]
 mod tests {
+
+    fn menu_recipe(id: &str) -> String {
+        format!(
+            r#"{{"schema":1,"id":"{id}","name":"Menu","version":"1.0.0","origin":"user","tags":["mobile"],
+            "match":["https://player.example.com/*"],
+            "options":[{{"id":"q","label":"Quality","description":"d","group":"content","default":true}}],
+            "rules":[{{"id":"q-menu","label":"Quality","type":"videoMenu","option":"q","kind":"quality","title":"Quality",
+              "open":[{{"css":"button.gear"}}],"items":{{"css":"li.level"}},"selected":{{"attr":"aria-checked"}}}}]}}"#
+        )
+    }
+
+    #[test]
+    fn only_the_official_library_may_carry_a_rule_that_clicks_the_sites_controls() {
+        let official = menu_recipe("market.official.example");
+        assert!(parse_shared(official.as_bytes(), Source::Official).is_ok());
+        // The same recipe as a community one, or one about to be shared, is refused.
+        assert!(parse_shared(official.as_bytes(), Source::Bundled).is_err());
+        let community = menu_recipe("market.community.example");
+        assert!(parse_shared(community.as_bytes(), Source::Official).is_ok());
+        assert!(parse_shared(community.as_bytes(), Source::Bundled).is_err());
+        // An installed copy keeps working only when it is an official one.
+        assert!(parse_shared(official.as_bytes(), Source::Stored).is_ok());
+        assert!(parse_shared(community.as_bytes(), Source::Stored).is_err());
+    }
     use super::*;
 
     fn recipe_json(id: &str, extra: &str) -> String {

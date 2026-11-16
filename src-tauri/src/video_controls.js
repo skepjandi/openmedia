@@ -608,6 +608,45 @@
         }
       },
       {
+        // JW Player: its API is reached through the container the video is in.
+        find: function (video) {
+          if (typeof window.jwplayer !== 'function') return null;
+          var holder = video.closest && video.closest('.jwplayer');
+          var player = holder && holder.id ? window.jwplayer(holder.id) : null;
+          return player && typeof player.getQualityLevels === 'function' ? player : null;
+        },
+        group: function (jw) {
+          var levels = jw.getQualityLevels();
+          if (!Array.isArray(levels)) return null;
+          if (levels.length < 2) return null;
+          var current = jw.getCurrentQuality();
+          return {
+            kind: 'quality',
+            label: 'Quality',
+            items: levels.map(function (level, index) { return { label: String(level.label), selected: index === current }; }),
+            select: function (at) { jw.setCurrentQuality(at); }
+          };
+        }
+      },
+      {
+        // Vidstack (a media-player element): `qualities` lists them, one of which can be selected.
+        find: function (video) {
+          var player = video.closest && video.closest('media-player');
+          return player && player.qualities && typeof player.qualities.autoSelect === 'function' ? player : null;
+        },
+        group: function (player) {
+          var list = Array.prototype.slice.call(player.qualities);
+          list.sort(function (a, b) { return (b.height || 0) - (a.height || 0); });
+          var labels = ['Auto'].concat(list.map(function (quality) { return quality.height ? quality.height + 'p' : String(quality.id); }));
+          var on = 0;
+          if (!player.qualities.auto) list.forEach(function (quality, index) { if (quality.selected) on = index + 1; });
+          return qualityGroup(labels, on, function (at) {
+            if (at === 0) player.qualities.autoSelect();
+            else list[at - 1].selected = true;
+          });
+        }
+      },
+      {
         // A player object (YouTube's) that answers for its qualities and holds the video.
         find: function (video) {
           var places = [

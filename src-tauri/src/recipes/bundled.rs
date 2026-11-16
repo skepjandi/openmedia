@@ -259,7 +259,12 @@ pub fn parse_all(files: &[File]) -> Vec<Result<Bundled>> {
 }
 
 fn parse_one(file: &File) -> Result<Bundled> {
-    let recipe = share::parse_shared(file.text.as_bytes(), Source::Bundled)
+    let source = if file.channel == Channel::Official {
+        Source::Official
+    } else {
+        Source::Bundled
+    };
+    let recipe = share::parse_shared(file.text.as_bytes(), source)
         .map_err(|error| problem(file, &error.to_string()))?;
     let official_id = recipe.id.starts_with(OFFICIAL_ID_PREFIX);
     if official_id != (file.channel == Channel::Official) {

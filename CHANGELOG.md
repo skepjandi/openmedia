@@ -6,6 +6,14 @@ All notable changes to OpenMedia are documented here.
 >
 > **Wiki**: the [GitHub Wiki](https://github.com/skepjandi/openmedia/wiki) is the public-facing main wiki — architecture, recipe format, AI pipeline, security model, roadmap. Source-controlled editing surface is `docs/wiki/` in this repo; CI (`.github/workflows/sync-wiki.yml`) mirrors it to the GitHub Wiki on every merge to `main`. New single-PR changes belong here, not as new wiki pages.
 
+### feat(video): official recipes may use videoMenu; JW Player and Vidstack quality lists from any site
+
+**Area:** `feat(video)`, `feat(recipes)`
+
+**Change:** Asked to give the built-in recipes' sites the player options, I looked at each player on the Android emulator through the WebView's remote debugging. What came out:
+- **Miruro** (its player is `strm.cx`, built with Vidstack) and **Internet Archive** (JW Player) are not recipe cases: their players are libraries, so detectors cover them and every other site that uses them. Added JW Player (quality levels from `getQualityLevels`) and Vidstack (`media-player.qualities`, with Auto) to the detectors in `video_controls.js`. Checked on a Vidstack page with an HLS stream on the emulator: the list (Auto, 1080p to 184p) appeared and picking 480p set the player to 480p. Miruro's stream and Archive's have one level each, so neither shows a list today; JW Player is checked only against its live API shape and fake objects.
+- **`videoMenu` rules are allowed in official recipes** (`Source::Official`, and installed copies of `market.official.*`), still refused in community, imported and shared recipes (AGENTS.md invariant 7 says so now). No official recipe uses one yet: Dailymotion's player menu did not open from synthetic or touch input in its frame, Vimeo's controls are hashed CSS modules shown on hover, Rumble's and Bilibili's players did not load without their app. Writing selectors I cannot run would break the rule that recipe rules are tested.
+
 ### feat(ai): tools for the assistant and the video controls to offer a site's own player options (quality, captions, audio)
 
 **Area:** `feat(ai)`, `feat(video)`, `feat(recipes)`
