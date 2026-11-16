@@ -6,6 +6,12 @@ All notable changes to OpenMedia are documented here.
 >
 > **Wiki**: the [GitHub Wiki](https://github.com/skepjandi/openmedia/wiki) is the public-facing main wiki — architecture, recipe format, AI pipeline, security model, roadmap. Source-controlled editing surface is `docs/wiki/` in this repo; CI (`.github/workflows/sync-wiki.yml`) mirrors it to the GitHub Wiki on every merge to `main`. New single-PR changes belong here, not as new wiki pages.
 
+### feat(video): drag the player down to shrink it into the small player, as in the YouTube app
+
+**Area:** `feat(video)`
+
+**Change:** On a watch page (not a feed), dragging the video down from the top of the page shrinks it as the finger goes into the small player in the corner (`dragStart`/`dragMove`/`dragEnd` in `video_controls.js`). Let go past 20 % of half the screen, or flick down, and it stays (the app then moves the page to the corner, as with the float button); short of that it goes back. Sideways drags (seek) and up (scroll) stay with the site. Feeds (Shorts, Reels) are unchanged: the swipe still goes to the next video. Needs the video controls on. A watch page at its top now counts as scrolled to the app's pull to refresh (`document[Symbol.for('openmedia.holdRefresh')]`, read by the touch scripts in the Android and iOS plugins), because on Android the refresh layer took the drag before the page saw it, so a pull down at the top of a watch page no longer refreshes it. Checked on the iPhone 17 Pro Max simulator and an Android emulator (drag, small player in the corner, page behind); not on a real device.
+
 ### fix(video): a press on the small player's or panel's button no longer clicks the page under it (Android, desktop)
 
 **Area:** `fix(video)`

@@ -162,6 +162,7 @@ private let touchScrollScript = """
         if (node.scrollTop > 0) { scrolled = true; break; }
         node = node.parentElement;
       }
+      if (document[Symbol.for('openmedia.holdRefresh')]) scrolled = true;
       try { window.webkit.messageHandlers.\(scrollHandlerName).postMessage(scrolled ? 1 : 0); } catch (error) {}
     }, { capture: true, passive: true });
   })();

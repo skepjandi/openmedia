@@ -1650,6 +1650,7 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
       if (node.scrollTop > 0) { scrolled = true; break; }
       node = node.parentElement;
     }
+    if (document[Symbol.for('openmedia.holdRefresh')]) scrolled = true;
     try { window.$SCROLL_OBJECT.postMessage(scrolled ? "1" : "0"); } catch (error) {}
   }, { capture: true, passive: true });
 })();

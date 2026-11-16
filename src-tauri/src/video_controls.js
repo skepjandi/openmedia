@@ -16,6 +16,7 @@
   var CURRENT = Symbol.for('openmedia.currentVideo');
   var NO_AUTOPLAY = Symbol.for('openmedia.noAutoplay');
   var MINI_WINDOW = Symbol.for('openmedia.miniWindow');
+  var REFRESH_HOLD = Symbol.for('openmedia.holdRefresh');
   var MINI_CLOSE = Symbol.for('openmedia.miniClose');
   var USER_PAUSE = Symbol.for('openmedia.userPause');
   var STORE = 'openmedia.video';
@@ -43,6 +44,11 @@
   var MINI_UNDO_MAX = 4; // times a site's pause is undone within the window below
   var MINI_UNDO_WINDOW_MS = 3000;
   var GHOST_MS = 500; // a touch's click comes this late at most, after its release
+  var DRAG_SLOP = 10; // px a finger moves before it is a drag, and which way
+  var DRAG_REACH = 0.5; // of the screen's height: how far down a drag is all the way to the small player
+  var DRAG_COMMIT = 0.2; // of that: letting go past it keeps the small player, short of it puts the video back
+  var DRAG_FLICK = 0.5; // px/ms: a flick this fast down keeps it too
+  var DRAG_SETTLE_MS = 200;
   var MINI_FIGHTS = 40; // and this many times, then the site wins
   var MINI_BOTTOM = 96; // px from the bottom edge, clear of the browser's own buttons
   var HIDE_MS = 3500; // the panel goes away this long after the last touch on it
@@ -400,21 +406,33 @@
       return element;
     }
 
+    // The app moves this page to the corner as it is and opens the page again in its place.
+    // Without an app to do that, the player stays over this page.
+    function askAppToFloat() {
+      try { window.webkit.messageHandlers.openmediaMini.postMessage({ float: true }); } catch (_) {}
+    }
+
     // Tells the app whether the small player is up, so it can keep the page when a link is tapped.
     function tellApp(up) {
       try { window.webkit.messageHandlers.openmediaMini.postMessage(up); } catch (_) {}
     }
 
-    function miniOn(video) {
+    function miniOn(video, from) {
       if (mini || !video.parentNode) return;
       var screenWidth = window.innerWidth || document.documentElement.clientWidth || 400;
       var screenHeight = window.innerHeight || document.documentElement.clientHeight || 800;
       var width = Math.round(Math.min(MINI_MAX, screenWidth * MINI_SHARE));
       var ratio = video.videoWidth > 0 && video.videoHeight > 0 ? video.videoWidth / video.videoHeight : 16 / 9;
       var height = Math.round(Math.min(screenHeight * 0.32, Math.max(90, width / ratio)));
+      // Started by a drag, it begins where the video was, full size, and the finger shrinks it.
+      var start = from ? {
+        right: screenWidth - from.right, bottom: screenHeight - from.bottom,
+        width: from.right - from.left, height: from.bottom - from.top
+      } : null;
       var root = make('div',
-        'position:fixed;right:' + MINI_EDGE + 'px;bottom:' + MINI_BOTTOM + 'px;width:' + width + 'px;height:' +
-        height + 'px;z-index:2147483647;background:#000;border-radius:12px;overflow:hidden;' +
+        'position:fixed;right:' + (start ? start.right : MINI_EDGE) + 'px;bottom:' + (start ? start.bottom : MINI_BOTTOM) +
+        'px;width:' + (start ? start.width : width) + 'px;height:' + (start ? start.height : height) +
+        'px;z-index:2147483647;background:#000;border-radius:' + (start ? 0 : 12) + 'px;overflow:hidden;' +
         'box-shadow:0 6px 24px rgba(0,0,0,.5);touch-action:none;-webkit-user-select:none;user-select:none');
       root.setAttribute('data-openmedia-mini', '');
       var state = {
@@ -428,6 +446,7 @@
         bottom: MINI_BOTTOM,
         width: width,
         height: height,
+        start: start,
         stops: []
       };
       var close = miniButton('close', 28, 'top:6px;right:6px', function () { miniOff(); });
@@ -544,6 +563,109 @@
       if (state.playing && video.paused) { try { video.play().catch(function () {}); } catch (_) {} }
     }
 
+    // Dragging the player down on a watch page, from the top of the page, shrinks it into the small
+    // player as the finger goes, as the YouTube app does; let go far enough (or flick) and it
+    // stays, short of that it goes back. Not in a feed, where a swipe down is the way to the
+    // previous video, and not sideways (a seek) or up (a scroll).
+    var drag = null;
+
+    // The app's own pull to refresh would take a drag down from the top of the page, and decides
+    // before the page can say anything about a touch that has just begun. So the page says so in
+    // advance: while a watch page is at its top with its video on screen, it counts as scrolled.
+    var refreshHeld = false;
+    function syncRefreshHold() {
+      var top = window.scrollY || (document.scrollingElement && document.scrollingElement.scrollTop) || 0;
+      var want = !mini && !document.hidden && panelOn() && !onFeedPage() && watchPage() && top <= 1 && !!focus();
+      if (want === refreshHeld) return;
+      refreshHeld = want;
+      document[REFRESH_HOLD] = want;
+      try { window.openmediaScroll.postMessage(want ? '1' : '0'); } catch (_) {}
+      try { window.webkit.messageHandlers.openmediaScroll.postMessage(want ? 1 : 0); } catch (_) {}
+    }
+
+    function miniDrag(progress) {
+      if (!mini || !mini.start) return;
+      var a = mini.start;
+      var mix = function (from, to) { return Math.round(from + (to - from) * progress); };
+      mini.root.style.right = mix(a.right, mini.right) + 'px';
+      mini.root.style.bottom = mix(a.bottom, mini.bottom) + 'px';
+      mini.root.style.width = mix(a.width, mini.width) + 'px';
+      mini.root.style.height = mix(a.height, mini.height) + 'px';
+      mini.root.style.borderRadius = Math.round(12 * progress) + 'px';
+    }
+
+    function settleMini(to, then) {
+      var state = mini;
+      if (!state) return;
+      state.root.style.transition = 'right,bottom,width,height,border-radius'.split(',').map(function (name) {
+        return name + ' ' + DRAG_SETTLE_MS + 'ms ease-out';
+      }).join(',');
+      to();
+      setTimeout(function () {
+        if (mini !== state) return;
+        state.root.style.transition = '';
+        then();
+      }, DRAG_SETTLE_MS + 20);
+    }
+
+    function dragStart(event) {
+      drag = null;
+      if (mini || !event.touches || event.touches.length !== 1 || document.hidden || window.__openmediaHold) return;
+      if (!panelOn() || onFeedPage() || !watchPage() || inPanel(event.target)) return;
+      var top = window.scrollY || (document.scrollingElement && document.scrollingElement.scrollTop) || 0;
+      if (top > 1) return;
+      var video = focus();
+      if (!video) return;
+      var touch = event.touches[0];
+      var box = boxOf(video);
+      if (!(touch.clientX >= box.left && touch.clientX <= box.right && touch.clientY >= box.top && touch.clientY <= box.bottom)) return;
+      if (onSiteButton(event.target, video)) return;
+      drag = {
+        video: video, x: touch.clientX, y: touch.clientY, engaged: false,
+        box: { left: box.left, right: box.right, top: box.top, bottom: box.bottom },
+        last: { y: touch.clientY, at: Date.now() }, speed: 0
+      };
+    }
+
+    function dragMove(event) {
+      if (!drag || !event.touches || !event.touches.length) return;
+      var touch = event.touches[0];
+      var dx = touch.clientX - drag.x;
+      var dy = touch.clientY - drag.y;
+      if (!drag.engaged) {
+        if (Math.abs(dx) > DRAG_SLOP && Math.abs(dx) >= Math.abs(dy)) { drag = null; return; }
+        if (dy < -DRAG_SLOP) { drag = null; return; }
+        if (dy < DRAG_SLOP || dy < Math.abs(dx) * 1.4) return;
+        hide();
+        miniOn(drag.video, drag.box);
+        if (!mini) { drag = null; return; }
+        drag.engaged = true;
+      }
+      event.stopImmediatePropagation();
+      if (event.cancelable) event.preventDefault();
+      var now = Date.now();
+      if (now > drag.last.at) drag.speed = (touch.clientY - drag.last.y) / (now - drag.last.at);
+      drag.last = { y: touch.clientY, at: now };
+      var reach = (window.innerHeight || document.documentElement.clientHeight || 800) * DRAG_REACH;
+      drag.progress = Math.min(1, Math.max(0, dy / reach));
+      miniDrag(drag.progress);
+    }
+
+    function dragEnd(event, cancelled) {
+      var held = drag;
+      drag = null;
+      if (!held || !held.engaged || !mini) return;
+      event.stopImmediatePropagation();
+      if (event.cancelable) event.preventDefault();
+      ghostUntil = Date.now() + GHOST_MS;
+      var keep = !cancelled && (held.progress >= DRAG_COMMIT || (held.speed > DRAG_FLICK && held.progress > 0.08));
+      if (keep) {
+        settleMini(function () { miniDrag(1); }, askAppToFloat);
+      } else {
+        settleMini(function () { miniDrag(0); }, miniOff);
+      }
+    }
+
     // The app moved this page into a small window of its own in the corner: the player fills it.
     var MINI_WINDOW_STYLE = 'html,body{background:transparent!important}body{visibility:hidden!important}';
     function miniWindow(on) {
@@ -639,9 +761,7 @@
           miniOff();
         } else {
           miniOn(target);
-          // The app moves this page to the corner as it is and opens the page again in its place.
-          // Without an app to do that, the player stays over this page.
-          try { window.webkit.messageHandlers.openmediaMini.postMessage({ float: true }); } catch (_) {}
+          askAppToFloat();
         }
         hide();
       });
@@ -723,6 +843,7 @@
     }
 
     function tick() {
+      syncRefreshHold();
       if (active()) {
         document.querySelectorAll('video').forEach(prepare);
       }
@@ -1032,6 +1153,10 @@
     on(window, 'pointermove', onPointerMove, { capture: true, passive: true });
     on(window, 'pointercancel', onPointerCancel, { capture: true, passive: true });
     on(window, 'pointerup', onPointerUp, { capture: true });
+    on(window, 'touchstart', dragStart, { capture: true, passive: true });
+    on(window, 'touchmove', dragMove, { capture: true, passive: false });
+    on(window, 'touchend', function (event) { dragEnd(event, false); }, { capture: true, passive: false });
+    on(window, 'touchcancel', function (event) { dragEnd(event, true); }, { capture: true, passive: false });
     on(window, 'touchstart', onTouchStart, { capture: true, passive: true });
     on(window, 'touchmove', keepFromSite, { capture: true, passive: true });
     on(window, 'touchend', onTouchEnd, { capture: true });
@@ -1088,6 +1213,7 @@
         miniOff();
         delete document[MINI_WINDOW];
         delete document[MINI_CLOSE];
+        delete document[REFRESH_HOLD];
         observers.forEach(function (observer) { observer.disconnect(); });
         teardown.forEach(function (step) { try { step(); } catch (_) {} });
         if (ui && ui.root.parentNode) ui.root.parentNode.removeChild(ui.root);

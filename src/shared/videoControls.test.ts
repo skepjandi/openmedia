@@ -237,6 +237,8 @@ interface Page {
   teardown: () => void;
   /** What the page told the app about the small player. */
   posts: unknown[];
+  /** The page's document, for what the controls leave on it. */
+  document: Record<string | symbol, unknown>;
   /** Callbacks of the mutation observers the controls made, as the browser would call them. */
   observers: Array<() => void>;
 }
@@ -521,6 +523,7 @@ function load(options: {
     teardown: () => (document[Symbol.for("openmedia.videoControls")] as () => void)(),
     observers,
     posts,
+    document,
   };
 }
 
@@ -850,6 +853,97 @@ describe("video controls", () => {
     expect(page.win("click", { target: { closest: () => null }, clientX: 540, clientY: 700 })).toBe(
       true,
     );
+  });
+
+  describe("dragging the player down on a watch page", () => {
+    const watch = () => {
+      const home = new FakeElement();
+      const video = new PlacedVideo();
+      home.appendChild(video as unknown as FakeElement);
+      const page = load({ videos: [video], current: video, pathname: "/watch", feed: false });
+      return { home, video, page };
+    };
+    const touch = (y: number, x = 200) => ({ touches: [{ clientX: x, clientY: y }] });
+    const miniBox = (page: Page) =>
+      page.body.children.find((child) => "data-openmedia-mini" in child.attributes);
+
+    it("shrinks the video into the small player as the finger goes, and keeps it past the halfway", () => {
+      const { video, page } = watch();
+      page.win("touchstart", touch(100));
+      page.win("touchmove", touch(130));
+      const box = miniBox(page);
+      expect(box).toBeDefined();
+      expect(video.parentNode).toBe(box);
+      const early = Number.parseInt(box?.style.width ?? "0");
+      page.win("touchmove", touch(300));
+      const later = Number.parseInt(box?.style.width ?? "0");
+      expect(later).toBeLessThan(early);
+      expect(page.win("touchend", touch(300))).toBe(true);
+      page.runTimers();
+      expect(page.posts).toContainEqual({ float: true });
+      expect(video.parentNode).toBe(box);
+    });
+
+    it("puts the video back when let go short of the way", () => {
+      const { home, video, page } = watch();
+      page.win("touchstart", touch(100));
+      page.win("touchmove", touch(140));
+      page.win("touchend", touch(140));
+      page.runTimers();
+      expect(video.parentNode).toBe(home);
+      expect(page.posts).not.toContainEqual({ float: true });
+    });
+
+    it("keeps it for a quick flick", () => {
+      const { video, page } = watch();
+      let now = 1000;
+      vi.spyOn(Date, "now").mockImplementation(() => now);
+      page.win("touchstart", touch(100));
+      now += 10;
+      page.win("touchmove", touch(112));
+      now += 20;
+      page.win("touchmove", touch(150));
+      page.win("touchend", touch(150));
+      page.runTimers();
+      expect(page.posts).toContainEqual({ float: true });
+      expect(video.parentNode).not.toBeNull();
+      vi.restoreAllMocks();
+    });
+
+    it("leaves a sideways drag (a seek) and a drag up (a scroll) to the site", () => {
+      const sideways = watch();
+      sideways.page.win("touchstart", touch(100, 100));
+      expect(sideways.page.win("touchmove", touch(120, 220))).toBe(false);
+      expect(miniBox(sideways.page)).toBeUndefined();
+      const up = watch();
+      up.page.win("touchstart", touch(300));
+      expect(up.page.win("touchmove", touch(200))).toBe(false);
+      expect(up.page.win("touchmove", touch(400))).toBe(false);
+      expect(miniBox(up.page)).toBeUndefined();
+    });
+
+    it("tells the app's pull to refresh in advance that the page counts as scrolled", () => {
+      const { page } = watch();
+      page.tick();
+      expect(page.posts).toEqual([]);
+      const held = () =>
+        (page.document as Record<symbol, unknown>)[Symbol.for("openmedia.holdRefresh")];
+      expect(held()).toBe(true);
+      const video = new PlacedVideo();
+      const feed = load({ videos: [video], current: video, feed: true, pathname: "/watch" });
+      feed.tick();
+      expect(
+        (feed.document as Record<symbol, unknown>)[Symbol.for("openmedia.holdRefresh")],
+      ).toBeFalsy();
+    });
+
+    it("does nothing in a feed, where the swipe is the way to the next video", () => {
+      const video = new PlacedVideo();
+      const feed = load({ videos: [video], current: video, feed: true, pathname: "/watch" });
+      feed.win("touchstart", touch(100));
+      expect(feed.win("touchmove", touch(300))).toBe(false);
+      expect(miniBox(feed)).toBeUndefined();
+    });
   });
 
   it("closes a small player whose video the site's player took out of the box", () => {
