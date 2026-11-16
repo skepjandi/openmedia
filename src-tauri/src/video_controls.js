@@ -1194,8 +1194,19 @@
     // The panel: three buttons above a row (mute, time left, speed) above the seek bar,
     // fixed above the bottom edge. Everything is made here as plain elements and nothing is read
     // back from the site.
+    // Where the panel lives: the page's body, or the element the page has made full screen (all
+    // else is hidden under it). A site that swaps its body out takes the panel with it, so it is
+    // put back rather than left showing nowhere.
+    function mount() {
+      if (!ui) return;
+      var full = document.fullscreenElement || document.webkitFullscreenElement;
+      var parent = full && full.tagName !== 'VIDEO' && full.tagName !== 'IFRAME' ? full :
+        (document.body || document.documentElement);
+      if (parent && ui.root.parentNode !== parent) parent.appendChild(ui.root);
+    }
+
     function build(video) {
-      if (ui) return ui;
+      if (ui) { mount(); return ui; }
       var parent = document.body || document.documentElement;
       if (!parent) return null;
       var root = make('div',

@@ -6,6 +6,14 @@ All notable changes to OpenMedia are documented here.
 >
 > **Wiki**: the [GitHub Wiki](https://github.com/skepjandi/openmedia/wiki) is the public-facing main wiki — architecture, recipe format, AI pipeline, security model, roadmap. Source-controlled editing surface is `docs/wiki/` in this repo; CI (`.github/workflows/sync-wiki.yml`) mirrors it to the GitHub Wiki on every merge to `main`. New single-PR changes belong here, not as new wiki pages.
 
+### fix(video): the tap panel is put back when a page swaps its body, and shown over a site's full screen
+
+**Area:** `fix(video)`
+
+**Change:** The panel was made once and kept. A site that replaced its `<body>` (single-page navigation) took the panel with it, and every later tap showed a panel that was not in the page, so the site's own controls were all the reader saw. A page's own full screen also covered it. `mount()` in `video_controls.js` now runs each time the panel is used: it puts the panel back on the body, or inside the full-screen element when the site made one (not a `<video>` or `<iframe>`, which cannot hold it).
+
+**Verified:** `videoControls.test.ts` still passes. **Not verified:** on a device.
+
 ### feat(fab): incognito moves across the button; a video controls switch beside it; video controls get a page
 
 **Area:** `feat(fab)`, `feat(settings)`
