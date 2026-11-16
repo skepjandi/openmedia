@@ -317,6 +317,7 @@ function load(options: {
     hidden: false,
     body,
     documentElement: body,
+    getElementById: () => null,
     createElement: () => new FakeElement(),
     createElementNS: () => new FakeElement(),
     createComment: () => new FakeElement(),

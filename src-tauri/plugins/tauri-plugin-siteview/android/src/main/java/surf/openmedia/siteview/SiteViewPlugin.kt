@@ -24,6 +24,7 @@ import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricPrompt
@@ -175,6 +176,57 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
     private var touchTarget: View? = null
     /** The window a page opened with `window.open`: a sign-in window. It sits above the page. */
     private var signInWindow: WebView? = null
+
+    /** The full screen a page's video asked for: the box over the window and what to tell the page. */
+    private var fullScreenBox: FrameLayout? = null
+    private var fullScreenCallback: WebChromeClient.CustomViewCallback? = null
+
+    private fun showFullScreen(content: View, callback: WebChromeClient.CustomViewCallback) {
+        if (fullScreenBox != null) {
+            callback.onCustomViewHidden()
+            return
+        }
+        val decor = activity.window.decorView as ViewGroup
+        val box = FrameLayout(activity)
+        box.setBackgroundColor(Color.BLACK)
+        box.addView(
+            content,
+            FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT,
+            ),
+        )
+        // The page's video has no controls of its own here, so the way out is ours.
+        val close = TextView(activity)
+        close.text = "\u2715"
+        close.setTextColor(Color.WHITE)
+        close.textSize = 20f
+        close.gravity = Gravity.CENTER
+        close.setBackgroundColor(0x99000000.toInt())
+        val size = (44 * activity.resources.displayMetrics.density).toInt()
+        val margin = (16 * activity.resources.displayMetrics.density).toInt()
+        val params = FrameLayout.LayoutParams(size, size, Gravity.TOP or Gravity.END)
+        params.setMargins(0, margin, margin, 0)
+        close.setOnClickListener { hideFullScreen() }
+        box.addView(close, params)
+        decor.addView(
+            box,
+            ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT),
+        )
+        fullScreenBox = box
+        fullScreenCallback = callback
+        WindowCompat.getInsetsController(activity.window, decor).hide(WindowInsetsCompat.Type.systemBars())
+    }
+
+    private fun hideFullScreen() {
+        val box = fullScreenBox ?: return
+        fullScreenBox = null
+        (box.parent as? ViewGroup)?.removeView(box)
+        fullScreenCallback?.onCustomViewHidden()
+        fullScreenCallback = null
+        val decor = activity.window.decorView
+        WindowCompat.getInsetsController(activity.window, decor).show(WindowInsetsCompat.Type.systemBars())
+    }
     /** The session whose page opened the sign-in window. */
     private var signInOwner: String? = null
     /** The session whose page is loading the address the sign-in window handed back. */
@@ -899,6 +951,14 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
 
             override fun onCloseWindow(window: WebView) {
                 if (window === signInWindow) closeSignInWindow()
+            }
+
+            override fun onShowCustomView(content: View, callback: CustomViewCallback) {
+                showFullScreen(content, callback)
+            }
+
+            override fun onHideCustomView() {
+                hideFullScreen()
             }
         }
         view.webViewClient = object : WebViewClient() {

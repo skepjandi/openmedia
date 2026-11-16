@@ -350,6 +350,14 @@
     // otherwise the browser's full screen.
     function toggleFullscreen(video) {
       try {
+        // A site's own styles can crop a video that fills the screen; the whole picture is shown.
+        if (!document.getElementById('openmedia-fullscreen')) {
+          var sheet = make('style', '');
+          sheet.id = 'openmedia-fullscreen';
+          sheet.textContent = 'video:fullscreen,video:-webkit-full-screen{object-fit:contain!important;' +
+            'width:100%!important;height:100%!important;background:#000!important}';
+          (document.head || document.documentElement).appendChild(sheet);
+        }
         if (video.webkitDisplayingFullscreen && video.webkitExitFullscreen) { video.webkitExitFullscreen(); return; }
         var shown = document.fullscreenElement || document.webkitFullscreenElement;
         if (shown) { (document.exitFullscreen || document.webkitExitFullscreen).call(document); return; }
@@ -996,7 +1004,7 @@
         '-webkit-user-select:none;user-select:none');
       root.setAttribute('data-openmedia-controls', '');
       var card = make('div',
-        'pointer-events:auto;margin:0 12px;padding:10px 14px 2px;border-radius:18px;background:rgba(0,0,0,.62);' +
+        'position:relative;pointer-events:auto;margin:0 12px;padding:10px 14px 2px;border-radius:18px;background:rgba(0,0,0,.62);' +
         '-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)');
       var transport = make('div',
         'display:flex;align-items:center;justify-content:center;gap:30px;padding-bottom:6px');
@@ -1057,8 +1065,6 @@
         paint(target);
       });
       row.appendChild(mute);
-      if (floatButton) row.appendChild(floatButton);
-      row.appendChild(fullButton);
       row.appendChild(left);
       row.appendChild(pill);
       var seek = slider(30, function (ratio) {
@@ -1067,6 +1073,11 @@
         target.currentTime = ratio * target.duration;
         paint(target);
       });
+      // The small player's button in the top left corner, full screen in the top right.
+      floatButton.style.cssText += ';position:absolute;top:8px;left:10px';
+      fullButton.style.cssText += ';position:absolute;top:8px;right:10px';
+      card.appendChild(floatButton);
+      card.appendChild(fullButton);
       card.appendChild(transport);
       card.appendChild(row);
       card.appendChild(seek.track);
