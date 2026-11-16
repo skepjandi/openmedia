@@ -8,6 +8,7 @@ import {
   SETTINGS_SIZE,
   STATS_SIZE,
   TABS_SIZE,
+  enlargedCenter,
   fabCenter,
   fanLayout,
   fanTargetAt,
@@ -216,5 +217,22 @@ describe("peekCenterY", () => {
       phone.height - insets.bottom - PEEK_HEIGHT / 2,
     );
     expect(peekCenterY(400, phone, insets)).toBe(400);
+  });
+
+  it("draws the enlarged button inside the screen, ring included, wherever it rests", () => {
+    const reach = (FAB_SIZE / 2) * HOLD_SCALE + 2;
+    for (const edge of ["left", "right"] as const) {
+      for (const y of [0, 400, 5000]) {
+        const rest = fabCenter(edge, y, phone, insets);
+        const drawn = enlargedCenter(rest, phone, insets);
+        expect(drawn.x - reach).toBeGreaterThanOrEqual(0);
+        expect(drawn.x + reach).toBeLessThanOrEqual(phone.width);
+        expect(drawn.y - reach).toBeGreaterThanOrEqual(insets.top);
+        expect(drawn.y + reach).toBeLessThanOrEqual(phone.height - insets.bottom);
+      }
+    }
+    const middle = fabCenter("right", 400, phone, insets);
+    expect(enlargedCenter({ x: 200, y: 400 }, phone, insets)).toEqual({ x: 200, y: 400 });
+    expect(enlargedCenter(middle, phone, insets).x).toBeLessThan(middle.x);
   });
 });

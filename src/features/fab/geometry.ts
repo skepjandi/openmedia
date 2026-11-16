@@ -85,6 +85,22 @@ export function fabCenter(edge: Edge, y: number, viewport: Size, insets: Insets)
   };
 }
 
+/** Space kept between the enlarged button, its ring included, and the edge of the screen. */
+const ENLARGED_MARGIN = 4;
+
+/**
+ * Where the enlarged button (held, or with the fan open) is drawn: its resting centre, moved in
+ * far enough that it grows inside the screen. At rest it sits `EDGE_MARGIN` from the edge, which
+ * is less than its growth, so it was cut off there.
+ */
+export function enlargedCenter(center: Point, viewport: Size, insets: Insets): Point {
+  const reach = (FAB_SIZE / 2) * HOLD_SCALE + 2 + ENLARGED_MARGIN;
+  return {
+    x: clamp(center.x, reach, viewport.width - reach),
+    y: clamp(center.y, insets.top + reach, viewport.height - insets.bottom - reach),
+  };
+}
+
 /** Where the button settles when released at `drop`: the nearer edge, clamped on screen. */
 export function snapToEdge(drop: Point, viewport: Size, insets: Insets): { edge: Edge; y: number } {
   const edge: Edge = drop.x < viewport.width / 2 ? "left" : "right";

@@ -6,6 +6,12 @@ All notable changes to OpenMedia are documented here.
 >
 > **Wiki**: the [GitHub Wiki](https://github.com/skepjandi/openmedia/wiki) is the public-facing main wiki — architecture, recipe format, AI pipeline, security model, roadmap. Source-controlled editing surface is `docs/wiki/` in this repo; CI (`.github/workflows/sync-wiki.yml`) mirrors it to the GitHub Wiki on every merge to `main`. New single-PR changes belong here, not as new wiki pages.
 
+### fix(fab): the enlarged floating button stays inside the screen
+
+**Area:** `fix(fab)`
+
+**Change:** The button grows by 30 % while it is held and while the fan is open, but it rests only 10 px from the screen edge, so its growth, ring and all, went past the edge and was cut off (right, top and bottom). While enlarged it is now drawn moved in far enough to stay 4 px inside every edge (`enlargedCenter` in `geometry.ts`); the fan's layout is unchanged. Checked live on the Android emulator by shifting the held button 10 px inward: the whole ring shows. Not tried on a real phone; iOS gets the same placement.
+
 ### fix(fab): the hold ring around the floating button is no longer cut off on Android
 
 **Area:** `fix(fab)`

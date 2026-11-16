@@ -9,6 +9,7 @@ import {
   FAVORITE_SIZE,
   HISTORY_SIZE,
   HOLD_SCALE,
+  enlargedCenter,
   INCOGNITO_SIZE,
   PEEK_HEIGHT,
   PEEK_WIDTH,
@@ -224,6 +225,7 @@ export function Fab() {
   const PeekIcon = position.edge === "left" ? ChevronRightIcon : ChevronLeftIcon;
   const holdState = gesture.phase === "pressing" ? "charging" : fanOpen ? "open" : "idle";
   const enlarged = gesture.phase === "pressing" || fanOpen;
+  const drawn = enlarged ? enlargedCenter(center, viewport, insets) : center;
 
   return (
     <>
@@ -466,7 +468,7 @@ export function Fab() {
         style={{
           width: FAB_SIZE,
           height: FAB_SIZE,
-          transform: `translate(${center.x - FAB_SIZE / 2 + (tucked ? tuckShift : 0)}px, ${center.y - FAB_SIZE / 2}px)${
+          transform: `translate(${drawn.x - FAB_SIZE / 2 + (tucked ? tuckShift : 0)}px, ${drawn.y - FAB_SIZE / 2}px)${
             enlarged ? ` scale(${HOLD_SCALE})` : ""
           }`,
           opacity: pushing ? 0.45 : tucked ? 0 : undefined,
