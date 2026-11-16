@@ -6,6 +6,12 @@ All notable changes to OpenMedia are documented here.
 >
 > **Wiki**: the [GitHub Wiki](https://github.com/skepjandi/openmedia/wiki) is the public-facing main wiki — architecture, recipe format, AI pipeline, security model, roadmap. Source-controlled editing surface is `docs/wiki/` in this repo; CI (`.github/workflows/sync-wiki.yml`) mirrors it to the GitHub Wiki on every merge to `main`. New single-PR changes belong here, not as new wiki pages.
 
+### fix(fab): the hold ring around the floating button is no longer cut off on Android
+
+**Area:** `fix(fab)`
+
+**Change:** While the floating button is held, the ring that fills around it was clipped flat at the top, bottom and sides on Android: its stroke ends exactly on the edge of the SVG it is drawn in, and the SVG clips what is outside. The ring's SVG now has `overflow: visible`. Checked live in a running emulator, held for a moment: the ring is a whole circle. Not on a real phone.
+
 ### fix(stats): a usage limit closes only what hit it
 
 **Area:** `fix(stats)`

@@ -165,6 +165,9 @@ input {
   width: calc(100% + 2px);
   height: calc(100% + 2px);
   pointer-events: none;
+  /* The ring's stroke ends on the edge of its box, and Android clipped it there: the ring looked
+     cut off at the top, bottom and sides. */
+  overflow: visible;
 }
 
 .fab-ring circle {
