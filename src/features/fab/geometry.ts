@@ -23,6 +23,12 @@ const BADGE_OVERHANG = 4;
 /** Distance from the button's centre to the far edge of its badge while the fan is open. */
 const FAB_OPEN_REACH = (FAB_SIZE / 2 + BADGE_OVERHANG) * HOLD_SCALE;
 export const EDGE_MARGIN = 10;
+/**
+ * How far from the screen edge the floating button rests: far enough that it grows by `HOLD_SCALE`
+ * (ring included, plus 4 px of air) without leaving the screen. Moving it in while it grows left a
+ * ghost of its ring behind on Android, so it rests there instead.
+ */
+export const FAB_REST_MARGIN = Math.ceil((FAB_SIZE / 2) * (HOLD_SCALE - 1)) + 2 + 4;
 /** Dropping the button this close to a screen edge, or pushing past it, hides it there. */
 export const HIDE_REACH = 14;
 /** The hidden button's tab: how far it sticks out of the edge, and how tall it is. */
@@ -76,28 +82,12 @@ export function separateVerticalPosition(
 export function fabCenter(edge: Edge, y: number, viewport: Size, insets: Insets): Point {
   const half = FAB_SIZE / 2;
   return {
-    x: edge === "left" ? EDGE_MARGIN + half : viewport.width - EDGE_MARGIN - half,
+    x: edge === "left" ? FAB_REST_MARGIN + half : viewport.width - FAB_REST_MARGIN - half,
     y: clamp(
       y,
-      insets.top + EDGE_MARGIN + half,
-      viewport.height - insets.bottom - EDGE_MARGIN - half,
+      insets.top + FAB_REST_MARGIN + half,
+      viewport.height - insets.bottom - FAB_REST_MARGIN - half,
     ),
-  };
-}
-
-/** Space kept between the enlarged button, its ring included, and the edge of the screen. */
-const ENLARGED_MARGIN = 4;
-
-/**
- * Where the enlarged button (held, or with the fan open) is drawn: its resting centre, moved in
- * far enough that it grows inside the screen. At rest it sits `EDGE_MARGIN` from the edge, which
- * is less than its growth, so it was cut off there.
- */
-export function enlargedCenter(center: Point, viewport: Size, insets: Insets): Point {
-  const reach = (FAB_SIZE / 2) * HOLD_SCALE + 2 + ENLARGED_MARGIN;
-  return {
-    x: clamp(center.x, reach, viewport.width - reach),
-    y: clamp(center.y, insets.top + reach, viewport.height - insets.bottom - reach),
   };
 }
 

@@ -159,6 +159,14 @@ input {
   box-shadow: 0 1px 4px rgb(0 0 0 / 0.4);
 }
 
+/* Android left a frame of the growing button behind (a second ring and a grey square) for as long
+   as it was held. The button now takes its held size at once: the ring that fills around it is
+   the animation. The transition is set on the element, hence !important. */
+:root[data-platform="android"] .fab[data-hold="charging"],
+:root[data-platform="android"] .fab[data-hold="open"] {
+  transition: none !important;
+}
+
 .fab-ring {
   position: absolute;
   inset: -1px;
