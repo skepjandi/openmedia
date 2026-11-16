@@ -78,6 +78,7 @@ Violating any of these is a bug regardless of whether tests pass. Details in `do
 6. **Snapshots are redacted before they leave the device,** and the user can preview exactly what will be sent.
 7. **Customize, never automate, except what the user asks their own assistant for.** The engine and every shared (bundled, imported) recipe change what the user sees; the script policy has no click, submit, request or navigation. A script the user asked their own assistant to write and accepted may do more; nothing of that kind may be shared or bundled, and no built-in feature may do it unasked.
 8. **Profiles are isolated.** Cookies/storage for one profile must never be readable by another or by the app shell.
+9. **Every feature is site agnostic, and tested on several sites.** A feature that works on YouTube alone is not done: it must work on any site that has what it acts on (a player, a feed, a page), from what the page is, never from where it is. Before it ships, run it on at least three unrelated sites (different players and page structures, plus a site that has none of it, which must stay untouched) on each platform it targets, and say which you ran. Players inside iframes and pages with their own controls are cases to try, not to skip.
 
 ## Second-Order Thinking Before Every Change
 
