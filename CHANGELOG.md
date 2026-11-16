@@ -12,6 +12,7 @@ All notable changes to OpenMedia are documented here.
 
 **Change:** Two things, replacing the inward shift of #257:
 - While the button was held, Android left a frame of its growing ring behind it for as long as the finger stayed down: a second, half-filled ring and a grey square. Switching rules off on the running emulator showed it comes from the button's grow transition (a layer of its own did not help, and neither did keeping its position fixed); with no transition while held the ghost is gone, so on Android the button takes its held size at once (the ring filling is the animation). Checked on the emulator: held 0.4 s, 2.5 s and 4 s, and after release.
+- While held and with the fan open, the button's soft shadow was drawn cut off flat along the bottom and the left (clearest when the ring was just starting). In those states on Android it now has a rim with no blur instead (dark 1 px, light 2 px), which cannot be cut off and keeps it visible on a white page. Checked on the emulator: the first frames of a hold and the open state.
 - The button rests `FAB_REST_MARGIN` (16 px) from the screen edge instead of 10, which is what its 30 % growth, ring included, needs to stay on screen. Moving it in while it grew (#257) is gone. The back button keeps `EDGE_MARGIN`. The margin was checked by emulating the position on the emulator; not rebuilt, not on a real phone.
 
 ### fix(fab): the enlarged floating button stays inside the screen
