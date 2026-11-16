@@ -183,6 +183,22 @@ input {
   }
 }
 
+/* On Android the shell is a transparent view over the page, and the open fan was left half
+   repainted: its buttons drawn again at other heights, grey tiles where their shadows had been, a
+   scrim that stopped part way. Layers of their own make each frame replace the last whole. */
+.fan-item,
+.fan-scrim,
+.fab-glass,
+.incognito-badge,
+.pro-badge {
+  will-change: transform, opacity;
+}
+
+.fan-item,
+.fan-scrim {
+  backface-visibility: hidden;
+}
+
 .fan-item {
   transition:
     transform 420ms var(--ease-spring) calc(var(--i) * 35ms),

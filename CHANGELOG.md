@@ -6,6 +6,12 @@ All notable changes to OpenMedia are documented here.
 >
 > **Wiki**: the [GitHub Wiki](https://github.com/skepjandi/openmedia/wiki) is the public-facing main wiki — architecture, recipe format, AI pipeline, security model, roadmap. Source-controlled editing surface is `docs/wiki/` in this repo; CI (`.github/workflows/sync-wiki.yml`) mirrors it to the GitHub Wiki on every merge to `main`. New single-PR changes belong here, not as new wiki pages.
 
+### fix(fab): the open fan on Android is drawn whole, not as stale copies
+
+**Area:** `fix(fab)`
+
+**Change:** On the Android emulator, long-pressing the floating button left the open fan half repainted: its buttons repeated at other heights, grey tiles where their shadows had been, the dark scrim cut off part way, and the favorite button missing. The page's DOM was correct (six items, one each); the shell's transparent view just did not redraw. The scrim, the fan items, the glass buttons and the badges now get layers of their own (`will-change`, `.fan-scrim`). Checked by injecting the same rules into the shell of a running emulator through the WebView's remote debugging: two long presses drew the fan whole, with the favorite button. A small light square stays behind the incognito badge. Not rebuilt or tried on a real phone; iOS is not affected.
+
 ### feat(video): official recipes may use videoMenu; JW Player and Vidstack quality lists from any site
 
 **Area:** `feat(video)`, `feat(recipes)`
