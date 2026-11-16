@@ -6,6 +6,14 @@ All notable changes to OpenMedia are documented here.
 >
 > **Wiki**: the [GitHub Wiki](https://github.com/skepjandi/openmedia/wiki) is the public-facing main wiki — architecture, recipe format, AI pipeline, security model, roadmap. Source-controlled editing surface is `docs/wiki/` in this repo; CI (`.github/workflows/sync-wiki.yml`) mirrors it to the GitHub Wiki on every merge to `main`. New single-PR changes belong here, not as new wiki pages.
 
+### fix(siteview): video controls work with epilepsy protection on
+
+**Area:** `fix(siteview)`
+
+**Change:** Epilepsy protection switched the feed player off completely, so it stopped reporting the video in view and the tap panel (pause, seek, speed) had nothing to control. The player now keeps tracking the video in view and only stops starting and retrying playback.
+
+**Verified:** `feedPlayer.test.ts` (new calm-mode case) and `videoControls.test.ts`. **Not verified:** on a device.
+
 ### fix(ui): pickers and sheets opened on a scrolled Settings page cover the screen again
 
 **Area:** `fix(ui)`

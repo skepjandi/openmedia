@@ -45,7 +45,7 @@ Toggled by Core. Overlays a highlight on hover/tap, shows a breadcrumb of ancest
 - **Refusals.** `NotAllowedError` on iOS posts to the native-only `openmediaPlay` handler, and the plugin calls the page's `Symbol.for('openmedia.feedPlayNow')` through `evaluateJavaScript`, which WebKit runs with a user gesture (so sound and low power mode are not obstacles). Without the handler (Android, macOS) the player mutes and plays. Any other refusal is retried on the next settle.
 - **Attempts.** Each element gets 8 attempts, 300 ms apart, then one every 5 s. A new source (`loadstart`, `emptied`) or a new video in view resets the count, because feeds reuse one element for every item. A video that reports playing but does not move for three settles is paused and retried.
 - **Reader's pause.** Only a pause within 900 ms of a tap (a finger that moved at most 10 px), a click or a key, on the video in view, counts as the reader's and is left alone until the video leaves the screen. A swipe never does, and neither does a pause the player makes itself.
-- **Hold.** It is idle while `window.__openmediaHold` is set (the native background pause; iOS sets it too, with an `openmedia-resume` event on resume) or calm mode is on (`Symbol.for('openmedia.noAutoplay')`). iOS site views also set `mediaTypesRequiringUserActionForPlayback = []`.
+- **Hold.** It is idle while `window.__openmediaHold` is set (the native background pause; iOS sets it too, with an `openmedia-resume` event on resume) and, in calm mode (`Symbol.for('openmedia.noAutoplay')`), it still reports the video in view (`currentVideo`, which the video controls need) but starts and retries nothing. iOS site views also set `mediaTypesRequiringUserActionForPlayback = []`.
 
 ## Video controls
 

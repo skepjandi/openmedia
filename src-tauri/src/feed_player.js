@@ -85,11 +85,17 @@
         inCustomFeed(path);
     }
 
-    function active() {
-      // Not while the small player is up: its video is not a feed item, and the feed's idea of what
-      // plays and what is out of view is not for it.
-      return inFeed() && !document.hidden && !window.__openmediaHold && !document[NO_AUTOPLAY] &&
+    // Which video is in view, for the video controls and for autoplay alike. Not while the small
+    // player is up: its video is not a feed item, and the feed's idea of what plays and what is
+    // out of view is not for it.
+    function tracking() {
+      return inFeed() && !document.hidden && !window.__openmediaHold &&
         !document.querySelector('[data-openmedia-mini]');
+    }
+
+    // Calm mode (epilepsy protection) keeps the video in view known but never starts one.
+    function active() {
+      return tracking() && !document[NO_AUTOPLAY];
     }
 
     // How much of the viewport a box covers, and how much of the box is on screen, both 0 to 1.
@@ -211,7 +217,7 @@
 
     function settle() {
       timer = 0;
-      if (!active()) return;
+      if (!tracking()) return;
       for (var video of Array.from(videos)) if (!video.isConnected) videos.delete(video);
       var best = null;
       var bestShare = 0;
@@ -228,7 +234,7 @@
         if (candidate === current) return;
         if (playing(candidate) && share(candidate) < 0.1) stop(candidate);
       });
-      if (!current || current.ended || userPaused.has(current)) return;
+      if (!active() || !current || current.ended || userPaused.has(current)) return;
       if (current.paused) attempt(current);
       else watchProgress(current);
     }

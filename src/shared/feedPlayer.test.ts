@@ -71,6 +71,10 @@ interface Page {
   userPause: (video: FakeVideo, paused: boolean) => void;
   /** Reports one added element to the page's mutation observer; returns how often it was searched. */
   addNode: () => number;
+  /** Epilepsy protection: the page script that stops autoplay sets this flag. */
+  setCalm: () => void;
+  /** The video the controls read as the one in view. */
+  currentVideo: () => FakeVideo | null;
 }
 
 function load(options: {
@@ -154,6 +158,12 @@ function load(options: {
     },
     setMini(up) {
       document.miniUp = up;
+    },
+    setCalm() {
+      (document as Record<symbol, unknown>)[Symbol.for("openmedia.noAutoplay")] = true;
+    },
+    currentVideo() {
+      return (document as Record<symbol, FakeVideo | null>)[Symbol.for("openmedia.currentVideo")];
     },
     userPause(video, paused) {
       (document as Record<symbol, (video: FakeVideo, paused: boolean) => void>)[
@@ -320,6 +330,17 @@ describe("feed player", () => {
     await page.settle();
     expect(outgoing.paused).toBe(false);
     expect(incoming.playCalls).toBe(0);
+  });
+
+  it("still reports the video in view in calm mode, and starts none", async () => {
+    const video = new FakeVideo();
+    const page = load({ videos: [video] });
+    page.setCalm();
+    await page.settle();
+    expect(page.currentVideo()).toBe(video);
+    expect(video.playCalls).toBe(0);
+    await page.tick();
+    expect(video.playCalls).toBe(0);
   });
 
   it("runs on Instagram reels opened from a profile but not on its home feed", async () => {
