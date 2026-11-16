@@ -101,6 +101,7 @@ export const el: Messages = {
   "usage.limitReached": "Συμπληρώθηκε το ημερήσιο όριο",
   "usage.adjust": "Προσαρμογή ορίου",
   "usage.seeUsage": "Προβολή χρήσης",
+  "usage.browseOther": "Περιήγηση σε άλλα μέρη",
   "usage.pausesIn": "{value} σήμερα · παύση σε {left}",
   "usage.pausedNotice":
     "Ο ιστότοπος {name} τέθηκε σε παύση μετά από {value} σήμερα. Ανοίγει ξανά τα μεσάνυχτα, σε {left}. Οι άλλοι ιστότοποι είναι διαθέσιμοι.",

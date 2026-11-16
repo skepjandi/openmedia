@@ -101,6 +101,7 @@ export const it: Messages = {
   "usage.limitReached": "Limite giornaliero raggiunto",
   "usage.adjust": "Modifica limite",
   "usage.seeUsage": "Vedi utilizzo",
+  "usage.browseOther": "Esplora altre sezioni",
   "usage.pausesIn": "{value} oggi · pausa tra {left}",
   "usage.pausedNotice":
     "{name} è in pausa dopo {value} oggi. Si riapre a mezzanotte, tra {left}. Gli altri siti restano disponibili.",

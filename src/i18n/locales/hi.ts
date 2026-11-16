@@ -95,6 +95,7 @@ export const hi: Messages = {
   "usage.limitReached": "दैनिक सीमा पूरी हो गई",
   "usage.adjust": "सीमा बदलें",
   "usage.seeUsage": "उपयोग देखें",
+  "usage.browseOther": "अन्य हिस्से देखें",
   "usage.pausesIn": "आज {value} · {left} में रुकेगी",
   "usage.pausedNotice":
     "{name} आज {value} के बाद रोक दी गई है। यह आधी रात को, {left} में फिर खुलेगी। अन्य साइटें उपलब्ध हैं।",

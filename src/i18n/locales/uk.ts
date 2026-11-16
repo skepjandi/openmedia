@@ -100,6 +100,7 @@ export const uk: Messages = {
   "usage.limitReached": "Досягнуто денний ліміт",
   "usage.adjust": "Налаштувати ліміт",
   "usage.seeUsage": "Переглянути використання",
+  "usage.browseOther": "Переглянути інші розділи",
   "usage.pausesIn": "Сьогодні {value} · призупиниться за {left}",
   "usage.pausedNotice":
     "Сайт {name} призупинено після {value} сьогодні. Він знову відкриється опівночі, через {left}. Інші сайти доступні.",

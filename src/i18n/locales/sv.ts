@@ -98,6 +98,7 @@ export const sv: Messages = {
   "usage.limitReached": "Daglig gräns nådd",
   "usage.adjust": "Justera gräns",
   "usage.seeUsage": "Visa användning",
+  "usage.browseOther": "Bläddra bland andra delar",
   "usage.pausesIn": "{value} idag · pausas om {left}",
   "usage.pausedNotice":
     "{name} är pausad efter {value} idag. Den öppnas igen vid midnatt, om {left}. Andra webbplatser är fortfarande tillgängliga.",

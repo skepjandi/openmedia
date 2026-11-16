@@ -99,6 +99,7 @@ export const nl: Messages = {
   "usage.limitReached": "Dagelijkse limiet bereikt",
   "usage.adjust": "Limiet aanpassen",
   "usage.seeUsage": "Gebruik bekijken",
+  "usage.browseOther": "Andere delen bekijken",
   "usage.pausesIn": "{value} vandaag · pauze over {left}",
   "usage.pausedNotice":
     "{name} is gepauzeerd na {value} vandaag. De site gaat om middernacht weer open, over {left}. Andere sites blijven beschikbaar.",

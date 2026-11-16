@@ -100,6 +100,7 @@ export const cs: Messages = {
   "usage.limitReached": "Denní limit dosažen",
   "usage.adjust": "Upravit limit",
   "usage.seeUsage": "Zobrazit využití",
+  "usage.browseOther": "Procházet jiné části",
   "usage.pausesIn": "Dnes {value} · pozastavení za {left}",
   "usage.pausedNotice":
     "Web {name} je po {value} dnes pozastaven. Znovu se otevře o půlnoci, za {left}. Ostatní weby jsou dál dostupné.",

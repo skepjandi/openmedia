@@ -99,6 +99,7 @@ export const tr: Messages = {
   "usage.limitReached": "Günlük sınıra ulaşıldı",
   "usage.adjust": "Sınırı ayarla",
   "usage.seeUsage": "Kullanımı gör",
+  "usage.browseOther": "Diğer bölümlere göz at",
   "usage.pausesIn": "Bugün {value} · {left} sonra duraklar",
   "usage.pausedNotice":
     "{name}, bugün {value} kullanıldıktan sonra duraklatıldı. Gece yarısı, {left} sonra yeniden açılır. Diğer siteler kullanılabilir durumda.",

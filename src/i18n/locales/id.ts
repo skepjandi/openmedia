@@ -94,6 +94,7 @@ export const id: Messages = {
   "usage.limitReached": "Batas harian tercapai",
   "usage.adjust": "Atur batas",
   "usage.seeUsage": "Lihat penggunaan",
+  "usage.browseOther": "Jelajahi bagian lain",
   "usage.pausesIn": "{value} hari ini · dijeda dalam {left}",
   "usage.pausedNotice":
     "{name} dijeda setelah {value} hari ini. Situs ini dibuka lagi tengah malam, dalam {left}. Situs lain tetap tersedia.",

@@ -102,6 +102,7 @@ export const en = {
   "usage.limitReached": "Daily limit reached",
   "usage.adjust": "Adjust limit",
   "usage.seeUsage": "See usage",
+  "usage.browseOther": "Browse other parts",
   "usage.pausesIn": "{value} today · pauses in {left}",
   "usage.pausedNotice":
     "{name} is paused after {value} today. It opens again at midnight, in {left}. Other sites are still available.",

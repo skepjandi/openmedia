@@ -119,7 +119,17 @@ function TimeCheck({ host, section, spent, policy, reached }: NoticeProps) {
 }
 
 /** Covers the closed page, and only the page, and says when it opens again. */
-function LimitReached({ host, lock, part }: { host: string; lock: PageLock; part: string | null }) {
+function LimitReached({
+  host,
+  lock,
+  part,
+  onBrowse,
+}: {
+  host: string;
+  lock: PageLock;
+  part: string | null;
+  onBrowse: () => void;
+}) {
   const t = useT();
   const favorites = useFavorites();
   const openSheet = useApp((state) => state.openSheet);
@@ -148,10 +158,15 @@ function LimitReached({ host, lock, part }: { host: string; lock: PageLock; part
           })}
         </p>
         <div className="mt-5 flex flex-col gap-2">
+          {lock.kind === "part" && (
+            <button type="button" onClick={onBrowse} className={`${primaryButton} py-3`}>
+              {t("usage.browseOther")}
+            </button>
+          )}
           <button
             type="button"
             onClick={() => openLimits(host)}
-            className={`${primaryButton} py-3`}
+            className={`${lock.kind === "part" ? quietButton : primaryButton} py-3`}
           >
             {t("usage.adjust")}
           </button>
@@ -181,7 +196,7 @@ export function useLimitBlock() {
     isPro && control.ready && target
       ? pageLock(control.limits, control.seconds, control.sectionSeconds, target)
       : null;
-  return { control, isPro, host, target, seconds, policy, lock, blocked: lock !== null };
+  return { control, isPro, host, target, seconds, policy, lock, blocked: lock?.kind === "site" };
 }
 
 /**
@@ -192,12 +207,18 @@ export function LimitCover() {
   const { host, target, lock } = useLimitBlock();
   const sheet = useApp((state) => state.sheet);
   const t = useT();
-  if (!lock || !host || sheet !== "none") return null;
+  // A closed part is not frozen (the site's own navigation is the way out of it), so the cover can
+  // be set aside until the page moves to another part. It returns when the part is entered again.
+  const [browsing, setBrowsing] = useState<string | null>(null);
+  const key = lock?.kind === "part" && target ? `${target.host}${target.section}` : null;
+  if (key === null && browsing !== null) setBrowsing(null);
+  if (!lock || !host || sheet !== "none" || (key !== null && browsing === key)) return null;
   return (
     <LimitReached
       host={host}
       lock={lock}
       part={lock.kind === "part" && target ? sectionLabel(target.section, t) : null}
+      onBrowse={() => setBrowsing(key)}
     />
   );
 }
@@ -233,7 +254,8 @@ export function UsageGuard() {
       const shouldBlock =
         isPro &&
         !!sessionTarget &&
-        pageLock(control.limits, control.seconds, control.sectionSeconds, sessionTarget) !== null;
+        pageLock(control.limits, control.seconds, control.sectionSeconds, sessionTarget)?.kind ===
+          "site";
       const previous = requested.current.get(session.id);
       if (previous === shouldBlock || (previous === undefined && !shouldBlock)) continue;
       requested.current.set(session.id, shouldBlock);

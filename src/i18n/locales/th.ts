@@ -93,6 +93,7 @@ export const th: Messages = {
   "usage.limitReached": "ถึงขีดจำกัดรายวันแล้ว",
   "usage.adjust": "ปรับขีดจำกัด",
   "usage.seeUsage": "ดูการใช้งาน",
+  "usage.browseOther": "เรียกดูส่วนอื่น",
   "usage.pausesIn": "วันนี้ {value} · หยุดใช้ในอีก {left}",
   "usage.pausedNotice":
     "{name} ถูกหยุดใช้งานหลังจากใช้ไป {value} วันนี้ จะเปิดอีกครั้งเมื่อถึงเที่ยงคืน ในอีก {left} เว็บไซต์อื่นยังใช้ได้ตามปกติ",

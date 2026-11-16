@@ -99,6 +99,7 @@ export const ur: Messages = {
   "usage.limitReached": "روزانہ کی حد پہنچ گئی",
   "usage.adjust": "حد ایڈجسٹ کریں",
   "usage.seeUsage": "استعمال دیکھیں",
+  "usage.browseOther": "دیگر حصے دیکھیں",
   "usage.pausesIn": "آج {value} · {left} میں رک جائے گی",
   "usage.pausedNotice":
     "{name} آج {value} کے بعد روک دی گئی ہے۔ یہ آدھی رات کو، {left} میں دوبارہ کھلے گی۔ دیگر سائٹس دستیاب ہیں۔",

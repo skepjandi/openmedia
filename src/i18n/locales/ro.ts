@@ -99,6 +99,7 @@ export const ro: Messages = {
   "usage.limitReached": "Limita zilnică a fost atinsă",
   "usage.adjust": "Ajustează limita",
   "usage.seeUsage": "Vezi utilizarea",
+  "usage.browseOther": "Răsfoiește alte secțiuni",
   "usage.pausesIn": "{value} azi · pauză în {left}",
   "usage.pausedNotice":
     "{name} este în pauză după {value} azi. Se deschide din nou la miezul nopții, peste {left}. Celelalte site-uri sunt în continuare disponibile.",

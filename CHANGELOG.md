@@ -12,6 +12,14 @@ All notable changes to OpenMedia are documented here.
 
 **Change:** While the floating button is held, the ring that fills around it was clipped flat at the top, bottom and sides on Android: its stroke ends exactly on the edge of the SVG it is drawn in, and the SVG clips what is outside. The ring's SVG now has `overflow: visible`. Checked live in a running emulator, held for a moment: the ring is a whole circle. Not on a real phone.
 
+### fix(stats): a closed part no longer freezes the page
+
+**Area:** `fix(stats)`
+
+**Change:** A part over its own limit was frozen natively like a whole site, so a page opened on it (home, for example) never loaded and there was no way to reach another part. Now only a site limit freezes the page. A part limit covers the part with a "Browse other parts" button that sets the cover aside until the page moves to another part; entering the part again brings it back. Time in a closed part is still not counted.
+
+**Verified:** `yarn ts:check`, ESLint, Prettier and 588 frontend tests. **Not verified:** on a device.
+
 ### fix(stats): a usage limit closes only what hit it
 
 **Area:** `fix(stats)`

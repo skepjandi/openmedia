@@ -97,6 +97,7 @@ export const ja: Messages = {
   "usage.limitReached": "1日の上限に達しました",
   "usage.adjust": "上限を調整",
   "usage.seeUsage": "利用状況を見る",
+  "usage.browseOther": "他のページを見る",
   "usage.pausesIn": "今日 {value} · あと{left}で一時停止",
   "usage.pausedNotice":
     "{name}は今日{value}使用したため一時停止中です。{left}後の午前0時に再び開けます。ほかのサイトは引き続き利用できます。",

@@ -97,6 +97,7 @@ export const ar: Messages = {
   "usage.limitReached": "تم بلوغ الحد اليومي",
   "usage.adjust": "ضبط الحد",
   "usage.seeUsage": "عرض الاستخدام",
+  "usage.browseOther": "تصفح أجزاء أخرى",
   "usage.pausesIn": "{value} اليوم · يتوقف بعد {left}",
   "usage.pausedNotice":
     "تم إيقاف {name} بعد {value} اليوم. سيُفتح مجددًا عند منتصف الليل، بعد {left}. المواقع الأخرى متاحة.",

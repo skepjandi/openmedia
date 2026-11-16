@@ -96,6 +96,7 @@ export const vi: Messages = {
   "usage.limitReached": "Đã chạm giới hạn hằng ngày",
   "usage.adjust": "Điều chỉnh giới hạn",
   "usage.seeUsage": "Xem mức sử dụng",
+  "usage.browseOther": "Duyệt các phần khác",
   "usage.pausesIn": "Hôm nay {value} · tạm dừng sau {left}",
   "usage.pausedNotice":
     "{name} đã tạm dừng sau {value} hôm nay. Trang sẽ mở lại vào nửa đêm, sau {left}. Các trang khác vẫn dùng được.",

@@ -100,6 +100,7 @@ export const ta: Messages = {
   "usage.limitReached": "தினசரி வரம்பு அடைந்தது",
   "usage.adjust": "வரம்பை சரிசெய்",
   "usage.seeUsage": "பயன்பாட்டைப் பார்",
+  "usage.browseOther": "பிற பகுதிகளைப் பார்",
   "usage.pausesIn": "இன்று {value} · {left} இல் இடைநிறுத்தம்",
   "usage.pausedNotice":
     "இன்று {value} முடிந்ததும் {name} இடைநிறுத்தப்பட்டது. நள்ளிரவில், {left} இல் அது மீண்டும் திறக்கும். மற்ற தளங்கள் தொடர்ந்து கிடைக்கும்.",

@@ -97,6 +97,7 @@ export const si: Messages = {
   "usage.limitReached": "දෛනික සීමාව පසුගත විය",
   "usage.adjust": "සීමාව සකසන්න",
   "usage.seeUsage": "භාවිතය බලන්න",
+  "usage.browseOther": "වෙනත් කොටස් බලන්න",
   "usage.pausesIn": "අද {value} · {left} කින් විරාම වේ",
   "usage.pausedNotice":
     "අද {value} කට පසු {name} විරාම කර ඇත. එය මධ්‍යම රාත්‍රියේදී, {left} කින් නැවත විවෘත වේ. අනෙක් අඩවි තවමත් ලබාගත හැක.",

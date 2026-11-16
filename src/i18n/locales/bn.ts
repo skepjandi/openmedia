@@ -95,6 +95,7 @@ export const bn: Messages = {
   "usage.limitReached": "দৈনিক সীমা পূর্ণ হয়েছে",
   "usage.adjust": "সীমা সমন্বয় করুন",
   "usage.seeUsage": "ব্যবহার দেখুন",
+  "usage.browseOther": "অন্য অংশ ব্রাউজ করুন",
   "usage.pausesIn": "আজ {value} · {left} পরে বিরতি",
   "usage.pausedNotice":
     "আজ {value} পর {name} বিরতিতে আছে। {left} পরে মধ্যরাতে এটি আবার খুলবে। অন্য সাইটগুলো এখনও পাওয়া যাবে।",

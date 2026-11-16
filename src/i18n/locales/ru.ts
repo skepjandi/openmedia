@@ -100,6 +100,7 @@ export const ru: Messages = {
   "usage.limitReached": "Достигнут дневной лимит",
   "usage.adjust": "Изменить лимит",
   "usage.seeUsage": "Показать использование",
+  "usage.browseOther": "Открыть другие разделы",
   "usage.pausesIn": "Сегодня {value} · пауза через {left}",
   "usage.pausedNotice":
     "Сайт {name} приостановлен после {value} сегодня. Он снова откроется в полночь, через {left}. Остальные сайты по-прежнему доступны.",

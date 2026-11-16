@@ -96,6 +96,7 @@ export const zhHant: Messages = {
   "usage.limitReached": "已達到每日上限",
   "usage.adjust": "調整限制",
   "usage.seeUsage": "查看使用情況",
+  "usage.browseOther": "瀏覽其他部分",
   "usage.pausesIn": "今天 {value} · {left}後暫停",
   "usage.pausedNotice":
     "{name} 在今天使用 {value} 後已暫停，將在午夜（{left}後）重新開放。其他網站仍可使用。",

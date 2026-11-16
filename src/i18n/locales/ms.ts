@@ -95,6 +95,7 @@ export const ms: Messages = {
   "usage.limitReached": "Had harian telah dicapai",
   "usage.adjust": "Laras had",
   "usage.seeUsage": "Lihat penggunaan",
+  "usage.browseOther": "Layari bahagian lain",
   "usage.pausesIn": "{value} hari ini · dijeda dalam {left}",
   "usage.pausedNotice":
     "{name} dijeda selepas {value} hari ini. Ia dibuka semula pada tengah malam, dalam {left}. Laman lain masih tersedia.",

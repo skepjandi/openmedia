@@ -100,6 +100,7 @@ export const pl: Messages = {
   "usage.limitReached": "Osiągnięto dzienny limit",
   "usage.adjust": "Dostosuj limit",
   "usage.seeUsage": "Zobacz użycie",
+  "usage.browseOther": "Przeglądaj inne części",
   "usage.pausesIn": "{value} dzisiaj · wstrzymanie za {left}",
   "usage.pausedNotice":
     "Witryna {name} jest wstrzymana po {value} dzisiaj. Otworzy się ponownie o północy, za {left}. Inne witryny są nadal dostępne.",

@@ -98,6 +98,7 @@ export const ko: Messages = {
   "usage.limitReached": "일일 한도에 도달했습니다",
   "usage.adjust": "한도 조정",
   "usage.seeUsage": "사용 시간 보기",
+  "usage.browseOther": "다른 부분 둘러보기",
   "usage.pausesIn": "오늘 {value} · {left} 후 일시 정지",
   "usage.pausedNotice":
     "{name}은(는) 오늘 {value} 사용 후 일시 정지되었습니다. 자정에 다시 열리며, {left} 남았습니다. 다른 사이트는 계속 이용할 수 있습니다.",

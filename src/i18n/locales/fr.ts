@@ -101,6 +101,7 @@ export const fr: Messages = {
   "usage.limitReached": "Limite quotidienne atteinte",
   "usage.adjust": "Ajuster la limite",
   "usage.seeUsage": "Voir l’utilisation",
+  "usage.browseOther": "Parcourir d’autres sections",
   "usage.pausesIn": "{value} aujourd’hui · pause dans {left}",
   "usage.pausedNotice":
     "{name} est en pause après {value} aujourd’hui. Il rouvrira à minuit, dans {left}. Les autres sites restent disponibles.",
