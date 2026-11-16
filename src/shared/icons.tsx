@@ -140,6 +140,15 @@ export const IncognitoIcon = ({ active = false, size }: { active?: boolean; size
   </Icon>
 );
 
+/** A play button over a seek bar. Off draws a slash through it, so the state reads without color. */
+export const VideoControlsIcon = ({ on = true }: { on?: boolean }) => (
+  <Icon>
+    <path d="M9 4.5v9l7-4.5-7-4.5z" fill={on ? "currentColor" : "none"} />
+    <path d="M4 18.5h16" />
+    {!on && <path d="M4 4l16 16" />}
+  </Icon>
+);
+
 /** Pro: a crown. Marks what the paywall unlocks. */
 export const ProIcon = ({ size }: { size?: number }) => (
   <Icon size={size}>

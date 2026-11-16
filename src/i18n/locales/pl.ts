@@ -44,6 +44,8 @@ export const pl: Messages = {
   "fab.usage": "Użycie",
   "fab.settings": "Ustawienia",
   "fab.assistant": "Asystent. Przytrzymaj, aby zobaczyć ulubione.",
+  "fab.videoControls":
+    "Sterowanie wideo. Dotknij, aby włączyć lub wyłączyć, przytrzymaj, aby zobaczyć opcje.",
 
   "history.title": "Historia",
   "history.close": "Zamknij historię",

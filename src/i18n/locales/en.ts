@@ -49,6 +49,7 @@ export const en = {
   "fab.usage": "Usage",
   "fab.settings": "Settings",
   "fab.assistant": "Assistant. Hold for favorites.",
+  "fab.videoControls": "Video controls. Tap to turn on or off, hold for options.",
 
   "history.title": "History",
   "history.close": "Close history",

@@ -43,6 +43,8 @@ export const tr: Messages = {
   "fab.usage": "Kullanım",
   "fab.settings": "Ayarlar",
   "fab.assistant": "Asistan. Favoriler için basılı tutun.",
+  "fab.videoControls":
+    "Video denetimleri. Açmak veya kapatmak için dokunun, seçenekler için basılı tutun.",
 
   "history.title": "Geçmiş",
   "history.close": "Geçmişi kapat",

@@ -44,6 +44,8 @@ export const cs: Messages = {
   "fab.usage": "Využití",
   "fab.settings": "Nastavení",
   "fab.assistant": "Asistent. Podržením zobrazíte oblíbené.",
+  "fab.videoControls":
+    "Ovládání videa. Klepnutím zapnete nebo vypnete, podržením otevřete možnosti.",
 
   "history.title": "Historie",
   "history.close": "Zavřít historii",

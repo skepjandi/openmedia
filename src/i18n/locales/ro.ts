@@ -43,6 +43,8 @@ export const ro: Messages = {
   "fab.usage": "Utilizare",
   "fab.settings": "Setări",
   "fab.assistant": "Asistent. Ține apăsat pentru favorite.",
+  "fab.videoControls":
+    "Comenzi video. Atinge pentru a activa sau dezactiva, ține apăsat pentru opțiuni.",
 
   "history.title": "Istoric",
   "history.close": "Închide istoricul",

@@ -4,6 +4,7 @@ import {
   FAVORITE_SIZE,
   HISTORY_SIZE,
   HOLD_SCALE,
+  CONTROLS_SIZE,
   INCOGNITO_SIZE,
   SETTINGS_SIZE,
   STATS_SIZE,
@@ -74,6 +75,7 @@ describe("fanLayout", () => {
             { center: layout.tabs, size: TABS_SIZE },
             { center: layout.stats, size: STATS_SIZE },
             { center: layout.incognito, size: INCOGNITO_SIZE },
+            { center: layout.controls, size: CONTROLS_SIZE },
           ];
           for (const { center, size } of items) {
             expect(center.x - size / 2).toBeGreaterThanOrEqual(0);
@@ -167,16 +169,30 @@ describe("fanLayout", () => {
     }
   });
 
-  it("puts incognito at the top of the column, directly above usage", () => {
+  it("puts incognito and the controls switch across the button from the page column when there is room", () => {
     for (const edge of edges) {
-      for (const y of heights) {
-        for (const count of [0, 6]) {
-          const origin = fabCenter(edge, y, phone, insets);
-          const layout = fanLayout(origin, edge, phone, insets, count);
-          expect(layout.incognito.x).toBe(layout.stats.x);
-          expect(layout.incognito.y).toBeLessThan(layout.stats.y);
-        }
+      for (const count of [0, 1, 2, 4]) {
+        const origin = fabCenter(edge, 426, phone, insets);
+        const layout = fanLayout(origin, edge, phone, insets, count);
+        const pageSide = Math.sign(layout.settings.y - origin.y);
+        expect(layout.incognito.x).toBe(origin.x);
+        expect(layout.controls.x).toBe(origin.x);
+        for (const page of [layout.settings, layout.history, layout.tabs, layout.stats])
+          expect(Math.sign(page.y - origin.y)).toBe(pageSide);
+        expect(Math.sign(layout.incognito.y - origin.y)).toBe(-pageSide);
+        expect(Math.sign(layout.controls.y - origin.y)).toBe(-pageSide);
       }
+    }
+  });
+
+  it("continues the page column with incognito and the controls switch near the screen edge", () => {
+    for (const edge of edges) {
+      const origin = fabCenter(edge, insets.top, phone, insets);
+      const layout = fanLayout(origin, edge, phone, insets, 0);
+      expect(layout.incognito.x).toBe(layout.stats.x);
+      expect(layout.incognito.y).toBeLessThan(layout.stats.y);
+      expect(layout.controls.x).toBe(layout.stats.x);
+      expect(layout.controls.y).toBeLessThan(layout.incognito.y);
     }
   });
 });
@@ -192,6 +208,7 @@ describe("fanTargetAt", () => {
     expect(fanTargetAt(layout.tabs, layout)).toEqual({ kind: "tabs" });
     expect(fanTargetAt(layout.stats, layout)).toEqual({ kind: "stats" });
     expect(fanTargetAt(layout.incognito, layout)).toEqual({ kind: "incognito" });
+    expect(fanTargetAt(layout.controls, layout)).toEqual({ kind: "controls" });
   });
 
   it("returns null away from every item", () => {

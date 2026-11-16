@@ -44,6 +44,7 @@ export const sv: Messages = {
   "fab.usage": "Användning",
   "fab.settings": "Inställningar",
   "fab.assistant": "Assistent. Håll in för favoriter.",
+  "fab.videoControls": "Videokontroller. Tryck för att slå på eller av, håll in för alternativ.",
 
   "history.title": "Historik",
   "history.close": "Stäng historiken",

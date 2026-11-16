@@ -43,6 +43,7 @@ export const nl: Messages = {
   "fab.usage": "Gebruik",
   "fab.settings": "Instellingen",
   "fab.assistant": "Assistent. Houd ingedrukt voor favorieten.",
+  "fab.videoControls": "Videobediening. Tik om aan of uit te zetten, houd ingedrukt voor opties.",
 
   "history.title": "Geschiedenis",
   "history.close": "Geschiedenis sluiten",

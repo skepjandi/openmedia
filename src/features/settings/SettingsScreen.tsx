@@ -9,7 +9,7 @@ import { Screen } from "../../shared/Screen";
 import type { SearchEngine, Theme } from "../../shared/ipc";
 import { DEFAULT_SEARCH_ENGINE, SEARCH_ENGINES } from "../../shared/searchEngines";
 import { AccessibilitySection } from "./AccessibilitySection";
-import { VideoControlsSection } from "./VideoControlsSection";
+import { VideoControlsLink } from "./VideoControlsScreen";
 import { AiSection } from "./AiSection";
 import { FavoritesSection } from "./FavoritesSection";
 import { IncognitoFavoritesSection, IncognitoRecipesLink } from "./IncognitoSections";
@@ -36,7 +36,7 @@ export function SettingsScreen() {
         <LanguageSection />
         <BrowsingSection />
         <AccessibilitySection />
-        <VideoControlsSection />
+        <VideoControlsLink />
         <FavoritesSection />
         <RecipesLink />
         <LibraryLinks />

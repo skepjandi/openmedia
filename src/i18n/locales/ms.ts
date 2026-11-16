@@ -40,6 +40,8 @@ export const ms: Messages = {
   "fab.usage": "Penggunaan",
   "fab.settings": "Tetapan",
   "fab.assistant": "Pembantu. Tekan panjang untuk kegemaran.",
+  "fab.videoControls":
+    "Kawalan video. Ketik untuk hidup atau matikan, tekan panjang untuk pilihan.",
 
   "history.title": "Sejarah",
   "history.close": "Tutup sejarah",

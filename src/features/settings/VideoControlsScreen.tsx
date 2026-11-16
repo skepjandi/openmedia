@@ -1,18 +1,57 @@
 import { useApp } from "../../app/store";
 import { useT } from "../../i18n/useT";
+import { ForwardIcon } from "../../shared/icons";
+import { Screen } from "../../shared/Screen";
 import { VIDEO_CONTROLS_DEFAULT } from "../../shared/videoControls";
 import { MarginSlider } from "./MarginSlider";
 import { Switch } from "./Switch";
-import { Group, Section } from "./ui";
+import { Group } from "./ui";
 
-/** The controls for the video in view in a full-screen feed: Shorts, Reels and the like. */
-export function VideoControlsSection() {
-  const controls = useApp((s) => s.state?.videoControls ?? VIDEO_CONTROLS_DEFAULT);
-  const setVideoControls = useApp((s) => s.setVideoControls);
+/** The row in Settings that opens the video controls page. */
+export function VideoControlsLink() {
+  const openSheet = useApp((s) => s.openSheet);
   const t = useT();
 
   return (
-    <Section title={t("settings.videoControls")} note={t("settings.videoControlsNote")}>
+    <Group>
+      <button
+        type="button"
+        onClick={() => openSheet("video-controls")}
+        className="flex w-full items-center gap-3 px-4 py-3.5 text-start active:bg-paper/[0.05]"
+      >
+        <span className="min-w-0 flex-1">
+          <span className="block text-base font-medium">{t("settings.videoControls")}</span>
+          <span className="block text-sm text-paper/55">{t("settings.videoControlsNote")}</span>
+        </span>
+        <span aria-hidden="true" className="text-paper/50 rtl:-scale-x-100">
+          <ForwardIcon />
+        </span>
+      </button>
+    </Group>
+  );
+}
+
+/**
+ * The controls for the video in view in a full-screen feed: Shorts, Reels and the like. Opened
+ * from Settings, or by holding the video controls button in the floating button's fan.
+ */
+export function VideoControlsScreen() {
+  const open = useApp((s) => s.sheet === "video-controls");
+  const closeSheet = useApp((s) => s.closeSheet);
+  const parent = useApp((s) => s.sheetParent);
+  const controls = useApp((s) => s.state?.videoControls ?? VIDEO_CONTROLS_DEFAULT);
+  const setVideoControls = useApp((s) => s.setVideoControls);
+  const t = useT();
+  if (!open) return null;
+
+  return (
+    <Screen
+      title={t("settings.videoControls")}
+      subtitle={t("settings.videoControlsNote")}
+      closeLabel={t(parent === "settings" ? "common.back" : "settings.close")}
+      onClose={closeSheet}
+      back={parent === "settings"}
+    >
       <Group>
         <Switch
           label={t("settings.videoPanel")}
@@ -60,6 +99,6 @@ export function VideoControlsSection() {
           onChange={(on) => void setVideoControls({ autoAdvance: on })}
         />
       </Group>
-    </Section>
+    </Screen>
   );
 }

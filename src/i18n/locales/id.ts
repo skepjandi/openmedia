@@ -40,6 +40,7 @@ export const id: Messages = {
   "fab.usage": "Penggunaan",
   "fab.settings": "Pengaturan",
   "fab.assistant": "Asisten. Tahan untuk favorit.",
+  "fab.videoControls": "Kontrol video. Ketuk untuk menyalakan atau mematikan, tahan untuk opsi.",
 
   "history.title": "Riwayat",
   "history.close": "Tutup riwayat",

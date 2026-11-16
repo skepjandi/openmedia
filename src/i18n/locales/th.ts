@@ -40,6 +40,7 @@ export const th: Messages = {
   "fab.usage": "เวลาใช้งาน",
   "fab.settings": "การตั้งค่า",
   "fab.assistant": "ผู้ช่วย กดค้างเพื่อดูรายการโปรด",
+  "fab.videoControls": "ตัวควบคุมวิดีโอ แตะเพื่อเปิดหรือปิด กดค้างเพื่อดูตัวเลือก",
 
   "history.title": "ประวัติ",
   "history.close": "ปิดประวัติ",

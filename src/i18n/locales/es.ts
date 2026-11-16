@@ -44,6 +44,8 @@ export const es: Messages = {
   "fab.usage": "Uso",
   "fab.settings": "Ajustes",
   "fab.assistant": "Asistente. Mantén pulsado para ver los favoritos.",
+  "fab.videoControls":
+    "Controles de vídeo. Toca para activar o desactivar; mantén pulsado para ver las opciones.",
 
   "history.title": "Historial",
   "history.close": "Cerrar historial",

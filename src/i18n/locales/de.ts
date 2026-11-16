@@ -38,6 +38,8 @@ export const de: Messages = {
   "fab.history": "Verlauf",
   "fab.settings": "Einstellungen",
   "fab.assistant": "Assistent. Für Favoriten gedrückt halten.",
+  "fab.videoControls":
+    "Videosteuerung. Tippen zum Ein- oder Ausschalten, gedrückt halten für Optionen.",
 
   "history.title": "Verlauf",
   "history.close": "Verlauf schließen",

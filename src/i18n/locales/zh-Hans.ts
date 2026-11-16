@@ -43,6 +43,7 @@ export const zhHans: Messages = {
   "fab.usage": "用量",
   "fab.settings": "设置",
   "fab.assistant": "助手。长按可打开收藏。",
+  "fab.videoControls": "视频控制。轻点开启或关闭，长按查看选项。",
 
   "history.title": "历史",
   "history.close": "关闭历史",

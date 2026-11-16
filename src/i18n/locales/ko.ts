@@ -43,6 +43,7 @@ export const ko: Messages = {
   "fab.usage": "사용 시간",
   "fab.settings": "설정",
   "fab.assistant": "어시스턴트. 길게 누르면 즐겨찾기가 나타납니다.",
+  "fab.videoControls": "동영상 컨트롤. 탭하여 켜거나 끄고, 길게 눌러 옵션을 엽니다.",
 
   "history.title": "기록",
   "history.close": "기록 닫기",

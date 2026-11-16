@@ -43,6 +43,7 @@ export const ja: Messages = {
   "fab.usage": "使用時間",
   "fab.settings": "設定",
   "fab.assistant": "アシスタント。長押しでお気に入り。",
+  "fab.videoControls": "動画コントロール。タップでオン/オフ、長押しでオプション。",
 
   "history.title": "履歴",
   "history.close": "履歴を閉じる",

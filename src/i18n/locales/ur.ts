@@ -43,6 +43,8 @@ export const ur: Messages = {
   "fab.usage": "استعمال",
   "fab.settings": "ترتیبات",
   "fab.assistant": "معاون۔ پسندیدہ کے لیے دبائیں رکھیں۔",
+  "fab.videoControls":
+    "ویڈیو کنٹرولز۔ آن یا آف کرنے کے لیے ٹیپ کریں، اختیارات کے لیے دبائیں رکھیں۔",
 
   "history.title": "تاریخ",
   "history.close": "تاریخ بند کریں",

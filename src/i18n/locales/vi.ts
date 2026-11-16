@@ -40,6 +40,7 @@ export const vi: Messages = {
   "fab.usage": "Thời gian sử dụng",
   "fab.settings": "Cài đặt",
   "fab.assistant": "Trợ lý. Giữ để xem yêu thích.",
+  "fab.videoControls": "Điều khiển video. Chạm để bật hoặc tắt, giữ để xem tùy chọn.",
 
   "history.title": "Lịch sử",
   "history.close": "Đóng lịch sử",

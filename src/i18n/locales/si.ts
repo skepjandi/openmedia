@@ -43,6 +43,8 @@ export const si: Messages = {
   "fab.usage": "භාවිතය",
   "fab.settings": "සැකසුම්",
   "fab.assistant": "සහායක. ආදරණීය සඳහා දිගු ඔබන්න.",
+  "fab.videoControls":
+    "වීඩියෝ පාලන. ක්‍රියාත්මක හෝ අක්‍රිය කිරීමට තට්ටු කරන්න, විකල්ප සඳහා දිගු ඔබන්න.",
 
   "history.title": "ඉතිහාසය",
   "history.close": "ඉතිහාසය වසන්න",

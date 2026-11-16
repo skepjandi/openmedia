@@ -40,6 +40,8 @@ export const hi: Messages = {
   "fab.usage": "उपयोग",
   "fab.settings": "सेटिंग्स",
   "fab.assistant": "सहायक। पसंदीदा के लिए देर तक दबाएँ।",
+  "fab.videoControls":
+    "वीडियो नियंत्रण। चालू या बंद करने के लिए टैप करें, विकल्पों के लिए देर तक दबाएँ।",
 
   "history.title": "इतिहास",
   "history.close": "इतिहास बंद करें",

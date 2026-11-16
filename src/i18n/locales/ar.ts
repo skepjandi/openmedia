@@ -43,6 +43,7 @@ export const ar: Messages = {
   "fab.usage": "الاستخدام",
   "fab.settings": "الإعدادات",
   "fab.assistant": "المساعد. اضغط مطولًا للمفضلة.",
+  "fab.videoControls": "عناصر تحكم الفيديو. اضغط للتشغيل أو الإيقاف، واضغط مطولًا للخيارات.",
 
   "history.title": "السجل",
   "history.close": "إغلاق السجل",

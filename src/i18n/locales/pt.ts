@@ -44,6 +44,8 @@ export const pt: Messages = {
   "fab.usage": "Uso",
   "fab.settings": "Configurações",
   "fab.assistant": "Assistente. Mantenha pressionado para ver os favoritos.",
+  "fab.videoControls":
+    "Controles de vídeo. Toque para ligar ou desligar, mantenha pressionado para ver as opções.",
 
   "history.title": "Histórico",
   "history.close": "Fechar histórico",

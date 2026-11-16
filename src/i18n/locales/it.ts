@@ -44,6 +44,8 @@ export const it: Messages = {
   "fab.usage": "Utilizzo",
   "fab.settings": "Impostazioni",
   "fab.assistant": "Assistente. Tieni premuto per i preferiti.",
+  "fab.videoControls":
+    "Controlli video. Tocca per attivare o disattivare, tieni premuto per le opzioni.",
 
   "history.title": "Cronologia",
   "history.close": "Chiudi cronologia",

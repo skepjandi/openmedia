@@ -43,6 +43,7 @@ export const zhHant: Messages = {
   "fab.usage": "用量",
   "fab.settings": "設定",
   "fab.assistant": "助理。長按可開啟我的最愛。",
+  "fab.videoControls": "影片控制。輕點開啟或關閉，長按檢視選項。",
 
   "history.title": "記錄",
   "history.close": "關閉記錄",

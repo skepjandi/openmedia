@@ -40,6 +40,7 @@ export const bn: Messages = {
   "fab.usage": "ব্যবহার",
   "fab.settings": "সেটিংস",
   "fab.assistant": "সহকারী। পছন্দের জন্য চেপে ধরুন।",
+  "fab.videoControls": "ভিডিও নিয়ন্ত্রণ। চালু বা বন্ধ করতে ট্যাপ করুন, বিকল্পের জন্য চেপে ধরুন।",
 
   "history.title": "ইতিহাস",
   "history.close": "ইতিহাস বন্ধ করুন",

@@ -6,6 +6,12 @@ All notable changes to OpenMedia are documented here.
 >
 > **Wiki**: the [GitHub Wiki](https://github.com/skepjandi/openmedia/wiki) is the public-facing main wiki — architecture, recipe format, AI pipeline, security model, roadmap. Source-controlled editing surface is `docs/wiki/` in this repo; CI (`.github/workflows/sync-wiki.yml`) mirrors it to the GitHub Wiki on every merge to `main`. New single-PR changes belong here, not as new wiki pages.
 
+### feat(fab): incognito moves across the button; a video controls switch beside it; video controls get a page
+
+**Area:** `feat(fab)`, `feat(settings)`
+
+**Change:** In the fan, Incognito now sits on the opposite side of the button from the page buttons (Settings, History, Tabs, Usage), and a new video controls switch sits next to it. Tapping the switch turns the tap panel on or off everywhere (`videoControls.panel`), which gives a site's own player back where the panel does not suit it; holding it opens the new Video controls page (`VideoControlsScreen`, sheet `video-controls`). Settings no longer lists the video choices inline: a single row opens that page. Near the top or bottom of the screen, where the far side has no room, the buttons fall back to one column (`fanLayout` tries the split first at each arc position). New string `fab.videoControls` in all 27 locales. `yarn ts:check`, `yarn lint` and `yarn test` pass; the fan was not looked at on a device.
+
 ### fix(siteview): video controls work with epilepsy protection on
 
 **Area:** `fix(siteview)`

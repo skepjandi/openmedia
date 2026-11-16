@@ -40,10 +40,11 @@ export const HISTORY_SIZE = 44;
 export const TABS_SIZE = 44;
 export const STATS_SIZE = 44;
 export const INCOGNITO_SIZE = 44;
+export const CONTROLS_SIZE = 44;
 /** Centre-to-centre distance between neighbouring buttons in the settings column. */
 const COLUMN_OFFSET = 52;
-/** From the settings button up to the incognito button at the top of the column. */
-const COLUMN_REACH = 4 * COLUMN_OFFSET;
+/** From the settings button up to the usage button at the top of the page column. */
+const COLUMN_REACH = 3 * COLUMN_OFFSET;
 
 const MIN_FAN_RADIUS = 108;
 const MAX_ARC_DEGREES = 120;
@@ -51,7 +52,7 @@ const MAX_STEP_DEGREES = 30;
 const SETTINGS_DISTANCE = 132;
 const ITEM_GAP = 6;
 /** Centre-to-centre distance that keeps the column's top button clear of the open button. */
-const COLUMN_CLEARANCE = FAB_OPEN_REACH + INCOGNITO_SIZE / 2 + ITEM_GAP;
+const COLUMN_CLEARANCE = FAB_OPEN_REACH + STATS_SIZE / 2 + ITEM_GAP;
 const SCREEN_PADDING = 6;
 /** Absorbs rounding when an item is placed exactly at its minimum distance. */
 const FLOAT_SLACK = 1e-6;
@@ -121,6 +122,8 @@ export interface FanLayout {
   tabs: Point;
   stats: Point;
   incognito: Point;
+  /** The video controls switch, on the opposite side of the button from the page buttons. */
+  controls: Point;
 }
 
 export type FanTarget =
@@ -129,6 +132,7 @@ export type FanTarget =
   | { kind: "stats" }
   | { kind: "history" }
   | { kind: "tabs" }
+  | { kind: "controls" }
   | { kind: "settings" };
 
 interface FanItem {
@@ -173,10 +177,11 @@ function isValid(items: FanItem[], origin: Point, viewport: Size, insets: Insets
 }
 
 /**
- * Favorites sit on an arc opening away from the edge, listed top to bottom. Settings is tucked
- * on the edge column above or below the button, farther out than the arc, so it never reads as
- * a favorite. History sits directly above it in the same column, tabs directly above that, then
- * usage, and incognito at the top. Below the button the whole column is pushed out far enough that its top
+ * Favorites sit on an arc opening away from the edge, listed top to bottom. The page buttons
+ * (settings, then history, tabs and usage above it) are tucked on the edge column above or below
+ * the button, farther out than the arc, so they never read as favorites. Incognito and the video
+ * controls switch sit in the same column on the opposite side of the button, so a switch is never
+ * mistaken for a page. Below the button the page column is pushed out far enough that its top
  * item clears the button. When the button is near the top or bottom the arc rotates, the column
  * may flip sides, and finally the arc compacts (smaller steps, larger radius) until everything
  * fits.
@@ -196,13 +201,14 @@ export function fanLayout(
   const roomAbove = origin.y - insets.top;
   const preferred = roomBelow >= roomAbove ? 1 : -1;
 
-  const place = (scale: number, shift: number, side: number): FanLayout => {
+  const place = (scale: number, shift: number, side: number, split: boolean): FanLayout => {
     const step = nominalStep * scale;
     const radius = radiusFor(step);
     const distance = Math.max(SETTINGS_DISTANCE, radius + 30);
+    const reach = split ? COLUMN_REACH : COLUMN_REACH + 2 * COLUMN_OFFSET;
     const settings = {
       x: origin.x,
-      y: origin.y + (side > 0 ? Math.max(distance, COLUMN_REACH + COLUMN_CLEARANCE) : -distance),
+      y: origin.y + (side > 0 ? Math.max(distance, reach + COLUMN_CLEARANCE) : -distance),
     };
     return {
       favorites: Array.from({ length: favoriteCount }, (_, i) =>
@@ -212,7 +218,12 @@ export function fanLayout(
       history: { x: settings.x, y: settings.y - COLUMN_OFFSET },
       tabs: { x: settings.x, y: settings.y - 2 * COLUMN_OFFSET },
       stats: { x: settings.x, y: settings.y - 3 * COLUMN_OFFSET },
-      incognito: { x: settings.x, y: settings.y - 4 * COLUMN_OFFSET },
+      incognito: split
+        ? { x: origin.x, y: origin.y - side * distance }
+        : { x: settings.x, y: settings.y - 4 * COLUMN_OFFSET },
+      controls: split
+        ? { x: origin.x, y: origin.y - side * (distance + COLUMN_OFFSET) }
+        : { x: settings.x, y: settings.y - 5 * COLUMN_OFFSET },
     };
   };
   const items = (layout: FanLayout): FanItem[] => [
@@ -222,17 +233,20 @@ export function fanLayout(
     { center: layout.tabs, size: TABS_SIZE },
     { center: layout.stats, size: STATS_SIZE },
     { center: layout.incognito, size: INCOGNITO_SIZE },
+    { center: layout.controls, size: CONTROLS_SIZE },
   ];
 
   for (const scale of favoriteCount > 1 ? ARC_SCALES : [1]) {
     for (const shift of SHIFTS) {
       for (const side of [preferred, -preferred]) {
-        const layout = place(scale, shift, side);
-        if (isValid(items(layout), origin, viewport, insets)) return layout;
+        for (const split of [true, false]) {
+          const layout = place(scale, shift, side, split);
+          if (isValid(items(layout), origin, viewport, insets)) return layout;
+        }
       }
     }
   }
-  return place(1, 0, preferred);
+  return place(1, 0, preferred, false);
 }
 
 const TOUCH_SLACK = 10;
@@ -243,6 +257,7 @@ export function fanTargetAt(point: Point, layout: FanLayout): FanTarget | null {
     Math.hypot(point.x - center.x, point.y - center.y) <= size / 2 + TOUCH_SLACK;
   const index = layout.favorites.findIndex((p) => near(p, FAVORITE_SIZE));
   if (index >= 0) return { kind: "favorite", index };
+  if (near(layout.controls, CONTROLS_SIZE)) return { kind: "controls" };
   if (near(layout.incognito, INCOGNITO_SIZE)) return { kind: "incognito" };
   if (near(layout.stats, STATS_SIZE)) return { kind: "stats" };
   if (near(layout.tabs, TABS_SIZE)) return { kind: "tabs" };
