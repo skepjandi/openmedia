@@ -6,9 +6,8 @@ import { VIDEO_CONTROLS_DEFAULT } from "./videoControls";
 
 const read = (name: string) =>
   readFileSync(new URL(`../../src-tauri/src/${name}`, import.meta.url), "utf8");
-const SOURCE = read("video_controls.js").replace(
-  "/*@DETECTORS@*/",
-  () => read("video_detectors.js"),
+const SOURCE = read("video_controls.js").replace("/*@DETECTORS@*/", () =>
+  read("video_detectors.js"),
 );
 
 type Listener = (event: Record<string, unknown>) => void;
