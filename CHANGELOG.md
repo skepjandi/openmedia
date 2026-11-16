@@ -6,6 +6,12 @@ All notable changes to OpenMedia are documented here.
 >
 > **Wiki**: the [GitHub Wiki](https://github.com/skepjandi/openmedia/wiki) is the public-facing main wiki — architecture, recipe format, AI pipeline, security model, roadmap. Source-controlled editing surface is `docs/wiki/` in this repo; CI (`.github/workflows/sync-wiki.yml`) mirrors it to the GitHub Wiki on every merge to `main`. New single-PR changes belong here, not as new wiki pages.
 
+### fix(fab): nothing of the held floating button is cut off on Android
+
+**Area:** `fix(fab)`
+
+**Change:** The blur-free rim of #259 was drawn outside the button's box and was still cut off flat along the left and bottom for the first moments of a hold (the ring at its start or a quarter filled). While held and with the fan open, on Android, everything is now inside the box: no outer shadow, and the rim is the border (`border-color`). Checked on the emulator: the first frames of a hold and the open state show a whole circle. Not on a real phone.
+
 ### fix(fab): no ghost ring while the floating button is held on Android; it rests far enough from the edge to grow
 
 **Area:** `fix(fab)`
