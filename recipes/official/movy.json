@@ -4,13 +4,8 @@
   "name": "Movy",
   "version": "1.0.0",
   "origin": "user",
-  "tags": [
-    "desktop",
-    "mobile"
-  ],
-  "match": [
-    "https://*.movy.sx/*"
-  ],
+  "tags": ["desktop", "mobile"],
+  "match": ["https://*.movy.sx/*"],
   "options": [
     {
       "id": "cookie-banners",
