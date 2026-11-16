@@ -6,6 +6,12 @@ All notable changes to OpenMedia are documented here.
 >
 > **Wiki**: the [GitHub Wiki](https://github.com/skepjandi/openmedia/wiki) is the public-facing main wiki — architecture, recipe format, AI pipeline, security model, roadmap. Source-controlled editing surface is `docs/wiki/` in this repo; CI (`.github/workflows/sync-wiki.yml`) mirrors it to the GitHub Wiki on every merge to `main`. New single-PR changes belong here, not as new wiki pages.
 
+### fix(ui): pickers and sheets opened on a scrolled Settings page cover the screen again
+
+**Area:** `fix(ui)`
+
+**Change:** The page-rise animation (`.screen`) used `animation-fill-mode: both`, which left a transform on every full-screen page after the animation ended. A transformed page is the containing block of `position: fixed` children, so the reading-font picker (and any other sheet drawn inside a page) was laid out against the page's scrolling content instead of the screen: on a scrolled Settings page it sat partway up with the page undimmed below it. The animation now fills `backwards` only. Reproduced in Chromium with a fixed child of a scrolled, `both`-filled page (child top -1000 px at scroll 1000) and not with `backwards` (top 0); not checked on a device.
+
 ### refactor(video): the player detectors live in their own file; two stale wiki paragraphs removed
 
 **Area:** `refactor(video)`, `docs(wiki)`

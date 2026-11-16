@@ -384,9 +384,12 @@ svg {
   }
 }
 
-/* Full-screen pages rise into place once; nothing else on them animates. */
+/* Full-screen pages rise into place once; nothing else on them animates. `backwards`, not `both`:
+   a filled animation keeps a transform on the page after it ends, and a transformed page is the
+   containing block of every `fixed` child (the pickers and sheets in Settings), so they scroll
+   with the page instead of covering the screen. */
 .screen {
-  animation: screen-in 260ms var(--ease-spring) both;
+  animation: screen-in 260ms var(--ease-spring) backwards;
 }
 
 @keyframes screen-in {
