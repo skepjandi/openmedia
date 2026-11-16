@@ -17,6 +17,7 @@ OpenMedia is a Tauri v2 app for browsing websites in native web views and custom
 | [Architecture](./architecture.md) | Current components, data flow, stack, and repository layout |
 | [Recipe Format](./recipe-format.md) | The declarative customization format: targets, rules, matching, versioning, trust levels |
 | [Site Runtime](./site-runtime.md) | Runtime design: injection, SPA navigation, picker, snapshots, and reporting |
+| [Video players](./video-players.md) | What each recipe site's mobile-web player is built with and which option lists reach it |
 | [AI Assistant](./ai-assistant.md) | BYOK providers, snapshot redaction, structured generation, repair loop |
 | [Security](./security.md) | Threat model, invariants, IPC boundary, key storage, legal and store-policy risks |
 | [Paywall](./paywall.md) | Pro entitlement via RevenueCat: what is paid, plans, Rust-side gate, no-login restore, store setup |

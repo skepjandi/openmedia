@@ -81,6 +81,44 @@
       };
     }
 
+    // hls.js and Shaka keep their player in a variable of the site's own, out of reach. The
+    // script runs before the page's, so the classes are wrapped as the page defines them and every
+    // player made is remembered (a few, the newest), to be found by the video it is attached to.
+    var PLAYERS = Symbol.for('openmedia.players');
+    if (!window[PLAYERS] && typeof Proxy === 'function') {
+      var made = window[PLAYERS] = [];
+      var track = function (Class) {
+        if (typeof Class !== 'function') return Class;
+        try {
+          return new Proxy(Class, {
+            construct: function (target, args, newTarget) {
+              var instance = Reflect.construct(target, args, newTarget);
+              made.push(instance);
+              if (made.length > 12) made.shift();
+              return instance;
+            }
+          });
+        } catch (_) { return Class; }
+      };
+      var hook = function (name, wrap) {
+        try {
+          if (window[name]) { window[name] = wrap(window[name]); return; }
+          var held;
+          Object.defineProperty(window, name, {
+            configurable: true,
+            enumerable: true,
+            get: function () { return held; },
+            set: function (value) { try { held = wrap(value); } catch (_) { held = value; } }
+          });
+        } catch (_) {}
+      };
+      hook('Hls', track);
+      hook('shaka', function (shaka) {
+        if (shaka && typeof shaka.Player === 'function') shaka.Player = track(shaka.Player);
+        return shaka;
+      });
+    }
+
     // Every video on the page, those inside shadow roots too.
     function allVideos() {
       var found = Array.prototype.slice.call(document.querySelectorAll('video'));
@@ -455,7 +493,7 @@
     }
 
     function firstWindowObject(test) {
-      var objects = windowObjects();
+      var objects = (window[PLAYERS] || []).concat(windowObjects());
       for (var i = 0; i < objects.length; i++) {
         try { if (test(objects[i])) return objects[i]; } catch (_) {}
       }

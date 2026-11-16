@@ -259,6 +259,8 @@ interface Page {
   teardown: () => void;
   /** What the page told the app about the small player. */
   posts: unknown[];
+  /** The page's window, for what a site defines on it. */
+  window: Record<string, unknown>;
   /** What a frame told its page. */
   parentPosts: unknown[];
   /** The page the frame is in, as the source of its messages. */
@@ -569,6 +571,7 @@ function load(options: {
     posts,
     parentPosts,
     parent,
+    window: win,
     document,
   };
 }
@@ -1240,6 +1243,37 @@ describe("video controls", () => {
     ]);
     vsRows?.children[0]?.fire("pointerup");
     expect(picks).toEqual(["jw0", "auto"]);
+  });
+
+  it("finds an hls.js player the page keeps in a variable of its own, by remembering the ones it makes", () => {
+    const video = new FakeVideo();
+    const page = load({ videos: [video], current: video });
+    class Hls {
+      levels = [{ height: 360 }, { height: 720 }];
+      currentLevel = -1;
+      autoLevelEnabled = true;
+      media: unknown = null;
+      attachMedia(media: unknown) {
+        this.media = media;
+      }
+    }
+    // The page defines its library after the controls started, then makes a player nobody can reach.
+    page.window.Hls = Hls;
+    const player = new (page.window.Hls as typeof Hls)();
+    player.attachMedia(video);
+    expect(player).toBeInstanceOf(Hls);
+    openPanel(page);
+    buttonWith(page, "gear").fire("pointerup");
+    const rows = page.body
+      .descendants()
+      .find((element) => element.style.display === "block" && element.children.length === 3);
+    expect(rows?.children.map((row) => row.textContent)).toEqual([
+      "\u2713 Auto",
+      "\u2003360p",
+      "\u2003720p",
+    ]);
+    rows?.children[2]?.fire("pointerup");
+    expect(player.currentLevel).toBe(1);
   });
 
   it("takes the video full screen with the panel's button, in the phone's own player when there is one", () => {
