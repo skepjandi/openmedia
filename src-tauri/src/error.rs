@@ -4,7 +4,8 @@ pub type Result<T> = std::result::Result<T, Error>;
 
 /// Messages here reach the UI, so none of them may contain a key, a header, or a response body.
 /// `ProRequired` serializes as the stable code `pro-required`, which the shell matches to open
-/// the paywall.
+/// the paywall; `UsageLocked` as `usage-locked`, which the shell shows as the settings lock's
+/// own message.
 #[derive(Debug, thiserror::Error)]
 pub enum Error {
     #[error("a favorite needs a name of 1-20 characters")]
@@ -15,6 +16,8 @@ pub enum Error {
     InvalidMargin(u32),
     #[error("invalid usage record: {0}")]
     InvalidUsage(&'static str),
+    #[error("usage-locked")]
+    UsageLocked,
     #[error("invalid chat: {0}")]
     InvalidChat(&'static str),
     #[error("no such site option")]

@@ -3,12 +3,16 @@ use std::{
     fs,
     path::PathBuf,
     sync::{Mutex, MutexGuard},
+    time::{SystemTime, UNIX_EPOCH},
 };
 
 use serde::{Deserialize, Serialize};
 
 use crate::error::{Error, Result};
 use crate::library::write_atomically;
+use crate::recipes::OptionValue;
+use crate::schedule::Schedule;
+use crate::usage_lock::{LockData, LockStatus, limit_relaxed, pause_relaxed};
 use tauri_plugin_siteview::site::{is_public_suffix, registrable_domain};
 
 const FORMAT_VERSION: u32 = 1;
@@ -26,6 +30,9 @@ pub const MAX_POLICY_SECONDS: u32 = 86_400;
 pub const MAX_SECONDS_PER_RECORD: u32 = 3600;
 const MAX_HOST_CHARS: usize = 253;
 const MAX_SECTION_CHARS: usize = 24;
+/// The shortest and longest pause-screen delay a site may carry.
+pub const MIN_PAUSE_SECONDS: u32 = 3;
+pub const MAX_PAUSE_SECONDS: u32 = 120;
 /// The section of a page at the root of its site.
 pub const HOME_SECTION: &str = "/";
 /// The section of every page whose first path segment is not a plain lowercase word.
@@ -47,6 +54,32 @@ struct UsageData {
     /// section, such as Reels inside Instagram.
     #[serde(default)]
     section_policies: SectionPolicies,
+    /// The times of day each site is closed. Files from before schedules existed have none.
+    #[serde(default)]
+    schedules: Schedules,
+    /// The pause-screen delay of each site.
+    #[serde(default)]
+    pauses: Pauses,
+    /// Whether pause screens show at all; on unless the user turned them off.
+    #[serde(default = "pauses_on")]
+    pause_enabled: bool,
+    /// The settings lock and its cooling-off request.
+    #[serde(default)]
+    lock: LockData,
+}
+
+fn pauses_on() -> bool {
+    true
+}
+
+/// Everything the settings lock guards, copied so a refused or failed change can be undone.
+struct Rules {
+    policies: UsagePolicies,
+    section_policies: SectionPolicies,
+    schedules: Schedules,
+    pauses: Pauses,
+    pause_enabled: bool,
+    lock: LockData,
 }
 
 impl UsageData {
@@ -56,7 +89,31 @@ impl UsageData {
             days: BTreeMap::new(),
             policies: UsagePolicies::new(),
             section_policies: SectionPolicies::new(),
+            schedules: Schedules::new(),
+            pauses: Pauses::new(),
+            pause_enabled: true,
+            lock: LockData::default(),
         }
+    }
+
+    fn rules(&self) -> Rules {
+        Rules {
+            policies: self.policies.clone(),
+            section_policies: self.section_policies.clone(),
+            schedules: self.schedules.clone(),
+            pauses: self.pauses.clone(),
+            pause_enabled: self.pause_enabled,
+            lock: self.lock.clone(),
+        }
+    }
+
+    fn restore(&mut self, rules: Rules) {
+        self.policies = rules.policies;
+        self.section_policies = rules.section_policies;
+        self.schedules = rules.schedules;
+        self.pauses = rules.pauses;
+        self.pause_enabled = rules.pause_enabled;
+        self.lock = rules.lock;
     }
 }
 
@@ -86,7 +143,14 @@ pub type UsagePolicies = BTreeMap<String, UsagePolicy>;
 /// The policy of every part of a site the user set one for, keyed by host and then by section.
 pub type SectionPolicies = BTreeMap<String, UsagePolicies>;
 
-/// Every limit the user set: for whole sites and for the parts of them.
+/// The downtime schedule of every site the user set one for, keyed by host.
+pub type Schedules = BTreeMap<String, Schedule>;
+
+/// The pause-screen delay in seconds of every site the user set one for, keyed by host.
+pub type Pauses = BTreeMap<String, u32>;
+
+/// Every rule the user set: limits for whole sites and for parts of them, downtime schedules and
+/// pause screens.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
 pub struct UsageLimits {
@@ -94,6 +158,12 @@ pub struct UsageLimits {
     pub sites: UsagePolicies,
     /// The limit of every part of a site, keyed by host and then by section.
     pub sections: SectionPolicies,
+    /// The downtime of every site, keyed by host.
+    pub schedules: Schedules,
+    /// The pause-screen delay of every site, keyed by host.
+    pub pauses: Pauses,
+    /// The global switch for pause screens; off means no site shows one, whatever its delay.
+    pub pause_enabled: bool,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
@@ -123,15 +193,23 @@ pub struct UsageReport {
 
 /// Seconds spent per site and per area of the site, per local day. Holds only host names, the
 /// first path segment and counts: never a full address, query or title. Kept in its own file so
-/// the library stays small, and it never leaves the device.
+/// the library stays small, and it never leaves the device. The same file holds the rules the
+/// user set around that time: limits, schedules, pause screens and the settings lock.
 pub struct Usage {
     path: PathBuf,
     data: Mutex<UsageData>,
+    /// Seconds since the Unix epoch. Only the settings lock reads it, to time its cooling-off
+    /// period; everything else works on the local date the shell passes.
+    clock: Box<dyn Fn() -> i64 + Send + Sync>,
 }
 
 impl Usage {
     /// A missing, corrupt or newer-format file starts empty: these numbers are disposable.
     pub fn load(path: PathBuf) -> Result<Self> {
+        Self::load_with_clock(path, Box::new(unix_now))
+    }
+
+    fn load_with_clock(path: PathBuf, clock: Box<dyn Fn() -> i64 + Send + Sync>) -> Result<Self> {
         let data = match fs::read_to_string(&path) {
             Ok(text) => parse(&text),
             Err(e) if e.kind() == std::io::ErrorKind::NotFound => UsageData::empty(),
@@ -140,6 +218,7 @@ impl Usage {
         Ok(Self {
             path,
             data: Mutex::new(data),
+            clock,
         })
     }
 
@@ -204,44 +283,38 @@ impl Usage {
         Ok(summarize(merged))
     }
 
-    /// Every limit the user set: for whole sites and for the parts of them.
+    /// Every limit the user set: for whole sites and for the parts of them, plus the schedules and
+    /// pause screens that sit beside them.
     pub fn limits(&self) -> Result<UsageLimits> {
         let data = self.lock()?;
-        Ok(UsageLimits {
-            sites: data.policies.clone(),
-            sections: data.section_policies.clone(),
-        })
+        Ok(limits_of(&data))
     }
 
     /// Saves the daily warning and limit for one site, and returns every limit. A policy with
-    /// neither step removes the site's policy, which is how a limit is lifted.
+    /// neither step removes the site's policy, which is how a limit is lifted. While the settings
+    /// lock is on, a higher or removed threshold is refused.
     pub fn set_limit(&self, host: &str, policy: UsagePolicy) -> Result<UsageLimits> {
         if !valid_host(host) {
             return Err(Error::InvalidUsage("invalid host"));
         }
         check_policy(&policy)?;
-        let mut data = self.lock()?;
-        let previous = data.policies.clone();
-        if policy.is_unset() {
-            data.policies.remove(host);
-        } else {
-            if !data.policies.contains_key(host) && data.policies.len() >= MAX_POLICY_HOSTS {
-                return Err(Error::InvalidUsage("too many sites carry a limit"));
+        self.change(|data| {
+            let relaxing = policy_relaxed(data.policies.get(host), &policy);
+            if policy.is_unset() {
+                data.policies.remove(host);
+            } else {
+                if !data.policies.contains_key(host) && data.policies.len() >= MAX_POLICY_HOSTS {
+                    return Err(Error::InvalidUsage("too many sites carry a limit"));
+                }
+                data.policies.insert(host.to_owned(), policy);
             }
-            data.policies.insert(host.to_owned(), policy);
-        }
-        if let Err(error) = self.save(&data) {
-            data.policies = previous;
-            return Err(error);
-        }
-        Ok(UsageLimits {
-            sites: data.policies.clone(),
-            sections: data.section_policies.clone(),
+            Ok(relaxing)
         })
     }
 
     /// Saves the daily warning and limit for one part of a site, and returns every limit. A
-    /// policy with neither step removes the part's policy, which is how a limit is lifted.
+    /// policy with neither step removes the part's policy, which is how a limit is lifted. The
+    /// settings lock refuses a relaxation the same way as for a whole site.
     pub fn set_section_limit(
         &self,
         host: &str,
@@ -255,44 +328,202 @@ impl Usage {
             return Err(Error::InvalidUsage("invalid section"));
         }
         check_policy(&policy)?;
-        let mut data = self.lock()?;
-        let previous = data.section_policies.clone();
-        let known = data.section_policies.get(host);
-        if !policy.is_unset() {
-            let parts = known.map(|parts| parts.len()).unwrap_or(0);
-            let is_new = !known.is_some_and(|parts| parts.contains_key(section));
-            if known.is_none() && data.section_policies.len() >= MAX_POLICY_HOSTS {
-                return Err(Error::InvalidUsage("too many sites carry a limit"));
+        self.change(|data| {
+            let known = data.section_policies.get(host);
+            let relaxing = policy_relaxed(known.and_then(|parts| parts.get(section)), &policy);
+            if !policy.is_unset() {
+                let parts = known.map(|parts| parts.len()).unwrap_or(0);
+                let is_new = !known.is_some_and(|parts| parts.contains_key(section));
+                if known.is_none() && data.section_policies.len() >= MAX_POLICY_HOSTS {
+                    return Err(Error::InvalidUsage("too many sites carry a limit"));
+                }
+                if is_new && parts >= MAX_SECTION_POLICIES {
+                    return Err(Error::InvalidUsage(
+                        "too many parts of a site carry a limit",
+                    ));
+                }
             }
-            if is_new && parts >= MAX_SECTION_POLICIES {
-                return Err(Error::InvalidUsage(
-                    "too many parts of a site carry a limit",
-                ));
-            }
-        }
-        {
             let parts = data.section_policies.entry(host.to_owned()).or_default();
             if policy.is_unset() {
                 parts.remove(section);
             } else {
                 parts.insert(section.to_owned(), policy);
             }
+            if parts.is_empty() {
+                data.section_policies.remove(host);
+            }
+            Ok(relaxing)
+        })
+    }
+
+    /// Saves the downtime schedule of one site and returns every limit. A schedule without
+    /// windows removes it. While the settings lock is on, a schedule that leaves the site open
+    /// at a time the old one closed it is refused.
+    pub fn set_schedule(&self, host: &str, schedule: Schedule) -> Result<UsageLimits> {
+        if !valid_host(host) {
+            return Err(Error::InvalidUsage("invalid host"));
         }
-        if data
-            .section_policies
-            .get(host)
-            .is_some_and(|parts| parts.is_empty())
+        schedule.check()?;
+        self.change(|data| {
+            let relaxing = data
+                .schedules
+                .get(host)
+                .is_some_and(|old| !old.is_contained_in(&schedule));
+            if schedule.is_empty() {
+                data.schedules.remove(host);
+            } else {
+                if !data.schedules.contains_key(host) && data.schedules.len() >= MAX_POLICY_HOSTS {
+                    return Err(Error::InvalidUsage("too many sites carry a schedule"));
+                }
+                data.schedules.insert(host.to_owned(), schedule);
+            }
+            Ok(relaxing)
+        })
+    }
+
+    /// Saves the pause-screen delay of one site, or removes it with `None`, and returns every
+    /// limit. While the settings lock is on, a shorter delay or none is refused.
+    pub fn set_pause(&self, host: &str, seconds: Option<u32>) -> Result<UsageLimits> {
+        if !valid_host(host) {
+            return Err(Error::InvalidUsage("invalid host"));
+        }
+        if seconds
+            .is_some_and(|seconds| !(MIN_PAUSE_SECONDS..=MAX_PAUSE_SECONDS).contains(&seconds))
         {
-            data.section_policies.remove(host);
+            return Err(Error::InvalidUsage(
+                "a pause must be between 3 and 120 seconds",
+            ));
         }
-        if let Err(error) = self.save(&data) {
-            data.section_policies = previous;
+        self.change(|data| {
+            let relaxing = pause_relaxed(data.pauses.get(host).copied(), seconds);
+            match seconds {
+                None => {
+                    data.pauses.remove(host);
+                }
+                Some(seconds) => {
+                    if !data.pauses.contains_key(host) && data.pauses.len() >= MAX_POLICY_HOSTS {
+                        return Err(Error::InvalidUsage("too many sites carry a pause"));
+                    }
+                    data.pauses.insert(host.to_owned(), seconds);
+                }
+            }
+            Ok(relaxing)
+        })
+    }
+
+    /// Turns every pause screen on or off at once, keeping each site's delay. While the settings
+    /// lock is on, turning them off is refused.
+    pub fn set_pause_enabled(&self, enabled: bool) -> Result<UsageLimits> {
+        self.change(|data| {
+            let relaxing = data.pause_enabled && !enabled;
+            data.pause_enabled = enabled;
+            Ok(relaxing)
+        })
+    }
+
+    /// Where the settings lock stands now.
+    pub fn lock_status(&self) -> Result<LockStatus> {
+        Ok(self.lock()?.lock.status((self.clock)()))
+    }
+
+    /// Turns the settings lock on. Always allowed: it only restricts.
+    pub fn enable_lock(&self) -> Result<LockStatus> {
+        self.change_lock(|lock, _| {
+            lock.enable();
+            Ok(())
+        })
+    }
+
+    /// Starts the 24 hour cooling-off period before the lock may be relaxed. A request already
+    /// running keeps its time.
+    pub fn request_unlock(&self) -> Result<LockStatus> {
+        self.change_lock(|lock, now| lock.request_unlock(now))
+    }
+
+    /// Cancels an unlock request, during the wait or after it, and keeps the lock on.
+    pub fn cancel_unlock(&self) -> Result<LockStatus> {
+        self.change_lock(|lock, _| {
+            lock.cancel_unlock();
+            Ok(())
+        })
+    }
+
+    /// Lifts the lock without changing anything, once the cooling-off period is over.
+    pub fn lift_lock(&self) -> Result<LockStatus> {
+        self.change_lock(|lock, now| lock.lift(now))
+    }
+
+    /// Marks a recipe option protected at `value`, the value it has now. Always allowed.
+    pub fn protect_option(
+        &self,
+        recipe_id: &str,
+        option_id: &str,
+        value: OptionValue,
+    ) -> Result<LockStatus> {
+        self.change_lock(|lock, _| lock.protect(recipe_id, option_id, value))
+    }
+
+    /// Removes the protection mark. While the lock is on this is a relaxation.
+    pub fn unprotect_option(&self, recipe_id: &str, option_id: &str) -> Result<LockStatus> {
+        self.change_lock(|lock, now| {
+            let relaxing = lock.enabled && lock.protected_value(recipe_id, option_id).is_some();
+            lock.allow(relaxing, now)?;
+            lock.unprotect(recipe_id, option_id);
+            Ok(())
+        })
+    }
+
+    /// Checks a write to a recipe option against the settings lock. While the lock is on, a
+    /// protected option may only keep the value it was marked with; any other value is a
+    /// relaxation. Call before saving the option.
+    pub fn check_option_write(
+        &self,
+        recipe_id: &str,
+        option_id: &str,
+        value: &OptionValue,
+    ) -> Result<()> {
+        let enabled_and_marked = |lock: &LockData| {
+            lock.enabled
+                && lock
+                    .protected_value(recipe_id, option_id)
+                    .is_some_and(|marked| marked != value)
+        };
+        if !enabled_and_marked(&self.lock()?.lock) {
+            return Ok(());
+        }
+        self.change_lock(|lock, now| lock.allow(true, now))?;
+        Ok(())
+    }
+
+    /// Applies `edit` to the rules, then lets the settings lock judge it: `edit` reports whether
+    /// it relaxed anything. A refused or failed change leaves every rule as it was.
+    fn change(&self, edit: impl FnOnce(&mut UsageData) -> Result<bool>) -> Result<UsageLimits> {
+        let now = (self.clock)();
+        let mut data = self.lock()?;
+        let before = data.rules();
+        let outcome = edit(&mut data)
+            .and_then(|relaxing| data.lock.allow(relaxing, now))
+            .and_then(|()| self.save(&data));
+        if let Err(error) = outcome {
+            data.restore(before);
             return Err(error);
         }
-        Ok(UsageLimits {
-            sites: data.policies.clone(),
-            sections: data.section_policies.clone(),
-        })
+        Ok(limits_of(&data))
+    }
+
+    /// Applies `edit` to the settings lock alone and saves it.
+    fn change_lock(
+        &self,
+        edit: impl FnOnce(&mut LockData, i64) -> Result<()>,
+    ) -> Result<LockStatus> {
+        let now = (self.clock)();
+        let mut data = self.lock()?;
+        let before = data.lock.clone();
+        if let Err(error) = edit(&mut data.lock, now).and_then(|()| self.save(&data)) {
+            data.lock = before;
+            return Err(error);
+        }
+        Ok(data.lock.status(now))
     }
 
     /// Sites an earlier build stored under a public suffix (`github.io`, `com.br`) because it
@@ -391,6 +622,26 @@ fn check_policy(policy: &UsagePolicy) -> Result<()> {
         ));
     }
     Ok(())
+}
+
+/// Every limit the user set, with the schedules and pause screens beside them.
+fn limits_of(data: &UsageData) -> UsageLimits {
+    UsageLimits {
+        sites: data.policies.clone(),
+        sections: data.section_policies.clone(),
+        schedules: data.schedules.clone(),
+        pauses: data.pauses.clone(),
+        pause_enabled: data.pause_enabled,
+    }
+}
+
+/// True when moving to `new` lets a site use more than `old` did: a higher or dropped threshold.
+/// A site that had no policy cannot be relaxed by adding one.
+fn policy_relaxed(old: Option<&UsagePolicy>, new: &UsagePolicy) -> bool {
+    old.is_some_and(|old| {
+        limit_relaxed(old.warn_seconds, new.warn_seconds)
+            || limit_relaxed(old.limit_seconds, new.limit_seconds)
+    })
 }
 
 /// True when the site has already used up its daily limit on `day`.
@@ -495,6 +746,15 @@ fn strictest(a: Option<u32>, b: Option<u32>) -> Option<u32> {
         (None, other) | (other, None) => other,
         (Some(a), Some(b)) => Some(a.min(b)),
     }
+}
+
+/// Seconds since the Unix epoch; a clock set before 1970 reads as 0.
+fn unix_now() -> i64 {
+    SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .ok()
+        .and_then(|elapsed| i64::try_from(elapsed.as_secs()).ok())
+        .unwrap_or(0)
 }
 
 fn parse(text: &str) -> UsageData {
@@ -798,7 +1058,12 @@ mod tests {
         let text = fs::read_to_string(dir.path().join("usage.json")).unwrap();
         assert_eq!(
             text,
-            r#"{"version":1,"days":{"2026-11-08":{"youtube.com":{"/watch":7}}},"policies":{},"section_policies":{}}"#
+            concat!(
+                r#"{"version":1,"days":{"2026-11-08":{"youtube.com":{"/watch":7}}},"#,
+                r#""policies":{},"section_policies":{},"schedules":{},"pauses":{},"#,
+                r#""pause_enabled":true,"lock":{"enabled":false,"unlockRequestedAt":null,"#,
+                r#""protectedOptions":{}}}"#
+            )
         );
     }
 
@@ -1155,5 +1420,339 @@ mod tests {
             std::fs::read(dir.path().join("usage.json")).unwrap(),
             before
         );
+    }
+}
+
+#[cfg(test)]
+mod time_controls_tests {
+    use std::sync::Arc;
+    use std::sync::atomic::{AtomicI64, Ordering};
+
+    use super::*;
+    use crate::schedule::ScheduleWindow;
+    use crate::usage_lock::{COOLING_OFF_SECONDS, LockPhase};
+
+    const START: i64 = 1_800_000_000;
+
+    struct Harness {
+        dir: tempfile::TempDir,
+        clock: Arc<AtomicI64>,
+        usage: Usage,
+    }
+
+    fn harness() -> Harness {
+        let dir = tempfile::tempdir().unwrap();
+        let clock = Arc::new(AtomicI64::new(START));
+        let shared = Arc::clone(&clock);
+        let usage = Usage::load_with_clock(
+            dir.path().join("usage.json"),
+            Box::new(move || shared.load(Ordering::SeqCst)),
+        )
+        .unwrap();
+        Harness { dir, clock, usage }
+    }
+
+    impl Harness {
+        fn advance(&self, seconds: i64) {
+            self.clock.fetch_add(seconds, Ordering::SeqCst);
+        }
+
+        fn reload(&self) -> Usage {
+            let shared = Arc::clone(&self.clock);
+            Usage::load_with_clock(
+                self.dir.path().join("usage.json"),
+                Box::new(move || shared.load(Ordering::SeqCst)),
+            )
+            .unwrap()
+        }
+    }
+
+    fn policy(warn: Option<u32>, limit: Option<u32>) -> UsagePolicy {
+        UsagePolicy {
+            warn_seconds: warn,
+            limit_seconds: limit,
+        }
+    }
+
+    fn night(start: u16, end: u16) -> Schedule {
+        Schedule {
+            windows: vec![ScheduleWindow {
+                days: 0b111_1111,
+                start_minute: start,
+                end_minute: end,
+            }],
+        }
+    }
+
+    fn is_locked<T: std::fmt::Debug>(result: Result<T>) -> bool {
+        matches!(result, Err(Error::UsageLocked))
+    }
+
+    #[test]
+    fn schedules_and_pauses_persist_and_old_files_load_without_them() {
+        let h = harness();
+        h.usage
+            .set_schedule("youtube.com", night(1320, 420))
+            .unwrap();
+        h.usage.set_pause("youtube.com", Some(10)).unwrap();
+        h.usage.set_pause_enabled(false).unwrap();
+        let limits = h.reload().limits().unwrap();
+        assert_eq!(limits.schedules["youtube.com"], night(1320, 420));
+        assert_eq!(limits.pauses["youtube.com"], 10);
+        assert!(!limits.pause_enabled);
+
+        let old = r#"{"version":1,"days":{},"policies":{"a.com":{"warnSeconds":null,"limitSeconds":60}}}"#;
+        let dir = tempfile::tempdir().unwrap();
+        std::fs::write(dir.path().join("usage.json"), old).unwrap();
+        let loaded = Usage::load(dir.path().join("usage.json")).unwrap();
+        let limits = loaded.limits().unwrap();
+        assert_eq!(limits.sites["a.com"].limit_seconds, Some(60));
+        assert!(limits.schedules.is_empty() && limits.pauses.is_empty());
+        assert!(limits.pause_enabled, "pause screens default to on");
+        assert_eq!(loaded.lock_status().unwrap().phase, LockPhase::Off);
+    }
+
+    #[test]
+    fn a_schedule_is_validated_and_an_empty_one_removes_it() {
+        let h = harness();
+        assert!(h.usage.set_schedule("Bad Host", night(0, 60)).is_err());
+        assert!(h.usage.set_schedule("a.com", night(60, 60)).is_err());
+        h.usage.set_schedule("a.com", night(1320, 420)).unwrap();
+        let limits = h.usage.set_schedule("a.com", Schedule::default()).unwrap();
+        assert!(limits.schedules.is_empty());
+    }
+
+    #[test]
+    fn pauses_are_validated() {
+        let h = harness();
+        assert!(h.usage.set_pause("a.com", Some(2)).is_err());
+        assert!(h.usage.set_pause("a.com", Some(121)).is_err());
+        h.usage.set_pause("a.com", Some(5)).unwrap();
+        let limits = h.usage.set_pause("a.com", None).unwrap();
+        assert!(limits.pauses.is_empty());
+    }
+
+    #[test]
+    fn without_a_lock_every_change_is_allowed() {
+        let h = harness();
+        h.usage.set_limit("a.com", policy(None, Some(600))).unwrap();
+        h.usage
+            .set_limit("a.com", policy(None, Some(6000)))
+            .unwrap();
+        h.usage.set_limit("a.com", policy(None, None)).unwrap();
+        h.usage.set_pause("a.com", Some(30)).unwrap();
+        h.usage.set_pause("a.com", Some(5)).unwrap();
+    }
+
+    #[test]
+    fn a_locked_lock_lets_limits_get_stricter_and_refuses_the_rest() {
+        let h = harness();
+        h.usage
+            .set_limit("a.com", policy(Some(300), Some(600)))
+            .unwrap();
+        h.usage.enable_lock().unwrap();
+
+        h.usage
+            .set_limit("a.com", policy(Some(200), Some(500)))
+            .unwrap();
+        h.usage.set_limit("b.com", policy(None, Some(900))).unwrap();
+        assert!(is_locked(
+            h.usage.set_limit("a.com", policy(Some(200), Some(501)))
+        ));
+        assert!(is_locked(
+            h.usage.set_limit("a.com", policy(None, Some(500)))
+        ));
+        assert!(is_locked(h.usage.set_limit("a.com", policy(None, None))));
+        assert!(is_locked(
+            h.usage.set_limit("b.com", policy(None, Some(901)))
+        ));
+        let limits = h.usage.limits().unwrap();
+        assert_eq!(limits.sites["a.com"], policy(Some(200), Some(500)));
+        assert_eq!(limits.sites["b.com"], policy(None, Some(900)));
+    }
+
+    #[test]
+    fn a_locked_lock_refuses_to_relax_a_part_of_a_site() {
+        let h = harness();
+        h.usage
+            .set_section_limit("a.com", "/watch", policy(None, Some(600)))
+            .unwrap();
+        h.usage.enable_lock().unwrap();
+        h.usage
+            .set_section_limit("a.com", "/watch", policy(None, Some(300)))
+            .unwrap();
+        h.usage
+            .set_section_limit("a.com", "/feed", policy(None, Some(300)))
+            .unwrap();
+        assert!(is_locked(h.usage.set_section_limit(
+            "a.com",
+            "/watch",
+            policy(None, None)
+        )));
+        assert!(is_locked(h.usage.set_section_limit(
+            "a.com",
+            "/watch",
+            policy(None, Some(301))
+        )));
+        assert_eq!(
+            h.usage.limits().unwrap().sections["a.com"]["/watch"],
+            policy(None, Some(300))
+        );
+    }
+
+    #[test]
+    fn a_locked_lock_allows_adding_and_growing_a_schedule_but_not_shrinking_it() {
+        let h = harness();
+        h.usage.set_schedule("a.com", night(1320, 420)).unwrap();
+        h.usage.enable_lock().unwrap();
+
+        h.usage.set_schedule("a.com", night(1260, 480)).unwrap();
+        h.usage.set_schedule("b.com", night(0, 60)).unwrap();
+        assert!(is_locked(h.usage.set_schedule("a.com", night(1320, 420))));
+        assert!(is_locked(h.usage.set_schedule("a.com", night(1260, 479))));
+        assert!(is_locked(
+            h.usage.set_schedule("a.com", Schedule::default())
+        ));
+        assert_eq!(
+            h.usage.limits().unwrap().schedules["a.com"],
+            night(1260, 480)
+        );
+    }
+
+    #[test]
+    fn a_locked_lock_refuses_shorter_and_disabled_pauses() {
+        let h = harness();
+        h.usage.set_pause("a.com", Some(10)).unwrap();
+        h.usage.enable_lock().unwrap();
+
+        h.usage.set_pause("a.com", Some(30)).unwrap();
+        h.usage.set_pause("b.com", Some(5)).unwrap();
+        assert!(is_locked(h.usage.set_pause("a.com", Some(10))));
+        assert!(is_locked(h.usage.set_pause("a.com", None)));
+        assert!(is_locked(h.usage.set_pause_enabled(false)));
+        h.usage.set_pause_enabled(true).unwrap();
+        assert_eq!(h.usage.limits().unwrap().pauses["a.com"], 30);
+    }
+
+    #[test]
+    fn protected_options_keep_their_value_while_locked() {
+        let h = harness();
+        let on = OptionValue::Toggle(true);
+        let off = OptionValue::Toggle(false);
+        h.usage.protect_option("r", "shorts", on.clone()).unwrap();
+        h.usage.check_option_write("r", "shorts", &off).unwrap();
+
+        h.usage.enable_lock().unwrap();
+        h.usage.check_option_write("r", "shorts", &on).unwrap();
+        h.usage.check_option_write("r", "other", &off).unwrap();
+        assert!(is_locked(h.usage.check_option_write("r", "shorts", &off)));
+        assert!(is_locked(h.usage.unprotect_option("r", "shorts")));
+        h.usage.protect_option("r", "other", off).unwrap();
+        assert_eq!(h.usage.lock_status().unwrap().protected_options.len(), 2);
+    }
+
+    #[test]
+    fn unlocking_waits_a_day_then_allows_one_relaxation_and_lifts_the_lock() {
+        let h = harness();
+        h.usage.set_limit("a.com", policy(None, Some(600))).unwrap();
+        h.usage.enable_lock().unwrap();
+        assert!(is_locked(h.usage.set_limit("a.com", policy(None, None))));
+
+        let status = h.usage.request_unlock().unwrap();
+        assert_eq!(status.phase, LockPhase::CoolingOff);
+        assert_eq!(status.remaining_seconds, COOLING_OFF_SECONDS as u64);
+        h.advance(COOLING_OFF_SECONDS - 1);
+        assert!(is_locked(h.usage.set_limit("a.com", policy(None, None))));
+        assert_eq!(h.usage.lock_status().unwrap().remaining_seconds, 1);
+
+        h.advance(1);
+        assert_eq!(h.usage.lock_status().unwrap().phase, LockPhase::Ready);
+        h.usage.set_limit("a.com", policy(None, None)).unwrap();
+        assert_eq!(h.usage.lock_status().unwrap().phase, LockPhase::Off);
+        h.usage
+            .set_limit("a.com", policy(None, Some(6000)))
+            .unwrap();
+    }
+
+    #[test]
+    fn the_request_time_is_kept_by_rust_across_restarts() {
+        let h = harness();
+        h.usage.enable_lock().unwrap();
+        h.usage.request_unlock().unwrap();
+        h.advance(3600);
+        let reloaded = h.reload();
+        let status = reloaded.lock_status().unwrap();
+        assert_eq!(status.phase, LockPhase::CoolingOff);
+        assert_eq!(
+            status.remaining_seconds,
+            (COOLING_OFF_SECONDS - 3600) as u64
+        );
+    }
+
+    #[test]
+    fn cancelling_during_the_wait_keeps_the_lock_and_restarts_nothing() {
+        let h = harness();
+        h.usage.set_pause("a.com", Some(10)).unwrap();
+        h.usage.enable_lock().unwrap();
+        h.usage.request_unlock().unwrap();
+        h.advance(COOLING_OFF_SECONDS / 2);
+        assert_eq!(h.usage.cancel_unlock().unwrap().phase, LockPhase::Locked);
+        h.advance(COOLING_OFF_SECONDS);
+        assert!(is_locked(h.usage.set_pause("a.com", None)));
+    }
+
+    #[test]
+    fn lifting_without_a_relaxation_needs_the_wait_too() {
+        let h = harness();
+        h.usage.enable_lock().unwrap();
+        assert!(is_locked(h.usage.lift_lock()));
+        h.usage.request_unlock().unwrap();
+        assert!(is_locked(h.usage.lift_lock()));
+        h.advance(COOLING_OFF_SECONDS);
+        assert_eq!(h.usage.lift_lock().unwrap().phase, LockPhase::Off);
+    }
+
+    #[test]
+    fn a_ready_lock_lifts_on_a_protected_option_write_once() {
+        let h = harness();
+        h.usage
+            .protect_option("r", "shorts", OptionValue::Toggle(true))
+            .unwrap();
+        h.usage.enable_lock().unwrap();
+        h.usage.request_unlock().unwrap();
+        h.advance(COOLING_OFF_SECONDS);
+        h.usage
+            .check_option_write("r", "shorts", &OptionValue::Toggle(false))
+            .unwrap();
+        assert_eq!(h.usage.lock_status().unwrap().phase, LockPhase::Off);
+    }
+
+    #[test]
+    fn a_failed_save_leaves_every_rule_and_the_lock_as_they_were() {
+        let h = harness();
+        h.usage.set_limit("a.com", policy(None, Some(600))).unwrap();
+        h.usage.enable_lock().unwrap();
+        h.usage.request_unlock().unwrap();
+        h.advance(COOLING_OFF_SECONDS);
+        let blocker = h.dir.path().join("not-a-folder");
+        let broken =
+            Usage::load_with_clock(blocker.join("usage.json"), Box::new(|| START)).unwrap();
+        std::fs::write(&blocker, "").unwrap();
+        broken
+            .set_limit("a.com", policy(None, Some(600)))
+            .unwrap_err();
+        assert!(broken.limits().unwrap().sites.is_empty());
+        broken.enable_lock().unwrap_err();
+        assert_eq!(broken.lock_status().unwrap().phase, LockPhase::Off);
+    }
+
+    #[test]
+    fn clearing_usage_keeps_the_lock_and_the_rules() {
+        let h = harness();
+        h.usage.set_schedule("a.com", night(0, 60)).unwrap();
+        h.usage.enable_lock().unwrap();
+        h.usage.clear().unwrap();
+        assert!(!h.usage.limits().unwrap().schedules.is_empty());
+        assert_eq!(h.usage.lock_status().unwrap().phase, LockPhase::Locked);
     }
 }
