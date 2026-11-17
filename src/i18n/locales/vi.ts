@@ -372,6 +372,7 @@ export const vi: Messages = {
   "library.review.rules": "Những gì nó thay đổi",
   "library.review.hides": "Ẩn",
   "library.review.restyles": "Đổi kiểu dáng",
+  "library.review.prunes": "Xóa",
   "library.review.runsCode": "Chạy mã",
   "library.review.showCode": "Xem mã",
   "library.review.hideCode": "Ẩn mã",

@@ -368,6 +368,7 @@ export const bn: Messages = {
   "library.review.rules": "যা বদলায়",
   "library.review.hides": "লুকায়",
   "library.review.restyles": "দেখতে বদলায়",
+  "library.review.prunes": "সরায়",
   "library.review.runsCode": "কোড চালায়",
   "library.review.showCode": "কোড দেখান",
   "library.review.hideCode": "কোড লুকান",

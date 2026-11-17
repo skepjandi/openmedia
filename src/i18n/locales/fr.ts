@@ -387,6 +387,7 @@ export const fr: Messages = {
   "library.review.rules": "Ce qu’elle modifie",
   "library.review.hides": "Masque",
   "library.review.restyles": "Change l’apparence de",
+  "library.review.prunes": "Supprime",
   "library.review.runsCode": "Exécute du code",
   "library.review.showCode": "Afficher le code",
   "library.review.hideCode": "Masquer le code",

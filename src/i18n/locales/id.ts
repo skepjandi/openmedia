@@ -375,6 +375,7 @@ export const id: Messages = {
   "library.review.rules": "Yang diubah",
   "library.review.hides": "Menyembunyikan",
   "library.review.restyles": "Mengubah tampilan",
+  "library.review.prunes": "Menghapus",
   "library.review.runsCode": "Menjalankan kode",
   "library.review.showCode": "Tampilkan kode",
   "library.review.hideCode": "Sembunyikan kode",

@@ -388,6 +388,7 @@ export const ta: Messages = {
   "library.review.rules": "எதை மாற்றுகிறது",
   "library.review.hides": "மறைப்பவை",
   "library.review.restyles": "தோற்றத்தை மாற்றுபவை",
+  "library.review.prunes": "நீக்குகிறது",
   "library.review.runsCode": "குறியீட்டை இயக்கும்",
   "library.review.showCode": "குறியீட்டைக் காட்டு",
   "library.review.hideCode": "குறியீட்டை மறை",

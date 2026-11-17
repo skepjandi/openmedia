@@ -377,6 +377,7 @@ export const tr: Messages = {
   "library.review.rules": "Neyi değiştirir",
   "library.review.hides": "Gizler",
   "library.review.restyles": "Yeniden biçimlendirir",
+  "library.review.prunes": "Kaldırır",
   "library.review.runsCode": "Kod çalıştırır",
   "library.review.showCode": "Kodu göster",
   "library.review.hideCode": "Kodu gizle",

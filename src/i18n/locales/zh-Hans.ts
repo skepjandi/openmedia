@@ -349,6 +349,7 @@ export const zhHans: Messages = {
   "library.review.rules": "改动内容",
   "library.review.hides": "隐藏",
   "library.review.restyles": "调整样式",
+  "library.review.prunes": "移除",
   "library.review.runsCode": "运行代码",
   "library.review.showCode": "显示代码",
   "library.review.hideCode": "隐藏代码",

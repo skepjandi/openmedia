@@ -379,6 +379,7 @@ export const sv: Messages = {
   "library.review.rules": "Vad det ändrar",
   "library.review.hides": "Döljer",
   "library.review.restyles": "Ändrar utseendet",
+  "library.review.prunes": "Tar bort",
   "library.review.runsCode": "Kör kod",
   "library.review.showCode": "Visa koden",
   "library.review.hideCode": "Dölj koden",

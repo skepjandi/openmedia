@@ -372,6 +372,7 @@ export const ko: Messages = {
   "library.review.rules": "변경되는 내용",
   "library.review.hides": "숨기는 것",
   "library.review.restyles": "스타일을 바꾸는 것",
+  "library.review.prunes": "제거하는 것",
   "library.review.runsCode": "코드 실행",
   "library.review.showCode": "코드 보기",
   "library.review.hideCode": "코드 숨기기",

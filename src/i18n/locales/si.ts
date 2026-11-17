@@ -374,6 +374,7 @@ export const si: Messages = {
   "library.review.rules": "වෙනස් කරන දේ",
   "library.review.hides": "සඟවයි",
   "library.review.restyles": "පෙනුම වෙනස් කරයි",
+  "library.review.prunes": "ඉවත් කරයි",
   "library.review.runsCode": "කේතය ධාවනය කරයි",
   "library.review.showCode": "කේතය පෙන්වන්න",
   "library.review.hideCode": "කේතය සඟවන්න",

@@ -377,6 +377,7 @@ export const cs: Messages = {
   "library.review.rules": "Co mění",
   "library.review.hides": "Skrývá",
   "library.review.restyles": "Mění vzhled",
+  "library.review.prunes": "Odstraňuje",
   "library.review.runsCode": "Spouští kód",
   "library.review.showCode": "Zobrazit kód",
   "library.review.hideCode": "Skrýt kód",

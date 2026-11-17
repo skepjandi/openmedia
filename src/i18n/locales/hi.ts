@@ -373,6 +373,7 @@ export const hi: Messages = {
   "library.review.rules": "यह क्या बदलती है",
   "library.review.hides": "छिपाती है",
   "library.review.restyles": "रूप बदलती है",
+  "library.review.prunes": "हटाती है",
   "library.review.runsCode": "कोड चलाती है",
   "library.review.showCode": "कोड दिखाएँ",
   "library.review.hideCode": "कोड छिपाएँ",

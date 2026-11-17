@@ -350,6 +350,7 @@ export const zhHant: Messages = {
   "library.review.rules": "變更內容",
   "library.review.hides": "隱藏",
   "library.review.restyles": "調整樣式",
+  "library.review.prunes": "移除",
   "library.review.runsCode": "執行程式碼",
   "library.review.showCode": "顯示程式碼",
   "library.review.hideCode": "隱藏程式碼",

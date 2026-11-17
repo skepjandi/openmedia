@@ -378,6 +378,7 @@ export const ur: Messages = {
   "library.review.rules": "کیا بدلتی ہے",
   "library.review.hides": "چھپاتی ہے",
   "library.review.restyles": "انداز بدلتی ہے",
+  "library.review.prunes": "ہٹاتی ہے",
   "library.review.runsCode": "کوڈ چلاتی ہے",
   "library.review.showCode": "کوڈ دکھائیں",
   "library.review.hideCode": "کوڈ چھپائیں",

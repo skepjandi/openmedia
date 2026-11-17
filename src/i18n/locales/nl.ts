@@ -380,6 +380,7 @@ export const nl: Messages = {
   "library.review.rules": "Wat het verandert",
   "library.review.hides": "Verbergt",
   "library.review.restyles": "Past de stijl aan van",
+  "library.review.prunes": "Verwijdert",
   "library.review.runsCode": "Voert code uit",
   "library.review.showCode": "Code tonen",
   "library.review.hideCode": "Code verbergen",
