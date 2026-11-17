@@ -4,6 +4,7 @@ mod ai;
 mod boot;
 mod color_pick;
 mod commands;
+mod dark_mode;
 #[cfg(target_os = "macos")]
 mod desktop_menu;
 mod entitlement;
@@ -165,6 +166,8 @@ pub fn run() {
             commands::set_accessibility,
             commands::set_video_controls,
             commands::set_site_video_controls,
+            commands::set_dark_mode,
+            commands::set_site_dark_mode,
             commands::ai_state,
             commands::ai_save_provider,
             commands::ai_delete_provider,

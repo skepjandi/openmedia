@@ -32,6 +32,8 @@ import {
   type DetectedTech,
   siteView,
   type Accessibility,
+  type DarkMode,
+  type SiteDark,
   type SiteVideo,
   type VideoControls,
   type AiState,
@@ -74,7 +76,8 @@ export type Sheet =
   | "library"
   | "share-recipe"
   | "paywall"
-  | "video-controls";
+  | "video-controls"
+  | "dark-mode";
 
 /** Pages that open on top of Settings. Closing one returns to Settings, which stays mounted beneath it. */
 const SETTINGS_CHILDREN: readonly Sheet[] = [
@@ -86,6 +89,7 @@ const SETTINGS_CHILDREN: readonly Sheet[] = [
   "share-recipe",
   "paywall",
   "video-controls",
+  "dark-mode",
 ];
 const isSettingsChild = (sheet: Sheet): boolean => SETTINGS_CHILDREN.includes(sheet);
 
@@ -232,6 +236,10 @@ export interface AppStore {
   setVideoControls: (changes: Partial<VideoControls>) => Promise<void>;
   /** One site's own video controls choice; an empty one returns the site to the shared choice. */
   setSiteVideoControls: (site: string, video: SiteVideo) => Promise<void>;
+  /** Changes some of the dark mode choices; the rest keep their value. */
+  setDarkMode: (changes: Partial<DarkMode>) => Promise<void>;
+  /** One site's own dark mode choice; an empty one returns the site to the shared choice. */
+  setSiteDarkMode: (site: string, dark: SiteDark) => Promise<void>;
   loadSites: () => Promise<void>;
   /** Re-reads the favorites after Rust changed them on its own, as the guide's quick-access pick does. */
   reloadFavorites: () => Promise<void>;
@@ -997,6 +1005,38 @@ export const useApp = create<AppStore>((set, get) => {
       } catch (error) {
         set((current) => ({
           state: current.state && { ...current.state, videoSites: previous },
+          error: appError(error),
+        }));
+      }
+    },
+
+    setDarkMode: async (changes) => {
+      const previous = get().state?.darkMode;
+      if (!previous) return;
+      const next = { ...previous, ...changes };
+      set((current) => ({ state: current.state && { ...current.state, darkMode: next } }));
+      try {
+        await library.setDarkMode(next);
+      } catch (error) {
+        set((current) => ({
+          state: current.state && { ...current.state, darkMode: previous },
+          error: appError(error),
+        }));
+      }
+    },
+
+    setSiteDarkMode: async (site, dark) => {
+      const previous = get().state?.darkSites;
+      if (!previous) return;
+      const empty = dark.mode === undefined && dark.method === undefined;
+      const others = Object.fromEntries(Object.entries(previous).filter(([key]) => key !== site));
+      const next = empty ? others : { ...others, [site]: dark };
+      set((current) => ({ state: current.state && { ...current.state, darkSites: next } }));
+      try {
+        await library.setSiteDarkMode(site, dark);
+      } catch (error) {
+        set((current) => ({
+          state: current.state && { ...current.state, darkSites: previous },
           error: appError(error),
         }));
       }

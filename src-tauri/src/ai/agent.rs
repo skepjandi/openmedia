@@ -124,9 +124,9 @@ pub struct ProposalRule {
     pub label: String,
     #[serde(default)]
     pub kind: ProposalRuleKind,
-    /// Empty for a script rule.
+    /// Empty for a script rule; the elements a dark rule flips, comma separated.
     pub selector: String,
-    /// Elements a style rule matches now; 0 for a script rule, which is never counted.
+    /// Elements a style rule matches now; 0 for a script or dark rule, which are never counted.
     pub matches: i64,
     /// The script, exactly as it will be saved and run; only for a script rule.
     #[serde(default)]
@@ -142,6 +142,7 @@ pub enum ProposalRuleKind {
     #[default]
     Style,
     Script,
+    Dark,
 }
 
 /// One policy finding on a script, shown to the user before they accept it.
@@ -160,6 +161,17 @@ impl ProposalRule {
             kind: ProposalRuleKind::Style,
             selector,
             matches,
+            code: None,
+            powers: Vec::new(),
+        }
+    }
+
+    fn dark(label: String, invert: &[String]) -> Self {
+        Self {
+            label,
+            kind: ProposalRuleKind::Dark,
+            selector: invert.join(", "),
+            matches: 0,
             code: None,
             powers: Vec::new(),
         }
@@ -383,7 +395,7 @@ fn selectors_and_css(patch: &Patch, base: Option<&Recipe>) -> (Vec<(String, Stri
                     PatchRule::VideoMenu {
                         label, open, items, ..
                     } => Some((label.clone(), menu_selector(open, items))),
-                    PatchRule::Script { .. } => None,
+                    PatchRule::Script { .. } | PatchRule::Dark { .. } => None,
                 })
                 .collect(),
             patch::preview_css(patch),
@@ -441,6 +453,9 @@ fn shown_rules(
                 PatchRule::Style { .. } | PatchRule::VideoMenu { .. } => counted.next(),
                 PatchRule::Script { label, code } => {
                     Some(ProposalRule::script(label.clone(), code.clone()))
+                }
+                PatchRule::Dark { label, invert, .. } => {
+                    Some(ProposalRule::dark(label.clone(), invert))
                 }
             })
             .collect(),

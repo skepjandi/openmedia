@@ -10,10 +10,10 @@ use serde_json::{Value, json};
 
 use crate::error::{Error, Result};
 use crate::recipes::{
-    CSS_PROPERTIES, MENU_SELECTED_ATTRS, Meta, OptionGroup, OptionValue, Origin, Recipe, Rule,
-    Selected, SiteOption, Target, VideoMenuKind, current_platform_tag, is_script_text,
-    script_policy, targets_page_root, validate_declarations, validate_selector,
-    validate_video_menu,
+    CSS_PROPERTIES, DarkFixMethod, DarkFixMode, MENU_SELECTED_ATTRS, Meta, OptionGroup,
+    OptionValue, Origin, Recipe, Rule, Selected, SiteOption, Target, VideoMenuKind,
+    current_platform_tag, is_script_text, script_policy, targets_page_root, validate_dark,
+    validate_declarations, validate_selector, validate_video_menu,
 };
 use tauri_plugin_siteview::site::registrable_domain;
 
@@ -46,6 +46,14 @@ pub enum PatchRule {
         selected: Selected,
         close: Option<Target>,
     },
+    /// A fix for the app's dark mode: force it on or off, pick a method, flip some elements.
+    /// Nothing runs and nothing is previewed.
+    Dark {
+        label: String,
+        mode: Option<DarkFixMode>,
+        method: Option<DarkFixMethod>,
+        invert: Vec<String>,
+    },
 }
 
 impl PatchRule {
@@ -53,7 +61,8 @@ impl PatchRule {
         match self {
             Self::Style { label, .. }
             | Self::Script { label, .. }
-            | Self::VideoMenu { label, .. } => label,
+            | Self::VideoMenu { label, .. }
+            | Self::Dark { label, .. } => label,
         }
     }
 }
@@ -140,7 +149,7 @@ pub fn patch_schema() -> Value {
                 "items": {
                     "type": "object",
                     "additionalProperties": false,
-                    "required": ["label", "selector", "declarations", "script", "menu"],
+                    "required": ["label", "selector", "declarations", "script", "menu", "dark"],
                     "properties": {
                         "label": { "type": "string", "description": "What this rule changes, at most 60 characters." },
                         "selector": { "type": ["string", "null"], "description": "Style rules: one CSS selector (comma list allowed): at most 300 characters, at most 2 uses of :has(, none of { } ; \\ < @. null for a script rule." },
@@ -158,6 +167,17 @@ pub fn patch_schema() -> Value {
                                 "selectedAttr": { "type": ["string", "null"], "enum": MENU_SELECTED_ATTRS.iter().map(|attr| json!(attr)).chain([Value::Null]).collect::<Vec<_>>(), "description": "The attribute an entry has when it is the one in use. Set this or selectedClass, not both." },
                                 "selectedClass": { "type": ["string", "null"], "description": "The class an entry has when it is the one in use. null when selectedAttr is set." },
                                 "close": { "type": ["string", "null"], "description": "A CSS selector to click to close the menu after a pick; null when picking an entry closes it." }
+                            }
+                        },
+                        "dark": {
+                            "type": ["object", "null"],
+                            "description": "Dark mode fix rules only: how the app's dark mode treats this site. null for every other rule; set at least one of mode, method, invert.",
+                            "additionalProperties": false,
+                            "required": ["mode", "method", "invert"],
+                            "properties": {
+                                "mode": { "type": ["string", "null"], "enum": ["on", "off", null], "description": "off keeps dark mode away from the site (already dark, or broken by it); on forces it. null leaves it as the user set it." },
+                                "method": { "type": ["string", "null"], "enum": ["dynamic", "filter", "filterplus", "static", null], "description": "The method dark mode must use on this site. null leaves it as the user set it." },
+                                "invert": { "type": ["array", "null"], "items": { "type": "string" }, "description": "At most 20 CSS selectors of elements drawn dark on transparent (logos, icons, charts) whose colours dark mode flips. Never photos. null or empty for none." }
                             }
                         },
                         "declarations": {
@@ -211,6 +231,19 @@ struct RawRule {
     script: Option<String>,
     #[serde(default)]
     menu: Option<RawMenu>,
+    #[serde(default)]
+    dark: Option<RawDark>,
+}
+
+#[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
+struct RawDark {
+    #[serde(default)]
+    mode: Option<DarkFixMode>,
+    #[serde(default)]
+    method: Option<DarkFixMethod>,
+    #[serde(default)]
+    invert: Option<Vec<String>>,
 }
 
 #[derive(Deserialize)]
@@ -271,6 +304,18 @@ fn plain(text: &str, what: &str, max: usize, allow_empty: bool) -> Result<String
 fn checked_rule(rule: RawRule) -> Result<PatchRule> {
     let label = plain(&rule.label, "a rule label", MAX_LABEL_CHARS, false)?;
     let selector = rule.selector.as_deref().map(str::trim).unwrap_or_default();
+    if let Some(dark) = rule.dark {
+        if !selector.is_empty()
+            || rule.script.is_some()
+            || rule.declarations.is_some()
+            || rule.menu.is_some()
+        {
+            return Err(reject(
+                "a dark mode rule has no selector, script, declarations or menu",
+            ));
+        }
+        return checked_dark(label, dark);
+    }
     if let Some(menu) = rule.menu {
         if !selector.is_empty() || rule.script.is_some() || rule.declarations.is_some() {
             return Err(reject(
@@ -290,6 +335,23 @@ fn checked_rule(rule: RawRule) -> Result<PatchRule> {
         }
         (false, None) => checked_style(label, selector, rule.declarations),
     }
+}
+
+fn checked_dark(label: String, dark: RawDark) -> Result<PatchRule> {
+    let invert: Vec<String> = dark
+        .invert
+        .unwrap_or_default()
+        .into_iter()
+        .map(|css| css.trim().to_owned())
+        .collect();
+    validate_dark("the assistant's", dark.mode, dark.method, &invert)
+        .map_err(|error| reject(error.to_string()))?;
+    Ok(PatchRule::Dark {
+        label,
+        mode: dark.mode,
+        method: dark.method,
+        invert,
+    })
 }
 
 fn checked_menu(label: String, menu: RawMenu) -> Result<PatchRule> {
@@ -390,7 +452,7 @@ fn check_script_totals(rules: &[PatchRule], recipe: Option<&Recipe>) -> Result<(
         });
     let added = rules.iter().filter_map(|rule| match rule {
         PatchRule::Script { code, .. } => Some(code.len()),
-        PatchRule::Style { .. } | PatchRule::VideoMenu { .. } => None,
+        PatchRule::Style { .. } | PatchRule::VideoMenu { .. } | PatchRule::Dark { .. } => None,
     });
     let (count, bytes) = existing
         .chain(added)
@@ -663,6 +725,21 @@ pub fn apply_patch(base: Option<&Recipe>, host_domain: &str, patch: &Patch) -> R
                 selected: selected.clone(),
                 close: close.clone(),
             },
+            PatchRule::Dark {
+                label,
+                mode,
+                method,
+                invert,
+            } => Rule::Dark {
+                id,
+                label: label.clone(),
+                option,
+                choice: None,
+                on: None,
+                mode: *mode,
+                method: *method,
+                invert: invert.clone(),
+            },
         };
         recipe.rules.push(rule);
     }
@@ -744,7 +821,8 @@ pub fn option_css(recipe: &Recipe, option_id: &str, choice: Option<&str>) -> Str
             Rule::Script { .. }
             | Rule::VideoMenu { .. }
             | Rule::Prune { .. }
-            | Rule::Redirect { .. } => {}
+            | Rule::Redirect { .. }
+            | Rule::Dark { .. } => {}
         }
     }
     css
@@ -1142,6 +1220,110 @@ mod tests {
         assert!(parse_patch(&new_option(both), None).is_err());
     }
 
+    fn dark_rule(dark: Value) -> Value {
+        json!([{ "label": "Dark logo", "selector": null, "declarations": null, "script": null, "menu": null, "dark": dark }])
+    }
+
+    #[test]
+    fn a_dark_rule_is_checked_and_becomes_a_recipe_rule() {
+        let dark =
+            json!({ "mode": null, "method": "filter", "invert": [" img.logo ", ".brand svg"] });
+        let patch = parse_patch(&new_option(dark_rule(dark)), None).unwrap();
+        assert_eq!(
+            patch.rules(),
+            [PatchRule::Dark {
+                label: "Dark logo".into(),
+                mode: None,
+                method: Some(DarkFixMethod::Filter),
+                invert: vec!["img.logo".into(), ".brand svg".into()],
+            }]
+        );
+        assert_eq!(preview_css(&patch), "");
+        let recipe = apply_patch(None, "example.com", &patch).unwrap();
+        assert!(matches!(
+            &recipe.rules[0],
+            Rule::Dark { mode: None, method: Some(DarkFixMethod::Filter), invert, .. } if invert.len() == 2
+        ));
+        let again = Recipe::parse(&serde_json::to_string(&recipe).unwrap()).unwrap();
+        assert_eq!(again, recipe);
+        assert_eq!(option_css(&recipe, "hide-the-stories-row", None), "");
+    }
+
+    #[test]
+    fn a_dark_rule_may_only_switch_dark_mode_off() {
+        let patch = parse_patch(
+            &new_option(dark_rule(
+                json!({ "mode": "off", "method": null, "invert": null }),
+            )),
+            None,
+        )
+        .unwrap();
+        assert!(matches!(
+            patch.rules().first(),
+            Some(PatchRule::Dark { mode: Some(DarkFixMode::Off), invert, .. }) if invert.is_empty()
+        ));
+    }
+
+    #[test]
+    fn a_dark_rule_that_is_not_plainly_one_is_refused() {
+        let refused = |dark: Value| parse_patch(&new_option(dark_rule(dark)), None).is_err();
+        assert!(refused(
+            json!({ "mode": null, "method": null, "invert": null })
+        ));
+        assert!(refused(
+            json!({ "mode": null, "method": null, "invert": [] })
+        ));
+        assert!(refused(
+            json!({ "mode": "dim", "method": null, "invert": null })
+        ));
+        assert!(refused(
+            json!({ "mode": null, "method": "magic", "invert": null })
+        ));
+        assert!(refused(
+            json!({ "mode": null, "method": null, "invert": ["body"] })
+        ));
+        assert!(refused(
+            json!({ "mode": null, "method": null, "invert": ["img{color:red}"] })
+        ));
+        assert!(refused(
+            json!({ "mode": null, "method": null, "invert": [""] })
+        ));
+        let many: Vec<String> = (0..21).map(|n| format!("img.l{n}")).collect();
+        assert!(refused(
+            json!({ "mode": null, "method": null, "invert": many })
+        ));
+        assert!(refused(
+            json!({ "mode": "on", "method": null, "invert": null, "extra": 1 })
+        ));
+        let twin = |extra: (&str, Value)| {
+            let mut rule = dark_rule(json!({ "mode": "off", "method": null, "invert": null }));
+            rule[0][extra.0] = extra.1;
+            parse_patch(&new_option(rule), None).is_err()
+        };
+        assert!(twin(("selector", json!("div.x"))));
+        assert!(twin(("script", json!("return 1;"))));
+        assert!(twin((
+            "declarations",
+            json!([{ "property": "color", "value": "red" }])
+        )));
+        assert!(twin(("menu", quality_menu())));
+    }
+
+    #[test]
+    fn the_rule_schema_offers_a_nullable_dark_object() {
+        let rule = &patch_schema()["properties"]["rules"]["items"];
+        assert!(
+            rule["required"]
+                .as_array()
+                .unwrap()
+                .contains(&json!("dark"))
+        );
+        let dark = &rule["properties"]["dark"];
+        assert_eq!(dark["additionalProperties"], false);
+        assert_eq!(dark["required"], json!(["mode", "method", "invert"]));
+        assert_eq!(dark["type"], json!(["object", "null"]));
+    }
+
     #[test]
     fn a_switch_for_an_installed_recipe_goes_into_a_new_custom_recipe_beside_it() {
         let base = youtube();
@@ -1335,7 +1517,14 @@ mod tests {
         let item = &patch_schema()["properties"]["rules"]["items"];
         assert_eq!(
             item["required"],
-            json!(["label", "selector", "declarations", "script", "menu"])
+            json!([
+                "label",
+                "selector",
+                "declarations",
+                "script",
+                "menu",
+                "dark"
+            ])
         );
         assert_eq!(
             item["properties"]["menu"]["type"],

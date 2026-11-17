@@ -127,6 +127,10 @@ Sharing such a recipe goes through the normal checks: a script with powers is re
 
 The app plays and controls the video in view in full-screen feeds ([Video controls](./site-runtime.md#video-controls)); the user can switch the tap controls off, or move them, in Settings or per favorite. For a feed of a site the app does not know, the prompt (`VIDEO_FEEDS`, prompt version 5) tells the assistant to write one script rule that names the feed's paths, `document[Symbol.for("openmedia.feedPaths")] = ["^/path"]`, and to use ordinary `hide` rules for the rest of a feed's overlays. Because it uses `Symbol`, that script has powers in the policy's terms and cannot be shared.
 
+### Dark mode
+
+The app has a built-in dark mode for pages ([Dark Mode for Pages](./dark-mode.md)). The system prompt (`DARK_MODE` in `prompt.rs`) tells the assistant what it is, that its settings (method, colours, schedule, per-site choice) are the reader's and not the assistant's, and when a request is a dark-mode fix: a logo or icon that vanishes on dark, an image inverted wrongly, a page that is already dark or that the engine breaks, a page the dynamic method cannot theme. The answer is one `dark` rule (`mode`, `method`, `invert` selectors from the snapshot) in the patch's rule list, or an ordinary `css` rule for a single element (the engine never rewrites recipe CSS). `patch::parse_patch` validates it like any other rule: enums only, selectors through the recipe validator, at most 20. The rule has no count to preview; the review shows its mode, method and selectors.
+
 ### Video player options
 
 To find and write what a request needs, the assistant has three read-only inspection tools in a short bounded investigation before it answers (`ai/inspect.rs`; only when the page has a video or a big frame; any failure there is ignored): `list_media` (videos and frames, with sizes and playing state, shadow roots included), `inspect(selector)` (a redacted outline of what a selector matches) and `player_api` (the names, never values, of what a page's player objects expose). What it found goes into the request as a fenced block of untrusted data.

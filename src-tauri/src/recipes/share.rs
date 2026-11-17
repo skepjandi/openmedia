@@ -186,7 +186,8 @@ fn check_shared(recipe: &Recipe) -> Result<()> {
         | Rule::Script { label, .. }
         | Rule::VideoMenu { label, .. }
         | Rule::Prune { label, .. }
-        | Rule::Redirect { label, .. } => label,
+        | Rule::Redirect { label, .. }
+        | Rule::Dark { label, .. } => label,
     });
     let tab_labels = recipe
         .hub
@@ -335,6 +336,25 @@ fn rule_preview(rule: &Rule) -> RulePreview {
             kind: "prune",
             selector: urls.join(", "),
             declarations: BTreeMap::from([("remove".to_owned(), prune::describe(remove))]),
+            code: None,
+        },
+        Rule::Dark {
+            label,
+            mode,
+            method,
+            invert,
+            ..
+        } => RulePreview {
+            label: label.clone(),
+            kind: "dark",
+            selector: invert.join(", "),
+            declarations: [
+                ("mode", mode.map(|mode| format!("{mode:?}"))),
+                ("method", method.map(|method| format!("{method:?}"))),
+            ]
+            .into_iter()
+            .filter_map(|(key, value)| Some((key.to_owned(), value?.to_lowercase())))
+            .collect(),
             code: None,
         },
         Rule::Script { label, code, .. } => RulePreview {

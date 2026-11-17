@@ -7,6 +7,7 @@ vi.mock("@tauri-apps/api/event", () => ({ listen: vi.fn() }));
 import { useApp } from "./store";
 import type { Startup } from "../shared/ipc";
 import { ACCESSIBILITY_OFF } from "../shared/accessibility";
+import { DARK_MODE_DEFAULT } from "../shared/darkMode";
 import { VIDEO_CONTROLS_DEFAULT } from "../shared/videoControls";
 
 const startup = {
@@ -31,6 +32,8 @@ const startup = {
   accessibility: ACCESSIBILITY_OFF,
   videoControls: VIDEO_CONTROLS_DEFAULT,
   videoSites: {},
+  darkMode: DARK_MODE_DEFAULT,
+  darkSites: {},
   bootSession: { id: "boot-session", url: "https://m.youtube.com/watch?v=example" },
   desktop: false,
 } satisfies Startup;

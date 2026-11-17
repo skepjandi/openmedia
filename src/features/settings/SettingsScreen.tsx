@@ -9,6 +9,7 @@ import { Screen } from "../../shared/Screen";
 import type { SearchEngine, Theme } from "../../shared/ipc";
 import { DEFAULT_SEARCH_ENGINE, SEARCH_ENGINES } from "../../shared/searchEngines";
 import { AccessibilitySection } from "./AccessibilitySection";
+import { DarkModeLink } from "./DarkModeScreen";
 import { VideoControlsLink } from "./VideoControlsScreen";
 import { AiSection } from "./AiSection";
 import { FavoritesSection } from "./FavoritesSection";
@@ -36,6 +37,7 @@ export function SettingsScreen() {
         <LanguageSection />
         <BrowsingSection />
         <AccessibilitySection />
+        <DarkModeLink />
         <VideoControlsLink />
         <FanButtonSwitches />
         <FavoritesSection />

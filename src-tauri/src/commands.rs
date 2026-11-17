@@ -30,6 +30,7 @@ use crate::ai::{
 };
 use crate::boot::{Boot, Startup};
 use crate::color_pick;
+use crate::dark_mode::{DarkMode, SiteDark};
 use crate::entitlement::Entitlement;
 use crate::error::{Error, Result};
 use crate::incognito::Incognito;
@@ -446,15 +447,16 @@ pub(crate) fn current_script(
 const FEED_PLAYER_SCRIPT: &str = include_str!("feed_player.js");
 
 /// The page script for `mode`. The accessibility choices follow the recipes and apply in both sets,
-/// then the feed player and the video controls.
+/// then the feed player, the video controls and dark mode, which reads the recipes' dark fixes.
 pub(crate) fn script_for(library: &Library, recipes: &Recipes, mode: Mode) -> Result<String> {
     let recipe_script = recipes.script(&library.site_options(mode)?)?;
     Ok(format!(
-        "{recipe_script}\n{}\n{FEED_PLAYER_SCRIPT}\n{}",
+        "{recipe_script}\n{}\n{FEED_PLAYER_SCRIPT}\n{}\n{}",
         library.accessibility()?.page_script(),
         library
             .video_controls()?
-            .page_script(&library.video_sites()?)
+            .page_script(&library.video_sites()?),
+        library.dark_mode()?.page_script(&library.dark_sites()?)
     ))
 }
 
@@ -626,6 +628,32 @@ pub async fn set_site_video_controls(
     video: SiteVideo,
 ) -> Result<()> {
     library.set_site_video(&site, video)?;
+    reload_script(&app, &library, &recipes)
+}
+
+/// Saves the dark mode choices. Open pages take them at once.
+#[tauri::command]
+pub async fn set_dark_mode(
+    app: AppHandle,
+    library: State<'_, Library>,
+    recipes: State<'_, Recipes>,
+    dark_mode: DarkMode,
+) -> Result<()> {
+    library.set_dark_mode(dark_mode)?;
+    reload_script(&app, &library, &recipes)
+}
+
+/// Saves what the user chose for one site's dark mode (`site` is a registrable domain); a choice
+/// with nothing in it returns the site to the global settings. Open pages take it at once.
+#[tauri::command]
+pub async fn set_site_dark_mode(
+    app: AppHandle,
+    library: State<'_, Library>,
+    recipes: State<'_, Recipes>,
+    site: String,
+    dark: SiteDark,
+) -> Result<()> {
+    library.set_site_dark(&site, dark)?;
     reload_script(&app, &library, &recipes)
 }
 

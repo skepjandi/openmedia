@@ -47,6 +47,8 @@ Toggled by Core. Overlays a highlight on hover/tap, shows a breadcrumb of ancest
 
 ## Feed player
 
+`src-tauri/src/dark_mode/page.js` is appended after the video controls script, in every frame, when the reader has dark mode on (or a site/recipe asks for it); with it off it still runs, to remove what an earlier run left. See [Dark Mode for Pages](./dark-mode.md).
+
 `src-tauri/src/feed_player.js` is appended to the document-start script after the accessibility script, in the top frame only. It runs in full-screen feeds: `/shorts`, `/reel(s)`, `/<user>/reel(s)`, `/watch/reel(s)` and `/stories` on any site, TikTok, Instagram `/p/` and `/tv/`, and Facebook `/watch`. Once scrolling settles it picks the video in view (one covering at least half the viewport, or a wide clip that sits on screen); a video the site parks off screen while it is not playing (YouTube Shorts) is placed by its wrapper when that is at most 1.5 screens tall, plays it, and pauses videos that left the screen.
 
 - **Refusals.** `NotAllowedError` on iOS posts to the native-only `openmediaPlay` handler, and the plugin calls the page's `Symbol.for('openmedia.feedPlayNow')` through `evaluateJavaScript`, which WebKit runs with a user gesture (so sound and low power mode are not obstacles). Without the handler (Android, macOS) the player mutes and plays. Any other refusal is retried on the next settle.

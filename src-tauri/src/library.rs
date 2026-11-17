@@ -16,6 +16,7 @@ use uuid::Uuid;
 
 use crate::accessibility::Accessibility;
 use crate::ai::{AiSettings, MAX_PROVIDERS, ProviderConfig, ProviderInput};
+use crate::dark_mode::{DarkMode, SiteDark};
 use crate::error::{Error, Result};
 use crate::recipes::{OptionChoices, OptionValue};
 use crate::video_controls::{MAX_HEIGHT as MAX_VIDEO_HEIGHT, SiteVideo, VideoControls};
@@ -178,6 +179,9 @@ pub struct AppState {
     pub video_controls: VideoControls,
     /// What the user chose for one site's video controls, by registrable domain.
     pub video_sites: BTreeMap<String, SiteVideo>,
+    pub dark_mode: DarkMode,
+    /// What the user chose for one site's dark mode, by registrable domain.
+    pub dark_sites: BTreeMap<String, SiteDark>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -263,6 +267,13 @@ struct LibraryData {
     /// `video_controls`.
     #[serde(default)]
     video_sites: BTreeMap<String, SiteVideo>,
+    /// Dark mode for pages; off until switched on.
+    #[serde(default)]
+    dark_mode: DarkMode,
+    /// Per-site dark mode choices by registrable domain; a site without an entry follows
+    /// `dark_mode`.
+    #[serde(default)]
+    dark_sites: BTreeMap<String, SiteDark>,
 }
 
 /// The user's favorites, page, theme and provider settings, persisted as one JSON file. Holds no
@@ -332,6 +343,8 @@ impl Library {
             accessibility: data.accessibility,
             video_controls: data.video_controls,
             video_sites: data.video_sites.clone(),
+            dark_mode: data.dark_mode.clone(),
+            dark_sites: data.dark_sites.clone(),
         })
     }
 
@@ -632,6 +645,34 @@ impl Library {
             data.video_sites.remove(&site);
         } else {
             data.video_sites.insert(site, video);
+        }
+        self.save(&data)
+    }
+
+    pub fn dark_mode(&self) -> Result<DarkMode> {
+        Ok(self.lock()?.dark_mode.clone())
+    }
+
+    pub fn set_dark_mode(&self, dark_mode: DarkMode) -> Result<()> {
+        dark_mode.validate()?;
+        let mut data = self.lock()?;
+        data.dark_mode = dark_mode.normalized();
+        self.save(&data)
+    }
+
+    pub fn dark_sites(&self) -> Result<BTreeMap<String, SiteDark>> {
+        Ok(self.lock()?.dark_sites.clone())
+    }
+
+    /// Saves what the user chose for one site's dark mode; a choice with nothing in it returns
+    /// the site to the global settings.
+    pub fn set_site_dark(&self, site: &str, dark: SiteDark) -> Result<()> {
+        let site = checked_site(site)?;
+        let mut data = self.lock()?;
+        if dark.is_empty() {
+            data.dark_sites.remove(&site);
+        } else {
+            data.dark_sites.insert(site, dark);
         }
         self.save(&data)
     }
@@ -969,6 +1010,8 @@ fn default_data() -> LibraryData {
         accessibility: Accessibility::default(),
         video_controls: VideoControls::default(),
         video_sites: BTreeMap::new(),
+        dark_mode: DarkMode::default(),
+        dark_sites: BTreeMap::new(),
         incognito_site_options: OptionChoices::new(),
         incognito_favorites: None,
     }
@@ -1020,6 +1063,7 @@ mod tests {
     use super::*;
     use crate::accessibility::{ReadingFont, Tint};
     use crate::ai::ProviderKind;
+    use crate::dark_mode::{DarkMethod, SiteDarkMode};
 
     fn library() -> (tempfile::TempDir, Library) {
         let dir = tempfile::tempdir().unwrap();
@@ -1577,6 +1621,82 @@ mod tests {
             .set_site_video("youtube.com", SiteVideo::default())
             .unwrap();
         assert!(reload(&dir).video_sites().unwrap().is_empty());
+    }
+
+    #[test]
+    fn dark_mode_is_off_by_default_and_the_choices_persist() {
+        let (dir, library) = library();
+        assert_eq!(library.state().unwrap().dark_mode, DarkMode::default());
+        assert!(!library.dark_mode().unwrap().enabled);
+        let chosen = DarkMode {
+            enabled: true,
+            brightness: 80,
+            background: "#101010".into(),
+            ..DarkMode::default()
+        };
+        library.set_dark_mode(chosen.clone()).unwrap();
+        assert_eq!(library.dark_mode().unwrap(), chosen);
+        assert_eq!(reload(&dir).state().unwrap().dark_mode, chosen);
+        let upper = DarkMode {
+            text: "#FFFFFF".into(),
+            ..chosen.clone()
+        };
+        library.set_dark_mode(upper).unwrap();
+        assert_eq!(library.dark_mode().unwrap().text, "#ffffff");
+        let bad = DarkMode {
+            contrast: 200,
+            ..chosen.clone()
+        };
+        assert!(library.set_dark_mode(bad).is_err());
+        assert_eq!(library.dark_mode().unwrap().text, "#ffffff");
+    }
+
+    #[test]
+    fn a_library_saved_before_dark_mode_existed_loads_with_the_defaults() {
+        let (dir, library) = library();
+        library
+            .set_dark_mode(DarkMode {
+                enabled: true,
+                ..DarkMode::default()
+            })
+            .unwrap();
+        library
+            .set_site_dark(
+                "a.example",
+                SiteDark {
+                    mode: Some(SiteDarkMode::On),
+                    method: None,
+                },
+            )
+            .unwrap();
+        let path = dir.path().join("library.json");
+        let mut saved: serde_json::Value =
+            serde_json::from_str(&fs::read_to_string(&path).unwrap()).unwrap();
+        let object = saved.as_object_mut().unwrap();
+        assert!(object.remove("darkMode").is_some());
+        assert!(object.remove("darkSites").is_some());
+        fs::write(&path, saved.to_string()).unwrap();
+        drop(library);
+        let reloaded = reload(&dir);
+        assert_eq!(reloaded.state().unwrap().dark_mode, DarkMode::default());
+        assert!(reloaded.dark_sites().unwrap().is_empty());
+    }
+
+    #[test]
+    fn a_site_keeps_its_own_dark_choice_until_it_has_none() {
+        let (dir, library) = library();
+        assert!(library.state().unwrap().dark_sites.is_empty());
+        let own = SiteDark {
+            mode: Some(SiteDarkMode::Off),
+            method: Some(DarkMethod::Static),
+        };
+        library.set_site_dark("YouTube.com", own).unwrap();
+        assert_eq!(reload(&dir).dark_sites().unwrap()["youtube.com"], own);
+        assert!(library.set_site_dark("https://a.example/", own).is_err());
+        library
+            .set_site_dark("youtube.com", SiteDark::default())
+            .unwrap();
+        assert!(reload(&dir).dark_sites().unwrap().is_empty());
     }
 
     #[test]

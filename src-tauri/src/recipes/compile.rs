@@ -6,7 +6,9 @@ use serde::Serialize;
 use super::matcher::Matcher;
 use super::prune::{self, PRUNE_RUNTIME, PagePrune};
 use super::route::RouteGlob;
-use super::schema::{OptionValue, Recipe, Rule, Selected, VideoMenuKind};
+use super::schema::{
+    DarkFixMethod, DarkFixMode, OptionValue, Recipe, Rule, Selected, VideoMenuKind,
+};
 use super::script_policy::wrap;
 use crate::error::{Error, Result};
 
@@ -23,6 +25,17 @@ struct PageRecipe {
     menus: Vec<PageMenu>,
     prunes: Vec<PagePrune>,
     redirects: Vec<PageRedirect>,
+    darks: Vec<PageDark>,
+}
+
+/// A `dark` rule as the dark mode engine reads it from `openmedia.darkFixes`.
+#[derive(Serialize)]
+struct PageDark {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    mode: Option<DarkFixMode>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    method: Option<DarkFixMethod>,
+    invert: Vec<String>,
 }
 
 /// A `redirect` rule as the page's runtime reads it (`route_redirect.js`): the compiled path glob
@@ -74,7 +87,8 @@ fn css_of<'a>(rules: impl Iterator<Item = &'a Rule>) -> String {
             Rule::Script { .. }
             | Rule::VideoMenu { .. }
             | Rule::Prune { .. }
-            | Rule::Redirect { .. } => Ok(()),
+            | Rule::Redirect { .. }
+            | Rule::Dark { .. } => Ok(()),
             Rule::Css {
                 target,
                 declarations,
@@ -173,6 +187,21 @@ fn page_recipes(
                     _ => None,
                 })
                 .collect::<Result<Vec<_>>>()?;
+            let darks = scoped()
+                .filter_map(|rule| match rule {
+                    Rule::Dark {
+                        mode,
+                        method,
+                        invert,
+                        ..
+                    } => Some(PageDark {
+                        mode: *mode,
+                        method: *method,
+                        invert: invert.clone(),
+                    }),
+                    _ => None,
+                })
+                .collect();
             Ok(PageRecipe {
                 id: recipe.id.clone(),
                 matchers: matchers_of(scope.unwrap_or(&recipe.matches))?,
@@ -181,6 +210,7 @@ fn page_recipes(
                 menus,
                 prunes,
                 redirects,
+                darks,
             })
         })
         .collect()
@@ -246,6 +276,10 @@ pub fn page_script(recipes: &[Recipe], choices: &OptionChoices) -> Result<String
     }} else if (pruneState) {{
       try {{ pruneState.rules = []; }} catch (_) {{}}
     }}
+    const darkFixes = found.reduce((all, recipe) => all.concat(recipe.darks), []);
+    const darkKey = Symbol.for("openmedia.darkFixes");
+    if (darkFixes.length) document[darkKey] = darkFixes;
+    else delete document[darkKey];
     const run = (index) => {{
       try {{ scripts[index].call(undefined); }} catch (_) {{}}
     }};

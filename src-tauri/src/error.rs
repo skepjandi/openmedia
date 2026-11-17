@@ -16,6 +16,8 @@ pub enum Error {
     UnknownSite,
     #[error("the bottom margin can be at most {0} pixels")]
     InvalidMargin(u32),
+    #[error("invalid dark mode choice: {0}")]
+    InvalidDarkMode(&'static str),
     #[error("invalid usage record: {0}")]
     InvalidUsage(&'static str),
     #[error("usage-locked")]

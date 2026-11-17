@@ -48,6 +48,50 @@ export interface SiteVideo {
   fullVideos?: boolean;
 }
 
+export type DarkMethod = "dynamic" | "filter" | "filterplus" | "static";
+export type DarkScheduleKind = "always" | "system" | "time";
+
+/** When dark mode is active. `from` and `to` are `HH:MM` in the device's local time and only matter for `time`. */
+export interface DarkSchedule {
+  kind: DarkScheduleKind;
+  from: string;
+  to: string;
+}
+
+/** How pages are darkened, for every site without a choice of its own. */
+export interface DarkMode {
+  enabled: boolean;
+  method: DarkMethod;
+  /** Percent, 50 to 150. */
+  brightness: number;
+  /** Percent, 50 to 150. */
+  contrast: number;
+  /** Percent, 0 to 100. */
+  sepia: number;
+  /** Percent, 0 to 100. */
+  grayscale: number;
+  /** `#rrggbb`, lowercase. */
+  background: string;
+  /** `#rrggbb`, lowercase. */
+  text: string;
+  schedule: DarkSchedule;
+  /** Leaves a page that is already dark alone. */
+  skipDarkPages: boolean;
+  /** Dark scrollbars, form controls and default colours. */
+  systemControls: boolean;
+  scrollbars: boolean;
+  /** Inverts dark transparent icons and tones down large light diagrams. */
+  images: boolean;
+  /** Tenths of a pixel, 0 to 10. */
+  textStroke: number;
+}
+
+/** One site's own dark mode choice (by registrable domain); a field that is missing follows the shared one. */
+export interface SiteDark {
+  mode?: "on" | "off";
+  method?: DarkMethod;
+}
+
 export interface Favorite {
   id: string;
   name: string;
@@ -101,6 +145,9 @@ export interface AppState {
   videoControls: VideoControls;
   /** Per-site video controls choices by registrable domain. */
   videoSites: Record<string, SiteVideo>;
+  darkMode: DarkMode;
+  /** Per-site dark mode choices by registrable domain. */
+  darkSites: Record<string, SiteDark>;
 }
 
 /** The page Rust already started loading at launch; the shell takes it over. */
@@ -316,6 +363,8 @@ export const library = {
   setSiteVideoControls: (site: string, video: SiteVideo) =>
     command("set_site_video_controls", { site, video }),
   setBottomMargin: (pixels: number) => command("set_bottom_margin", { pixels }),
+  /** Saves one site's dark mode choice; an empty choice returns the site to the shared one. */
+  setSiteDarkMode: (site: string, dark: SiteDark) => command("set_site_dark_mode", { site, dark }),
   setSiteBottomMargin: (recipeId: string, pixels: number | null) =>
     command("set_site_bottom_margin", { recipeId, pixels }),
   /** The margin that applies to this page: its site's own, else the shared one. */
@@ -345,6 +394,7 @@ export const library = {
     command("set_accessibility", { accessibility }),
   setVideoControls: (videoControls: VideoControls) =>
     command("set_video_controls", { videoControls }),
+  setDarkMode: (darkMode: DarkMode) => command("set_dark_mode", { darkMode }),
 };
 
 export interface SectionUsage {

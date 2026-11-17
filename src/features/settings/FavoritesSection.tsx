@@ -9,15 +9,18 @@ import {
   resolveLanding,
 } from "../../shared/favorites";
 import { DownIcon, ForwardIcon, ProIcon, PlusIcon, StarIcon, UpIcon } from "../../shared/icons";
-import type { Favorite, FavoriteInput, SiteSettings } from "../../shared/ipc";
+import type { DarkMethod, Favorite, FavoriteInput, SiteSettings } from "../../shared/ipc";
 import { SiteTile } from "../../shared/SiteTile";
 import { siteOf } from "../../shared/site";
+import { DARK_METHODS } from "../../shared/darkMode";
 import { VIDEO_CONTROLS_DEFAULT } from "../../shared/videoControls";
 import { isIos } from "../../shared/platform";
 import { normalizeWebUrl } from "../../shared/url";
 import { useEntitlementStore } from "../paywall/store";
 import { describeAddress } from "../history/address";
 import { MarginSlider } from "./MarginSlider";
+import { Picker } from "./Picker";
+import { Segmented } from "./Segmented";
 import { MAX_FAVORITE_NAME } from "./presets";
 import { Switch } from "./Switch";
 import { Group, GroupLabel, Section, field, primaryButton, quietButton } from "./ui";
@@ -487,6 +490,7 @@ function FavoriteEditor({
       {playsInBackground && <BackgroundMedia url={url} />}
       {playsInBackground && isIos() && <PictureInPicture url={url} />}
       {playsInBackground && <SiteVideoControls url={url} />}
+      <SiteDarkMode url={url} />
       {(problem ?? hint) && (
         <p className={`text-sm ${problem ? "text-accent" : "text-paper/55"}`}>{problem ?? hint}</p>
       )}
@@ -615,6 +619,52 @@ function SiteVideoControls({ url }: { url: string }) {
       )}
     </div>
   );
+}
+
+/**
+ * This site's own dark mode choice: always on, off, or following the shared settings, and the
+ * method it darkens with. It saves at once, not with Save.
+ */
+function SiteDarkMode({ url }: { url: string }) {
+  const site = siteOf(url);
+  const own = useApp((s) => (site ? s.state?.darkSites[site] : undefined));
+  const setSiteDarkMode = useApp((s) => s.setSiteDarkMode);
+  const t = useT();
+  if (!site) return null;
+  const mode = own?.mode ?? "follow";
+  return (
+    <div className="flex flex-col gap-2">
+      <div className="text-sm font-medium">{t("favorites.darkMode")}</div>
+      <Segmented
+        label={t("favorites.darkModeLabel", { site })}
+        value={mode}
+        options={[
+          { value: "follow", label: t("favorites.darkFollow") },
+          { value: "on", label: t("favorites.darkOn") },
+          { value: "off", label: t("favorites.darkOff") },
+        ]}
+        onChange={(next) =>
+          void setSiteDarkMode(site, { ...own, mode: next === "follow" ? undefined : next })
+        }
+      />
+      {mode !== "off" && (
+        <Picker
+          label={t("favorites.darkMethod")}
+          value={own?.method ?? ""}
+          options={[
+            { value: "", label: t("favorites.darkMethodDefault") },
+            ...DARK_METHODS.map((entry) => ({ value: entry.value, label: t(entry.label) })),
+          ]}
+          onChange={(next) => void setSiteDarkMode(site, { ...own, method: methodOf(next) })}
+        />
+      )}
+    </div>
+  );
+}
+
+/** The method a picker value names; an empty value follows the shared one. */
+function methodOf(value: string): DarkMethod | undefined {
+  return DARK_METHODS.find((entry) => entry.value === value)?.value;
 }
 
 /** Whether the site's videos may float in a picture-in-picture window. It saves at once, not with Save. */

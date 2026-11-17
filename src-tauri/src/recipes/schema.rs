@@ -26,6 +26,7 @@ const MAX_HUB_URL_CHARS: usize = 300;
 const MAX_SHOWN_FINDINGS: usize = 3;
 const MAX_FINDING_CHARS: usize = 160;
 const MAX_VIDEO_MENUS: usize = 4;
+pub const MAX_DARK_INVERT: usize = 20;
 const MAX_MENU_STEPS: usize = 3;
 const MAX_MENU_TITLE_CHARS: usize = 24;
 /// The attributes a site's menu may use to mark the entry in use.
@@ -197,6 +198,24 @@ pub enum VideoMenuKind {
     Other,
 }
 
+/// Whether a `dark` rule forces dark mode on or off for the pages it matches.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "lowercase")]
+pub enum DarkFixMode {
+    On,
+    Off,
+}
+
+/// The method a `dark` rule asks dark mode to use for the pages it matches.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "lowercase")]
+pub enum DarkFixMethod {
+    Dynamic,
+    Filter,
+    Filterplus,
+    Static,
+}
+
 /// How an entry of a site's menu shows that it is the one in use: an attribute that is set (and not
 /// `false`) or a class it has. Exactly one of the two.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -334,6 +353,26 @@ pub enum Rule {
         when: RouteCondition,
         to: String,
     },
+    /// A fix for the app's dark mode on the pages the recipe matches: force it on or off, pick its
+    /// method, and name the elements whose colours it flips (logos and icons drawn dark on
+    /// transparent). Enums and validated selectors only; nothing runs.
+    Dark {
+        id: String,
+        label: String,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        option: Option<String>,
+        /// For a rule on a choice option: the choices in which it applies.
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        choice: Option<Vec<String>>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        on: Option<Vec<String>>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        mode: Option<DarkFixMode>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        method: Option<DarkFixMethod>,
+        #[serde(default, skip_serializing_if = "Vec::is_empty")]
+        invert: Vec<String>,
+    },
 }
 
 impl Rule {
@@ -344,7 +383,8 @@ impl Rule {
             | Self::Script { id, .. }
             | Self::VideoMenu { id, .. }
             | Self::Prune { id, .. }
-            | Self::Redirect { id, .. } => id,
+            | Self::Redirect { id, .. }
+            | Self::Dark { id, .. } => id,
         }
     }
 
@@ -356,7 +396,8 @@ impl Rule {
             | Self::Script { option, .. }
             | Self::VideoMenu { option, .. }
             | Self::Prune { option, .. }
-            | Self::Redirect { option, .. } => option.as_deref(),
+            | Self::Redirect { option, .. }
+            | Self::Dark { option, .. } => option.as_deref(),
         }
     }
 
@@ -368,7 +409,8 @@ impl Rule {
             | Self::Script { choice, .. }
             | Self::VideoMenu { choice, .. }
             | Self::Prune { choice, .. }
-            | Self::Redirect { choice, .. } => choice.as_deref(),
+            | Self::Redirect { choice, .. }
+            | Self::Dark { choice, .. } => choice.as_deref(),
         }
     }
 
@@ -380,7 +422,8 @@ impl Rule {
             | Self::Script { on, .. }
             | Self::VideoMenu { on, .. }
             | Self::Prune { on, .. }
-            | Self::Redirect { on, .. } => on.as_deref(),
+            | Self::Redirect { on, .. }
+            | Self::Dark { on, .. } => on.as_deref(),
         }
     }
 }
@@ -556,6 +599,13 @@ impl Recipe {
                     id, urls, remove, ..
                 } => prune::validate(id, urls, remove)?,
                 Rule::Redirect { id, when, to, .. } => validate_redirect(id, &when.path, to)?,
+                Rule::Dark {
+                    id,
+                    mode,
+                    method,
+                    invert,
+                    ..
+                } => validate_dark(id, *mode, *method, invert)?,
             }
         }
         Ok(())
@@ -824,6 +874,30 @@ fn hides_content(declarations: &BTreeMap<String, String>) -> bool {
 fn validate_redirect(id: &str, glob: &str, to: &str) -> Result<()> {
     let glob = RouteGlob::parse(glob).map_err(|e| Error::Recipe(format!("redirect {id}: {e}")))?;
     validate_target(to, &glob).map_err(|e| Error::Recipe(format!("redirect {id}: {e}")))
+}
+
+/// A dark rule says something (a mode, a method or elements to flip) and only through enums and
+/// selectors, so nothing in it can run.
+pub fn validate_dark(
+    id: &str,
+    mode: Option<DarkFixMode>,
+    method: Option<DarkFixMethod>,
+    invert: &[String],
+) -> Result<()> {
+    let refuse = |reason: &str| Error::Recipe(format!("dark rule {id} {reason}"));
+    if mode.is_none() && method.is_none() && invert.is_empty() {
+        return Err(refuse("sets nothing"));
+    }
+    if invert.len() > MAX_DARK_INVERT {
+        return Err(refuse("lists too many elements to invert"));
+    }
+    for css in invert {
+        validate_selector(css)?;
+        if targets_page_root(css) {
+            return Err(refuse("would invert the whole page"));
+        }
+    }
+    Ok(())
 }
 
 /// A video menu is made of selectors and one way to read the entry in use; nothing in it can run.

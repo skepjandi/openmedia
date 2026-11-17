@@ -55,3 +55,7 @@ OpenMedia is the **general, open, local-first** version: SocialLite's mechanism,
 - <https://sociallite.app/>, <https://sociallite.app/faq/>, <https://sociallite.app/terms/>
 - App Store listing: SocialLite — Block Reels & Shorts App
 - Reddit r/IPhoneApps, "Anyone tried Sociallite?"
+
+## Dark Reader
+
+[Dark Reader](https://darkreader.org/) (MIT) is the browser extension that recolours any page dark. Its dynamic theme engine (stylesheet rewriting with a colour model per role, `var()` variants, image analysis, a database of per-site fixes) is the model for [Dark Mode for Pages](./dark-mode.md). OpenMedia reimplements the approach for the page script (no extension APIs, no background page, no sync) and replaces its per-site fix database with recipes: a `dark` rule per site, reviewed like any other.

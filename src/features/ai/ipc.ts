@@ -26,10 +26,10 @@ export interface Power {
 
 export interface ProposalRule {
   label: string;
-  kind: "style" | "script";
-  /** Empty for a script rule. */
+  kind: "style" | "script" | "dark";
+  /** Empty for a script rule; the elements a dark rule flips, comma separated. */
   selector: string;
-  /** Elements a style rule hides on the page right now; 0 for a script rule. */
+  /** Elements a style rule hides on the page right now; 0 for a script or dark rule. */
   matches: number;
   /** A script rule's code, exactly as it is saved. It does not run before the user accepts. */
   code: string | null;

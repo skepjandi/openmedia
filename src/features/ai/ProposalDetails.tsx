@@ -52,6 +52,16 @@ function RuleItem({ rule }: { rule: ProposalRule }) {
       </li>
     );
   }
+  if (rule.kind === "dark") {
+    return (
+      <li className="text-xs">
+        <span className="block min-w-0 truncate text-paper/80">{rule.label}</span>
+        {rule.selector !== "" && (
+          <code className="mt-0.5 block break-all text-paper/55">{rule.selector}</code>
+        )}
+      </li>
+    );
+  }
   return (
     <li className="flex items-baseline justify-between gap-3 text-xs">
       <span className="min-w-0 truncate text-paper/80">{rule.label}</span>

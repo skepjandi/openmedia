@@ -109,6 +109,10 @@ It adds no path from a site to native code:
 - A blocking failure is reported through the existing site-view error path; browsing remains
   available.
 
+## Dark mode for pages
+
+The dark mode engine ([Dark Mode for Pages](./dark-mode.md)) is a page script like the accessibility one: it adds no command, event or capability a site view can reach, and the page can read and call whatever the engine can, as with any injected script. Its only requests are (a) a second fetch of a cross-origin stylesheet the page itself loaded, by the same address, with the page's own origin and no credentials added, so the engine can read rules the CSSOM hides, and (b) image loads of addresses the page already uses, to read their pixels for the image analysis. Nothing is sent anywhere the page was not already going, and a refused request leaves that sheet or image as the page made it. The settings (`darkMode`, `darkSites`) are plain data validated in Rust; the `dark` recipe rule carries enums and validated selectors only, so it is allowed in shared and bundled recipes.
+
 ## Sessions and the popup browser
 
 Each opened site is a session (a separate native web view) scoped to its current registrable domain, determined by the Public Suffix List (`bob.github.io` and `alice.github.io` are different sites). A user-activated top-level HTTP(S) link stays in that embedded view; the session follows redirects and adopts the destination domain once the load settles. Back/forward history also remains in the embedded view. Automatic cross-domain navigation is cancelled in the session's view and opened in an in-app window that shares the session's profile (a sign-in redirect needs the cookies it sets); a system popup browser is only the fallback. This adds no path from a site to native code:

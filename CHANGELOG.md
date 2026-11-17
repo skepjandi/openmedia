@@ -14,6 +14,14 @@ All notable changes to OpenMedia are documented here.
 
 **Verified:** `fanLayout` tests for every on/off combination, `color_pick` and `tech_detect` Rust tests, the persisted settings, `yarn ts:check`, `yarn lint`, `yarn format:check`, `yarn test`, clippy. **Not verified:** the page scripts and the panels on a device or simulator.
 
+### feat(dark-mode): dark mode for pages, with a dynamic theme engine, a `dark` recipe rule and assistant support
+
+**Area:** `feat(dark-mode)`, `feat(recipes)`, `feat(ai)`, `feat(shell)`
+
+**Change:** Appearance only flipped `prefers-color-scheme`, so a site with no dark stylesheet stayed white. Settings → Dark mode now paints any page dark with a document-start page script modelled on Dark Reader's dynamic theme engine: it rewrites the colours of every readable stylesheet (shadow roots, adopted sheets, `@import`, nested rules, `var()` variants, inline styles) and keeps up with pages that add styles later, analyses images (dark icons inverted, large white diagrams toned down), and leaves pages that are already dark alone. Also Filter, Filter+ and Static methods; brightness, contrast, sepia and grayscale; a dark scheme with presets and custom colours; always / follow the app theme / time-window schedule; themed scrollbars and selection; dark form controls; text stroke; and a per-site choice (follow, on, off, own method) on each favorite. A new declarative `dark` recipe rule (`mode`, `method`, `invert`) carries per-site fixes, is allowed in shared recipes, is validated equally by Rust and the Worker, and the in-app assistant knows it and writes it when a site looks wrong in dark mode. Wiki: [Dark Mode for Pages](docs/wiki/dark-mode.md).
+
+**Verified:** unit tests for the colour maths, stylesheet rewriting, schedule, image classification and teardown; Rust tests for settings, persistence, the recipe rule and the assistant patch; frontend tests and type check. **Not verified:** on-device iOS and Android rendering, real sites with heavy CSS-in-JS, the cost on a long page on a phone. The 16 translations beyond the first 13 languages were machine-written and need a native review (Sinhala especially).
+
 ### feat(video): a volume bar in the panel; fix(video): the small player's black corners; fix: float of an embedded player
 
 **Area:** `feat(video)`, `fix(video)`, `fix(siteview)`

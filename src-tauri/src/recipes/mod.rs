@@ -11,11 +11,11 @@ mod share;
 pub use compile::{OptionChoices, page_script};
 pub(crate) use schema::is_script_text;
 pub use schema::{
-    Hub, HubTab, MAX_HUB_LABEL_CHARS, MAX_HUB_TABS, MIN_HUB_TABS, Meta, OptionChoice, OptionGroup,
-    OptionValue, Origin, Recipe, Rule, Selected, SiteOption, Target, VideoMenuKind,
-    current_platform_tag,
+    DarkFixMethod, DarkFixMode, Hub, HubTab, MAX_HUB_LABEL_CHARS, MAX_HUB_TABS, MIN_HUB_TABS, Meta,
+    OptionChoice, OptionGroup, OptionValue, Origin, Recipe, Rule, Selected, SiteOption, Target,
+    VideoMenuKind, current_platform_tag,
 };
-pub(crate) use schema::{MENU_SELECTED_ATTRS, validate_video_menu};
+pub(crate) use schema::{MENU_SELECTED_ATTRS, validate_dark, validate_video_menu};
 pub(crate) use selector::{
     CSS_PROPERTIES, targets_page_root, validate_declarations, validate_selector,
 };
@@ -839,6 +839,89 @@ mod tests {
         assert!(!preview.runs_code);
         assert_eq!(preview.rules[0].kind, "redirect");
         assert_eq!(preview.rules[0].selector, "/clips/** → /");
+    }
+
+    const DARK_RULE: &str = r#"{"id":"d","label":"Dark logo","type":"dark","option":"feed","mode":"on","method":"filter","invert":["img.logo",".brand svg"]}"#;
+
+    #[test]
+    fn a_dark_rule_round_trips_and_leaves_out_what_it_does_not_set() {
+        let recipe = Recipe::parse(&prune_recipe("user", DARK_RULE)).unwrap();
+        let Rule::Dark {
+            mode,
+            method,
+            invert,
+            ..
+        } = &recipe.rules[0]
+        else {
+            panic!("not a dark rule");
+        };
+        assert_eq!(*mode, Some(DarkFixMode::On));
+        assert_eq!(*method, Some(DarkFixMethod::Filter));
+        assert_eq!(invert.len(), 2);
+        let json = serde_json::to_value(&recipe.rules[0]).unwrap();
+        assert_eq!(json["type"], "dark");
+        assert_eq!(json["mode"], "on");
+        let bare = r#"{"id":"d","label":"Dark","type":"dark","mode":"off"}"#;
+        let recipe = Recipe::parse(&prune_recipe("user", bare)).unwrap();
+        let json = serde_json::to_value(&recipe.rules[0]).unwrap();
+        assert!(json.get("method").is_none() && json.get("invert").is_none());
+    }
+
+    #[test]
+    fn a_dark_rule_needs_something_to_say_and_says_it_with_valid_parts() {
+        let invert = |n: usize| {
+            let list: Vec<String> = (0..n).map(|i| format!("\"img.l{i}\"")).collect();
+            format!(
+                r#"{{"id":"d","label":"Dark","type":"dark","invert":[{}]}}"#,
+                list.join(",")
+            )
+        };
+        assert!(Recipe::parse(&prune_recipe("user", &invert(20))).is_ok());
+        assert!(Recipe::parse(&prune_recipe("user", &invert(21))).is_err());
+        for bad in [
+            r#"{"id":"d","label":"Dark","type":"dark"}"#,
+            r#"{"id":"d","label":"Dark","type":"dark","invert":[]}"#,
+            r#"{"id":"d","label":"Dark","type":"dark","mode":"dim"}"#,
+            r#"{"id":"d","label":"Dark","type":"dark","method":"magic"}"#,
+            r#"{"id":"d","label":"Dark","type":"dark","invert":["img{color:red}"]}"#,
+            r#"{"id":"d","label":"Dark","type":"dark","invert":["body"]}"#,
+            r#"{"id":"d","label":"Dark","type":"dark","mode":"on","extra":1}"#,
+        ] {
+            assert!(Recipe::parse(&prune_recipe("user", bad)).is_err(), "{bad}");
+        }
+    }
+
+    #[test]
+    fn a_dark_rule_changes_nothing_but_the_engine_so_every_origin_may_have_one() {
+        for origin in ["user", "ai", "imported"] {
+            assert!(
+                Recipe::parse(&prune_recipe(origin, DARK_RULE)).is_ok(),
+                "{origin}"
+            );
+        }
+        let shared = prune_recipe("imported", DARK_RULE)
+            .replace("\"id\":\"t.default\"", "\"id\":\"market.t.default\"");
+        let recipe = parse_bundled_recipe(shared.as_bytes()).unwrap();
+        let preview = preview_recipe(&recipe, None);
+        assert!(!preview.runs_code);
+        assert_eq!(preview.rules[0].kind, "dark");
+    }
+
+    #[test]
+    fn a_dark_rule_sets_the_fixes_symbol_while_it_applies_and_deletes_it_otherwise() {
+        let recipe = Recipe::parse(&prune_recipe("user", DARK_RULE)).unwrap();
+        let off = page_script(std::slice::from_ref(&recipe), &OptionChoices::new()).unwrap();
+        assert!(!off.contains("img.logo"));
+        assert!(off.contains("delete document[darkKey]"));
+        let on = OptionChoices::from([(
+            "t.default".to_owned(),
+            [("feed".to_owned(), OptionValue::Toggle(true))].into(),
+        )]);
+        let with = page_script(&[recipe], &on).unwrap();
+        assert!(with.contains("openmedia.darkFixes"));
+        assert!(
+            with.contains(r#""mode":"on","method":"filter","invert":["img.logo",".brand svg"]"#)
+        );
     }
 
     fn with_script_rules(origin: &str, codes: &[&str]) -> String {
