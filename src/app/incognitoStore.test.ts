@@ -123,6 +123,7 @@ describe("incognito mode", () => {
           homepage: null,
           hub: null,
           origin: "user",
+          author: null,
           favorite: false,
           options: [
             {

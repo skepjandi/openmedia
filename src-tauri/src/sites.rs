@@ -38,6 +38,8 @@ pub struct SiteSettings {
     pub bottom_margin: Option<u32>,
     /// Who the recipe is from: `imported` (including recipes added from the library) can be removed.
     pub origin: Origin,
+    /// Who made the recipe, from its `meta.author`.
+    pub author: Option<String>,
 }
 
 pub fn site_settings(
@@ -78,6 +80,7 @@ pub fn site_settings(
                 options,
                 bottom_margin: margins.get(&recipe.id).copied(),
                 origin: recipe.origin,
+                author: recipe.meta.as_ref().and_then(|meta| meta.author.clone()),
             }
         })
         .collect()

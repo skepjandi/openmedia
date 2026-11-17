@@ -15,6 +15,7 @@ const site = (recipeId: string, name: string, hub: SiteSettings["hub"]): SiteSet
   options: [],
   bottomMargin: null,
   origin: "user",
+  author: null,
   hub,
 });
 

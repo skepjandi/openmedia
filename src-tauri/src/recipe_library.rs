@@ -237,6 +237,13 @@ pub fn library_preview(recipes: State<'_, Recipes>, recipe_id: String) -> Result
     ))
 }
 
+/// The recipe as installed on this device, rule by rule, scripts in full. Saves nothing.
+#[tauri::command]
+pub fn recipe_preview(recipes: State<'_, Recipes>, recipe_id: String) -> Result<RecipePreview> {
+    let recipe = recipes.get(&recipe_id).ok_or(Error::UnknownSite)?;
+    Ok(preview_recipe(&recipe, None))
+}
+
 /// Async so the page views are reloaded off the main thread.
 #[tauri::command]
 pub async fn library_install(

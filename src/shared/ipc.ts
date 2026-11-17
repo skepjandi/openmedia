@@ -159,6 +159,8 @@ export interface SiteSettings {
   bottomMargin: number | null;
   /** Who the recipe is from; `imported` (a pasted bundle or the recipe library) can be removed. */
   origin: "user" | "ai" | "imported";
+  /** Who made the recipe (its `meta.author`); null when it names no one. */
+  author: string | null;
   /** The pages this recipe opens as tabs; null for an ordinary recipe. */
   hub: Hub | null;
 }

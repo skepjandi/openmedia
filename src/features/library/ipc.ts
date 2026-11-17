@@ -144,6 +144,8 @@ async function command(name: string, args?: Record<string, unknown>): Promise<vo
 export const recipeLibrary = {
   list: () => invoke<LibraryListing>("library_list"),
   preview: (recipeId: string) => invoke<RecipePreview>("library_preview", { recipeId }),
+  /** An installed recipe, whatever its origin, as Rust would validate it. */
+  installedPreview: (recipeId: string) => invoke<RecipePreview>("recipe_preview", { recipeId }),
   install: (recipeId: string) => command("library_install", { recipeId }),
   uninstall: (recipeId: string) => command("library_uninstall", { recipeId }),
 };

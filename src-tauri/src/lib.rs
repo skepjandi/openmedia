@@ -135,6 +135,7 @@ pub fn run() {
             commands::set_site_option,
             recipe_library::library_list,
             recipe_library::library_preview,
+            recipe_library::recipe_preview,
             recipe_library::library_install,
             recipe_library::library_uninstall,
             recipe_library::onboarding_options,

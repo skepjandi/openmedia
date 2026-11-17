@@ -301,6 +301,7 @@ describe("a hub's quick-access favorite", () => {
       options: [],
       bottomMargin: null,
       origin: "user",
+      author: null,
       hub: { tabs: [{ label: "WhatsApp", url: "https://web.whatsapp.com/" }] },
     },
   ];
