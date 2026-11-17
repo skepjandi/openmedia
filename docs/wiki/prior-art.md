@@ -31,7 +31,8 @@ Web versions lack: one-time-view DMs, sending video, story poll interaction, mus
 | Hardcoded list of ~7 platforms; fixed feature toggles | **Our differentiator:** any site, via recipes + AI |
 | Needs a backend: accounts, parent linking, push, analytics | We have none. Push notifications and parent plans are **out of scope**; say so |
 | Android Accessibility Service for native-app blocking | Not pursued (policy and trust cost); revisit only if users demand it |
-| Daily-allowance and scheduling features | Good fit as local-only recipe rules later (`limit` rule type, deferred) |
+| Daily-allowance and scheduling features (Sleep Mode, downtime) | Built as local-only Usage features, not recipe rules: daily limits, per-site downtime schedules (windows on weekdays, through midnight) closing a site with the same native shield |
+| Friction before opening, and locks that cannot be waived on impulse (Feurstagram-style permanent lock) | Built: optional per-site pause screen with a breathing countdown, and an opt-in settings lock with a 24 hour cooling-off that Rust enforces; reinstalling bypasses it, so it is a commitment device, not security |
 | Multiple accounts per site | Fits our per-profile data stores (Phase 2/3) |
 | Web-version feature gaps | Unavoidable; document as known limitations |
 | Subscription, closed | We are open, BYOK, local-first |
