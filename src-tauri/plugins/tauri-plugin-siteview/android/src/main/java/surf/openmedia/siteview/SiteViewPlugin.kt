@@ -104,6 +104,8 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
         var blocked: Boolean = false,
         /** True while the page's media is paused because the page went out of sight. */
         var mediaPaused: Boolean = false,
+        /** True while the view itself is paused because the app is in the background. */
+        var viewPaused: Boolean = false,
         var shield: View? = null,
         var recipe: String? = null,
         var adBlockScriptlet: String? = null,
@@ -646,10 +648,20 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
             if (session.blocked) continue
             val shown = appForeground && session.id == activeId
             val pause = !shown && session.scope !in backgroundMediaSites
+            // The script reaches the main frame only, and a page can start playing again: with the
+            // app in the background the view itself is paused, which stops every frame's media.
+            setViewPaused(session, pause && !appForeground)
             if (pause == session.mediaPaused) continue
             session.mediaPaused = pause
             session.view.evaluateJavascript(if (pause) PAUSE_MEDIA_SCRIPT else RESUME_MEDIA_SCRIPT, null)
         }
+        signInWindow?.let { if (appForeground) it.onResume() else it.onPause() }
+    }
+
+    private fun setViewPaused(session: Session, paused: Boolean) {
+        if (paused == session.viewPaused) return
+        session.viewPaused = paused
+        if (paused) session.view.onPause() else session.view.onResume()
     }
 
     override fun onPause() {

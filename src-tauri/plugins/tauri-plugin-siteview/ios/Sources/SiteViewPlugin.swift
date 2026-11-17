@@ -143,6 +143,17 @@ private let inPictureInPictureScript = """
     return false;
   })()
   """
+/// True only for a real picture-in-picture window. The page's own small player lives inside the
+/// app, so it is gone from the screen when the app is left and must not keep the media going.
+private let inSystemPictureInPictureScript = """
+  (function () {
+    var videos = document.querySelectorAll('video');
+    for (var i = 0; i < videos.length; i++) {
+      if (videos[i].webkitPresentationMode === 'picture-in-picture') return true;
+    }
+    return false;
+  })()
+  """
 /// Puts the small player's video back in its place in its own page.
 private let miniCloseScript =
   "(function(){var f=document[Symbol.for('openmedia.miniClose')];if(typeof f==='function')f()})()"
@@ -588,6 +599,7 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
       self?.appForeground = true
       self?.sessions.values.forEach { $0.windowOpen = false }
       self?.refreshMedia()
+      self?.checkFloats()
     }
     NotificationCenter.default.addObserver(
       forName: UIApplication.willResignActiveNotification, object: nil, queue: .main
@@ -933,11 +945,11 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
     }
   }
 
-  /// Just before the app is left: is the page in front floating a video? Read while the page can
-  /// still answer, so minimizing never suspends it.
+  /// Just before the app is left: is the page in front floating a video in a system window? Read
+  /// while the page can still answer, so minimizing never suspends it.
   private func noteWindowOpen() {
     guard let id = activeId, let session = sessions[id], !session.blocked else { return }
-    session.view.evaluateJavaScript(inPictureInPictureScript) { [weak session] result, _ in
+    session.view.evaluateJavaScript(inSystemPictureInPictureScript) { [weak session] result, _ in
       session?.windowOpen = (result as? Bool) == true
     }
   }
@@ -1142,19 +1154,34 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
       }
       setMediaSuspended(!shown && !backgroundMediaSites.contains(session.scope), in: session)
     }
+    // Pages kept alive for a small player (in the corner or hidden) are not in `sessions`: with the
+    // app in the background they play on unless a system window shows them.
+    for session in floatingSessions where !session.blocked {
+      if appForeground {
+        setMediaSuspended(false, in: session)
+      } else {
+        suspendUnlessFloating(session)
+      }
+    }
   }
 
-  /// The page in front when the app is left keeps playing only if its video floats in a
-  /// picture-in-picture window; otherwise it is suspended as any page out of sight is. Until the
-  /// page answers, nothing changes, so the window is never cut off.
+  /// A page that is left keeps playing only if its video floats in a system picture-in-picture
+  /// window; otherwise it is suspended as any page out of sight is. A page that does not answer
+  /// in time is suspended too: a video playing on with no window and no screen cannot be stopped
+  /// from the app once it is back.
   private func suspendUnlessFloating(_ session: Session) {
-    session.view.evaluateJavaScript(inPictureInPictureScript) { [weak self, weak session] result, _ in
-      guard let self, let session, !self.appForeground else { return }
-      let floating = (result as? Bool) == true
+    var answered = false
+    let settle = { [weak self, weak session] (floating: Bool) in
+      guard !answered, let self, let session, !self.appForeground else { return }
+      answered = true
       session.windowOpen = floating
       self.setMediaSuspended(
         !floating && !self.backgroundMediaSites.contains(session.scope), in: session)
     }
+    session.view.evaluateJavaScript(inSystemPictureInPictureScript) { result, _ in
+      settle((result as? Bool) == true)
+    }
+    DispatchQueue.main.asyncAfter(deadline: .now() + floatAnswerWait) { settle(false) }
   }
 
   /// The one place media is suspended or resumed. WebKit counts every suspend and resumes only

@@ -6,6 +6,14 @@ All notable changes to OpenMedia are documented here.
 >
 > **Wiki**: the [GitHub Wiki](https://github.com/skepjandi/openmedia/wiki) is the public-facing main wiki — architecture, recipe format, AI pipeline, security model, roadmap. Source-controlled editing surface is `docs/wiki/` in this repo; CI (`.github/workflows/sync-wiki.yml`) mirrors it to the GitHub Wiki on every merge to `main`. New single-PR changes belong here, not as new wiki pages.
 
+### fix(siteview): minimizing during a video no longer leaves it playing
+
+**Area:** `fix(siteview)`
+
+**Change:** iOS: the page's own small player no longer counts as a picture-in-picture window when the app is left, pages kept alive for the small player are suspended too, a page that does not answer within 0.6 s is suspended, and floats are checked on return. Android: with the app in the background each page's view (and the sign-in window) is paused natively, which also stops media in iframes and players that restart after the script pause.
+
+**Not verified:** on a device or simulator.
+
 ### chore(recipes): the library is cut from 143 to 20 recipes
 
 **Area:** `chore(recipes)`
