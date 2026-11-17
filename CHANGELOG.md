@@ -6,6 +6,14 @@ All notable changes to OpenMedia are documented here.
 >
 > **Wiki**: the [GitHub Wiki](https://github.com/skepjandi/openmedia/wiki) is the public-facing main wiki — architecture, recipe format, AI pipeline, security model, roadmap. Source-controlled editing surface is `docs/wiki/` in this repo; CI (`.github/workflows/sync-wiki.yml`) mirrors it to the GitHub Wiki on every merge to `main`. New single-PR changes belong here, not as new wiki pages.
 
+### fix(siteview): media and picture-in-picture left playing after minimizing or closing, on iOS, Android and macOS
+
+**Area:** `fix(siteview)`
+
+**Change:** macOS: a minimized window or hidden app now pauses its pages' media like a page out of sight, and the web view's `setAllMediaPlaybackSuspended` pauses iframes too (before, only the main frame's `video`/`audio` were paused, so an embedded player kept playing on minimize and on a tab switch); a video in a picture-in-picture window is spared. iOS: a picture-in-picture window asked for on leaving the app gets 0.8 s to appear before the page is suspended, and a window kept open in the background is checked every 2 s, so closing it no longer leaves the page's video playing behind it. 
+
+**Verified:** macOS debug build run on this Mac: a bare mp4 and a video in a `tryit` iframe stop (the `HTMLMediaElement playback` power assertion disappears) on minimize and on Cmd+H, a bare mp4 comes back playing, and closing the window quits the app with no audio left; iOS Simulator: media interrupted on minimize, closing a tab stops its audio; Android emulator: audio stops on Home and on recents. `cargo clippy`/`cargo test` for the plugin. **Not verified:** a real picture-in-picture window (the iPhone Simulator does not show one), so the 0.8 s wait and the 2 s check are untested on a device; iframe video does not restart by itself when the window comes back (paused until played).
+
 ### fix(video): seek knob, small player and speed fixes from a review of the video controls
 
 **Area:** `fix(video)`

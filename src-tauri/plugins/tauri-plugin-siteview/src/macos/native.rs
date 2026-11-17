@@ -96,6 +96,16 @@ pub fn enable_gestures<R: Runtime>(webview: &Webview<R>) -> Result<()> {
     })
 }
 
+/// Suspends or resumes the media of every frame of the page, the iframes of a player included,
+/// which a script of the page's own document cannot reach. WebKit counts the calls: each suspend
+/// needs one resume, so the caller keeps them in pairs.
+pub fn set_media_suspended<R: Runtime>(webview: &Webview<R>, suspended: bool) -> Result<()> {
+    // SAFETY: a plain call on the main thread; no completion handler is needed.
+    with_view(webview, move |view| unsafe {
+        view.setAllMediaPlaybackSuspended_completionHandler(suspended, None);
+    })
+}
+
 const ZOOM_STEP: f64 = 1.1;
 const MIN_ZOOM: f64 = 0.3;
 const MAX_ZOOM: f64 = 5.0;

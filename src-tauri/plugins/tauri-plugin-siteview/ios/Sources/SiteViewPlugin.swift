@@ -123,6 +123,8 @@ private let floatForNavigationScript = """
 private let floatCheckEvery: TimeInterval = 2
 /// How long a page gets to answer before the next one is shown anyway.
 private let floatAnswerWait: TimeInterval = 0.6
+/// How long a picture-in-picture window asked for on leaving the app gets to appear.
+private let floatSettleWait: TimeInterval = 0.8
 private let exitPictureInPictureScript = """
   (function () {
     var videos = document.querySelectorAll('video');
@@ -569,6 +571,9 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
   private var pictureInPictureSites: Set<String> = []
   /// False from the app entering the background to it coming back.
   private var appForeground = true
+  /// True while a timer is waiting to ask whether the windows kept open in the background are
+  /// still open.
+  private var watchingWindows = false
   /// Pages that were left for another while their video played: the page stays alive, hidden, so
   /// its picture-in-picture window keeps playing, until the window is closed or the page in front
   /// plays a video of its own.
@@ -1148,7 +1153,10 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
       if !appForeground && session.id == activeId {
         // A window the reader opened (the panel's button, or an automatic one) keeps playing while
         // the app is minimized, on any site. Without one the page is suspended as usual.
-        if session.windowOpen { continue }
+        if session.windowOpen {
+          watchWindows()
+          continue
+        }
         suspendUnlessFloating(session)
         continue
       }
@@ -1168,13 +1176,24 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
   /// A page that is left keeps playing only if its video floats in a system picture-in-picture
   /// window; otherwise it is suspended as any page out of sight is. A page that does not answer
   /// in time is suspended too: a video playing on with no window and no screen cannot be stopped
-  /// from the app once it is back.
-  private func suspendUnlessFloating(_ session: Session) {
+  /// from the app once it is back. A window asked for a moment ago takes a beat to appear, so a
+  /// page that floated automatically is asked once more before it is suspended; suspending it
+  /// at once would close the window just opened.
+  private func suspendUnlessFloating(_ session: Session, retry: Bool = true) {
     var answered = false
     let settle = { [weak self, weak session] (floating: Bool) in
       guard !answered, let self, let session, !self.appForeground else { return }
       answered = true
+      if !floating, retry, session.autoPictureInPicture {
+        DispatchQueue.main.asyncAfter(deadline: .now() + floatSettleWait) { [weak self, weak session] in
+          guard let self, let session, !self.appForeground else { return }
+          self.suspendUnlessFloating(session, retry: false)
+        }
+        return
+      }
+      if !floating { session.autoPictureInPicture = false }
       session.windowOpen = floating
+      if floating { self.watchWindows() }
       self.setMediaSuspended(
         !floating && !self.backgroundMediaSites.contains(session.scope), in: session)
     }
@@ -1182,6 +1201,30 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
       settle((result as? Bool) == true)
     }
     DispatchQueue.main.asyncAfter(deadline: .now() + floatAnswerWait) { settle(false) }
+  }
+
+  /// While the app is in the background, a window that is kept open is asked after every so often:
+  /// when the reader closes it, a site may start its video again behind it, and nothing else would
+  /// stop that sound. A window that is gone ends the exemption and the page is suspended.
+  private func watchWindows() {
+    guard !watchingWindows, !appForeground, sessions.values.contains(where: { $0.windowOpen })
+    else { return }
+    watchingWindows = true
+    DispatchQueue.main.asyncAfter(deadline: .now() + floatCheckEvery) { [weak self] in
+      guard let self else { return }
+      self.watchingWindows = false
+      guard !self.appForeground else { return }
+      for session in self.sessions.values where session.windowOpen {
+        session.view.evaluateJavaScript(inSystemPictureInPictureScript) {
+          [weak self, weak session] result, _ in
+          guard let self, let session, !self.appForeground, (result as? Bool) != true else { return }
+          session.windowOpen = false
+          session.autoPictureInPicture = false
+          self.setMediaSuspended(!self.backgroundMediaSites.contains(session.scope), in: session)
+        }
+      }
+      self.watchWindows()
+    }
   }
 
   /// The one place media is suspended or resumed. WebKit counts every suspend and resumes only

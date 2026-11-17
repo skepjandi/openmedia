@@ -69,10 +69,14 @@ const SAFARI_USER_AGENT: &str = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)
 const MAX_REMEMBERED_BLOCKED: usize = 32;
 /// Pauses what is playing in a page that went out of sight and remembers which elements it
 /// paused, so showing the page again resumes exactly those and nothing the visitor had paused.
-const PAUSE_MEDIA_SCRIPT: &str = "(function(){window.__openmediaHold=true;var held=window.__openmediaPaused=window.__openmediaPaused||[];document.querySelectorAll('video,audio').forEach(function(m){if(!m.paused&&!m.ended&&held.indexOf(m)<0){held.push(m);m.pause()}})})()";
+const PAUSE_MEDIA_SCRIPT: &str = "(function(){window.__openmediaHold=true;var held=window.__openmediaPaused=window.__openmediaPaused||[];document.querySelectorAll('video,audio').forEach(function(m){if(m.webkitPresentationMode==='picture-in-picture'||m===document.pictureInPictureElement)return;if(!m.paused&&!m.ended&&held.indexOf(m)<0){held.push(m);m.pause()}})})()";
 const RESUME_MEDIA_SCRIPT: &str = "(function(){window.__openmediaHold=false;var held=window.__openmediaPaused||[];window.__openmediaPaused=[];held.forEach(function(m){if(!m.isConnected)return;try{var p=m.play();if(p&&p.catch)p.catch(function(){})}catch(e){}});document.dispatchEvent(new Event('openmedia-resume'))})()";
 const STOP_MEDIA_SCRIPT: &str =
     "document.querySelectorAll('video,audio').forEach(function(m){m.pause()});window.stop();";
+/// True when a video of the page's own document floats in a picture-in-picture window.
+const PICTURE_IN_PICTURE_SCRIPT: &str = "(function(){var v=document.querySelectorAll('video');for(var i=0;i<v.length;i++){if(v[i].webkitPresentationMode==='picture-in-picture')return true}return !!document.pictureInPictureElement})()";
+/// How long the page gets to say whether a video floats.
+const PICTURE_IN_PICTURE_WAIT: Duration = Duration::from_secs(1);
 
 /// What was last told to the shell about a session, so only changes are sent.
 #[derive(Debug, Clone, PartialEq)]
@@ -108,6 +112,10 @@ struct State<R: Runtime> {
     background_media: Vec<String>,
     /// Sessions whose media was paused because their page went out of sight.
     media_paused: HashSet<String>,
+    /// Sessions whose web view was told to suspend all media, each owed one resume.
+    native_suspended: HashSet<String>,
+    /// True while the window is minimized or the app is hidden: no page is in front then.
+    window_hidden: bool,
 }
 
 /// What a page's media needs when its visibility changes.
@@ -129,6 +137,19 @@ fn media_step(shown: bool, blocked: bool, keeps_playing: bool, paused: bool) -> 
         (true, true) => Some(MediaStep::Resume),
         _ => None,
     }
+}
+
+/// Whether a video of the page floats in a picture-in-picture window. A page that does not answer
+/// in time is taken as having none, so it is suspended like any other.
+fn in_picture_in_picture<R: Runtime>(webview: &Webview<R>) -> bool {
+    let (sender, receiver) = mpsc::channel();
+    let asked = webview.eval_with_callback(PICTURE_IN_PICTURE_SCRIPT, move |answer| {
+        let _ = sender.send(answer);
+    });
+    asked.is_ok()
+        && receiver
+            .recv_timeout(PICTURE_IN_PICTURE_WAIT)
+            .is_ok_and(|answer| answer == "true")
 }
 
 /// Everything a new web view needs.
@@ -171,6 +192,8 @@ pub fn init<R: Runtime, C: DeserializeOwned>(
             blocked: Vec::new(),
             background_media: Vec::new(),
             media_paused: HashSet::new(),
+            native_suspended: HashSet::new(),
+            window_hidden: false,
         }),
         labels: AtomicU64::new(0),
         focused: Mutex::new(None),
@@ -487,12 +510,7 @@ impl<R: Runtime> Inner<R> {
             let media = Self::media_steps(&mut state);
             (rect, overlay, views, media)
         };
-        for (webview, step) in media {
-            let _ = webview.eval(match step {
-                MediaStep::Pause => PAUSE_MEDIA_SCRIPT,
-                MediaStep::Resume => RESUME_MEDIA_SCRIPT,
-            });
-        }
+        self.apply_media(media);
         // Asked of the main thread, so never while the state lock is held.
         let bounds = rect.and_then(|rect| self.page_bounds(Some(rect)).ok());
         for (webview, shown) in &views {
@@ -516,12 +534,41 @@ impl<R: Runtime> Inner<R> {
         self.focus(&focus);
     }
 
+    /// Does what `media_steps` recorded. The page's script pauses what its own document plays and
+    /// is told it is on hold; the web view then suspends every frame's media as well, which reaches
+    /// the iframes of a player, unless a video of the page floats in a picture-in-picture window
+    /// (suspending would close it). A resume undoes exactly the suspend that was made. Never on the
+    /// main thread: the page is asked for its answer.
+    fn apply_media(&self, steps: Vec<(String, Webview<R>, MediaStep)>) {
+        for (id, webview, step) in steps {
+            match step {
+                MediaStep::Pause => {
+                    let _ = webview.eval(PAUSE_MEDIA_SCRIPT);
+                    if in_picture_in_picture(&webview) {
+                        continue;
+                    }
+                    let suspend = self.state().native_suspended.insert(id);
+                    if suspend {
+                        let _ = native::set_media_suspended(&webview, true);
+                    }
+                }
+                MediaStep::Resume => {
+                    let resume = self.state().native_suspended.remove(&id);
+                    if resume {
+                        let _ = native::set_media_suspended(&webview, false);
+                    }
+                    let _ = webview.eval(RESUME_MEDIA_SCRIPT);
+                }
+            }
+        }
+    }
+
     /// The pause or resume each session needs for where it now stands, recorded as done. Run the
     /// scripts after the state lock is released.
-    fn media_steps(state: &mut State<R>) -> Vec<(Webview<R>, MediaStep)> {
+    fn media_steps(state: &mut State<R>) -> Vec<(String, Webview<R>, MediaStep)> {
         let mut steps = Vec::new();
         for (id, session) in &state.sessions {
-            let shown = state.active.as_deref() == Some(id.as_str());
+            let shown = state.active.as_deref() == Some(id.as_str()) && !state.window_hidden;
             let blocked = state.blocked.contains(id);
             let scope = session
                 .scope
@@ -537,7 +584,7 @@ impl<R: Runtime> Inner<R> {
                 MediaStep::Pause => state.media_paused.insert(id.clone()),
                 MediaStep::Resume => state.media_paused.remove(id),
             };
-            steps.push((session.webview.clone(), step));
+            steps.push((id.clone(), session.webview.clone(), step));
         }
         steps
     }
@@ -603,6 +650,9 @@ impl<R: Runtime> Inner<R> {
         let webview = self.build_webview(&window, view)?;
         {
             let mut state = self.state();
+            // The new view has not been paused: the next sync works that out afresh.
+            state.media_paused.remove(session);
+            state.native_suspended.remove(session);
             if let Some(entry) = state.sessions.get_mut(session) {
                 entry.webview = webview.clone();
                 entry.stale = false;
@@ -616,7 +666,27 @@ impl<R: Runtime> Inner<R> {
         Ok(())
     }
 
+    /// A minimized window or a hidden app has no page in front: its media is paused as a page out
+    /// of sight is (a video in a picture-in-picture window is spared by the script), and resumed
+    /// when the window is back.
+    fn follow_window(&self) {
+        let Some(window) = self.app.get_window(MAIN_WINDOW) else {
+            return;
+        };
+        let hidden = window.is_minimized().unwrap_or(false) || !window.is_visible().unwrap_or(true);
+        let media = {
+            let mut state = self.state();
+            if state.window_hidden == hidden {
+                return;
+            }
+            state.window_hidden = hidden;
+            Self::media_steps(&mut state)
+        };
+        self.apply_media(media);
+    }
+
     fn poll(&self) {
+        self.follow_window();
         let targets: Vec<(String, Webview<R>)> = self
             .state()
             .sessions
@@ -767,6 +837,7 @@ impl<R: Runtime> Siteview<R> {
                 state.active = None;
             }
             state.media_paused.remove(&request.session);
+            state.native_suspended.remove(&request.session);
             state.sessions.remove(&request.session)
         };
         if let Some(session) = removed {
