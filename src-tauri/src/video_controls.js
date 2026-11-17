@@ -155,6 +155,7 @@
     var awaitTapEnd = false;
     var awaitTapClick = false;
     var mutedAtDown = null;
+    var panelSound = null; // what the reader last chose with the panel's mute button, until the page closes
 
     function read() {
       try { return JSON.parse(localStorage.getItem(STORE) || '{}') || {}; } catch (_) { return {}; }
@@ -239,10 +240,14 @@
           video.playbackRate = saved.rate;
         } catch (_) {}
       }
-      if (wantsSound && typeof saved.muted === 'boolean') {
+      // The panel's mute button changes the video, not the site's own idea of sound, so the next
+      // video would start muted again: the choice is carried over for as long as the page lives,
+      // and across pages when asked for.
+      var sound = wantsSound ? saved : panelSound;
+      if (sound && typeof sound.muted === 'boolean') {
         try {
-          video.muted = saved.muted;
-          if (typeof saved.volume === 'number') video.volume = saved.volume;
+          video.muted = sound.muted;
+          if (typeof sound.volume === 'number') video.volume = sound.volume;
         } catch (_) {}
       }
     }
@@ -1244,6 +1249,7 @@
       var mute = button(32, 'sound', function (target) {
         target.muted = !target.muted;
         if (!target.muted && target.volume === 0) target.volume = 1;
+        panelSound = { muted: target.muted, volume: target.volume };
       });
       var floatButton = button(32, 'pip', function (target) {
         if (framed) {
