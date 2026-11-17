@@ -77,7 +77,10 @@ export type Sheet =
   | "share-recipe"
   | "paywall"
   | "video-controls"
-  | "dark-mode";
+  | "dark-mode"
+  | "site-settings"
+  | "site-dark-mode"
+  | "site-video";
 
 /** Pages that open on top of Settings. Closing one returns to Settings, which stays mounted beneath it. */
 const SETTINGS_CHILDREN: readonly Sheet[] = [
@@ -90,20 +93,41 @@ const SETTINGS_CHILDREN: readonly Sheet[] = [
   "paywall",
   "video-controls",
   "dark-mode",
+  "site-settings",
+  "site-dark-mode",
+  "site-video",
 ];
 const isSettingsChild = (sheet: Sheet): boolean => SETTINGS_CHILDREN.includes(sheet);
 
+/** The pages about one site, reached from its hub or straight from the floating button. */
+const SITE_PAGES: readonly Sheet[] = ["site-settings", "site-dark-mode", "site-video"];
+const isSitePage = (sheet: Sheet): boolean => SITE_PAGES.includes(sheet);
+
 type SheetState = Pick<AppStore, "sheet" | "sheetParent">;
+type SheetTrail = SheetState & Pick<AppStore, "sheetBack" | "sheetSite">;
 
 /** Whether Settings is on screen, either itself or under one of its child pages. */
 export const selectSettingsOpen = (store: SheetState): boolean =>
   store.sheet === "settings" || (isSettingsChild(store.sheet) && store.sheetParent === "settings");
 
-/** What showing `next` changes: a child page opened from Settings remembers Settings as its parent. */
-const showSheet = (current: SheetState, next: Sheet): SheetState => ({
-  sheet: next,
-  sheetParent: selectSettingsOpen(current) && isSettingsChild(next) ? "settings" : "none",
-});
+/** Whether closing the sheet goes back to another page about the same site, not to Settings or the page. */
+export const selectSheetHasBack = (store: Pick<AppStore, "sheetBack">): boolean =>
+  store.sheetBack.length > 0;
+
+/**
+ * What showing `next` changes: a child page opened from Settings remembers Settings as its parent.
+ * A site page that opens another site page, or the shared dark mode page, is remembered so closing
+ * the next one comes back to it, whatever sits beneath.
+ */
+const showSheet = (current: SheetTrail, next: Sheet): SheetTrail => {
+  const continuing = isSitePage(current.sheet) && (isSitePage(next) || next === "dark-mode");
+  return {
+    sheet: next,
+    sheetParent: selectSettingsOpen(current) && isSettingsChild(next) ? "settings" : "none",
+    sheetBack: continuing ? [...current.sheetBack, current.sheet] : [],
+    sheetSite: continuing ? current.sheetSite : null,
+  };
+};
 
 /** What the web layer must do natively next; `nonce` makes a repeat of the same action distinct. */
 export type SessionAction = { nonce: number } & (
@@ -137,6 +161,10 @@ export interface AppStore {
   sheet: Sheet;
   /** Where closing a child page of Settings returns to; `none` for every other sheet. */
   sheetParent: "none" | "settings";
+  /** The site pages to return to before `sheetParent` applies, nearest last. */
+  sheetBack: Sheet[];
+  /** The site the open site pages are about, by registrable domain. */
+  sheetSite: string | null;
   /** The recipe the Recipes page opens with expanded, set when a favorite sends the user there. */
   recipeFocus: string | null;
   onboardingOpen: boolean;
@@ -157,6 +185,8 @@ export interface AppStore {
   assistant: AssistantState;
   load: () => Promise<void>;
   openSheet: (sheet: Sheet) => void;
+  /** Opens a page about one site (`site-settings`, `site-dark-mode`, `site-video`). */
+  openSiteSheet: (sheet: Sheet, site: string) => void;
   closeSheet: () => void;
   /** An empty page with the command bar open: a new tab. The sessions stay open underneath it. */
   openNewTab: () => void;
@@ -518,6 +548,8 @@ export const useApp = create<AppStore>((set, get) => {
     error: null,
     sheet: "none",
     sheetParent: "none",
+    sheetBack: [],
+    sheetSite: null,
     recipeFocus: null,
     onboardingOpen: false,
     sessions: [],
@@ -569,12 +601,23 @@ export const useApp = create<AppStore>((set, get) => {
     openNewTab: () => {
       set((current) => ({ ...showSheet(current, "assistant"), blankTab: true }));
     },
+    openSiteSheet: (sheet, site) => {
+      set((current) => ({ ...showSheet(current, sheet), sheetSite: site }));
+    },
     closeSheet: () =>
-      set((current) => ({
-        sheet: isSettingsChild(current.sheet) ? current.sheetParent : "none",
-        sheetParent: "none",
-        recipeFocus: null,
-      })),
+      set((current) => {
+        const back = current.sheetBack[current.sheetBack.length - 1];
+        if (back) {
+          return { sheet: back, sheetBack: current.sheetBack.slice(0, -1), recipeFocus: null };
+        }
+        return {
+          sheet: isSettingsChild(current.sheet) ? current.sheetParent : "none",
+          sheetParent: "none",
+          sheetBack: [],
+          sheetSite: null,
+          recipeFocus: null,
+        };
+      }),
 
     openRecipe: (recipeId) => {
       get().openSheet("recipes");

@@ -246,7 +246,6 @@ export const sv: Messages = {
   "settings.title": "Inställningar",
   "settings.close": "Stäng inställningar",
   "settings.appearance": "Utseende",
-  "settings.appearanceNote": "Gäller appen och webbplatser som följer systemets färgschema.",
   "settings.themeLabel": "Tema",
   "settings.themeSystem": "System",
   "settings.themeLight": "Ljust",
@@ -413,8 +412,6 @@ export const sv: Messages = {
   "settings.darkEnabled": "Mörka sidor",
   "settings.darkEnabledNote":
     "Aktiverar mörkt läge för alla webbplatser som inte har ett eget val.",
-  "settings.darkSitesNote":
-    "Inställningarna gäller alla webbplatser, om inte en webbplats har ett eget val. Ange det i en favorits inställningar.",
   "settings.darkMethod": "Metod",
   "settings.darkMethodDynamic": "Dynamisk",
   "settings.darkMethodDynamicNote":
@@ -446,9 +443,7 @@ export const sv: Messages = {
   "settings.darkText": "Textfärg",
   "settings.darkSchedule": "Schema",
   "settings.darkScheduleAlways": "Alltid",
-  "settings.darkScheduleSystem": "Appens tema",
   "settings.darkScheduleTime": "Tid",
-  "settings.darkScheduleSystemNote": "Mörkar sidorna medan appens tema är mörkt.",
   "settings.darkFrom": "Från",
   "settings.darkTo": "Till",
   "settings.darkBehavior": "Beteende",
@@ -793,4 +788,20 @@ export const sv: Messages = {
   "tabs.statToday": "{value} idag",
   "tabs.statShowing": "Visas nu",
   "tabs.statIdle": "Använd {value}",
+  "settings.appearanceNote": "Gäller bara appen. Hur sidor ser ut ställs in under Mörkt läge.",
+  "settings.darkScheduleSystem": "System",
+  "settings.darkScheduleSystemNote": "Följer enhetens ljusa eller mörka inställning.",
+  "settings.darkSitesNote":
+    "Inställningarna gäller alla webbplatser, om inte en webbplats har ett eget val. Ange det i webbplatsens sidinställningar.",
+  "fab.darkMode":
+    "Mörkt läge. Tryck för att slå på eller av för den här sidan, håll nedtryckt för alternativ.",
+  "favorites.pageSettings": "Sidinställningar",
+  "siteSettings.darkNote": "Mörkt läge bara för den här webbplatsen.",
+  "siteSettings.videoNote": "Videokontroller bara för den här webbplatsen.",
+  "siteDark.effectiveOn": "Mörkt läge är på för den här webbplatsen.",
+  "siteDark.effectiveOff": "Mörkt läge är av för den här webbplatsen.",
+  "siteDark.openShared": "Inställningar för mörkt läge",
+  "siteDark.openSharedNote": "Färger, schema och den delade metoden för alla webbplatser.",
+  "favorites.videoPanel": "Kontrollpanel",
+  "favorites.videoPanelLabel": "Videokontrollpanel för {site}",
 };

@@ -870,7 +870,6 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
       case "dark": self.colorScheme = .dark
       default: self.colorScheme = .unspecified
       }
-      self.sessions.values.forEach { $0.view.overrideUserInterfaceStyle = self.colorScheme }
       self.backdrop?.overrideUserInterfaceStyle = self.colorScheme
       invoke.resolve()
     }
@@ -1728,7 +1727,6 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
     view.navigationDelegate = self
     view.uiDelegate = self
     view.customUserAgent = safariUserAgent
-    view.overrideUserInterfaceStyle = colorScheme
     host.insertSubview(view, aboveSubview: session.view)
     signInWindow = view
     signInOwner = session.id
@@ -1751,7 +1749,6 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
     view.navigationDelegate = self
     view.uiDelegate = self
     view.customUserAgent = safariUserAgent
-    view.overrideUserInterfaceStyle = colorScheme
     host.insertSubview(view, aboveSubview: session.view)
     signInWindow = view
     signInOwner = session.id
@@ -2285,7 +2282,6 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
     view.customUserAgent = safariUserAgent
     view.navigationDelegate = self
     view.uiDelegate = self
-    view.overrideUserInterfaceStyle = colorScheme
     view.alpha = 0
     let refresh = UIRefreshControl()
     refresh.addAction(UIAction { [weak view] _ in view?.reload() }, for: .valueChanged)

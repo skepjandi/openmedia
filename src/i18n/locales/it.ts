@@ -251,8 +251,6 @@ export const it: Messages = {
   "settings.title": "Impostazioni",
   "settings.close": "Chiudi impostazioni",
   "settings.appearance": "Aspetto",
-  "settings.appearanceNote":
-    "Si applica all’app e ai siti che seguono lo schema di colori di sistema.",
   "settings.themeLabel": "Tema",
   "settings.themeSystem": "Sistema",
   "settings.themeLight": "Chiaro",
@@ -417,8 +415,6 @@ export const it: Messages = {
   "settings.darkEnabled": "Scurisci le pagine",
   "settings.darkEnabledNote":
     "Attiva la modalità scura su ogni sito che non ha una scelta propria.",
-  "settings.darkSitesNote":
-    "Queste impostazioni valgono per ogni sito, a meno che un sito non abbia una scelta propria. Impostala nelle impostazioni di un preferito.",
   "settings.darkMethod": "Metodo",
   "settings.darkMethodDynamic": "Dinamico",
   "settings.darkMethodDynamicNote":
@@ -450,9 +446,7 @@ export const it: Messages = {
   "settings.darkText": "Colore del testo",
   "settings.darkSchedule": "Programmazione",
   "settings.darkScheduleAlways": "Sempre",
-  "settings.darkScheduleSystem": "Tema dell'app",
   "settings.darkScheduleTime": "Orario",
-  "settings.darkScheduleSystemNote": "Scurisce le pagine finché il tema dell'app è scuro.",
   "settings.darkFrom": "Dalle",
   "settings.darkTo": "Alle",
   "settings.darkBehavior": "Comportamento",
@@ -803,4 +797,21 @@ export const it: Messages = {
   "tabs.statToday": "{value} oggi",
   "tabs.statShowing": "In primo piano",
   "tabs.statIdle": "Usato {value}",
+  "settings.appearanceNote":
+    "Si applica solo all’app. L’aspetto delle pagine si imposta nella modalità scura.",
+  "settings.darkScheduleSystem": "Sistema",
+  "settings.darkScheduleSystemNote": "Segue l'impostazione chiara o scura del dispositivo.",
+  "settings.darkSitesNote":
+    "Queste impostazioni valgono per ogni sito, a meno che un sito non abbia una scelta propria. Impostala nelle impostazioni della pagina del sito.",
+  "fab.darkMode":
+    "Modalità scura. Tocca per attivarla o disattivarla in questa pagina, tieni premuto per le opzioni.",
+  "favorites.pageSettings": "Impostazioni della pagina",
+  "siteSettings.darkNote": "Modalità scura solo per questo sito.",
+  "siteSettings.videoNote": "Controlli video solo per questo sito.",
+  "siteDark.effectiveOn": "La modalità scura è attiva per questo sito.",
+  "siteDark.effectiveOff": "La modalità scura è disattivata per questo sito.",
+  "siteDark.openShared": "Impostazioni della modalità scura",
+  "siteDark.openSharedNote": "Colori, orario e metodo condiviso per tutti i siti.",
+  "favorites.videoPanel": "Pannello dei controlli",
+  "favorites.videoPanelLabel": "Pannello dei controlli video di {site}",
 };

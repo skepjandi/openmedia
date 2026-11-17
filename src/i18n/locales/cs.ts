@@ -245,8 +245,6 @@ export const cs: Messages = {
   "settings.title": "Nastavení",
   "settings.close": "Zavřít nastavení",
   "settings.appearance": "Vzhled",
-  "settings.appearanceNote":
-    "Platí pro aplikaci i pro weby, které se řídí systémovým barevným schématem.",
   "settings.themeLabel": "Motiv",
   "settings.themeSystem": "Systémový",
   "settings.themeLight": "Světlý",
@@ -410,8 +408,6 @@ export const cs: Messages = {
   "settings.darkModeNote": "Ztmaví stránky, které otevřete.",
   "settings.darkEnabled": "Ztmavit stránky",
   "settings.darkEnabledNote": "Zapne tmavý režim na všech webech, které nemají vlastní volbu.",
-  "settings.darkSitesNote":
-    "Tato nastavení platí pro všechny weby, pokud web nemá vlastní volbu. Nastavíte ji v nastavení oblíbené položky.",
   "settings.darkMethod": "Metoda",
   "settings.darkMethodDynamic": "Dynamická",
   "settings.darkMethodDynamicNote":
@@ -443,9 +439,7 @@ export const cs: Messages = {
   "settings.darkText": "Barva textu",
   "settings.darkSchedule": "Plán",
   "settings.darkScheduleAlways": "Vždy",
-  "settings.darkScheduleSystem": "Motiv aplikace",
   "settings.darkScheduleTime": "Čas",
-  "settings.darkScheduleSystemNote": "Ztmaví stránky, dokud je motiv aplikace tmavý.",
   "settings.darkFrom": "Od",
   "settings.darkTo": "Do",
   "settings.darkBehavior": "Chování",
@@ -789,4 +783,20 @@ export const cs: Messages = {
   "tabs.statToday": "Dnes {value}",
   "tabs.statShowing": "Právě zobrazeno",
   "tabs.statIdle": "Použito {value}",
+  "settings.appearanceNote": "Platí jen pro aplikaci. Vzhled stránek se nastavuje v tmavém režimu.",
+  "settings.darkScheduleSystem": "Systém",
+  "settings.darkScheduleSystemNote": "Řídí se světlým nebo tmavým nastavením zařízení.",
+  "settings.darkSitesNote":
+    "Tato nastavení platí pro všechny weby, pokud web nemá vlastní volbu. Nastavíte ji v nastavení stránky daného webu.",
+  "fab.darkMode":
+    "Tmavý režim. Klepnutím ho pro tuto stránku zapnete nebo vypnete, podržením otevřete možnosti.",
+  "favorites.pageSettings": "Nastavení stránky",
+  "siteSettings.darkNote": "Tmavý režim jen pro tento web.",
+  "siteSettings.videoNote": "Ovládání videa jen pro tento web.",
+  "siteDark.effectiveOn": "Tmavý režim je pro tento web zapnutý.",
+  "siteDark.effectiveOff": "Tmavý režim je pro tento web vypnutý.",
+  "siteDark.openShared": "Nastavení tmavého režimu",
+  "siteDark.openSharedNote": "Barvy, plán a sdílená metoda pro všechny weby.",
+  "favorites.videoPanel": "Panel ovládání",
+  "favorites.videoPanelLabel": "Panel ovládání videa na {site}",
 };

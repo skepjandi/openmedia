@@ -242,7 +242,6 @@ export const ja: Messages = {
   "settings.title": "設定",
   "settings.close": "設定を閉じる",
   "settings.appearance": "外観",
-  "settings.appearanceNote": "アプリと、システムの配色をそのまま使うサイト全体に適用されます。",
   "settings.themeLabel": "テーマ",
   "settings.themeSystem": "システム",
   "settings.themeLight": "ライト",
@@ -404,8 +403,6 @@ export const ja: Messages = {
   "settings.darkModeNote": "開いたページを暗くします。",
   "settings.darkEnabled": "ページを暗くする",
   "settings.darkEnabledNote": "サイト個別の設定がないすべてのサイトでダークモードをオンにします。",
-  "settings.darkSitesNote":
-    "サイトごとに個別の設定がない限り、この設定がすべてのサイトに適用されます。個別設定はお気に入りの設定で行えます。",
   "settings.darkMethod": "方式",
   "settings.darkMethodDynamic": "ダイナミック",
   "settings.darkMethodDynamicNote":
@@ -437,9 +434,7 @@ export const ja: Messages = {
   "settings.darkText": "文字色",
   "settings.darkSchedule": "スケジュール",
   "settings.darkScheduleAlways": "常時",
-  "settings.darkScheduleSystem": "アプリのテーマ",
   "settings.darkScheduleTime": "時刻",
-  "settings.darkScheduleSystemNote": "アプリのテーマがダークの間、ページを暗くします。",
   "settings.darkFrom": "開始",
   "settings.darkTo": "終了",
   "settings.darkBehavior": "動作",
@@ -784,4 +779,20 @@ export const ja: Messages = {
   "tabs.statToday": "今日 {value}",
   "tabs.statShowing": "表示中",
   "tabs.statIdle": "使用: {value}",
+  "settings.appearanceNote": "アプリにのみ適用されます。ページの見た目はダークモードで設定します。",
+  "settings.darkScheduleSystem": "システム",
+  "settings.darkScheduleSystemNote": "デバイスのライト／ダーク設定に従います。",
+  "settings.darkSitesNote":
+    "サイトごとに個別の設定がない限り、この設定がすべてのサイトに適用されます。個別設定はサイトのページ設定で行えます。",
+  "fab.darkMode":
+    "ダークモード。タップでこのページのオン／オフを切り替え、長押しでオプションを開きます。",
+  "favorites.pageSettings": "ページ設定",
+  "siteSettings.darkNote": "このサイトだけのダークモードです。",
+  "siteSettings.videoNote": "このサイトだけの動画コントロールです。",
+  "siteDark.effectiveOn": "このサイトではダークモードがオンです。",
+  "siteDark.effectiveOff": "このサイトではダークモードがオフです。",
+  "siteDark.openShared": "ダークモードの設定",
+  "siteDark.openSharedNote": "色、スケジュール、すべてのサイト共通の方式を設定します。",
+  "favorites.videoPanel": "コントロールパネル",
+  "favorites.videoPanelLabel": "{site}の動画コントロールパネル",
 };

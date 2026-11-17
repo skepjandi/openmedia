@@ -240,7 +240,6 @@ export const vi: Messages = {
   "settings.title": "Cài đặt",
   "settings.close": "Đóng cài đặt",
   "settings.appearance": "Giao diện",
-  "settings.appearanceNote": "Áp dụng cho ứng dụng và cho các trang web bám theo màu hệ thống.",
   "settings.themeLabel": "Chủ đề",
   "settings.themeSystem": "Hệ thống",
   "settings.themeLight": "Sáng",
@@ -405,8 +404,6 @@ export const vi: Messages = {
   "settings.darkModeNote": "Làm tối các trang bạn mở.",
   "settings.darkEnabled": "Làm tối trang",
   "settings.darkEnabledNote": "Bật chế độ tối cho mọi trang web không có lựa chọn riêng.",
-  "settings.darkSitesNote":
-    "Các cài đặt này áp dụng cho mọi trang web, trừ khi trang web có lựa chọn riêng. Đặt lựa chọn đó trong cài đặt của một mục yêu thích.",
   "settings.darkMethod": "Phương pháp",
   "settings.darkMethodDynamic": "Động",
   "settings.darkMethodDynamicNote":
@@ -438,9 +435,7 @@ export const vi: Messages = {
   "settings.darkText": "Màu chữ",
   "settings.darkSchedule": "Lịch",
   "settings.darkScheduleAlways": "Luôn luôn",
-  "settings.darkScheduleSystem": "Chủ đề ứng dụng",
   "settings.darkScheduleTime": "Thời gian",
-  "settings.darkScheduleSystemNote": "Làm tối trang khi chủ đề của ứng dụng là tối.",
   "settings.darkFrom": "Từ",
   "settings.darkTo": "Đến",
   "settings.darkBehavior": "Hành vi",
@@ -783,4 +778,20 @@ export const vi: Messages = {
   "tabs.statToday": "Hôm nay {value}",
   "tabs.statShowing": "Đang hiển thị",
   "tabs.statIdle": "Đã dùng {value}",
+  "settings.appearanceNote":
+    "Chỉ áp dụng cho ứng dụng. Giao diện của các trang được đặt trong Chế độ tối.",
+  "settings.darkScheduleSystem": "Hệ thống",
+  "settings.darkScheduleSystemNote": "Theo cài đặt sáng hoặc tối của thiết bị.",
+  "settings.darkSitesNote":
+    "Các cài đặt này áp dụng cho mọi trang web, trừ khi trang web có lựa chọn riêng. Đặt lựa chọn đó trong cài đặt trang của trang web.",
+  "fab.darkMode": "Chế độ tối. Chạm để bật hoặc tắt cho trang này, nhấn giữ để xem tùy chọn.",
+  "favorites.pageSettings": "Cài đặt trang",
+  "siteSettings.darkNote": "Chế độ tối chỉ cho trang web này.",
+  "siteSettings.videoNote": "Điều khiển video chỉ cho trang web này.",
+  "siteDark.effectiveOn": "Chế độ tối đang bật cho trang web này.",
+  "siteDark.effectiveOff": "Chế độ tối đang tắt cho trang web này.",
+  "siteDark.openShared": "Cài đặt chế độ tối",
+  "siteDark.openSharedNote": "Màu sắc, lịch trình và phương pháp dùng chung cho mọi trang web.",
+  "favorites.videoPanel": "Bảng điều khiển",
+  "favorites.videoPanelLabel": "Bảng điều khiển video của {site}",
 };

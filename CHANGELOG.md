@@ -6,6 +6,14 @@ All notable changes to OpenMedia are documented here.
 >
 > **Wiki**: the [GitHub Wiki](https://github.com/skepjandi/openmedia/wiki) is the public-facing main wiki — architecture, recipe format, AI pipeline, security model, roadmap. Source-controlled editing surface is `docs/wiki/` in this repo; CI (`.github/workflows/sync-wiki.yml`) mirrors it to the GitHub Wiki on every merge to `main`. New single-PR changes belong here, not as new wiki pages.
 
+### feat(dark-mode): a dark mode button in the fan, page settings per site, and Appearance for the app only
+
+**Area:** `feat(fab)`, `feat(settings)`, `fix(siteview)`
+
+**Change:** Appearance (Light, Dark, System) now themes OpenMedia's own screens only. On iOS and Android the native plugin no longer applies it to pages (iOS `overrideUserInterfaceStyle` on site views, Android's algorithmic darkening), which fought the dark mode engine; pages see the device's setting, and the dark mode schedule "System" follows it. A moon button in the floating button's fan, after Incognito and the video controls switch, turns dark mode on or off for the page in view (global when no page is open); holding it opens that page's dark mode settings. Each favorite in Settings has a "Page settings" button that opens a hub with a Dark mode page and a Video controls page for the site; the per-site video controls moved there from the favorite editor, which also gains a panel Follow/On/Off choice. Fan layout adds candidates so six favorites plus both optional buttons still fit.
+
+**Verified:** frontend and Rust checks, geometry tests for the extra button, store tests for the back trail. **Not verified:** on a device (the changed Swift and Kotlin were built but not driven), the new pages on small screens, macOS (the window's appearance is still the page's there). Translations of the new strings are unreviewed.
+
 ### feat(fab): a color picker and a technology detector on the floating button, off until switched on
 
 **Area:** `feat(fab)`, `feat(settings)`

@@ -4,6 +4,7 @@ import {
   DARK_PRESETS,
   activePreset,
   clamp,
+  darkActiveFor,
   darkSiteLabel,
   isClockTime,
   strokeLabel,
@@ -64,5 +65,27 @@ describe("darkSiteLabel", () => {
     expect(darkSiteLabel({ mode: "off" })).toEqual(["favorites.darkOff"]);
     expect(darkSiteLabel({ method: "filter" })).toEqual(["settings.darkMethodFilter"]);
     expect(darkSiteLabel({})).toEqual([]);
+  });
+});
+
+describe("darkActiveFor", () => {
+  const off = { enabled: false };
+  const on = { enabled: true };
+
+  it("follows the global switch for a site with no mode of its own", () => {
+    expect(darkActiveFor(on, {}, "a.com")).toBe(true);
+    expect(darkActiveFor(off, {}, "a.com")).toBe(false);
+    expect(darkActiveFor(on, { "a.com": { method: "filter" } }, "a.com")).toBe(true);
+  });
+
+  it("lets the site's own mode win over the global switch", () => {
+    expect(darkActiveFor(off, { "a.com": { mode: "on" } }, "a.com")).toBe(true);
+    expect(darkActiveFor(on, { "a.com": { mode: "off" } }, "a.com")).toBe(false);
+    expect(darkActiveFor(on, { "b.com": { mode: "off" } }, "a.com")).toBe(true);
+  });
+
+  it("uses only the global switch when no page is open", () => {
+    expect(darkActiveFor(on, { "a.com": { mode: "off" } }, null)).toBe(true);
+    expect(darkActiveFor(off, {}, null)).toBe(false);
   });
 });

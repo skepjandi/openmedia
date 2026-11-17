@@ -89,3 +89,16 @@ export function darkSiteLabel(dark: SiteDark): MessageKey[] {
   if (method) labels.push(method.label);
   return labels;
 }
+
+/**
+ * Whether dark mode is in effect for a site: its own mode when it has one, else the global
+ * switch. Without a site (nothing open) only the global switch counts.
+ */
+export function darkActiveFor(
+  darkMode: Pick<DarkMode, "enabled">,
+  darkSites: Record<string, SiteDark>,
+  site: string | null,
+): boolean {
+  const own = site ? darkSites[site]?.mode : undefined;
+  return own === undefined ? darkMode.enabled : own === "on";
+}

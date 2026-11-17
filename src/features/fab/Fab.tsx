@@ -1,8 +1,10 @@
 import { useMemo, useRef, useState, type CSSProperties, type PointerEvent } from "react";
-import { selectQuickFavorites, useApp } from "../../app/store";
+import { selectPage, selectQuickFavorites, useApp } from "../../app/store";
 import { unreadByFavorite } from "../web/unreadWatch";
 import { useT } from "../../i18n/useT";
 import { quickSlots, usableQuickAccess } from "../../shared/favorites";
+import { DARK_MODE_DEFAULT, darkActiveFor } from "../../shared/darkMode";
+import { siteOf } from "../../shared/site";
 import { VIDEO_CONTROLS_DEFAULT } from "../../shared/videoControls";
 import { useInsets, useViewport } from "../../shared/viewport";
 import {
@@ -12,6 +14,7 @@ import {
   HOLD_SCALE,
   COLOR_PICKER_SIZE,
   CONTROLS_SIZE,
+  DARK_MODE_SIZE,
   INCOGNITO_SIZE,
   PEEK_HEIGHT,
   PEEK_WIDTH,
@@ -44,6 +47,7 @@ import {
   TechIcon,
   HistoryIcon,
   IncognitoIcon,
+  MoonIcon,
   ProIcon,
   SlidersIcon,
   StatsIcon,
@@ -88,6 +92,14 @@ export function Fab() {
   const sheet = useApp((s) => s.sheet);
   const controlsOn = useApp((s) => (s.state?.videoControls ?? VIDEO_CONTROLS_DEFAULT).panel);
   const setVideoControls = useApp((s) => s.setVideoControls);
+  const darkMode = useApp((s) => s.state?.darkMode ?? DARK_MODE_DEFAULT);
+  const darkSites = useApp((s) => s.state?.darkSites);
+  const pageUrl = useApp((s) => selectPage(s)?.url);
+  const pageSite = pageUrl ? siteOf(pageUrl) : null;
+  const darkOn = darkActiveFor(darkMode, darkSites ?? {}, pageSite);
+  const setDarkMode = useApp((s) => s.setDarkMode);
+  const setSiteDarkMode = useApp((s) => s.setSiteDarkMode);
+  const openSiteSheet = useApp((s) => s.openSiteSheet);
   // The page script runs through native code that desktop has no site view for.
   const colorPickerOn = useApp((s) => (s.state?.colorPicker ?? false) && !s.desktop);
   const techDetectorOn = useApp((s) => (s.state?.techDetector ?? false) && !s.desktop);
@@ -114,6 +126,13 @@ export function Fab() {
   const ignorePress = useRef(false);
   const controlsHold = useRef(0);
   const controlsHeld = useRef(false);
+  const [darkCharging, setDarkCharging] = useState(false);
+  const stopDarkHold = () => {
+    clearTimeout(darkHold.current);
+    setDarkCharging(false);
+  };
+  const darkHold = useRef(0);
+  const darkHeld = useRef(false);
 
   const list = useMemo(() => quickSlots(favorites, isPro), [favorites, isPro]);
   const sessions = useApp((s) => s.sessions);
@@ -149,7 +168,11 @@ export function Fab() {
       void (incognito.active ? exitIncognito() : enterIncognito());
     else if (target.kind === "colorPicker") void startColorPick();
     else if (target.kind === "techDetector") void startTechDetect();
-    else if (target.kind === "controls") {
+    else if (target.kind === "darkMode") {
+      if (pageSite) {
+        void setSiteDarkMode(pageSite, { ...darkSites?.[pageSite], mode: darkOn ? "off" : "on" });
+      } else void setDarkMode({ enabled: !darkOn });
+    } else if (target.kind === "controls") {
       // The quick switch is for every site: a site's own "on" would keep the panel showing there.
       const next = !controlsOn;
       void setVideoControls({ panel: next });
@@ -250,7 +273,7 @@ export function Fab() {
     "--dx": `${center.x - target.x}px`,
     "--dy": `${center.y - target.y}px`,
     "--i": index,
-    "--n": list.length + 6 + Number(colorPickerOn) + Number(techDetectorOn),
+    "--n": list.length + 7 + Number(colorPickerOn) + Number(techDetectorOn),
   });
 
   const hidden = sheet !== "none" || onboardingOpen;
@@ -492,6 +515,54 @@ export function Fab() {
         </svg>
       </button>
 
+      <button
+        type="button"
+        data-open={fanOpen}
+        data-active={darkOn}
+        aria-label={t("fab.darkMode")}
+        aria-pressed={darkOn}
+        tabIndex={fanOpen ? 0 : -1}
+        data-hold={darkCharging ? "charging" : "idle"}
+        onPointerDown={() => {
+          darkHeld.current = false;
+          setDarkCharging(true);
+          darkHold.current = window.setTimeout(() => {
+            darkHeld.current = true;
+            setDarkCharging(false);
+            if (pageSite) openSiteSheet("site-dark-mode", pageSite);
+            else openSheet("dark-mode");
+            dispatch({ type: "dismiss" });
+          }, HOLD_MS);
+        }}
+        onPointerUp={stopDarkHold}
+        onPointerLeave={stopDarkHold}
+        onPointerCancel={stopDarkHold}
+        onContextMenu={(event) => event.preventDefault()}
+        onClick={() => {
+          if (darkHeld.current) {
+            darkHeld.current = false;
+            return;
+          }
+          select({ kind: "darkMode" });
+          dispatch({ type: "dismiss" });
+        }}
+        style={{
+          ...fanStyle(layout.darkMode, list.length + 6),
+          width: DARK_MODE_SIZE,
+          height: DARK_MODE_SIZE,
+          margin: -DARK_MODE_SIZE / 2,
+          touchAction: "none",
+        }}
+        className={`fan-item fab-glass fixed z-20 grid place-items-center rounded-full ${
+          hover?.kind === "darkMode" ? "border-accent! text-accent" : "text-white"
+        }`}
+      >
+        <MoonIcon on={darkOn} />
+        <svg className="fab-ring" viewBox="0 0 64 64" aria-hidden="true">
+          <circle cx="32" cy="32" r="31" pathLength="1" />
+        </svg>
+      </button>
+
       {layout.colorPicker && (
         <button
           type="button"
@@ -503,7 +574,7 @@ export function Fab() {
             dispatch({ type: "dismiss" });
           }}
           style={{
-            ...fanStyle(layout.colorPicker, list.length + 6),
+            ...fanStyle(layout.colorPicker, list.length + 7),
             width: COLOR_PICKER_SIZE,
             height: COLOR_PICKER_SIZE,
             margin: -COLOR_PICKER_SIZE / 2,
@@ -527,7 +598,7 @@ export function Fab() {
             dispatch({ type: "dismiss" });
           }}
           style={{
-            ...fanStyle(layout.techDetector, list.length + 6 + Number(colorPickerOn)),
+            ...fanStyle(layout.techDetector, list.length + 7 + Number(colorPickerOn)),
             width: TECH_DETECTOR_SIZE,
             height: TECH_DETECTOR_SIZE,
             margin: -TECH_DETECTOR_SIZE / 2,

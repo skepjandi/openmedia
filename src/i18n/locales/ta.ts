@@ -252,8 +252,6 @@ export const ta: Messages = {
   "settings.title": "அமைப்புகள்",
   "settings.close": "அமைப்புகளை மூடு",
   "settings.appearance": "தோற்றம்",
-  "settings.appearanceNote":
-    "செயலிக்கும், அமைப்பின் வண்ணத் திட்டத்தைப் பின்பற்றும் தளங்களுக்கும் பொருந்தும்.",
   "settings.themeLabel": "தீம்",
   "settings.themeSystem": "அமைப்பு",
   "settings.themeLight": "வெளிர்",
@@ -423,8 +421,6 @@ export const ta: Messages = {
   "settings.darkEnabled": "பக்கங்களை இருளாக்கு",
   "settings.darkEnabledNote":
     "தனக்கென தேர்வு இல்லாத ஒவ்வொரு தளத்திலும் இருண்ட பயன்முறையை இயக்கும்.",
-  "settings.darkSitesNote":
-    "ஒரு தளத்திற்குத் தனி தேர்வு இல்லாதவரை இந்த அமைப்புகள் எல்லா தளங்களுக்கும் பொருந்தும். பிடித்தவையின் அமைப்புகளில் அதை அமைக்கவும்.",
   "settings.darkMethod": "முறை",
   "settings.darkMethodDynamic": "டைனமிக்",
   "settings.darkMethodDynamicNote":
@@ -456,10 +452,7 @@ export const ta: Messages = {
   "settings.darkText": "உரை நிறம்",
   "settings.darkSchedule": "அட்டவணை",
   "settings.darkScheduleAlways": "எப்போதும்",
-  "settings.darkScheduleSystem": "செயலியின் தீம்",
   "settings.darkScheduleTime": "நேரம்",
-  "settings.darkScheduleSystemNote":
-    "செயலியின் தீம் இருண்டதாக இருக்கும்போது பக்கங்களை இருளாக்கும்.",
   "settings.darkFrom": "தொடக்கம்",
   "settings.darkTo": "முடிவு",
   "settings.darkBehavior": "நடத்தை",
@@ -813,4 +806,21 @@ export const ta: Messages = {
   "tabs.statToday": "இன்று {value}",
   "tabs.statShowing": "இப்போது காட்டப்படுகிறது",
   "tabs.statIdle": "பயன்படுத்தியது {value}",
+  "settings.appearanceNote":
+    "செயலிக்கு மட்டும் பொருந்தும். பக்கங்கள் எப்படித் தெரியும் என்பது இருண்ட பயன்முறையில் அமைக்கப்படும்.",
+  "settings.darkScheduleSystem": "அமைப்பு",
+  "settings.darkScheduleSystemNote": "சாதனத்தின் வெளிர் அல்லது இருண்ட அமைப்பைப் பின்பற்றும்.",
+  "settings.darkSitesNote":
+    "ஒரு தளத்திற்குத் தனி தேர்வு இல்லாதவரை இந்த அமைப்புகள் எல்லா தளங்களுக்கும் பொருந்தும். தளத்தின் பக்க அமைப்புகளில் அதை அமைக்கவும்.",
+  "fab.darkMode":
+    "இருண்ட பயன்முறை. இந்தப் பக்கத்திற்கு இயக்க அல்லது அணைக்கத் தட்டவும், விருப்பங்களுக்கு அழுத்திப் பிடிக்கவும்.",
+  "favorites.pageSettings": "பக்க அமைப்புகள்",
+  "siteSettings.darkNote": "இந்தத் தளத்துக்கு மட்டும் இருண்ட பயன்முறை.",
+  "siteSettings.videoNote": "இந்தத் தளத்துக்கு மட்டும் வீடியோ கட்டுப்பாடுகள்.",
+  "siteDark.effectiveOn": "இந்தத் தளத்தில் இருண்ட பயன்முறை இயக்கத்தில் உள்ளது.",
+  "siteDark.effectiveOff": "இந்தத் தளத்தில் இருண்ட பயன்முறை அணைக்கப்பட்டுள்ளது.",
+  "siteDark.openShared": "இருண்ட பயன்முறை அமைப்புகள்",
+  "siteDark.openSharedNote": "வண்ணங்கள், அட்டவணை மற்றும் எல்லா தளங்களுக்குமான பொதுவான முறை.",
+  "favorites.videoPanel": "கட்டுப்பாட்டுப் பலகை",
+  "favorites.videoPanelLabel": "{site} வீடியோ கட்டுப்பாட்டுப் பலகை",
 };

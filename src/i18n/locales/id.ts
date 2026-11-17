@@ -241,8 +241,6 @@ export const id: Messages = {
   "settings.title": "Pengaturan",
   "settings.close": "Tutup pengaturan",
   "settings.appearance": "Tampilan",
-  "settings.appearanceNote":
-    "Berlaku untuk aplikasi dan untuk situs yang mengikuti skema warna sistem.",
   "settings.themeLabel": "Tema",
   "settings.themeSystem": "Sistem",
   "settings.themeLight": "Terang",
@@ -406,8 +404,6 @@ export const id: Messages = {
   "settings.darkEnabled": "Gelapkan halaman",
   "settings.darkEnabledNote":
     "Mengaktifkan mode gelap untuk setiap situs yang tidak punya pilihan sendiri.",
-  "settings.darkSitesNote":
-    "Pengaturan ini berlaku untuk semua situs kecuali situs tersebut punya pilihan sendiri. Atur di pengaturan favorit.",
   "settings.darkMethod": "Metode",
   "settings.darkMethodDynamic": "Dinamis",
   "settings.darkMethodDynamicNote":
@@ -439,9 +435,7 @@ export const id: Messages = {
   "settings.darkText": "Warna teks",
   "settings.darkSchedule": "Jadwal",
   "settings.darkScheduleAlways": "Selalu",
-  "settings.darkScheduleSystem": "Tema aplikasi",
   "settings.darkScheduleTime": "Waktu",
-  "settings.darkScheduleSystemNote": "Menggelapkan halaman saat tema aplikasi gelap.",
   "settings.darkFrom": "Dari",
   "settings.darkTo": "Hingga",
   "settings.darkBehavior": "Perilaku",
@@ -792,4 +786,20 @@ export const id: Messages = {
   "tabs.statToday": "{value} hari ini",
   "tabs.statShowing": "Sedang ditampilkan",
   "tabs.statIdle": "Dipakai {value}",
+  "settings.appearanceNote": "Hanya berlaku untuk aplikasi. Tampilan halaman diatur di Mode gelap.",
+  "settings.darkScheduleSystem": "Sistem",
+  "settings.darkScheduleSystemNote": "Mengikuti pengaturan terang atau gelap perangkat.",
+  "settings.darkSitesNote":
+    "Pengaturan ini berlaku untuk semua situs kecuali situs tersebut punya pilihan sendiri. Atur di pengaturan halaman situs.",
+  "fab.darkMode":
+    "Mode gelap. Ketuk untuk menyalakan atau mematikannya di halaman ini, tahan untuk opsi.",
+  "favorites.pageSettings": "Pengaturan halaman",
+  "siteSettings.darkNote": "Mode gelap hanya untuk situs ini.",
+  "siteSettings.videoNote": "Kontrol video hanya untuk situs ini.",
+  "siteDark.effectiveOn": "Mode gelap aktif untuk situs ini.",
+  "siteDark.effectiveOff": "Mode gelap nonaktif untuk situs ini.",
+  "siteDark.openShared": "Pengaturan mode gelap",
+  "siteDark.openSharedNote": "Warna, jadwal, dan metode bersama untuk semua situs.",
+  "favorites.videoPanel": "Panel kontrol",
+  "favorites.videoPanelLabel": "Panel kontrol video {site}",
 };

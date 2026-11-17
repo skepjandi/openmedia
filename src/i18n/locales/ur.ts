@@ -244,8 +244,6 @@ export const ur: Messages = {
   "settings.title": "ترتیبات",
   "settings.close": "ترتیبات بند کریں",
   "settings.appearance": "ظاہری شکل",
-  "settings.appearanceNote":
-    "ایپ پر اور اُن سائٹس پر لاگو ہوتا ہے جو سسٹم کے رنگوں کا پیمانہ استعمال کرتی ہیں۔",
   "settings.themeLabel": "تھیم",
   "settings.themeSystem": "سسٹم",
   "settings.themeLight": "ہلکا",
@@ -410,8 +408,6 @@ export const ur: Messages = {
   "settings.darkModeNote": "آپ کے کھولے ہوئے صفحات کو گہرا کرتا ہے۔",
   "settings.darkEnabled": "صفحات گہرے کریں",
   "settings.darkEnabledNote": "ہر اس سائٹ پر ڈارک موڈ آن کرتا ہے جس کی اپنی کوئی پسند نہیں۔",
-  "settings.darkSitesNote":
-    "یہ سیٹنگز ہر سائٹ پر لاگو ہوتی ہیں جب تک کسی سائٹ کی اپنی پسند نہ ہو۔ اسے کسی پسندیدہ کی سیٹنگز میں طے کریں۔",
   "settings.darkMethod": "طریقہ",
   "settings.darkMethodDynamic": "ڈائنامک",
   "settings.darkMethodDynamicNote":
@@ -443,9 +439,7 @@ export const ur: Messages = {
   "settings.darkText": "متن کا رنگ",
   "settings.darkSchedule": "شیڈول",
   "settings.darkScheduleAlways": "ہمیشہ",
-  "settings.darkScheduleSystem": "ایپ کی تھیم",
   "settings.darkScheduleTime": "وقت",
-  "settings.darkScheduleSystemNote": "ایپ کی تھیم گہری ہونے پر صفحات کو گہرا کرتا ہے۔",
   "settings.darkFrom": "از",
   "settings.darkTo": "تک",
   "settings.darkBehavior": "رویہ",
@@ -787,4 +781,21 @@ export const ur: Messages = {
   "tabs.statToday": "آج {value}",
   "tabs.statShowing": "ابھی دکھائی جا رہی ہے",
   "tabs.statIdle": "استعمال {value}",
+  "settings.appearanceNote":
+    "صرف ایپ پر لاگو ہوتا ہے۔ صفحات کیسے نظر آئیں، یہ ڈارک موڈ میں طے ہوتا ہے۔",
+  "settings.darkScheduleSystem": "سسٹم",
+  "settings.darkScheduleSystemNote": "ڈیوائس کی ہلکی یا گہری سیٹنگ کی پیروی کرتا ہے۔",
+  "settings.darkSitesNote":
+    "یہ سیٹنگز ہر سائٹ پر لاگو ہوتی ہیں جب تک کسی سائٹ کی اپنی پسند نہ ہو۔ اسے سائٹ کی صفحہ سیٹنگز میں طے کریں۔",
+  "fab.darkMode":
+    "ڈارک موڈ۔ اس صفحے کے لیے آن یا آف کرنے کو ٹیپ کریں، اختیارات کے لیے دبائے رکھیں۔",
+  "favorites.pageSettings": "صفحہ سیٹنگز",
+  "siteSettings.darkNote": "صرف اس سائٹ کے لیے ڈارک موڈ۔",
+  "siteSettings.videoNote": "صرف اس سائٹ کے لیے ویڈیو کنٹرولز۔",
+  "siteDark.effectiveOn": "اس سائٹ کے لیے ڈارک موڈ آن ہے۔",
+  "siteDark.effectiveOff": "اس سائٹ کے لیے ڈارک موڈ بند ہے۔",
+  "siteDark.openShared": "ڈارک موڈ سیٹنگز",
+  "siteDark.openSharedNote": "رنگ، شیڈول اور تمام سائٹس کا مشترکہ طریقہ۔",
+  "favorites.videoPanel": "کنٹرول پینل",
+  "favorites.videoPanelLabel": "{site} کا ویڈیو کنٹرول پینل",
 };

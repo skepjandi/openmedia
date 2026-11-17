@@ -252,8 +252,6 @@ export const el: Messages = {
   "settings.title": "Ρυθμίσεις",
   "settings.close": "Κλείσιμο ρυθμίσεων",
   "settings.appearance": "Εμφάνιση",
-  "settings.appearanceNote":
-    "Ισχύει για την εφαρμογή και για τους ιστότοπους που ακολουθούν το χρωματικό σύστημα της συσκευής.",
   "settings.themeLabel": "Θέμα",
   "settings.themeSystem": "Σύστημα",
   "settings.themeLight": "Φωτεινό",
@@ -422,8 +420,6 @@ export const el: Messages = {
   "settings.darkEnabled": "Σκούρεμα σελίδων",
   "settings.darkEnabledNote":
     "Ενεργοποιεί τη σκοτεινή λειτουργία σε κάθε ιστότοπο που δεν έχει δική του επιλογή.",
-  "settings.darkSitesNote":
-    "Αυτές οι ρυθμίσεις ισχύουν για κάθε ιστότοπο, εκτός αν ο ιστότοπος έχει δική του επιλογή. Ορίστε την στις ρυθμίσεις ενός αγαπημένου.",
   "settings.darkMethod": "Μέθοδος",
   "settings.darkMethodDynamic": "Δυναμική",
   "settings.darkMethodDynamicNote":
@@ -455,10 +451,7 @@ export const el: Messages = {
   "settings.darkText": "Χρώμα κειμένου",
   "settings.darkSchedule": "Πρόγραμμα",
   "settings.darkScheduleAlways": "Πάντα",
-  "settings.darkScheduleSystem": "Θέμα εφαρμογής",
   "settings.darkScheduleTime": "Ώρα",
-  "settings.darkScheduleSystemNote":
-    "Σκουραίνει τις σελίδες όταν το θέμα της εφαρμογής είναι σκοτεινό.",
   "settings.darkFrom": "Από",
   "settings.darkTo": "Έως",
   "settings.darkBehavior": "Συμπεριφορά",
@@ -810,4 +803,21 @@ export const el: Messages = {
   "tabs.statToday": "{value} σήμερα",
   "tabs.statShowing": "Εμφανίζεται τώρα",
   "tabs.statIdle": "Χρήση {value}",
+  "settings.appearanceNote":
+    "Ισχύει μόνο για την εφαρμογή. Η εμφάνιση των σελίδων ορίζεται στη Σκοτεινή λειτουργία.",
+  "settings.darkScheduleSystem": "Σύστημα",
+  "settings.darkScheduleSystemNote": "Ακολουθεί τη φωτεινή ή σκοτεινή ρύθμιση της συσκευής.",
+  "settings.darkSitesNote":
+    "Αυτές οι ρυθμίσεις ισχύουν για κάθε ιστότοπο, εκτός αν ο ιστότοπος έχει δική του επιλογή. Ορίστε την στις ρυθμίσεις σελίδας του ιστότοπου.",
+  "fab.darkMode":
+    "Σκοτεινή λειτουργία. Πατήστε για ενεργοποίηση ή απενεργοποίηση σε αυτή τη σελίδα, παρατεταμένο πάτημα για επιλογές.",
+  "favorites.pageSettings": "Ρυθμίσεις σελίδας",
+  "siteSettings.darkNote": "Σκοτεινή λειτουργία μόνο για αυτόν τον ιστότοπο.",
+  "siteSettings.videoNote": "Στοιχεία ελέγχου βίντεο μόνο για αυτόν τον ιστότοπο.",
+  "siteDark.effectiveOn": "Η σκοτεινή λειτουργία είναι ενεργή για αυτόν τον ιστότοπο.",
+  "siteDark.effectiveOff": "Η σκοτεινή λειτουργία είναι ανενεργή για αυτόν τον ιστότοπο.",
+  "siteDark.openShared": "Ρυθμίσεις σκοτεινής λειτουργίας",
+  "siteDark.openSharedNote": "Χρώματα, πρόγραμμα και η κοινή μέθοδος για όλους τους ιστότοπους.",
+  "favorites.videoPanel": "Πίνακας ελέγχου",
+  "favorites.videoPanelLabel": "Πίνακας ελέγχου βίντεο στο {site}",
 };

@@ -246,8 +246,6 @@ export const nl: Messages = {
   "settings.title": "Instellingen",
   "settings.close": "Instellingen sluiten",
   "settings.appearance": "Uiterlijk",
-  "settings.appearanceNote":
-    "Geldt voor de app en voor sites die het kleurenschema van het systeem volgen.",
   "settings.themeLabel": "Thema",
   "settings.themeSystem": "Systeem",
   "settings.themeLight": "Licht",
@@ -410,8 +408,6 @@ export const nl: Messages = {
   "settings.darkModeNote": "Maakt de pagina's die je opent donker.",
   "settings.darkEnabled": "Pagina's donker maken",
   "settings.darkEnabledNote": "Zet de donkere modus aan voor elke site zonder eigen keuze.",
-  "settings.darkSitesNote":
-    "Deze instellingen gelden voor elke site, tenzij een site een eigen keuze heeft. Stel er een in via de instellingen van een favoriet.",
   "settings.darkMethod": "Methode",
   "settings.darkMethodDynamic": "Dynamisch",
   "settings.darkMethodDynamicNote":
@@ -443,9 +439,7 @@ export const nl: Messages = {
   "settings.darkText": "Tekstkleur",
   "settings.darkSchedule": "Schema",
   "settings.darkScheduleAlways": "Altijd",
-  "settings.darkScheduleSystem": "App-thema",
   "settings.darkScheduleTime": "Tijd",
-  "settings.darkScheduleSystemNote": "Maakt pagina's donker zolang het thema van de app donker is.",
   "settings.darkFrom": "Van",
   "settings.darkTo": "Tot",
   "settings.darkBehavior": "Gedrag",
@@ -799,4 +793,21 @@ export const nl: Messages = {
   "tabs.statToday": "{value} vandaag",
   "tabs.statShowing": "Nu zichtbaar",
   "tabs.statIdle": "Gebruikt {value}",
+  "settings.appearanceNote":
+    "Geldt alleen voor de app. Hoe pagina's eruitzien stel je in bij Donkere modus.",
+  "settings.darkScheduleSystem": "Systeem",
+  "settings.darkScheduleSystemNote": "Volgt de lichte of donkere instelling van het apparaat.",
+  "settings.darkSitesNote":
+    "Deze instellingen gelden voor elke site, tenzij een site een eigen keuze heeft. Stel er een in via de pagina-instellingen van de site.",
+  "fab.darkMode":
+    "Donkere modus. Tik om hem voor deze pagina aan of uit te zetten, houd ingedrukt voor opties.",
+  "favorites.pageSettings": "Pagina-instellingen",
+  "siteSettings.darkNote": "Donkere modus alleen voor deze site.",
+  "siteSettings.videoNote": "Videobediening alleen voor deze site.",
+  "siteDark.effectiveOn": "Donkere modus staat aan voor deze site.",
+  "siteDark.effectiveOff": "Donkere modus staat uit voor deze site.",
+  "siteDark.openShared": "Instellingen voor donkere modus",
+  "siteDark.openSharedNote": "Kleuren, schema en de gedeelde methode voor alle sites.",
+  "favorites.videoPanel": "Bedieningspaneel",
+  "favorites.videoPanelLabel": "Videobedieningspaneel van {site}",
 };

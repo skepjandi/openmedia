@@ -2,7 +2,7 @@
 
 > **Status: Implemented, not device-verified.** Rust, the settings screen and the page engine are covered by unit tests and by runs of the engine against local HTML fixtures; nothing has been looked at on a real iOS or Android page yet.
 
-OpenMedia's **Appearance** setting (Light, Dark, System) themes the app and, through the native view's `overrideUserInterfaceStyle`, tells sites that follow `prefers-color-scheme` which scheme to use. A site with no dark stylesheet stays white. **Dark mode for pages** (Settings → Dark mode) paints those pages dark as well. It is the feature set of the Dark Reader extension, reimplemented for the page script: the engine is original code, with Dark Reader (MIT) as prior art for the approach.
+**Appearance** (Settings, Light / Dark / System) themes OpenMedia's own screens and nothing on a page. How pages look is the **Dark mode** feature: Settings → Dark mode for every site, a per-site choice on each page's settings, and a button in the floating button's fan. A site with no dark stylesheet stays white until Dark mode paints it. Pages see the device's own light or dark setting as `prefers-color-scheme` (on iOS and Android the app no longer overrides it; on macOS the window's appearance is the page's, which the view cannot separate). The engine is the feature set of the Dark Reader extension, reimplemented for the page script: original code, with Dark Reader (MIT) as prior art for the approach.
 
 Everything is off until chosen, nothing leaves the device, and the reader can switch it off globally and per site ([invariant 10](../../AGENTS.md)).
 
@@ -14,7 +14,7 @@ Everything is off until chosen, nothing leaves the device, and the reader can sw
 | Method | Dynamic, Filter, Filter+, Static | `method: "dynamic" \| "filter" \| "filterplus" \| "static"` |
 | Colour | Brightness 50–150 %, Contrast 50–150 %, Sepia 0–100 %, Grayscale 0–100 % | `brightness`, `contrast`, `sepia`, `grayscale` |
 | Colour | Dark scheme: background and text colour, with presets (Default, Black, Graphite, Midnight, Warm) | `background`, `text` (`#rrggbb`) |
-| When | Always, follow the app's theme, or between two times (wraps midnight) | `schedule: { kind: "always" \| "system" \| "time", from, to }` |
+| When | Always, follow the device's light/dark setting, or between two times (wraps midnight) | `schedule: { kind: "always" \| "system" \| "time", from, to }` |
 | Pages | Skip pages that are already dark | `skipDarkPages` (default on) |
 | Pages | Dark form controls and scrollbars (`color-scheme: dark`) | `systemControls` (default on) |
 | Pages | Themed scrollbars and text selection | `scrollbars` (default on) |
@@ -23,6 +23,12 @@ Everything is off until chosen, nothing leaves the device, and the reader can sw
 | Per site | Follow settings, Always on, Off, and a method of its own | `darkSites: { "<registrable domain>": { mode?, method? } }` |
 
 A file saved before this existed has none of these keys and loads with the defaults above; no migration. `set_dark_mode(darkMode)` validates (ranges, `#rrggbb`, `HH:MM`; serde rejects an unknown method or mode) and saves; `set_site_dark_mode(site, dark)` saves one site's entry (an entry with neither field removes it). Both hand the open pages a recompiled script, as `set_accessibility` does, so a change shows without a reload. Dark mode applies in normal and incognito mode alike.
+
+## Where the reader turns it on
+
+- **Settings → Dark mode:** every choice above, for every site that has no choice of its own.
+- **The floating button:** a moon button in the fan, after Incognito and the video controls switch. A tap turns dark mode on or off for the page in view (it sets that site's `mode`; with no page open it flips the global `enabled`); holding it opens that page's dark mode settings, or the global ones when no page is open.
+- **Settings → Favorites → Page settings:** one page per site with its Dark mode and Video controls pages. The per-site dark page holds Follow settings / Always on / Off and a method of its own.
 
 ## The methods
 
@@ -48,7 +54,7 @@ Recipe CSS (`style[data-openmedia]`) is never rewritten: it is the reader's own 
 
 ## Which setting wins
 
-User's per-site entry (`darkSites`, longest registrable-domain match) → recipe `dark` rule → global settings. `mode: "on"` forces the engine on regardless of `enabled` and the schedule and skips the dark-page check; `mode: "off"` forces it off. The schedule `system` follows `prefers-color-scheme` as the page sees it, which the app sets from its Appearance choice.
+User's per-site entry (`darkSites`, longest registrable-domain match) → recipe `dark` rule → global settings. `mode: "on"` forces the engine on regardless of `enabled` and the schedule and skips the dark-page check; `mode: "off"` forces it off. The schedule `system` follows `prefers-color-scheme` as the page sees it, which is the device's setting.
 
 ## Recipes and the assistant
 

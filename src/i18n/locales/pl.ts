@@ -249,7 +249,6 @@ export const pl: Messages = {
   "settings.title": "Ustawienia",
   "settings.close": "Zamknij ustawienia",
   "settings.appearance": "Wygląd",
-  "settings.appearanceNote": "Dotyczy aplikacji oraz witryn, które stosują się do motywu systemu.",
   "settings.themeLabel": "Motyw",
   "settings.themeSystem": "Systemowy",
   "settings.themeLight": "Jasny",
@@ -414,8 +413,6 @@ export const pl: Messages = {
   "settings.darkModeNote": "Przyciemnia otwierane strony.",
   "settings.darkEnabled": "Przyciemniaj strony",
   "settings.darkEnabledNote": "Włącza tryb ciemny na każdej witrynie bez własnego wyboru.",
-  "settings.darkSitesNote":
-    "Te ustawienia dotyczą każdej witryny, chyba że ma ona własny wybór. Ustaw go w ustawieniach ulubionej.",
   "settings.darkMethod": "Metoda",
   "settings.darkMethodDynamic": "Dynamiczna",
   "settings.darkMethodDynamicNote":
@@ -447,9 +444,7 @@ export const pl: Messages = {
   "settings.darkText": "Kolor tekstu",
   "settings.darkSchedule": "Harmonogram",
   "settings.darkScheduleAlways": "Zawsze",
-  "settings.darkScheduleSystem": "Motyw aplikacji",
   "settings.darkScheduleTime": "Godziny",
-  "settings.darkScheduleSystemNote": "Przyciemnia strony, gdy motyw aplikacji jest ciemny.",
   "settings.darkFrom": "Od",
   "settings.darkTo": "Do",
   "settings.darkBehavior": "Zachowanie",
@@ -794,4 +789,20 @@ export const pl: Messages = {
   "tabs.statToday": "Dziś {value}",
   "tabs.statShowing": "Wyświetlana teraz",
   "tabs.statIdle": "Użyto {value}",
+  "settings.appearanceNote": "Dotyczy tylko aplikacji. Wygląd stron ustawia się w trybie ciemnym.",
+  "settings.darkScheduleSystem": "Systemowy",
+  "settings.darkScheduleSystemNote": "Stosuje się do jasnego lub ciemnego ustawienia urządzenia.",
+  "settings.darkSitesNote":
+    "Te ustawienia dotyczą każdej witryny, chyba że ma ona własny wybór. Ustaw go w ustawieniach strony tej witryny.",
+  "fab.darkMode":
+    "Tryb ciemny. Stuknij, aby włączyć lub wyłączyć go na tej stronie, przytrzymaj, aby zobaczyć opcje.",
+  "favorites.pageSettings": "Ustawienia strony",
+  "siteSettings.darkNote": "Tryb ciemny tylko dla tej witryny.",
+  "siteSettings.videoNote": "Sterowanie wideo tylko dla tej witryny.",
+  "siteDark.effectiveOn": "Tryb ciemny jest włączony dla tej witryny.",
+  "siteDark.effectiveOff": "Tryb ciemny jest wyłączony dla tej witryny.",
+  "siteDark.openShared": "Ustawienia trybu ciemnego",
+  "siteDark.openSharedNote": "Kolory, harmonogram i wspólna metoda dla wszystkich witryn.",
+  "favorites.videoPanel": "Panel sterowania",
+  "favorites.videoPanelLabel": "Panel sterowania wideo w {site}",
 };

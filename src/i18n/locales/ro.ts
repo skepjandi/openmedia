@@ -248,8 +248,6 @@ export const ro: Messages = {
   "settings.title": "Setări",
   "settings.close": "Închide setările",
   "settings.appearance": "Aspect",
-  "settings.appearanceNote":
-    "Se aplică aplicației și site-urilor care urmează schema de culori a sistemului.",
   "settings.themeLabel": "Temă",
   "settings.themeSystem": "Sistem",
   "settings.themeLight": "Luminoasă",
@@ -417,8 +415,6 @@ export const ro: Messages = {
   "settings.darkEnabled": "Întunecă paginile",
   "settings.darkEnabledNote":
     "Activează modul întunecat pentru fiecare site care nu are o alegere proprie.",
-  "settings.darkSitesNote":
-    "Aceste setări se aplică tuturor site-urilor, în afară de cazul în care un site are alegerea lui. Setează-o în setările unui favorit.",
   "settings.darkMethod": "Metodă",
   "settings.darkMethodDynamic": "Dinamică",
   "settings.darkMethodDynamicNote":
@@ -450,9 +446,7 @@ export const ro: Messages = {
   "settings.darkText": "Culoare text",
   "settings.darkSchedule": "Program",
   "settings.darkScheduleAlways": "Mereu",
-  "settings.darkScheduleSystem": "Tema aplicației",
   "settings.darkScheduleTime": "Oră",
-  "settings.darkScheduleSystemNote": "Întunecă paginile cât timp tema aplicației este întunecată.",
   "settings.darkFrom": "De la",
   "settings.darkTo": "Până la",
   "settings.darkBehavior": "Comportament",
@@ -805,4 +799,21 @@ export const ro: Messages = {
   "tabs.statToday": "{value} azi",
   "tabs.statShowing": "Afișat acum",
   "tabs.statIdle": "Folosit {value}",
+  "settings.appearanceNote":
+    "Se aplică doar aplicației. Aspectul paginilor se stabilește în Modul întunecat.",
+  "settings.darkScheduleSystem": "Sistem",
+  "settings.darkScheduleSystemNote": "Urmează setarea luminoasă sau întunecată a dispozitivului.",
+  "settings.darkSitesNote":
+    "Aceste setări se aplică tuturor site-urilor, în afară de cazul în care un site are alegerea lui. Setează-o în setările paginii site-ului.",
+  "fab.darkMode":
+    "Mod întunecat. Atinge pentru a-l porni sau opri pe această pagină, ține apăsat pentru opțiuni.",
+  "favorites.pageSettings": "Setările paginii",
+  "siteSettings.darkNote": "Mod întunecat doar pentru acest site.",
+  "siteSettings.videoNote": "Comenzi video doar pentru acest site.",
+  "siteDark.effectiveOn": "Modul întunecat este activat pentru acest site.",
+  "siteDark.effectiveOff": "Modul întunecat este dezactivat pentru acest site.",
+  "siteDark.openShared": "Setări mod întunecat",
+  "siteDark.openSharedNote": "Culori, program și metoda comună pentru toate site-urile.",
+  "favorites.videoPanel": "Panou de comenzi",
+  "favorites.videoPanelLabel": "Panoul de comenzi video de pe {site}",
 };

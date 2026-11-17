@@ -248,8 +248,6 @@ export const uk: Messages = {
   "settings.title": "Налаштування",
   "settings.close": "Закрити налаштування",
   "settings.appearance": "Вигляд",
-  "settings.appearanceNote":
-    "Стосується застосунку та сайтів, які використовують системну колірну схему.",
   "settings.themeLabel": "Тема",
   "settings.themeSystem": "Системна",
   "settings.themeLight": "Світла",
@@ -414,8 +412,6 @@ export const uk: Messages = {
   "settings.darkModeNote": "Затемнює сторінки, які ви відкриваєте.",
   "settings.darkEnabled": "Затемнювати сторінки",
   "settings.darkEnabledNote": "Вмикає темний режим на кожному сайті, що не має власного вибору.",
-  "settings.darkSitesNote":
-    "Ці налаштування діють на всіх сайтах, якщо сайт не має власного вибору. Задайте його в налаштуваннях обраного.",
   "settings.darkMethod": "Метод",
   "settings.darkMethodDynamic": "Динамічний",
   "settings.darkMethodDynamicNote":
@@ -447,9 +443,7 @@ export const uk: Messages = {
   "settings.darkText": "Колір тексту",
   "settings.darkSchedule": "Розклад",
   "settings.darkScheduleAlways": "Завжди",
-  "settings.darkScheduleSystem": "Тема застосунку",
   "settings.darkScheduleTime": "Час",
-  "settings.darkScheduleSystemNote": "Затемнює сторінки, поки тема застосунку темна.",
   "settings.darkFrom": "З",
   "settings.darkTo": "До",
   "settings.darkBehavior": "Поведінка",
@@ -797,4 +791,21 @@ export const uk: Messages = {
   "tabs.statToday": "Сьогодні {value}",
   "tabs.statShowing": "Показується зараз",
   "tabs.statIdle": "Використано {value}",
+  "settings.appearanceNote":
+    "Стосується лише застосунку. Вигляд сторінок задається в темному режимі.",
+  "settings.darkScheduleSystem": "Система",
+  "settings.darkScheduleSystemNote": "Дотримується світлого або темного налаштування пристрою.",
+  "settings.darkSitesNote":
+    "Ці налаштування діють на всіх сайтах, якщо сайт не має власного вибору. Задайте його в налаштуваннях сторінки сайту.",
+  "fab.darkMode":
+    "Темний режим. Торкніться, щоб увімкнути або вимкнути його для цієї сторінки, утримуйте для налаштувань.",
+  "favorites.pageSettings": "Налаштування сторінки",
+  "siteSettings.darkNote": "Темний режим лише для цього сайту.",
+  "siteSettings.videoNote": "Керування відео лише для цього сайту.",
+  "siteDark.effectiveOn": "Темний режим для цього сайту ввімкнено.",
+  "siteDark.effectiveOff": "Темний режим для цього сайту вимкнено.",
+  "siteDark.openShared": "Налаштування темного режиму",
+  "siteDark.openSharedNote": "Кольори, розклад і спільний метод для всіх сайтів.",
+  "favorites.videoPanel": "Панель керування",
+  "favorites.videoPanelLabel": "Панель керування відео на {site}",
 };

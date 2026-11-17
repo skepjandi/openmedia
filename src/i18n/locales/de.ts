@@ -244,8 +244,6 @@ export const de: Messages = {
   "settings.title": "Einstellungen",
   "settings.close": "Einstellungen schließen",
   "settings.appearance": "Darstellung",
-  "settings.appearanceNote":
-    "Gilt für die App sowie für Websites, die dem Farbschema des Systems folgen.",
   "settings.themeLabel": "Design",
   "settings.themeSystem": "System",
   "settings.themeLight": "Hell",
@@ -414,8 +412,6 @@ export const de: Messages = {
   "settings.darkEnabled": "Seiten abdunkeln",
   "settings.darkEnabledNote":
     "Schaltet den Dunkelmodus für jede Seite ein, die keine eigene Wahl hat.",
-  "settings.darkSitesNote":
-    "Diese Einstellungen gelten für jede Seite, sofern sie keine eigene Wahl hat. Lege eine in den Einstellungen eines Favoriten fest.",
   "settings.darkMethod": "Methode",
   "settings.darkMethodDynamic": "Dynamisch",
   "settings.darkMethodDynamicNote":
@@ -447,9 +443,7 @@ export const de: Messages = {
   "settings.darkText": "Textfarbe",
   "settings.darkSchedule": "Zeitplan",
   "settings.darkScheduleAlways": "Immer",
-  "settings.darkScheduleSystem": "App-Design",
   "settings.darkScheduleTime": "Zeit",
-  "settings.darkScheduleSystemNote": "Dunkelt Seiten ab, solange das Design der App dunkel ist.",
   "settings.darkFrom": "Von",
   "settings.darkTo": "Bis",
   "settings.darkBehavior": "Verhalten",
@@ -810,4 +804,21 @@ export const de: Messages = {
   "tabs.statToday": "Heute {value}",
   "tabs.statShowing": "Wird angezeigt",
   "tabs.statIdle": "Zuletzt genutzt {value}",
+  "settings.appearanceNote":
+    "Gilt nur für die App. Wie Seiten aussehen, legst du im Dunkelmodus fest.",
+  "settings.darkScheduleSystem": "System",
+  "settings.darkScheduleSystemNote": "Folgt der hellen oder dunklen Einstellung des Geräts.",
+  "settings.darkSitesNote":
+    "Diese Einstellungen gelten für jede Seite, sofern sie keine eigene Wahl hat. Lege eine in den Seiteneinstellungen der Seite fest.",
+  "fab.darkMode":
+    "Dunkelmodus. Tippen schaltet ihn für diese Seite ein oder aus, gedrückt halten öffnet die Optionen.",
+  "favorites.pageSettings": "Seiteneinstellungen",
+  "siteSettings.darkNote": "Dunkelmodus nur für diese Seite.",
+  "siteSettings.videoNote": "Videosteuerung nur für diese Seite.",
+  "siteDark.effectiveOn": "Der Dunkelmodus ist für diese Seite an.",
+  "siteDark.effectiveOff": "Der Dunkelmodus ist für diese Seite aus.",
+  "siteDark.openShared": "Einstellungen für den Dunkelmodus",
+  "siteDark.openSharedNote": "Farben, Zeitplan und die gemeinsame Methode für alle Seiten.",
+  "favorites.videoPanel": "Steuerungsleiste",
+  "favorites.videoPanelLabel": "Videosteuerungsleiste auf {site}",
 };

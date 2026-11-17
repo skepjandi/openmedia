@@ -248,7 +248,6 @@ export const tr: Messages = {
   "settings.title": "Ayarlar",
   "settings.close": "Ayarları kapat",
   "settings.appearance": "Görünüm",
-  "settings.appearanceNote": "Uygulama ve sistem renk şemasını izleyen siteler için geçerlidir.",
   "settings.themeLabel": "Tema",
   "settings.themeSystem": "Sistem",
   "settings.themeLight": "Açık",
@@ -412,8 +411,6 @@ export const tr: Messages = {
   "settings.darkModeNote": "Açtığınız sayfaları koyulaştırır.",
   "settings.darkEnabled": "Sayfaları koyulaştır",
   "settings.darkEnabledNote": "Kendi seçimi olmayan her sitede koyu modu açar.",
-  "settings.darkSitesNote":
-    "Bir sitenin kendi seçimi yoksa bu ayarlar her siteye uygulanır. Bunu bir favorinin ayarlarından belirleyin.",
   "settings.darkMethod": "Yöntem",
   "settings.darkMethodDynamic": "Dinamik",
   "settings.darkMethodDynamicNote":
@@ -445,9 +442,7 @@ export const tr: Messages = {
   "settings.darkText": "Metin rengi",
   "settings.darkSchedule": "Zamanlama",
   "settings.darkScheduleAlways": "Her zaman",
-  "settings.darkScheduleSystem": "Uygulama teması",
   "settings.darkScheduleTime": "Saat",
-  "settings.darkScheduleSystemNote": "Uygulamanın teması koyuyken sayfaları koyulaştırır.",
   "settings.darkFrom": "Başlangıç",
   "settings.darkTo": "Bitiş",
   "settings.darkBehavior": "Davranış",
@@ -792,4 +787,21 @@ export const tr: Messages = {
   "tabs.statToday": "Bugün {value}",
   "tabs.statShowing": "Şu an gösteriliyor",
   "tabs.statIdle": "Kullanıldı {value}",
+  "settings.appearanceNote":
+    "Yalnızca uygulama için geçerlidir. Sayfaların görünümü Koyu mod'da ayarlanır.",
+  "settings.darkScheduleSystem": "Sistem",
+  "settings.darkScheduleSystemNote": "Cihazın açık veya koyu ayarını izler.",
+  "settings.darkSitesNote":
+    "Bir sitenin kendi seçimi yoksa bu ayarlar her siteye uygulanır. Bunu sitenin sayfa ayarlarından belirleyin.",
+  "fab.darkMode":
+    "Koyu mod. Bu sayfada açmak veya kapatmak için dokunun, seçenekler için basılı tutun.",
+  "favorites.pageSettings": "Sayfa ayarları",
+  "siteSettings.darkNote": "Yalnızca bu site için koyu mod.",
+  "siteSettings.videoNote": "Yalnızca bu site için video kontrolleri.",
+  "siteDark.effectiveOn": "Bu site için koyu mod açık.",
+  "siteDark.effectiveOff": "Bu site için koyu mod kapalı.",
+  "siteDark.openShared": "Koyu mod ayarları",
+  "siteDark.openSharedNote": "Renkler, zamanlama ve tüm siteler için ortak yöntem.",
+  "favorites.videoPanel": "Kontrol paneli",
+  "favorites.videoPanelLabel": "{site} video kontrol paneli",
 };

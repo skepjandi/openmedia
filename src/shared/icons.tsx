@@ -149,6 +149,13 @@ export const VideoControlsIcon = ({ on = true }: { on?: boolean }) => (
   </Icon>
 );
 
+/** Dark mode: a crescent moon, filled while dark mode is on. */
+export const MoonIcon = ({ on = true }: { on?: boolean }) => (
+  <Icon>
+    <path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z" fill={on ? "currentColor" : "none"} />
+  </Icon>
+);
+
 /** Color picker: an eyedropper. */
 export const ColorPickerIcon = () => (
   <Icon>

@@ -294,10 +294,9 @@ pub(crate) async fn open_session(
             None
         }
     };
-    // The page must load under the saved theme: the shell sets it only after it has booted, by
-    // which time a page opened at launch has already read `prefers-color-scheme` once, and sites
-    // such as Instagram keep parts of the old scheme when it flips mid-load. Platforms with no
-    // site view reject this the same way they reject the open below.
+    // The app's own appearance (backdrop, status bar icons) must be right before the first frame.
+    // On iOS and Android it never reaches the page: how pages look is the dark mode setting.
+    // The window's appearance is the page's on macOS, where the view cannot be told apart.
     let _ = app.siteview().set_color_scheme(SetColorSchemeRequest {
         scheme: match library.theme()? {
             Theme::System => ColorScheme::System,

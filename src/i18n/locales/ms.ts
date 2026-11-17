@@ -244,8 +244,6 @@ export const ms: Messages = {
   "settings.title": "Tetapan",
   "settings.close": "Tutup tetapan",
   "settings.appearance": "Penampilan",
-  "settings.appearanceNote":
-    "Berkuat kuasa untuk aplikasi dan untuk laman yang mengikut skim warna sistem.",
   "settings.themeLabel": "Tema",
   "settings.themeSystem": "Sistem",
   "settings.themeLight": "Cerah",
@@ -411,8 +409,6 @@ export const ms: Messages = {
   "settings.darkEnabled": "Gelapkan laman",
   "settings.darkEnabledNote":
     "Menghidupkan mod gelap untuk setiap tapak yang tiada pilihan sendiri.",
-  "settings.darkSitesNote":
-    "Tetapan ini digunakan pada setiap tapak melainkan tapak itu mempunyai pilihan sendiri. Tetapkannya dalam tetapan kegemaran.",
   "settings.darkMethod": "Kaedah",
   "settings.darkMethodDynamic": "Dinamik",
   "settings.darkMethodDynamicNote":
@@ -444,9 +440,7 @@ export const ms: Messages = {
   "settings.darkText": "Warna teks",
   "settings.darkSchedule": "Jadual",
   "settings.darkScheduleAlways": "Sentiasa",
-  "settings.darkScheduleSystem": "Tema aplikasi",
   "settings.darkScheduleTime": "Masa",
-  "settings.darkScheduleSystemNote": "Menggelapkan laman semasa tema aplikasi gelap.",
   "settings.darkFrom": "Dari",
   "settings.darkTo": "Hingga",
   "settings.darkBehavior": "Tingkah laku",
@@ -796,4 +790,20 @@ export const ms: Messages = {
   "tabs.statToday": "{value} hari ini",
   "tabs.statShowing": "Sedang dipaparkan",
   "tabs.statIdle": "Digunakan {value}",
+  "settings.appearanceNote": "Hanya terpakai pada aplikasi. Rupa laman ditetapkan dalam Mod gelap.",
+  "settings.darkScheduleSystem": "Sistem",
+  "settings.darkScheduleSystemNote": "Mengikut tetapan cerah atau gelap peranti.",
+  "settings.darkSitesNote":
+    "Tetapan ini digunakan pada setiap tapak melainkan tapak itu mempunyai pilihan sendiri. Tetapkannya dalam tetapan halaman tapak itu.",
+  "fab.darkMode":
+    "Mod gelap. Ketik untuk menghidupkan atau mematikannya bagi halaman ini, tekan lama untuk pilihan.",
+  "favorites.pageSettings": "Tetapan halaman",
+  "siteSettings.darkNote": "Mod gelap untuk tapak ini sahaja.",
+  "siteSettings.videoNote": "Kawalan video untuk tapak ini sahaja.",
+  "siteDark.effectiveOn": "Mod gelap dihidupkan untuk tapak ini.",
+  "siteDark.effectiveOff": "Mod gelap dimatikan untuk tapak ini.",
+  "siteDark.openShared": "Tetapan mod gelap",
+  "siteDark.openSharedNote": "Warna, jadual dan kaedah dikongsi untuk semua tapak.",
+  "favorites.videoPanel": "Panel kawalan",
+  "favorites.videoPanelLabel": "Panel kawalan video {site}",
 };

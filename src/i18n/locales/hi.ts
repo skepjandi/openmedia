@@ -242,8 +242,6 @@ export const hi: Messages = {
   "settings.title": "सेटिंग्स",
   "settings.close": "सेटिंग्स बंद करें",
   "settings.appearance": "रूप",
-  "settings.appearanceNote":
-    "यह ऐप पर और उन साइटों पर लागू होता है जो सिस्टम के रंग-योजना का पालन करती हैं।",
   "settings.themeLabel": "थीम",
   "settings.themeSystem": "सिस्टम",
   "settings.themeLight": "हल्का",
@@ -405,8 +403,6 @@ export const hi: Messages = {
   "settings.darkModeNote": "आपके खोले गए पेजों को गहरा करता है।",
   "settings.darkEnabled": "पेज गहरे करें",
   "settings.darkEnabledNote": "हर उस साइट पर डार्क मोड चालू करता है जिसकी अपनी कोई पसंद नहीं है।",
-  "settings.darkSitesNote":
-    "ये सेटिंग हर साइट पर लागू होती हैं, जब तक किसी साइट की अपनी पसंद न हो। इसे किसी पसंदीदा की सेटिंग में तय करें।",
   "settings.darkMethod": "तरीका",
   "settings.darkMethodDynamic": "डायनैमिक",
   "settings.darkMethodDynamicNote":
@@ -438,9 +434,7 @@ export const hi: Messages = {
   "settings.darkText": "टेक्स्ट का रंग",
   "settings.darkSchedule": "समय-सारणी",
   "settings.darkScheduleAlways": "हमेशा",
-  "settings.darkScheduleSystem": "ऐप की थीम",
   "settings.darkScheduleTime": "समय",
-  "settings.darkScheduleSystemNote": "ऐप की थीम गहरी होने पर पेजों को गहरा करता है।",
   "settings.darkFrom": "से",
   "settings.darkTo": "तक",
   "settings.darkBehavior": "व्यवहार",
@@ -787,4 +781,21 @@ export const hi: Messages = {
   "tabs.statToday": "आज {value}",
   "tabs.statShowing": "अभी दिख रही है",
   "tabs.statIdle": "उपयोग {value}",
+  "settings.appearanceNote":
+    "यह केवल ऐप पर लागू होता है। पेज कैसे दिखें, यह डार्क मोड में तय होता है।",
+  "settings.darkScheduleSystem": "सिस्टम",
+  "settings.darkScheduleSystemNote": "डिवाइस की लाइट या डार्क सेटिंग का पालन करता है।",
+  "settings.darkSitesNote":
+    "ये सेटिंग हर साइट पर लागू होती हैं, जब तक किसी साइट की अपनी पसंद न हो। इसे साइट की पेज सेटिंग में तय करें।",
+  "fab.darkMode":
+    "डार्क मोड। इस पेज के लिए चालू या बंद करने को टैप करें, विकल्पों के लिए दबाए रखें।",
+  "favorites.pageSettings": "पेज सेटिंग",
+  "siteSettings.darkNote": "केवल इस साइट के लिए डार्क मोड।",
+  "siteSettings.videoNote": "केवल इस साइट के लिए वीडियो नियंत्रण।",
+  "siteDark.effectiveOn": "इस साइट के लिए डार्क मोड चालू है।",
+  "siteDark.effectiveOff": "इस साइट के लिए डार्क मोड बंद है।",
+  "siteDark.openShared": "डार्क मोड सेटिंग",
+  "siteDark.openSharedNote": "रंग, समय-सारणी और सभी साइटों का साझा तरीका।",
+  "favorites.videoPanel": "नियंत्रण पैनल",
+  "favorites.videoPanelLabel": "{site} का वीडियो नियंत्रण पैनल",
 };

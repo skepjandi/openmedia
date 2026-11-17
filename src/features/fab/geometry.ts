@@ -41,6 +41,7 @@ export const TABS_SIZE = 44;
 export const STATS_SIZE = 44;
 export const INCOGNITO_SIZE = 44;
 export const CONTROLS_SIZE = 44;
+export const DARK_MODE_SIZE = 44;
 export const COLOR_PICKER_SIZE = 44;
 export const TECH_DETECTOR_SIZE = 44;
 /** Centre-to-centre distance between neighbouring buttons in the settings column. */
@@ -126,7 +127,9 @@ export interface FanLayout {
   incognito: Point;
   /** The video controls switch, on the opposite side of the button from the page buttons. */
   controls: Point;
-  /** The color picker, after the video controls switch; null while it is turned off in Settings. */
+  /** The dark mode switch, after the video controls switch. */
+  darkMode: Point;
+  /** The color picker, after the dark mode switch; null while it is turned off in Settings. */
   colorPicker: Point | null;
   /** The technology detector, after the color picker; null while it is turned off in Settings. */
   techDetector: Point | null;
@@ -145,6 +148,7 @@ export type FanTarget =
   | { kind: "history" }
   | { kind: "tabs" }
   | { kind: "controls" }
+  | { kind: "darkMode" }
   | { kind: "colorPicker" }
   | { kind: "techDetector" }
   | { kind: "settings" };
@@ -194,10 +198,10 @@ function isValid(items: FanItem[], origin: Point, viewport: Size, insets: Insets
  * Favorites sit on an arc opening away from the edge, listed top to bottom. The page buttons
  * (settings, then history, tabs and usage above it) are tucked on the edge column above or below
  * the button, farther out than the arc, so they never read as favorites. Incognito, the video
- * controls switch and the optional color picker and technology detector (when on) sit in the same column on the opposite side of the button, so a switch is never
+ * controls and dark mode switches and the optional color picker and technology detector (when on) sit in the same column on the opposite side of the button, so a switch is never
  * mistaken for a page. Below the button the page column is pushed out far enough that its top
  * item clears the button. When the button is near the top or bottom the arc rotates, the column
- * may flip sides, and finally the arc compacts (smaller steps, larger radius) until everything
+ * may flip sides, the switches may move up against the button, and finally the arc compacts (smaller steps, larger radius) until everything
  * fits.
  */
 export function fanLayout(
@@ -216,26 +220,33 @@ export function fanLayout(
   const roomAbove = origin.y - insets.top;
   const preferred = roomBelow >= roomAbove ? 1 : -1;
 
-  /** The optional buttons continue the column after the video controls switch, in this order. */
+  /** The optional buttons continue the column after the dark mode switch, in this order. */
   const slots = [extras.colorPicker, extras.techDetector];
   const extraCount = slots.filter(Boolean).length;
   const slotOf = (index: number) =>
     slots[index] ? slots.slice(0, index).filter(Boolean).length : -1;
-  const place = (scale: number, shift: number, side: number, split: boolean): FanLayout => {
+  const place = (
+    scale: number,
+    shift: number,
+    side: number,
+    split: boolean,
+    tight: boolean,
+  ): FanLayout => {
     const step = nominalStep * scale;
     const radius = radiusFor(step);
     const distance = Math.max(SETTINGS_DISTANCE, radius + 30);
-    const reach = split ? COLUMN_REACH : COLUMN_REACH + (2 + extraCount) * COLUMN_OFFSET;
+    const switchStart = tight ? COLUMN_CLEARANCE : distance;
+    const reach = split ? COLUMN_REACH : COLUMN_REACH + (3 + extraCount) * COLUMN_OFFSET;
     const settings = {
       x: origin.x,
-      y: origin.y + (side > 0 ? Math.max(distance, reach + COLUMN_CLEARANCE) : -distance),
+      y: origin.y + (side > 0 ? Math.max(switchStart, reach + COLUMN_CLEARANCE) : -switchStart),
     };
     const extraPoint = (index: number): Point | null => {
       const slot = slotOf(index);
       if (slot < 0) return null;
       return split
-        ? { x: origin.x, y: origin.y - side * (distance + (2 + slot) * COLUMN_OFFSET) }
-        : { x: settings.x, y: settings.y - (6 + slot) * COLUMN_OFFSET };
+        ? { x: origin.x, y: origin.y - side * (switchStart + (3 + slot) * COLUMN_OFFSET) }
+        : { x: settings.x, y: settings.y - (7 + slot) * COLUMN_OFFSET };
     };
     return {
       favorites: Array.from({ length: favoriteCount }, (_, i) =>
@@ -246,11 +257,14 @@ export function fanLayout(
       tabs: { x: settings.x, y: settings.y - 2 * COLUMN_OFFSET },
       stats: { x: settings.x, y: settings.y - 3 * COLUMN_OFFSET },
       incognito: split
-        ? { x: origin.x, y: origin.y - side * distance }
+        ? { x: origin.x, y: origin.y - side * switchStart }
         : { x: settings.x, y: settings.y - 4 * COLUMN_OFFSET },
       controls: split
-        ? { x: origin.x, y: origin.y - side * (distance + COLUMN_OFFSET) }
+        ? { x: origin.x, y: origin.y - side * (switchStart + COLUMN_OFFSET) }
         : { x: settings.x, y: settings.y - 5 * COLUMN_OFFSET },
+      darkMode: split
+        ? { x: origin.x, y: origin.y - side * (switchStart + 2 * COLUMN_OFFSET) }
+        : { x: settings.x, y: settings.y - 6 * COLUMN_OFFSET },
       colorPicker: extraPoint(0),
       techDetector: extraPoint(1),
     };
@@ -263,6 +277,7 @@ export function fanLayout(
     { center: layout.stats, size: STATS_SIZE },
     { center: layout.incognito, size: INCOGNITO_SIZE },
     { center: layout.controls, size: CONTROLS_SIZE },
+    { center: layout.darkMode, size: DARK_MODE_SIZE },
     ...(layout.colorPicker ? [{ center: layout.colorPicker, size: COLOR_PICKER_SIZE }] : []),
     ...(layout.techDetector ? [{ center: layout.techDetector, size: TECH_DETECTOR_SIZE }] : []),
   ];
@@ -270,14 +285,19 @@ export function fanLayout(
   for (const scale of favoriteCount > 1 ? ARC_SCALES : [1]) {
     for (const shift of SHIFTS) {
       for (const side of [preferred, -preferred]) {
-        for (const split of [true, false]) {
-          const layout = place(scale, shift, side, split);
+        for (const [split, tight] of [
+          [true, false],
+          [false, false],
+          [true, true],
+          [false, true],
+        ]) {
+          const layout = place(scale, shift, side, split, tight);
           if (isValid(items(layout), origin, viewport, insets)) return layout;
         }
       }
     }
   }
-  return place(1, 0, preferred, false);
+  return place(1, 0, preferred, false, false);
 }
 
 const TOUCH_SLACK = 10;
@@ -292,6 +312,7 @@ export function fanTargetAt(point: Point, layout: FanLayout): FanTarget | null {
     return { kind: "techDetector" };
   if (layout.colorPicker && near(layout.colorPicker, COLOR_PICKER_SIZE))
     return { kind: "colorPicker" };
+  if (near(layout.darkMode, DARK_MODE_SIZE)) return { kind: "darkMode" };
   if (near(layout.controls, CONTROLS_SIZE)) return { kind: "controls" };
   if (near(layout.incognito, INCOGNITO_SIZE)) return { kind: "incognito" };
   if (near(layout.stats, STATS_SIZE)) return { kind: "stats" };

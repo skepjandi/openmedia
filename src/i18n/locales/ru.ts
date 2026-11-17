@@ -247,8 +247,6 @@ export const ru: Messages = {
   "settings.title": "Настройки",
   "settings.close": "Закрыть настройки",
   "settings.appearance": "Оформление",
-  "settings.appearanceNote":
-    "Применяется к приложению и к сайтам, которые следуют системной цветовой схеме.",
   "settings.themeLabel": "Тема",
   "settings.themeSystem": "Системная",
   "settings.themeLight": "Светлая",
@@ -414,8 +412,6 @@ export const ru: Messages = {
   "settings.darkEnabled": "Затемнять страницы",
   "settings.darkEnabledNote":
     "Включает тёмный режим на всех сайтах, у которых нет собственного выбора.",
-  "settings.darkSitesNote":
-    "Эти настройки действуют на всех сайтах, если у сайта нет собственного выбора. Задайте его в настройках избранного.",
   "settings.darkMethod": "Метод",
   "settings.darkMethodDynamic": "Динамический",
   "settings.darkMethodDynamicNote":
@@ -447,9 +443,7 @@ export const ru: Messages = {
   "settings.darkText": "Цвет текста",
   "settings.darkSchedule": "Расписание",
   "settings.darkScheduleAlways": "Всегда",
-  "settings.darkScheduleSystem": "Тема приложения",
   "settings.darkScheduleTime": "Время",
-  "settings.darkScheduleSystemNote": "Затемняет страницы, пока тема приложения тёмная.",
   "settings.darkFrom": "С",
   "settings.darkTo": "До",
   "settings.darkBehavior": "Поведение",
@@ -796,4 +790,21 @@ export const ru: Messages = {
   "tabs.statToday": "Сегодня {value}",
   "tabs.statShowing": "Показывается сейчас",
   "tabs.statIdle": "Использовался {value}",
+  "settings.appearanceNote":
+    "Применяется только к приложению. Вид страниц задаётся в тёмном режиме.",
+  "settings.darkScheduleSystem": "Система",
+  "settings.darkScheduleSystemNote": "Следует светлой или тёмной настройке устройства.",
+  "settings.darkSitesNote":
+    "Эти настройки действуют на всех сайтах, если у сайта нет собственного выбора. Задайте его в настройках страницы сайта.",
+  "fab.darkMode":
+    "Тёмный режим. Нажмите, чтобы включить или выключить его для этой страницы, удерживайте для настроек.",
+  "favorites.pageSettings": "Настройки страницы",
+  "siteSettings.darkNote": "Тёмный режим только для этого сайта.",
+  "siteSettings.videoNote": "Управление видео только для этого сайта.",
+  "siteDark.effectiveOn": "Тёмный режим для этого сайта включён.",
+  "siteDark.effectiveOff": "Тёмный режим для этого сайта выключен.",
+  "siteDark.openShared": "Настройки тёмного режима",
+  "siteDark.openSharedNote": "Цвета, расписание и общий метод для всех сайтов.",
+  "favorites.videoPanel": "Панель управления",
+  "favorites.videoPanelLabel": "Панель управления видео на {site}",
 };

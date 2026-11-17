@@ -252,8 +252,6 @@ export const fr: Messages = {
   "settings.title": "Réglages",
   "settings.close": "Fermer les réglages",
   "settings.appearance": "Apparence",
-  "settings.appearanceNote":
-    "S’applique à l’application et aux sites qui suivent le mode de couleur du système.",
   "settings.themeLabel": "Thème",
   "settings.themeSystem": "Système",
   "settings.themeLight": "Clair",
@@ -422,8 +420,6 @@ export const fr: Messages = {
   "settings.darkEnabled": "Assombrir les pages",
   "settings.darkEnabledNote":
     "Active le mode sombre sur tous les sites qui n'ont pas de choix propre.",
-  "settings.darkSitesNote":
-    "Ces réglages s'appliquent à tous les sites, sauf si un site a son propre choix. Définissez-en un dans les réglages d'un favori.",
   "settings.darkMethod": "Méthode",
   "settings.darkMethodDynamic": "Dynamique",
   "settings.darkMethodDynamicNote":
@@ -455,9 +451,7 @@ export const fr: Messages = {
   "settings.darkText": "Couleur du texte",
   "settings.darkSchedule": "Programmation",
   "settings.darkScheduleAlways": "Toujours",
-  "settings.darkScheduleSystem": "Thème de l'app",
   "settings.darkScheduleTime": "Heure",
-  "settings.darkScheduleSystemNote": "Assombrit les pages tant que le thème de l'app est sombre.",
   "settings.darkFrom": "De",
   "settings.darkTo": "Jusqu'à",
   "settings.darkBehavior": "Comportement",
@@ -813,4 +807,21 @@ export const fr: Messages = {
   "tabs.statToday": "{value} aujourd'hui",
   "tabs.statShowing": "Affiché maintenant",
   "tabs.statIdle": "Utilisé {value}",
+  "settings.appearanceNote":
+    "S’applique uniquement à l’application. L’aspect des pages se règle dans le mode sombre.",
+  "settings.darkScheduleSystem": "Système",
+  "settings.darkScheduleSystemNote": "Suit le réglage clair ou sombre de l’appareil.",
+  "settings.darkSitesNote":
+    "Ces réglages s'appliquent à tous les sites, sauf si un site a son propre choix. Définissez-en un dans les réglages de page du site.",
+  "fab.darkMode":
+    "Mode sombre. Touchez pour l’activer ou le désactiver sur cette page, maintenez pour les options.",
+  "favorites.pageSettings": "Réglages de la page",
+  "siteSettings.darkNote": "Mode sombre pour ce site uniquement.",
+  "siteSettings.videoNote": "Commandes vidéo pour ce site uniquement.",
+  "siteDark.effectiveOn": "Le mode sombre est activé pour ce site.",
+  "siteDark.effectiveOff": "Le mode sombre est désactivé pour ce site.",
+  "siteDark.openShared": "Réglages du mode sombre",
+  "siteDark.openSharedNote": "Couleurs, horaire et méthode commune à tous les sites.",
+  "favorites.videoPanel": "Panneau de commandes",
+  "favorites.videoPanelLabel": "Panneau des commandes vidéo de {site}",
 };

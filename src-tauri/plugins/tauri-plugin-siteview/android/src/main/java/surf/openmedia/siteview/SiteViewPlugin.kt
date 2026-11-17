@@ -42,7 +42,6 @@ import androidx.webkit.ScriptHandler
 import androidx.webkit.WebMessageCompat
 import androidx.webkit.WebViewCompat
 import androidx.webkit.WebViewFeature
-import androidx.webkit.WebSettingsCompat
 import app.tauri.annotation.Command
 import app.tauri.annotation.Permission
 import app.tauri.annotation.PermissionCallback
@@ -373,7 +372,6 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
         events = args.onEvent ?: events
         blockPopups = args.blockPopups
 
-        applyScheme(session)
         installBridge(session)
         installScripts(session, args.documentStartScript)
         frame.addView(
@@ -1684,15 +1682,8 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
     }
 
     private fun applyColorScheme() {
-        for (session in sessions.values) applyScheme(session)
         backdrop?.setBackgroundColor(backdropColor())
         applyStatusBarIcons()
-    }
-
-    private fun applyScheme(session: Session) {
-        runCatching {
-            WebSettingsCompat.setAlgorithmicDarkeningAllowed(session.view.settings, isDark())
-        }
     }
 
     private fun backdropColor(): Int =

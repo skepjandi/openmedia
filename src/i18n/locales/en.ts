@@ -244,8 +244,6 @@ export const en = {
   "settings.title": "Settings",
   "settings.close": "Close settings",
   "settings.appearance": "Appearance",
-  "settings.appearanceNote":
-    "Applies to the app, and to sites that follow the system color scheme.",
   "settings.themeLabel": "Theme",
   "settings.themeSystem": "System",
   "settings.themeLight": "Light",
@@ -408,8 +406,6 @@ export const en = {
   "settings.darkModeNote": "Darkens the pages you open.",
   "settings.darkEnabled": "Darken pages",
   "settings.darkEnabledNote": "Turns dark mode on for every site that has no choice of its own.",
-  "settings.darkSitesNote":
-    "These settings apply to every site unless a site has its own choice. Set one in a favorite's settings.",
   "settings.darkMethod": "Method",
   "settings.darkMethodDynamic": "Dynamic",
   "settings.darkMethodDynamicNote":
@@ -441,9 +437,7 @@ export const en = {
   "settings.darkText": "Text color",
   "settings.darkSchedule": "Schedule",
   "settings.darkScheduleAlways": "Always",
-  "settings.darkScheduleSystem": "App theme",
   "settings.darkScheduleTime": "Time",
-  "settings.darkScheduleSystemNote": "Darkens pages while the app's theme is dark.",
   "settings.darkFrom": "From",
   "settings.darkTo": "Until",
   "settings.darkBehavior": "Behavior",
@@ -782,4 +776,19 @@ export const en = {
   "tabs.statToday": "{value} today",
   "tabs.statShowing": "Showing now",
   "tabs.statIdle": "Used {value}",
+  "settings.appearanceNote": "Applies to the app only. How pages look is set in Dark mode.",
+  "settings.darkScheduleSystem": "System",
+  "settings.darkScheduleSystemNote": "Follows the device's light or dark setting.",
+  "settings.darkSitesNote":
+    "These settings apply to every site unless a site has its own choice. Set one in the site's page settings.",
+  "fab.darkMode": "Dark mode. Tap to turn on or off for this page, hold for options.",
+  "favorites.pageSettings": "Page settings",
+  "siteSettings.darkNote": "Dark mode for this site only.",
+  "siteSettings.videoNote": "Video controls for this site only.",
+  "siteDark.effectiveOn": "Dark mode is on for this site.",
+  "siteDark.effectiveOff": "Dark mode is off for this site.",
+  "siteDark.openShared": "Dark mode settings",
+  "siteDark.openSharedNote": "Colors, schedule and the shared method for every site.",
+  "favorites.videoPanel": "Controls panel",
+  "favorites.videoPanelLabel": "{site} video controls panel",
 } as const;

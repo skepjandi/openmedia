@@ -239,7 +239,6 @@ export const si: Messages = {
   "settings.title": "සැකසුම්",
   "settings.close": "සැකසුම් වසන්න",
   "settings.appearance": "පෙනුම",
-  "settings.appearanceNote": "ඇප් එකට සහ පද්ධතියේ පැහැදිලි පැහැය අනුගමනය කරන අඩවි සඳහා යොදනු ලැබේ.",
   "settings.themeLabel": "තේමා",
   "settings.themeSystem": "පද්ධතිය",
   "settings.themeLight": "ආල්ල",
@@ -404,8 +403,6 @@ export const si: Messages = {
   "settings.darkModeNote": "ඔබ විවෘත කරන පිටු අඳුරු කරයි.",
   "settings.darkEnabled": "පිටු අඳුරු කරන්න",
   "settings.darkEnabledNote": "තමන්ගේම තේරීමක් නැති සියලු අඩවිවල අඳුරු ප්‍රකාරය සක්‍රිය කරයි.",
-  "settings.darkSitesNote":
-    "අඩවියකට තමන්ගේම තේරීමක් නොමැති නම් මෙම සැකසුම් සියලු අඩවිවලට අදාළ වේ. ආදරණීයයක සැකසුම්වල එය සකසන්න.",
   "settings.darkMethod": "ක්‍රමය",
   "settings.darkMethodDynamic": "ගතික",
   "settings.darkMethodDynamicNote":
@@ -437,9 +434,7 @@ export const si: Messages = {
   "settings.darkText": "පෙළ වර්ණය",
   "settings.darkSchedule": "කාලසටහන",
   "settings.darkScheduleAlways": "සෑම විටම",
-  "settings.darkScheduleSystem": "යෙදුමේ තේමාව",
   "settings.darkScheduleTime": "වේලාව",
-  "settings.darkScheduleSystemNote": "යෙදුමේ තේමාව අඳුරු විට පිටු අඳුරු කරයි.",
   "settings.darkFrom": "සිට",
   "settings.darkTo": "තෙක්",
   "settings.darkBehavior": "හැසිරීම",
@@ -786,4 +781,20 @@ export const si: Messages = {
   "tabs.statToday": "අද {value}",
   "tabs.statShowing": "දැන් පෙන්වමින්",
   "tabs.statIdle": "භාවිත කළේ {value}",
+  "settings.appearanceNote": "යෙදුමට පමණක් අදාළ වේ. පිටු පෙනෙන ආකාරය අඳුරු ප්‍රකාරයෙන් සකසයි.",
+  "settings.darkScheduleSystem": "පද්ධතිය",
+  "settings.darkScheduleSystemNote": "උපාංගයේ ආලෝක හෝ අඳුරු සැකසුම අනුගමනය කරයි.",
+  "settings.darkSitesNote":
+    "අඩවියකට තමන්ගේම තේරීමක් නොමැති නම් මෙම සැකසුම් සියලු අඩවිවලට අදාළ වේ. අඩවියේ පිටු සැකසුම්වල එය සකසන්න.",
+  "fab.darkMode":
+    "අඳුරු ප්‍රකාරය. මෙම පිටුව සඳහා සක්‍රිය හෝ අක්‍රිය කිරීමට තට්ටු කරන්න, විකල්ප සඳහා අල්ලාගෙන සිටින්න.",
+  "favorites.pageSettings": "පිටු සැකසුම්",
+  "siteSettings.darkNote": "මෙම අඩවිය සඳහා පමණක් අඳුරු ප්‍රකාරය.",
+  "siteSettings.videoNote": "මෙම අඩවිය සඳහා පමණක් වීඩියෝ පාලන.",
+  "siteDark.effectiveOn": "මෙම අඩවිය සඳහා අඳුරු ප්‍රකාරය සක්‍රියයි.",
+  "siteDark.effectiveOff": "මෙම අඩවිය සඳහා අඳුරු ප්‍රකාරය අක්‍රියයි.",
+  "siteDark.openShared": "අඳුරු ප්‍රකාර සැකසුම්",
+  "siteDark.openSharedNote": "වර්ණ, කාලසටහන සහ සියලු අඩවි සඳහා බෙදාගත් ක්‍රමය.",
+  "favorites.videoPanel": "පාලන පුවරුව",
+  "favorites.videoPanelLabel": "{site} වීඩියෝ පාලන පුවරුව",
 };

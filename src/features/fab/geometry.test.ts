@@ -6,6 +6,7 @@ import {
   HOLD_SCALE,
   COLOR_PICKER_SIZE,
   CONTROLS_SIZE,
+  DARK_MODE_SIZE,
   TECH_DETECTOR_SIZE,
   INCOGNITO_SIZE,
   SETTINGS_SIZE,
@@ -92,6 +93,7 @@ describe("fanLayout", () => {
             { center: layout.stats, size: STATS_SIZE },
             { center: layout.incognito, size: INCOGNITO_SIZE },
             { center: layout.controls, size: CONTROLS_SIZE },
+            { center: layout.darkMode, size: DARK_MODE_SIZE },
             ...(layout.colorPicker
               ? [{ center: layout.colorPicker, size: COLOR_PICKER_SIZE }]
               : []),
@@ -220,10 +222,12 @@ describe("fanLayout", () => {
         const pageSide = Math.sign(layout.settings.y - origin.y);
         expect(layout.incognito.x).toBe(origin.x);
         expect(layout.controls.x).toBe(origin.x);
+        expect(layout.darkMode.x).toBe(origin.x);
         for (const page of [layout.settings, layout.history, layout.tabs, layout.stats])
           expect(Math.sign(page.y - origin.y)).toBe(pageSide);
         expect(Math.sign(layout.incognito.y - origin.y)).toBe(-pageSide);
         expect(Math.sign(layout.controls.y - origin.y)).toBe(-pageSide);
+        expect(Math.sign(layout.darkMode.y - origin.y)).toBe(-pageSide);
         expect(layout.colorPicker?.x).toBe(origin.x);
         expect(Math.sign((layout.colorPicker?.y ?? 0) - origin.y)).toBe(-pageSide);
         expect(layout.techDetector?.x).toBe(origin.x);
@@ -240,8 +244,10 @@ describe("fanLayout", () => {
       expect(layout.incognito.y).toBeLessThan(layout.stats.y);
       expect(layout.controls.x).toBe(layout.stats.x);
       expect(layout.controls.y).toBeLessThan(layout.incognito.y);
+      expect(layout.darkMode.x).toBe(layout.stats.x);
+      expect(layout.darkMode.y).toBeLessThan(layout.controls.y);
       expect(layout.colorPicker?.x).toBe(layout.stats.x);
-      expect(layout.colorPicker?.y).toBeLessThan(layout.controls.y);
+      expect(layout.colorPicker?.y).toBeLessThan(layout.darkMode.y);
       expect(layout.techDetector?.x).toBe(layout.stats.x);
       expect(layout.techDetector?.y).toBeLessThan(layout.colorPicker?.y ?? 0);
     }
@@ -258,6 +264,34 @@ function pickerOf(layout: FanLayout): Point {
   return layout.colorPicker;
 }
 
+describe("the dark mode button", () => {
+  it("sits right after the controls switch and never overlaps another item", () => {
+    for (const edge of ["left", "right"] as const) {
+      for (const y of [insets.top, 200, 426, 700, phone.height - insets.bottom]) {
+        for (const extras of EXTRA_CHOICES) {
+          const origin = fabCenter(edge, y, phone, insets);
+          const layout = fanLayout(origin, edge, phone, insets, 4, extras);
+          expect(distance(layout.darkMode, layout.controls)).toBeCloseTo(52);
+          const others = [
+            ...layout.favorites,
+            layout.settings,
+            layout.history,
+            layout.tabs,
+            layout.stats,
+            layout.incognito,
+            layout.controls,
+            ...(layout.colorPicker ? [layout.colorPicker] : []),
+            ...(layout.techDetector ? [layout.techDetector] : []),
+          ];
+          for (const other of others) {
+            expect(distance(layout.darkMode, other)).toBeGreaterThan(DARK_MODE_SIZE);
+          }
+        }
+      }
+    }
+  });
+});
+
 describe("fanTargetAt", () => {
   const origin = fabCenter("left", 426, phone, insets);
   const layout = fanLayout(origin, "left", phone, insets, 4, ALL_EXTRAS);
@@ -270,18 +304,19 @@ describe("fanTargetAt", () => {
     expect(fanTargetAt(layout.stats, layout)).toEqual({ kind: "stats" });
     expect(fanTargetAt(layout.incognito, layout)).toEqual({ kind: "incognito" });
     expect(fanTargetAt(layout.controls, layout)).toEqual({ kind: "controls" });
+    expect(fanTargetAt(layout.darkMode, layout)).toEqual({ kind: "darkMode" });
     expect(fanTargetAt(pickerOf(layout), layout)).toEqual({ kind: "colorPicker" });
     expect(fanTargetAt(techOf(layout), layout)).toEqual({ kind: "techDetector" });
   });
 
-  it("stacks the technology detector straight after the controls switch when the picker is off", () => {
+  it("stacks the technology detector straight after the dark mode switch when the picker is off", () => {
     const only = fanLayout(origin, "left", phone, insets, 4, {
       colorPicker: false,
       techDetector: true,
     });
     const both = layout;
-    expect(distance(only.techDetector ?? origin, only.controls)).toBeCloseTo(
-      distance(both.colorPicker ?? origin, both.controls),
+    expect(distance(only.techDetector ?? origin, only.darkMode)).toBeCloseTo(
+      distance(both.colorPicker ?? origin, both.darkMode),
     );
   });
 
@@ -292,8 +327,8 @@ describe("fanTargetAt", () => {
     });
     expect(without.colorPicker).toBeNull();
     expect(without.techDetector).toBeNull();
-    expect(fanTargetAt(pickerOf(layout), without)).toBeNull();
-    expect(fanTargetAt(techOf(layout), without)).toBeNull();
+    expect(fanTargetAt(pickerOf(layout), without)?.kind).not.toBe("colorPicker");
+    expect(fanTargetAt(techOf(layout), without)?.kind).not.toBe("techDetector");
   });
 
   it("returns null away from every item", () => {
