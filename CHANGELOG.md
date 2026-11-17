@@ -6,6 +6,12 @@ All notable changes to OpenMedia are documented here.
 >
 > **Wiki**: the [GitHub Wiki](https://github.com/skepjandi/openmedia/wiki) is the public-facing main wiki — architecture, recipe format, AI pipeline, security model, roadmap. Source-controlled editing surface is `docs/wiki/` in this repo; CI (`.github/workflows/sync-wiki.yml`) mirrors it to the GitHub Wiki on every merge to `main`. New single-PR changes belong here, not as new wiki pages.
 
+### chore(recipes): the library is cut from 143 to 20 recipes
+
+**Area:** `chore(recipes)`
+
+**Change:** Removed 123 low-use official recipes, their fixtures, bundled icons and `categories.json` / `discover.json` entries. Kept: YouTube, Instagram, TikTok, Miruro, Movy, Reddit, X, YouTube Music, Spotify, Apple Music, LinkedIn, Twitch, Facebook, Threads, Snapchat, Netflix, Discord, Telegram, WhatsApp and the messages hub. The thin recipes among them (Miruro, Movy, YouTube Music, Apple Music, Spotify, Netflix) gain more options. Pinterest, Messenger and the other removed sites can come back from git history; saved choices for a removed recipe are simply no longer offered.
+
 ### feat(recipes): YouTube's Hide Shorts option also drops Shorts from the feeds as they load
 
 **Area:** `feat(recipes)`

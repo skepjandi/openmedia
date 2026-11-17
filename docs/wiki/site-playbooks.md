@@ -1,6 +1,6 @@
 # Site Playbooks
 
-> **Status: Implemented for 18 sites.** The first five are Instagram, Facebook, X, Reddit and YouTube; Threads, Telegram, Douyin, Messenger, Discord, Kuaishou, LinkedIn, WhatsApp, Snapchat, Pinterest, Weibo, TikTok and Twitch were added later from logged-out research only. WeChat and QQ have no recipe: their logged-out pages offer nothing to hide. The recipes are `recipes/official/<site>.json` (published to the marketplace as `market.official.<site>`, not embedded in the app); their DOM fixtures are in `recipes/fixtures/`. This page is the knowledge behind them, written so that a weaker model (the in-app assistant, see [AI Assistant](./ai-assistant.md)) can write correct selectors for these sites and for new ones. When a selector here stops matching, fix the recipe and this page together.
+> **Status: Implemented for 13 sites.** The first five are Instagram, Facebook, X, Reddit and YouTube; Threads, Telegram, Discord, LinkedIn, WhatsApp, Snapchat, TikTok and Twitch were added later from logged-out research only. WeChat and QQ have no recipe: their logged-out pages offer nothing to hide. The recipes are `recipes/official/<site>.json` (published to the marketplace as `market.official.<site>`, not embedded in the app); their DOM fixtures are in `recipes/fixtures/`. This page is the knowledge behind them, written so that a weaker model (the in-app assistant, see [AI Assistant](./ai-assistant.md)) can write correct selectors for these sites and for new ones. When a selector here stops matching, fix the recipe and this page together.
 
 Researched 2026-11-07 with an iPhone user agent at 390×844 in headless Chromium (not WebKit, so iOS rendering of these selectors is untested), logged out, plus community filter lists. **Nobody on this team could log in during research, so every logged-in selector below is `SOURCE` or `INFERRED`, not `LIVE`.** On-device checks on a real, logged-in account remain the user's.
 
@@ -29,7 +29,7 @@ Desktop was checked on 2026-11-10 in the running Mac app, with every option on, 
 | Twitch | logged out: home, channel | none |
 | TikTok | logged out: For You | profile pages (bot-check page on a direct load) |
 | Instagram | logged out: public profile | the signed-in feed |
-| Threads, Snapchat, Pinterest, LinkedIn | logged out home | LinkedIn's signed-in feed |
+| Threads, Snapchat, LinkedIn | logged out home | LinkedIn's signed-in feed |
 | Facebook, X | login page only | every desktop rule |
 
 When you add a desktop rule, capture its fixture from the real page rather than writing one by hand where you can: the structure with text and personal attributes removed, the ancestors the selector needs, and the `data-keep` marks. A hand-written fixture is allowed for a rule that the page cannot show you, and the recipe's `meta.notes` must say which rules those are.
@@ -292,52 +292,7 @@ Matches `https://*.discord.com/*`. Checked 2026-11-07 and 2026-11-13, logged out
 
 **Pitfalls.** The page's `<footer>` is not the footer; use `.footer_new`. Logged-in class names are `name_hash`; never match the hash. Left alone: the "Open Discord in your browser" button, nav and footer `/download` links.
 
-## Douyin (`douyin.default`)
 
-- **Where it lands.** Two layouts were seen for the same iPhone UA. 2026-11-07: `www.douyin.com/` served the vertical slide feed (`[data-e2e="slideList"]` > `[data-e2e="feed-item"]`, xgplayer). 2026-11-13: it redirected to `/jingxuan`, a desktop-style Featured grid (`.discover-video-card-item` cards under `.discover-tab-bar`, left navigation with a red Get APP tile) squeezed into 390 px. Rules for both are kept; each rule only matches in its own layout.
-- **Classes are hashed**; stable hooks are `data-e2e`, ids, `discover-*`, `waterfall-videoCardContainer`, `videoImage`, `tab-get_app`, `xgplayer-*`/`xg-*` tags, `disturb-login-panel`, `ai-douyin-entry`.
-
-| Option (default) | Rules and evidence |
-|---|---|
-| `guide-overlay` (on) | `[data-e2e="recommend-guide-mask"]` `LIVE` 1 (slide layout, 11-07). |
-| `login-nag` (on) | `.disturb-login-panel` `LIVE` 3 (11-07; empty until triggered). Login-nag role `INFERRED`. |
-| `ai-features` (off) | `.ai-douyin-entry` `LIVE` 2; `[data-e2e="chapter-container"]` `LIVE` 1; `#chapterVideoSideCard` `LIVE` 1 (11-07). |
-| `follow-buttons` (off) | `[data-e2e="feed-follow-icon"]` `LIVE` 5 (11-07). |
-| `video-info` (off) | `[data-e2e="video-info"]` `LIVE` 2 (11-07). |
-| `thumbnails` (choice Show/Blur/Hide, show) | blur: `.discover-video-card-img` css `filter: blur(16px)` `LIVE` 30; hide: `.discover-video-card-item .videoImage` `LIVE` 30 (grid layout, 11-13). |
-| `card-captions` (off) | `.discover-video-card-item .videoImage + div` `LIVE` 30: title, author and date under each card (11-13). |
-| `video-blur` (off) | `xg-video-container video` css `filter: blur(20px)`; `SOURCE` earlier 11-07 fixture (0 on the grid layout). |
-| `player-chrome` (choice Show/Dim/Faint, show) | `.xgplayer-controls xg-left-grid, .xgplayer-controls xg-right-grid, .xgplayer-video-info-wrap` css opacity 0.35 (dim) or 0.1 (faint). `SOURCE` greasyfork douyin-helper "pure mode" (opacity 0.1 controls, 0.3 info wrap) plus 11-07 fixture; not LIVE on the grid layout. |
-| `side-counters` (off) | `[data-e2e="video-player-digg"] > div, [data-e2e="feed-comment-icon"] > div, [data-e2e="video-player-share"] > div`: counts only, buttons stay. 11-07 fixture, `INFERRED` for current layout. |
-| `app-promo` (on) | `.tab-get_app` `LIVE` 1: red Get APP tile in the left navigation (11-13). The slide layout's header Get APP has no stable hook. |
-| `category-tabs` (off) | `.discover-tab-bar` `LIVE` 1 (11-13). Hide the bar only; `.discover-tab-container` also wraps the grid. |
-| `header-icons` (off) | `[data-e2e="notice-entry"], [data-e2e="im-entry"]` `LIVE` 1 + 1 (11-13). |
-
-Fixtures: `feed-logged-out.html` (slide layout) and `jingxuan-grid.html` (grid layout, hand-reduced from the live DOM).
-
-What CSS cannot do: block the sponsored first video or full-screen ad popups (AdGuard issue 212150 reports them); they are fed by the API response.
-
-Pitfalls: hashed class names rotate per deploy, never use them. The same URL can yield a different layout per visit; do not assume the slide feed exists. `.discover-tab-container` contains the whole grid, so hide only `.discover-tab-bar`.
-
-## Kuaishou (`kuaishou.default`)
-
-Lands on `https://m.kuaishou.com/` (mobile UA is redirected there from `www`). Logged out this is a static brand landing page whose job is to push the app. Re-checked 2026-11-13: same page; the real web app (`www.kuaishou.com/brilliant`, desktop UA) timed out again (~50 s), so feed/video/profile/live are not covered. No community cosmetic list was found for m.kuaishou.com; every rule is `LIVE`.
-
-| Option (default) | Rules and evidence |
-| --- | --- |
-| `app-prompts` (on) | `.com-download-bar` `LIVE` 1; `a.open-or-download-app-main, .cover .arrrow-wrapper` `LIVE` 2; `.open-in-browser-dialog, .open-app-confirm-dialog` `LIVE` 2 (display:none until an app-open attempt, best-effort). |
-| `top-up-link` (off) | `.com-header li.nav.highlight` `LIVE` 1. |
-| `landing-pictures` (choice Show/Blur/Hide, show) | blur: `.title-pic .pic-wrapper img.pic` css `filter: blur(14px)` `LIVE` 3; hide: `.title-pic .pic-wrapper` `LIVE` 3 (phone screenshots). |
-| `marketing-sections` (off) | `.page-content .title-pic` `LIVE` 3: headline + tagline + picture blocks. |
-| `brand-slogan` (off) | `.cover img.slogan` `LIVE` 1: slogan artwork above the download button. |
-| `header-menus` (off) | `.com-header .navs > li.nav:has(> a > span.triangle)` `LIVE` 2: the APP and About dropdowns (Home and Top up stay separate). |
-| `registration-footer` (off) | `.com-icp` `LIVE` 1: ICP and public-security links. |
-
-Fixture: `recipes/fixtures/kuaishou/landing.html` (header, hero and content marked `data-keep`).
-
-What CSS cannot do: stop the page's own app-open redirect attempts; the dialogs are only shown by script.
-
-Pitfalls: `www.kuaishou.com` desktop app was unreachable from headless Chromium, so do not add feed rules without a live session.
 
 ## LinkedIn (`linkedin.default`)
 
@@ -376,60 +331,7 @@ Matches `https://*.linkedin.com/*`. Logged-out pages are server-rendered with st
 
 **Not verified:** how the sign-in pop-up and bottom sheet look while shown, scroll lock, `#toasts` (cookie toast template, deliberately left alone), the whole signed-in app (feed, badges, composer, notifications), and `.social-details-social-counts`.
 
-## Messenger (`messenger.default`)
 
-Matches `https://*.messenger.com/*` **and, since 2026-11-13, `https://www.facebook.com/messages` and `https://www.facebook.com/messages/*`.** Meta ended messaging on messenger.com on 2026-04-16 and redirects computers to `facebook.com/messages` (TechCrunch 2026-02-19; Business Standard 2026-02-20; IBTimes 2026-04); `www.messenger.com/` still serves the marketing landing page (`LIVE` 2026-11-13, iPhone UA 390x844, logged out). The Facebook recipe also matches `facebook.com/messages`; option choices are saved per recipe. Choice options (Show / Blur / Hide): the first state is the untouched one.
-
-| Option (default) | Rules and evidence |
-|---|---|
-| `app-badges` (on, annoyance) | unchanged: `span:has(> a[href^="https://lm.messenger.com/l.php"])` `LIVE` (3 earlier; the phone layout showed the App Store badge span). |
-| `signup-link` (on, annoyance) | unchanged: `a[href^="https://www.facebook.com/r.php"]` `LIVE` 1 on desktop `/login/`. |
-| `landing-art` (off) | `div[role="main"]:not(:has(footer)) div > img` `LIVE` 2 on the landing page (the 330x479 and 1136x1648 phone pictures). The outer `#root[role=main]` holds the footer so it is excluded; header, badge and footer logos sit in `span` or `a` parents. |
-| `chat-list` (choice, show) | blur 8 px: `[role="navigation"] [role="row"]` `SOURCE` (Caprine fork css/browser.css, 2026: private mode blurs these rows); hide: `div[aria-label="Thread list"]` `SOURCE` (greasyfork Messenger Hide Chat List, 2024, messenger.com; `INFERRED` still the label on `/messages`). Hide removes the way to switch chats. |
-| `conversation` (choice, show; 2 states) | blur 7 px: `[role="grid"][aria-label^="Messages in conversation"] [role="row"]` `SOURCE` (Shadeed 2021 and its Habr translation: `role=grid` labelled "Messages in conversation with <name>", `role=row` per message, `role=gridcell` inside). 2021, not re-checked. |
-| `chat-avatars` (choice, show) | blur 6 px or hide: `[role="navigation"] [role="row"] img, [role="navigation"] [role="row"] image, [role="grid"][aria-label^="Messages in conversation"] img` `INFERRED` (rows are `SOURCE`; avatar tags are not). |
-| `facebook-bar` (off) | `body:not(:has([role="dialog"])) div[role="banner"]` `SOURCE` (Caprine hides `[role='banner']` on `/messages`; the guard is `INFERRED` from Caprine's note that the photo viewer's Close button is mounted inside `role=banner`). `div` only: the landing page header is `header[role=banner]`. |
-| `call-buttons` (off) | `[aria-label="Start a voice call"], [aria-label="Start a video call"]` `INFERRED` (English labels; not seen). |
-
-**CSS cannot:** read or hide unread dots, active status or Notes (hashed classes only); block seen or typing receipts (network rules only, e.g. uBO `||facebook.com/ajax/mercury/change_read_status.php$xmlhttprequest`, and `facebook.com/messages` uses the newer transport); keep the chat list blurred but readable on hover (no `:hover` in `css` rules).
-
-**Pitfalls.** `/messages` is logged-in only and redirects to the login page logged out, so every `/messages` rule is `SOURCE`/`INFERRED`; fixture `messages.html` is hand-written. `[role="banner"]` unqualified would also hit the landing header (`header[role=banner]`, `data-keep` in the fixture). Fixtures: `landing.html` (phone landing, now with the picture divs), `login.html` (desktop login), `messages.html` (hand-written /messages; named without the `desktop-` prefix so `tags` stay `["mobile"]`).
-
-## Pinterest (`pinterest.default`)
-
-Matches `https://*.pinterest.com/*`. Logged out, a phone UA gets the mobile web app (React, hashed classes, stable `data-test-id`). The home page is itself a sign-up screen; every other route (pin, profile, board, search) shows the content behind a sign-up dialog: a bottom sheet on phones, a full-page "Welcome to Pinterest" log-in window on desktop.
-
-Evidence: LIVE = `querySelectorAll` in headless Chrome (puppeteer), logged out. 2026-11-08: iPhone UA 390x844 on `/`, `/pin/<id>/`, `/<user>/`, `/<user>/<board>/`, `/search/pins/?q=test`. 2026-11-13: iPhone UA and macOS Safari UA 1280x800 on a pin and on `/search/pins/?q=kitchen island`. SOURCE = named list, not seen logged out (Pinterest Power Menu userscript, Angel2mp3; uBlockOrigin/uAssets issue 18369), hand-written fixture `feed-logged-in.html`. Counts are total (visible).
-
-| Option (default) | Rules and evidence |
-| --- | --- |
-| `signup-popup` (on) | LIVE phone: `div[role="dialog"]:has([data-test-id="mobile-signup-mask"])` 1 on pin, profile, board, search (0 on home). New, LIVE desktop pin and search: `[data-test-id="fullPageSignupModal"]` 1 (0 visible: the wrapper has no box, its fixed children cover the page, 60% black layer, `<style>body{overflow:hidden !important}</style>` ships with it; with the modal hidden the window still scrolled 1200 px); `[data-test-id="bottom-right-upsell"]` 1 (1) ("You are signed out", fixed bottom right). |
-| `home-promo` (on) | LIVE, home only: `[data-test-id^="homepage-section-"]` 3, `bottom-signup-header` 1, `unauth-homepage-redesign-footer` 1. The hero sign-up block stays (`data-keep`). |
-| `one-tap` (on) | LIVE desktop home and pin: `#credential_picker_container, #credential_picker_iframe` (Google One Tap card top right). |
-| `related-pins` (off) | LIVE phone: `related-pins-without-drawer` 1 and `more-like-this-button` 2 on a pin; `more-ideas-container` 1 on a board. New, LIVE desktop: `[data-test-id="relatedPins"] [role="listitem"] [data-grid-item-idx]:not([data-grid-item-idx="0"])` 11-13 on a desktop pin, 4-5 on phone (the count varies per load). **On desktop `relatedPins` also contains the pin itself (grid item 0), so the wrapper must not be hidden; the rule skips grid item 0 by its index.** No match was ever inside `CloseupMainPin` (checked). Avoid `:not(:has(...))` here: the recipe selector engine does not need that nesting. |
-| `comments-button` (off) | LIVE phone: `comment-button` 1 on a pin. Only the button exists logged out on a phone. |
-| `follower-counts` (off) | LIVE: `follower-count` 1 on a pin, `div:has(> [data-test-id="profile-followers-count"])` 1 on a profile. |
-| **`sponsored`** (annoyance, on) | SOURCE only, signed in: two rules, `[role="listitem"]:has(div[title^="Sponsored"]), [role="listitem"]:has(div[title^="Partner"])` and `[role="listitem"]:has([data-test-id="otpp"])` (Power Menu hides list items with the titles Sponsored, Partner Content and Sponsored Content; uAssets issue 18369 hides `[data-test-id="otpp"]` and its list item). 0 matches on live pages (no promoted pin appeared logged out in 2026-11-08 or 2026-11-13). Split into several rules because one selector may carry at most two `:has(`. |
-| **`pin-images`** (choice: Show / Grayscale / Blur, default Show) | `filter: grayscale(1)` / `blur(14px)` on `[data-test-id="gated-pin-rep"] img, [data-test-id="pinWrapper"] img, [data-test-id="pin"] img, [data-test-id="pin-closeup-image"]`. LIVE: `gated-pin-rep img` 8 (8) phone search, 14 (14) desktop search; `pin-closeup-image` is a div on desktop, an img on phone, so the element itself is filtered. `pinWrapper` / `pin`: SOURCE (Power Menu). |
-| **`video-pins`** (choice: Show / Blur / Hide, default Show) | Blur: `[data-test-id="gated-pin-video"], [data-test-id="closeup-video-with-visibility"]`. Hide: `[role="listitem"]:has([data-test-id="gated-pin-video"]), [role="listitem"]:has([data-test-id="story-pin-video-block"])`. LIVE: 3 on a desktop pin, 1 on desktop search, 0 on a phone search (the "0:10" badge `PinTypeIdentifier` is on the same cards); 0 matches on a normal pin grid. `closeup-video-with-visibility`, `story-pin-video-block`: SOURCE. |
-| **`comments`** (choice: Show / Dim / Hide, default Show) | Dim `opacity: 0.35` / hide `[data-test-id="aggregated-comment-list"], [data-test-id="comments-count-container"]`. LIVE desktop pin: 1 each, visible (the comment box `unauth-comment-composer` is inside `comments-count-container`); none on a phone. |
-| **`shopping`** (off) | SOURCE only: `duplo-shopping-module`, `ShopTheLookSimilarProducts`, `visual-search-shopping-bar`, `related-products`, `ShopTheLookAnnotations`, `shopping-module`; product pins in two rules, `[role="listitem"]:has([aria-label="Shoppable Pin indicator"]), [role="listitem"]:has([data-test-id="product-price-text"])` and `[role="listitem"]:has([data-test-id="pincard-product-with-link"])`. Not seen logged out; 0 matches on live pages. |
-| **`search-chips`** (off) | LIVE: `[data-test-id="one-bar-module-3"]` 9 (9) phone search, 25 (25) desktop search (Small, Pendant lights, Seating...). `one-bar-module-0` is the filter button and stays. |
-| **`visual-search`** (off) | LIVE: `[data-test-id="visual-search-icon"]` 1 (1) desktop pin (magnifier button in the corner of the picture). |
-
-CSS cannot do:
-- Open the real comments or pins: gated cards are not links logged out and need a login anyway.
-- Close the gap a hidden masonry card leaves: cards are absolutely positioned.
-- Undo `body{overflow:hidden !important}` from the desktop modal (not needed: the root scroller still works) or un-blur on tap.
-- Select a promoted pin without a signed-in label: none appeared logged out.
-
-Pitfalls:
-- On desktop `relatedPins` wraps the whole pin page including the main pin; select its other `role="listitem"` children, never the wrapper.
-- Keep selectors free of `:not(:has(...))`: the recipe validator only allows plain attribute `:not()` here, and the desktop pin page is the only place where the main pin has to be skipped.
-- The desktop log-in modal wrapper reports zero size; check with `display:none` and a screenshot, not `getBoundingClientRect`.
-- The same pin page hydrates differently per run (12 vs 13 related items); compare ranges, not exact counts.
-
-Not verified: logged-in pages (promoted pins, shopping modules, the signed-in grid), non-US regional hosts, cookie banners, a desktop home sign-up screen beyond the One Tap card.
 
 ## Snapchat (`snapchat.default`)
 
@@ -603,30 +505,6 @@ Matches `https://*.twitch.tv/*`. One recipe, two different sites: an iPhone UA l
 
 No cookie/consent banner, notification prompt, Drops or Prime promo, shopping or AI module appeared logged out, so no rules exist for them. Logged-in views, other regions' consent dialogs, clips/schedule tabs and desktop `www.twitch.tv` are untested. Whether `sda-wrapper` ever shows a visible ad was not observed.
 
-## Weibo (`weibo.default`)
-
-Matches `*.weibo.cn` and `*.weibo.com`. Only the mobile site `m.weibo.cn` was observed (logged out, iPhone UA, 2026-11-08 and 2026-11-13). It opens via `visitor.passport.weibo.cn` then serves a Vue app: home feed, `/search?containerid=231583` (hot search), `/status/<id>` (post page). 2026-11-13 re-check covered the home feed only (15 posts).
-
-| Option (default) | Rules and evidence |
-|---|---|
-| `login-button` (on) | `div.login-box:has(> a.login-btn)` `LIVE` 1, fixed button on every feed view. |
-| `follow-buttons` (on) | `header.weibo-top > div.m-followBtn` `LIVE` 20 on Charts, 0 on Hot; leads only to sign-in. |
-| `trending` (off) | `div.card.card16.m-col-2` (2) and `div.card.card11.ctype-3` (1) on the search page, `LIVE`. |
-| `feed-tabs` (off) | `.lite-topbar.main-top > div.nav-main` `LIVE` 1. |
-| `counters` (off) | `footer.f-footer-ctrl > div.m-diy-btn` `LIVE` 45 on 15 posts; `div.lite-page-tab div.tab-item > i + i` `LIVE` 3. |
-| `comments` (off) | `div.comment-content` 1, `div.lite-page-tab` 1, `div.lite-page-editor` 1, `LIVE` on a post page. |
-| `media` (off) | `div.weibo-media.f-media` `LIVE`: image grids and video players. |
-| `avatars` (choice Show/Blur/Hide, show) | blur: `.weibo-top .m-avatar-box img` css `filter: blur(8px)` `LIVE` 15; hide: `.weibo-top > .m-avatar-box` `LIVE` 15 (picture and V badge). |
-| `quoted-reposts` (choice Show/Dim/Hide, show) | `.weibo-rp` `LIVE` 2: dim css opacity 0.35, or hide. |
-| `media-blur` (choice Show/Blur/Strong blur, show) | `.weibo-media img` css `filter: blur(10px)` / `blur(28px)` `LIVE` 29 (pictures and video covers). Works together with `media` (hide wins). |
-| `post-source` (off) | `.weibo-top h4 > .from, .weibo-top h4 > .time` `LIVE` 12 + 15: date and "from <client>" line (some posts have no client). |
-| `vip-badges` (off) | `.weibo-top .m-avatar-box i.m-icon` `LIVE` 15 (goldv/orangev badges); `.weibo-top h3 img.vipicon` `LIVE` 15 (member icon). |
-| `video-stats` (off) | `.mwb-video .mwbv-info-bar` `LIVE` 8: play count and duration on video covers. |
-| `search-hint` (off) | `.nav-top .nav-search .m-text-cut` `LIVE` 1: the "everyone is searching" topic hint; search link stays. |
-
-What CSS cannot do: stop the app-install address-bar popup and the login popup after playing a video (uBlockOrigin/uAssets issues 23990 and 23851); they are script-driven.
-
-Pitfalls: `.weibo-media` also matches the inner `.weibo-media-wraps`; target images (`.weibo-media img`) for blur rather than the wrapper. `.weibo-top` is both the header of a post and, on the post page, the author block, so `> .m-avatar-box` selectors cover both. Some posts have no `.from`.
 
 ## WhatsApp (`whatsapp.default`)
 

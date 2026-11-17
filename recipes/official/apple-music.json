@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "market.official.apple-music",
   "name": "Apple Music",
-  "version": "1.1.0",
+  "version": "2.0.0",
   "origin": "user",
   "tags": ["desktop", "mobile"],
   "match": ["https://*.music.apple.com/*"],
@@ -11,6 +11,153 @@
       "id": "playback-bar",
       "label": "Hide playback bar",
       "description": "The site’s observed bottom playback bar.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "upsell-banner",
+      "label": "Hide the Try It Now upsell banner",
+      "description": "The \"Explore 100 million songs. All ad-free.\" subscription banner with Try It Now and its close button.",
+      "group": "annoyance",
+      "default": true
+    },
+    {
+      "id": "open-in-music",
+      "label": "Hide the Open in Music button",
+      "description": "The Open in Music button in the sidebar that pushes the native Music app.",
+      "group": "annoyance",
+      "default": true
+    },
+    {
+      "id": "sign-in",
+      "label": "Hide the Sign In button",
+      "description": "The Sign In button at the bottom of the sidebar.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "radio-tab",
+      "label": "Hide the Radio tab",
+      "description": "The Radio entry in the sidebar navigation.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "home-shelves",
+      "label": "Home and New shelves",
+      "description": "Show, dim or hide the rows of albums, playlists, songs and stations on the New and Home pages.",
+      "group": "content",
+      "choices": [
+        {
+          "id": "show",
+          "label": "Show"
+        },
+        {
+          "id": "dim",
+          "label": "Dim"
+        },
+        {
+          "id": "hide",
+          "label": "Hide"
+        }
+      ],
+      "default": "show"
+    },
+    {
+      "id": "hero-carousel",
+      "label": "Hide the featured hero banner",
+      "description": "The big editorial banner at the top of New (the Featured section).",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "charts",
+      "label": "Hide charts shelves",
+      "description": "The Daily Top 100 and City Charts rows.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "trending",
+      "label": "Hide the Trending Songs shelf",
+      "description": "The Trending Songs row.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "radio-shelves",
+      "label": "Hide radio shelves",
+      "description": "The Listen to Live Radio Now and New Radio Episodes rows.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "video-shelves",
+      "label": "Hide video shelves",
+      "description": "Rows of music videos and interviews (vertical video cards and New Music Videos).",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "tour-and-mixes",
+      "label": "Hide set list and DJ mix shelves",
+      "description": "The Now on Tour (set lists) and Latest DJ Mixes rows.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "more-to-explore",
+      "label": "Hide the More to Explore grid",
+      "description": "The grid of links at the bottom of the New page.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "cover-art",
+      "label": "Cover art",
+      "description": "Show, blur or hide album, playlist and song artwork on cards, hero banners and video cards.",
+      "group": "content",
+      "choices": [
+        {
+          "id": "show",
+          "label": "Show"
+        },
+        {
+          "id": "blur",
+          "label": "Blur"
+        },
+        {
+          "id": "hide",
+          "label": "Hide"
+        }
+      ],
+      "default": "show"
+    },
+    {
+      "id": "explicit-badge",
+      "label": "Hide Explicit badges",
+      "description": "The small Explicit badge next to titles.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "up-next",
+      "label": "Hide the Up Next button",
+      "description": "The Up Next button in the player bar.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "volume",
+      "label": "Hide the volume control",
+      "description": "The volume button and slider in the player bar.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "footer",
+      "label": "Hide the page footer",
+      "description": "The country switcher, copyright and legal links under the page.",
       "group": "content",
       "default": false
     }
@@ -24,13 +171,194 @@
       "target": {
         "css": "[data-testid=\"player-bar\"]"
       }
+    },
+    {
+      "id": "upsell-banner",
+      "label": "Subscription upsell banner",
+      "type": "hide",
+      "option": "upsell-banner",
+      "target": {
+        "css": "[data-testid=\"upsell-banner\"]"
+      }
+    },
+    {
+      "id": "open-in-music",
+      "label": "Open in Music button",
+      "type": "hide",
+      "option": "open-in-music",
+      "target": {
+        "css": "[data-testid=\"native-cta\"]"
+      }
+    },
+    {
+      "id": "sign-in",
+      "label": "Sign In button",
+      "type": "hide",
+      "option": "sign-in",
+      "target": {
+        "css": "[data-testid=\"auth-content\"]"
+      }
+    },
+    {
+      "id": "radio-tab",
+      "label": "Radio tab",
+      "type": "hide",
+      "option": "radio-tab",
+      "target": {
+        "css": "[data-testid=\"navigation-item\"]:has(a[data-testid=\"radio\"])"
+      }
+    },
+    {
+      "id": "home-shelves-dim",
+      "label": "Shelves",
+      "type": "css",
+      "option": "home-shelves",
+      "choice": ["dim"],
+      "target": {
+        "css": "[data-testid=\"section-container\"]"
+      },
+      "declarations": {
+        "opacity": "0.35"
+      }
+    },
+    {
+      "id": "home-shelves-hide",
+      "label": "Shelves",
+      "type": "hide",
+      "option": "home-shelves",
+      "choice": ["hide"],
+      "target": {
+        "css": "[data-testid=\"section-container\"]"
+      }
+    },
+    {
+      "id": "hero-carousel",
+      "label": "Featured hero banner",
+      "type": "hide",
+      "option": "hero-carousel",
+      "target": {
+        "css": "[data-testid=\"section-container\"]:has([data-testid=\"editorial-card-wrapper\"])"
+      }
+    },
+    {
+      "id": "charts",
+      "label": "Charts shelves",
+      "type": "hide",
+      "option": "charts",
+      "target": {
+        "css": "[data-testid=\"section-container\"][aria-label=\"Daily Top 100\"], [data-testid=\"section-container\"][aria-label=\"City Charts\"]"
+      }
+    },
+    {
+      "id": "trending",
+      "label": "Trending Songs shelf",
+      "type": "hide",
+      "option": "trending",
+      "target": {
+        "css": "[data-testid=\"section-container\"][aria-label=\"Trending Songs\"]"
+      }
+    },
+    {
+      "id": "radio-shelves",
+      "label": "Radio shelves",
+      "type": "hide",
+      "option": "radio-shelves",
+      "target": {
+        "css": "[data-testid=\"section-container\"][aria-label=\"Listen to Live Radio Now\"], [data-testid=\"section-container\"][aria-label=\"New Radio Episodes\"]"
+      }
+    },
+    {
+      "id": "video-shelves",
+      "label": "Video shelves",
+      "type": "hide",
+      "option": "video-shelves",
+      "target": {
+        "css": "[data-testid=\"section-container\"]:has([data-testid=\"vertical-video\"]), [data-testid=\"section-container\"][aria-label=\"New Music Videos\"]"
+      }
+    },
+    {
+      "id": "tour-and-mixes",
+      "label": "Set list and DJ mix shelves",
+      "type": "hide",
+      "option": "tour-and-mixes",
+      "target": {
+        "css": "[data-testid=\"section-container\"][aria-label=\"Now on Tour\"], [data-testid=\"section-container\"][aria-label=\"Latest DJ Mixes\"]"
+      }
+    },
+    {
+      "id": "more-to-explore",
+      "label": "More to Explore grid",
+      "type": "hide",
+      "option": "more-to-explore",
+      "target": {
+        "css": "[data-testid=\"section-container\"]:has([data-testid=\"grid\"])"
+      }
+    },
+    {
+      "id": "cover-art-blur",
+      "label": "Artwork",
+      "type": "css",
+      "option": "cover-art",
+      "choice": ["blur"],
+      "target": {
+        "css": "[data-testid=\"artwork-component\"], [data-testid=\"track-lockup-artwork\"], [data-testid=\"vertical-video-artwork-wrapper\"]"
+      },
+      "declarations": {
+        "filter": "blur(12px)"
+      }
+    },
+    {
+      "id": "cover-art-hide",
+      "label": "Artwork",
+      "type": "hide",
+      "option": "cover-art",
+      "choice": ["hide"],
+      "target": {
+        "css": "[data-testid=\"artwork-component\"], [data-testid=\"track-lockup-artwork\"], [data-testid=\"vertical-video-artwork-wrapper\"]"
+      }
+    },
+    {
+      "id": "explicit-badge",
+      "label": "Explicit badges",
+      "type": "hide",
+      "option": "explicit-badge",
+      "target": {
+        "css": "[data-testid=\"explicit-badge\"]"
+      }
+    },
+    {
+      "id": "up-next",
+      "label": "Up Next button",
+      "type": "hide",
+      "option": "up-next",
+      "target": {
+        "css": "[data-testid=\"up-next-button\"]"
+      }
+    },
+    {
+      "id": "volume",
+      "label": "Volume control",
+      "type": "hide",
+      "option": "volume",
+      "target": {
+        "css": "[data-testid=\"chrome-volume\"]"
+      }
+    },
+    {
+      "id": "footer",
+      "label": "Page footer",
+      "type": "hide",
+      "option": "footer",
+      "target": {
+        "css": "footer[data-testid=\"footer\"]"
+      }
     }
   ],
   "meta": {
     "author": "OpenMedia",
     "homepage": "https://music.apple.com/",
-    "summary": "Hides the site’s observed playback bar",
-    "lastVerified": "2026-11-14",
-    "notes": "**Live check (2026-11-14).** Checked `https://music.apple.com/` (final URL `https://music.apple.com/us/new`) in a fresh, logged-out isolated browser tab using desktop Chrome UA `Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36` at 1440×900.\nThe previous shared cookie/ad/app selector pack matched 0 live elements on this page, so the rule below uses the site-specific hook observed instead.\n\n- `[data-testid=\"player-bar\"]` matched 1 element in the live DOM.\n\nOnly the public desktop home page was checked. Logged-in views and other routes were not available, and consent choices can change later loads. `recipes/fixtures/apple-music/desktop-real.html` is a sanitized excerpt of the captured live DOM; the legacy synthetic fixtures are not live evidence."
+    "summary": "Hides Apple Music's subscription banner and Open in Music nag; toggles for shelves, charts, radio, artwork, the player bar and footer",
+    "lastVerified": "2026-11-17",
+    "notes": "**Live check (2026-11-17).** Opened `https://music.apple.com/us/new` logged out in a desktop-UA browser at 1440×900 and read the DOM 9 seconds after load. `recipes/fixtures/apple-music/desktop-live-new.html` is a trimmed reconstruction of its structure (shelves reduced to one of each kind), alongside the earlier `desktop-real.html` excerpt of 2026-11-14.\n\nSeen live and used: `[data-testid=\"upsell-banner\"]` 1, `[data-testid=\"native-cta\"]` 1, `[data-testid=\"auth-content\"]` 1, the Radio navigation item, `[data-testid=\"section-container\"]` (about 20 shelves, each with an English `aria-label`), `editorial-card-wrapper` (Featured hero), `vertical-video`, the `grid` under More to Explore, `artwork-component`, `track-lockup-artwork`, `explicit-badge`, `up-next-button`, `chrome-volume`, `player-bar` and `footer`.\n\n**Not verified:** the shelf rules for charts, Trending Songs, radio, tour and DJ mixes match the shelf's English title (`aria-label`), so they do nothing in other languages and stop matching if Apple renames a shelf. Hover play buttons and the album, playlist and artist pages were not checked. Cover-art rules cover the `artwork-component` and lockup wrappers; whether every card image sits inside one was not confirmed. Signed-in views, the mobile layout and the cookie dialog (none appeared) were not available. The previous generic cookie, ad and app-banner rules matched nothing live and were not carried over.\n\n- The subscription banner and Open in Music button are on by default.\n- Everything else is off by default: Sign In, Radio tab, shelf and chart rows, hero, artwork, Explicit badges, Up Next, volume and footer."
   }
 }

@@ -2,10 +2,10 @@
   "schema": 1,
   "id": "market.official.miruro",
   "name": "Miruro",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "origin": "user",
   "tags": ["desktop", "mobile"],
-  "match": ["https://*.miruro.to/*"],
+  "match": ["https://*.miruro.to/*", "https://*.miruro.tv/*"],
   "options": [
     {
       "id": "domain-banner",
@@ -29,6 +29,13 @@
       "default": false
     },
     {
+      "id": "hero-synopsis",
+      "label": "Hide the carousel synopsis",
+      "description": "Only the plot blurb on each featured slide; the banner, title and buttons stay.",
+      "group": "content",
+      "default": false
+    },
+    {
       "id": "genre-strip",
       "label": "Hide the genre strip",
       "description": "The scrolling row of genre buttons under the carousel.",
@@ -36,23 +43,193 @@
       "default": false
     },
     {
+      "id": "watch-history",
+      "label": "Hide the Your Watchlist shelf",
+      "description": "The Watch History shelf of episodes you started, shown on the home page after you have watched something.",
+      "group": "content",
+      "default": false
+    },
+    {
       "id": "top-airing",
       "label": "Hide the Top Airing list",
-      "description": "The side list of currently airing shows.",
+      "description": "The Top Airing list in the side column of the home page.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "upcoming-list",
+      "label": "Hide the Upcoming list",
+      "description": "The Upcoming list in the side column of the home page.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "airing-schedule",
+      "label": "Hide the Airing Schedule",
+      "description": "The Estimated Airing Schedule block with its day picker, in the side column of the home page.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "finished-movies",
+      "label": "Hide Just Finished and Top Movies",
+      "description": "The two compact lists under the home page catalog (Just Finished, Top Movies).",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "side-column",
+      "label": "Hide the whole side column",
+      "description": "Everything in the home page's right-hand column: Top Airing, Upcoming and the Airing Schedule.",
       "group": "content",
       "default": false
     },
     {
       "id": "posters",
       "label": "Posters and banners",
-      "description": "Show, blur or hide the cover pictures on cards, the side list and the carousel.",
+      "description": "Show, blur or hide the cover pictures on cards, the side lists, the watch history shelf and the carousel.",
       "group": "content",
       "choices": [
-        { "id": "show", "label": "Show" },
-        { "id": "blur", "label": "Blur" },
-        { "id": "hide", "label": "Hide" }
+        {
+          "id": "show",
+          "label": "Show"
+        },
+        {
+          "id": "blur",
+          "label": "Blur"
+        },
+        {
+          "id": "hide",
+          "label": "Hide"
+        }
       ],
       "default": "show"
+    },
+    {
+      "id": "info-covers",
+      "label": "Info and watch page pictures",
+      "description": "Show, blur or hide the banner, cover and recommendation pictures on an anime's info and watch pages.",
+      "group": "content",
+      "choices": [
+        {
+          "id": "show",
+          "label": "Show"
+        },
+        {
+          "id": "blur",
+          "label": "Blur"
+        },
+        {
+          "id": "hide",
+          "label": "Hide"
+        }
+      ],
+      "default": "show"
+    },
+    {
+      "id": "episode-counts",
+      "label": "Hide SUB/DUB episode counts",
+      "description": "The SUB 12 / DUB 10 episode counters on cards, the watch page and the info page.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "airing-countdowns",
+      "label": "Hide next-episode countdowns",
+      "description": "The 'EP 8 4D 12H' badge on the carousel and the 'Episode 8 in 6d' line under the episode list.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "list-buttons",
+      "label": "Hide Add to List / Edit List buttons",
+      "description": "The AniList-style list buttons on cards, side lists and the watch and info pages.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "external-links",
+      "label": "Hide AniList and MyAnimeList links",
+      "description": "The round AniList and MyAnimeList buttons beside the cover on the watch and info pages.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "viewer-count",
+      "label": "Hide the live viewer count",
+      "description": "The 'live viewers across all Miruro frontends' number above the player.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "episode-thumbs",
+      "label": "Episode thumbnails",
+      "description": "Show, blur or hide the screenshot of each episode in the episode list, to avoid spoilers.",
+      "group": "content",
+      "choices": [
+        {
+          "id": "show",
+          "label": "Show"
+        },
+        {
+          "id": "blur",
+          "label": "Blur"
+        },
+        {
+          "id": "hide",
+          "label": "Hide"
+        }
+      ],
+      "default": "show"
+    },
+    {
+      "id": "episode-titles",
+      "label": "Hide episode titles",
+      "description": "Episode names in the episode list and above the player; they can spoil what happens.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "episode-descriptions",
+      "label": "Hide episode descriptions",
+      "description": "The one-line plot summary of each episode in the list and under the player.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "watch-comments",
+      "label": "Hide the comments panel",
+      "description": "The Anime Community comments panel on the watch and info pages.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "recommendations",
+      "label": "Hide Related and Recommendations",
+      "description": "The Related and Recommendations lists beside the player and the Recommendations row on the info page.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "info-trailer",
+      "label": "Hide the info page trailer",
+      "description": "The embedded trailer video on an anime's info page.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "random-button",
+      "label": "Hide the Random Anime button",
+      "description": "The dice button in the top bar that jumps to a random show.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "footer",
+      "label": "Hide the footer",
+      "description": "The disclaimer, links, theme switcher and Reddit icon at the bottom of every page.",
+      "group": "content",
+      "default": false
     }
   ],
   "rules": [
@@ -84,6 +261,15 @@
       }
     },
     {
+      "id": "carousel-synopsis",
+      "label": "Carousel synopsis",
+      "type": "hide",
+      "option": "hero-synopsis",
+      "target": {
+        "css": "[class*=\"_carouselWrapper_\"] [class*=\"_slide_\"] [class*=\"_description_\"]"
+      }
+    },
+    {
       "id": "genres",
       "label": "Genre strip",
       "type": "hide",
@@ -93,10 +279,55 @@
       }
     },
     {
+      "id": "watch-history-shelf",
+      "label": "Your Watchlist shelf",
+      "type": "hide",
+      "option": "watch-history",
+      "target": {
+        "css": "section:has(> [class*=\"_titleBlock_\"] > a[href=\"/history\"])"
+      }
+    },
+    {
       "id": "side-list",
       "label": "Top Airing side list",
       "type": "hide",
       "option": "top-airing",
+      "target": {
+        "css": "aside[class*=\"_side_\"] > [class*=\"_sideListContainer_\"]:nth-child(1)"
+      }
+    },
+    {
+      "id": "upcoming",
+      "label": "Upcoming side list",
+      "type": "hide",
+      "option": "upcoming-list",
+      "target": {
+        "css": "aside[class*=\"_side_\"] > [class*=\"_sideListContainer_\"]:nth-child(2)"
+      }
+    },
+    {
+      "id": "schedule",
+      "label": "Airing Schedule",
+      "type": "hide",
+      "option": "airing-schedule",
+      "target": {
+        "css": "[class*=\"_scheduleSlot_\"]"
+      }
+    },
+    {
+      "id": "finished-movies-lists",
+      "label": "Just Finished and Top Movies lists",
+      "type": "hide",
+      "option": "finished-movies",
+      "target": {
+        "css": "[class*=\"_mainContent_\"] > [class*=\"_sidelistRow_\"]"
+      }
+    },
+    {
+      "id": "side-column-all",
+      "label": "Home side column",
+      "type": "hide",
+      "option": "side-column",
       "target": {
         "css": "aside[class*=\"_side_\"]"
       }
@@ -108,7 +339,7 @@
       "option": "posters",
       "choice": ["blur"],
       "target": {
-        "css": "[class*=\"_styledCardItem_\"] img, aside[class*=\"_side_\"] img, [class*=\"_carouselWrapper_\"] img"
+        "css": "[class*=\"_styledCardItem_\"] img, aside[class*=\"_side_\"] img, [class*=\"_sideListWrapper_\"] img, [class*=\"_carouselWrapper_\"] img, [class*=\"_cardVerticalWrapper_\"] img"
       },
       "declarations": {
         "filter": "blur(12px)"
@@ -121,15 +352,196 @@
       "option": "posters",
       "choice": ["hide"],
       "target": {
-        "css": "[class*=\"_styledCardItem_\"] img, aside[class*=\"_side_\"] img, [class*=\"_carouselWrapper_\"] img"
+        "css": "[class*=\"_styledCardItem_\"] img, aside[class*=\"_side_\"] img, [class*=\"_sideListWrapper_\"] img, [class*=\"_carouselWrapper_\"] img, [class*=\"_cardVerticalWrapper_\"] img"
+      }
+    },
+    {
+      "id": "info-covers-blur",
+      "label": "Info and watch page pictures",
+      "type": "css",
+      "option": "info-covers",
+      "choice": ["blur"],
+      "target": {
+        "css": "[class*=\"_bannerImage_\"], [class*=\"_coverColumn_\"] img, [class*=\"_coverImageContainer_\"] img, [class*=\"_dragListContainer_\"] img, aside[class*=\"_sideSourceAndData_\"] img"
+      },
+      "declarations": {
+        "filter": "blur(12px)"
+      }
+    },
+    {
+      "id": "info-covers-hide",
+      "label": "Info and watch page pictures",
+      "type": "hide",
+      "option": "info-covers",
+      "choice": ["hide"],
+      "target": {
+        "css": "[class*=\"_bannerImage_\"], [class*=\"_coverColumn_\"] img, [class*=\"_coverImageContainer_\"] img, [class*=\"_dragListContainer_\"] img, aside[class*=\"_sideSourceAndData_\"] img"
+      }
+    },
+    {
+      "id": "episode-counts-rail",
+      "label": "SUB/DUB episode counts",
+      "type": "hide",
+      "option": "episode-counts",
+      "target": {
+        "css": "[class*=\"_rail_\"][aria-label=\"Episode availability\"]"
+      }
+    },
+    {
+      "id": "carousel-airing-badge",
+      "label": "Carousel next-episode badge",
+      "type": "hide",
+      "option": "airing-countdowns",
+      "target": {
+        "css": "[class*=\"_carouselWrapper_\"] [class*=\"_airing_\"]"
+      }
+    },
+    {
+      "id": "episode-list-airing",
+      "label": "Next episode line under the list",
+      "type": "hide",
+      "option": "airing-countdowns",
+      "target": {
+        "css": "[class*=\"_listFooter_\"] [class*=\"_airingText_\"]"
+      }
+    },
+    {
+      "id": "list-buttons-all",
+      "label": "Add to List / Edit List buttons",
+      "type": "hide",
+      "option": "list-buttons",
+      "target": {
+        "css": "[class*=\"_listButtonWrapper_\"], button[aria-label=\"Edit List\"], button[aria-label=\"Add to List\"]"
+      }
+    },
+    {
+      "id": "tracker-links",
+      "label": "AniList and MyAnimeList links",
+      "type": "hide",
+      "option": "external-links",
+      "target": {
+        "css": "a[href^=\"https://anilist.co/anime/\"], a[href^=\"https://myanimelist.net/anime/\"]"
+      }
+    },
+    {
+      "id": "viewers",
+      "label": "Live viewer count",
+      "type": "hide",
+      "option": "viewer-count",
+      "target": {
+        "css": "[class*=\"_viewerCount_\"]"
+      }
+    },
+    {
+      "id": "episode-thumbs-blur",
+      "label": "Episode thumbnails",
+      "type": "css",
+      "option": "episode-thumbs",
+      "choice": ["blur"],
+      "target": {
+        "css": "button[data-episode-number] img"
+      },
+      "declarations": {
+        "filter": "blur(14px)"
+      }
+    },
+    {
+      "id": "episode-thumbs-hide",
+      "label": "Episode thumbnails",
+      "type": "hide",
+      "option": "episode-thumbs",
+      "choice": ["hide"],
+      "target": {
+        "css": "button[data-episode-number] [class*=\"_imageWrapper_\"]"
+      }
+    },
+    {
+      "id": "episode-list-titles",
+      "label": "Episode titles in the list",
+      "type": "hide",
+      "option": "episode-titles",
+      "target": {
+        "css": "button[data-episode-number] [class*=\"_imageListHeader_\"]"
+      }
+    },
+    {
+      "id": "episode-current-title",
+      "label": "Episode title above the player",
+      "type": "hide",
+      "option": "episode-titles",
+      "target": {
+        "css": "[class*=\"_infoColumn_\"] [class*=\"_titleContainer_\"] > span:not([class])"
+      }
+    },
+    {
+      "id": "episode-summaries",
+      "label": "Episode descriptions",
+      "type": "hide",
+      "option": "episode-descriptions",
+      "target": {
+        "css": "button[data-episode-number] [class*=\"_description_\"], [class*=\"_infoColumn_\"] [class*=\"_description_\"]"
+      }
+    },
+    {
+      "id": "comments",
+      "label": "Anime Community comments",
+      "type": "hide",
+      "option": "watch-comments",
+      "target": {
+        "css": "[class*=\"_commentSectionContainer_\"]"
+      }
+    },
+    {
+      "id": "related-watch",
+      "label": "Related and Recommendations beside the player",
+      "type": "hide",
+      "option": "recommendations",
+      "target": {
+        "css": "aside[class*=\"_sideSourceAndData_\"]"
+      }
+    },
+    {
+      "id": "recommendations-info",
+      "label": "Recommendations row on the info page",
+      "type": "hide",
+      "option": "recommendations",
+      "target": {
+        "css": "[role=\"region\"][aria-label=\"Recommendations\"]"
+      }
+    },
+    {
+      "id": "trailer",
+      "label": "Info page trailer",
+      "type": "hide",
+      "option": "info-trailer",
+      "target": {
+        "css": "iframe[class*=\"_trailer_\"]"
+      }
+    },
+    {
+      "id": "random",
+      "label": "Random Anime button",
+      "type": "hide",
+      "option": "random-button",
+      "target": {
+        "css": "button[aria-label=\"Random Anime\"]"
+      }
+    },
+    {
+      "id": "footer-all",
+      "label": "Footer",
+      "type": "hide",
+      "option": "footer",
+      "target": {
+        "css": "footer"
       }
     }
   ],
   "meta": {
     "author": "OpenMedia",
     "homepage": "https://www.miruro.to/",
-    "summary": "Hides the bookmark banner and share card; optionally hides the carousel, genres, Top Airing, and blurs or hides posters",
-    "lastVerified": "2026-11-14",
-    "notes": "Checked 2026-11-14 on https://www.miruro.to/ logged out: desktop 1440x900 and an iPhone UA at 393px, headless WebKit. The site is a React single-page app with CSS-module class names whose trailing hash changes per build, so every selector matches the stable name prefix (`[class*=\"_banner_\"]`) and anchors on a role, tag or aria-label where it can. On both viewports the bookmark banner (`[role=status]`), the Love the Site? section, the carousel and the aside were present; the genre strip (18 buttons) and card grid load lazily and were checked on desktop only. Only the home page was inspected; watch and info pages, video ads inside players and logged-in views were not. The fixtures are sanitized excerpts of the capture."
+    "summary": "Hides the bookmark banner and share card; toggles for shelves, schedule, comments, recommendations; blur episode spoilers and posters",
+    "lastVerified": "2026-11-17",
+    "notes": "# Verified 2026-11-17\n\nOpened https://www.miruro.to/ in headless WebKit logged out, desktop 1440x900 and an iPhone UA at 390px, and ran every rule's selector against four real pages: home, a watch page with a long episode list (grid layout, ONE PIECE), a watch page with a short list (image-and-title rows, 7 episodes) and an info page. The site is a React SPA with CSS-module class names whose trailing hash changes per build, so each selector matches the stable name prefix (`[class*=\"_scheduleSlot_\"]`) and anchors on a role, tag, href or aria-label where it can. `miruro.tv` serves the same app (same title and shell), so it is matched too; `miruro.com` is a separate landing page and is not.\n\n# Live match counts\n\n- Home, both viewports: banner 1, Love the Site 1, carousel 1 (8 slides), genre strip 1, Your Watchlist shelf 1 (appears once you have watched something on this browser), Top Airing, Upcoming, schedule and Just Finished/Top Movies 1 each, SUB/DUB counters 27.\n- Watch pages: 7 image rows with thumbnail, title and description in the short-list layout; the long-list layout shows only numbers, so thumbnails, titles and descriptions only exist there for short shows. Related and Recommendations aside 1, comments panel 1 (desktop), viewer count 1, tracker links 2.\n- Info page: Recommendations row 1, trailer iframe 1, comments 1, 18 cover and recommendation pictures.\n- Random Anime button: desktop top bar only.\n\n# Choices worth knowing\n\n- Top Airing and Upcoming are the first and second children of the home side column. They carry only an uppercase header text, which CSS cannot match, so those two rules follow that order. The whole-column option is the safe fallback if the order changes.\n- The site has its own Hide episode spoilers toggle on the watch page; the thumbnail, title and description options here are always-on versions of it.\n- English `aria-label` values (Episode availability, Edit List, Add to List, Random Anime, Recommendations) are used; they will not match a translated interface.\n\n# Not verified\n\n- Logged-in views (own list, notifications, profile menu contents), the settings and history pages, and the schedule, trending and search pages.\n- The player itself: it is a separate frame (`strmcx-embed`), its ads, overlays, and the Auto next and Auto skip switches in its toolbar are player state that CSS cannot change. No ad slots or pop-ups were present in any page checked.\n- The comments panel on a phone-width watch page loaded lazily and was not present at capture; its rule is checked on desktop only.\n- The fixtures are trimmed, text-stripped captures of the real DOM, not full pages."
   }
 }

@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "market.official.movy",
   "name": "Movy",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "origin": "user",
   "tags": ["desktop", "mobile"],
   "match": ["https://*.movy.sx/*"],
@@ -27,6 +27,195 @@
       "description": "The Smart App Banner and install-our-app strips.",
       "group": "annoyance",
       "default": true
+    },
+    {
+      "id": "trailer-previews",
+      "label": "Hide hover trailer previews",
+      "description": "The muted looping trailer video that starts inside a poster card when you point at it.",
+      "group": "annoyance",
+      "default": true
+    },
+    {
+      "id": "hero",
+      "label": "Hide the home page hero slider",
+      "description": "The big rotating featured title with its Play and More info buttons at the top of Home. Detail pages keep their own header.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "hero-dots",
+      "label": "Hide the hero slide dots",
+      "description": "The row of tabs under the home hero that jumps between the featured titles. The slider itself stays.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "continue-watching",
+      "label": "Hide Continue watching",
+      "description": "The Continue watching row on Home, shown once you are signed in with a history.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "watchlist-row",
+      "label": "Hide the Watchlist row",
+      "description": "The Watchlist row on Home with the titles you saved to a list.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "top10-row",
+      "label": "Hide TOP 10 on Movy",
+      "description": "The TOP 10 block on Home: the featured #1 title with its plot and cast, and the ranked poster row under it.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "upcoming-shows",
+      "label": "Hide Current & upcoming TV shows",
+      "description": "The row of airing and upcoming episodes (S1.E8, Nov 10...) on Home.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "trending-row",
+      "label": "Hide Trending This Week",
+      "description": "The Trending This Week row on Home.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "streaming-rail",
+      "label": "Hide the Only on Netflix rail",
+      "description": "The streaming-service picker and its Only on Netflix, Prime Video, HBO Max... poster row on Home.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "new-4k-row",
+      "label": "Hide Recently added in 4K",
+      "description": "The Recently added in 4K row on Home.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "top-rated-row",
+      "label": "Hide Top rated",
+      "description": "The Top rated row on Home.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "genre-rail",
+      "label": "Hide Popular Genres",
+      "description": "The row of genre tiles (Comedy, Action, Drama...) on Home.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "thumbnails",
+      "label": "Posters and artwork",
+      "description": "Show, blur or hide posters, backdrops and cast photos so a cover does not spoil or decide what you watch.",
+      "group": "content",
+      "choices": [
+        {
+          "id": "show",
+          "label": "Show"
+        },
+        {
+          "id": "blur",
+          "label": "Blur"
+        },
+        {
+          "id": "hide",
+          "label": "Hide"
+        }
+      ],
+      "default": "show"
+    },
+    {
+      "id": "synopsis",
+      "label": "Plots and descriptions",
+      "description": "Show, blur or hide the synopsis text in the hero, the TOP 10 block and on title pages, to avoid spoilers.",
+      "group": "content",
+      "choices": [
+        {
+          "id": "show",
+          "label": "Show"
+        },
+        {
+          "id": "blur",
+          "label": "Blur"
+        },
+        {
+          "id": "hide",
+          "label": "Hide"
+        }
+      ],
+      "default": "show"
+    },
+    {
+      "id": "ratings",
+      "label": "Hide score numbers",
+      "description": "The star rating on cards and in the hero and title headers. Year and type stay.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "rank-badges",
+      "label": "Hide TOP 10 ranks",
+      "description": "The TOP 10 mark in the hero and the numbered rank badges on poster cards and in the TOP 10 block.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "quality-badges",
+      "label": "Hide 4K and age rating badges",
+      "description": "The 4K, R, TV-14 badges next to the year on the hero and title pages.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "votes",
+      "label": "Hide community votes",
+      "description": "The upvote and downvote buttons with their counts on title pages.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "cast",
+      "label": "Hide the Cast row",
+      "description": "The Actors row with photos and character names on movie and show pages.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "you-may-like",
+      "label": "Hide You may like",
+      "description": "The recommendation row (phone) and grid (desktop) under a title.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "download-share",
+      "label": "Hide Download and Share buttons",
+      "description": "The Download and Share buttons next to Play on a title page. Play and Add to List stay.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "episode-tools",
+      "label": "Hide episode list tools",
+      "description": "Episode search, reverse order and list or card view switch above the episodes of a show.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "footer",
+      "label": "Hide the footer",
+      "description": "The links (Help, Terms, Privacy, DMCA, API), the not-hosted notice and the version line at the bottom.",
+      "group": "content",
+      "default": false
     }
   ],
   "rules": [
@@ -56,12 +245,268 @@
       "target": {
         "css": "#smartbanner, .smartbanner, .smart-banner, .app-banner, #app-banner, .app-download-banner, .install-app-banner"
       }
+    },
+    {
+      "id": "trailer-previews",
+      "label": "Trailer preview layer on cards",
+      "type": "hide",
+      "option": "trailer-previews",
+      "target": {
+        "css": "[class*=\"movieCard-module\"][class*=\"__trailerWrapper\"]"
+      }
+    },
+    {
+      "id": "hero-slider",
+      "label": "Home hero slider",
+      "type": "hide",
+      "option": "hero",
+      "target": {
+        "css": "div[class*=\"HomeBanner-module\"][class*=\"__heroRoot\"]:has(> section[class*=\"HomeBanner-module\"][class*=\"__billboard\"])"
+      }
+    },
+    {
+      "id": "hero-dots",
+      "label": "Featured titles tabs",
+      "type": "hide",
+      "option": "hero-dots",
+      "target": {
+        "css": "[role=\"tablist\"][aria-label=\"Featured titles\"]"
+      }
+    },
+    {
+      "id": "continue-watching",
+      "label": "Continue watching row",
+      "type": "hide",
+      "option": "continue-watching",
+      "target": {
+        "css": "div[data-row=\"cw\"]"
+      }
+    },
+    {
+      "id": "watchlist-row",
+      "label": "Watchlist row",
+      "type": "hide",
+      "option": "watchlist-row",
+      "target": {
+        "css": "div[data-row=\"wl\"]"
+      }
+    },
+    {
+      "id": "top10-row",
+      "label": "TOP 10 on Movy block",
+      "type": "hide",
+      "option": "top10-row",
+      "target": {
+        "css": "div[data-reveal=\"true\"]:has([class*=\"top10-module\"])"
+      }
+    },
+    {
+      "id": "upcoming-shows",
+      "label": "Current & upcoming TV shows row",
+      "type": "hide",
+      "option": "upcoming-shows",
+      "target": {
+        "css": "div[data-reveal=\"true\"]:has([role=\"group\"][aria-label^=\"Current\"])"
+      }
+    },
+    {
+      "id": "trending-row",
+      "label": "Trending row",
+      "type": "hide",
+      "option": "trending-row",
+      "target": {
+        "css": "div[data-reveal=\"true\"]:has([role=\"group\"][aria-label^=\"Trending\"])"
+      }
+    },
+    {
+      "id": "streaming-rail",
+      "label": "Streaming service rail",
+      "type": "hide",
+      "option": "streaming-rail",
+      "target": {
+        "css": "div[data-reveal=\"true\"]:has([role=\"group\"][aria-label^=\"Streaming services\"])"
+      }
+    },
+    {
+      "id": "new-4k-row",
+      "label": "Recently added in 4K row",
+      "type": "hide",
+      "option": "new-4k-row",
+      "target": {
+        "css": "div[data-reveal=\"true\"]:has([role=\"group\"][aria-label^=\"Recently added\"])"
+      }
+    },
+    {
+      "id": "top-rated-row",
+      "label": "Top rated row",
+      "type": "hide",
+      "option": "top-rated-row",
+      "target": {
+        "css": "div[data-reveal=\"true\"]:has([role=\"group\"][aria-label^=\"Top rated\"])"
+      }
+    },
+    {
+      "id": "genre-rail",
+      "label": "Popular Genres row",
+      "type": "hide",
+      "option": "genre-rail",
+      "target": {
+        "css": "div[data-reveal=\"true\"]:has([role=\"group\"][aria-label^=\"Popular Genres\"])"
+      }
+    },
+    {
+      "id": "thumbs-blur",
+      "label": "Posters, artwork and cast photos",
+      "type": "css",
+      "option": "thumbnails",
+      "choice": ["blur"],
+      "target": {
+        "css": "[class*=\"movieCard-module\"][class*=\"__movieCardPoster\"], [class*=\"movieCard-module\"][class*=\"__backdropPosterMobile\"], [class*=\"top10-module\"] img, [class*=\"heroFade-module\"][class*=\"__backdropWrap\"] img, [class*=\"about-module\"][class*=\"__photoImg\"]"
+      },
+      "declarations": {
+        "filter": "blur(14px)"
+      }
+    },
+    {
+      "id": "thumbs-hide-cards",
+      "label": "Card posters and top 10 artwork",
+      "type": "hide",
+      "option": "thumbnails",
+      "choice": ["hide"],
+      "target": {
+        "css": "[class*=\"movieCard-module\"][class*=\"__movieCardImage\"], [class*=\"top10-module-module\"][class*=\"__wallpaper\"], [class*=\"top10-module-module\"][class*=\"__poster\"]"
+      }
+    },
+    {
+      "id": "thumbs-hide-backdrop",
+      "label": "Hero and page backdrop",
+      "type": "hide",
+      "option": "thumbnails",
+      "choice": ["hide"],
+      "target": {
+        "css": "[class*=\"heroFade-module\"][class*=\"__backdropWrap\"]"
+      }
+    },
+    {
+      "id": "thumbs-hide-cast",
+      "label": "Cast photos",
+      "type": "hide",
+      "option": "thumbnails",
+      "choice": ["hide"],
+      "target": {
+        "css": "[class*=\"about-module\"][class*=\"__photo\"]"
+      }
+    },
+    {
+      "id": "synopsis-blur",
+      "label": "Plot and cast text",
+      "type": "css",
+      "option": "synopsis",
+      "choice": ["blur"],
+      "target": {
+        "css": "[class*=\"HeroCopy-module\"][class*=\"__description\"], [class*=\"top10-module-module\"][class*=\"__plot\"], [class*=\"top10-module-module\"][class*=\"__cast\"]"
+      },
+      "declarations": {
+        "filter": "blur(6px)"
+      }
+    },
+    {
+      "id": "synopsis-hide",
+      "label": "Plot and cast text",
+      "type": "hide",
+      "option": "synopsis",
+      "choice": ["hide"],
+      "target": {
+        "css": "[class*=\"HeroCopy-module\"][class*=\"__description\"], [class*=\"top10-module-module\"][class*=\"__plot\"], [class*=\"top10-module-module\"][class*=\"__cast\"]"
+      }
+    },
+    {
+      "id": "ratings",
+      "label": "Score numbers",
+      "type": "hide",
+      "option": "ratings",
+      "target": {
+        "css": ".media-card h3 + div > span:has(svg), [class*=\"HeroCopy-module\"][class*=\"__fact\"]:has([class*=\"__score\"])"
+      }
+    },
+    {
+      "id": "rank-badges",
+      "label": "Rank badges",
+      "type": "hide",
+      "option": "rank-badges",
+      "target": {
+        "css": "[class*=\"heroCallouts-module\"][class*=\"__signal\"], [class*=\"top10-module-module\"][class*=\"__rankBadge\"], [class*=\"movieCardImage\"] > div[aria-hidden=\"true\"]:has(.tabular-nums)"
+      }
+    },
+    {
+      "id": "quality-badges",
+      "label": "4K and age rating badges",
+      "type": "hide",
+      "option": "quality-badges",
+      "target": {
+        "css": "[class*=\"HeroCopy-module\"][class*=\"__fact\"]:has(> [class*=\"__badges\"])"
+      }
+    },
+    {
+      "id": "votes",
+      "label": "Community votes",
+      "type": "hide",
+      "option": "votes",
+      "target": {
+        "css": "[class*=\"HeroCopy-module\"][class*=\"__fact\"]:has([aria-label=\"Community votes\"])"
+      }
+    },
+    {
+      "id": "cast",
+      "label": "Cast section",
+      "type": "hide",
+      "option": "cast",
+      "target": {
+        "css": "section[class*=\"about-module\"][class*=\"__section\"]"
+      }
+    },
+    {
+      "id": "you-may-like",
+      "label": "You may like",
+      "type": "hide",
+      "option": "you-may-like",
+      "target": {
+        "css": "#you-may-like"
+      }
+    },
+    {
+      "id": "download-share",
+      "label": "Download and Share buttons",
+      "type": "hide",
+      "option": "download-share",
+      "target": {
+        "css": "[class*=\"HomeBanner-module\"][class*=\"__ctaRow\"] button.mv-btn--secondary:not([aria-label])"
+      }
+    },
+    {
+      "id": "episode-tools",
+      "label": "Episode toolbar",
+      "type": "hide",
+      "option": "episode-tools",
+      "target": {
+        "css": "#episodes-section [role=\"group\"][aria-label=\"Episode layout\"], #episodes-section button[title^=\"Search episode\"], #episodes-section button[title=\"Reverse episode order\"]"
+      }
+    },
+    {
+      "id": "footer",
+      "label": "Footer",
+      "type": "hide",
+      "option": "footer",
+      "target": {
+        "css": "footer"
+      }
     }
   ],
   "meta": {
     "author": "OpenMedia",
     "homepage": "https://www.movy.sx/",
-    "summary": "Cleans up cookie banners, ads and app prompts on Movy, a media site",
-    "notes": "**Not verified live.** The fixtures in `recipes/fixtures/movy/` are synthetic: hand-written pages that contain the targeted elements, not captures of the site, so the fixture test proves only that the selectors parse and spare protected content. These are generic cleanup rules, written from the selectors that common cookie-consent, ad and app-banner scripts use. They were not run against Movy; a rule that matches nothing on a page is harmless, but nothing here promises that this site shows any of them.\n\n- **Cookie banners** hides the OneTrust, Cookiebot, Quantcast, Didomi, Usercentrics, TrustArc and Osano dialogs and common `cc-window` / `#cookie-banner` boxes. Some sites lock page scroll while the dialog is open; hiding the dialog does not undo that.\n- **Ads** hides Google ad slots and ad iframes. Sites that serve their own ad markup are not covered.\n- **App banners** hides the Smart App Banner and common \"install our app\" strips.\n\nOpen a page, toggle the options in Settings and report anything that hides content you wanted."
+    "summary": "Cleans up Movy: trailer pop-ups, hero, home rows, posters, plots, scores and rankings",
+    "notes": "Checked 2026-11-17, logged out, by fetching the server-rendered HTML of https://www.movy.sx/ (home), /movie/1368337, /tv/213375, /browse/movie and /help with a plain HTTP client, plus the site's public JS bundles for component class names and strings. Movy is a Next.js app with CSS-module class names (`HomeBanner-module-scss-module__<hash>__heroRoot`): the hash changes per build, so rules match `[class*=\"HomeBanner-module\"][class*=\"__heroRoot\"]` (component and local name), the `role`/`aria-label` of each row's `role=\"group\"` track, `data-row`, `#you-may-like`, `#episodes-section` and button titles. The fixtures `home`, `movie` and `tv` (and their `desktop-` twins) are trimmed reconstructions of that markup; the site serves one responsive DOM to every viewer, so the pairs differ only in their header comment.\n\n- **Verified in the markup:** every home row and its heading, hero and tabs, TOP 10 block, rank badges, card score spans, poster images (lazy `data-gate-src`), genre tiles, footer; on title pages the hero facts, badges, votes, CTA buttons, Cast section, `You may like` (a phone row and a desktop grid, both `#you-may-like`) and the episode toolbar. `trailerWrapper` is empty in the HTML; the bundle fills it with a muted, looping, autoplaying `<video>` on hover.\n- **Not verified:** the player page (client-rendered, nothing to fetch without running the JS), server and subtitle pickers, Watch Party, profile and notification menus, search overlay and the Continue watching / Watchlist rows with real data (the HTML only has their `data-row` placeholders). No rule targets them.\n- **Cookie banners, ads and app banners** are the original generic rules and still use the synthetic fixtures `synthetic.html` / `desktop-synthetic.html`: none of the fetched pages contained a consent dialog, ad slot or app banner. Movy's help page says it shows ads and that blocking them can break playback; the site has its own Show ads switch in settings.\n- Hiding a trailer preview or a row does not stop the page loading it. Score hiding leaves the `·` separator before the year on cards. The home hero rule scopes itself with `:has(> section...__billboard)` because title pages reuse the same `heroRoot` class for their header and Play button.",
+    "lastVerified": "2026-11-17"
   }
 }

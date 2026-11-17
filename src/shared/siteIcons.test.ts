@@ -32,14 +32,14 @@ describe("the icons that ship with the app", () => {
       }
     }
     // Some sites block icon retrieval or expose no image favicon; their library rows fetch on demand.
-    expect(coveredHosts).toBeGreaterThanOrEqual(200);
+    expect(coveredHosts).toBeGreaterThanOrEqual(25);
   });
 });
 
 describe("bundledIconForHosts", () => {
   it("returns the same site's icon by homepage or host when one is bundled", () => {
     const recipes = Object.values(RECIPES);
-    expect(recipes.length).toBeGreaterThanOrEqual(18);
+    expect(recipes.length).toBeGreaterThanOrEqual(19);
     let covered = 0;
     for (const recipe of recipes) {
       const hosts = recipe.match.map((pattern) => new URL(pattern).hostname);
@@ -48,7 +48,7 @@ describe("bundledIconForHosts", () => {
       covered += 1;
       expect(bundledIconForHosts([recipe.meta.homepage]), `${recipe.id} homepage`).toBe(icon);
     }
-    expect(covered).toBeGreaterThanOrEqual(120);
+    expect(covered).toBeGreaterThanOrEqual(15);
   });
 
   it("tries the later entries, handles wildcards and skips unknown or empty ones", () => {

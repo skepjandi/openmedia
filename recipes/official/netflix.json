@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "market.official.netflix",
   "name": "Netflix",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "origin": "user",
   "tags": ["desktop", "mobile"],
   "match": ["https://*.netflix.com/*"],
@@ -76,6 +76,76 @@
       "description": "The contact, legal and language links at the bottom of the landing page.",
       "group": "content",
       "default": false
+    },
+    {
+      "id": "billboard",
+      "label": "Hide the top billboard",
+      "description": "The big promo banner with the featured title at the top of the Browse page.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "billboard-trailer",
+      "label": "Hide the billboard trailer video",
+      "description": "Stops the featured-title trailer that plays by itself behind the billboard; the still image stays.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "preview-trailers",
+      "label": "Hide preview trailers",
+      "description": "The video that plays when you hover a title or open its details panel.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "continue-watching",
+      "label": "Hide the Continue Watching row",
+      "description": "The row of half-watched titles on Browse.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "my-list",
+      "label": "Hide the My List row",
+      "description": "Your saved titles row on Browse.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "because-you-added",
+      "label": "Hide 'Because you added' rows",
+      "description": "Recommendation rows built from titles you added to your list.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "games-rows",
+      "label": "Hide Netflix Games rows",
+      "description": "Mobile-game rows (Popular Games and the personalised games shelf) on Browse.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "match-score",
+      "label": "Hide match percentages",
+      "description": "The '98% Match' figure on title cards and in the details panel.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "maturity-rating",
+      "label": "Hide maturity rating badges",
+      "description": "The age-rating box (16, TV-MA...) on title cards and in the details panel.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "more-like-this",
+      "label": "Hide 'More Like This'",
+      "description": "The grid of suggested titles under a title's details panel.",
+      "group": "content",
+      "default": false
     }
   ],
   "rules": [
@@ -122,7 +192,7 @@
       "option": "poster-art",
       "choice": ["blur"],
       "target": {
-        "css": "[data-uia=\"hero-vlv\"] img, button[data-uia^=\"top-10-element-\"] span[style*=\"background-image\"]"
+        "css": "[data-uia=\"hero-vlv\"] img, button[data-uia^=\"top-10-element-\"] span[style*=\"background-image\"], .boxart-image, .billboard .static-image"
       },
       "declarations": {
         "filter": "blur(14px)"
@@ -135,7 +205,7 @@
       "option": "poster-art",
       "choice": ["hide"],
       "target": {
-        "css": "[data-uia=\"hero-vlv\"] img, button[data-uia^=\"top-10-element-\"] span[style*=\"background-image\"]"
+        "css": "[data-uia=\"hero-vlv\"] img, button[data-uia^=\"top-10-element-\"] span[style*=\"background-image\"], .boxart-image, .billboard .static-image"
       }
     },
     {
@@ -164,13 +234,112 @@
       "target": {
         "css": "[data-uia=\"footer\"]"
       }
+    },
+    {
+      "id": "billboard",
+      "label": "Billboard",
+      "type": "hide",
+      "option": "billboard",
+      "target": {
+        "css": ".billboard-row"
+      }
+    },
+    {
+      "id": "billboard-trailer",
+      "label": "Billboard trailer",
+      "type": "hide",
+      "option": "billboard-trailer",
+      "target": {
+        "css": ".billboard-motion, .volatile-billboard-animations-container"
+      }
+    },
+    {
+      "id": "preview-trailers",
+      "label": "Preview trailers",
+      "type": "hide",
+      "option": "preview-trailers",
+      "target": {
+        "css": ".previewModal--container video, .previewModal--player_container"
+      }
+    },
+    {
+      "id": "continue-watching",
+      "label": "Continue Watching row",
+      "type": "hide",
+      "option": "continue-watching",
+      "target": {
+        "css": ".lolomoRow[data-list-context=\"continueWatching\"]"
+      }
+    },
+    {
+      "id": "my-list",
+      "label": "My List row",
+      "type": "hide",
+      "option": "my-list",
+      "target": {
+        "css": ".lolomoRow[data-list-context=\"queue\"]"
+      }
+    },
+    {
+      "id": "because-you-added",
+      "label": "Because you added rows",
+      "type": "hide",
+      "option": "because-you-added",
+      "target": {
+        "css": ".lolomoRow[data-list-context=\"becauseYouAdded\"]"
+      }
+    },
+    {
+      "id": "games-rows",
+      "label": "Games rows",
+      "type": "hide",
+      "option": "games-rows",
+      "target": {
+        "css": ".lolomoRow[data-list-context=\"popularGames\"], .lolomoRow[data-list-context=\"configbased_cloudpersonalizedgames\"]"
+      }
+    },
+    {
+      "id": "trending-browse",
+      "label": "Trending row on Browse",
+      "type": "hide",
+      "option": "trending-row",
+      "target": {
+        "css": ".lolomoRow[data-list-context=\"trending\"]"
+      }
+    },
+    {
+      "id": "match-score",
+      "label": "Match percentage",
+      "type": "hide",
+      "option": "match-score",
+      "target": {
+        "css": ".match-score, .match-score-wrapper"
+      }
+    },
+    {
+      "id": "maturity-rating",
+      "label": "Maturity rating",
+      "type": "hide",
+      "option": "maturity-rating",
+      "target": {
+        "css": ".maturity-rating, .maturity-number"
+      }
+    },
+    {
+      "id": "more-like-this",
+      "label": "More Like This",
+      "type": "hide",
+      "option": "more-like-this",
+      "target": {
+        "css": ".moreLikeThis--container"
+      }
     }
   ],
   "meta": {
     "author": "OpenMedia",
     "homepage": "https://www.netflix.com/",
-    "summary": "Netflix: hides sign-up forms on the landing page, blurs or hides poster art, can hide the Trending row, FAQ and footer",
-    "notes": "**Checked 2026-11-13**, logged out, headless Chrome, once with an iPhone UA and once with a desktop UA on https://www.netflix.com/ (it redirects to the regional landing page). Both UAs received the same responsive page, so one capture serves as both fixtures. Netflix does not show the logged-in catalogue to a logged-out visitor, so everything below is the marketing landing page only.\n\n- **Sign-up forms**: `form[data-uia=\"email-form\"]` 2 and `[data-uia=\"footer-signup\"]` 1 (LIVE). The Sign In link (`[data-uia=\"header-login-link\"]`) is never hidden.\n- **Poster and hero art**: `[data-uia=\"hero-vlv\"] img` 1 and `button[data-uia^=\"top-10-element-\"] span[style*=\"background-image\"]` 10 (LIVE); the posters are CSS background images, so only the box can be blurred.\n- **Trending row** `[data-uia=\"nmhp-top-10\"]` 1, **features and FAQ** `[data-uia=\"nmhp-full-value-props\"]` 1 and `[data-uia=\"nmhp-faq\"]` 1, **footer** `[data-uia=\"footer\"]` 1 (LIVE).\n\nNot verified (needs a login, which this project never uses): the browse page, the billboard trailer, Netflix Games rows, the title overlay when pausing, profiles. Community lists mention those, but no selector could be re-checked here, so none are included. Class names are hashed (`default-ltr-iqcdef-cache-...`) and are not used; selectors rely on `data-uia` values.",
-    "lastVerified": "2026-11-13"
+    "summary": "Netflix: hides the billboard, trailers, rows, match and rating badges, blurs or hides poster art, plus sign-up forms and footer",
+    "notes": "**Checked 2026-11-13**, logged out, headless Chrome, once with an iPhone UA and once with a desktop UA on https://www.netflix.com/ (it redirects to the regional landing page). Both UAs received the same responsive page, so one capture serves as both fixtures. Netflix does not show the logged-in catalogue to a logged-out visitor, so everything below is the marketing landing page only.\n\n- **Sign-up forms**: `form[data-uia=\"email-form\"]` 2 and `[data-uia=\"footer-signup\"]` 1 (LIVE). The Sign In link (`[data-uia=\"header-login-link\"]`) is never hidden.\n- **Poster and hero art**: `[data-uia=\"hero-vlv\"] img` 1 and `button[data-uia^=\"top-10-element-\"] span[style*=\"background-image\"]` 10 (LIVE); the posters are CSS background images, so only the box can be blurred.\n- **Trending row** `[data-uia=\"nmhp-top-10\"]` 1, **features and FAQ** `[data-uia=\"nmhp-full-value-props\"]` 1 and `[data-uia=\"nmhp-faq\"]` 1, **footer** `[data-uia=\"footer\"]` 1 (LIVE).\n\nNot verified (needs a login, which this project never uses): the browse page, the billboard trailer, Netflix Games rows, the title overlay when pausing, profiles. Community lists mention those, but no selector could be re-checked here, so none are included. Class names are hashed (`default-ltr-iqcdef-cache-...`) and are not used; selectors rely on `data-uia` values.\n\n**Added 2026-11-17 (logged-in Browse, NOT live-verified)**: selectors come from public community sources, not from a capture, and are exercised only by the trimmed reconstruction `browse.html` / `desktop-browse.html`. Sources: uBlock Origin netflix.com filters (`.billboard-row`), bbbbbr/netflix-disable-auto-play-and-more, Greasy Fork \"Netflix Disable Billboard Video\" (`.billboard-motion`), the r/uBlockOrigin \"Hiding Netflix Games\" post (`.lolomoRow[data-list-context=\"popularGames\"]`), JustZix Netflix examples (`data-list-context` values `queue`, `continueWatching`, `trending`, `becauseYouAdded`, `.volatile-billboard-animations-container`, `.previewModal--container`). The names `.match-score`, `.maturity-rating`, `.moreLikeThis--container`, `.previewModal--player_container`, `.boxart-image` and `.static-image` are recalled from community styles and could not be re-checked; Netflix renames classes without notice, so a rule that stops matching is expected to be silent. The hover preview shares its container with the details panel, so only its video is hidden. The logged-out Top 10 row stays under its own option.",
+    "lastVerified": "2026-11-17"
   }
 }

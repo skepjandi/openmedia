@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "market.official.spotify",
   "name": "Spotify",
-  "version": "1.1.0",
+  "version": "2.0.0",
   "origin": "user",
   "tags": ["desktop", "mobile"],
   "match": ["https://*.spotify.com/*"],
@@ -88,6 +88,111 @@
       "id": "footer-links",
       "label": "Hide footer and legal links",
       "description": "The legal links under the left library column and the footer links at the bottom of the phone home page.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "now-playing-view",
+      "label": "Hide the Now playing view panel",
+      "description": "The right-hand Now playing view panel with the big cover art, credits and queue.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "library-sidebar",
+      "label": "Hide the left library sidebar",
+      "description": "The Your Library column on the left, including its legal links and language button.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "browse-button",
+      "label": "Hide the Browse button",
+      "description": "The Browse button next to the search box in the top bar.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "signup-button",
+      "label": "Hide the Sign up button",
+      "description": "The Sign up button in the top bar; Log in stays.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "language-button",
+      "label": "Hide the language button",
+      "description": "The English / language picker button at the bottom of the left sidebar.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "page-footer",
+      "label": "Hide the page footer links",
+      "description": "The Company, Communities and Useful links block and social icons at the bottom of Home.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "play-buttons",
+      "label": "Hide the green Play buttons on cards",
+      "description": "The round Play button that appears over album, artist and playlist cards.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "carousel-arrows",
+      "label": "Hide shelf arrows",
+      "description": "The previous and next arrows on the home shelves.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "shelf-trending",
+      "label": "Hide the Trending songs shelf",
+      "description": "The Trending songs row on Home.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "shelf-artists",
+      "label": "Hide the Popular artists shelf",
+      "description": "The Popular artists row on Home.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "shelf-albums",
+      "label": "Hide the Popular albums and singles shelf",
+      "description": "The Popular albums and singles row on Home.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "shelf-radio",
+      "label": "Hide the Popular radio shelf",
+      "description": "The Popular radio row on Home.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "shelf-charts",
+      "label": "Hide the Featured Charts shelf",
+      "description": "The Featured Charts row (Top Songs, Top 50) on Home.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "shelf-podcasts",
+      "label": "Hide podcast shelves",
+      "description": "The Shows to try and Episodes for you rows (listed by a public filter list, shown for some accounts).",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "shelf-for-you",
+      "label": "Hide Made For You and Recently played shelves",
+      "description": "The personal Made For You and Recently played rows (named by a userscript; shown when signed in).",
       "group": "content",
       "default": false
     }
@@ -201,13 +306,148 @@
       "target": {
         "css": "[data-testid=\"left-sidebar-footer\"], [data-testid=\"masthead-footer\"]"
       }
+    },
+    {
+      "id": "now-playing-view",
+      "label": "Now playing view panel",
+      "type": "hide",
+      "option": "now-playing-view",
+      "target": {
+        "css": "aside[aria-label=\"Now playing view\"]"
+      }
+    },
+    {
+      "id": "library-sidebar",
+      "label": "Left library sidebar",
+      "type": "hide",
+      "option": "library-sidebar",
+      "target": {
+        "css": "nav[aria-label=\"Main\"]"
+      }
+    },
+    {
+      "id": "browse-button",
+      "label": "Browse button",
+      "type": "hide",
+      "option": "browse-button",
+      "target": {
+        "css": "[data-testid=\"browse-button\"]"
+      }
+    },
+    {
+      "id": "signup-button",
+      "label": "Sign up button",
+      "type": "hide",
+      "option": "signup-button",
+      "target": {
+        "css": "[data-testid=\"signup-button\"]"
+      }
+    },
+    {
+      "id": "language-button",
+      "label": "Language button",
+      "type": "hide",
+      "option": "language-button",
+      "target": {
+        "css": "[data-testid=\"language-selection-button\"]"
+      }
+    },
+    {
+      "id": "page-footer",
+      "label": "Page footer links",
+      "type": "hide",
+      "option": "page-footer",
+      "target": {
+        "css": "[data-testid=\"footer-div\"]"
+      }
+    },
+    {
+      "id": "play-buttons",
+      "label": "Card Play buttons",
+      "type": "hide",
+      "option": "play-buttons",
+      "target": {
+        "css": "[data-testid=\"play-button\"]"
+      }
+    },
+    {
+      "id": "carousel-arrows",
+      "label": "Shelf arrows",
+      "type": "hide",
+      "option": "carousel-arrows",
+      "target": {
+        "css": "[data-testid=\"carousel-previous-button\"], [data-testid=\"carousel-next-button\"]"
+      }
+    },
+    {
+      "id": "shelf-trending",
+      "label": "Trending songs shelf",
+      "type": "hide",
+      "option": "shelf-trending",
+      "target": {
+        "css": "section[data-testid=\"component-shelf\"][aria-label=\"Trending songs\"]"
+      }
+    },
+    {
+      "id": "shelf-artists",
+      "label": "Popular artists shelf",
+      "type": "hide",
+      "option": "shelf-artists",
+      "target": {
+        "css": "section[data-testid=\"component-shelf\"][aria-label=\"Popular artists\"]"
+      }
+    },
+    {
+      "id": "shelf-albums",
+      "label": "Popular albums and singles shelf",
+      "type": "hide",
+      "option": "shelf-albums",
+      "target": {
+        "css": "section[data-testid=\"component-shelf\"][aria-label=\"Popular albums and singles\"]"
+      }
+    },
+    {
+      "id": "shelf-radio",
+      "label": "Popular radio shelf",
+      "type": "hide",
+      "option": "shelf-radio",
+      "target": {
+        "css": "section[data-testid=\"component-shelf\"][aria-label=\"Popular radio\"]"
+      }
+    },
+    {
+      "id": "shelf-charts",
+      "label": "Featured Charts shelf",
+      "type": "hide",
+      "option": "shelf-charts",
+      "target": {
+        "css": "section[data-testid=\"component-shelf\"][aria-label=\"Featured Charts\"]"
+      }
+    },
+    {
+      "id": "shelf-podcasts",
+      "label": "Podcast shelves",
+      "type": "hide",
+      "option": "shelf-podcasts",
+      "target": {
+        "css": "section[data-testid=\"component-shelf\"][aria-label=\"Shows to try\"], section[data-testid=\"component-shelf\"][aria-label=\"Episodes for you\"]"
+      }
+    },
+    {
+      "id": "shelf-for-you",
+      "label": "Made For You and Recently played shelves",
+      "type": "hide",
+      "option": "shelf-for-you",
+      "target": {
+        "css": "section[data-testid=\"component-shelf\"][aria-label=\"Made For You\"], section[data-testid=\"component-shelf\"][aria-label=\"Recently played\"]"
+      }
     }
   ],
   "meta": {
     "author": "OpenMedia",
     "homepage": "https://open.spotify.com/",
-    "summary": "Hides Spotify's sign-up bar and Premium promos; blur or hide cover art; dim or hide home shelves",
-    "notes": "Checked 2026-11-13, logged out, real Chrome (headless): iPhone UA 390x844 and desktop UA on open.spotify.com (home), DOM captured after 7 seconds. Fixtures `real.html` and `desktop-real.html` are sanitised excerpts of that DOM (text stripped, only needed ancestors, `data-keep` on main view, Log in button, player controls and the phone tab bar).\n\nLIVE desktop: `[data-testid=\"signup-bar\"]` 1, `#global-nav-bar a[href=\"/download\"]` 1, `[data-testid=\"card-image\"]` 54, `[data-testid=\"component-shelf\"]` 5, `[data-testid=\"left-sidebar-footer\"]` 1, Log in and Sign up buttons 1 each. LIVE phone: `[data-testid=\"premium-banner\"]` 1, `[data-testid=\"home-card\"] img` 84, `[data-testid=\"carousel-mwp\"]` 5, `[data-testid=\"masthead-footer\"]` 1. The original cookie rule matched `#onetrust-consent-sdk` and its banner (2) on both; ad and app-banner rules matched nothing.\n\nChoices: Cover art Show/Blur/Hide; Home shelves Show/Dim/Hide. The selectors use Spotify's data-testid attributes; the generated class names are hashed and are not used.\n\nNOT verified: logged-in player; album, artist and playlist pages (track-list covers, artist headers); the language modal (left alone); the Premium, Support and Download buttons in the top bar (no stable attribute, text only, so not touched); non-English locales for aria labels (none are used).\n",
-    "lastVerified": "2026-11-13"
+    "summary": "Hides Spotify's sign-up bar and Premium promos; toggles for shelves, sidebars, buttons, footer; blur or hide cover art",
+    "notes": "Checked 2026-11-13, logged out, real Chrome (headless): iPhone UA 390x844 and desktop UA on open.spotify.com (home), DOM captured after 7 seconds. Fixtures `real.html` and `desktop-real.html` are sanitised excerpts of that DOM (text stripped, only needed ancestors, `data-keep` on main view, Log in button, player controls and the phone tab bar).\n\nLIVE desktop: `[data-testid=\"signup-bar\"]` 1, `#global-nav-bar a[href=\"/download\"]` 1, `[data-testid=\"card-image\"]` 54, `[data-testid=\"component-shelf\"]` 5, `[data-testid=\"left-sidebar-footer\"]` 1, Log in and Sign up buttons 1 each. LIVE phone: `[data-testid=\"premium-banner\"]` 1, `[data-testid=\"home-card\"] img` 84, `[data-testid=\"carousel-mwp\"]` 5, `[data-testid=\"masthead-footer\"]` 1. The original cookie rule matched `#onetrust-consent-sdk` and its banner (2) on both; ad and app-banner rules matched nothing.\n\nChoices: Cover art Show/Blur/Hide; Home shelves Show/Dim/Hide. The selectors use Spotify's data-testid attributes; the generated class names are hashed and are not used.\n\n**Second check (2026-11-17).** Opened `https://open.spotify.com/` logged out in a desktop-UA browser at 1440×900 and read the DOM 9 seconds after load. `recipes/fixtures/spotify/desktop-live-home.html` is a trimmed reconstruction of what was found. Seen live and used: `aside[aria-label=\"Now playing view\"]`, `nav[aria-label=\"Main\"]` (the left sidebar), `[data-testid=\"browse-button\"]`, `signup-button`, `language-selection-button`, `footer-div`, `play-button` (40), `carousel-previous-button` and `carousel-next-button`, and home shelves labelled Trending songs, Popular artists, Popular albums and singles, Popular radio and Featured Charts.\n\nNOT verified: Shows to try, Episodes for you, Made For You and Recently played did not appear on the logged-out page; their labels come from a public uBlock filter list (nkorth.com/ublock.html) and a userscript, so those two options may do nothing for some accounts. Shelf rules match English shelf titles. Logged-in player and pages, the phone layout for the new options, album, artist and playlist pages; the Premium, Support and Download buttons in the top bar (no stable attribute, text only, so not touched). Ads: the Now playing bar exposes `data-testadtype` and the audio ads themselves cannot be removed by CSS.",
+    "lastVerified": "2026-11-17"
   }
 }

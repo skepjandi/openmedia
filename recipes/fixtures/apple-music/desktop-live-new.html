@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Apple Music fixture (desktop): trimmed reconstruction of the logged-out New page, captured 2026-11-17</title></head>
+<body>
+<!-- Trimmed reconstruction, not a verbatim capture. Attributes and nesting follow the live DOM of
+     https://music.apple.com/us/new read on 2026-11-17 (logged out, desktop Chrome UA, 1440x900, 9 seconds after load);
+     text, links and artwork are stripped and the 20+ shelves reduced to one of each kind. -->
+<div data-testid="app-container">
+  <nav data-testid="navigation">
+    <div data-testid="navigation-content" id="navigation">
+      <div data-testid="navigation-items-primary">
+        <ul>
+          <li data-testid="navigation-item"><a data-testid="search" role="button" href="/us/search" data-keep>Search</a></li>
+          <li data-testid="navigation-item"><a data-testid="home" role="button" href="/us/home" data-keep>Home</a></li>
+          <li data-testid="navigation-item"><a data-testid="new" role="button" href="/us/new" data-keep>New</a></li>
+          <li data-testid="navigation-item"><a data-testid="radio" role="button" href="/us/radio">Radio</a></li>
+        </ul>
+      </div>
+    </div>
+    <div>
+      <div data-testid="native-cta"><button data-testid="native-cta-button"><span>Open in Music</span></button></div>
+      <div data-testid="auth-content"><button data-testid="sign-in-button" tabindex="0">Sign In</button></div>
+    </div>
+  </nav>
+  <div data-testid="main-section">
+    <main data-testid="main">
+      <div data-testid="content-container">
+        <div data-testid="header-component-model" aria-hidden="false" data-keep><h1>New</h1></div>
+        <div data-testid="upsell-banner">
+          <div data-testid="upsell-banner-inline">
+            <button data-testid="upsell-banner-close" aria-label="Close"></button>
+            <p data-testid="upsell-banner-title">Explore 100 million songs.</p>
+            <div data-testid="upsell-banner-cta"><button data-testid="button-base">Try It Now</button></div>
+          </div>
+        </div>
+        <div data-testid="section-container" aria-label="Featured">
+          <section data-testid="shelf-component"><div data-testid="editorial-card-wrapper"><div data-testid="artwork-component"></div><div data-testid="play-button"></div></div></section>
+        </div>
+        <div data-testid="section-container" aria-label="2027 Grammy Nominees">
+          <section data-testid="shelf-component">
+            <div data-testid="square-lockup-wrapper"><div data-testid="product-lockup"><div data-testid="artwork-component"></div><span data-testid="explicit-badge" aria-label="Explicit"></span></div></div>
+          </section>
+        </div>
+        <div data-testid="section-container" aria-label="Best New Songs">
+          <section data-testid="shelf-component"><div data-testid="track-lockup"><div data-testid="track-lockup-artwork"></div></div></section>
+        </div>
+        <div data-testid="section-container" aria-label="Nonstop Holiday Hits">
+          <section data-testid="shelf-component"><div data-testid="vertical-video"><div data-testid="vertical-video-artwork-wrapper"></div></div></section>
+        </div>
+        <div data-testid="section-container" aria-label="Trending Songs"><section data-testid="shelf-component"></section></div>
+        <div data-testid="section-container" aria-label="Daily Top 100"><section data-testid="shelf-component"></section></div>
+        <div data-testid="section-container" aria-label="City Charts"><section data-testid="shelf-component"></section></div>
+        <div data-testid="section-container" aria-label="Now on Tour"><section data-testid="shelf-component"></section></div>
+        <div data-testid="section-container" aria-label="Latest DJ Mixes"><section data-testid="shelf-component"></section></div>
+        <div data-testid="section-container" aria-label="Listen to Live Radio Now"><section data-testid="shelf-component"></section></div>
+        <div data-testid="section-container" aria-label="New Radio Episodes"><section data-testid="shelf-component"><div data-testid="horizontal-lockup"></div></section></div>
+        <div data-testid="section-container" aria-label="New Music Videos"><section data-testid="shelf-component"></section></div>
+        <div data-testid="section-container" aria-label="More to Explore"><ul data-testid="grid"><li data-testid="grid-item"><div data-testid="link-component"></div></li></ul></div>
+      </div>
+    </main>
+    <footer data-testid="footer">
+      <button data-testid="locale-switcher-button">United States</button>
+      <ul><li data-testid="terms-of-use"></li><li data-testid="privacy-policy"></li></ul>
+    </footer>
+  </div>
+  <div data-testid="player-bar" aria-label="Music controls">
+    <div data-testid="chrome-player">
+      <div data-testid="playback-controls"></div>
+      <div data-testid="player-lcd"></div>
+      <button data-testid="up-next-button" aria-label="Up Next"></button>
+      <div data-testid="chrome-volume"><button data-testid="volume-button"></button></div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

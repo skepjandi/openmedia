@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>YouTube Music fixture (desktop): trimmed reconstruction of the logged-out home page, captured 2026-11-17</title></head>
+<body>
+<!-- Trimmed reconstruction, not a verbatim capture. Element names, attributes and nesting follow the live DOM of
+     https://music.youtube.com/ read on 2026-11-17 (logged out, desktop Chrome UA, 1440x900, 9 seconds after load);
+     text and generated ids are stripped.
+     NOT seen live: ytmusic-pivot-bar-item-renderer[tab-id="FEmusic_explore"] (the narrow-layout tab bar was not
+     rendered at 1440px; the tab id is the one the YouTube Music web app uses for Explore). -->
+<ytmusic-app>
+  <ytmusic-app-layout>
+    <ytmusic-nav-bar role="navigation">
+      <div id="left-content">
+        <yt-icon-button id="guide-button"><button aria-label="Guide" data-keep></button></yt-icon-button>
+        <ytmusic-logo><a aria-label="Home" href="/" data-keep></a></ytmusic-logo>
+      </div>
+      <ytmusic-search-box role="search">
+        <div aria-label="Search">
+          <div>
+            <input role="combobox" id="input" data-keep>
+          </div>
+          <div role="listbox" id="suggestion-list"></div>
+        </div>
+      </ytmusic-search-box>
+    </ytmusic-nav-bar>
+  </ytmusic-app-layout>
+  <tp-yt-app-drawer>
+    <ytmusic-guide-renderer id="guide-renderer">
+      <div id="sections">
+        <ytmusic-guide-section-renderer is-primary="">
+          <ytmusic-guide-entry-renderer is-primary=""><tp-yt-paper-item role="link">Home</tp-yt-paper-item></ytmusic-guide-entry-renderer>
+          <ytmusic-guide-entry-renderer is-primary=""><tp-yt-paper-item role="link">Explore</tp-yt-paper-item></ytmusic-guide-entry-renderer>
+        </ytmusic-guide-section-renderer>
+        <ytmusic-guide-signin-promo-renderer>
+          <yt-formatted-string>Sign in</yt-formatted-string>
+          <yt-button-renderer id="sign-in-button"><yt-button-shape><button aria-label="Sign in"></button></yt-button-shape></yt-button-renderer>
+        </ytmusic-guide-signin-promo-renderer>
+      </div>
+    </ytmusic-guide-renderer>
+  </tp-yt-app-drawer>
+  <ytmusic-pivot-bar-item-renderer tab-id="FEmusic_explore">Explore</ytmusic-pivot-bar-item-renderer>
+  <ytmusic-browse-response>
+    <ytmusic-section-list-renderer>
+      <ytmusic-chip-cloud-renderer>
+        <iron-selector>
+          <ytmusic-chip-cloud-chip-renderer chip-style="STYLE_LARGE_TRANSLUCENT_AND_SELECTED_WHITE"><a role="tab">Relax</a></ytmusic-chip-cloud-chip-renderer>
+          <ytmusic-chip-cloud-chip-renderer chip-style="STYLE_LARGE_TRANSLUCENT_AND_SELECTED_WHITE"><a role="tab">Sleep</a></ytmusic-chip-cloud-chip-renderer>
+        </iron-selector>
+      </ytmusic-chip-cloud-renderer>
+      <ytmusic-carousel-shelf-renderer header-style="MUSIC_CAROUSEL_SHELF_BASIC_HEADER_STYLE_DEFAULT">
+        <ytmusic-carousel-shelf-basic-header-renderer><yt-formatted-string role="heading">Tamil Hits</yt-formatted-string></ytmusic-carousel-shelf-basic-header-renderer>
+        <ytmusic-carousel>
+          <ytmusic-two-row-item-renderer role="listitem">
+            <ytmusic-thumbnail-renderer class="image"><yt-img-shadow></yt-img-shadow></ytmusic-thumbnail-renderer>
+            <ytmusic-item-thumbnail-overlay-renderer><ytmusic-play-button-renderer aria-label="Play Kollywood Hitlist" role="button"></ytmusic-play-button-renderer></ytmusic-item-thumbnail-overlay-renderer>
+            <a href="playlist?list=RDCLAK5uy_nTbyVypdXPQd00z15bTWjZr7pG-26yyQ4">Kollywood Hitlist</a>
+            <ytmusic-inline-badge-renderer><yt-icon aria-label="Explicit"></yt-icon></ytmusic-inline-badge-renderer>
+          </ytmusic-two-row-item-renderer>
+        </ytmusic-carousel>
+      </ytmusic-carousel-shelf-renderer>
+      <ytmusic-tastebuilder-shelf-renderer>
+        <h2 tabindex="-1"><yt-formatted-string>Tell us which artists you like</yt-formatted-string></h2>
+        <yt-button-renderer><yt-button-shape><button aria-label="Let's go"></button></yt-button-shape></yt-button-renderer>
+      </ytmusic-tastebuilder-shelf-renderer>
+    </ytmusic-section-list-renderer>
+  </ytmusic-browse-response>
+  <ytmusic-content-update-chip role="alertdialog"></ytmusic-content-update-chip>
+  <ytmusic-player-page id="player-page">
+    <div id="main-panel">
+      <div id="av-id"><ytmusic-av-toggle></ytmusic-av-toggle></div>
+      <ytmusic-player role="region" id="player">
+        <div id="song-image"><yt-img-shadow id="thumbnail"></yt-img-shadow></div>
+        <div id="song-video" data-keep></div>
+      </ytmusic-player>
+    </div>
+    <div id="side-panel">
+      <tp-yt-paper-tabs role="tablist"></tp-yt-paper-tabs>
+      <ytmusic-tab-renderer id="tab-renderer"><ytmusic-player-queue id="queue"></ytmusic-player-queue></ytmusic-tab-renderer>
+    </div>
+  </ytmusic-player-page>
+  <ytmusic-player-bar aria-label="Player bar" role="toolbar" data-keep>
+    <ytmusic-like-button-renderer></ytmusic-like-button-renderer>
+    <ytmusic-playback-rate-renderer><button aria-label="Playback Speed"></button></ytmusic-playback-rate-renderer>
+    <button aria-label="Shuffle"></button>
+  </ytmusic-player-bar>
+</ytmusic-app>
+</body>
+</html>

@@ -522,7 +522,7 @@ mod tests {
         }
         assert_eq!(popular_rank("market.official.youtube"), Some(0));
         assert_eq!(popular_rank("market.official.messages-hub"), None);
-        assert!(is_new("market.official.perplexity"));
+        assert!(is_new("market.official.movy"));
         assert!(!is_new("market.official.instagram"));
     }
 

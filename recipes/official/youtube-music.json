@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "market.official.youtube-music",
   "name": "YouTube Music",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "origin": "user",
   "tags": ["desktop", "mobile"],
   "match": ["https://music.youtube.com/*"],
@@ -34,6 +34,132 @@
       "description": "Cookie-consent dialogs from the common consent platforms.",
       "group": "annoyance",
       "default": true
+    },
+    {
+      "id": "signin-promo",
+      "label": "Hide the sidebar sign-in prompt",
+      "description": "The \"Sign in to create & share playlists\" card with a Sign in button in the left sidebar.",
+      "group": "annoyance",
+      "default": true
+    },
+    {
+      "id": "tastebuilder",
+      "label": "Hide \"Tell us which artists you like\"",
+      "description": "The taste-builder card on Home that asks you to pick artists for recommendations.",
+      "group": "annoyance",
+      "default": true
+    },
+    {
+      "id": "update-chip",
+      "label": "Hide the new-content refresh chip",
+      "description": "The pop-over chip that offers to refresh the page when newer content is available.",
+      "group": "annoyance",
+      "default": true
+    },
+    {
+      "id": "mood-chips",
+      "label": "Hide mood and genre chips",
+      "description": "The Relax, Sleep, Sad, Workout... chip row at the top of Home.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "home-shelves",
+      "label": "Home shelves",
+      "description": "Show, dim or hide the carousel rows of playlists, albums and mixes on Home and other browse pages.",
+      "group": "content",
+      "choices": [
+        {
+          "id": "show",
+          "label": "Show"
+        },
+        {
+          "id": "dim",
+          "label": "Dim"
+        },
+        {
+          "id": "hide",
+          "label": "Hide"
+        }
+      ],
+      "default": "show"
+    },
+    {
+      "id": "cover-art",
+      "label": "Cover art",
+      "description": "Show, blur or hide thumbnails on shelves and the big album picture in the player.",
+      "group": "content",
+      "choices": [
+        {
+          "id": "show",
+          "label": "Show"
+        },
+        {
+          "id": "blur",
+          "label": "Blur"
+        },
+        {
+          "id": "hide",
+          "label": "Hide"
+        }
+      ],
+      "default": "show"
+    },
+    {
+      "id": "explicit-badge",
+      "label": "Hide Explicit badges",
+      "description": "The small Explicit (E) badge next to track and album names.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "av-toggle",
+      "label": "Hide the Song / Video switch",
+      "description": "The Song and Video toggle above the player, so video is never one click away.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "side-panel",
+      "label": "Hide Up next, Lyrics and Related panel",
+      "description": "The right-hand panel on the player page with the queue, lyrics and related tabs.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "like-buttons",
+      "label": "Hide like and dislike buttons",
+      "description": "The thumbs up and thumbs down buttons in the player bar.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "playback-speed",
+      "label": "Hide the playback speed button",
+      "description": "The playback speed control in the player bar.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "guide-sidebar",
+      "label": "Hide the left sidebar",
+      "description": "The sidebar with Home, Explore, Library, playlists and the sign-in card.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "search-suggestions",
+      "label": "Hide search suggestions",
+      "description": "The suggestion list that drops down while you type in the search box. Results still load.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "explore-tab",
+      "label": "Hide the Explore tab",
+      "description": "The Explore tab in the narrow-layout tab bar (new releases, charts, moods and genres).",
+      "group": "content",
+      "default": false
     }
   ],
   "rules": [
@@ -81,12 +207,167 @@
       "target": {
         "css": "#onetrust-consent-sdk, #onetrust-banner-sdk, #CybotCookiebotDialog, #qc-cmp2-container, .fc-consent-root, #didomi-host, #usercentrics-root, #truste-consent-track, .osano-cm-window, .cc-window, #cookie-banner, #cookie-notice, #cookieBanner"
       }
+    },
+    {
+      "id": "signin-promo",
+      "label": "Sidebar sign-in prompt",
+      "type": "hide",
+      "option": "signin-promo",
+      "target": {
+        "css": "ytmusic-guide-signin-promo-renderer"
+      }
+    },
+    {
+      "id": "tastebuilder",
+      "label": "Taste-builder shelf",
+      "type": "hide",
+      "option": "tastebuilder",
+      "target": {
+        "css": "ytmusic-tastebuilder-shelf-renderer"
+      }
+    },
+    {
+      "id": "update-chip",
+      "label": "Content update chip",
+      "type": "hide",
+      "option": "update-chip",
+      "target": {
+        "css": "ytmusic-content-update-chip"
+      }
+    },
+    {
+      "id": "mood-chips",
+      "label": "Mood and genre chips",
+      "type": "hide",
+      "option": "mood-chips",
+      "target": {
+        "css": "ytmusic-chip-cloud-renderer"
+      }
+    },
+    {
+      "id": "home-shelves-dim",
+      "label": "Home shelves",
+      "type": "css",
+      "option": "home-shelves",
+      "choice": ["dim"],
+      "target": {
+        "css": "ytmusic-carousel-shelf-renderer"
+      },
+      "declarations": {
+        "opacity": "0.35"
+      }
+    },
+    {
+      "id": "home-shelves-hide",
+      "label": "Home shelves",
+      "type": "hide",
+      "option": "home-shelves",
+      "choice": ["hide"],
+      "target": {
+        "css": "ytmusic-carousel-shelf-renderer"
+      }
+    },
+    {
+      "id": "cover-art-blur",
+      "label": "Thumbnails and player picture",
+      "type": "css",
+      "option": "cover-art",
+      "choice": ["blur"],
+      "target": {
+        "css": "ytmusic-thumbnail-renderer, ytmusic-player #song-image"
+      },
+      "declarations": {
+        "filter": "blur(12px)"
+      }
+    },
+    {
+      "id": "cover-art-hide",
+      "label": "Thumbnails and player picture",
+      "type": "hide",
+      "option": "cover-art",
+      "choice": ["hide"],
+      "target": {
+        "css": "ytmusic-thumbnail-renderer, ytmusic-player #song-image"
+      }
+    },
+    {
+      "id": "explicit-badge",
+      "label": "Explicit badges",
+      "type": "hide",
+      "option": "explicit-badge",
+      "target": {
+        "css": "ytmusic-inline-badge-renderer"
+      }
+    },
+    {
+      "id": "av-toggle",
+      "label": "Song / Video switch",
+      "type": "hide",
+      "option": "av-toggle",
+      "target": {
+        "css": "ytmusic-av-toggle"
+      }
+    },
+    {
+      "id": "side-panel",
+      "label": "Player side panel",
+      "type": "hide",
+      "option": "side-panel",
+      "target": {
+        "css": "ytmusic-player-page #side-panel"
+      }
+    },
+    {
+      "id": "like-buttons",
+      "label": "Like and dislike buttons",
+      "type": "hide",
+      "option": "like-buttons",
+      "target": {
+        "css": "ytmusic-player-bar ytmusic-like-button-renderer"
+      }
+    },
+    {
+      "id": "playback-speed",
+      "label": "Playback speed button",
+      "type": "hide",
+      "option": "playback-speed",
+      "target": {
+        "css": "ytmusic-player-bar ytmusic-playback-rate-renderer"
+      }
+    },
+    {
+      "id": "guide-sidebar",
+      "label": "Left sidebar",
+      "type": "hide",
+      "option": "guide-sidebar",
+      "target": {
+        "css": "ytmusic-guide-renderer"
+      }
+    },
+    {
+      "id": "search-suggestions",
+      "label": "Search suggestion list",
+      "type": "hide",
+      "option": "search-suggestions",
+      "target": {
+        "css": "ytmusic-search-box #suggestion-list"
+      }
+    },
+    {
+      "id": "explore-tab",
+      "label": "Explore tab",
+      "type": "hide",
+      "option": "explore-tab",
+      "target": {
+        "css": "ytmusic-pivot-bar-item-renderer[tab-id=\"FEmusic_explore\"]"
+      }
     }
   ],
   "meta": {
     "author": "OpenMedia",
     "homepage": "https://music.youtube.com/",
-    "summary": "Hides YouTube Music promo banners, the Premium upsell pop-up, and optionally the Upgrade tab",
-    "notes": "**Live check (2026-11-13).** Checked `https://music.youtube.com/` in logged-out desktop Chromium at 1512×862. The page showed the public home feed and sign-in prompt; none of the four `ytmusic-*` / `SPunlimited` selectors or the common cookie selectors matched. The promo/dialog rules remain unverified because they may require a signed-in or triggered state. `recipes/fixtures/youtube-music/` contains synthetic contract fixtures, not site captures.\n\nThe recipe covers `music.youtube.com` only. The separate YouTube recipe covers `www.youtube.com` and `m.youtube.com`.\n\n- **Promo banners** and the **Premium upsell** are on by default.\n- **Upgrade tab** is off by default: it is a navigation entry you may want.\n- Ads inside playback are not touched: CSS cannot remove them."
+    "summary": "Hides YouTube Music promos, Premium nags and sign-in cards; toggles for shelves, chips, cover art, the player panel and more",
+    "notes": "**Live check (2026-11-17).** Opened `https://music.youtube.com/` logged out in a desktop-UA browser at 1440×900 and read the DOM 9 seconds after load, including the Polymer shadow children. `recipes/fixtures/youtube-music/desktop-live-home.html` is a trimmed reconstruction of that structure (not a verbatim capture).\n\nSeen live and used: `ytmusic-guide-signin-promo-renderer` 1, `ytmusic-tastebuilder-shelf-renderer` 1, `ytmusic-chip-cloud-renderer` (Relax, Sleep, Sad, Romance... 10 chips), `ytmusic-carousel-shelf-renderer` 3, `ytmusic-thumbnail-renderer`, `ytmusic-inline-badge-renderer` (Explicit), `ytmusic-content-update-chip`, `ytmusic-av-toggle`, `ytmusic-player-page #side-panel`, `ytmusic-like-button-renderer`, `ytmusic-playback-rate-renderer`, `ytmusic-guide-renderer` and `ytmusic-search-box #suggestion-list`.\n\n**Not verified:** the original `ytmusic-mealbar-promo-renderer`, `ytmusic-statement-banner-renderer`, `ytmusic-upsell-dialog-renderer` and `SPunlimited` Upgrade tab (they appear only signed in or after a trigger; they stay in the synthetic fixtures), the narrow-layout `ytmusic-pivot-bar-item-renderer[tab-id=\"FEmusic_explore\"]` Explore tab (not rendered at 1440px), the mobile layout, signed-in pages, the cookie dialog (none was shown) and what a Dim or Blur looks like on every page.\n\nThe recipe covers `music.youtube.com` only; the YouTube recipe covers `www.youtube.com` and `m.youtube.com`. Ads inside playback are not touched: CSS cannot remove them.\n\n- Promo banners, the Premium upsell, the sidebar sign-in card, the taste-builder card, the refresh chip and cookie banners are on by default.\n- Everything else (Upgrade and Explore tabs, chips, shelves, cover art, Explicit badges, Song/Video switch, side panel, like and speed buttons, sidebar, search suggestions) is off by default: you may want it.",
+    "lastVerified": "2026-11-17"
   }
 }

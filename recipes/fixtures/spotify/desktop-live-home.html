@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Spotify fixture (desktop): trimmed reconstruction of the logged-out home page, captured 2026-11-17</title></head>
+<body>
+<!-- Trimmed reconstruction, not a verbatim capture. Attributes and nesting follow the live DOM of https://open.spotify.com/
+     read on 2026-11-17 (logged out, desktop Chrome UA, 1440x900, 9 seconds after load); text, links and hashed classes
+     are stripped. Seen live: every data-testid / aria-label below except the two "From a filter list" shelves, which
+     only appear for some accounts and come from the public uBlock filter list at nkorth.com/ublock.html (shelf
+     aria-labels "Shows to try" and "Episodes for you") and the Spotify Web Player UI Tweaks userscript ("Made For You",
+     "Recently played"); they were not on the logged-out page. -->
+<div data-testid="root">
+  <div id="global-nav-bar" data-testid="global-nav-bar">
+    <a href="/"></a>
+    <button data-testid="home-button" aria-label="Home" data-keep></button>
+    <form role="search"><input data-testid="search-input" aria-label="What do you want to play?" role="combobox" data-keep></form>
+    <button data-testid="browse-button" aria-label="Browse"></button>
+    <button data-testid="signup-button">Sign up</button>
+    <button data-testid="login-button" data-keep>Log in</button>
+  </div>
+  <nav aria-label="Main">
+    <div data-testid="left-sidebar-footer">
+      <div data-testid="left-sidebar-legal-links"></div>
+      <button data-testid="language-selection-button">English</button>
+    </div>
+  </nav>
+  <aside aria-label="Now playing view"><div data-testid="PanelHeader_CloseButton"></div></aside>
+  <main aria-label="Spotify - Web Player" data-keep>
+    <section data-testid="home-page">
+      <section data-shelf="carousel" data-testid="component-shelf" aria-label="Trending songs">
+        <div data-testid="rich-title-row-shelf-header"><a data-testid="see-all-link" href="/section/0JQ5DB5E8N831KzFzsBBQ2"></a></div>
+        <div data-testid="carousel-scroller"><button data-testid="play-button" aria-label="Play Aeroplane"></button></div>
+        <div data-testid="carousel-previous-button"></div><div data-testid="carousel-next-button"></div>
+      </section>
+      <section data-shelf="carousel" data-testid="component-shelf" aria-label="Popular artists"></section>
+      <section data-shelf="carousel" data-testid="component-shelf" aria-label="Popular albums and singles"></section>
+      <section data-shelf="carousel" data-testid="component-shelf" aria-label="Popular radio"></section>
+      <section data-shelf="carousel" data-testid="component-shelf" aria-label="Featured Charts"></section>
+      <!-- From a filter list, not live: -->
+      <section data-shelf="carousel" data-testid="component-shelf" aria-label="Shows to try"></section>
+      <section data-shelf="carousel" data-testid="component-shelf" aria-label="Episodes for you"></section>
+      <section data-shelf="carousel" data-testid="component-shelf" aria-label="Made For You"></section>
+      <section data-shelf="carousel" data-testid="component-shelf" aria-label="Recently played"></section>
+    </section>
+    <nav data-testid="footer-div"></nav>
+  </main>
+  <aside data-testid="now-playing-bar" aria-label="Now playing bar">
+    <div data-testid="signup-bar"></div>
+    <div data-testid="player-controls" aria-label="Player controls" data-keep></div>
+  </aside>
+</div>
+</body>
+</html>
