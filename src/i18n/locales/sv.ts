@@ -272,9 +272,6 @@ export const sv: Messages = {
     "Stoppar animationer, automatiskt spelande video och animerade GIF-filer i appen och på sidor. Det kan inte upptäcka blinkningar i en video du startar själv.",
   "settings.videoControls": "Videokontroller",
   "settings.videoControlsNote": "För helskärmsflöden med video som Shorts och Reels.",
-  "settings.videoPanel": "Kontroller vid tryck",
-  "settings.videoPanelNote":
-    "Tryck på en video för att visa paus, 6 sekunder bakåt och framåt, ljud av, hastighet och ett sökfält, i stället för webbplatsens eget tryck. En favorit kan stänga av detta för att få tillbaka webbplatsens egna kontroller.",
   "settings.videoFull": "Även på hela videor",
   "settings.videoFullNote":
     "Använd kontrollerna även på visningssidor, i stället för webbplatsens egna. Av behåller webbplatsens spelare, som har fler funktioner, till exempel undertexter och kvalitet.",
@@ -394,9 +391,6 @@ export const sv: Messages = {
   "recipes.hubNote":
     "En hubb öppnar flera webbplatser samtidigt. Varje sida är en egen webbplats med egna cookies.",
   "favorites.bottomMargin": "Nedre marginal",
-  "favorites.videoControls": "OpenMedias videokontroller",
-  "favorites.videoControlsNote":
-    "Tryck på en video för att visa OpenMedias kontroller. Av ger tillbaka webbplatsens egna.",
   "favorites.videoFull": "Även på hela videor",
   "favorites.videoFullNote":
     "Använd kontrollerna även på den här webbplatsens visningssidor. Av behåller webbplatsens egen spelare.",

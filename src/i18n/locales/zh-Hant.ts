@@ -247,9 +247,6 @@ export const zhHant: Messages = {
     "停止 App 與網頁中的動畫、自動播放的影片和動態 GIF。無法偵測你自行開始播放的影片中的閃爍。",
   "settings.videoControls": "影片控制",
   "settings.videoControlsNote": "適用於 Shorts、Reels 等全螢幕影片串流。",
-  "settings.videoPanel": "點一下顯示控制",
-  "settings.videoPanelNote":
-    "點一下影片即可顯示暫停、倒退和快轉 6 秒、靜音、倍速和進度列，取代網站自己的點按操作。我的最愛可以關閉此功能，恢復網站自己的控制。",
   "settings.videoFull": "完整影片也適用",
   "settings.videoFullNote":
     "在觀看頁面也使用這些控制，取代網站自己的控制。關閉後保留網站自己的播放器，功能更多，例如字幕和畫質。",
@@ -361,8 +358,6 @@ export const zhHant: Messages = {
   "recipes.openHubPage": "開啟 {label}",
   "recipes.hubNote": "聚合頁會同時開啟多個網站。每個頁面都是獨立的網站，有自己的 Cookie。",
   "favorites.bottomMargin": "底部邊距",
-  "favorites.videoControls": "OpenMedia 影片控制",
-  "favorites.videoControlsNote": "點一下影片即可顯示 OpenMedia 的控制。關閉後恢復網站自己的控制。",
   "favorites.videoFull": "完整影片也適用",
   "favorites.videoFullNote": "在這個網站的觀看頁面也使用這些控制。關閉後保留網站自己的播放器。",
   "favorites.videoHeight": "影片控制高度",

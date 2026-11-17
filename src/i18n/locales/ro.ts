@@ -275,9 +275,6 @@ export const ro: Messages = {
     "Oprește animațiile, videoclipurile cu redare automată și GIF-urile animate în aplicație și pe pagini. Nu poate detecta luminile intermitente dintr-un videoclip pornit de tine.",
   "settings.videoControls": "Comenzi video",
   "settings.videoControlsNote": "Pentru fluxurile video pe ecran complet, precum Shorts și Reels.",
-  "settings.videoPanel": "Comenzi la atingere",
-  "settings.videoPanelNote":
-    "Atinge un videoclip ca să apară pauza, înapoi și înainte cu 6 secunde, dezactivarea sunetului, viteza și o bară de derulare, în loc de atingerea proprie a site-ului. Un favorit poate dezactiva asta ca să revii la comenzile site-ului.",
   "settings.videoFull": "Și la videoclipurile complete",
   "settings.videoFullNote":
     "Folosește comenzile și pe paginile de vizionare, în locul celor ale site-ului. Dezactivat, păstrează playerul site-ului, care are mai multe opțiuni, precum subtitrări și calitate.",
@@ -398,9 +395,6 @@ export const ro: Messages = {
   "recipes.hubNote":
     "Un hub deschide mai multe site-uri deodată. Fiecare pagină este un site propriu, cu cookie-urile proprii.",
   "favorites.bottomMargin": "Margine inferioară",
-  "favorites.videoControls": "Comenzi video OpenMedia",
-  "favorites.videoControlsNote":
-    "Atinge un videoclip ca să apară comenzile OpenMedia. Dezactivat, revii la cele ale site-ului.",
   "favorites.videoFull": "Și la videoclipurile complete",
   "favorites.videoFullNote":
     "Folosește comenzile și pe paginile de vizionare ale acestui site. Dezactivat, păstrează playerul propriu al site-ului.",

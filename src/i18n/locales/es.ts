@@ -277,9 +277,6 @@ export const es: Messages = {
     "Detiene las animaciones, los vídeos con reproducción automática y los GIF animados en la app y en las páginas. No puede detectar destellos en un vídeo que inicias tú.",
   "settings.videoControls": "Controles de vídeo",
   "settings.videoControlsNote": "Para feeds de vídeo a pantalla completa como Shorts y Reels.",
-  "settings.videoPanel": "Controles al tocar",
-  "settings.videoPanelNote":
-    "Toca un vídeo para mostrar pausa, retroceder y avanzar 6 segundos, silencio, velocidad y una barra de progreso, en lugar del toque propio del sitio. Un favorito puede desactivarlo para recuperar los controles del propio sitio.",
   "settings.videoFull": "También en vídeos completos",
   "settings.videoFullNote":
     "Usa los controles también en las páginas de reproducción, en lugar de los del propio sitio. Desactivado mantiene el reproductor del sitio, que tiene más, como subtítulos y calidad.",
@@ -400,9 +397,6 @@ export const es: Messages = {
   "recipes.hubNote":
     "Un hub abre varios sitios a la vez. Cada página es un sitio propio, con sus propias cookies.",
   "favorites.bottomMargin": "Margen inferior",
-  "favorites.videoControls": "Controles de vídeo de OpenMedia",
-  "favorites.videoControlsNote":
-    "Toca un vídeo para mostrar los controles de OpenMedia. Desactivado devuelve los del propio sitio.",
   "favorites.videoFull": "También en vídeos completos",
   "favorites.videoFullNote":
     "Usa los controles también en las páginas de reproducción de este sitio. Desactivado mantiene el reproductor del propio sitio.",

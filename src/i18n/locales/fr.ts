@@ -279,9 +279,6 @@ export const fr: Messages = {
     "Arrête les animations, les vidéos à lecture automatique et les GIF animés dans l’app et sur les pages. Elle ne peut pas détecter les flashs d’une vidéo que vous lancez vous-même.",
   "settings.videoControls": "Commandes vidéo",
   "settings.videoControlsNote": "Pour les fils vidéo en plein écran comme Shorts et Reels.",
-  "settings.videoPanel": "Commandes au toucher",
-  "settings.videoPanelNote":
-    "Touchez une vidéo pour afficher pause, retour et avance de 6 secondes, sourdine, vitesse et une barre de progression, à la place du toucher propre au site. Un favori peut le désactiver pour retrouver les commandes du site.",
   "settings.videoFull": "Aussi sur les vidéos complètes",
   "settings.videoFullNote":
     "Utilisez les commandes aussi sur les pages de lecture, à la place de celles du site. Désactivé garde le lecteur du site, qui offre plus, comme les sous-titres et la qualité.",
@@ -403,9 +400,6 @@ export const fr: Messages = {
   "recipes.hubNote":
     "Un hub ouvre plusieurs sites à la fois. Chaque page est un site à part entière, avec ses propres cookies.",
   "favorites.bottomMargin": "Marge inférieure",
-  "favorites.videoControls": "Commandes vidéo OpenMedia",
-  "favorites.videoControlsNote":
-    "Touchez une vidéo pour afficher les commandes d’OpenMedia. Désactivé, vous retrouvez celles du site.",
   "favorites.videoFull": "Aussi sur les vidéos complètes",
   "favorites.videoFullNote":
     "Utilisez les commandes aussi sur les pages de lecture de ce site. Désactivé garde le lecteur propre au site.",

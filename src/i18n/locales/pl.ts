@@ -275,9 +275,6 @@ export const pl: Messages = {
     "Zatrzymuje animacje, automatycznie odtwarzane wideo i animowane GIF-y w aplikacji i na stronach. Nie wykryje migotania w filmie uruchomionym samodzielnie.",
   "settings.videoControls": "Sterowanie wideo",
   "settings.videoControlsNote": "Dla pełnoekranowych kanałów wideo, takich jak Shorts i Reels.",
-  "settings.videoPanel": "Sterowanie po stuknięciu",
-  "settings.videoPanelNote":
-    "Stuknij wideo, aby pokazać pauzę, przewijanie o 6 sekund wstecz i do przodu, wyciszenie, prędkość i pasek postępu zamiast własnego działania witryny. Ulubione może to wyłączyć, aby przywrócić własne sterowanie witryny.",
   "settings.videoFull": "Także w pełnych filmach",
   "settings.videoFullNote":
     "Używaj sterowania także na stronach oglądania, zamiast własnego sterowania witryny. Wyłączone zachowuje odtwarzacz witryny, który ma więcej opcji, takich jak napisy i jakość.",
@@ -396,9 +393,6 @@ export const pl: Messages = {
   "recipes.hubNote":
     "Hub otwiera kilka stron naraz. Każda strona to osobna witryna, z własnymi plikami cookie.",
   "favorites.bottomMargin": "Dolny margines",
-  "favorites.videoControls": "Sterowanie wideo OpenMedia",
-  "favorites.videoControlsNote":
-    "Stuknij wideo, aby pokazać sterowanie OpenMedia. Wyłączone przywraca własne sterowanie witryny.",
   "favorites.videoFull": "Także w pełnych filmach",
   "favorites.videoFullNote":
     "Używaj sterowania także na stronach oglądania tej witryny. Wyłączone zachowuje własny odtwarzacz witryny.",

@@ -268,9 +268,6 @@ export const id: Messages = {
     "Menghentikan animasi, video yang diputar otomatis, dan GIF animasi di aplikasi dan di halaman. Tidak dapat mendeteksi kilatan pada video yang Anda putar sendiri.",
   "settings.videoControls": "Kontrol video",
   "settings.videoControlsNote": "Untuk umpan video layar penuh seperti Shorts dan Reels.",
-  "settings.videoPanel": "Kontrol saat diketuk",
-  "settings.videoPanelNote":
-    "Ketuk video untuk menampilkan jeda, mundur dan maju 6 detik, bisukan, kecepatan, dan bilah geser, menggantikan ketukan bawaan situs. Favorit dapat mematikannya agar kontrol bawaan situs kembali.",
   "settings.videoFull": "Juga di video penuh",
   "settings.videoFullNote":
     "Gunakan kontrol ini juga di halaman tonton, menggantikan kontrol bawaan situs. Jika mati, pemutar bawaan situs tetap dipakai, yang punya lebih banyak fitur, seperti teks dan kualitas.",
@@ -387,9 +384,6 @@ export const id: Messages = {
   "recipes.hubNote":
     "Hub membuka beberapa situs sekaligus. Setiap halaman adalah situsnya sendiri, dengan cookie sendiri.",
   "favorites.bottomMargin": "Margin bawah",
-  "favorites.videoControls": "Kontrol video OpenMedia",
-  "favorites.videoControlsNote":
-    "Ketuk video untuk menampilkan kontrol OpenMedia. Jika mati, kontrol bawaan situs kembali.",
   "favorites.videoFull": "Juga di video penuh",
   "favorites.videoFullNote":
     "Gunakan kontrol ini juga di halaman tonton situs ini. Jika mati, pemutar bawaan situs tetap dipakai.",

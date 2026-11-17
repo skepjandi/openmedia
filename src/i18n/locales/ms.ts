@@ -271,9 +271,6 @@ export const ms: Messages = {
     "Menghentikan animasi, video main automatik dan GIF beranimasi dalam aplikasi dan pada laman. Tidak dapat mengesan kelipan dalam video yang anda mulakan sendiri.",
   "settings.videoControls": "Kawalan video",
   "settings.videoControlsNote": "Untuk suapan video skrin penuh seperti Shorts dan Reels.",
-  "settings.videoPanel": "Kawalan semasa diketik",
-  "settings.videoPanelNote":
-    "Ketik video untuk memaparkan jeda, ke belakang dan ke hadapan 6 saat, senyap, kelajuan dan bar carian, menggantikan ketikan asal laman. Kegemaran boleh mematikannya untuk mendapatkan semula kawalan asal laman.",
   "settings.videoFull": "Juga pada video penuh",
   "settings.videoFullNote":
     "Guna kawalan ini pada halaman tonton juga, menggantikan kawalan asal laman. Jika dimatikan, pemain asal laman kekal, yang mempunyai lebih banyak ciri, seperti sari kata dan kualiti.",
@@ -392,9 +389,6 @@ export const ms: Messages = {
   "recipes.hubNote":
     "Hab membuka beberapa laman sekali gus. Setiap halaman ialah laman sendiri, dengan cookie sendiri.",
   "favorites.bottomMargin": "Margin bawah",
-  "favorites.videoControls": "Kawalan video OpenMedia",
-  "favorites.videoControlsNote":
-    "Ketik video untuk memaparkan kawalan OpenMedia. Jika dimatikan, kawalan asal laman kembali.",
   "favorites.videoFull": "Juga pada video penuh",
   "favorites.videoFullNote":
     "Guna kawalan ini pada halaman tonton laman ini juga. Jika dimatikan, pemain asal laman kekal.",

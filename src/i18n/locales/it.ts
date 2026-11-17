@@ -278,9 +278,6 @@ export const it: Messages = {
     "Ferma animazioni, video a riproduzione automatica e GIF animate nell’app e nelle pagine. Non può rilevare i lampi in un video che avvii tu.",
   "settings.videoControls": "Controlli video",
   "settings.videoControlsNote": "Per i feed video a schermo intero come Shorts e Reels.",
-  "settings.videoPanel": "Controlli al tocco",
-  "settings.videoPanelNote":
-    "Tocca un video per mostrare pausa, 6 secondi indietro e avanti, disattiva audio, velocità e una barra di scorrimento, al posto del tocco del sito. Un preferito può disattivarlo per riavere i controlli del sito.",
   "settings.videoFull": "Anche nei video a schermo intero",
   "settings.videoFullNote":
     "Usa i controlli anche nelle pagine di visione, al posto di quelli del sito. Se disattivato, resta il lettore del sito, che offre di più, come sottotitoli e qualità.",
@@ -397,9 +394,6 @@ export const it: Messages = {
   "recipes.openHubPage": "Apri {label}",
   "recipes.hubNote": "Un hub apre più siti insieme. Ogni pagina è un sito a sé, con i suoi cookie.",
   "favorites.bottomMargin": "Margine inferiore",
-  "favorites.videoControls": "Controlli video di OpenMedia",
-  "favorites.videoControlsNote":
-    "Tocca un video per mostrare i controlli di OpenMedia. Se disattivato, tornano quelli del sito.",
   "favorites.videoFull": "Anche nei video a schermo intero",
   "favorites.videoFullNote":
     "Usa i controlli anche nelle pagine di visione di questo sito. Se disattivato, resta il lettore del sito.",

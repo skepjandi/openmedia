@@ -1424,6 +1424,11 @@
     function tapAt(x, y, hit, event) {
       var video = videoAt(x, y, hit);
       if (!video) return false;
+      // A site's press and hold for double speed (YouTube's) changes the speed while the finger is
+      // down. That press is a hold, not a tap: the site keeps it whole, so it also sees the release
+      // that ends the boost, and no panel is shown.
+      var down = mutedAtDown;
+      if (down && down.video === video && video.playbackRate !== down.rate) return false;
       event.stopImmediatePropagation();
       if (event.cancelable) event.preventDefault();
       restoreMute();
@@ -1444,7 +1449,7 @@
       var now = Date.now();
       if (!fresh && mutedAtDown && now - mutedAtDown.at < 300) return;
       var video = panelPage() && panelOn() ? focus() : null;
-      mutedAtDown = video ? { video: video, muted: video.muted, at: now } : null;
+      mutedAtDown = video ? { video: video, muted: video.muted, rate: video.playbackRate, at: now } : null;
     }
 
     function restoreMute() {

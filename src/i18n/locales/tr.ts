@@ -274,9 +274,6 @@ export const tr: Messages = {
     "Uygulamada ve sayfalarda animasyonları, otomatik oynayan videoları ve hareketli GIF’leri durdurur. Kendi başlattığınız bir videodaki yanıp sönmeyi algılayamaz.",
   "settings.videoControls": "Video kontrolleri",
   "settings.videoControlsNote": "Shorts ve Reels gibi tam ekran video akışları için.",
-  "settings.videoPanel": "Dokununca kontroller",
-  "settings.videoPanelNote":
-    "Duraklatma, 6 saniye geri ve ileri, sessiz, hız ve arama çubuğunu göstermek için bir videoya dokunun; sitenin kendi dokunuşu yerine geçer. Bir favori bunu kapatıp sitenin kendi kontrollerini geri getirebilir.",
   "settings.videoFull": "Tam videolarda da",
   "settings.videoFullNote":
     "Kontrolleri izleme sayfalarında da sitenin kendi kontrollerinin yerine kullanın. Kapalıyken sitenin oynatıcısı kalır; altyazı ve kalite gibi daha fazlasına sahiptir.",
@@ -394,9 +391,6 @@ export const tr: Messages = {
   "recipes.hubNote":
     "Bir hub aynı anda birkaç siteyi açar. Her sayfa kendi site'ıdır ve kendi çerezleri vardır.",
   "favorites.bottomMargin": "Alt kenar boşluğu",
-  "favorites.videoControls": "OpenMedia video kontrolleri",
-  "favorites.videoControlsNote":
-    "OpenMedia'nın kontrollerini göstermek için bir videoya dokunun. Kapalıyken sitenin kendi kontrolleri geri gelir.",
   "favorites.videoFull": "Tam videolarda da",
   "favorites.videoFullNote":
     "Kontrolleri bu sitenin izleme sayfalarında da kullanın. Kapalıyken sitenin kendi oynatıcısı kalır.",

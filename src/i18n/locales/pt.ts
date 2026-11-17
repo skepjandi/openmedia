@@ -277,9 +277,6 @@ export const pt: Messages = {
     "Interrompe animações, vídeos com reprodução automática e GIFs animados no app e nas páginas. Não consegue detectar flashes em um vídeo que você inicia.",
   "settings.videoControls": "Controlos de vídeo",
   "settings.videoControlsNote": "Para feeds de vídeo em ecrã inteiro, como Shorts e Reels.",
-  "settings.videoPanel": "Controlos ao tocar",
-  "settings.videoPanelNote":
-    "Toca num vídeo para mostrar pausa, recuar e avançar 6 segundos, silenciar, velocidade e uma barra de progresso, em vez do toque do próprio site. Um favorito pode desligar isto para recuperar os controlos do site.",
   "settings.videoFull": "Também em vídeos completos",
   "settings.videoFullNote":
     "Usa os controlos também nas páginas de visualização, em vez dos do próprio site. Desligado, mantém o leitor do site, que tem mais opções, como legendas e qualidade.",
@@ -399,9 +396,6 @@ export const pt: Messages = {
   "recipes.hubNote":
     "Um hub abre vários sites ao mesmo tempo. Cada página é um site próprio, com os seus próprios cookies.",
   "favorites.bottomMargin": "Margem inferior",
-  "favorites.videoControls": "Controlos de vídeo do OpenMedia",
-  "favorites.videoControlsNote":
-    "Toca num vídeo para mostrar os controlos do OpenMedia. Desligado, volta a ter os do próprio site.",
   "favorites.videoFull": "Também em vídeos completos",
   "favorites.videoFullNote":
     "Usa os controlos também nas páginas de visualização deste site. Desligado, mantém o leitor do próprio site.",

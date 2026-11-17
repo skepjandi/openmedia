@@ -246,9 +246,6 @@ export const zhHans: Messages = {
     "停止应用和网页中的动画、自动播放的视频和动图 GIF。无法检测你自己开始播放的视频中的闪烁。",
   "settings.videoControls": "视频控制",
   "settings.videoControlsNote": "适用于 Shorts、Reels 等全屏视频流。",
-  "settings.videoPanel": "点按显示控制",
-  "settings.videoPanelNote":
-    "点按视频即可显示暂停、后退和快进 6 秒、静音、倍速和进度条，取代网站自己的点按操作。收藏可以关闭此功能，恢复网站自己的控制。",
   "settings.videoFull": "完整视频也适用",
   "settings.videoFullNote":
     "在观看页面也使用这些控制，取代网站自己的控制。关闭后保留网站自己的播放器，功能更多，例如字幕和画质。",
@@ -359,8 +356,6 @@ export const zhHans: Messages = {
   "recipes.openHubPage": "打开 {label}",
   "recipes.hubNote": "聚合页会同时打开多个网站。每个页面都是独立的网站，拥有自己的 Cookie。",
   "favorites.bottomMargin": "底部边距",
-  "favorites.videoControls": "OpenMedia 视频控制",
-  "favorites.videoControlsNote": "点按视频即可显示 OpenMedia 的控制。关闭后恢复网站自己的控制。",
   "favorites.videoFull": "完整视频也适用",
   "favorites.videoFullNote": "在这个网站的观看页面也使用这些控制。关闭后保留网站自己的播放器。",
   "favorites.videoHeight": "视频控制高度",

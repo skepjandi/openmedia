@@ -272,9 +272,6 @@ export const cs: Messages = {
     "Zastaví animace, automaticky spuštěná videa a animované GIFy v aplikaci i na stránkách. Nezjistí blikání ve videu, které spustíte sami.",
   "settings.videoControls": "Ovládání videa",
   "settings.videoControlsNote": "Pro celoobrazovková videa, například Shorts a Reels.",
-  "settings.videoPanel": "Ovládání klepnutím",
-  "settings.videoPanelNote":
-    "Klepnutím na video zobrazíte pozastavení, přetočení o 6 sekund zpět a vpřed, ztlumení, rychlost a posuvník přehrávání místo klepnutí samotného webu. Oblíbená stránka to může vypnout a vrátit ovládání webu.",
   "settings.videoFull": "I u celých videí",
   "settings.videoFullNote":
     "Používejte ovládání i na stránkách přehrávání místo ovládání samotného webu. Vypnuto ponechá přehrávač webu, který nabízí více, například titulky a kvalitu.",
@@ -393,9 +390,6 @@ export const cs: Messages = {
   "recipes.hubNote":
     "Hub otevře několik webů najednou. Každá stránka je vlastní web s vlastními cookies.",
   "favorites.bottomMargin": "Spodní okraj",
-  "favorites.videoControls": "Ovládání videa OpenMedia",
-  "favorites.videoControlsNote":
-    "Klepnutím na video zobrazíte ovládání OpenMedia. Vypnuto vrátí ovládání samotného webu.",
   "favorites.videoFull": "I u celých videí",
   "favorites.videoFullNote":
     "Používejte ovládání i na stránkách přehrávání tohoto webu. Vypnuto ponechá přehrávač samotného webu.",

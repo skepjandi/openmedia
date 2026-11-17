@@ -271,9 +271,6 @@ export const de: Messages = {
     "Stoppt Animationen, automatisch startende Videos und animierte GIFs in der App und auf Seiten. Blitzen in einem selbst gestarteten Video kann nicht erkannt werden.",
   "settings.videoControls": "Videosteuerung",
   "settings.videoControlsNote": "Für Vollbild-Videofeeds wie Shorts und Reels.",
-  "settings.videoPanel": "Steuerung beim Tippen",
-  "settings.videoPanelNote":
-    "Tippe auf ein Video, um Pause, 6 Sekunden zurück und vor, Stummschaltung, Tempo und eine Suchleiste zu zeigen, statt des eigenen Tippens der Website. Ein Favorit kann das ausschalten, um die Steuerung der Website zurückzubekommen.",
   "settings.videoFull": "Auch bei vollen Videos",
   "settings.videoFullNote":
     "Nutze die Steuerung auch auf Wiedergabeseiten, statt der eigenen der Website. Aus behält den Player der Website, der mehr bietet, etwa Untertitel und Qualität.",
@@ -395,9 +392,6 @@ export const de: Messages = {
   "recipes.hubNote":
     "Ein Hub öffnet mehrere Websites auf einmal. Jede Seite ist eine eigene Website mit eigenen Cookies.",
   "favorites.bottomMargin": "Unterer Rand",
-  "favorites.videoControls": "OpenMedia-Videosteuerung",
-  "favorites.videoControlsNote":
-    "Tippe auf ein Video, um die Steuerung von OpenMedia zu zeigen. Aus gibt die der Website zurück.",
   "favorites.videoFull": "Auch bei vollen Videos",
   "favorites.videoFullNote":
     "Nutze die Steuerung auch auf den Wiedergabeseiten dieser Website. Aus behält den eigenen Player der Website.",

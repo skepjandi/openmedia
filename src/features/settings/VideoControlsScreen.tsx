@@ -53,12 +53,6 @@ export function VideoControlsScreen() {
       back={parent === "settings"}
     >
       <Group>
-        <Switch
-          label={t("settings.videoPanel")}
-          description={t("settings.videoPanelNote")}
-          checked={controls.panel}
-          onChange={(on) => void setVideoControls({ panel: on })}
-        />
         {controls.panel && (
           <Switch
             label={t("settings.videoFull")}

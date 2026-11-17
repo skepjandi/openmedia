@@ -565,8 +565,9 @@ function BackgroundMedia({ url }: { url: string }) {
 }
 
 /**
- * This site's own video controls: whether OpenMedia's tap panel replaces the site's, and how high
- * it sits. A site with no choice follows the shared one in Settings. It saves at once, not with Save.
+ * This site's own video controls: whether the tap panel also covers full videos, and how high it
+ * sits (the panel itself is switched from the floating button). A site with no choice follows
+ * the shared one in Settings. It saves at once, not with Save.
  */
 function SiteVideoControls({ url }: { url: string }) {
   const site = siteOf(url);
@@ -575,17 +576,9 @@ function SiteVideoControls({ url }: { url: string }) {
   const setSiteVideoControls = useApp((s) => s.setSiteVideoControls);
   const t = useT();
   if (!site) return null;
-  const panel = own?.panel ?? shared.panel;
+  const panel = shared.panel;
   return (
     <div className="flex flex-col gap-2">
-      <div className="-mx-4">
-        <Switch
-          label={t("favorites.videoControls")}
-          description={t("favorites.videoControlsNote")}
-          checked={panel}
-          onChange={(next) => void setSiteVideoControls(site, { ...own, panel: next })}
-        />
-      </div>
       {panel && (
         <div className="-mx-4">
           <Switch

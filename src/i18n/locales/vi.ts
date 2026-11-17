@@ -266,9 +266,6 @@ export const vi: Messages = {
     "Dừng hoạt ảnh, video tự phát và ảnh GIF động trong ứng dụng và trên các trang. Không thể phát hiện ánh sáng nhấp nháy trong video do bạn tự bắt đầu phát.",
   "settings.videoControls": "Điều khiển video",
   "settings.videoControlsNote": "Dành cho nguồn cấp video toàn màn hình như Shorts và Reels.",
-  "settings.videoPanel": "Điều khiển khi chạm",
-  "settings.videoPanelNote":
-    "Chạm vào video để hiện tạm dừng, tua lùi và tua tới 6 giây, tắt tiếng, tốc độ và thanh tua, thay cho thao tác chạm của chính trang. Một mục yêu thích có thể tắt để dùng lại điều khiển của trang.",
   "settings.videoFull": "Cả trên video đầy đủ",
   "settings.videoFullNote":
     "Dùng điều khiển cả ở trang xem, thay cho điều khiển của trang. Khi tắt, giữ trình phát của trang, có nhiều hơn, như phụ đề và chất lượng.",
@@ -387,9 +384,6 @@ export const vi: Messages = {
   "recipes.hubNote":
     "Một hub mở nhiều trang web cùng lúc. Mỗi trang là một trang web riêng, với cookie riêng.",
   "favorites.bottomMargin": "Lề dưới",
-  "favorites.videoControls": "Điều khiển video của OpenMedia",
-  "favorites.videoControlsNote":
-    "Chạm vào video để hiện điều khiển của OpenMedia. Khi tắt, sẽ dùng lại điều khiển của trang.",
   "favorites.videoFull": "Cả trên video đầy đủ",
   "favorites.videoFullNote":
     "Dùng điều khiển cả ở trang xem của trang này. Khi tắt, giữ trình phát riêng của trang.",

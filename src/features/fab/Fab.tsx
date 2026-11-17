@@ -134,8 +134,17 @@ export function Fab() {
     else if (target.kind === "stats") openSheet("stats");
     else if (target.kind === "incognito")
       void (incognito.active ? exitIncognito() : enterIncognito());
-    else if (target.kind === "controls") void setVideoControls({ panel: !controlsOn });
-    else {
+    else if (target.kind === "controls") {
+      // The quick switch is for every site: a site's own "on" would keep the panel showing there.
+      const next = !controlsOn;
+      void setVideoControls({ panel: next });
+      if (!next) {
+        const { state, setSiteVideoControls } = useApp.getState();
+        for (const [site, own] of Object.entries(state?.videoSites ?? {})) {
+          if (own.panel === true) void setSiteVideoControls(site, { ...own, panel: undefined });
+        }
+      }
+    } else {
       const slot = list[target.index];
       if (slot?.locked) openSheet("paywall");
       else if (slot?.favorite) openFavorite(slot.favorite);

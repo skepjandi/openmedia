@@ -273,9 +273,6 @@ export const nl: Messages = {
     "Stopt animaties, automatisch afspelende video’s en geanimeerde GIF’s in de app en op pagina’s. Het kan geen flitsen herkennen in een video die je zelf start.",
   "settings.videoControls": "Videobediening",
   "settings.videoControlsNote": "Voor videofeeds op volledig scherm, zoals Shorts en Reels.",
-  "settings.videoPanel": "Bediening bij tikken",
-  "settings.videoPanelNote":
-    "Tik op een video om pauzeren, 6 seconden terug en vooruit, dempen, snelheid en een zoekbalk te tonen, in plaats van de eigen tik van de site. Een favoriet kan dit uitzetten om de eigen bediening van de site terug te krijgen.",
   "settings.videoFull": "Ook bij volledige video’s",
   "settings.videoFullNote":
     "Gebruik de bediening ook op kijkpagina’s, in plaats van die van de site zelf. Uit houdt de eigen speler van de site, die meer biedt, zoals ondertiteling en kwaliteit.",
@@ -392,9 +389,6 @@ export const nl: Messages = {
   "recipes.hubNote":
     "Een hub opent meerdere sites tegelijk. Elke pagina is een eigen site, met eigen cookies.",
   "favorites.bottomMargin": "Ondermarge",
-  "favorites.videoControls": "OpenMedia-videobediening",
-  "favorites.videoControlsNote":
-    "Tik op een video om de bediening van OpenMedia te tonen. Uit geeft de eigen bediening van de site terug.",
   "favorites.videoFull": "Ook bij volledige video’s",
   "favorites.videoFullNote":
     "Gebruik de bediening ook op de kijkpagina’s van deze site. Uit houdt de eigen speler van de site.",

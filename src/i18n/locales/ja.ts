@@ -268,9 +268,6 @@ export const ja: Messages = {
     "アプリとページ内のアニメーション、自動再生の動画、動くGIFを停止します。自分で再生した動画の点滅は検出できません。",
   "settings.videoControls": "動画コントロール",
   "settings.videoControlsNote": "ShortsやReelsなどの全画面動画フィード向けです。",
-  "settings.videoPanel": "タップでコントロール表示",
-  "settings.videoPanelNote":
-    "動画をタップすると、サイト標準のタップの代わりに、一時停止、6秒戻る・進む、ミュート、速度、シークバーが表示されます。お気に入りでオフにすると、サイト標準のコントロールに戻せます。",
   "settings.videoFull": "通常の動画でも使う",
   "settings.videoFullNote":
     "視聴ページでも、サイト標準のものの代わりにこのコントロールを使います。オフにするとサイト標準のプレーヤーのままで、字幕や画質の設定など、より多くの機能が使えます。",
@@ -386,9 +383,6 @@ export const ja: Messages = {
   "recipes.hubNote":
     "ハブは複数のサイトを一度に開きます。各ページはそれぞれ独立したサイトで、Cookieも別々です。",
   "favorites.bottomMargin": "下余白",
-  "favorites.videoControls": "OpenMediaの動画コントロール",
-  "favorites.videoControlsNote":
-    "動画をタップするとOpenMediaのコントロールが表示されます。オフにするとサイト標準のものに戻ります。",
   "favorites.videoFull": "通常の動画でも使う",
   "favorites.videoFullNote":
     "このサイトの視聴ページでもこのコントロールを使います。オフにするとサイト標準のプレーヤーのままです。",

@@ -271,9 +271,6 @@ export const en = {
     "Stops animations, autoplaying video and animated GIFs in the app and on pages. It cannot detect flashing in a video you start yourself.",
   "settings.videoControls": "Video controls",
   "settings.videoControlsNote": "For full-screen video feeds such as Shorts and Reels.",
-  "settings.videoPanel": "Controls on tap",
-  "settings.videoPanelNote":
-    "Tap a video to show pause, back and forward 6 seconds, mute, speed and a seek bar, instead of the site's own tap. A favorite can turn this off to get the site's own controls back.",
   "settings.videoFull": "Also on full videos",
   "settings.videoFullNote":
     "Use the controls on watch pages too, in place of the site's own. Off keeps the site's player, which has more, such as captions and quality.",
@@ -390,9 +387,6 @@ export const en = {
   "recipes.hubNote":
     "A hub opens several sites at once. Each page is a site of its own, with its own cookies.",
   "favorites.bottomMargin": "Bottom margin",
-  "favorites.videoControls": "OpenMedia video controls",
-  "favorites.videoControlsNote":
-    "Tap a video to show OpenMedia's controls. Off gives back the site's own.",
   "favorites.videoFull": "Also on full videos",
   "favorites.videoFullNote":
     "Use the controls on this site's watch pages too. Off keeps the site's own player.",

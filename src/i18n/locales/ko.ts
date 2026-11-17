@@ -266,9 +266,6 @@ export const ko: Messages = {
     "앱과 페이지에서 애니메이션, 자동 재생 동영상, 움직이는 GIF를 멈춥니다. 직접 재생한 동영상의 깜박임은 감지할 수 없습니다.",
   "settings.videoControls": "동영상 컨트롤",
   "settings.videoControlsNote": "Shorts, Reels 같은 전체 화면 동영상 피드용입니다.",
-  "settings.videoPanel": "탭하면 컨트롤 표시",
-  "settings.videoPanelNote":
-    "동영상을 탭하면 사이트 자체 탭 동작 대신 일시정지, 6초 뒤로·앞으로, 음소거, 속도, 탐색 막대가 표시됩니다. 즐겨찾기에서 끄면 사이트 자체 컨트롤로 돌아갑니다.",
   "settings.videoFull": "전체 동영상에서도 사용",
   "settings.videoFullNote":
     "시청 페이지에서도 사이트 자체 컨트롤 대신 이 컨트롤을 사용합니다. 끄면 자막, 화질 등 더 많은 기능이 있는 사이트 자체 플레이어가 유지됩니다.",
@@ -382,9 +379,6 @@ export const ko: Messages = {
   "recipes.hubNote":
     "허브는 여러 사이트를 한 번에 엽니다. 각 페이지는 별도의 사이트이며 자체 쿠키를 사용합니다.",
   "favorites.bottomMargin": "하단 여백",
-  "favorites.videoControls": "OpenMedia 동영상 컨트롤",
-  "favorites.videoControlsNote":
-    "동영상을 탭하면 OpenMedia 컨트롤이 표시됩니다. 끄면 사이트 자체 컨트롤로 돌아갑니다.",
   "favorites.videoFull": "전체 동영상에서도 사용",
   "favorites.videoFullNote":
     "이 사이트의 시청 페이지에서도 이 컨트롤을 사용합니다. 끄면 사이트 자체 플레이어가 유지됩니다.",
