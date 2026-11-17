@@ -6,6 +6,7 @@ import { useT } from "../../i18n/useT";
 import { Chevron } from "../../shared/Chevron";
 import { PlusIcon } from "../../shared/icons";
 import { usage } from "../../shared/ipc";
+import { Switch } from "../settings/Switch";
 import { Group, GroupLabel, field, primaryButton } from "../settings/ui";
 import { formatDuration, localDay, sectionLabel } from "./format";
 import {
@@ -18,7 +19,17 @@ import {
   type LimitSite,
 } from "./limits";
 import { LimitEditor } from "./LimitEditor";
-import { sectionUsageSeconds, usageSeconds, useUsageControl, type UsagePolicy } from "./policy";
+import { LockSection } from "./LockSection";
+import { PauseEditor } from "./PauseEditor";
+import { ScheduleEditor } from "./ScheduleEditor";
+import {
+  sectionUsageSeconds,
+  usageLimits,
+  usageSeconds,
+  useUsageControl,
+  type UsagePolicy,
+} from "./policy";
+import { refusesRelaxing, useUsageLock } from "./lock";
 import { SiteBadge } from "./SiteBadge";
 import { settleUsageWrites } from "./tracker";
 import { statusText, UsageMeter } from "./UsageMeter";
@@ -157,6 +168,8 @@ function LimitRow({
       {open && (
         <>
           <LimitEditor host={site.host} section={null} policy={policy} spentSeconds={spent} />
+          <ScheduleEditor host={site.host} schedule={limits.schedules[site.host]} />
+          <PauseEditor host={site.host} seconds={limits.pauses[site.host]} />
           {parts.length > 0 && (
             <div>
               <p className="px-4 pt-5 pb-3 text-sm font-semibold text-paper/60">
@@ -252,6 +265,34 @@ function AddSite({ suggestions, onAdd }: AddSiteProps) {
   );
 }
 
+/** Turns every pause screen on or off; each site keeps its own delay. */
+function PauseSwitch() {
+  const t = useT();
+  const enabled = useUsageControl((s) => s.limits.pauseEnabled);
+  const phase = useUsageLock((s) => s.status.phase);
+  const reportError = useApp((s) => s.reportError);
+  const anyPause = useUsageControl((s) => Object.keys(s.limits.pauses).length > 0);
+  const toggle = (next: boolean) => {
+    if (refusesRelaxing(phase) && enabled && !next) {
+      reportError(t("usage.lock.refused"));
+      return;
+    }
+    usageLimits
+      .setPauseEnabled(next)
+      .catch((error: unknown) => reportError(describeError(error, t)));
+  };
+  return (
+    <Group>
+      <Switch
+        label={t("usage.pauseAll")}
+        description={anyPause ? t("usage.pauseAllHint") : t("usage.pauseAllEmptyHint")}
+        checked={enabled}
+        onChange={toggle}
+      />
+    </Group>
+  );
+}
+
 /** Every favorite with its daily limit one tap away, then the other sites that have one. */
 export function LimitsTab() {
   const t = useT();
@@ -324,6 +365,8 @@ export function LimitsTab() {
 
   return (
     <div className="flex flex-col gap-7">
+      <LockSection />
+      <PauseSwitch />
       <p className="px-1 text-sm leading-relaxed text-paper/60">{t("usage.limitsIntro")}</p>
 
       <section>

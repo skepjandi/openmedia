@@ -411,9 +411,24 @@ svg {
   }
 }
 
+.pause-breath {
+  animation: pause-breath 8s ease-in-out infinite;
+}
+
+@keyframes pause-breath {
+  0%,
+  100% {
+    transform: scale(0.82);
+  }
+  50% {
+    transform: scale(1.12);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .screen,
   .usage-warning,
+  .pause-breath,
   .fab-peek {
     animation: none;
   }

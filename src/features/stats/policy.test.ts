@@ -1,8 +1,10 @@
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import {
+  closesSite,
   isUsageBlocked,
   pageLock,
   limitReached,
+  NO_LIMITS,
   policyForHost,
   policyForSection,
   sectionUsageSeconds,
@@ -18,14 +20,14 @@ const sectionPolicies = {
   "example.com": { "/watch": { warnSeconds: 30, limitSeconds: 90 } },
 };
 
-const empty = { limits: { sites: {}, sections: {} }, seconds: {}, sectionSeconds: {} };
+const empty = { limits: NO_LIMITS, seconds: {}, sectionSeconds: {} };
 
 afterEach(() => useUsageControl.setState({ ...empty, ready: false }));
 
 describe("daily site limits", () => {
   it("blocks at the exact boundary, not the warning, and keeps unrelated sites open", () => {
     useUsageControl.setState({
-      limits: { sites: policies, sections: {} },
+      limits: { ...NO_LIMITS, sites: policies },
       seconds: { "example.com": 119, "other.test": 50 },
       ready: true,
     });
@@ -50,7 +52,7 @@ describe("daily site limits", () => {
   it("keeps warning-only policies unblocked and lifts limits when today's totals reset", () => {
     expect(limitReached({ warnSeconds: 60, limitSeconds: null }, 90_000)).toBe(false);
     useUsageControl.setState({
-      limits: { sites: policies, sections: {} },
+      limits: { ...NO_LIMITS, sites: policies },
       seconds: { "example.com": 120 },
       ready: true,
     });
@@ -96,6 +98,7 @@ describe("daily part limits", () => {
 
 describe("pageLock", () => {
   const limits = {
+    ...NO_LIMITS,
     sites: { "example.com": { warnSeconds: null, limitSeconds: 100 } },
     sections: { "example.com": { "/reels": { warnSeconds: null, limitSeconds: 10 } } },
   };
@@ -121,5 +124,42 @@ describe("pageLock", () => {
         section: "/",
       }),
     ).toEqual({ kind: "site", spent: 100 });
+  });
+});
+
+describe("downtime schedules", () => {
+  const night = { windows: [{ days: 0b111_1111, startMinute: 22 * 60, endMinute: 7 * 60 }] };
+  const limits = { ...NO_LIMITS, schedules: { "example.com": night } };
+  const target = { host: "example.com", section: "/" };
+
+  it("closes the whole site inside a window that crosses midnight, and says when it opens", () => {
+    const late = new Date(2026, 0, 5, 23, 30);
+    const lock = pageLock(limits, {}, {}, target, late);
+    expect(lock?.kind).toBe("schedule");
+    expect(lock?.kind === "schedule" && lock.opensAt?.getHours()).toBe(7);
+    expect(closesSite(lock)).toBe(true);
+    expect(pageLock(limits, {}, {}, target, new Date(2026, 0, 6, 6, 59))?.kind).toBe("schedule");
+  });
+
+  it("leaves the site open outside the window", () => {
+    expect(pageLock(limits, {}, {}, target, new Date(2026, 0, 5, 7, 0))).toBeNull();
+  });
+
+  it("applies to subdomains and not to lookalike domains", () => {
+    const late = new Date(2026, 0, 5, 23, 30);
+    expect(pageLock(limits, {}, {}, { host: "m.example.com", section: "/" }, late)?.kind).toBe(
+      "schedule",
+    );
+    expect(pageLock(limits, {}, {}, { host: "notexample.com", section: "/" }, late)).toBeNull();
+  });
+
+  it("stops time counting while closed", () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date(2026, 0, 5, 23, 30));
+    useUsageControl.setState({ limits, ready: true });
+    expect(isUsageBlocked("example.com")).toBe(true);
+    vi.setSystemTime(new Date(2026, 0, 6, 12, 0));
+    expect(isUsageBlocked("example.com")).toBe(false);
+    vi.useRealTimers();
   });
 });

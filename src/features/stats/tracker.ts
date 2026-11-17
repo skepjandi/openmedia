@@ -5,12 +5,14 @@ import { advance, createAccumulator, drain, type UsageEntry } from "./accumulato
 import { localDay } from "./format";
 import {
   isUsageBlocked,
+  NO_LIMITS,
   policyForSection,
   sectionUsageSeconds,
   usageLimits,
   useUsageControl,
   type UsageLimits,
 } from "./policy";
+import { usePauseCover } from "./pause";
 import { usageTargetOf, type UsageTarget } from "./section";
 
 const TICK_MS = 1_000;
@@ -28,7 +30,8 @@ export function currentTarget(store: AppStore, visible: boolean): UsageTarget | 
   if (!visible || store.sheet !== "none" || store.onboardingOpen) return null;
   const page = selectPage(store);
   const target = page?.url ? usageTargetOf(page.url, page.scope) : null;
-  return target && !isUsageBlocked(target.host) ? target : null;
+  if (!target || isUsageBlocked(target.host)) return null;
+  return page && usePauseCover.getState().sessionId === page.id ? null : target;
 }
 
 /**
@@ -181,7 +184,7 @@ export function startUsageTracking(): () => void {
       void load();
     } else {
       useUsageControl.setState({
-        limits: { sites: {}, sections: {} },
+        limits: NO_LIMITS,
         seconds: {},
         sectionSeconds: {},
         warning: null,

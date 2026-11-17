@@ -1,6 +1,7 @@
 import { invoke } from "@tauri-apps/api/core";
 import { create } from "zustand";
 import { localDay } from "./format";
+import { closedNow, nextOpening, type Schedule, type Schedules } from "./schedule";
 
 export interface UsagePolicy {
   warnSeconds: number | null;
@@ -13,11 +14,26 @@ export type UsagePolicies = Record<string, UsagePolicy>;
 /** The limit of every part of a site the user set one for, keyed by host and then by section. */
 export type SectionPolicies = Record<string, UsagePolicies>;
 
-/** Every limit the user set: for whole sites and for the parts of them. */
+/** The pause-screen delay in seconds of every site the user set one for, keyed by host. */
+export type Pauses = Record<string, number>;
+
+/** Every rule the user set: limits for sites and parts of them, schedules and pause screens. */
 export interface UsageLimits {
   sites: UsagePolicies;
   sections: SectionPolicies;
+  schedules: Schedules;
+  pauses: Pauses;
+  /** The global switch: off means no site shows a pause screen, whatever its delay. */
+  pauseEnabled: boolean;
 }
+
+export const NO_LIMITS: UsageLimits = {
+  sites: {},
+  sections: {},
+  schedules: {},
+  pauses: {},
+  pauseEnabled: true,
+};
 
 export interface UsageControl {
   day: string;
@@ -38,7 +54,7 @@ export interface UsageControl {
 
 export const useUsageControl = create<UsageControl>(() => ({
   day: localDay(new Date()),
-  limits: { sites: {}, sections: {} },
+  limits: NO_LIMITS,
   seconds: {},
   sectionSeconds: {},
   ready: false,
@@ -87,19 +103,47 @@ export function limitReached(policy: UsagePolicy | undefined, seconds: number): 
   return policy?.limitSeconds != null && seconds >= policy.limitSeconds;
 }
 
-/** What closes a page today: its whole site's limit, or the limit of the part it is in. */
-export type PageLock = { kind: "site" | "part"; spent: number };
+/** The schedule that applies to `host`: the windows of the site itself and of the domains around it. */
+export function scheduleForHost(schedules: Schedules, host: string): Schedule {
+  return {
+    windows: Object.keys(schedules)
+      .filter((site) => sameSite(host, site))
+      .flatMap((site) => schedules[site].windows),
+  };
+}
+
+/** The pause-screen delay that applies to `host`: the longest among the domains around it. */
+export function pauseForHost(pauses: Pauses, host: string): number | null {
+  const delays = Object.keys(pauses)
+    .filter((site) => sameSite(host, site))
+    .map((site) => pauses[site]);
+  return delays.length === 0 ? null : Math.max(...delays);
+}
 
 /**
- * The limit that has closed the page at `target`, if any. A part's limit closes only that part;
- * the rest of the site stays open.
+ * What closes a page: its whole site's daily limit, the limit of the part it is in, or a
+ * schedule. A schedule closes the whole site until `opensAt` (`null` when it never opens).
+ */
+export type PageLock =
+  { kind: "site" | "part"; spent: number } | { kind: "schedule"; opensAt: Date | null };
+
+/** Whether the lock shuts the whole site, as opposed to one part of it. */
+export const closesSite = (lock: PageLock | null): boolean =>
+  lock?.kind === "site" || lock?.kind === "schedule";
+
+/**
+ * The limit or schedule that has closed the page at `target`, if any. A part's limit closes only
+ * that part; the rest of the site stays open.
  */
 export function pageLock(
   limits: UsageLimits,
   seconds: Record<string, number>,
   sectionSeconds: Record<string, Record<string, number>>,
   target: { host: string; section: string },
+  now: Date = new Date(),
 ): PageLock | null {
+  const schedule = scheduleForHost(limits.schedules, target.host);
+  if (closedNow(schedule, now)) return { kind: "schedule", opensAt: nextOpening(schedule, now) };
   const site = usageSeconds(seconds, target.host);
   if (limitReached(policyForHost(limits.sites, target.host), site)) {
     return { kind: "site", spent: site };
@@ -137,7 +181,8 @@ export function isUsageBlocked(host: string): boolean {
   const state = useUsageControl.getState();
   return (
     state.ready &&
-    limitReached(policyForHost(state.limits.sites, host), usageSeconds(state.seconds, host))
+    (limitReached(policyForHost(state.limits.sites, host), usageSeconds(state.seconds, host)) ||
+      closedNow(scheduleForHost(state.limits.schedules, host), new Date()))
   );
 }
 
@@ -150,6 +195,22 @@ export const usageLimits = {
   },
   setSection: async (host: string, section: string, policy: UsagePolicy): Promise<UsageLimits> => {
     const limits = await invoke<UsageLimits>("set_usage_section_limit", { host, section, policy });
+    useUsageControl.setState({ limits });
+    return limits;
+  },
+  setSchedule: async (host: string, schedule: Schedule): Promise<UsageLimits> => {
+    const limits = await invoke<UsageLimits>("set_usage_schedule", { host, schedule });
+    useUsageControl.setState({ limits });
+    return limits;
+  },
+  /** `null` removes the site's pause screen. */
+  setPause: async (host: string, seconds: number | null): Promise<UsageLimits> => {
+    const limits = await invoke<UsageLimits>("set_usage_pause", { host, seconds });
+    useUsageControl.setState({ limits });
+    return limits;
+  },
+  setPauseEnabled: async (enabled: boolean): Promise<UsageLimits> => {
+    const limits = await invoke<UsageLimits>("set_usage_pause_enabled", { enabled });
     useUsageControl.setState({ limits });
     return limits;
   },
