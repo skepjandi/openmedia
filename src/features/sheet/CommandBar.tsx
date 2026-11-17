@@ -1,5 +1,5 @@
 import { canStepBack } from "../web/sessions";
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import { selectPage, selectQuickFavorites, useApp } from "../../app/store";
 import { describeError } from "../../i18n/errors";
 import { useT } from "../../i18n/useT";
@@ -87,6 +87,14 @@ export function CommandBar() {
   useEffect(() => {
     if (open && assistantIdle) focusChat(chatDomain);
   }, [open, assistantIdle, chatDomain, focusChat, savedChats]);
+
+  // The bar is hidden, not unmounted: a field that keeps focus keeps the keyboard up over the page.
+  const barRef = useRef<HTMLElement>(null);
+  useEffect(() => {
+    const focused = document.activeElement;
+    if (!open && focused instanceof HTMLElement && barRef.current?.contains(focused))
+      focused.blur();
+  }, [open]);
 
   const submit = (event: FormEvent) => {
     event.preventDefault();
@@ -205,6 +213,7 @@ export function CommandBar() {
       className={`fixed inset-0 z-40 ${open ? "" : "pointer-events-none"}`}
     >
       <section
+        ref={barRef}
         data-open={open}
         onPointerDown={(event) => event.stopPropagation()}
         className="command-bar glass absolute inset-x-3 top-[calc(var(--safe-top)+8px)] rounded-3xl p-3"

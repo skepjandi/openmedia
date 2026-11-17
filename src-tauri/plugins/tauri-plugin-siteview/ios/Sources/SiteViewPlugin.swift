@@ -1487,9 +1487,13 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
     reportFailure(error)
   }
 
-  /// A navigation the app itself cancelled (a redirect handed to another view) is not a failure.
+  /// A navigation the app itself cancelled (a redirect handed to another view) is not a failure, and
+  /// neither is a load WebKit hands to its media player (204, "Plug-in handled load") or to the
+  /// system (102, "Frame load interrupted"): the page is fine, there is nothing to report.
   private func reportFailure(_ error: Error) {
-    if (error as NSError).domain == NSURLErrorDomain, (error as NSError).code == NSURLErrorCancelled { return }
+    let nsError = error as NSError
+    if nsError.domain == NSURLErrorDomain, nsError.code == NSURLErrorCancelled { return }
+    if nsError.domain == "WebKitErrorDomain", nsError.code == 204 || nsError.code == 102 { return }
     send(ErrorEvent(message: error.localizedDescription))
   }
 

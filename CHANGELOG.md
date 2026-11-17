@@ -6,6 +6,14 @@ All notable changes to OpenMedia are documented here.
 >
 > **Wiki**: the [GitHub Wiki](https://github.com/skepjandi/openmedia/wiki) is the public-facing main wiki — architecture, recipe format, AI pipeline, security model, roadmap. Source-controlled editing surface is `docs/wiki/` in this repo; CI (`.github/workflows/sync-wiki.yml`) mirrors it to the GitHub Wiki on every merge to `main`. New single-PR changes belong here, not as new wiki pages.
 
+### fix(shell): the keyboard stays up after an address is submitted; iOS no longer reports media loads as errors
+
+**Area:** `fix(shell)`, `fix(siteview)`
+
+**Change:** The command bar is hidden, not unmounted, so its field kept focus and the keyboard (iOS: its toolbar) stayed over the page after Go; the field is now blurred when the bar closes. iOS no longer shows WebKit's "Plug-in handled load" (204) and "Frame load interrupted" (102) as an error toast: the page is fine in both cases.
+
+**Verified:** iOS Simulator (iPhone 17 Pro Max) and Android emulator (API 36): keyboard gone after submitting an address; Android audio player goes `started` then `stopped` when the app is minimized and `started` again on return, iOS WebKit media sessions go `Interrupted` on minimize (Movy iframe player, Instagram, bare mp4). **Not verified:** real devices, picture-in-picture windows.
+
 ### fix(siteview): minimizing during a video no longer leaves it playing
 
 **Area:** `fix(siteview)`
