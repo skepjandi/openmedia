@@ -253,6 +253,11 @@ export const cs: Messages = {
   "settings.browsingNote":
     "Blokování reklam používá seznamy zabudované v aplikaci; pokud web přestane fungovat, vypněte je a stránka se znovu načte. Tlačítko Zpět je naproti hlavnímu tlačítku, pro weby, které žádné vlastní nemají. Recept může mít vlastní spodní okraj.",
   "settings.adBlock": "Blokovat reklamy a sledovače",
+  "settings.blockPopups": "Blokovat vyskakovací okna a přesměrování",
+  "settings.blockPopupsNote":
+    "Zahazuje okna a přesměrování, která stránka otevře sama, kromě přihlášení. Platí pro stránky, které otevřete příště.",
+  "web.popupBlocked":
+    "Zablokováno vyskakovací okno nebo přesměrování na {host}. Pokud selhalo přihlášení nebo platba, vypněte v Nastavení blokování vyskakovacích oken a přesměrování.",
   "settings.backButton": "Plovoucí tlačítko Zpět",
   "settings.backButtonNote":
     "Vždy viditelné. Nejdřív zavře Nastavení a další panely, potom se vrátí na předchozí stránku.",

@@ -3,17 +3,23 @@ interface SwitchProps {
   description?: string;
   checked: boolean;
   onChange: (checked: boolean) => void;
+  /** Greys the row and ignores taps, for a setting that depends on another one. */
+  disabled?: boolean;
 }
 
 /** A full-width row with a label on the left and a switch on the right; sits inside a `Group`. */
-export function Switch({ label, description, checked, onChange }: SwitchProps) {
+export function Switch({ label, description, checked, onChange, disabled }: SwitchProps) {
   return (
     <button
       type="button"
       role="switch"
       aria-checked={checked}
+      aria-disabled={disabled}
+      disabled={disabled}
       onClick={() => onChange(!checked)}
-      className="flex w-full items-center justify-between gap-4 px-4 py-3.5 text-start active:bg-paper/[0.05]"
+      className={`flex w-full items-center justify-between gap-4 px-4 py-3.5 text-start active:bg-paper/[0.05] ${
+        disabled ? "opacity-40" : ""
+      }`}
     >
       <span className="min-w-0">
         <span className="block text-base">{label}</span>

@@ -169,6 +169,10 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
     /** False from the activity's pause to its resume. */
     private var appForeground = true
     private var events: Channel? = null
+
+    /** Drop windows and redirects a page makes on its own that are no sign-in; set by every `open`. */
+    @Volatile
+    private var blockPopups = true
     private var interactiveRegions = emptyList<RectF>()
     private var colorScheme = "system"
     private val blockedSessions = ArrayList<String>()
@@ -361,6 +365,7 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
         // flips the setting.
         args.contentRuleLists?.let { lists -> applyRuleLists(lists.map { it.path }) }
         events = args.onEvent ?: events
+        blockPopups = args.blockPopups
 
         applyScheme(session)
         installBridge(session)
@@ -946,6 +951,8 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
             ): Boolean {
                 val session = sessionOf(view) ?: return false
                 if (session.blocked) return false
+                // A window nobody tapped for is a popunder; a sign-in always follows a tap.
+                if (blockPopups && !isUserGesture) return false
                 return openSignInWindow(session, resultMsg)
             }
 
@@ -985,10 +992,14 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
                         session.settled,
                         request.isForMainFrame,
                         userInitiated,
+                        !blockPopups || DomainScope.looksLikeSignIn(url.host, url.path, url.query),
                     )
                 ) {
                     DomainScope.Verdict.ALLOW -> false
-                    DomainScope.Verdict.CANCEL -> true
+                    DomainScope.Verdict.CANCEL -> {
+                        sendPopupBlocked(url)
+                        true
+                    }
                     DomainScope.Verdict.POPUP -> {
                         // A redirect the page made on its own (a sign-in that runs after the tap)
                         // has to stay in the app: the system browser shares no cookies with it.
@@ -1304,6 +1315,12 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
                     popup.post { closeSignInWindow(popup) }
                     return true
                 }
+                if (blockPopups && !DomainScope.looksLikeSignIn(host, url.path, url.query)) {
+                    // Not a sign-in and not the site itself: an ad window. It never shows.
+                    sendPopupBlocked(url)
+                    popup.post { closeSignInWindow(popup) }
+                    return true
+                }
                 return false
             }
 
@@ -1553,6 +1570,17 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
         val payload = JSObject()
         payload.put("type", "error")
         payload.put("message", message)
+        events?.send(payload)
+    }
+
+    /** Tells the shell a window or redirect was dropped, so a sign-in refused by mistake can be switched off. */
+    private fun sendPopupBlocked(url: Uri) {
+        val host = url.host
+        val scheme = url.scheme?.lowercase()
+        if (host.isNullOrEmpty() || (scheme != "http" && scheme != "https")) return
+        val payload = JSObject()
+        payload.put("type", "popupBlocked")
+        payload.put("host", host)
         events?.send(payload)
     }
 

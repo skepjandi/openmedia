@@ -252,6 +252,11 @@ export const ms: Messages = {
   "settings.browsingNote":
     "Pemblokiran iklan guna senarai yang dibina dalam aplikasi; jika sesebuah laman terhenti berfungsi, matikan sahaja dan halaman itu akan dimuat semula. Butang kembali terletak di seberang butang utama, untuk laman yang tiada butang sendiri. Resipi boleh menetapkan margin bawahnya sendiri.",
   "settings.adBlock": "Blokir iklan dan penjejak",
+  "settings.blockPopups": "Sekat pop timbul dan lencongan",
+  "settings.blockPopupsNote":
+    "Membuang tetingkap dan lencongan yang dibuka sendiri oleh halaman, kecuali log masuk. Terpakai untuk halaman yang anda buka selepas ini.",
+  "web.popupBlocked":
+    "Pop timbul atau lencongan ke {host} disekat. Jika log masuk atau pembayaran gagal, matikan Sekat pop timbul dan lencongan dalam Tetapan.",
   "settings.backButton": "Butang kembali terapung",
   "settings.backButtonNote":
     "Sentiasa dipaparkan. Menutup Tetapan dan helaian lain dahulu, kemudian kembali dalam halaman.",

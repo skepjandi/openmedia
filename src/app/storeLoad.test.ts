@@ -18,6 +18,7 @@ const startup = {
   onboarded: true,
   theme: "system",
   adBlock: false,
+  blockPopups: true,
   bottomMargin: 0,
   backgroundMediaSites: [],
   pictureInPictureSites: [],

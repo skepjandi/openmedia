@@ -253,6 +253,11 @@ export const sv: Messages = {
   "settings.browsingNote":
     "Annonsblockering använder listor som är inbyggda i appen; om en webbplats slutar fungera, stäng av den så laddas sidan om. Bakåtknappen sitter mittemot huvudknappen, för webbplatser som saknar en egen. Ett recept kan ange sin egen nedre marginal.",
   "settings.adBlock": "Blockera annonser och spårare",
+  "settings.blockPopups": "Blockera popup-fönster och omdirigeringar",
+  "settings.blockPopupsNote":
+    "Släpper fönster och omdirigeringar som en sida öppnar av sig själv, utom inloggningar. Gäller sidor du öppnar efteråt.",
+  "web.popupBlocked":
+    "Ett popup-fönster eller en omdirigering till {host} blockerades. Om en inloggning eller betalning misslyckades, stäng av Blockera popup-fönster och omdirigeringar i Inställningar.",
   "settings.backButton": "Flytande bakåtknapp",
   "settings.backButtonNote":
     "Alltid synlig. Stänger först Inställningar och andra vyer, och går sedan bakåt på sidan.",

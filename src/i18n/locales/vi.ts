@@ -247,6 +247,11 @@ export const vi: Messages = {
   "settings.browsingNote":
     "Chặn quảng cáo dùng các danh sách có sẵn trong ứng dụng; nếu một trang ngừng hoạt động, hãy tắt và trang sẽ tải lại. Nút quay lại nằm đối diện với nút chính, dành cho các trang không có nút riêng. Một công thức có thể đặt lề dưới riêng.",
   "settings.adBlock": "Chặn quảng cáo và trình theo dõi",
+  "settings.blockPopups": "Chặn cửa sổ bật lên và chuyển hướng",
+  "settings.blockPopupsNote":
+    "Loại bỏ cửa sổ và chuyển hướng mà trang tự mở, trừ đăng nhập. Áp dụng cho các trang bạn mở tiếp theo.",
+  "web.popupBlocked":
+    "Đã chặn một cửa sổ bật lên hoặc chuyển hướng tới {host}. Nếu đăng nhập hoặc thanh toán thất bại, hãy tắt Chặn cửa sổ bật lên và chuyển hướng trong Cài đặt.",
   "settings.backButton": "Nút quay lại nổi",
   "settings.backButtonNote":
     "Luôn hiển thị. Đóng Cài đặt và các bảng khác trước, sau đó quay lại trong trang.",

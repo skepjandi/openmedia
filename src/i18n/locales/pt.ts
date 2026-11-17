@@ -258,6 +258,11 @@ export const pt: Messages = {
   "settings.browsingNote":
     "O bloqueio de anúncios usa listas incorporadas ao app; se um site parar de funcionar, desative-o e a página será recarregada. O botão de voltar fica oposto ao botão principal, para sites que não têm o próprio. Uma receita pode definir sua própria margem inferior.",
   "settings.adBlock": "Bloquear anúncios e rastreadores",
+  "settings.blockPopups": "Bloquear pop-ups e redirecionamentos",
+  "settings.blockPopupsNote":
+    "Descarta janelas e redirecionamentos que uma página abre sozinha, exceto inícios de sessão. Vale para as páginas que abrir a seguir.",
+  "web.popupBlocked":
+    "Um pop-up ou redirecionamento para {host} foi bloqueado. Se um início de sessão ou pagamento falhou, desative Bloquear pop-ups e redirecionamentos em Definições.",
   "settings.backButton": "Botão de voltar flutuante",
   "settings.backButtonNote":
     "Sempre visível. Fecha primeiro as Definições e outras folhas e depois volta na página.",

@@ -252,6 +252,11 @@ export const de: Messages = {
   "settings.browsingNote":
     "Der Werbeblocker verwendet Listen, die in der App integriert sind; wenn eine Website nicht mehr funktioniert, schalte ihn aus und die Seite wird neu geladen. Die Zurück-Taste befindet sich gegenüber der Haupttaste, für Websites ohne eigene Zurück-Schaltfläche. Ein Rezept kann einen eigenen unteren Rand festlegen.",
   "settings.adBlock": "Werbung und Tracker blockieren",
+  "settings.blockPopups": "Pop-ups und Weiterleitungen blockieren",
+  "settings.blockPopupsNote":
+    "Verwirft Fenster und Weiterleitungen, die eine Seite von selbst öffnet, außer Anmeldungen. Gilt für Seiten, die du danach öffnest.",
+  "web.popupBlocked":
+    "Ein Pop-up oder eine Weiterleitung zu {host} wurde blockiert. Falls eine Anmeldung oder Zahlung fehlschlug, schalte „Pop-ups und Weiterleitungen blockieren“ in den Einstellungen aus.",
   "settings.backButton": "Schwebende Zurück-Taste",
   "settings.backButtonNote":
     "Immer sichtbar. Schließt zuerst die Einstellungen und andere Ansichten, danach geht es auf der Seite zurück.",

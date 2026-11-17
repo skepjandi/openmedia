@@ -6,7 +6,8 @@ use tauri::{
 };
 
 use crate::events::{
-    BRIDGE_EVENT, CLOSED_EVENT, ERROR_EVENT, MEMORY_EVENT, NOTIFICATION_TAP_EVENT, STATE_EVENT,
+    BRIDGE_EVENT, CLOSED_EVENT, ERROR_EVENT, MEMORY_EVENT, NOTIFICATION_TAP_EVENT,
+    POPUP_BLOCKED_EVENT, STATE_EVENT,
 };
 use crate::models::*;
 use crate::validate::{
@@ -57,6 +58,7 @@ fn dispatch_event<R: Runtime>(app: &AppHandle<R>, json: &str) {
             Err(_) => Ok(()),
         },
         SiteViewEvent::Error { message } => app.emit(ERROR_EVENT, message),
+        SiteViewEvent::PopupBlocked { host } => app.emit(POPUP_BLOCKED_EVENT, host),
         SiteViewEvent::Bridge { origin, body } => match parse_bridge_body(&body) {
             Ok(body) => app.emit(BRIDGE_EVENT, BridgeMessage { origin, body }),
             Err(_) => Ok(()),

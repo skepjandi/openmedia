@@ -16,11 +16,11 @@ func domain(_ host: String) -> String { DomainScope.registrableDomain(of: host) 
 func contains(_ scope: String, _ host: String) -> Bool { DomainScope.contains(scope: scope, host: host) }
 func verdict(
   _ scheme: String?, _ host: String?, scope: String, settled: Bool = true, mainFrame: Bool = true,
-  userInitiated: Bool = false
+  userInitiated: Bool = false, signIn: Bool = false
 ) -> NavigationVerdict {
   DomainScope.verdict(
     scheme: scheme, host: host, scope: scope, settled: settled, isMainFrame: mainFrame,
-    userInitiated: userInitiated)
+    userInitiated: userInitiated, signIn: signIn)
 }
 
 expect(domain("www.instagram.com"), "instagram.com", "www prefix")
@@ -45,11 +45,29 @@ expect(contains("instagram.com", "notinstagram.com"), false, "lookalike")
 expect(contains("instagram.com", "instagram.com.evil.io"), false, "suffix trick")
 
 expect(verdict("https", "l.instagram.com", scope: "instagram.com"), .allow, "same domain")
-expect(verdict("https", "evil.io", scope: "instagram.com"), .popup, "outside domain")
+expect(verdict("https", "evil.io", scope: "instagram.com"), .cancel, "automatic redirect to an unrelated domain is an ad")
+expect(verdict("https", "accounts.google.com", scope: "instagram.com", signIn: true), .popup, "sign-in goes to an app window")
 expect(verdict("https", "evil.io", scope: "instagram.com", userInitiated: true), .allow, "clicked external link stays in the web view")
 expect(verdict("https", "evil.io", scope: "instagram.com", mainFrame: false), .allow, "subframe")
 expect(verdict("https", "x.com", scope: "twitter.com", settled: false), .allow, "first-load redirect")
-expect(verdict("https", "x.com", scope: "twitter.com"), .popup, "redirect after the first load")
+expect(verdict("https", "x.com", scope: "twitter.com"), .cancel, "redirect after the first load")
+
+func signIn(_ url: String) -> Bool {
+  let parts = URLComponents(string: url)!
+  return DomainScope.looksLikeSignIn(host: parts.host, path: parts.path, query: parts.query)
+}
+expect(signIn("https://accounts.google.com/o/oauth2/v2/auth?x=1"), true, "google")
+expect(signIn("https://appleid.apple.com/auth/authorize?a=b"), true, "apple")
+expect(signIn("https://sub.okta.com/app/x"), true, "identity provider subdomain")
+expect(signIn("https://idp.example/oauth2/authorize?client_id=1"), true, "oauth path")
+expect(signIn("https://idp.example/start?client_id=1&redirect_uri=https%3A%2F%2Fa"), true, "oauth query")
+expect(signIn("https://idp.example/x?SAMLRequest=abc"), true, "saml query")
+expect(signIn("https://shop.example/login"), true, "login path")
+expect(signIn("https://mv.auditsupcast.click/sbx/b/abc?xy=1"), false, "ad network")
+expect(signIn("https://unodepurreic.rest/lp/i/df/df.png"), false, "ad landing")
+expect(signIn("https://evil.io/author/page"), false, "auth inside a longer word")
+expect(signIn("https://notpaypal.com/"), false, "lookalike host")
+expect(signIn("https://x.example/?client_id=1"), false, "client_id alone")
 expect(verdict("about", nil, scope: "a.com"), .allow, "about:blank")
 expect(verdict("javascript", nil, scope: "a.com"), .cancel, "javascript:")
 expect(verdict("tel", nil, scope: "a.com"), .cancel, "tel:")

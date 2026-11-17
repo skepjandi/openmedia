@@ -256,6 +256,11 @@ export const ro: Messages = {
   "settings.browsingNote":
     "Blocarea reclamelor folosește liste integrate în aplicație; dacă un site nu mai funcționează, dezactivează-o și pagina se reîncarcă. Butonul Înapoi este plasat opus butonului principal, pentru site-urile care nu au unul propriu. O rețetă își poate seta propria margine inferioară.",
   "settings.adBlock": "Blochează reclamele și trackerele",
+  "settings.blockPopups": "Blochează ferestrele pop-up și redirecționările",
+  "settings.blockPopupsNote":
+    "Elimină ferestrele și redirecționările pe care o pagină le deschide singură, cu excepția autentificărilor. Se aplică paginilor deschise ulterior.",
+  "web.popupBlocked":
+    "A fost blocat un pop-up sau o redirecționare către {host}. Dacă o autentificare sau o plată a eșuat, dezactivează Blochează ferestrele pop-up și redirecționările în Setări.",
   "settings.backButton": "Buton Înapoi plutitor",
   "settings.backButtonNote":
     "Mereu vizibil. Închide mai întâi Setările și alte panouri, apoi revine în pagină.",

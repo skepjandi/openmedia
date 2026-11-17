@@ -258,6 +258,11 @@ export const es: Messages = {
   "settings.browsingNote":
     "El bloqueo de anuncios usa listas integradas en la app; si un sitio deja de funcionar, desactívalo y la página se recargará. El botón de retroceso se sitúa frente al botón principal para los sitios que no tienen uno propio. Una receta puede fijar su propio margen inferior.",
   "settings.adBlock": "Bloquear anuncios y rastreadores",
+  "settings.blockPopups": "Bloquear ventanas emergentes y redirecciones",
+  "settings.blockPopupsNote":
+    "Descarta las ventanas y redirecciones que una página abre por sí sola, salvo los inicios de sesión. Se aplica a las páginas que abras después.",
+  "web.popupBlocked":
+    "Se bloqueó una ventana emergente o redirección a {host}. Si falló un inicio de sesión o un pago, desactiva Bloquear ventanas emergentes y redirecciones en Ajustes.",
   "settings.backButton": "Botón de retroceso flotante",
   "settings.backButtonNote":
     "Siempre visible. Primero cierra Ajustes y otras hojas, y después retrocede en la página.",

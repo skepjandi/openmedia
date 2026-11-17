@@ -52,7 +52,11 @@ class DomainScopeTest {
     @Test
     fun verdictRoutesAutomaticCrossDomainNavigationsToPopup() {
         assertEquals(Verdict.ALLOW, verdict("https", "l.instagram.com", "instagram.com"))
-        assertEquals(Verdict.POPUP, verdict("https", "evil.io", "instagram.com"))
+        assertEquals(Verdict.CANCEL, verdict("https", "evil.io", "instagram.com"))
+        assertEquals(
+            Verdict.POPUP,
+            verdict("https", "accounts.google.com", "instagram.com", signIn = true),
+        )
         assertEquals(Verdict.ALLOW, verdict("https", "evil.io", "instagram.com", mainFrame = false))
     }
 
@@ -63,7 +67,7 @@ class DomainScopeTest {
             verdict("https", "result.example", "search.example", userInitiated = true),
         )
         assertEquals(
-            Verdict.POPUP,
+            Verdict.CANCEL,
             verdict("https", "result.example", "search.example", userInitiated = false),
         )
     }
@@ -71,7 +75,7 @@ class DomainScopeTest {
     @Test
     fun verdictAllowsTheFirstLoadToFindItsHome() {
         assertEquals(Verdict.ALLOW, verdict("https", "x.com", "twitter.com", settled = false))
-        assertEquals(Verdict.POPUP, verdict("https", "x.com", "twitter.com"))
+        assertEquals(Verdict.CANCEL, verdict("https", "x.com", "twitter.com"))
     }
 
     @Test
@@ -82,6 +86,29 @@ class DomainScopeTest {
         assertEquals(Verdict.CANCEL, verdict("https", null, "a.com"))
     }
 
+    @Test
+    fun looksLikeSignInKnowsIdentityProvidersAndOAuthShapes() {
+        assertTrue(signIn("accounts.google.com", "/o/oauth2/v2/auth", "x=1"))
+        assertTrue(signIn("appleid.apple.com", "/auth/authorize", "a=b"))
+        assertTrue(signIn("sub.okta.com", "/app/x", null))
+        assertTrue(signIn("idp.example", "/oauth2/authorize", "client_id=1"))
+        assertTrue(signIn("idp.example", "/start", "client_id=1&redirect_uri=https%3A%2F%2Fa"))
+        assertTrue(signIn("idp.example", "/x", "SAMLRequest=abc"))
+        assertTrue(signIn("shop.example", "/login", null))
+    }
+
+    @Test
+    fun looksLikeSignInRefusesAdNetworksAndLookalikes() {
+        assertFalse(signIn("mv.auditsupcast.click", "/sbx/b/abc", "xy=1"))
+        assertFalse(signIn("unodepurreic.rest", "/lp/i/df/df.png", null))
+        assertFalse(signIn("evil.io", "/author/page", null))
+        assertFalse(signIn("notpaypal.com", "/", null))
+        assertFalse(signIn("x.example", "/", "client_id=1"))
+    }
+
+    private fun signIn(host: String, path: String, query: String?) =
+        DomainScope.looksLikeSignIn(host, path, query)
+
     private fun verdict(
         scheme: String?,
         host: String?,
@@ -89,5 +116,6 @@ class DomainScopeTest {
         settled: Boolean = true,
         mainFrame: Boolean = true,
         userInitiated: Boolean = false,
-    ) = DomainScope.verdict(scheme, host, scope, settled, mainFrame, userInitiated)
+        signIn: Boolean = false,
+    ) = DomainScope.verdict(scheme, host, scope, settled, mainFrame, userInitiated, signIn)
 }

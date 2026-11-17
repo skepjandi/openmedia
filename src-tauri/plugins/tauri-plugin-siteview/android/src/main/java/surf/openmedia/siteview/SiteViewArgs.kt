@@ -31,6 +31,7 @@ class OpenArgs {
     var documentStartScript: String? = null
     var adBlockScriptlet: String? = null
     var adBlockEnabled: Boolean = false
+    var blockPopups: Boolean = true
     var contentRuleLists: List<RuleListArgs>? = null
     var onEvent: Channel? = null
 }

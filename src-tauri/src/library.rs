@@ -154,6 +154,9 @@ pub struct AppState {
     pub onboarded: bool,
     pub theme: Theme,
     pub ad_block: bool,
+    /// Drops the pop-ups and redirects a page opens on its own that are no sign-in. Part of ad
+    /// blocking: it has no effect while ad blocking is off.
+    pub block_popups: bool,
     /// Pixels kept clear under every page, unless the site has its own.
     pub bottom_margin: u32,
     /// The sites whose media keeps playing in the background.
@@ -189,6 +192,9 @@ struct LibraryData {
     /// On by default; the shell can turn blocking off.
     #[serde(default = "enabled")]
     ad_block: bool,
+    /// On by default, and only in force while `ad_block` is on.
+    #[serde(default = "enabled")]
+    block_popups: bool,
     /// Toggles the user changed, by recipe id and then option id. Anything absent keeps the
     /// recipe's default, so shipping a recipe with a new option needs no migration.
     #[serde(default)]
@@ -303,6 +309,7 @@ impl Library {
             onboarded: data.onboarded,
             theme: data.theme,
             ad_block: data.ad_block,
+            block_popups: data.block_popups,
             bottom_margin: data.bottom_margin,
             background_media_sites: data.background_media_sites.iter().cloned().collect(),
             picture_in_picture_sites: data.picture_in_picture_sites.iter().cloned().collect(),
@@ -443,6 +450,19 @@ impl Library {
     pub fn set_ad_block(&self, enabled: bool) -> Result<()> {
         let mut data = self.lock()?;
         data.ad_block = enabled;
+        self.save(&data)
+    }
+
+    /// Whether pop-ups and redirects that are no sign-in are dropped: the saved choice, in force
+    /// only while ad blocking is on.
+    pub fn popup_blocking_enabled(&self) -> Result<bool> {
+        let data = self.lock()?;
+        Ok(data.ad_block && data.block_popups)
+    }
+
+    pub fn set_block_popups(&self, enabled: bool) -> Result<()> {
+        let mut data = self.lock()?;
+        data.block_popups = enabled;
         self.save(&data)
     }
 
@@ -907,6 +927,7 @@ fn default_data() -> LibraryData {
         onboarded: false,
         theme: Theme::System,
         ad_block: true,
+        block_popups: true,
         site_options: OptionChoices::new(),
         bottom_margin: 0,
         site_bottom_margins: BTreeMap::new(),
@@ -1552,6 +1573,18 @@ mod tests {
         library.set_ad_block(false).unwrap();
         assert!(!library.ad_block_enabled().unwrap());
         assert!(!reload(&dir).state().unwrap().ad_block);
+    }
+
+    #[test]
+    fn popup_blocking_is_on_by_default_and_needs_ad_blocking() {
+        let (dir, library) = library();
+        assert!(library.popup_blocking_enabled().unwrap());
+        library.set_block_popups(false).unwrap();
+        assert!(!library.popup_blocking_enabled().unwrap());
+        assert!(!reload(&dir).state().unwrap().block_popups);
+        library.set_block_popups(true).unwrap();
+        library.set_ad_block(false).unwrap();
+        assert!(!library.popup_blocking_enabled().unwrap());
     }
 
     #[test]

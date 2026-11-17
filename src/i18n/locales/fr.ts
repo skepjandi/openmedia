@@ -260,6 +260,11 @@ export const fr: Messages = {
   "settings.browsingNote":
     "Le blocage des publicités utilise des listes intégrées à l’application ; si un site cesse de fonctionner, désactivez-le et la page se rechargera. Le bouton de retour se place à l’opposé du bouton principal pour les sites qui n’en ont pas. Une recette peut définir sa propre marge inférieure.",
   "settings.adBlock": "Bloquer les publicités et les traceurs",
+  "settings.blockPopups": "Bloquer les pop-ups et les redirections",
+  "settings.blockPopupsNote":
+    "Écarte les fenêtres et redirections qu'une page ouvre d'elle-même, sauf les connexions. S'applique aux pages que vous ouvrirez ensuite.",
+  "web.popupBlocked":
+    "Un pop-up ou une redirection vers {host} a été bloqué. Si une connexion ou un paiement a échoué, désactivez Bloquer les pop-ups et les redirections dans Réglages.",
   "settings.backButton": "Bouton de retour flottant",
   "settings.backButtonNote":
     "Toujours visible. Elle ferme d'abord les Réglages et les autres feuilles, puis revient en arrière dans la page.",

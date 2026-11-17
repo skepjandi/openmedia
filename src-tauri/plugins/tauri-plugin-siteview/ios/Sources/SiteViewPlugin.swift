@@ -242,6 +242,7 @@ class OpenArgs: Decodable {
   let documentStartScript: String?
   let adBlockScriptlet: String?
   let adBlockEnabled: Bool
+  let blockPopups: Bool
   let contentRuleLists: [RuleListArgs]?
   let onEvent: Channel
 }
@@ -330,6 +331,11 @@ struct MemoryWarningEvent: Encodable {
 struct NotificationTappedEvent: Encodable {
   let type = "notificationTapped"
   let session: String
+}
+
+struct PopupBlockedEvent: Encodable {
+  let type = "popupBlocked"
+  let host: String
 }
 
 struct ErrorEvent: Encodable {
@@ -516,6 +522,8 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
   private var activeId: String?
   private var router: TouchRouter?
   private var events: Channel?
+  /// Drop windows and redirects a page makes on its own that are no sign-in; set by every `open`.
+  private var blockPopups = true
   private var popup: SFSafariViewController?
   /// The window a page opened with `window.open`. It sits above the site view, shares the
   /// profile's data store and keeps `window.opener`, so the page can be told the sign-in is done.
@@ -651,6 +659,7 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
       self.sessions[session.id] = session
       self.activeId = session.id
       self.events = args.onEvent
+      self.blockPopups = args.blockPopups
       self.observe(session)
       self.mount(session)
       if self.isBlocked(args.session) {
@@ -1392,12 +1401,13 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
     if userInitiated { session.settled = false }
     switch DomainScope.verdict(
       scheme: url?.scheme, host: url?.host, scope: session.scope, settled: session.settled,
-      isMainFrame: isMainFrame, userInitiated: userInitiated)
+      isMainFrame: isMainFrame, userInitiated: userInitiated, signIn: !blockPopups || looksLikeSignIn(url))
     {
     case .allow:
       decisionHandler(.allow)
     case .cancel:
       decisionHandler(.cancel)
+      notePopupBlocked(url)
     case .popup:
       // A redirect the page made on its own (a sign-in that runs after the tap) has to stay in
       // the app: the system browser shares no cookies with the page.
@@ -1519,7 +1529,7 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
     if userInitiated { session.settled = false }
     switch DomainScope.verdict(
       scheme: url.scheme, host: url.host, scope: session.scope, settled: session.settled,
-      isMainFrame: true, userInitiated: userInitiated)
+      isMainFrame: true, userInitiated: userInitiated, signIn: !blockPopups || looksLikeSignIn(url))
     {
     case .allow: webView.load(navigationAction.request)
     case .popup:
@@ -1527,9 +1537,23 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
       // `window.opener`, so the sign-in can hand its token back to the page.
       if let window = openSignInWindow(configuration, for: session) { return window }
       presentPopup(url)
-    case .cancel: break
+    case .cancel: notePopupBlocked(url)  // A window the page opens on its own that is no sign-in.
     }
     return nil
+  }
+
+  /// Tells the shell a window or redirect was dropped, so a sign-in refused by mistake can be
+  /// switched off. Other refusals (a scheme the app never loads) are not this.
+  private func notePopupBlocked(_ url: URL?) {
+    guard let url, let host = url.host, !host.isEmpty,
+      ["http", "https"].contains(url.scheme?.lowercased() ?? "")
+    else { return }
+    send(PopupBlockedEvent(host: host))
+  }
+
+  private func looksLikeSignIn(_ url: URL?) -> Bool {
+    guard let url, let parts = URLComponents(url: url, resolvingAgainstBaseURL: false) else { return false }
+    return DomainScope.looksLikeSignIn(host: parts.host, path: parts.path, query: parts.query)
   }
 
   /// The window a page opened with `window.open`: a sign-in window. WebKit hands over the

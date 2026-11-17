@@ -131,6 +131,7 @@ pub fn run() {
             commands::open_site,
             commands::adopt_boot_session,
             commands::set_ad_block,
+            commands::set_block_popups,
             commands::get_sites,
             commands::set_site_option,
             recipe_library::library_list,

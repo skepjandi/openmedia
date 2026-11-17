@@ -252,6 +252,11 @@ export const en = {
   "settings.browsingNote":
     "Ad blocking uses lists built into the app; if a site stops working, turn it off and the page reloads. The back button sits opposite the main button, for sites with none of their own. A favorite can set its own bottom margin.",
   "settings.adBlock": "Block ads and trackers",
+  "settings.blockPopups": "Block pop-ups and redirects",
+  "settings.blockPopupsNote":
+    "Drops windows and redirects a page opens on its own, except sign-ins. Applies to pages you open next.",
+  "web.popupBlocked":
+    "Blocked a pop-up or redirect to {host}. If a sign-in or payment failed, turn off Block pop-ups and redirects in Settings.",
   "settings.backButton": "Floating back button",
   "settings.backButtonNote":
     "Always shown. Closes Settings and other sheets first, then goes back in the page.",

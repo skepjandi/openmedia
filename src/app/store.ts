@@ -199,6 +199,7 @@ export interface AppStore {
   /** Picks the engine the command bar searches with. */
   setSearchEngine: (engine: SearchEngine) => Promise<void>;
   setAdBlock: (enabled: boolean) => Promise<void>;
+  setBlockPopups: (enabled: boolean) => Promise<void>;
   /** Changes some of the accessibility choices; the rest keep their value. */
   setAccessibility: (changes: Partial<Accessibility>) => Promise<void>;
   /** Changes some of the video controls; the rest keep their value. */
@@ -780,6 +781,22 @@ export const useApp = create<AppStore>((set, get) => {
           state:
             current.state && previous !== undefined
               ? { ...current.state, adBlock: previous }
+              : current.state,
+          error: appError(error),
+        }));
+      }
+    },
+
+    setBlockPopups: async (enabled) => {
+      const previous = get().state?.blockPopups;
+      set((current) => ({ state: current.state && { ...current.state, blockPopups: enabled } }));
+      try {
+        await library.setBlockPopups(enabled);
+      } catch (error) {
+        set((current) => ({
+          state:
+            current.state && previous !== undefined
+              ? { ...current.state, blockPopups: previous }
               : current.state,
           error: appError(error),
         }));

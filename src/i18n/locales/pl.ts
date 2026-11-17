@@ -256,6 +256,11 @@ export const pl: Messages = {
   "settings.browsingNote":
     "Blokowanie reklam korzysta z list wbudowanych w aplikację; jeśli witryna przestanie działać, wyłącz je, a strona zostanie wczytana ponownie. Przycisk wstecz znajduje się naprzeciw głównego przycisku, dla witryn, które nie mają własnego. Przepis może ustawić własny dolny margines.",
   "settings.adBlock": "Blokuj reklamy i skrypty śledzące",
+  "settings.blockPopups": "Blokuj wyskakujące okna i przekierowania",
+  "settings.blockPopupsNote":
+    "Odrzuca okna i przekierowania, które strona otwiera sama, poza logowaniem. Dotyczy stron otwieranych później.",
+  "web.popupBlocked":
+    "Zablokowano wyskakujące okno lub przekierowanie do {host}. Jeśli logowanie lub płatność się nie powiodły, wyłącz w Ustawieniach blokowanie wyskakujących okien i przekierowań.",
   "settings.backButton": "Pływający przycisk wstecz",
   "settings.backButtonNote":
     "Zawsze widoczny. Najpierw zamyka Ustawienia i inne panele, a potem cofa na stronie.",

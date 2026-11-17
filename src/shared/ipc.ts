@@ -80,6 +80,8 @@ export interface AppState {
   onboarded: boolean;
   theme: Theme;
   adBlock: boolean;
+  /** Drops pop-ups and redirects that are no sign-in; in force only while `adBlock` is on. */
+  blockPopups: boolean;
   /** Pixels kept clear under every page that has no margin of its own. */
   bottomMargin: number;
   /** The sites (registrable domains) whose media keeps playing while hidden or in the background. */
@@ -264,6 +266,8 @@ export const library = {
   setSearchEngine: (engine: SearchEngine) => command("set_search_engine", { engine }),
   /** Persists the choice and reloads the open page under it; see `set_ad_block` in Rust. */
   setAdBlock: (enabled: boolean) => command("set_ad_block", { enabled }),
+  /** Persists the choice; pages opened afterwards use it. */
+  setBlockPopups: (enabled: boolean) => command("set_block_popups", { enabled }),
   /** The recipes with their toggles, from the normal choices or the incognito ones. */
   getSites: (incognito: boolean) => invoke<SiteSettings[]>("get_sites", { incognito }),
   /**
@@ -376,6 +380,9 @@ export const siteView = {
   /** The user tapped a notification; the payload is the session it was raised for. */
   onNotificationTap: (handler: (session: string) => void): Promise<UnlistenFn> =>
     listen<string>("siteview:notification-tap", (event) => handler(event.payload)),
+  /** A pop-up or redirect the page made on its own was dropped; the payload is the host it wanted. */
+  onPopupBlocked: (handler: (host: string) => void): Promise<UnlistenFn> =>
+    listen<string>("siteview:popup-blocked", (event) => handler(event.payload)),
   onError: (handler: (message: string) => void): Promise<UnlistenFn> =>
     listen<string>("siteview:error", (event) => handler(event.payload)),
 };

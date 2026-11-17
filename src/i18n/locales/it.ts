@@ -259,6 +259,11 @@ export const it: Messages = {
   "settings.browsingNote":
     "Il blocco degli annunci usa elenchi integrati nell’app; se un sito smette di funzionare, disattivalo e la pagina si ricaricherà. Il pulsante Indietro si mette dalla parte opposta del pulsante principale, per i siti che non ne hanno uno. Una ricetta può impostare il proprio margine inferiore.",
   "settings.adBlock": "Blocca annunci e tracker",
+  "settings.blockPopups": "Blocca pop-up e reindirizzamenti",
+  "settings.blockPopupsNote":
+    "Scarta le finestre e i reindirizzamenti che una pagina apre da sola, tranne gli accessi. Vale per le pagine che aprirai dopo.",
+  "web.popupBlocked":
+    "Bloccato un pop-up o un reindirizzamento verso {host}. Se un accesso o un pagamento non è riuscito, disattiva Blocca pop-up e reindirizzamenti in Impostazioni.",
   "settings.backButton": "Pulsante Indietro fluttuante",
   "settings.backButtonNote":
     "Sempre visibile. Chiude prima Impostazioni e gli altri pannelli, poi torna indietro nella pagina.",

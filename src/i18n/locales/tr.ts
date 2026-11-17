@@ -255,6 +255,11 @@ export const tr: Messages = {
   "settings.browsingNote":
     "Reklam engelleme, uygulamaya gömülü listeleri kullanır. Bir site çalışmaz hâle gelirse kapatın, sayfa yeniden yüklenir. Geri düğmesi, kendi geri düğmesi olmayan siteler için ana düğmenin karşısında durur. Bir tarif kendi alt kenar boşluğunu ayarlayabilir.",
   "settings.adBlock": "Reklamları ve izleyicileri engelle",
+  "settings.blockPopups": "Açılır pencereleri ve yönlendirmeleri engelle",
+  "settings.blockPopupsNote":
+    "Bir sayfanın kendiliğinden açtığı pencereleri ve yönlendirmeleri, oturum açma hariç, atar. Bundan sonra açtığınız sayfalara uygulanır.",
+  "web.popupBlocked":
+    "{host} için bir açılır pencere veya yönlendirme engellendi. Oturum açma ya da ödeme başarısız olduysa Ayarlar'dan Açılır pencereleri ve yönlendirmeleri engelle seçeneğini kapatın.",
   "settings.backButton": "Yüzen geri düğmesi",
   "settings.backButtonNote":
     "Her zaman görünür. Önce Ayarlar ve diğer sayfaları kapatır, sonra sayfada geri gider.",

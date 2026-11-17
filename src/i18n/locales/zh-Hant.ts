@@ -230,6 +230,11 @@ export const zhHant: Messages = {
   "settings.browsingNote":
     "廣告阻擋使用 App 內建的清單；若某個網站無法運作，關閉後頁面會重新載入。返回按鈕位於主要按鈕的對面，供沒有自己返回功能的網站使用。配方可以有自己的底部邊距。",
   "settings.adBlock": "阻擋廣告與追蹤程式",
+  "settings.blockPopups": "封鎖彈出視窗與重新導向",
+  "settings.blockPopupsNote":
+    "捨棄頁面自行開啟的視窗與重新導向（登入除外）。對之後開啟的頁面生效。",
+  "web.popupBlocked":
+    "已封鎖前往 {host} 的彈出視窗或重新導向。若登入或付款失敗，請在設定中關閉「封鎖彈出視窗與重新導向」。",
   "settings.backButton": "浮動返回按鈕",
   "settings.backButtonNote": "一律顯示。先關閉設定等面板，再在頁面中返回。",
   "settings.bottomMargin": "全域底部邊距",

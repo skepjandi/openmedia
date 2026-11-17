@@ -230,6 +230,10 @@ export const zhHans: Messages = {
   "settings.browsingNote":
     "广告拦截使用应用内置的拦截列表；如果某个网站无法正常工作，可以将其关闭，页面会重新加载。返回按钮位于主按钮的对面，供那些自己没有返回按钮的网站使用。配方可以设置自己的底部边距。",
   "settings.adBlock": "屏蔽广告和跟踪器",
+  "settings.blockPopups": "拦截弹窗和重定向",
+  "settings.blockPopupsNote": "丢弃页面自行打开的窗口和重定向（登录除外）。对之后打开的页面生效。",
+  "web.popupBlocked":
+    "已拦截指向 {host} 的弹窗或重定向。如果登录或付款失败，请在设置中关闭“拦截弹窗和重定向”。",
   "settings.backButton": "悬浮返回按钮",
   "settings.backButtonNote": "始终显示。先关闭设置等面板，再在页面中后退。",
   "settings.bottomMargin": "全局底部边距",

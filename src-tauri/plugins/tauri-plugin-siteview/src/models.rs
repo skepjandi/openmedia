@@ -32,6 +32,8 @@ pub struct OpenRequest {
     #[serde(default)]
     pub ad_block_scriptlet: Option<String>,
     pub ad_block_enabled: bool,
+    /// Drop pop-ups and redirects that are no sign-in; see `DomainScope.looksLikeSignIn`.
+    pub block_popups: bool,
     #[serde(default)]
     pub content_rule_lists: Vec<ContentRuleList>,
 }
@@ -119,6 +121,11 @@ pub enum SiteViewEvent {
     Bridge {
         origin: String,
         body: String,
+    },
+    /// The page opened a window or redirected on its own and it was dropped; `host` is where it
+    /// wanted to go.
+    PopupBlocked {
+        host: String,
     },
 }
 

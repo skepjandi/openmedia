@@ -116,7 +116,9 @@ function LanguageSection() {
 function BrowsingSection() {
   const adBlock = useApp((s) => s.state?.adBlock ?? true);
   const searchEngine = useApp((s) => s.state?.searchEngine ?? DEFAULT_SEARCH_ENGINE);
+  const blockPopups = useApp((s) => s.state?.blockPopups ?? true);
   const setAdBlock = useApp((s) => s.setAdBlock);
+  const setBlockPopups = useApp((s) => s.setBlockPopups);
   const setSearchEngine = useApp((s) => s.setSearchEngine);
   const t = useT();
 
@@ -128,6 +130,15 @@ function BrowsingSection() {
           checked={adBlock}
           onChange={(on) => void setAdBlock(on)}
         />
+        <div className="ps-6">
+          <Switch
+            label={t("settings.blockPopups")}
+            description={t("settings.blockPopupsNote")}
+            checked={blockPopups}
+            disabled={!adBlock}
+            onChange={(on) => void setBlockPopups(on)}
+          />
+        </div>
         <div className="flex flex-col gap-2 px-4 py-3.5">
           <div className="text-xs text-paper/60">{t("settings.searchEngine")}</div>
           <Picker

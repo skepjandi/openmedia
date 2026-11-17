@@ -18,6 +18,9 @@ import { LimitCover } from "../stats/UsageGuard";
 /** How often idle and surplus hidden sessions are swept. */
 const SWEEP_MS = 60_000;
 
+/** The least time between two warnings that a pop-up was dropped. */
+const POPUP_WARNING_GAP_MS = 30_000;
+
 /**
  * The page itself. This component only reserves the rectangle the native site view fills and
  * mirrors page state into the store; the web content is drawn by native code underneath. Each
@@ -63,6 +66,7 @@ export function WebLayer() {
   }, [listening, profileId, action, sessionOpenFailed, reportError]);
 
   useEffect(() => {
+    let lastPopupWarning = 0;
     const watches = new Map<string, Watch>();
     /** The last address each session finished loading, to tell when it left a search for a site. */
     const loadedUrls = new Map<string, string>();
@@ -121,6 +125,13 @@ export function WebLayer() {
       }),
       siteView.onMemoryWarning(() => trimSessions("memory")),
       siteView.onError(reportError),
+      siteView.onPopupBlocked((host) => {
+        // An ad script retries every tap: say it once in a while, not on every attempt.
+        const at = Date.now();
+        if (at - lastPopupWarning < POPUP_WARNING_GAP_MS) return;
+        lastPopupWarning = at;
+        reportError(translate.current("web.popupBlocked", { host }));
+      }),
       siteView.onNotificationTap(openSession),
     ];
     const sweep = window.setInterval(() => trimSessions("routine"), SWEEP_MS);

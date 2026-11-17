@@ -249,6 +249,11 @@ export const id: Messages = {
   "settings.browsingNote":
     "Pemblokiran iklan memakai daftar yang sudah ada di dalam aplikasi; jika sebuah situs berhenti berfungsi, matikan saja dan halamannya akan dimuat ulang. Tombol kembali berada di seberang tombol utama, untuk situs yang tidak punya tombol sendiri. Resep bisa mengatur margin bawahnya sendiri.",
   "settings.adBlock": "Blokir iklan dan pelacak",
+  "settings.blockPopups": "Blokir pop-up dan pengalihan",
+  "settings.blockPopupsNote":
+    "Membuang jendela dan pengalihan yang dibuka halaman sendiri, kecuali proses masuk. Berlaku untuk halaman yang Anda buka berikutnya.",
+  "web.popupBlocked":
+    "Pop-up atau pengalihan ke {host} diblokir. Jika proses masuk atau pembayaran gagal, matikan Blokir pop-up dan pengalihan di Pengaturan.",
   "settings.backButton": "Tombol kembali mengambang",
   "settings.backButtonNote":
     "Selalu tampil. Menutup Pengaturan dan lembar lain lebih dulu, lalu mundur di halaman.",

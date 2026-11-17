@@ -310,6 +310,7 @@ pub(crate) async fn open_session(
         document_start_script: Some(current_script(app, &library, &recipes)?),
         ad_block_scriptlet,
         ad_block_enabled,
+        block_popups: library.popup_blocking_enabled()?,
         content_rule_lists,
     })?;
     let blocking_failure = (!blocking_failures.is_empty()).then(|| blocking_failures.join("; "));
@@ -372,6 +373,12 @@ pub async fn set_ad_block(
     app.siteview()
         .set_content_rule_lists(SetContentRuleListsRequest { enabled, lists })?;
     library.set_ad_block(enabled)
+}
+
+/// Turns pop-up and redirect blocking on or off. It takes effect for pages opened afterwards.
+#[tauri::command]
+pub fn set_block_popups(library: State<'_, Library>, enabled: bool) -> Result<()> {
+    library.set_block_popups(enabled)
 }
 
 #[tauri::command(async)]

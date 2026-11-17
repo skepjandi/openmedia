@@ -22,7 +22,7 @@ use std::{
     process::Command,
     sync::{
         Arc, Mutex, MutexGuard, PoisonError, Weak,
-        atomic::{AtomicU64, Ordering},
+        atomic::{AtomicBool, AtomicU64, Ordering},
         mpsc,
     },
     time::{Duration, Instant},
@@ -42,7 +42,7 @@ use uuid::Uuid;
 
 use native::PageSnapshot;
 
-use crate::events::{NOTIFICATION_TAP_EVENT, STATE_EVENT};
+use crate::events::{NOTIFICATION_TAP_EVENT, POPUP_BLOCKED_EVENT, STATE_EVENT};
 use crate::models::*;
 use crate::site::site_of_host;
 use crate::validate::{
@@ -147,6 +147,8 @@ struct Inner<R: Runtime> {
     labels: AtomicU64,
     /// The label of the web view that was last given the keyboard.
     focused: Mutex<Option<String>>,
+    /// Drop windows a page opens that are no sign-in; set by every `open`.
+    block_popups: Arc<AtomicBool>,
 }
 
 pub struct Siteview<R: Runtime> {
@@ -172,6 +174,7 @@ pub fn init<R: Runtime, C: DeserializeOwned>(
         }),
         labels: AtomicU64::new(0),
         focused: Mutex::new(None),
+        block_popups: Arc::new(AtomicBool::new(true)),
     });
     spawn_poller(Arc::downgrade(&inner))?;
     let tapped = app.clone();
@@ -204,6 +207,59 @@ fn allows_navigation(url: &Url) -> bool {
 fn scope_contains(scope: &str, host: &str) -> bool {
     let host = host.trim_end_matches('.').to_ascii_lowercase();
     host == scope || host.ends_with(&format!(".{scope}"))
+}
+
+/// Hosts, and their subdomains, that only identity providers and payment pages use.
+const SIGN_IN_HOSTS: [&str; 9] = [
+    "accounts.google.com",
+    "accounts.youtube.com",
+    "appleid.apple.com",
+    "login.microsoftonline.com",
+    "login.live.com",
+    "checkout.stripe.com",
+    "paypal.com",
+    "okta.com",
+    "auth0.com",
+];
+/// Path pieces that name a sign-in or an authorization step.
+const SIGN_IN_PATHS: [&str; 9] = [
+    "/oauth",
+    "/authorize",
+    "/saml",
+    "/sso",
+    "/openid",
+    "/signin",
+    "/sign-in",
+    "/login",
+    "/log-in",
+];
+
+/// Whether an address outside the session's site is plausibly a sign-in or a payment, the only
+/// reason a page has to open another window on its own. Ad networks use throwaway domains with
+/// none of these marks, so every other window a page opens is refused. Heuristic: an unknown
+/// identity provider that uses none of these marks is refused too. Twin of
+/// `DomainScope.looksLikeSignIn` on iOS and Android.
+fn looks_like_sign_in(url: &Url) -> bool {
+    let host = url.host_str().unwrap_or_default().to_ascii_lowercase();
+    if SIGN_IN_HOSTS
+        .iter()
+        .any(|known| host == *known || host.ends_with(&format!(".{known}")))
+    {
+        return true;
+    }
+    let path = url.path().to_ascii_lowercase();
+    if SIGN_IN_PATHS.iter().any(|piece| path.contains(piece))
+        || path.ends_with("/auth")
+        || path.contains("/auth/")
+    {
+        return true;
+    }
+    let names: Vec<String> = url
+        .query_pairs()
+        .map(|(name, _)| name.to_ascii_lowercase())
+        .collect();
+    let has = |name: &str| names.iter().any(|candidate| candidate == name);
+    has("samlrequest") || (has("client_id") && (has("redirect_uri") || has("response_type")))
 }
 
 /// Selects a file in Finder.
@@ -339,6 +395,7 @@ impl<R: Runtime> Inner<R> {
             bounds,
         } = view;
         let app = self.app.clone();
+        let block_popups = Arc::clone(&self.block_popups);
         let scope = Arc::clone(scope);
         let own_label = label.to_owned();
         let downloading = Mutex::new(None::<PathBuf>);
@@ -381,7 +438,13 @@ impl<R: Runtime> Inner<R> {
                     }
                     return NewWindowResponse::Deny;
                 }
-                // Sign-in (Google, Apple) and outside links open in a popup inside the app. It is
+                if block_popups.load(Ordering::Relaxed) && !looks_like_sign_in(&url) {
+                    // Not the site and not a sign-in: a popunder or an ad window. Say so, so a
+                    // sign-in that was refused by mistake can be switched off.
+                    let _ = app.emit(POPUP_BLOCKED_EVENT, url.host_str().unwrap_or_default());
+                    return NewWindowResponse::Deny;
+                }
+                // Sign-in (Google, Apple) opens in a popup inside the app. It is
                 // built on the opener's configuration, so it shares the session's data store and
                 // keeps `window.opener`, which sign-in flows report back through.
                 match open_popup(&app, features) {
@@ -635,6 +698,9 @@ impl<R: Runtime> Siteview<R> {
                 state.document_start_script = script;
             }
             state.rule_lists = request.content_rule_lists;
+            inner
+                .block_popups
+                .store(request.block_popups, Ordering::Relaxed);
             (state.document_start_script.clone(), state.rect)
         };
         let bounds = inner.page_bounds(bounds)?;
@@ -976,5 +1042,22 @@ mod tests {
             Some("bbc.co.uk".into())
         );
         assert_eq!(scope_of("about:blank"), None);
+    }
+
+    #[test]
+    fn sign_in_windows_are_told_from_ad_windows() {
+        let yes = |url: &str| looks_like_sign_in(&Url::parse(url).unwrap());
+        assert!(yes("https://accounts.google.com/o/oauth2/v2/auth?x=1"));
+        assert!(yes("https://appleid.apple.com/auth/authorize?a=b"));
+        assert!(yes("https://sub.okta.com/app/x"));
+        assert!(yes("https://idp.example/oauth2/authorize?client_id=1"));
+        assert!(yes(
+            "https://idp.example/start?client_id=1&redirect_uri=https%3A%2F%2Fa"
+        ));
+        assert!(yes("https://idp.example/x?SAMLRequest=abc"));
+        assert!(!yes("https://mv.auditsupcast.click/sbx/b/abc?xy=1"));
+        assert!(!yes("https://evil.io/author/page"));
+        assert!(!yes("https://notpaypal.com/"));
+        assert!(!yes("https://x.example/?client_id=1"));
     }
 }
