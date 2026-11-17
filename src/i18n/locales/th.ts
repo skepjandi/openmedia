@@ -41,6 +41,8 @@ export const th: Messages = {
   "fab.settings": "การตั้งค่า",
   "fab.assistant": "ผู้ช่วย กดค้างเพื่อดูรายการโปรด",
   "fab.videoControls": "ตัวควบคุมวิดีโอ แตะเพื่อเปิดหรือปิด กดค้างเพื่อดูตัวเลือก",
+  "fab.colorPicker": "ตัวเลือกสี แตะ แล้วแตะสิ่งใดก็ได้บนหน้า",
+  "fab.techDetector": "เทคโนโลยีของไซต์ แตะเพื่อดูว่าหน้านี้สร้างด้วยอะไร",
 
   "history.title": "ประวัติ",
   "history.close": "ปิดประวัติ",
@@ -244,6 +246,26 @@ export const th: Messages = {
   "settings.backButton": "ปุ่มย้อนกลับลอย",
   "settings.backButtonNote":
     "แสดงตลอดเวลา ปิดการตั้งค่าและแผ่นอื่น ๆ ก่อน แล้วจึงย้อนกลับในหน้าเว็บ",
+  "settings.colorPicker": "ตัวเลือกสี",
+  "settings.colorPickerNote":
+    "เพิ่มตัวเลือกสีลงในปุ่มลอย แตะที่ปุ่ม แล้วแตะสิ่งใดก็ได้บนหน้าเพื่ออ่านสี",
+  "settings.techDetector": "ตัวตรวจจับเทคโนโลยี",
+  "settings.techDetectorNote":
+    "เพิ่มปุ่มในปุ่มลอยเพื่อแสดงเทคโนโลยีที่หน้าเว็บใช้ เช่น เฟรมเวิร์ก CMS การวิเคราะห์ และอื่นๆ",
+  "colorPicker.hint": "แตะสิ่งใดก็ได้บนหน้าเพื่ออ่านสี",
+  "colorPicker.copy": "คัดลอก",
+  "colorPicker.copied": "คัดลอกแล้ว",
+  "tech.title": "สร้างด้วย",
+  "tech.loading": "กำลังตรวจดูหน้าเว็บ…",
+  "tech.none": "ไม่พบเทคโนโลยีที่รู้จักในหน้านี้",
+  "tech.note":
+    "อ่านจากสคริปต์ สไตล์ และมาร์กอัปของหน้า ข้อมูลที่เซิร์ฟเวอร์เท่านั้นที่เปิดเผยจะไม่แสดง",
+  "tech.cat.framework": "เฟรมเวิร์กและไลบรารี",
+  "tech.cat.platform": "แพลตฟอร์มและ CMS",
+  "tech.cat.analytics": "การวิเคราะห์และการตลาด",
+  "tech.cat.service": "บริการและวิดเจ็ต",
+  "tech.cat.design": "ดีไซน์และฟอนต์",
+  "tech.cat.delivery": "โฮสติ้งและการส่งมอบ",
   "settings.bottomMargin": "ขอบล่างส่วนกลาง",
   "settings.bottomMarginNote": "เว้นพื้นที่ด้านล่างของทุกหน้าเว็บ สำหรับเมนูที่เลื่อนใต้ขอบจอ",
   "settings.bottomMarginLabel": "ขอบล่างสำหรับทุกเว็บไซต์",

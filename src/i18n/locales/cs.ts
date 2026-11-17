@@ -46,6 +46,8 @@ export const cs: Messages = {
   "fab.assistant": "Asistent. Podržením zobrazíte oblíbené.",
   "fab.videoControls":
     "Ovládání videa. Klepnutím zapnete nebo vypnete, podržením otevřete možnosti.",
+  "fab.colorPicker": "Výběr barvy. Klepněte a pak klepněte na cokoli na stránce.",
+  "fab.techDetector": "Technologie webu. Klepnutím zjistíte, na čem je stránka postavená.",
 
   "history.title": "Historie",
   "history.close": "Zavřít historii",
@@ -261,6 +263,25 @@ export const cs: Messages = {
   "settings.backButton": "Plovoucí tlačítko Zpět",
   "settings.backButtonNote":
     "Vždy viditelné. Nejdřív zavře Nastavení a další panely, potom se vrátí na předchozí stránku.",
+  "settings.colorPicker": "Výběr barvy",
+  "settings.colorPickerNote":
+    "Přidá k plovoucímu tlačítku výběr barvy. Klepněte na něj a pak na cokoli na stránce, abyste zjistili jeho barvu.",
+  "settings.techDetector": "Detektor technologií",
+  "settings.techDetectorNote":
+    "Přidá k plovoucímu tlačítku tlačítko, které zobrazí technologie použité na stránce: frameworky, CMS, analytiku a další.",
+  "colorPicker.hint": "Klepnutím na cokoli na stránce zjistíte jeho barvu.",
+  "colorPicker.copy": "Kopírovat",
+  "colorPicker.copied": "Zkopírováno",
+  "tech.title": "Postaveno na",
+  "tech.loading": "Prohlížím stránku…",
+  "tech.none": "Na této stránce nebyly nalezeny žádné známé technologie.",
+  "tech.note": "Načteno ze skriptů, stylů a značek stránky. Co odhalí jen server, se nezobrazuje.",
+  "tech.cat.framework": "Frameworky a knihovny",
+  "tech.cat.platform": "Platformy a CMS",
+  "tech.cat.analytics": "Analytika a marketing",
+  "tech.cat.service": "Služby a widgety",
+  "tech.cat.design": "Design a písma",
+  "tech.cat.delivery": "Hosting a doručování",
   "settings.bottomMargin": "Globální spodní okraj",
   "settings.bottomMarginNote":
     "Udržuje spodní část každé stránky volnou, pro nabídky, které se vysouvají zpod okraje obrazovky.",

@@ -164,6 +164,10 @@ pub struct AppState {
     /// The sites whose videos may open in a picture-in-picture window.
     pub picture_in_picture_sites: Vec<String>,
     pub back_button: bool,
+    /// Whether the floating button fans out the color picker. Off by default.
+    pub color_picker: bool,
+    /// Whether the floating button fans out the technology detector. Off by default.
+    pub tech_detector: bool,
     /// Show the exact AI payload and ask before sending it.
     pub ai_preview: bool,
     /// The language the user picked, as a BCP 47 tag. `None` follows the device's language.
@@ -224,6 +228,12 @@ struct LibraryData {
     /// Off by default; the shell can show a floating back button over the page.
     #[serde(default)]
     back_button: bool,
+    /// Off by default; the floating button can fan out the color picker.
+    #[serde(default)]
+    color_picker: bool,
+    /// Off by default; the floating button can fan out the technology detector.
+    #[serde(default)]
+    tech_detector: bool,
     /// On by default: the assistant shows what it will send and waits for the user.
     #[serde(default = "enabled")]
     ai_preview: bool,
@@ -314,6 +324,8 @@ impl Library {
             background_media_sites: data.background_media_sites.iter().cloned().collect(),
             picture_in_picture_sites: data.picture_in_picture_sites.iter().cloned().collect(),
             back_button: data.back_button,
+            color_picker: data.color_picker,
+            tech_detector: data.tech_detector,
             ai_preview: data.ai_preview,
             locale: data.locale.clone(),
             search_engine: data.search_engine,
@@ -568,6 +580,18 @@ impl Library {
     pub fn set_back_button(&self, enabled: bool) -> Result<()> {
         let mut data = self.lock()?;
         data.back_button = enabled;
+        self.save(&data)
+    }
+
+    pub fn set_color_picker(&self, enabled: bool) -> Result<()> {
+        let mut data = self.lock()?;
+        data.color_picker = enabled;
+        self.save(&data)
+    }
+
+    pub fn set_tech_detector(&self, enabled: bool) -> Result<()> {
+        let mut data = self.lock()?;
+        data.tech_detector = enabled;
         self.save(&data)
     }
 
@@ -934,6 +958,8 @@ fn default_data() -> LibraryData {
         background_media_sites: BTreeSet::new(),
         picture_in_picture_sites: BTreeSet::new(),
         back_button: false,
+        color_picker: false,
+        tech_detector: false,
         ai_preview: true,
         icons: BTreeMap::new(),
         history: Vec::new(),
@@ -1605,6 +1631,17 @@ mod tests {
         assert!(!library.state().unwrap().back_button);
         library.set_back_button(true).unwrap();
         assert!(reload(&dir).state().unwrap().back_button);
+    }
+
+    #[test]
+    fn the_color_picker_and_tech_detector_are_off_by_default_and_the_choices_persist() {
+        let (dir, library) = library();
+        let state = library.state().unwrap();
+        assert!(!state.color_picker && !state.tech_detector);
+        library.set_color_picker(true).unwrap();
+        library.set_tech_detector(true).unwrap();
+        let state = reload(&dir).state().unwrap();
+        assert!(state.color_picker && state.tech_detector);
     }
 
     #[test]

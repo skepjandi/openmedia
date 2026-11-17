@@ -37,6 +37,7 @@ export function SettingsScreen() {
         <BrowsingSection />
         <AccessibilitySection />
         <VideoControlsLink />
+        <FanButtonSwitches />
         <FavoritesSection />
         <RecipesLink />
         <LibraryLinks />
@@ -47,6 +48,37 @@ export function SettingsScreen() {
         <DataSection />
       </div>
     </Screen>
+  );
+}
+
+/**
+ * Turns the optional buttons on the floating button's fan on or off. Both are off until chosen.
+ * Desktop has no page to read, so no switches there.
+ */
+function FanButtonSwitches() {
+  const desktop = useApp((s) => s.desktop);
+  const colorPicker = useApp((s) => s.state?.colorPicker ?? false);
+  const techDetector = useApp((s) => s.state?.techDetector ?? false);
+  const setColorPicker = useApp((s) => s.setColorPicker);
+  const setTechDetector = useApp((s) => s.setTechDetector);
+  const t = useT();
+  if (desktop) return null;
+
+  return (
+    <Group>
+      <Switch
+        label={t("settings.colorPicker")}
+        description={t("settings.colorPickerNote")}
+        checked={colorPicker}
+        onChange={(on) => void setColorPicker(on)}
+      />
+      <Switch
+        label={t("settings.techDetector")}
+        description={t("settings.techDetectorNote")}
+        checked={techDetector}
+        onChange={(on) => void setTechDetector(on)}
+      />
+    </Group>
   );
 }
 

@@ -46,6 +46,8 @@ export const pt: Messages = {
   "fab.assistant": "Assistente. Mantenha pressionado para ver os favoritos.",
   "fab.videoControls":
     "Controles de vídeo. Toque para ligar ou desligar, mantenha pressionado para ver as opções.",
+  "fab.colorPicker": "Seletor de cor. Toque e depois toque em qualquer coisa na página.",
+  "fab.techDetector": "Tecnologias do site. Toque para ver com o que a página foi criada.",
 
   "history.title": "Histórico",
   "history.close": "Fechar histórico",
@@ -266,6 +268,26 @@ export const pt: Messages = {
   "settings.backButton": "Botão de voltar flutuante",
   "settings.backButtonNote":
     "Sempre visível. Fecha primeiro as Definições e outras folhas e depois volta na página.",
+  "settings.colorPicker": "Seletor de cor",
+  "settings.colorPickerNote":
+    "Adiciona um seletor de cor ao botão flutuante. Toque nele e depois em qualquer coisa na página para ler a cor.",
+  "settings.techDetector": "Detetor de tecnologias",
+  "settings.techDetectorNote":
+    "Adiciona um botão ao botão flutuante que lista as tecnologias da página: frameworks, CMS, análise e mais.",
+  "colorPicker.hint": "Toque em qualquer coisa na página para ler a cor.",
+  "colorPicker.copy": "Copiar",
+  "colorPicker.copied": "Copiado",
+  "tech.title": "Criado com",
+  "tech.loading": "A analisar a página…",
+  "tech.none": "Nenhuma tecnologia conhecida encontrada nesta página.",
+  "tech.note":
+    "Lido a partir dos scripts, estilos e marcação da página. O que só o servidor revela não é mostrado.",
+  "tech.cat.framework": "Frameworks e bibliotecas",
+  "tech.cat.platform": "Plataformas e CMS",
+  "tech.cat.analytics": "Análise e marketing",
+  "tech.cat.service": "Serviços e widgets",
+  "tech.cat.design": "Design e fontes",
+  "tech.cat.delivery": "Hospedagem e entrega",
   "settings.bottomMargin": "Margem inferior global",
   "settings.bottomMarginNote":
     "Mantém a parte inferior de cada página livre, para menus que deslizam sob a borda da tela.",

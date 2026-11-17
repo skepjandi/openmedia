@@ -29,6 +29,7 @@ use crate::ai::{
     validate_key,
 };
 use crate::boot::{Boot, Startup};
+use crate::color_pick;
 use crate::entitlement::Entitlement;
 use crate::error::{Error, Result};
 use crate::incognito::Incognito;
@@ -41,6 +42,7 @@ use crate::recipes::{
 };
 use crate::secrets::SecretStore;
 use crate::sites::{self, SiteSettings};
+use crate::tech_detect;
 use crate::usage::{Usage, UsageReport};
 use crate::video_controls::{SiteVideo, VideoControls};
 
@@ -538,6 +540,48 @@ pub(crate) fn push_picture_in_picture(app: &AppHandle, sites: Vec<String>) -> Re
     app.siteview()
         .set_picture_in_picture(SetPictureInPictureRequest { sites })?;
     Ok(())
+}
+
+/// Shows or hides the color picker on the floating button's fan. The shell draws it.
+#[tauri::command]
+pub fn set_color_picker(library: State<'_, Library>, enabled: bool) -> Result<()> {
+    library.set_color_picker(enabled)
+}
+
+/// Puts the picking layer over the page in front. The scripts are fixed: the webview chooses
+/// nothing but when to run them.
+#[tauri::command]
+pub fn color_pick_start(app: AppHandle) -> Result<()> {
+    LivePage(&app).evaluate(color_pick::START_SCRIPT.to_owned())?;
+    Ok(())
+}
+
+/// What the picking layer found so far.
+#[tauri::command]
+pub fn color_pick_read(app: AppHandle) -> Result<color_pick::Reading> {
+    Ok(color_pick::parse_reading(
+        &LivePage(&app).evaluate(color_pick::READ_SCRIPT.to_owned())?,
+    ))
+}
+
+/// Takes the picking layer down.
+#[tauri::command]
+pub fn color_pick_cancel(app: AppHandle) -> Result<()> {
+    LivePage(&app).evaluate(color_pick::CANCEL_SCRIPT.to_owned())?;
+    Ok(())
+}
+
+/// Shows or hides the technology detector on the floating button's fan. The shell draws it.
+#[tauri::command]
+pub fn set_tech_detector(library: State<'_, Library>, enabled: bool) -> Result<()> {
+    library.set_tech_detector(enabled)
+}
+
+/// What the page in front is built with, matched in Rust against its own table of technologies.
+#[tauri::command]
+pub fn tech_detect(app: AppHandle) -> Result<Vec<tech_detect::Detected>> {
+    let evidence = LivePage(&app).evaluate(tech_detect::script())?;
+    Ok(tech_detect::detect(&evidence))
 }
 
 /// Shows or hides the floating back button. The shell draws it; nothing native changes.

@@ -45,6 +45,8 @@ export const sv: Messages = {
   "fab.settings": "Inställningar",
   "fab.assistant": "Assistent. Håll in för favoriter.",
   "fab.videoControls": "Videokontroller. Tryck för att slå på eller av, håll in för alternativ.",
+  "fab.colorPicker": "Färgväljare. Tryck och tryck sedan på något på sidan.",
+  "fab.techDetector": "Webbplatsens teknik. Tryck för att se vad sidan är byggd med.",
 
   "history.title": "Historik",
   "history.close": "Stäng historiken",
@@ -261,6 +263,26 @@ export const sv: Messages = {
   "settings.backButton": "Flytande bakåtknapp",
   "settings.backButtonNote":
     "Alltid synlig. Stänger först Inställningar och andra vyer, och går sedan bakåt på sidan.",
+  "settings.colorPicker": "Färgväljare",
+  "settings.colorPickerNote":
+    "Lägger till en färgväljare på den flytande knappen. Tryck på den och sedan på något på sidan för att läsa dess färg.",
+  "settings.techDetector": "Teknikdetektor",
+  "settings.techDetectorNote":
+    "Lägger till en knapp i den flytande knappen som listar sidans teknik: ramverk, CMS, analys och mer.",
+  "colorPicker.hint": "Tryck på något på sidan för att läsa dess färg.",
+  "colorPicker.copy": "Kopiera",
+  "colorPicker.copied": "Kopierat",
+  "tech.title": "Byggd med",
+  "tech.loading": "Tittar på sidan…",
+  "tech.none": "Inga kända tekniker hittades på den här sidan.",
+  "tech.note":
+    "Läst från sidans skript, stilar och kod. Sådant som bara servern avslöjar visas inte.",
+  "tech.cat.framework": "Ramverk och bibliotek",
+  "tech.cat.platform": "Plattformar och CMS",
+  "tech.cat.analytics": "Analys och marknadsföring",
+  "tech.cat.service": "Tjänster och widgetar",
+  "tech.cat.design": "Design och typsnitt",
+  "tech.cat.delivery": "Webbhotell och leverans",
   "settings.bottomMargin": "Global nedre marginal",
   "settings.bottomMarginNote":
     "Håller nederkanten av varje sida fri, för menyer som glider in under skärmkanten.",

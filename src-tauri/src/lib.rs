@@ -2,6 +2,7 @@ mod accessibility;
 mod ad_block;
 mod ai;
 mod boot;
+mod color_pick;
 mod commands;
 #[cfg(target_os = "macos")]
 mod desktop_menu;
@@ -18,6 +19,7 @@ mod secrets;
 mod self_update;
 mod share;
 mod sites;
+mod tech_detect;
 mod usage;
 mod usage_commands;
 mod usage_lock;
@@ -154,6 +156,12 @@ pub fn run() {
             commands::set_site_background_media,
             commands::set_site_picture_in_picture,
             commands::set_back_button,
+            commands::set_color_picker,
+            commands::color_pick_start,
+            commands::color_pick_read,
+            commands::color_pick_cancel,
+            commands::set_tech_detector,
+            commands::tech_detect,
             commands::set_accessibility,
             commands::set_video_controls,
             commands::set_site_video_controls,

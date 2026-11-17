@@ -44,6 +44,8 @@ export const nl: Messages = {
   "fab.settings": "Instellingen",
   "fab.assistant": "Assistent. Houd ingedrukt voor favorieten.",
   "fab.videoControls": "Videobediening. Tik om aan of uit te zetten, houd ingedrukt voor opties.",
+  "fab.colorPicker": "Kleurkiezer. Tik erop en tik dan op iets op de pagina.",
+  "fab.techDetector": "Sitetechnologieën. Tik om te zien waarmee de pagina is gebouwd.",
 
   "history.title": "Geschiedenis",
   "history.close": "Geschiedenis sluiten",
@@ -262,6 +264,26 @@ export const nl: Messages = {
   "settings.backButton": "Zwevende terugknop",
   "settings.backButtonNote":
     "Altijd zichtbaar. Sluit eerst Instellingen en andere schermen, en gaat daarna terug in de pagina.",
+  "settings.colorPicker": "Kleurkiezer",
+  "settings.colorPickerNote":
+    "Voegt een kleurkiezer toe aan de zwevende knop. Tik erop en tik dan op iets op de pagina om de kleur te lezen.",
+  "settings.techDetector": "Technologiedetector",
+  "settings.techDetectorNote":
+    "Voegt een knop toe aan de zwevende knop die de technologieën van een pagina toont: frameworks, CMS, analytics en meer.",
+  "colorPicker.hint": "Tik op iets op de pagina om de kleur te lezen.",
+  "colorPicker.copy": "Kopiëren",
+  "colorPicker.copied": "Gekopieerd",
+  "tech.title": "Gebouwd met",
+  "tech.loading": "Pagina bekijken…",
+  "tech.none": "Geen bekende technologieën gevonden op deze pagina.",
+  "tech.note":
+    "Gelezen uit de scripts, stijlen en opmaak van de pagina. Wat alleen de server onthult, wordt niet getoond.",
+  "tech.cat.framework": "Frameworks & bibliotheken",
+  "tech.cat.platform": "Platforms & CMS",
+  "tech.cat.analytics": "Analytics & marketing",
+  "tech.cat.service": "Diensten & widgets",
+  "tech.cat.design": "Ontwerp & lettertypen",
+  "tech.cat.delivery": "Hosting & levering",
   "settings.bottomMargin": "Globale ondermarge",
   "settings.bottomMarginNote":
     "Houdt de onderkant van elke pagina vrij, voor menu’s die onder de rand van het scherm schuiven.",

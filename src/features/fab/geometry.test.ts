@@ -4,7 +4,9 @@ import {
   FAVORITE_SIZE,
   HISTORY_SIZE,
   HOLD_SCALE,
+  COLOR_PICKER_SIZE,
   CONTROLS_SIZE,
+  TECH_DETECTOR_SIZE,
   INCOGNITO_SIZE,
   SETTINGS_SIZE,
   STATS_SIZE,
@@ -19,6 +21,8 @@ import {
   separateVerticalPosition,
   snapToEdge,
   type Edge,
+  type FanExtras,
+  type FanLayout,
   type Insets,
   type Point,
 } from "./geometry";
@@ -56,6 +60,14 @@ describe("separateVerticalPosition", () => {
   });
 });
 
+const ALL_EXTRAS: FanExtras = { colorPicker: true, techDetector: true };
+const EXTRA_CHOICES: FanExtras[] = [
+  { colorPicker: false, techDetector: false },
+  { colorPicker: true, techDetector: false },
+  { colorPicker: false, techDetector: true },
+  ALL_EXTRAS,
+];
+
 const distance = (a: Point, b: Point) => Math.hypot(a.x - b.x, a.y - b.y);
 
 describe("fanLayout", () => {
@@ -64,10 +76,14 @@ describe("fanLayout", () => {
 
   for (const edge of edges) {
     for (const y of heights) {
-      for (const count of [0, 1, 2, 4, 6]) {
-        it(`keeps ${count} favorites on screen and apart (${edge} edge, y=${y})`, () => {
+      for (const [count, extras] of [0, 1, 2, 4, 6].flatMap((n) =>
+        EXTRA_CHOICES.map((choice) => [n, choice] as const),
+      )) {
+        it(`keeps ${count} favorites on screen and apart (${edge} edge, y=${y}, ${JSON.stringify(extras)})`, () => {
           const origin = fabCenter(edge, y, phone, insets);
-          const layout = fanLayout(origin, edge, phone, insets, count);
+          const layout = fanLayout(origin, edge, phone, insets, count, extras);
+          expect(layout.colorPicker === null).toBe(!extras.colorPicker);
+          expect(layout.techDetector === null).toBe(!extras.techDetector);
           const items = [
             ...layout.favorites.map((center) => ({ center, size: FAVORITE_SIZE })),
             { center: layout.settings, size: SETTINGS_SIZE },
@@ -76,6 +92,12 @@ describe("fanLayout", () => {
             { center: layout.stats, size: STATS_SIZE },
             { center: layout.incognito, size: INCOGNITO_SIZE },
             { center: layout.controls, size: CONTROLS_SIZE },
+            ...(layout.colorPicker
+              ? [{ center: layout.colorPicker, size: COLOR_PICKER_SIZE }]
+              : []),
+            ...(layout.techDetector
+              ? [{ center: layout.techDetector, size: TECH_DETECTOR_SIZE }]
+              : []),
           ];
           for (const { center, size } of items) {
             expect(center.x - size / 2).toBeGreaterThanOrEqual(0);
@@ -99,7 +121,14 @@ describe("fanLayout", () => {
 
   it("lists favorites top to bottom on both edges", () => {
     for (const edge of edges) {
-      const layout = fanLayout(fabCenter(edge, 426, phone, insets), edge, phone, insets, 4);
+      const layout = fanLayout(
+        fabCenter(edge, 426, phone, insets),
+        edge,
+        phone,
+        insets,
+        4,
+        ALL_EXTRAS,
+      );
       const ys = layout.favorites.map((p) => p.y);
       expect(ys).toEqual([...ys].sort((a, b) => a - b));
     }
@@ -108,7 +137,7 @@ describe("fanLayout", () => {
   it("keeps the arc compact when the middle of the screen has room for it", () => {
     for (const edge of edges) {
       const origin = fabCenter(edge, 426, phone, insets);
-      const layout = fanLayout(origin, edge, phone, insets, 5);
+      const layout = fanLayout(origin, edge, phone, insets, 5, ALL_EXTRAS);
       for (const favorite of layout.favorites) {
         expect(distance(favorite, origin)).toBeLessThan(130);
       }
@@ -116,15 +145,29 @@ describe("fanLayout", () => {
   });
 
   it("opens away from the edge the button rests on", () => {
-    const left = fanLayout(fabCenter("left", 426, phone, insets), "left", phone, insets, 4);
-    const right = fanLayout(fabCenter("right", 426, phone, insets), "right", phone, insets, 4);
+    const left = fanLayout(
+      fabCenter("left", 426, phone, insets),
+      "left",
+      phone,
+      insets,
+      4,
+      ALL_EXTRAS,
+    );
+    const right = fanLayout(
+      fabCenter("right", 426, phone, insets),
+      "right",
+      phone,
+      insets,
+      4,
+      ALL_EXTRAS,
+    );
     expect(left.favorites.every((p) => p.x > FAB_SIZE)).toBe(true);
     expect(right.favorites.every((p) => p.x < phone.width - FAB_SIZE)).toBe(true);
   });
 
   it("puts settings farther out than every favorite and clear of the arc", () => {
     const origin = fabCenter("right", 426, phone, insets);
-    const layout = fanLayout(origin, "right", phone, insets, 4);
+    const layout = fanLayout(origin, "right", phone, insets, 4, ALL_EXTRAS);
     const settings = distance(origin, layout.settings);
     for (const favorite of layout.favorites) {
       expect(settings).toBeGreaterThan(distance(origin, favorite));
@@ -136,7 +179,7 @@ describe("fanLayout", () => {
     for (const edge of edges) {
       for (const y of heights) {
         const origin = fabCenter(edge, y, phone, insets);
-        const layout = fanLayout(origin, edge, phone, insets, 4);
+        const layout = fanLayout(origin, edge, phone, insets, 4, ALL_EXTRAS);
         expect(layout.history.x).toBe(layout.settings.x);
         expect(layout.history.y).toBeLessThan(layout.settings.y);
       }
@@ -148,7 +191,7 @@ describe("fanLayout", () => {
       for (const y of heights) {
         for (const count of [0, 6]) {
           const origin = fabCenter(edge, y, phone, insets);
-          const layout = fanLayout(origin, edge, phone, insets, count);
+          const layout = fanLayout(origin, edge, phone, insets, count, ALL_EXTRAS);
           expect(layout.tabs.x).toBe(layout.history.x);
           expect(layout.tabs.y).toBeLessThan(layout.history.y);
         }
@@ -161,7 +204,7 @@ describe("fanLayout", () => {
       for (const y of heights) {
         for (const count of [0, 6]) {
           const origin = fabCenter(edge, y, phone, insets);
-          const layout = fanLayout(origin, edge, phone, insets, count);
+          const layout = fanLayout(origin, edge, phone, insets, count, ALL_EXTRAS);
           expect(layout.stats.x).toBe(layout.tabs.x);
           expect(layout.stats.y).toBeLessThan(layout.tabs.y);
         }
@@ -173,7 +216,7 @@ describe("fanLayout", () => {
     for (const edge of edges) {
       for (const count of [0, 1, 2, 4]) {
         const origin = fabCenter(edge, 426, phone, insets);
-        const layout = fanLayout(origin, edge, phone, insets, count);
+        const layout = fanLayout(origin, edge, phone, insets, count, ALL_EXTRAS);
         const pageSide = Math.sign(layout.settings.y - origin.y);
         expect(layout.incognito.x).toBe(origin.x);
         expect(layout.controls.x).toBe(origin.x);
@@ -181,6 +224,10 @@ describe("fanLayout", () => {
           expect(Math.sign(page.y - origin.y)).toBe(pageSide);
         expect(Math.sign(layout.incognito.y - origin.y)).toBe(-pageSide);
         expect(Math.sign(layout.controls.y - origin.y)).toBe(-pageSide);
+        expect(layout.colorPicker?.x).toBe(origin.x);
+        expect(Math.sign((layout.colorPicker?.y ?? 0) - origin.y)).toBe(-pageSide);
+        expect(layout.techDetector?.x).toBe(origin.x);
+        expect(Math.sign((layout.techDetector?.y ?? 0) - origin.y)).toBe(-pageSide);
       }
     }
   });
@@ -188,18 +235,32 @@ describe("fanLayout", () => {
   it("continues the page column with incognito and the controls switch near the screen edge", () => {
     for (const edge of edges) {
       const origin = fabCenter(edge, insets.top, phone, insets);
-      const layout = fanLayout(origin, edge, phone, insets, 0);
+      const layout = fanLayout(origin, edge, phone, insets, 0, ALL_EXTRAS);
       expect(layout.incognito.x).toBe(layout.stats.x);
       expect(layout.incognito.y).toBeLessThan(layout.stats.y);
       expect(layout.controls.x).toBe(layout.stats.x);
       expect(layout.controls.y).toBeLessThan(layout.incognito.y);
+      expect(layout.colorPicker?.x).toBe(layout.stats.x);
+      expect(layout.colorPicker?.y).toBeLessThan(layout.controls.y);
+      expect(layout.techDetector?.x).toBe(layout.stats.x);
+      expect(layout.techDetector?.y).toBeLessThan(layout.colorPicker?.y ?? 0);
     }
   });
 });
 
+function techOf(layout: FanLayout): Point {
+  if (!layout.techDetector) throw new Error("the layout has no technology detector");
+  return layout.techDetector;
+}
+
+function pickerOf(layout: FanLayout): Point {
+  if (!layout.colorPicker) throw new Error("the layout has no color picker");
+  return layout.colorPicker;
+}
+
 describe("fanTargetAt", () => {
   const origin = fabCenter("left", 426, phone, insets);
-  const layout = fanLayout(origin, "left", phone, insets, 4);
+  const layout = fanLayout(origin, "left", phone, insets, 4, ALL_EXTRAS);
 
   it("finds the item under the finger", () => {
     expect(fanTargetAt(layout.favorites[2], layout)).toEqual({ kind: "favorite", index: 2 });
@@ -209,6 +270,30 @@ describe("fanTargetAt", () => {
     expect(fanTargetAt(layout.stats, layout)).toEqual({ kind: "stats" });
     expect(fanTargetAt(layout.incognito, layout)).toEqual({ kind: "incognito" });
     expect(fanTargetAt(layout.controls, layout)).toEqual({ kind: "controls" });
+    expect(fanTargetAt(pickerOf(layout), layout)).toEqual({ kind: "colorPicker" });
+    expect(fanTargetAt(techOf(layout), layout)).toEqual({ kind: "techDetector" });
+  });
+
+  it("stacks the technology detector straight after the controls switch when the picker is off", () => {
+    const only = fanLayout(origin, "left", phone, insets, 4, {
+      colorPicker: false,
+      techDetector: true,
+    });
+    const both = layout;
+    expect(distance(only.techDetector ?? origin, only.controls)).toBeCloseTo(
+      distance(both.colorPicker ?? origin, both.controls),
+    );
+  });
+
+  it("has no color picker to find when it is turned off", () => {
+    const without = fanLayout(origin, "left", phone, insets, 4, {
+      colorPicker: false,
+      techDetector: false,
+    });
+    expect(without.colorPicker).toBeNull();
+    expect(without.techDetector).toBeNull();
+    expect(fanTargetAt(pickerOf(layout), without)).toBeNull();
+    expect(fanTargetAt(techOf(layout), without)).toBeNull();
   });
 
   it("returns null away from every item", () => {

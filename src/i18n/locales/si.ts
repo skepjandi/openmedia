@@ -45,6 +45,8 @@ export const si: Messages = {
   "fab.assistant": "සහායක. ආදරණීය සඳහා දිගු ඔබන්න.",
   "fab.videoControls":
     "වීඩියෝ පාලන. ක්‍රියාත්මක හෝ අක්‍රිය කිරීමට තට්ටු කරන්න, විකල්ප සඳහා දිගු ඔබන්න.",
+  "fab.colorPicker": "වර්ණ තෝරකය. තට්ටු කර, පසුව පිටුවේ ඕනෑම දෙයක් තට්ටු කරන්න.",
+  "fab.techDetector": "වෙබ් අඩවියේ තාක්ෂණ. පිටුව සාදා ඇත්තේ කුමකින්දැයි බැලීමට තට්ටු කරන්න.",
 
   "history.title": "ඉතිහාසය",
   "history.close": "ඉතිහාසය වසන්න",
@@ -254,6 +256,26 @@ export const si: Messages = {
   "settings.backButton": "පාවෙනි ආපසු බොත්තක්",
   "settings.backButtonNote":
     "සැම විටම පෙනේ. මුලින් සැකසුම් සහ වෙනත් තිර වසා, පසුව පිටුවේ ආපසු යයි.",
+  "settings.colorPicker": "වර්ණ තෝරකය",
+  "settings.colorPickerNote":
+    "පාවෙන බොත්තමට වර්ණ තෝරකයක් එක් කරයි. එය තට්ටු කර, පසුව වර්ණය කියවීමට පිටුවේ ඕනෑම දෙයක් තට්ටු කරන්න.",
+  "settings.techDetector": "තාක්ෂණ අනාවරකය",
+  "settings.techDetectorNote":
+    "පිටුවේ භාවිත තාක්ෂණ (රාමු, CMS, විශ්ලේෂණ ආදිය) ලැයිස්තුගත කරන බොත්තමක් පාවෙන බොත්තමට එක් කරයි.",
+  "colorPicker.hint": "වර්ණය කියවීමට පිටුවේ ඕනෑම දෙයක් තට්ටු කරන්න.",
+  "colorPicker.copy": "පිටපත් කරන්න",
+  "colorPicker.copied": "පිටපත් කළා",
+  "tech.title": "සාදා ඇත්තේ",
+  "tech.loading": "පිටුව බලමින්…",
+  "tech.none": "මෙම පිටුවේ දන්නා තාක්ෂණ කිසිවක් හමු නොවීය.",
+  "tech.note":
+    "පිටුවේ ස්ක්‍රිප්ට්, ශෛලි සහ මාර්කප් වලින් කියවන ලදී. සේවාදායකය පමණක් හෙළි කරන දේ පෙන්වන්නේ නැත.",
+  "tech.cat.framework": "රාමු සහ පුස්තකාල",
+  "tech.cat.platform": "වේදිකා සහ CMS",
+  "tech.cat.analytics": "විශ්ලේෂණ සහ අලෙවිකරණය",
+  "tech.cat.service": "සේවා සහ විජට්",
+  "tech.cat.design": "සැලසුම සහ අකුරු",
+  "tech.cat.delivery": "සත්කාරකත්වය සහ බෙදාහැරීම",
   "settings.bottomMargin": "සර්වත්‍ර පහළ දුරස්ථය",
   "settings.bottomMarginNote":
     "තිරයේ පහළ දෙළුණට යටතින් ගලා එන මෙනු සඳහා සෑම පිටුවකම පහළ කොටස හිස්ව තබයි.",

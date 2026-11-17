@@ -42,6 +42,8 @@ export const ms: Messages = {
   "fab.assistant": "Pembantu. Tekan panjang untuk kegemaran.",
   "fab.videoControls":
     "Kawalan video. Ketik untuk hidup atau matikan, tekan panjang untuk pilihan.",
+  "fab.colorPicker": "Pemilih warna. Ketik, kemudian ketik apa-apa pada halaman.",
+  "fab.techDetector": "Teknologi tapak. Ketik untuk melihat apa yang membina halaman ini.",
 
   "history.title": "Sejarah",
   "history.close": "Tutup sejarah",
@@ -260,6 +262,26 @@ export const ms: Messages = {
   "settings.backButton": "Butang kembali terapung",
   "settings.backButtonNote":
     "Sentiasa dipaparkan. Menutup Tetapan dan helaian lain dahulu, kemudian kembali dalam halaman.",
+  "settings.colorPicker": "Pemilih warna",
+  "settings.colorPickerNote":
+    "Menambah pemilih warna pada butang terapung. Ketik, kemudian ketik apa-apa pada halaman untuk membaca warnanya.",
+  "settings.techDetector": "Pengesan teknologi",
+  "settings.techDetectorNote":
+    "Menambah butang pada butang terapung yang menyenaraikan teknologi halaman: rangka kerja, CMS, analitik dan banyak lagi.",
+  "colorPicker.hint": "Ketik apa-apa pada halaman untuk membaca warnanya.",
+  "colorPicker.copy": "Salin",
+  "colorPicker.copied": "Disalin",
+  "tech.title": "Dibina dengan",
+  "tech.loading": "Meneliti halaman…",
+  "tech.none": "Tiada teknologi yang dikenali ditemui pada halaman ini.",
+  "tech.note":
+    "Dibaca daripada skrip, gaya dan penanda halaman. Apa-apa yang hanya didedahkan pelayan tidak dipaparkan.",
+  "tech.cat.framework": "Rangka kerja & pustaka",
+  "tech.cat.platform": "Platform & CMS",
+  "tech.cat.analytics": "Analitik & pemasaran",
+  "tech.cat.service": "Perkhidmatan & widget",
+  "tech.cat.design": "Reka bentuk & fon",
+  "tech.cat.delivery": "Pengehosan & penghantaran",
   "settings.bottomMargin": "Margin bawah global",
   "settings.bottomMarginNote":
     "Menjaga bahagian bawah setiap halaman kosong, untuk menu yang meluncur ke bawah tepi skrin.",

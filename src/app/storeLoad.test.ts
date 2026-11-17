@@ -23,6 +23,8 @@ const startup = {
   backgroundMediaSites: [],
   pictureInPictureSites: [],
   backButton: true,
+  colorPicker: true,
+  techDetector: true,
   aiPreview: true,
   locale: "en",
   searchEngine: "google",

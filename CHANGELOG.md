@@ -6,6 +6,14 @@ All notable changes to OpenMedia are documented here.
 >
 > **Wiki**: the [GitHub Wiki](https://github.com/skepjandi/openmedia/wiki) is the public-facing main wiki — architecture, recipe format, AI pipeline, security model, roadmap. Source-controlled editing surface is `docs/wiki/` in this repo; CI (`.github/workflows/sync-wiki.yml`) mirrors it to the GitHub Wiki on every merge to `main`. New single-PR changes belong here, not as new wiki pages.
 
+### feat(fab): a color picker and a technology detector on the floating button, off until switched on
+
+**Area:** `feat(fab)`, `feat(settings)`
+
+**Change:** The fan can show an eyedropper and a technology detector after Incognito and the video controls switch. Both are off by default; Settings has a switch for each (`colorPicker`, `techDetector` in `library.json`), and off means the button is not drawn at all. Color picker: tap it, then tap anything on the page; a bar shows the color's `#rrggbb` code with Copy. Technology detector: lists what the page is built with (frameworks, CMS, analytics, services, fonts, hosting), grouped by category, from the page's globals, scripts, styles, generator tag and cookie names matched against Rust's own table; no headers or versions. Neither is offered on desktop, which has no site view to read. Rust runs fixed scripts through the plugin's Rust-only `evaluate` and passes on only validated colors and names from its table.
+
+**Verified:** `fanLayout` tests for every on/off combination, `color_pick` and `tech_detect` Rust tests, the persisted settings, `yarn ts:check`, `yarn lint`, `yarn format:check`, `yarn test`, clippy. **Not verified:** the page scripts and the panels on a device or simulator.
+
 ### feat(video): a volume bar in the panel; fix(video): the small player's black corners; fix: float of an embedded player
 
 **Area:** `feat(video)`, `fix(video)`, `fix(siteview)`

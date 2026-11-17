@@ -46,6 +46,8 @@ export const it: Messages = {
   "fab.assistant": "Assistente. Tieni premuto per i preferiti.",
   "fab.videoControls":
     "Controlli video. Tocca per attivare o disattivare, tieni premuto per le opzioni.",
+  "fab.colorPicker": "Selettore colore. Tocca, poi tocca qualsiasi cosa nella pagina.",
+  "fab.techDetector": "Tecnologie del sito. Tocca per vedere con cosa è costruita la pagina.",
 
   "history.title": "Cronologia",
   "history.close": "Chiudi cronologia",
@@ -267,6 +269,26 @@ export const it: Messages = {
   "settings.backButton": "Pulsante Indietro fluttuante",
   "settings.backButtonNote":
     "Sempre visibile. Chiude prima Impostazioni e gli altri pannelli, poi torna indietro nella pagina.",
+  "settings.colorPicker": "Selettore colore",
+  "settings.colorPickerNote":
+    "Aggiunge un selettore colore al pulsante flottante. Toccalo, poi tocca qualsiasi cosa nella pagina per leggerne il colore.",
+  "settings.techDetector": "Rilevatore di tecnologie",
+  "settings.techDetectorNote":
+    "Aggiunge un pulsante al pulsante flottante che elenca le tecnologie della pagina: framework, CMS, analytics e altro.",
+  "colorPicker.hint": "Tocca qualsiasi cosa nella pagina per leggerne il colore.",
+  "colorPicker.copy": "Copia",
+  "colorPicker.copied": "Copiato",
+  "tech.title": "Realizzato con",
+  "tech.loading": "Analisi della pagina…",
+  "tech.none": "Nessuna tecnologia nota trovata in questa pagina.",
+  "tech.note":
+    "Letto da script, stili e markup della pagina. Ciò che rivela solo il server non viene mostrato.",
+  "tech.cat.framework": "Framework e librerie",
+  "tech.cat.platform": "Piattaforme e CMS",
+  "tech.cat.analytics": "Analytics e marketing",
+  "tech.cat.service": "Servizi e widget",
+  "tech.cat.design": "Design e font",
+  "tech.cat.delivery": "Hosting e distribuzione",
   "settings.bottomMargin": "Margine inferiore globale",
   "settings.bottomMarginNote":
     "Mantiene libera la parte inferiore di ogni pagina, per i menu che scorrono sotto il bordo dello schermo.",

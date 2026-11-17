@@ -46,6 +46,8 @@ export const fr: Messages = {
   "fab.assistant": "Assistant. Maintenez pour afficher les favoris.",
   "fab.videoControls":
     "Commandes vidéo. Touchez pour activer ou désactiver, maintenez pour les options.",
+  "fab.colorPicker": "Sélecteur de couleur. Touchez, puis touchez n'importe quoi sur la page.",
+  "fab.techDetector": "Technologies du site. Touchez pour voir avec quoi la page est construite.",
 
   "history.title": "Historique",
   "history.close": "Fermer l’historique",
@@ -268,6 +270,26 @@ export const fr: Messages = {
   "settings.backButton": "Bouton de retour flottant",
   "settings.backButtonNote":
     "Toujours visible. Elle ferme d'abord les Réglages et les autres feuilles, puis revient en arrière dans la page.",
+  "settings.colorPicker": "Sélecteur de couleur",
+  "settings.colorPickerNote":
+    "Ajoute un sélecteur de couleur au bouton flottant. Touchez-le, puis touchez n'importe quoi sur la page pour lire sa couleur.",
+  "settings.techDetector": "Détecteur de technologies",
+  "settings.techDetectorNote":
+    "Ajoute un bouton au bouton flottant qui liste les technologies d'une page : frameworks, CMS, analytique et plus.",
+  "colorPicker.hint": "Touchez n'importe quoi sur la page pour lire sa couleur.",
+  "colorPicker.copy": "Copier",
+  "colorPicker.copied": "Copié",
+  "tech.title": "Construit avec",
+  "tech.loading": "Analyse de la page…",
+  "tech.none": "Aucune technologie connue trouvée sur cette page.",
+  "tech.note":
+    "Lu depuis les scripts, styles et balisage de la page. Ce que seul le serveur révèle n'est pas affiché.",
+  "tech.cat.framework": "Frameworks et bibliothèques",
+  "tech.cat.platform": "Plateformes et CMS",
+  "tech.cat.analytics": "Analytique et marketing",
+  "tech.cat.service": "Services et widgets",
+  "tech.cat.design": "Design et polices",
+  "tech.cat.delivery": "Hébergement et diffusion",
   "settings.bottomMargin": "Marge inférieure globale",
   "settings.bottomMarginNote":
     "Garde le bas de chaque page dégagé, pour les menus qui glissent sous le bord de l’écran.",

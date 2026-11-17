@@ -46,6 +46,8 @@ export const pl: Messages = {
   "fab.assistant": "Asystent. Przytrzymaj, aby zobaczyć ulubione.",
   "fab.videoControls":
     "Sterowanie wideo. Dotknij, aby włączyć lub wyłączyć, przytrzymaj, aby zobaczyć opcje.",
+  "fab.colorPicker": "Próbnik kolorów. Dotknij, a potem dotknij czegokolwiek na stronie.",
+  "fab.techDetector": "Technologie witryny. Dotknij, aby zobaczyć, na czym zbudowano stronę.",
 
   "history.title": "Historia",
   "history.close": "Zamknij historię",
@@ -264,6 +266,26 @@ export const pl: Messages = {
   "settings.backButton": "Pływający przycisk wstecz",
   "settings.backButtonNote":
     "Zawsze widoczny. Najpierw zamyka Ustawienia i inne panele, a potem cofa na stronie.",
+  "settings.colorPicker": "Próbnik kolorów",
+  "settings.colorPickerNote":
+    "Dodaje próbnik kolorów do pływającego przycisku. Dotknij go, a potem czegokolwiek na stronie, aby odczytać kolor.",
+  "settings.techDetector": "Wykrywacz technologii",
+  "settings.techDetectorNote":
+    "Dodaje przycisk do pływającego przycisku, który wyświetla technologie strony: frameworki, CMS, analitykę i inne.",
+  "colorPicker.hint": "Dotknij czegokolwiek na stronie, aby odczytać kolor.",
+  "colorPicker.copy": "Kopiuj",
+  "colorPicker.copied": "Skopiowano",
+  "tech.title": "Zbudowano przy użyciu",
+  "tech.loading": "Analizowanie strony…",
+  "tech.none": "Nie znaleziono znanych technologii na tej stronie.",
+  "tech.note":
+    "Odczytano ze skryptów, stylów i znaczników strony. To, co ujawnia tylko serwer, nie jest pokazywane.",
+  "tech.cat.framework": "Frameworki i biblioteki",
+  "tech.cat.platform": "Platformy i CMS",
+  "tech.cat.analytics": "Analityka i marketing",
+  "tech.cat.service": "Usługi i widżety",
+  "tech.cat.design": "Projekt i czcionki",
+  "tech.cat.delivery": "Hosting i dostarczanie",
   "settings.bottomMargin": "Globalny dolny margines",
   "settings.bottomMarginNote":
     "Zostawia wolne dół każdej strony, dla menu wysuwanych spod krawędzi ekranu.",

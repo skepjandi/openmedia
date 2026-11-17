@@ -46,6 +46,8 @@ export const es: Messages = {
   "fab.assistant": "Asistente. Mantén pulsado para ver los favoritos.",
   "fab.videoControls":
     "Controles de vídeo. Toca para activar o desactivar; mantén pulsado para ver las opciones.",
+  "fab.colorPicker": "Selector de color. Toca y luego toca cualquier cosa de la página.",
+  "fab.techDetector": "Tecnologías del sitio. Toca para ver con qué está hecha la página.",
 
   "history.title": "Historial",
   "history.close": "Cerrar historial",
@@ -266,6 +268,26 @@ export const es: Messages = {
   "settings.backButton": "Botón de retroceso flotante",
   "settings.backButtonNote":
     "Siempre visible. Primero cierra Ajustes y otras hojas, y después retrocede en la página.",
+  "settings.colorPicker": "Selector de color",
+  "settings.colorPickerNote":
+    "Añade un selector de color al botón flotante. Tócalo y luego toca cualquier cosa de la página para leer su color.",
+  "settings.techDetector": "Detector de tecnologías",
+  "settings.techDetectorNote":
+    "Añade un botón al botón flotante que muestra las tecnologías de la página: frameworks, CMS, analítica y más.",
+  "colorPicker.hint": "Toca cualquier cosa de la página para leer su color.",
+  "colorPicker.copy": "Copiar",
+  "colorPicker.copied": "Copiado",
+  "tech.title": "Creado con",
+  "tech.loading": "Analizando la página…",
+  "tech.none": "No se encontraron tecnologías conocidas en esta página.",
+  "tech.note":
+    "Leído de los scripts, estilos y marcado de la página. Lo que solo revela el servidor no se muestra.",
+  "tech.cat.framework": "Frameworks y bibliotecas",
+  "tech.cat.platform": "Plataformas y CMS",
+  "tech.cat.analytics": "Analítica y marketing",
+  "tech.cat.service": "Servicios y widgets",
+  "tech.cat.design": "Diseño y fuentes",
+  "tech.cat.delivery": "Alojamiento y distribución",
   "settings.bottomMargin": "Margen inferior global",
   "settings.bottomMarginNote":
     "Mantiene despejado el fondo de cada página, para los menús que se deslizan bajo el borde de la pantalla.",

@@ -45,6 +45,8 @@ export const ro: Messages = {
   "fab.assistant": "Asistent. Ține apăsat pentru favorite.",
   "fab.videoControls":
     "Comenzi video. Atinge pentru a activa sau dezactiva, ține apăsat pentru opțiuni.",
+  "fab.colorPicker": "Selector de culoare. Atingeți, apoi atingeți orice de pe pagină.",
+  "fab.techDetector": "Tehnologiile site-ului. Atinge pentru a vedea cu ce este construită pagina.",
 
   "history.title": "Istoric",
   "history.close": "Închide istoricul",
@@ -264,6 +266,26 @@ export const ro: Messages = {
   "settings.backButton": "Buton Înapoi plutitor",
   "settings.backButtonNote":
     "Mereu vizibil. Închide mai întâi Setările și alte panouri, apoi revine în pagină.",
+  "settings.colorPicker": "Selector de culoare",
+  "settings.colorPickerNote":
+    "Adaugă un selector de culoare la butonul plutitor. Atingeți-l, apoi atingeți orice de pe pagină pentru a-i citi culoarea.",
+  "settings.techDetector": "Detector de tehnologii",
+  "settings.techDetectorNote":
+    "Adaugă un buton la butonul plutitor care listează tehnologiile paginii: framework-uri, CMS, analiză și altele.",
+  "colorPicker.hint": "Atingeți orice de pe pagină pentru a-i citi culoarea.",
+  "colorPicker.copy": "Copiază",
+  "colorPicker.copied": "Copiat",
+  "tech.title": "Construit cu",
+  "tech.loading": "Se analizează pagina…",
+  "tech.none": "Nu s-au găsit tehnologii cunoscute pe această pagină.",
+  "tech.note":
+    "Citit din scripturile, stilurile și marcajul paginii. Ce dezvăluie doar serverul nu este afișat.",
+  "tech.cat.framework": "Framework-uri și biblioteci",
+  "tech.cat.platform": "Platforme și CMS",
+  "tech.cat.analytics": "Analiză și marketing",
+  "tech.cat.service": "Servicii și widgeturi",
+  "tech.cat.design": "Design și fonturi",
+  "tech.cat.delivery": "Găzduire și livrare",
   "settings.bottomMargin": "Margine inferioară globală",
   "settings.bottomMarginNote":
     "Lasă liberă partea de jos a fiecărei pagini, pentru meniurile care glisează sub marginea ecranului.",

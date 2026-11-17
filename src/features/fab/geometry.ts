@@ -41,6 +41,8 @@ export const TABS_SIZE = 44;
 export const STATS_SIZE = 44;
 export const INCOGNITO_SIZE = 44;
 export const CONTROLS_SIZE = 44;
+export const COLOR_PICKER_SIZE = 44;
+export const TECH_DETECTOR_SIZE = 44;
 /** Centre-to-centre distance between neighbouring buttons in the settings column. */
 const COLUMN_OFFSET = 52;
 /** From the settings button up to the usage button at the top of the page column. */
@@ -124,6 +126,16 @@ export interface FanLayout {
   incognito: Point;
   /** The video controls switch, on the opposite side of the button from the page buttons. */
   controls: Point;
+  /** The color picker, after the video controls switch; null while it is turned off in Settings. */
+  colorPicker: Point | null;
+  /** The technology detector, after the color picker; null while it is turned off in Settings. */
+  techDetector: Point | null;
+}
+
+/** The optional buttons the user can switch on in Settings. */
+export interface FanExtras {
+  colorPicker: boolean;
+  techDetector: boolean;
 }
 
 export type FanTarget =
@@ -133,6 +145,8 @@ export type FanTarget =
   | { kind: "history" }
   | { kind: "tabs" }
   | { kind: "controls" }
+  | { kind: "colorPicker" }
+  | { kind: "techDetector" }
   | { kind: "settings" };
 
 interface FanItem {
@@ -179,8 +193,8 @@ function isValid(items: FanItem[], origin: Point, viewport: Size, insets: Insets
 /**
  * Favorites sit on an arc opening away from the edge, listed top to bottom. The page buttons
  * (settings, then history, tabs and usage above it) are tucked on the edge column above or below
- * the button, farther out than the arc, so they never read as favorites. Incognito and the video
- * controls switch sit in the same column on the opposite side of the button, so a switch is never
+ * the button, farther out than the arc, so they never read as favorites. Incognito, the video
+ * controls switch and the optional color picker and technology detector (when on) sit in the same column on the opposite side of the button, so a switch is never
  * mistaken for a page. Below the button the page column is pushed out far enough that its top
  * item clears the button. When the button is near the top or bottom the arc rotates, the column
  * may flip sides, and finally the arc compacts (smaller steps, larger radius) until everything
@@ -192,6 +206,7 @@ export function fanLayout(
   viewport: Size,
   insets: Insets,
   favoriteCount: number,
+  extras: FanExtras,
 ): FanLayout {
   const inward = edge === "left" ? 0 : 180;
   const direction = edge === "left" ? 1 : -1;
@@ -201,14 +216,26 @@ export function fanLayout(
   const roomAbove = origin.y - insets.top;
   const preferred = roomBelow >= roomAbove ? 1 : -1;
 
+  /** The optional buttons continue the column after the video controls switch, in this order. */
+  const slots = [extras.colorPicker, extras.techDetector];
+  const extraCount = slots.filter(Boolean).length;
+  const slotOf = (index: number) =>
+    slots[index] ? slots.slice(0, index).filter(Boolean).length : -1;
   const place = (scale: number, shift: number, side: number, split: boolean): FanLayout => {
     const step = nominalStep * scale;
     const radius = radiusFor(step);
     const distance = Math.max(SETTINGS_DISTANCE, radius + 30);
-    const reach = split ? COLUMN_REACH : COLUMN_REACH + 2 * COLUMN_OFFSET;
+    const reach = split ? COLUMN_REACH : COLUMN_REACH + (2 + extraCount) * COLUMN_OFFSET;
     const settings = {
       x: origin.x,
       y: origin.y + (side > 0 ? Math.max(distance, reach + COLUMN_CLEARANCE) : -distance),
+    };
+    const extraPoint = (index: number): Point | null => {
+      const slot = slotOf(index);
+      if (slot < 0) return null;
+      return split
+        ? { x: origin.x, y: origin.y - side * (distance + (2 + slot) * COLUMN_OFFSET) }
+        : { x: settings.x, y: settings.y - (6 + slot) * COLUMN_OFFSET };
     };
     return {
       favorites: Array.from({ length: favoriteCount }, (_, i) =>
@@ -224,6 +251,8 @@ export function fanLayout(
       controls: split
         ? { x: origin.x, y: origin.y - side * (distance + COLUMN_OFFSET) }
         : { x: settings.x, y: settings.y - 5 * COLUMN_OFFSET },
+      colorPicker: extraPoint(0),
+      techDetector: extraPoint(1),
     };
   };
   const items = (layout: FanLayout): FanItem[] => [
@@ -234,6 +263,8 @@ export function fanLayout(
     { center: layout.stats, size: STATS_SIZE },
     { center: layout.incognito, size: INCOGNITO_SIZE },
     { center: layout.controls, size: CONTROLS_SIZE },
+    ...(layout.colorPicker ? [{ center: layout.colorPicker, size: COLOR_PICKER_SIZE }] : []),
+    ...(layout.techDetector ? [{ center: layout.techDetector, size: TECH_DETECTOR_SIZE }] : []),
   ];
 
   for (const scale of favoriteCount > 1 ? ARC_SCALES : [1]) {
@@ -257,6 +288,10 @@ export function fanTargetAt(point: Point, layout: FanLayout): FanTarget | null {
     Math.hypot(point.x - center.x, point.y - center.y) <= size / 2 + TOUCH_SLACK;
   const index = layout.favorites.findIndex((p) => near(p, FAVORITE_SIZE));
   if (index >= 0) return { kind: "favorite", index };
+  if (layout.techDetector && near(layout.techDetector, TECH_DETECTOR_SIZE))
+    return { kind: "techDetector" };
+  if (layout.colorPicker && near(layout.colorPicker, COLOR_PICKER_SIZE))
+    return { kind: "colorPicker" };
   if (near(layout.controls, CONTROLS_SIZE)) return { kind: "controls" };
   if (near(layout.incognito, INCOGNITO_SIZE)) return { kind: "incognito" };
   if (near(layout.stats, STATS_SIZE)) return { kind: "stats" };

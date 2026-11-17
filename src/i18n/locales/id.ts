@@ -41,6 +41,8 @@ export const id: Messages = {
   "fab.settings": "Pengaturan",
   "fab.assistant": "Asisten. Tahan untuk favorit.",
   "fab.videoControls": "Kontrol video. Ketuk untuk menyalakan atau mematikan, tahan untuk opsi.",
+  "fab.colorPicker": "Pemilih warna. Ketuk, lalu ketuk apa saja di halaman.",
+  "fab.techDetector": "Teknologi situs. Ketuk untuk melihat apa yang membangun halaman ini.",
 
   "history.title": "Riwayat",
   "history.close": "Tutup riwayat",
@@ -257,6 +259,26 @@ export const id: Messages = {
   "settings.backButton": "Tombol kembali mengambang",
   "settings.backButtonNote":
     "Selalu tampil. Menutup Pengaturan dan lembar lain lebih dulu, lalu mundur di halaman.",
+  "settings.colorPicker": "Pemilih warna",
+  "settings.colorPickerNote":
+    "Menambahkan pemilih warna ke tombol mengambang. Ketuk, lalu ketuk apa saja di halaman untuk membaca warnanya.",
+  "settings.techDetector": "Pendeteksi teknologi",
+  "settings.techDetectorNote":
+    "Menambahkan tombol ke tombol mengambang yang mencantumkan teknologi halaman: framework, CMS, analitik, dan lainnya.",
+  "colorPicker.hint": "Ketuk apa saja di halaman untuk membaca warnanya.",
+  "colorPicker.copy": "Salin",
+  "colorPicker.copied": "Tersalin",
+  "tech.title": "Dibangun dengan",
+  "tech.loading": "Memeriksa halaman…",
+  "tech.none": "Tidak ada teknologi yang dikenal di halaman ini.",
+  "tech.note":
+    "Dibaca dari skrip, gaya, dan markup halaman. Yang hanya diungkap server tidak ditampilkan.",
+  "tech.cat.framework": "Framework & pustaka",
+  "tech.cat.platform": "Platform & CMS",
+  "tech.cat.analytics": "Analitik & pemasaran",
+  "tech.cat.service": "Layanan & widget",
+  "tech.cat.design": "Desain & font",
+  "tech.cat.delivery": "Hosting & pengiriman",
   "settings.bottomMargin": "Margin bawah global",
   "settings.bottomMarginNote":
     "Menjaga bagian bawah setiap halaman tetap kosong, untuk menu yang meluncur ke bawah tepi layar.",

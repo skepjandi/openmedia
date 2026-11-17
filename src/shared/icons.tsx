@@ -149,6 +149,23 @@ export const VideoControlsIcon = ({ on = true }: { on?: boolean }) => (
   </Icon>
 );
 
+/** Color picker: an eyedropper. */
+export const ColorPickerIcon = () => (
+  <Icon>
+    <path d="M14.5 5.5l4 4" />
+    <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L9 17l-4 1 1-4L16.5 3.5z" />
+  </Icon>
+);
+
+/** Technology detector: code brackets over a magnifier-free page outline. */
+export const TechIcon = () => (
+  <Icon>
+    <path d="M8 7l-5 5 5 5" />
+    <path d="M16 7l5 5-5 5" />
+    <path d="M13.5 5l-3 14" />
+  </Icon>
+);
+
 /** Pro: a crown. Marks what the paywall unlocks. */
 export const ProIcon = ({ size }: { size?: number }) => (
   <Icon size={size}>

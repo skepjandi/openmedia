@@ -10,6 +10,7 @@ import {
   FAVORITE_SIZE,
   HISTORY_SIZE,
   HOLD_SCALE,
+  COLOR_PICKER_SIZE,
   CONTROLS_SIZE,
   INCOGNITO_SIZE,
   PEEK_HEIGHT,
@@ -17,6 +18,7 @@ import {
   SETTINGS_SIZE,
   STATS_SIZE,
   TABS_SIZE,
+  TECH_DETECTOR_SIZE,
   fabCenter,
   fanLayout,
   fanTargetAt,
@@ -38,6 +40,8 @@ import { BiometricIcon } from "../incognito/BiometricIcon";
 import {
   ChevronLeftIcon,
   ChevronRightIcon,
+  ColorPickerIcon,
+  TechIcon,
   HistoryIcon,
   IncognitoIcon,
   ProIcon,
@@ -84,6 +88,11 @@ export function Fab() {
   const sheet = useApp((s) => s.sheet);
   const controlsOn = useApp((s) => (s.state?.videoControls ?? VIDEO_CONTROLS_DEFAULT).panel);
   const setVideoControls = useApp((s) => s.setVideoControls);
+  // The page script runs through native code that desktop has no site view for.
+  const colorPickerOn = useApp((s) => (s.state?.colorPicker ?? false) && !s.desktop);
+  const techDetectorOn = useApp((s) => (s.state?.techDetector ?? false) && !s.desktop);
+  const startTechDetect = useApp((s) => s.startTechDetect);
+  const startColorPick = useApp((s) => s.startColorPick);
   const openSheet = useApp((s) => s.openSheet);
   const openFavorite = useApp((s) => s.openFavorite);
   const onboardingOpen = useApp((s) => s.onboardingOpen);
@@ -117,10 +126,14 @@ export function Fab() {
   const anyUnread = unread.some((count) => count > 0);
   const resting = fabCenter(position.edge, position.yRatio * viewport.height, viewport, insets);
   const layout = useMemo(
-    () => fanLayout(resting, position.edge, viewport, insets, list.length),
+    () =>
+      fanLayout(resting, position.edge, viewport, insets, list.length, {
+        colorPicker: colorPickerOn,
+        techDetector: techDetectorOn,
+      }),
     // resting is derived from these inputs
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [position, viewport, insets, list.length],
+    [position, viewport, insets, list.length, colorPickerOn, techDetectorOn],
   );
 
   const center: Point = gesture.phase === "dragging" ? gesture.position : resting;
@@ -134,6 +147,8 @@ export function Fab() {
     else if (target.kind === "stats") openSheet("stats");
     else if (target.kind === "incognito")
       void (incognito.active ? exitIncognito() : enterIncognito());
+    else if (target.kind === "colorPicker") void startColorPick();
+    else if (target.kind === "techDetector") void startTechDetect();
     else if (target.kind === "controls") {
       // The quick switch is for every site: a site's own "on" would keep the panel showing there.
       const next = !controlsOn;
@@ -235,7 +250,7 @@ export function Fab() {
     "--dx": `${center.x - target.x}px`,
     "--dy": `${center.y - target.y}px`,
     "--i": index,
-    "--n": list.length + 6,
+    "--n": list.length + 6 + Number(colorPickerOn) + Number(techDetectorOn),
   });
 
   const hidden = sheet !== "none" || onboardingOpen;
@@ -476,6 +491,54 @@ export function Fab() {
           <circle cx="32" cy="32" r="31" pathLength="1" />
         </svg>
       </button>
+
+      {layout.colorPicker && (
+        <button
+          type="button"
+          data-open={fanOpen}
+          aria-label={t("fab.colorPicker")}
+          tabIndex={fanOpen ? 0 : -1}
+          onClick={() => {
+            select({ kind: "colorPicker" });
+            dispatch({ type: "dismiss" });
+          }}
+          style={{
+            ...fanStyle(layout.colorPicker, list.length + 6),
+            width: COLOR_PICKER_SIZE,
+            height: COLOR_PICKER_SIZE,
+            margin: -COLOR_PICKER_SIZE / 2,
+          }}
+          className={`fan-item fab-glass fixed z-20 grid place-items-center rounded-full ${
+            hover?.kind === "colorPicker" ? "border-accent! text-accent" : "text-white"
+          }`}
+        >
+          <ColorPickerIcon />
+        </button>
+      )}
+
+      {layout.techDetector && (
+        <button
+          type="button"
+          data-open={fanOpen}
+          aria-label={t("fab.techDetector")}
+          tabIndex={fanOpen ? 0 : -1}
+          onClick={() => {
+            select({ kind: "techDetector" });
+            dispatch({ type: "dismiss" });
+          }}
+          style={{
+            ...fanStyle(layout.techDetector, list.length + 6 + Number(colorPickerOn)),
+            width: TECH_DETECTOR_SIZE,
+            height: TECH_DETECTOR_SIZE,
+            margin: -TECH_DETECTOR_SIZE / 2,
+          }}
+          className={`fan-item fab-glass fixed z-20 grid place-items-center rounded-full ${
+            hover?.kind === "techDetector" ? "border-accent! text-accent" : "text-white"
+          }`}
+        >
+          <TechIcon />
+        </button>
+      )}
 
       <button
         type="button"

@@ -27,6 +27,9 @@ import {
 import {
   ai,
   library,
+  colorPick,
+  techDetect,
+  type DetectedTech,
   siteView,
   type Accessibility,
   type SiteVideo,
@@ -104,6 +107,12 @@ export type SessionAction = { nonce: number } & (
   | { type: "adopt"; id: string; url: string; previousId: null }
   | { type: "activate"; id: string }
 );
+
+/** The picker's progress: the layer waits for a tap, then the color it read is shown. */
+export type ColorPickState = { status: "waiting" } | { status: "done"; hex: string };
+
+/** The detector's progress: the page is being read, then its technologies are listed. */
+export type TechState = { status: "loading" } | { status: "done"; items: DetectedTech[] };
 
 export interface IncognitoState {
   active: boolean;
@@ -200,6 +209,23 @@ export interface AppStore {
   setSearchEngine: (engine: SearchEngine) => Promise<void>;
   setAdBlock: (enabled: boolean) => Promise<void>;
   setBlockPopups: (enabled: boolean) => Promise<void>;
+  /** Shows or hides the color picker on the floating button's fan. */
+  setColorPicker: (enabled: boolean) => Promise<void>;
+  /** Shows or hides the technology detector on the floating button's fan. */
+  setTechDetector: (enabled: boolean) => Promise<void>;
+  /** The technologies panel: being read, or listed; null while closed. */
+  tech: TechState | null;
+  /** Reads the page in front and opens the panel. */
+  startTechDetect: () => Promise<void>;
+  endTechDetect: () => void;
+  /** The picking layer is on the page, or its color is on show; null otherwise. */
+  colorPick: ColorPickState | null;
+  /** Puts the picking layer over the page in front. */
+  startColorPick: () => Promise<void>;
+  /** Takes the picking layer down and clears the result. */
+  endColorPick: () => void;
+  /** Records what the layer found. */
+  setColorPick: (next: ColorPickState | null) => void;
   /** Changes some of the accessibility choices; the rest keep their value. */
   setAccessibility: (changes: Partial<Accessibility>) => Promise<void>;
   /** Changes some of the video controls; the rest keep their value. */
@@ -479,6 +505,8 @@ export const useApp = create<AppStore>((set, get) => {
   return {
     state: null,
     desktop: false,
+    colorPick: null,
+    tech: null,
     error: null,
     sheet: "none",
     sheetParent: "none",
@@ -846,6 +874,69 @@ export const useApp = create<AppStore>((set, get) => {
         }));
       }
     },
+
+    setColorPicker: async (enabled) => {
+      const previous = get().state?.colorPicker;
+      set((current) => ({ state: current.state && { ...current.state, colorPicker: enabled } }));
+      if (!enabled) get().endColorPick();
+      try {
+        await library.setColorPicker(enabled);
+      } catch (error) {
+        set((current) => ({
+          state:
+            current.state && previous !== undefined
+              ? { ...current.state, colorPicker: previous }
+              : current.state,
+          error: appError(error),
+        }));
+      }
+    },
+
+    setTechDetector: async (enabled) => {
+      const previous = get().state?.techDetector;
+      set((current) => ({ state: current.state && { ...current.state, techDetector: enabled } }));
+      if (!enabled) get().endTechDetect();
+      try {
+        await library.setTechDetector(enabled);
+      } catch (error) {
+        set((current) => ({
+          state:
+            current.state && previous !== undefined
+              ? { ...current.state, techDetector: previous }
+              : current.state,
+          error: appError(error),
+        }));
+      }
+    },
+
+    startTechDetect: async () => {
+      set({ tech: { status: "loading" } });
+      try {
+        const items = await techDetect.run();
+        // Closed while it was reading: leave it closed.
+        if (get().tech) set({ tech: { status: "done", items } });
+      } catch (error) {
+        set({ tech: null, error: appError(error) });
+      }
+    },
+
+    endTechDetect: () => set({ tech: null }),
+
+    startColorPick: async () => {
+      set({ colorPick: { status: "waiting" } });
+      try {
+        await colorPick.start();
+      } catch (error) {
+        set({ colorPick: null, error: appError(error) });
+      }
+    },
+
+    endColorPick: () => {
+      if (get().colorPick?.status === "waiting") void colorPick.cancel().catch(() => {});
+      set({ colorPick: null });
+    },
+
+    setColorPick: (next) => set({ colorPick: next }),
 
     setBackButton: async (enabled) => {
       const previous = get().state?.backButton;

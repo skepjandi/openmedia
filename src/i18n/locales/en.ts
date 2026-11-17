@@ -50,6 +50,8 @@ export const en = {
   "fab.settings": "Settings",
   "fab.assistant": "Assistant. Hold for favorites.",
   "fab.videoControls": "Video controls. Tap to turn on or off, hold for options.",
+  "fab.colorPicker": "Color picker. Tap, then tap anything on the page.",
+  "fab.techDetector": "Site technologies. Tap to see what the page is built with.",
 
   "history.title": "History",
   "history.close": "Close history",
@@ -260,6 +262,26 @@ export const en = {
   "settings.backButton": "Floating back button",
   "settings.backButtonNote":
     "Always shown. Closes Settings and other sheets first, then goes back in the page.",
+  "settings.colorPicker": "Color picker",
+  "settings.colorPickerNote":
+    "Adds a color picker to the floating button. Tap it, then tap anything on the page to read its color.",
+  "settings.techDetector": "Technology detector",
+  "settings.techDetectorNote":
+    "Adds a button to the floating button that lists the technologies a page is built with: frameworks, CMS, analytics and more.",
+  "colorPicker.hint": "Tap anything on the page to read its color.",
+  "colorPicker.copy": "Copy",
+  "colorPicker.copied": "Copied",
+  "tech.title": "Built with",
+  "tech.loading": "Looking at the page…",
+  "tech.none": "No known technologies found on this page.",
+  "tech.note":
+    "Read from the page's scripts, styles and markup. Anything only the server reveals is not shown.",
+  "tech.cat.framework": "Frameworks & libraries",
+  "tech.cat.platform": "Platforms & CMS",
+  "tech.cat.analytics": "Analytics & marketing",
+  "tech.cat.service": "Services & widgets",
+  "tech.cat.design": "Design & fonts",
+  "tech.cat.delivery": "Hosting & delivery",
   "settings.bottomMargin": "Global bottom margin",
   "settings.bottomMarginNote":
     "Keeps the bottom of every page clear, for menus that slide under the screen edge.",

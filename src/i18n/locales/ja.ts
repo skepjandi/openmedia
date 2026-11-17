@@ -44,6 +44,8 @@ export const ja: Messages = {
   "fab.settings": "設定",
   "fab.assistant": "アシスタント。長押しでお気に入り。",
   "fab.videoControls": "動画コントロール。タップでオン/オフ、長押しでオプション。",
+  "fab.colorPicker": "カラーピッカー。タップしてから、ページ上の好きな場所をタップします。",
+  "fab.techDetector": "サイトの技術。タップしてページの構築に使われている技術を確認します。",
 
   "history.title": "履歴",
   "history.close": "履歴を閉じる",
@@ -257,6 +259,26 @@ export const ja: Messages = {
   "settings.backButton": "フローティング戻るボタン",
   "settings.backButtonNote":
     "常に表示されます。まず設定などのシートを閉じ、その後ページを戻ります。",
+  "settings.colorPicker": "カラーピッカー",
+  "settings.colorPickerNote":
+    "フローティングボタンにカラーピッカーを追加します。タップしてから、ページ上の好きな場所をタップすると色を読み取れます。",
+  "settings.techDetector": "技術検出",
+  "settings.techDetectorNote":
+    "フローティングボタンに、ページで使われている技術（フレームワーク、CMS、アナリティクスなど）を一覧表示するボタンを追加します。",
+  "colorPicker.hint": "ページ上の好きな場所をタップすると色を読み取れます。",
+  "colorPicker.copy": "コピー",
+  "colorPicker.copied": "コピーしました",
+  "tech.title": "使用技術",
+  "tech.loading": "ページを確認中…",
+  "tech.none": "このページでは既知の技術が見つかりませんでした。",
+  "tech.note":
+    "ページのスクリプト、スタイル、マークアップから読み取っています。サーバーだけが明らかにする情報は表示されません。",
+  "tech.cat.framework": "フレームワークとライブラリ",
+  "tech.cat.platform": "プラットフォームとCMS",
+  "tech.cat.analytics": "アナリティクスとマーケティング",
+  "tech.cat.service": "サービスとウィジェット",
+  "tech.cat.design": "デザインとフォント",
+  "tech.cat.delivery": "ホスティングと配信",
   "settings.bottomMargin": "共通の下余白",
   "settings.bottomMarginNote":
     "画面下端に潜り込むメニューでもできるよう、各ページの下側を空けておきます。",

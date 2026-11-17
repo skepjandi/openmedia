@@ -1,5 +1,7 @@
 import { lazy, Suspense, useEffect, useState } from "react";
 import { AssistantDock } from "../features/ai/AssistantDock";
+import { TechPanel } from "../features/techdetect/TechPanel";
+import { ColorPickBar } from "../features/colorpick/ColorPickBar";
 import { BackButton } from "../features/back/BackButton";
 import { Fab } from "../features/fab/Fab";
 import { CommandBar } from "../features/sheet/CommandBar";
@@ -148,6 +150,8 @@ export function App() {
       <UsageGuard />
       <Fab />
       <BackButton />
+      <ColorPickBar />
+      <TechPanel />
       <CommandBar />
       <AssistantDock />
       <HistorySheet />

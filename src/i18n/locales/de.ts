@@ -40,6 +40,8 @@ export const de: Messages = {
   "fab.assistant": "Assistent. Für Favoriten gedrückt halten.",
   "fab.videoControls":
     "Videosteuerung. Tippen zum Ein- oder Ausschalten, gedrückt halten für Optionen.",
+  "fab.colorPicker": "Farbwähler. Tippen, dann etwas auf der Seite antippen.",
+  "fab.techDetector": "Website-Technologien. Tippen, um zu sehen, womit die Seite erstellt wurde.",
 
   "history.title": "Verlauf",
   "history.close": "Verlauf schließen",
@@ -260,6 +262,26 @@ export const de: Messages = {
   "settings.backButton": "Schwebende Zurück-Taste",
   "settings.backButtonNote":
     "Immer sichtbar. Schließt zuerst die Einstellungen und andere Ansichten, danach geht es auf der Seite zurück.",
+  "settings.colorPicker": "Farbwähler",
+  "settings.colorPickerNote":
+    "Fügt dem schwebenden Button einen Farbwähler hinzu. Tippe ihn an und dann etwas auf der Seite, um dessen Farbe zu lesen.",
+  "settings.techDetector": "Technologie-Erkennung",
+  "settings.techDetectorNote":
+    "Fügt dem schwebenden Button eine Schaltfläche hinzu, die die Technologien der Seite auflistet: Frameworks, CMS, Analytics und mehr.",
+  "colorPicker.hint": "Tippe etwas auf der Seite an, um dessen Farbe zu lesen.",
+  "colorPicker.copy": "Kopieren",
+  "colorPicker.copied": "Kopiert",
+  "tech.title": "Erstellt mit",
+  "tech.loading": "Seite wird analysiert…",
+  "tech.none": "Auf dieser Seite wurden keine bekannten Technologien gefunden.",
+  "tech.note":
+    "Aus Skripten, Styles und Markup der Seite ausgelesen. Was nur der Server preisgibt, wird nicht angezeigt.",
+  "tech.cat.framework": "Frameworks & Bibliotheken",
+  "tech.cat.platform": "Plattformen & CMS",
+  "tech.cat.analytics": "Analytics & Marketing",
+  "tech.cat.service": "Dienste & Widgets",
+  "tech.cat.design": "Design & Schriftarten",
+  "tech.cat.delivery": "Hosting & Auslieferung",
   "settings.bottomMargin": "Globaler unterer Rand",
   "settings.bottomMarginNote":
     "Hält den unteren Bereich jeder Seite frei, etwa für Menüs, die unter den Bildschirmrand gleiten.",

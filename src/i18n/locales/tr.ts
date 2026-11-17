@@ -45,6 +45,8 @@ export const tr: Messages = {
   "fab.assistant": "Asistan. Favoriler için basılı tutun.",
   "fab.videoControls":
     "Video denetimleri. Açmak veya kapatmak için dokunun, seçenekler için basılı tutun.",
+  "fab.colorPicker": "Renk seçici. Dokunun, sonra sayfada herhangi bir şeye dokunun.",
+  "fab.techDetector": "Site teknolojileri. Sayfanın neyle yapıldığını görmek için dokunun.",
 
   "history.title": "Geçmiş",
   "history.close": "Geçmişi kapat",
@@ -263,6 +265,26 @@ export const tr: Messages = {
   "settings.backButton": "Yüzen geri düğmesi",
   "settings.backButtonNote":
     "Her zaman görünür. Önce Ayarlar ve diğer sayfaları kapatır, sonra sayfada geri gider.",
+  "settings.colorPicker": "Renk seçici",
+  "settings.colorPickerNote":
+    "Yüzen düğmeye bir renk seçici ekler. Ona dokunun, sonra rengini okumak için sayfada herhangi bir şeye dokunun.",
+  "settings.techDetector": "Teknoloji algılayıcı",
+  "settings.techDetectorNote":
+    "Kayan düğmeye, sayfanın teknolojilerini listeleyen bir düğme ekler: çerçeveler, CMS, analitik ve daha fazlası.",
+  "colorPicker.hint": "Rengini okumak için sayfada herhangi bir şeye dokunun.",
+  "colorPicker.copy": "Kopyala",
+  "colorPicker.copied": "Kopyalandı",
+  "tech.title": "Şununla oluşturuldu",
+  "tech.loading": "Sayfa inceleniyor…",
+  "tech.none": "Bu sayfada bilinen bir teknoloji bulunamadı.",
+  "tech.note":
+    "Sayfanın betiklerinden, stillerinden ve işaretlemesinden okundu. Yalnızca sunucunun açığa çıkardığı bilgiler gösterilmez.",
+  "tech.cat.framework": "Çerçeveler ve kitaplıklar",
+  "tech.cat.platform": "Platformlar ve CMS",
+  "tech.cat.analytics": "Analitik ve pazarlama",
+  "tech.cat.service": "Hizmetler ve widget'lar",
+  "tech.cat.design": "Tasarım ve yazı tipleri",
+  "tech.cat.delivery": "Barındırma ve teslimat",
   "settings.bottomMargin": "Genel alt kenar boşluğu",
   "settings.bottomMarginNote":
     "Ekran kenarının altına kayan menüler için her sayfanın altını boş bırakır.",

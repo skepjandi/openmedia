@@ -89,6 +89,10 @@ export interface AppState {
   /** The sites (registrable domains) whose videos may open in a picture-in-picture window. */
   pictureInPictureSites: string[];
   backButton: boolean;
+  /** The color picker on the floating button's fan. On unless the user turned it off. */
+  colorPicker: boolean;
+  /** The technology detector on the fan. Off unless the user turned it on. */
+  techDetector: boolean;
   aiPreview: boolean;
   /** The language the user picked, as a BCP 47 tag; null follows the device's language. */
   locale: string | null;
@@ -231,6 +235,31 @@ export interface AppUpdate {
   notes: string | null;
 }
 
+export type TechCategory =
+  "framework" | "platform" | "analytics" | "service" | "design" | "delivery";
+
+/** A technology the page shows signs of. Names come from Rust's own table, never from the page. */
+export interface DetectedTech {
+  name: string;
+  category: TechCategory;
+}
+
+/** Asks what the page in front is built with. */
+export const techDetect = {
+  run: () => invoke<DetectedTech[]>("tech_detect"),
+};
+
+/** What the picking layer on the page has found; `hex` is `#rrggbb`, lowercase. */
+export type ColorReading =
+  { status: "idle" | "waiting" | "cancelled" } | { status: "done"; hex: string };
+
+/** The color picker: a layer on the page in front that reports the color under the next tap. */
+export const colorPick = {
+  start: () => command("color_pick_start"),
+  read: () => invoke<ColorReading>("color_pick_read"),
+  cancel: () => command("color_pick_cancel"),
+};
+
 async function command(name: string, args?: Record<string, unknown>): Promise<void> {
   await invoke(name, args);
 }
@@ -310,6 +339,8 @@ export const library = {
   /** Forgets the typed addresses and the remembered last page. */
   clearHistory: () => command("clear_history"),
   setBackButton: (enabled: boolean) => command("set_back_button", { enabled }),
+  setColorPicker: (enabled: boolean) => command("set_color_picker", { enabled }),
+  setTechDetector: (enabled: boolean) => command("set_tech_detector", { enabled }),
   setAccessibility: (accessibility: Accessibility) =>
     command("set_accessibility", { accessibility }),
   setVideoControls: (videoControls: VideoControls) =>

@@ -41,6 +41,8 @@ export const vi: Messages = {
   "fab.settings": "Cài đặt",
   "fab.assistant": "Trợ lý. Giữ để xem yêu thích.",
   "fab.videoControls": "Điều khiển video. Chạm để bật hoặc tắt, giữ để xem tùy chọn.",
+  "fab.colorPicker": "Công cụ chọn màu. Chạm, rồi chạm vào bất kỳ thứ gì trên trang.",
+  "fab.techDetector": "Công nghệ của trang. Nhấn để xem trang được xây dựng bằng gì.",
 
   "history.title": "Lịch sử",
   "history.close": "Đóng lịch sử",
@@ -255,6 +257,26 @@ export const vi: Messages = {
   "settings.backButton": "Nút quay lại nổi",
   "settings.backButtonNote":
     "Luôn hiển thị. Đóng Cài đặt và các bảng khác trước, sau đó quay lại trong trang.",
+  "settings.colorPicker": "Công cụ chọn màu",
+  "settings.colorPickerNote":
+    "Thêm công cụ chọn màu vào nút nổi. Chạm vào nút đó, rồi chạm vào bất kỳ thứ gì trên trang để đọc màu của nó.",
+  "settings.techDetector": "Trình phát hiện công nghệ",
+  "settings.techDetectorNote":
+    "Thêm một nút vào nút nổi, liệt kê các công nghệ của trang: framework, CMS, phân tích và hơn thế nữa.",
+  "colorPicker.hint": "Chạm vào bất kỳ thứ gì trên trang để đọc màu của nó.",
+  "colorPicker.copy": "Sao chép",
+  "colorPicker.copied": "Đã sao chép",
+  "tech.title": "Được xây dựng với",
+  "tech.loading": "Đang xem trang…",
+  "tech.none": "Không tìm thấy công nghệ nào đã biết trên trang này.",
+  "tech.note":
+    "Đọc từ tập lệnh, kiểu và mã đánh dấu của trang. Những gì chỉ máy chủ tiết lộ sẽ không được hiển thị.",
+  "tech.cat.framework": "Framework & thư viện",
+  "tech.cat.platform": "Nền tảng & CMS",
+  "tech.cat.analytics": "Phân tích & tiếp thị",
+  "tech.cat.service": "Dịch vụ & tiện ích",
+  "tech.cat.design": "Thiết kế & phông chữ",
+  "tech.cat.delivery": "Lưu trữ & phân phối",
   "settings.bottomMargin": "Lề dưới chung",
   "settings.bottomMarginNote":
     "Giữ phần dưới mọi trang trống, cho các menu trượt xuống dưới mép màn hình.",
