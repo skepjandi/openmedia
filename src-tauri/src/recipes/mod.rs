@@ -684,6 +684,67 @@ mod tests {
         );
     }
 
+    fn marked_keep(value: &serde_json::Value) -> usize {
+        match value {
+            serde_json::Value::Object(object) => object
+                .iter()
+                .map(|(key, child)| usize::from(key == "dataKeep") + marked_keep(child))
+                .sum(),
+            serde_json::Value::Array(items) => items.iter().map(marked_keep).sum(),
+            _ => 0,
+        }
+    }
+
+    /// Response fixtures live in `recipes/fixtures-json/<site>/`, apart from the DOM fixtures: each is
+    /// `{ "url": <request path>, "body": <response> }`, and anything marked `dataKeep` must survive.
+    #[test]
+    fn every_official_prune_rule_removes_something_from_a_response_fixture_and_keeps_what_is_marked()
+     {
+        let root = Path::new(env!("CARGO_MANIFEST_DIR")).join("../recipes/fixtures-json");
+        let mut idle = Vec::new();
+        for recipe in official_recipes() {
+            let responses: Vec<(String, serde_json::Value)> =
+                fs::read_dir(root.join(site_of(&recipe)))
+                    .into_iter()
+                    .flatten()
+                    .map(|entry| fs::read_to_string(entry.unwrap().path()).unwrap())
+                    .map(|text| serde_json::from_str::<serde_json::Value>(&text).unwrap())
+                    .map(|fixture| {
+                        (
+                            fixture["url"].as_str().unwrap().to_owned(),
+                            fixture["body"].clone(),
+                        )
+                    })
+                    .collect();
+            for rule in &recipe.rules {
+                let Rule::Prune { urls, remove, .. } = rule else {
+                    continue;
+                };
+                let page_rule = prune::page_rule(urls, remove);
+                let removed_somewhere = responses.iter().any(|(path, body)| {
+                    let mut pruned = body.clone();
+                    let removed = prune::apply(&page_rule, path, &mut pruned);
+                    assert_eq!(
+                        marked_keep(body),
+                        marked_keep(&pruned),
+                        "{}: {} removed something a fixture marks dataKeep",
+                        recipe.id,
+                        rule.id()
+                    );
+                    removed > 0
+                });
+                if !removed_somewhere {
+                    idle.push(format!("{}: {}", recipe.id, rule.id()));
+                }
+            }
+        }
+        assert!(
+            idle.is_empty(),
+            "prune rules no response fixture changes:\n{}",
+            idle.join("\n")
+        );
+    }
+
     const REDIRECTING: &str = r#"{"schema":1,"id":"t.route","name":"T","version":"1.0.0","origin":"user","tags":["desktop"],"match":["https://t.example/*"],
       "options":[{"id":"clips","label":"Clips","description":"d","group":"content","default":true}],
       "rules":[{"id":"clips-route","label":"Clips go home","type":"redirect","option":"clips","when":{"path":"/clips/**"},"to":"/"}]}"#;

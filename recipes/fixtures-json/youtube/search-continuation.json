@@ -1,0 +1,32 @@
+{
+  "url": "/youtubei/v1/search",
+  "note": "Reduced from a logged-out m.youtube.com search continuation (2026-11-17); ids and text replaced.",
+  "body": {
+    "onResponseReceivedCommands": [
+      {
+        "appendContinuationItemsAction": {
+          "continuationItems": [
+            {
+              "itemSectionRenderer": {
+                "contents": [
+                  { "videoRenderer": { "videoId": "keep-1", "dataKeep": true } },
+                  {
+                    "gridShelfViewModel": {
+                      "contents": [
+                        { "shortsLockupViewModel": { "entityId": "short-1" } },
+                        { "shortsLockupViewModel": { "entityId": "short-2" } }
+                      ],
+                      "contentAspectRatio": "GRID_SHELF_VIEW_MODEL_CONTENT_ASPECT_RATIO_VERTICAL"
+                    }
+                  },
+                  { "videoRenderer": { "videoId": "keep-2", "dataKeep": true } }
+                ]
+              }
+            },
+            { "continuationItemRenderer": { "token": "keep-token", "dataKeep": true } }
+          ]
+        }
+      }
+    ]
+  }
+}

@@ -12,8 +12,8 @@ const MAX_URLS: usize = 8;
 const MAX_REMOVES: usize = 8;
 const MAX_URL_CHARS: usize = 120;
 const MAX_URL_WILDCARDS: usize = 4;
-const MAX_PATH_CHARS: usize = 120;
-const MAX_STEPS: usize = 10;
+const MAX_PATH_CHARS: usize = 200;
+const MAX_STEPS: usize = 16;
 const MAX_KEY_CHARS: usize = 40;
 const MAX_INDEX: u32 = 9_999;
 const MAX_TEXT_CHARS: usize = 80;
@@ -181,7 +181,7 @@ pub fn validate(id: &str, urls: &[String], remove: &[PruneRemove]) -> Result<()>
     for entry in remove {
         if parse_path(&entry.path).is_none() {
             return Err(refuse(
-                "has a path outside the grammar: keys, [*] and [n], dot separated, 10 steps at most",
+                "has a path outside the grammar: keys, [*] and [n], dot separated, 16 steps at most",
             ));
         }
         if let Some(when) = &entry.when
@@ -229,12 +229,100 @@ pub fn describe(remove: &[PruneRemove]) -> String {
         .join("; ")
 }
 
+/// What the page's runtime does to one response body, for fixture tests: how many values the
+/// rule removed from `body` when `request_path` matches one of its `urls`.
+#[cfg(test)]
+pub(super) fn apply(rule: &PagePrune, request_path: &str, body: &mut serde_json::Value) -> usize {
+    let matched = rule
+        .urls
+        .iter()
+        .any(|source| regex::Regex::new(source).is_ok_and(|re| re.is_match(request_path)));
+    if !matched {
+        return 0;
+    }
+    rule.remove
+        .iter()
+        .map(|entry| remove_at(body, &entry.steps, entry.when.as_ref()))
+        .sum()
+}
+
+#[cfg(test)]
+fn holds(value: &serde_json::Value, when: Option<&PruneWhen>) -> bool {
+    let Some(when) = when else { return true };
+    let Some(found) = value.as_object().and_then(|object| object.get(&when.key)) else {
+        return false;
+    };
+    match (&when.equals, found) {
+        (PruneScalar::Bool(want), serde_json::Value::Bool(have)) => want == have,
+        (PruneScalar::Number(want), serde_json::Value::Number(have)) => want == have,
+        (PruneScalar::Text(want), serde_json::Value::String(have)) => want == have,
+        _ => false,
+    }
+}
+
+#[cfg(test)]
+fn remove_at(value: &mut serde_json::Value, steps: &[Step], when: Option<&PruneWhen>) -> usize {
+    use serde_json::Value;
+    let Some((step, rest)) = steps.split_first() else {
+        return 0;
+    };
+    if rest.is_empty() {
+        return match (step, value) {
+            (Step::Key(name), Value::Array(items)) if name == ANY => {
+                let before = items.len();
+                items.retain(|item| !holds(item, when));
+                before - items.len()
+            }
+            (Step::Key(name), Value::Object(object)) => {
+                if object.get(name).is_some_and(|found| holds(found, when)) {
+                    object.remove(name);
+                    1
+                } else {
+                    0
+                }
+            }
+            (Step::Index(at), Value::Array(items)) => {
+                let at = *at as usize;
+                if items.get(at).is_some_and(|found| holds(found, when)) {
+                    items.remove(at);
+                    1
+                } else {
+                    0
+                }
+            }
+            _ => 0,
+        };
+    }
+    match (step, value) {
+        (Step::Key(name), Value::Array(items)) if name == ANY => items
+            .iter_mut()
+            .map(|item| remove_at(item, rest, when))
+            .sum(),
+        (Step::Key(name), Value::Object(object)) => object
+            .get_mut(name)
+            .map_or(0, |child| remove_at(child, rest, when)),
+        (Step::Index(at), Value::Array(items)) => items
+            .get_mut(*at as usize)
+            .map_or(0, |child| remove_at(child, rest, when)),
+        _ => 0,
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
 
     fn key(name: &str) -> Step {
         Step::Key(name.to_owned())
+    }
+
+    #[test]
+    fn a_path_may_run_sixteen_steps_and_two_hundred_characters_and_no_more() {
+        let steps = |count: usize| vec!["a"; count].join(".");
+        assert_eq!(parse_path(&steps(16)).map(|found| found.len()), Some(16));
+        assert_eq!(parse_path(&steps(17)), None);
+        let long = vec!["k".repeat(30); 8].join(".");
+        assert_eq!(parse_path(&long), None);
     }
 
     #[test]
@@ -276,7 +364,7 @@ mod tests {
             "$..a",
             "a.b\n",
             "a\u{200b}",
-            "a.b.c.d.e.f.g.h.i.j.k",
+            "a.b.c.d.e.f.g.h.i.j.k.l.m.n.o.p.q",
         ] {
             assert_eq!(parse_path(path), None, "{path:?}");
         }

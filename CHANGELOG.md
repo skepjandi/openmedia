@@ -6,6 +6,16 @@ All notable changes to OpenMedia are documented here.
 >
 > **Wiki**: the [GitHub Wiki](https://github.com/skepjandi/openmedia/wiki) is the public-facing main wiki — architecture, recipe format, AI pipeline, security model, roadmap. Source-controlled editing surface is `docs/wiki/` in this repo; CI (`.github/workflows/sync-wiki.yml`) mirrors it to the GitHub Wiki on every merge to `main`. New single-PR changes belong here, not as new wiki pages.
 
+### feat(recipes): YouTube's Hide Shorts option also drops Shorts from the feeds as they load
+
+**Area:** `feat(recipes)`
+
+**Change:** The first official recipe to use `prune`. YouTube 2.4.0 adds `shorts-prune-search` (`/youtubei/v1/search`) and `shorts-prune-browse` (`/youtubei/v1/browse`) to the `shorts` option: they delete each `shortsLockupViewModel` from the continuation responses of the page's own requests, so those Shorts are never handed to the page. The path limit of a `prune` removal goes from 10 steps and 120 characters to 16 and 200, because YouTube nests these items 11 and 12 levels deep (Rust `prune.rs`, `recipe-format.md`; the Worker mirror is a separate pull request). A reference pruner in the Rust tests runs each official prune rule over reduced response fixtures in `recipes/fixtures-json/<site>/` (`{ url, body }`, anything marked `dataKeep` must survive); no rule may be idle.
+
+**Limits:** only continuation responses (scrolling, "load more") are pruned. The first page of Home, search and channels is embedded in the HTML as `ytInitialData`, which `prune` does not touch, so the existing CSS `hide` rules still do that part. The deleted item leaves an empty entry in the shelf; the shelf's own `hide` rules cover it.
+
+**Verified:** Rust fixture test and limit tests. Ran the real `prune_runtime.js` in Chromium (iPhone user agent on `m.youtube.com`, desktop user agent on `www.youtube.com`, logged out, 2026-11-17) with these two rules against live continuation responses: Shorts elements after scrolling dropped from 40 to 16 on phone search, 10 to 6 on phone Home and 128 to 38 on desktop search, video results unchanged (158 before and after), no page errors. **Not verified:** a device, a logged-in account, channel pages, the Shorts shelf in watch-page suggestions (no such response was captured), and YouTube's own history wrapping with the redirect rule.
+
 ### feat(recipes): `prune` rule removes items from a page's own JSON responses
 
 **Area:** `feat(recipes)`, `feat(engine)`

@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "market.official.youtube",
   "name": "YouTube",
-  "version": "2.3.0",
+  "version": "2.4.0",
   "origin": "user",
   "tags": ["desktop", "mobile"],
   "match": ["https://www.youtube.com/*", "https://m.youtube.com/*", "https://youtube.com/*"],
@@ -1080,6 +1080,30 @@
         "path": "/shorts/**"
       },
       "to": "/"
+    },
+    {
+      "id": "shorts-prune-search",
+      "label": "Drop Shorts from search results as they load",
+      "type": "prune",
+      "option": "shorts",
+      "urls": ["/youtubei/v1/search"],
+      "remove": [
+        {
+          "path": "onResponseReceivedCommands[*].appendContinuationItemsAction.continuationItems[*].itemSectionRenderer.contents[*].gridShelfViewModel.contents[*].shortsLockupViewModel"
+        }
+      ]
+    },
+    {
+      "id": "shorts-prune-browse",
+      "label": "Drop Shorts from the Home feed as it loads",
+      "type": "prune",
+      "option": "shorts",
+      "urls": ["/youtubei/v1/browse"],
+      "remove": [
+        {
+          "path": "onResponseReceivedActions[*].appendContinuationItemsAction.continuationItems[*].richSectionRenderer.content.gridShelfViewModel.contents[*].shortsLockupViewModel"
+        }
+      ]
     }
   ],
   "meta": {

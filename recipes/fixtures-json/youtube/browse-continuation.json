@@ -1,0 +1,33 @@
+{
+  "url": "/youtubei/v1/browse",
+  "note": "Reduced from a logged-out m.youtube.com Home continuation (2026-11-17); ids and text replaced.",
+  "body": {
+    "onResponseReceivedActions": [
+      {
+        "appendContinuationItemsAction": {
+          "continuationItems": [
+            {
+              "richItemRenderer": {
+                "content": { "videoRenderer": { "videoId": "keep-1", "dataKeep": true } }
+              }
+            },
+            {
+              "richSectionRenderer": {
+                "content": {
+                  "gridShelfViewModel": {
+                    "header": { "sectionHeaderViewModel": { "headline": { "content": "Shorts" } } },
+                    "contents": [
+                      { "shortsLockupViewModel": { "entityId": "short-1" } },
+                      { "shortsLockupViewModel": { "entityId": "short-2" } }
+                    ]
+                  }
+                }
+              }
+            },
+            { "continuationItemRenderer": { "token": "keep-token", "dataKeep": true } }
+          ]
+        }
+      }
+    ]
+  }
+}
