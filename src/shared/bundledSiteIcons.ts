@@ -29,6 +29,7 @@ export const BUNDLED_ICON_BY_DOMAIN: Record<string, string> = {
   "instagram.com": instagram,
   "linkedin.com": linkedin,
   "miruro.to": miruro,
+  "miruro.tv": miruro,
   "movy.sx": movy,
   "netflix.com": netflix,
   "reddit.com": reddit,

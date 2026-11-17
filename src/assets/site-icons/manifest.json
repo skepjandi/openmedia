@@ -45,7 +45,7 @@
     "market.official.miruro": {
       "file": "miruro.png",
       "source": "https://www.miruro.to/apple-touch-icon-180x180.png?v=1.15.9",
-      "domains": ["miruro.to"],
+      "domains": ["miruro.to", "miruro.tv"],
       "bytes": 4135,
       "sha256": "a1d79c2446ec3aba70112bf7643f0b2309bd232a20ffce11a1432d6d9100f638"
     },
