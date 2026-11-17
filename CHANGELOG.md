@@ -6,6 +6,16 @@ All notable changes to OpenMedia are documented here.
 >
 > **Wiki**: the [GitHub Wiki](https://github.com/skepjandi/openmedia/wiki) is the public-facing main wiki — architecture, recipe format, AI pipeline, security model, roadmap. Source-controlled editing surface is `docs/wiki/` in this repo; CI (`.github/workflows/sync-wiki.yml`) mirrors it to the GitHub Wiki on every merge to `main`. New single-PR changes belong here, not as new wiki pages.
 
+### fix(siteview): picture-in-picture never started when leaving the app, and the volume bar could snap back (iOS)
+
+**Area:** `fix(siteview)`
+
+**Cause:** The iOS plugin never set the app's audio session category. A web view's video then reports no picture-in-picture support (`webkitSupportsPresentationMode('picture-in-picture')` is false), so the window asked for when the app resigns active never opened, and media follows the ringer switch. The volume bar sets the device volume through a hidden `MPVolumeView`, whose slider was looked up only among its direct children and only once, so a missing slider meant the device volume never changed and the bar snapped back to the device's real level a second later.
+
+**Change:** The plugin sets the `.playback` category (`.moviePlayback` mode) when it loads; it does not activate the session, so other apps' audio is untouched until media plays. The volume slider is found at any depth and, if the view has not built it yet, the level is applied a moment later.
+
+**Verified:** the iOS plugin builds for the simulator; the simulator reports no picture-in-picture support for web video (`webkitSupportsPresentationMode` is false there before and after), so a window cannot be shown or checked there. Android's volume bar was driven on the emulator: dragging set the media stream (12 to 5) and the bar stayed. **Not verified:** a physical iPhone, which is where both fixes need checking (PiP when leaving the app with a playing video on a listed site; the bar holding after a drag). With the ringer switch on silent, video audio now plays, as in Safari.
+
 ### fix(fab): the technology detector and color picker froze iOS and found little; a new draggable color picker
 
 **Area:** `fix(fab)`, `feat(fab)`, `fix(siteview)`

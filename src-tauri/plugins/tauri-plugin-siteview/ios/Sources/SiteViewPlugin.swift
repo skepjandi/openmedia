@@ -628,6 +628,11 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
     webview.scrollView.minimumZoomScale = 1
     webview.scrollView.maximumZoomScale = 1
     webview.scrollView.pinchGestureRecognizer?.isEnabled = false
+    // A web view's video floats in picture-in-picture, or plays on out of the app, only when the
+    // app's audio session is in the playback category (the audio background mode alone is not
+    // enough). Only the category is set here: WebKit activates the session when media plays, so
+    // other apps' music is not interrupted until then.
+    try? AVAudioSession.sharedInstance().setCategory(.playback, mode: .moviePlayback)
     NotificationCenter.default.addObserver(
       forName: UIApplication.didReceiveMemoryWarningNotification, object: nil, queue: .main
     ) { [weak self] _ in self?.send(MemoryWarningEvent()) }
@@ -1380,7 +1385,24 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
     }
     guard let view = volumeView else { return }
     view.layoutIfNeeded()
-    (view.subviews.compactMap { $0 as? UISlider }.first)?.value = level
+    if let slider = volumeSlider(in: view) {
+      slider.value = level
+      return
+    }
+    // The view builds its slider a moment after it is added, and deeper than its own children on
+    // some systems: apply the level once it is there.
+    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self, weak view] in
+      guard let view, let slider = self?.volumeSlider(in: view) else { return }
+      slider.value = level
+    }
+  }
+
+  private func volumeSlider(in view: UIView) -> UISlider? {
+    if let slider = view as? UISlider { return slider }
+    for child in view.subviews {
+      if let slider = volumeSlider(in: child) { return slider }
+    }
+    return nil
   }
 
   func playFeedVideo(_ view: WKWebView) {
