@@ -373,6 +373,7 @@ export const ja: Messages = {
   "library.review.options": "スイッチ",
   "library.review.rules": "変更内容",
   "library.review.hides": "非表示にするもの",
+  "library.review.redirects": "転送するもの",
   "library.review.restyles": "見た目を変えるもの",
   "library.review.runsCode": "コードを実行",
   "library.review.showCode": "コードを表示",
@@ -615,6 +616,12 @@ export const ja: Messages = {
   "favorites.backgroundMedia": "バックグラウンドで再生を続ける",
   "favorites.backgroundMediaNote":
     "オフ：別のサイトに切り替えたりアプリを離れたりすると、音声と動画が一時停止します。オン：このサイトは再生を続けます。",
+  "favorites.landingLabel": "開始ページ",
+  "favorites.landingNote":
+    "このお気に入りを最初に開くページです。同じサイトのページである必要があります。空のままにすると上のアドレスを開きます。",
+  "favorites.landingPlaceholder": "アドレスと同じ",
+  "favorites.landingReset": "アドレスを使う",
+  "favorites.landingInvalid": "開始ページは同じサイトのページにしてください。",
   "favorites.pictureInPicture": "ピクチャインピクチャ動画",
   "favorites.pictureInPictureNote":
     "オフ：動画はページ内にとどまります。オン：アプリを離れると、再生中の動画が小さなウィンドウで浮かび、プレーヤーからも浮かべられます。",

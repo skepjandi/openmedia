@@ -380,6 +380,7 @@ export const uk: Messages = {
   "library.review.options": "Перемикачі",
   "library.review.rules": "Що змінює",
   "library.review.hides": "Приховує",
+  "library.review.redirects": "Перенаправляє",
   "library.review.restyles": "Змінює вигляд",
   "library.review.runsCode": "Запускає код",
   "library.review.showCode": "Показати код",
@@ -625,6 +626,12 @@ export const uk: Messages = {
   "favorites.backgroundMedia": "Продовжувати відтворення у фоні",
   "favorites.backgroundMediaNote":
     "Вимк.: звук і відео ставляться на паузу, коли ви переходите на інший сайт або виходите з застосунку. Ввімк.: цей сайт продовжує відтворення.",
+  "favorites.landingLabel": "Стартова сторінка",
+  "favorites.landingNote":
+    "Сторінка, яку це обране відкриває першою. Вона має бути на тому самому сайті. Залиште порожнім, щоб відкривалася адреса вище.",
+  "favorites.landingPlaceholder": "Як адреса",
+  "favorites.landingReset": "Використати адресу",
+  "favorites.landingInvalid": "Стартова сторінка має бути сторінкою того самого сайту.",
   "favorites.pictureInPicture": "Відео «картинка в картинці»",
   "favorites.pictureInPictureNote":
     "Вимк.: відео залишається на сторінці. Ввімк.: відео, що відтворюється, виходить у маленьке плаваюче вікно, коли ви залишаєте застосунок, і його можна так само вивести з програвача.",

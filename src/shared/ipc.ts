@@ -56,6 +56,8 @@ export interface Favorite {
   icon?: string;
   /** Whether a rise in the page's unread count raises a local notification. */
   notify: boolean;
+  /** Where a new session of this favorite starts instead of `url`; always on the favorite's own site. */
+  landing?: string;
 }
 
 export interface FavoriteInput {
@@ -63,6 +65,8 @@ export interface FavoriteInput {
   url: string;
   /** Left out, it is on: Rust's default, and what every new favorite gets. */
   notify?: boolean;
+  /** An address or a path on the favorite's site; left out or null, the favorite opens `url`. */
+  landing?: string | null;
 }
 
 export interface AppState {

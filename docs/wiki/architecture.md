@@ -104,7 +104,7 @@ First launch shows the guide, then a step "What do you need in quick access?" th
 
 ### Launch
 
-The page does not wait for the shell. Core opens the start page (the last page, else the first favorite) from its own `setup`, in parallel with the shell's boot; the shell adopts it once it can listen for its events.
+The page does not wait for the shell. Core opens the start page (the last page, else the first favorite's landing page or address) from its own `setup`, in parallel with the shell's boot; the shell adopts it once it can listen for its events.
 
 ```mermaid
 sequenceDiagram

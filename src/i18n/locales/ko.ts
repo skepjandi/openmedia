@@ -371,6 +371,7 @@ export const ko: Messages = {
   "library.review.options": "스위치",
   "library.review.rules": "변경되는 내용",
   "library.review.hides": "숨기는 것",
+  "library.review.redirects": "이동시키는 것",
   "library.review.restyles": "스타일을 바꾸는 것",
   "library.review.runsCode": "코드 실행",
   "library.review.showCode": "코드 보기",
@@ -609,6 +610,12 @@ export const ko: Messages = {
   "favorites.backgroundMedia": "백그라운드에서 계속 재생",
   "favorites.backgroundMediaNote":
     "끔: 다른 사이트로 전환하거나 앱을 나가면 오디오와 비디오가 일시 정지됩니다. 켬: 이 사이트는 계속 재생됩니다.",
+  "favorites.landingLabel": "시작 페이지",
+  "favorites.landingNote":
+    "이 즐겨찾기가 처음 여는 페이지입니다. 같은 사이트의 페이지여야 합니다. 비워 두면 위의 주소를 엽니다.",
+  "favorites.landingPlaceholder": "주소와 동일",
+  "favorites.landingReset": "주소 사용",
+  "favorites.landingInvalid": "시작 페이지는 같은 사이트의 페이지여야 합니다.",
   "favorites.pictureInPicture": "화면 속 화면 동영상",
   "favorites.pictureInPictureNote":
     "끔: 동영상이 페이지 안에 머뭅니다. 켬: 앱을 나가면 재생 중인 동영상이 작은 창으로 떠 있고, 플레이어에서도 직접 띄울 수 있습니다.",

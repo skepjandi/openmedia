@@ -377,6 +377,7 @@ export const ur: Messages = {
   "library.review.options": "سوئچ",
   "library.review.rules": "کیا بدلتی ہے",
   "library.review.hides": "چھپاتی ہے",
+  "library.review.redirects": "ری ڈائریکٹ کرتی ہے",
   "library.review.restyles": "انداز بدلتی ہے",
   "library.review.runsCode": "کوڈ چلاتی ہے",
   "library.review.showCode": "کوڈ دکھائیں",
@@ -617,6 +618,12 @@ export const ur: Messages = {
   "favorites.backgroundMedia": "پس منظر میں چلانا جاری رکھیں",
   "favorites.backgroundMediaNote":
     "بند: دوسری سائٹ پر جانے یا ایپ چھوڑنے پر آڈیو اور ویڈیو رک جاتے ہیں۔ آن: یہ سائٹ چلتی رہتی ہے۔",
+  "favorites.landingLabel": "لینڈنگ صفحہ",
+  "favorites.landingNote":
+    "وہ صفحہ جو یہ پسندیدہ سب سے پہلے کھولتا ہے۔ یہ اسی سائٹ پر ہونا چاہیے۔ اوپر والا پتہ کھولنے کے لیے خالی چھوڑ دیں۔",
+  "favorites.landingPlaceholder": "پتے کے برابر",
+  "favorites.landingReset": "پتہ استعمال کریں",
+  "favorites.landingInvalid": "لینڈنگ صفحہ اسی سائٹ کا صفحہ ہونا چاہیے۔",
   "favorites.pictureInPicture": "پکچر اِن پکچر ویڈیو",
   "favorites.pictureInPictureNote":
     "بند: ویڈیو صفحے کے اندر رہتے ہیں۔ آن: ایپ چھوڑنے پر چلتی ہوئی ویڈیو ایک چھوٹی تیرتی ونڈو میں آ جاتی ہے، اور آپ اسے پلیئر سے بھی تیرا سکتے ہیں۔",

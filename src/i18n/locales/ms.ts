@@ -377,6 +377,7 @@ export const ms: Messages = {
   "library.review.options": "Suis",
   "library.review.rules": "Apa yang diubah",
   "library.review.hides": "Menyembunyikan",
+  "library.review.redirects": "Mengalihkan",
   "library.review.restyles": "Mengubah gaya",
   "library.review.runsCode": "Menjalankan kod",
   "library.review.showCode": "Tunjukkan kod",
@@ -623,6 +624,12 @@ export const ms: Messages = {
   "favorites.backgroundMedia": "Teruskan main di latar belakang",
   "favorites.backgroundMediaNote":
     "Mati: audio dan video dijeda apabila anda bertukar ke laman lain atau meninggalkan aplikasi. Hidup: laman ini terus bermain.",
+  "favorites.landingLabel": "Halaman pendaratan",
+  "favorites.landingNote":
+    "Halaman yang dibuka dahulu oleh kegemaran ini. Mesti berada di laman yang sama. Biarkan kosong untuk membuka alamat di atas.",
+  "favorites.landingPlaceholder": "Sama seperti alamat",
+  "favorites.landingReset": "Guna alamat",
+  "favorites.landingInvalid": "Halaman pendaratan mestilah halaman daripada laman yang sama.",
   "favorites.pictureInPicture": "Video gambar-dalam-gambar",
   "favorites.pictureInPictureNote":
     "Mati: video kekal dalam halaman. Hidup: video yang sedang dimainkan terapung dalam tetingkap kecil apabila anda meninggalkan aplikasi, dan anda juga boleh mengapungkannya daripada pemainnya.",

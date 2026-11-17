@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { usableQuickAccess } from "../shared/favorites";
+import { favoriteStartUrl, usableQuickAccess } from "../shared/favorites";
 import {
   assistantReducer,
   initialAssistant,
@@ -160,8 +160,11 @@ export interface AppStore {
   openSearch: (url: string) => void;
   /** A site the user reached from a search: remembered in history, without opening anything. */
   recordVisit: (url: string) => void;
-  /** A favorite: switches to its live session if there is one, otherwise opens a new one. */
-  openFavorite: (url: string) => void;
+  /**
+   * A favorite: switches to its live session if there is one, otherwise opens a new one at its
+   * landing page, or at its address when it has none.
+   */
+  openFavorite: (favorite: Pick<Favorite, "url" | "landing">) => void;
   /** A page of a hub: switches to its live session if there is one, otherwise opens a new one. */
   openHubTab: (url: string, hubId: string) => void;
   /** A history entry: switches to the live session typed with it, otherwise opens a new one. */
@@ -402,10 +405,10 @@ export const useApp = create<AppStore>((set, get) => {
    * session and its own cookies. A hub page and a favorite on the same site stay separate
    * sessions, so the Instagram favorite is Instagram and the hub's tab is its inbox.
    */
-  const openPickedPage = (url: string, hubId: string | null = null) => {
+  const openPickedPage = (url: string, hubId: string | null = null, startUrl: string = url) => {
     const live = findFavoriteSession(get().sessions, url, hubId);
     if (live) switchTo(live.id);
-    else startSession(url, hubId ? "hub" : "favorite", undefined, hubId);
+    else startSession(startUrl, hubId ? "hub" : "favorite", undefined, hubId);
   };
 
   /** Incognito chats live only in memory: switching modes drops them and loads the saved ones again. */
@@ -572,7 +575,12 @@ export const useApp = create<AppStore>((set, get) => {
 
     openSearch: (url) => startSession(url, "typed"),
 
-    openFavorite: (url) => openPickedPage(url, hubForFavorite(get().sites, url)?.recipeId ?? null),
+    openFavorite: (favorite) =>
+      openPickedPage(
+        favorite.url,
+        hubForFavorite(get().sites, favorite.url)?.recipeId ?? null,
+        favoriteStartUrl(favorite),
+      ),
 
     openHubTab: (url, hubId) => openPickedPage(url, hubId),
 

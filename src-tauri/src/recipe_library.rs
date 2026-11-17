@@ -166,6 +166,7 @@ fn favorite_for(option: &OnboardingOption) -> FavoriteInput {
         name: option.name.chars().take(MAX_FAVORITE_NAME_CHARS).collect(),
         url: option.homepage.clone(),
         notify: true,
+        landing: None,
     }
 }
 

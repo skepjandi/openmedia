@@ -372,6 +372,7 @@ export const hi: Messages = {
   "library.review.options": "स्विच",
   "library.review.rules": "यह क्या बदलती है",
   "library.review.hides": "छिपाती है",
+  "library.review.redirects": "रीडायरेक्ट करती है",
   "library.review.restyles": "रूप बदलती है",
   "library.review.runsCode": "कोड चलाती है",
   "library.review.showCode": "कोड दिखाएँ",
@@ -615,6 +616,12 @@ export const hi: Messages = {
   "favorites.backgroundMedia": "बैकग्राउंड में चलते रहें",
   "favorites.backgroundMediaNote":
     "बंद: दूसरी साइट पर जाने या ऐप छोड़ने पर ऑडियो और वीडियो रुक जाते हैं। चालू: यह साइट चलती रहती है।",
+  "favorites.landingLabel": "लैंडिंग पेज",
+  "favorites.landingNote":
+    "यह पसंदीदा सबसे पहले जो पेज खोलता है। यह उसी साइट का होना चाहिए। ऊपर का पता खोलने के लिए इसे खाली छोड़ें।",
+  "favorites.landingPlaceholder": "पते जैसा ही",
+  "favorites.landingReset": "पते का उपयोग करें",
+  "favorites.landingInvalid": "लैंडिंग पेज उसी साइट का पेज होना चाहिए।",
   "favorites.pictureInPicture": "पिक्चर-इन-पिक्चर वीडियो",
   "favorites.pictureInPictureNote":
     "बंद: वीडियो पृष्ठ के भीतर ही रहते हैं। चालू: ऐप छोड़ने पर चलता हुआ वीडियो छोटी तैरती विंडो में दिखता है, और आप उसे प्लेयर से भी तैरा सकते हैं।",

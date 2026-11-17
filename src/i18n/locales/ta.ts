@@ -387,6 +387,7 @@ export const ta: Messages = {
   "library.review.options": "மாற்றிகள்",
   "library.review.rules": "எதை மாற்றுகிறது",
   "library.review.hides": "மறைப்பவை",
+  "library.review.redirects": "வேறு பக்கத்துக்கு திருப்புகிறது",
   "library.review.restyles": "தோற்றத்தை மாற்றுபவை",
   "library.review.runsCode": "குறியீட்டை இயக்கும்",
   "library.review.showCode": "குறியீட்டைக் காட்டு",
@@ -635,6 +636,12 @@ export const ta: Messages = {
   "favorites.backgroundMedia": "பின்னணியில் தொடர்ந்து இயக்கு",
   "favorites.backgroundMediaNote":
     "முடக்கம்: வேறு தளத்துக்கு மாறினால் அல்லது செயலியை விட்டால் ஆடியோவும் வீடியோவும் இடைநிறுத்தப்படும். இயக்கம்: இந்த தளம் தொடர்ந்து இயங்கும்.",
+  "favorites.landingLabel": "தொடக்கப் பக்கம்",
+  "favorites.landingNote":
+    "இந்த விருப்பமான தளம் முதலில் திறக்கும் பக்கம். அது அதே தளத்தில் இருக்க வேண்டும். மேலே உள்ள முகவரியைத் திறக்க காலியாக விடவும்.",
+  "favorites.landingPlaceholder": "முகவரியைப் போலவே",
+  "favorites.landingReset": "முகவரியைப் பயன்படுத்து",
+  "favorites.landingInvalid": "தொடக்கப் பக்கம் அதே தளத்தின் பக்கமாக இருக்க வேண்டும்.",
   "favorites.pictureInPicture": "படத்துக்குள் படம் வீடியோ",
   "favorites.pictureInPictureNote":
     "முடக்கம்: வீடியோக்கள் பக்கத்திலேயே இருக்கும். இயக்கம்: செயலியை விட்டதும் இயங்கும் வீடியோ சிறிய மிதக்கும் சாளரத்தில் தோன்றும்; பிளேயரிலிருந்தும் அதை மிதக்கச் செய்யலாம்.",

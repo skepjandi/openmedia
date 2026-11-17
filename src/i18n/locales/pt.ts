@@ -382,6 +382,7 @@ export const pt: Messages = {
   "library.review.options": "Opções",
   "library.review.rules": "O que ela altera",
   "library.review.hides": "Oculta",
+  "library.review.redirects": "Redireciona",
   "library.review.restyles": "Muda o visual",
   "library.review.runsCode": "Executa código",
   "library.review.showCode": "Mostrar o código",
@@ -624,6 +625,12 @@ export const pt: Messages = {
   "favorites.backgroundMedia": "Continuar tocando em segundo plano",
   "favorites.backgroundMediaNote":
     "Desativado: áudio e vídeo pausam ao trocar de site ou sair do app. Ativado: este site continua tocando.",
+  "favorites.landingLabel": "Página inicial",
+  "favorites.landingNote":
+    "A página que este favorito abre primeiro. Tem de ser do mesmo site. Deixe vazio para abrir o endereço acima.",
+  "favorites.landingPlaceholder": "Igual ao endereço",
+  "favorites.landingReset": "Usar o endereço",
+  "favorites.landingInvalid": "A página inicial tem de ser uma página do mesmo site.",
   "favorites.pictureInPicture": "Vídeo em picture-in-picture",
   "favorites.pictureInPictureNote":
     "Desativado: os vídeos ficam na página. Ativado: um vídeo em reprodução flutua em uma janela pequena ao sair do app, e você também pode fazê-lo flutuar pelo player.",
