@@ -63,6 +63,17 @@ Options beyond the browser's tracks come from three places, in this order (`read
 
 The feed pages are the ones the feed player knows. A page it does not know is added by a script rule from the assistant, `document[Symbol.for('openmedia.feedPaths')] = ['^/clips/']` (up to 8 case-insensitive path patterns), which also turns on the autoplay of the feed player there. Hiding parts of a feed (title, channel, buttons) is ordinary `hide` rules.
 
+## Prune rules
+
+`src-tauri/src/prune_runtime.js` is a function expression, embedded in the document-start script (like `video_menu.js`) only when a rule that currently applies is a `prune` rule. The page script hands it the rules of every recipe entry matching the page: each rule's `urls` compiled by Rust to anchored path regexes (`recipes/prune.rs`) and each `remove` path parsed by Rust into steps (a string is a key, `"*"` every array element, a number an index), so the page never parses the grammar. It runs in every frame whose own URL a recipe matches, in the page's own world, because that is where the page's `fetch` lives.
+
+- **Wrapping.** `window.fetch`, `XMLHttpRequest.prototype.open` and the `responseText`/`response` getters are wrapped once per window; the wrapper state lives under `Symbol.for('openmedia.prune')`. A second run (a toggled option, a swapped recipe, `set_document_start_script`'s live eval) finds the state and only replaces its rules; the page script runs `state.rules = []` when no prune rule applies any more, so the effect stops on the next response with no reload. Wrapping is never removed (the wrapper with no rules returns the page's own promise or value).
+- **What it reads.** The request's URL (a string, `URL` or `Request.url`; never a body, header or option) and the response the page already asked for. It must be on the page's own origin both as requested and as finally answered (a redirect elsewhere is left alone), its path must match a rule, and the response must be `ok`, `basic`/`default` type, JSON-typed (or empty or `text/plain`), and buffered within 2 MiB. For `fetch` it reads a **clone** (`response.clone()`), counting bytes chunk by chunk and giving up past the cap or at a larger `Content-Length`, so the page's own response is never consumed. For XHR it acts only at `readyState` 4 on text and `json` response types.
+- **What it returns.** If a path removed anything, a new `Response` (same status, status text and headers, minus `Content-Length` and `Content-Encoding`, `url` kept) holding the re-serialised JSON, or for XHR the pruned text or object. In every other case, including every parse error, shape mismatch and exception, the page gets the original response object or value.
+- **What it never does.** Start, change, delay beyond buffering, or read the body of a request, touch the bridge, or send anything. The wait: for a matching request the page's `fetch` promise resolves when the body has been buffered, not when the headers arrive.
+- **Circuit breaker.** An unexpected exception (not a parse failure, which is normal) counts as a fault; after 5 the rules are emptied and the page is left as the site made it until the next run of the page script.
+- Tested in `src/shared/pruneRuntime.test.ts` (stub `fetch`/XHR, no site) and `recipes/prune.rs` / `recipes/mod.rs` (validation and delivery).
+
 ## Snapshot
 
 `__om.snapshot(opts)` returns a pruned tree used by the [AI Assistant](./ai-assistant.md).

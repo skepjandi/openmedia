@@ -111,6 +111,17 @@ Further syntax rules, each `syntax-not-allowed`: `var` (only `const` and `let`);
 - **No acting for the user.** No click, submit, focus, dispatched event, prompt or navigation.
 - **Not covered:** a script can still use the CPU (a loop that never ends; `for(;;)` and `while` are refused but `for(let i=0;true;i++)` is not), slow the page, hide or rewrite things the user needs (a script can say "Your session expired"), and call page-defined functions only through names already in `members`. The policy is a static check of source text; engine behaviour I did not list is [INFERENCE] safe. Defense in depth is the human review of every pull request that adds a recipe, and the fact that nothing reaches users except in an app release, not this page alone.
 
+## `prune` is a rule, not a script capability
+
+| | `prune` rule | `script` rule |
+|---|---|---|
+| What it is | Data: same-origin path patterns and a closed path grammar ([Recipe Format](./recipe-format.md#the-prune-rule)) | Code |
+| Wraps `fetch` / `XMLHttpRequest` | The engine's runtime (`prune_runtime.js`) does, and only rewrites the response body of a request the page made | **Never.** `fetch`, `XMLHttpRequest` and their prototypes are `network` findings; a script may not wrap, replace or call them |
+| Starts or changes a request | No | Cannot (no network API) |
+| Allowed in shared and bundled recipes | Yes | Only if it passes the policy |
+
+So the policy promise (a script that passes cannot send data anywhere) is unchanged: response pruning is not offered to scripts, and a recipe that needs it declares a `prune` rule that the app validates and applies. [Security](./security.md#prune-rules) argues why that rule keeps invariants 1, 3 and 7.
+
 ## Changing the policy
 
 The policy is code that ships with the app, so a release can make it stricter. An installed recipe that no longer passes is skipped when the recipes load (`Recipes::load` skips every invalid file; the file stays on disk), so it stops running and the app still starts. Making the policy looser is a security change: both repos, a `version` bump in `policy.json`, new vectors, and the Worker and CI updated before a recipe that needs the new rule is merged, because the app re-checks every bundled recipe.

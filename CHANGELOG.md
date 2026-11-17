@@ -6,6 +6,14 @@ All notable changes to OpenMedia are documented here.
 >
 > **Wiki**: the [GitHub Wiki](https://github.com/skepjandi/openmedia/wiki) is the public-facing main wiki — architecture, recipe format, AI pipeline, security model, roadmap. Source-controlled editing surface is `docs/wiki/` in this repo; CI (`.github/workflows/sync-wiki.yml`) mirrors it to the GitHub Wiki on every merge to `main`. New single-PR changes belong here, not as new wiki pages.
 
+### feat(recipes): `prune` rule removes items from a page's own JSON responses
+
+**Area:** `feat(recipes)`, `feat(engine)`
+
+**Change:** A new declarative rule type, `prune` (`{ urls: ["/api/feed"], remove: [{ path: "data.items[*]", when?: { key, equals } }] }`), removes items from the JSON that the page's own same-origin `fetch` and `XMLHttpRequest` calls receive before the page reads them, so a feed's reels, suggestions or sponsored items never load, autoplay or count (CSS `hide` leaves them in the page). `src-tauri/src/prune_runtime.js` is embedded in the page script only when a rule applies; Rust (`recipes/prune.rs`) validates the closed grammar (path patterns without a host, dot keys, `[*]`, `[n]`, one scalar `key == value` condition; 8 rules per recipe, 8 urls and 8 removals each) and hands the runtime compiled regexes and steps. It handles only fully buffered JSON up to 2 MiB from the page's own origin and returns the original response on any parse, shape or other failure; it starts, changes and reads no request and sends nothing. Wrapping happens once per page; switching the option off or swapping recipes replaces the rules, so pruning stops on the next response, and five unexpected failures switch it off. Allowed in shared and bundled recipes (a rule, not a script capability: scripts still may not wrap `fetch`); the review screen lists it as "Removes" in all 29 locales. Docs: `recipe-format.md`, `site-runtime.md`, `security.md`, `script-policy.md`, `ad-blocking.md`. The Worker validator (`openmedia-worker/src/validate.ts`) must mirror the schema before a recipe with a `prune` rule can be shared.
+
+**Verified:** Vitest (`src/shared/pruneRuntime.test.ts`: matching, non-matching, non-JSON, malformed, cross-origin and redirected responses, option off and back on, no double wrapping, size cap by length and by stream, `when`, `[*]`, nested paths and indexes, XHR text and `json`, circuit breaker), Rust unit tests for the grammar, caps and page-script delivery. **Not verified:** on a device or against any live site: the runtime is tested only against stub `fetch`/XHR. No official recipe uses `prune` yet, because no endpoint or response shape was grounded in a committed fixture or the repo's research notes (Instagram's native-app paths in Feurstagram are not the web endpoints). The translations of the new review label are machine-made; the Worker mirror is not written.
+
 ### fix(incognito): switching mode shows a blank page
 
 **Area:** `fix(incognito)`
