@@ -100,7 +100,7 @@ export function Fab() {
   const darkOn = darkActiveFor(darkMode, darkSites ?? {}, pageSite);
   const setDarkMode = useApp((s) => s.setDarkMode);
   const setSiteDarkMode = useApp((s) => s.setSiteDarkMode);
-  const openFavoriteSettings = useApp((s) => s.openFavoriteSettings);
+  const openSiteSheet = useApp((s) => s.openSiteSheet);
   // The page script runs through native code that desktop has no site view for.
   const colorPickerOn = useApp((s) => (s.state?.colorPicker ?? false) && !s.desktop);
   const techDetectorOn = useApp((s) => (s.state?.techDetector ?? false) && !s.desktop);
@@ -532,7 +532,8 @@ export function Fab() {
             setDarkCharging(false);
             const own = pageSite ? usableQuickAccess(savedFavorites ?? [], isPro) : [];
             const match = own.find((favorite) => siteOf(favorite.url) === pageSite);
-            if (match && !incognito.active) openFavoriteSettings(match.id);
+            if (pageSite && match && !incognito.active)
+              openSiteSheet("site-dark-mode", pageSite, match.name);
             else openSheet("dark-mode");
             dispatch({ type: "dismiss" });
           }, HOLD_MS);

@@ -29,8 +29,8 @@ A file saved before this existed has none of these keys and loads with the defau
 Three layers, the last one winning:
 
 1. **General** (Settings → Dark mode): every choice above, the default for every site.
-2. **Specific** (Settings → Favorites, in the expanded favorite): Follow general / Always on / Off for that site and a method of its own. It overrides general.
-3. **The floating button:** a moon button in the fan, after Incognito and the video controls switch. A tap turns dark mode on or off for the page in view and overrides what the favorite says (it writes that site's specific `mode`; with no page open it flips the general `enabled`). Holding it opens the favorite's settings for that site when the page is a favorite, and the general page otherwise.
+2. **Specific** (Settings → Favorites, the expanded favorite's **Dark mode** row, which opens its own page `Dark mode: <name>`): the same controls as general (on/off for this site, method, brightness, contrast, sepia, grayscale, text stroke, scheme colours, schedule, skip dark pages, dark controls, scrollbars, images), each one either following general or overriding it. A control the site overrides shows a dot and a *Follow general* button that clears only that field; *Reset all to general* clears the site's entry. Stored as `darkSites[<registrable domain>]`, every field optional (`mode`, `method`, `brightness`, `contrast`, `sepia`, `grayscale`, `background`, `text`, `schedule` as a whole, `skipDarkPages`, `systemControls`, `scrollbars`, `images`, `textStroke`); the page engine overlays the entry on the general config (`effectiveConfig`), so a missing field follows general.
+3. **The floating button:** a moon button in the fan, after Incognito and the video controls switch. A tap turns dark mode on or off for the page in view and overrides what the favorite says (it writes that site's specific `mode`; with no page open it flips the general `enabled`). Holding it opens that favorite's *Dark mode* page when the page is a favorite, and the general page otherwise.
 
 ## The methods
 

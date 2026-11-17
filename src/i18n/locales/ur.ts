@@ -463,20 +463,9 @@ export const ur: Messages = {
   "recipes.hubNote":
     "ہب ایک وقت میں کئی سائٹس کھولتا ہے۔ ہر صفحہ اپنی سائٹ ہے، اپنے کوکیز کے ساتھ۔",
   "favorites.bottomMargin": "نیچے کا مارجن",
-  "favorites.videoFull": "مکمل ویڈیوز پر بھی",
-  "favorites.videoFullNote":
-    "کنٹرولز کو اس سائٹ کے دیکھنے کے صفحات پر بھی استعمال کریں۔ بند ہونے پر سائٹ کا اپنا پلیئر رہتا ہے۔",
-  "favorites.videoHeight": "ویڈیو کنٹرولز کی اونچائی",
-  "favorites.videoHeightShared":
-    "مشترکہ اونچائی استعمال ہوتی ہے۔ سلائیڈر کو ہلائیں تاکہ اس سائٹ کی اپنی اونچائی ہو۔",
-  "favorites.videoHeightOwn": "اس سائٹ کی اپنی اونچائی ہے۔",
-  "favorites.videoHeightLabel": "{site} ویڈیو کنٹرولز کی اونچائی",
-  "favorites.videoUseShared": "مشترکہ ویڈیو سیٹنگز استعمال کریں",
   "favorites.darkModeLabel": "{site} کا ڈارک موڈ",
   "favorites.darkOn": "ہمیشہ آن",
   "favorites.darkOff": "بند",
-  "favorites.darkMethod": "اس سائٹ کے لیے طریقہ",
-  "favorites.darkMethodDefault": "مشترکہ طریقہ",
   "recipes.sharedMargin":
     "مشترکہ مارجن استعمال ہوتا ہے۔ سلائیڈر کو ہلائیں تاکہ اس سائٹ کا اپنا مارجن ہو۔",
   "recipes.ownMargin": "اس سائٹ کا اپنا مارجن ہے۔",
@@ -785,7 +774,6 @@ export const ur: Messages = {
   "settings.darkScheduleSystemNote": "ڈیوائس کی ہلکی یا گہری سیٹنگ کی پیروی کرتا ہے۔",
   "favorites.videoPanel": "کنٹرول پینل",
   "favorites.videoPanelLabel": "{site} کا ویڈیو کنٹرول پینل",
-  "favorites.darkMode": "مخصوص ڈارک موڈ",
   "favorites.darkFollow": "عمومی کی پیروی کریں",
   "settings.darkModeNote": "عمومی سیٹنگز، ہر سائٹ کے لیے طے شدہ",
   "settings.darkModeTitle": "عمومی ڈارک موڈ",
@@ -794,11 +782,20 @@ export const ur: Messages = {
   "settings.darkSites": "مخصوص سیٹنگز والی سائٹس",
   "settings.darkSitesNote":
     "یہ سیٹنگز ہر سائٹ پر لاگو ہوتی ہیں جب تک کسی سائٹ کی مخصوص سیٹنگز نہ ہوں۔ انہیں کسی پسندیدہ میں طے کریں۔",
-  "favorites.darkModeNote": "اس سائٹ کے لیے عمومی ڈارک موڈ کو بدل دیتا ہے۔",
   "fab.darkMode":
     "ڈارک موڈ۔ تمام سائٹس کے لیے آن یا آف کرنے کو ٹیپ کریں، عمومی سیٹنگز کے لیے دبائے رکھیں۔",
   "fab.darkModeSite":
     "اس سائٹ کے لیے ڈارک موڈ۔ آن یا آف کرنے کو ٹیپ کریں، اس کی سیٹنگز کے لیے دبائے رکھیں۔",
   "favorites.darkEffectiveOn": "اس سائٹ کے لیے ڈارک موڈ آن ہے۔",
   "favorites.darkEffectiveOff": "اس سائٹ کے لیے ڈارک موڈ بند ہے۔",
+  "site.darkTitle": "ڈارک موڈ: {name}",
+  "site.videoTitle": "ویڈیو کنٹرولز: {name}",
+  "site.subtitle":
+    "صرف اس سائٹ پر لاگو ہوتا ہے۔ ہر سیٹنگ عمومی کی پیروی کرتی ہے جب تک آپ اسے یہاں نہ بدلیں۔",
+  "site.overridden": "اس سائٹ کے لیے طے شدہ",
+  "site.followGeneralFor": "عمومی کی پیروی کریں: {setting}",
+  "site.resetAll": "سب کچھ عمومی پر ری سیٹ کریں",
+  "site.followsGeneral": "عمومی کی پیروی کرتا ہے",
+  "site.overrideCount": "مخصوص سیٹنگز: {count}",
+  "settings.videoControlsTitle": "عمومی ویڈیو کنٹرولز",
 };

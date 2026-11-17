@@ -467,20 +467,9 @@ export const sv: Messages = {
   "recipes.hubNote":
     "En hubb öppnar flera webbplatser samtidigt. Varje sida är en egen webbplats med egna cookies.",
   "favorites.bottomMargin": "Nedre marginal",
-  "favorites.videoFull": "Även på hela videor",
-  "favorites.videoFullNote":
-    "Använd kontrollerna även på den här webbplatsens visningssidor. Av behåller webbplatsens egen spelare.",
-  "favorites.videoHeight": "Videokontrollernas höjd",
-  "favorites.videoHeightShared":
-    "Använder den delade höjden. Flytta reglaget för att ge den här webbplatsen en egen.",
-  "favorites.videoHeightOwn": "Den här webbplatsen har en egen höjd.",
-  "favorites.videoHeightLabel": "Videokontrollernas höjd för {site}",
-  "favorites.videoUseShared": "Använd de delade videoinställningarna",
   "favorites.darkModeLabel": "Mörkt läge för {site}",
   "favorites.darkOn": "Alltid på",
   "favorites.darkOff": "Av",
-  "favorites.darkMethod": "Metod för den här webbplatsen",
-  "favorites.darkMethodDefault": "Delad metod",
   "recipes.sharedMargin":
     "Använder den delade marginalen. Flytta reglaget för att ge den här webbplatsen en egen.",
   "recipes.ownMargin": "Den här webbplatsen har en egen marginal.",
@@ -791,7 +780,6 @@ export const sv: Messages = {
   "settings.darkScheduleSystemNote": "Följer enhetens ljusa eller mörka inställning.",
   "favorites.videoPanel": "Kontrollpanel",
   "favorites.videoPanelLabel": "Videokontrollpanel för {site}",
-  "favorites.darkMode": "Specifikt mörkt läge",
   "favorites.darkFollow": "Följ det allmänna",
   "settings.darkModeNote": "Allmänna inställningar, standard för alla webbplatser",
   "settings.darkModeTitle": "Allmänt mörkt läge",
@@ -800,11 +788,20 @@ export const sv: Messages = {
   "settings.darkSites": "Webbplatser med specifika inställningar",
   "settings.darkSitesNote":
     "Inställningarna gäller alla webbplatser, om inte en webbplats har specifika inställningar. Ange dem i en favorit.",
-  "favorites.darkModeNote": "Åsidosätter det allmänna mörka läget för den här webbplatsen.",
   "fab.darkMode":
     "Mörkt läge. Tryck för att slå på eller av för alla webbplatser, håll nedtryckt för allmänna inställningar.",
   "fab.darkModeSite":
     "Mörkt läge för den här webbplatsen. Tryck för att slå på eller av, håll nedtryckt för dess inställningar.",
   "favorites.darkEffectiveOn": "Mörkt läge är på för den här webbplatsen.",
   "favorites.darkEffectiveOff": "Mörkt läge är av för den här webbplatsen.",
+  "site.darkTitle": "Mörkt läge: {name}",
+  "site.videoTitle": "Videokontroller: {name}",
+  "site.subtitle":
+    "Gäller bara den här webbplatsen. Varje inställning följer den allmänna tills du ändrar den här.",
+  "site.overridden": "Inställd för den här webbplatsen",
+  "site.followGeneralFor": "Följ det allmänna: {setting}",
+  "site.resetAll": "Återställ allt till allmänt",
+  "site.followsGeneral": "Följer det allmänna",
+  "site.overrideCount": "Specifika inställningar: {count}",
+  "settings.videoControlsTitle": "Allmänna videokontroller",
 };

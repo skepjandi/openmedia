@@ -118,19 +118,89 @@ pub enum SiteDarkMode {
     Off,
 }
 
-/// What the user chose for one site; a site without a choice follows the global settings.
-#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
+/// What the user chose for one site; every field is optional and a missing one follows the
+/// global settings. A site with nothing chosen has no entry at all.
+#[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase", default, deny_unknown_fields)]
 pub struct SiteDark {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub mode: Option<SiteDarkMode>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub method: Option<DarkMethod>,
+    /// Percent, 50 to 150.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub brightness: Option<u32>,
+    /// Percent, 50 to 150.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub contrast: Option<u32>,
+    /// Percent, 0 to 100.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub sepia: Option<u32>,
+    /// Percent, 0 to 100.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub grayscale: Option<u32>,
+    /// `#rrggbb`.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub background: Option<String>,
+    /// `#rrggbb`.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub text: Option<String>,
+    /// Replaces the global schedule as a whole.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub schedule: Option<DarkSchedule>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub skip_dark_pages: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub system_controls: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub scrollbars: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub images: Option<bool>,
+    /// Tenths of a pixel, 0 to 10.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub text_stroke: Option<u32>,
 }
 
 impl SiteDark {
     pub fn is_empty(&self) -> bool {
-        self.mode.is_none() && self.method.is_none()
+        *self == SiteDark::default()
+    }
+
+    /// Rejects values outside the ranges [`DarkMode::validate`] accepts, for the fields set.
+    pub fn validate(&self) -> Result<()> {
+        if let Some(v) = self.brightness {
+            in_range(v, 50, 150, "brightness must be 50-150")?;
+        }
+        if let Some(v) = self.contrast {
+            in_range(v, 50, 150, "contrast must be 50-150")?;
+        }
+        if let Some(v) = self.sepia {
+            in_range(v, 0, 100, "sepia must be 0-100")?;
+        }
+        if let Some(v) = self.grayscale {
+            in_range(v, 0, 100, "grayscale must be 0-100")?;
+        }
+        if let Some(v) = self.text_stroke {
+            in_range(v, 0, 10, "text stroke must be 0-10")?;
+        }
+        for colour in [&self.background, &self.text].into_iter().flatten() {
+            if !is_color(colour) {
+                return Err(Error::InvalidDarkMode("colours must be #rrggbb"));
+            }
+        }
+        if let Some(schedule) = &self.schedule
+            && (!is_clock(&schedule.from) || !is_clock(&schedule.to))
+        {
+            return Err(Error::InvalidDarkMode("times must be HH:MM"));
+        }
+        Ok(())
+    }
+
+    pub fn normalized(mut self) -> Self {
+        for colour in [&mut self.background, &mut self.text].into_iter().flatten() {
+            colour.make_ascii_lowercase();
+        }
+        self
     }
 }
 
@@ -240,7 +310,7 @@ mod tests {
             "youtube.com".to_string(),
             SiteDark {
                 mode: Some(SiteDarkMode::Off),
-                method: None,
+                ..SiteDark::default()
             },
         );
         let config = config_of(&DarkMode::default(), &sites);
@@ -341,16 +411,134 @@ mod tests {
         assert!(
             !SiteDark {
                 mode: Some(SiteDarkMode::On),
-                method: None
+                ..SiteDark::default()
             }
             .is_empty()
         );
         assert!(
             !SiteDark {
-                mode: None,
-                method: Some(DarkMethod::Static)
+                method: Some(DarkMethod::Static),
+                ..SiteDark::default()
             }
             .is_empty()
         );
+        for json in [
+            r#"{"brightness":100}"#,
+            r#"{"contrast":100}"#,
+            r#"{"sepia":0}"#,
+            r#"{"grayscale":0}"#,
+            r##"{"background":"#181a1b"}"##,
+            r##"{"text":"#e8e6e3"}"##,
+            r#"{"schedule":{"kind":"system","from":"21:00","to":"07:00"}}"#,
+            r#"{"skipDarkPages":false}"#,
+            r#"{"systemControls":false}"#,
+            r#"{"scrollbars":false}"#,
+            r#"{"images":false}"#,
+            r#"{"textStroke":0}"#,
+        ] {
+            let site: SiteDark = serde_json::from_str(json).unwrap();
+            assert!(!site.is_empty(), "{json}");
+            assert_eq!(serde_json::to_string(&site).unwrap(), json);
+        }
+    }
+
+    #[test]
+    fn a_full_site_entry_has_the_contract_shape() {
+        let site = SiteDark {
+            mode: Some(SiteDarkMode::On),
+            method: Some(DarkMethod::FilterPlus),
+            brightness: Some(90),
+            contrast: Some(110),
+            sepia: Some(10),
+            grayscale: Some(20),
+            background: Some("#000000".into()),
+            text: Some("#ffffff".into()),
+            schedule: Some(DarkSchedule {
+                kind: ScheduleKind::Time,
+                from: "20:00".into(),
+                to: "06:30".into(),
+            }),
+            skip_dark_pages: Some(false),
+            system_controls: Some(false),
+            scrollbars: Some(true),
+            images: Some(false),
+            text_stroke: Some(3),
+        };
+        let value = serde_json::to_value(&site).unwrap();
+        assert_eq!(
+            value,
+            serde_json::json!({
+                "mode": "on",
+                "method": "filterplus",
+                "brightness": 90,
+                "contrast": 110,
+                "sepia": 10,
+                "grayscale": 20,
+                "background": "#000000",
+                "text": "#ffffff",
+                "schedule": { "kind": "time", "from": "20:00", "to": "06:30" },
+                "skipDarkPages": false,
+                "systemControls": false,
+                "scrollbars": true,
+                "images": false,
+                "textStroke": 3
+            })
+        );
+        assert_eq!(serde_json::from_value::<SiteDark>(value).unwrap(), site);
+        assert!(site.validate().is_ok());
+    }
+
+    #[test]
+    fn a_partial_site_entry_round_trips_without_the_missing_fields() {
+        let site: SiteDark = serde_json::from_str(r##"{"sepia":5,"text":"#ABCDEF"}"##).unwrap();
+        assert_eq!(site.sepia, Some(5));
+        assert!(site.brightness.is_none() && site.schedule.is_none());
+        assert_eq!(
+            serde_json::to_string(&site.normalized()).unwrap(),
+            r##"{"sepia":5,"text":"#abcdef"}"##
+        );
+    }
+
+    fn site_rejected(change: impl FnOnce(&mut SiteDark)) -> bool {
+        let mut site = SiteDark::default();
+        change(&mut site);
+        site.validate().is_err()
+    }
+
+    #[test]
+    fn site_values_outside_the_ranges_are_rejected() {
+        assert!(SiteDark::default().validate().is_ok());
+        assert!(site_rejected(|s| s.brightness = Some(49)));
+        assert!(site_rejected(|s| s.brightness = Some(151)));
+        assert!(site_rejected(|s| s.contrast = Some(0)));
+        assert!(site_rejected(|s| s.contrast = Some(151)));
+        assert!(site_rejected(|s| s.sepia = Some(101)));
+        assert!(site_rejected(|s| s.grayscale = Some(101)));
+        assert!(site_rejected(|s| s.text_stroke = Some(11)));
+        assert!(site_rejected(|s| s.background = Some("181a1b".into())));
+        assert!(site_rejected(|s| s.text = Some("#gggggg".into())));
+        assert!(site_rejected(|s| {
+            s.schedule = Some(DarkSchedule {
+                from: "24:00".into(),
+                ..DarkSchedule::default()
+            })
+        }));
+        assert!(site_rejected(|s| {
+            s.schedule = Some(DarkSchedule {
+                to: "7:00".into(),
+                ..DarkSchedule::default()
+            })
+        }));
+        let edges = SiteDark {
+            brightness: Some(50),
+            contrast: Some(150),
+            sepia: Some(100),
+            grayscale: Some(0),
+            text_stroke: Some(10),
+            background: Some("#ABCDEF".into()),
+            ..SiteDark::default()
+        };
+        assert!(edges.validate().is_ok());
+        assert_eq!(edges.normalized().background.as_deref(), Some("#abcdef"));
     }
 }

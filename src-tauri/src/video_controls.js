@@ -63,9 +63,14 @@
   try {
     if (typeof document[KEY] === 'function') document[KEY]();
 
-    var wantsSound = !!config.remember;
-    var wantsLoopOff = !!(config.loopOff || config.autoAdvance);
-    var wantsAdvance = !!config.autoAdvance;
+    // The choices of this site, else the shared ones. Auto-advance needs the video not to loop.
+    var ownChoice = siteChoice();
+    function chosen(key) {
+      return typeof ownChoice[key] === 'boolean' ? ownChoice[key] : !!config[key];
+    }
+    var wantsSound = chosen('remember');
+    var wantsAdvance = chosen('autoAdvance');
+    var wantsLoopOff = chosen('loopOff') || wantsAdvance;
 
     // Players built as web components keep their video in a shadow root, which a query on the
     // document does not reach. Roots are noted as the page makes them (the script runs before the

@@ -453,20 +453,9 @@ export const ko: Messages = {
   "recipes.hubNote":
     "허브는 여러 사이트를 한 번에 엽니다. 각 페이지는 별도의 사이트이며 자체 쿠키를 사용합니다.",
   "favorites.bottomMargin": "하단 여백",
-  "favorites.videoFull": "전체 동영상에서도 사용",
-  "favorites.videoFullNote":
-    "이 사이트의 시청 페이지에서도 이 컨트롤을 사용합니다. 끄면 사이트 자체 플레이어가 유지됩니다.",
-  "favorites.videoHeight": "동영상 컨트롤 높이",
-  "favorites.videoHeightShared":
-    "공통 높이를 사용합니다. 슬라이더를 옮기면 이 사이트만 별도의 높이를 갖게 됩니다.",
-  "favorites.videoHeightOwn": "이 사이트는 별도의 높이를 사용합니다.",
-  "favorites.videoHeightLabel": "{site} 동영상 컨트롤 높이",
-  "favorites.videoUseShared": "공통 동영상 설정 사용",
   "favorites.darkModeLabel": "{site} 다크 모드",
   "favorites.darkOn": "항상 켜기",
   "favorites.darkOff": "끄기",
-  "favorites.darkMethod": "이 사이트의 방식",
-  "favorites.darkMethodDefault": "공통 방식",
   "recipes.sharedMargin":
     "공통 여백을 사용합니다. 슬라이더를 옮기면 이 사이트만 별도의 여백을 갖게 됩니다.",
   "recipes.ownMargin": "이 사이트에는 자체 여백이 있습니다.",
@@ -774,7 +763,6 @@ export const ko: Messages = {
   "settings.darkScheduleSystemNote": "기기의 라이트/다크 설정을 따릅니다.",
   "favorites.videoPanel": "컨트롤 패널",
   "favorites.videoPanelLabel": "{site} 동영상 컨트롤 패널",
-  "favorites.darkMode": "개별 다크 모드",
   "favorites.darkFollow": "일반 설정 따르기",
   "settings.darkModeNote": "일반 설정, 모든 사이트의 기본값",
   "settings.darkModeTitle": "일반 다크 모드",
@@ -783,10 +771,18 @@ export const ko: Messages = {
   "settings.darkSites": "개별 설정이 있는 사이트",
   "settings.darkSitesNote":
     "사이트에 개별 설정이 없으면 이 설정이 모든 사이트에 적용됩니다. 개별 설정은 즐겨찾기에서 지정하세요.",
-  "favorites.darkModeNote": "이 사이트에서는 일반 다크 모드보다 우선합니다.",
   "fab.darkMode": "다크 모드. 탭하면 모든 사이트에서 켜거나 끄고, 길게 누르면 일반 설정을 엽니다.",
   "fab.darkModeSite":
     "이 사이트의 다크 모드. 탭하면 켜거나 끄고, 길게 누르면 이 사이트의 설정을 엽니다.",
   "favorites.darkEffectiveOn": "이 사이트에서 다크 모드가 켜져 있습니다.",
   "favorites.darkEffectiveOff": "이 사이트에서 다크 모드가 꺼져 있습니다.",
+  "site.darkTitle": "다크 모드: {name}",
+  "site.videoTitle": "동영상 컨트롤: {name}",
+  "site.subtitle": "이 사이트에만 적용됩니다. 여기서 바꾸기 전까지 각 설정은 일반 설정을 따릅니다.",
+  "site.overridden": "이 사이트에 지정됨",
+  "site.followGeneralFor": "일반 설정 따르기: {setting}",
+  "site.resetAll": "모두 일반 설정으로 되돌리기",
+  "site.followsGeneral": "일반 설정 따름",
+  "site.overrideCount": "개별 설정: {count}",
+  "settings.videoControlsTitle": "일반 동영상 컨트롤",
 };

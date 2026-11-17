@@ -5,7 +5,7 @@ import {
   activePreset,
   clamp,
   darkActiveFor,
-  darkSiteLabel,
+  effectiveDark,
   isClockTime,
   strokeLabel,
 } from "./darkMode";
@@ -56,15 +56,42 @@ describe("isClockTime", () => {
   });
 });
 
-describe("darkSiteLabel", () => {
-  it("names the mode, then the method", () => {
-    expect(darkSiteLabel({ mode: "on", method: "static" })).toEqual([
-      "favorites.darkOn",
-      "settings.darkMethodStatic",
-    ]);
-    expect(darkSiteLabel({ mode: "off" })).toEqual(["favorites.darkOff"]);
-    expect(darkSiteLabel({ method: "filter" })).toEqual(["settings.darkMethodFilter"]);
-    expect(darkSiteLabel({})).toEqual([]);
+describe("effectiveDark", () => {
+  it("is general for a site with no entry", () => {
+    expect(effectiveDark(DARK_MODE_DEFAULT, undefined)).toEqual(DARK_MODE_DEFAULT);
+    expect(effectiveDark(DARK_MODE_DEFAULT, {})).toEqual(DARK_MODE_DEFAULT);
+  });
+
+  it("lays the site's own fields over general and leaves the rest", () => {
+    const schedule = { kind: "time" as const, from: "20:00", to: "06:00" };
+    const result = effectiveDark(DARK_MODE_DEFAULT, {
+      method: "static",
+      brightness: 120,
+      background: "#000000",
+      schedule,
+      images: false,
+    });
+    expect(result).toEqual({
+      ...DARK_MODE_DEFAULT,
+      method: "static",
+      brightness: 120,
+      background: "#000000",
+      schedule,
+      images: false,
+    });
+  });
+
+  it("takes the site's mode for the switch, else general's", () => {
+    const general = { ...DARK_MODE_DEFAULT, enabled: true };
+    expect(effectiveDark(general, { mode: "off" }).enabled).toBe(false);
+    expect(effectiveDark(DARK_MODE_DEFAULT, { mode: "on" }).enabled).toBe(true);
+    expect(effectiveDark(general, { method: "filter" }).enabled).toBe(true);
+  });
+
+  it("ignores a field that was handed back to general", () => {
+    expect(effectiveDark(DARK_MODE_DEFAULT, { sepia: undefined, mode: undefined })).toEqual(
+      DARK_MODE_DEFAULT,
+    );
   });
 });
 

@@ -467,20 +467,9 @@ export const de: Messages = {
   "recipes.hubNote":
     "Ein Hub öffnet mehrere Websites auf einmal. Jede Seite ist eine eigene Website mit eigenen Cookies.",
   "favorites.bottomMargin": "Unterer Rand",
-  "favorites.videoFull": "Auch bei vollen Videos",
-  "favorites.videoFullNote":
-    "Nutze die Steuerung auch auf den Wiedergabeseiten dieser Website. Aus behält den eigenen Player der Website.",
-  "favorites.videoHeight": "Höhe der Videosteuerung",
-  "favorites.videoHeightShared":
-    "Verwendet die gemeinsame Höhe. Verschiebe den Regler, um dieser Website eine eigene zu geben.",
-  "favorites.videoHeightOwn": "Diese Website hat eine eigene Höhe.",
-  "favorites.videoHeightLabel": "Höhe der Videosteuerung für {site}",
-  "favorites.videoUseShared": "Die gemeinsamen Videoeinstellungen verwenden",
   "favorites.darkModeLabel": "Dunkelmodus für {site}",
   "favorites.darkOn": "Immer an",
   "favorites.darkOff": "Aus",
-  "favorites.darkMethod": "Methode für diese Seite",
-  "favorites.darkMethodDefault": "Gemeinsame Methode",
   "recipes.sharedMargin":
     "Verwendet den gemeinsamen Rand. Verschiebe den Regler, um dieser Website einen eigenen zu geben.",
   "recipes.ownMargin": "Diese Website hat einen eigenen unteren Rand.",
@@ -808,7 +797,6 @@ export const de: Messages = {
   "settings.darkScheduleSystemNote": "Folgt der hellen oder dunklen Einstellung des Geräts.",
   "favorites.videoPanel": "Steuerungsleiste",
   "favorites.videoPanelLabel": "Videosteuerungsleiste auf {site}",
-  "favorites.darkMode": "Spezifischer Dunkelmodus",
   "favorites.darkFollow": "Allgemein folgen",
   "settings.darkModeNote": "Allgemeine Einstellungen, der Standard für jede Seite",
   "settings.darkModeTitle": "Allgemeiner Dunkelmodus",
@@ -817,11 +805,20 @@ export const de: Messages = {
   "settings.darkSites": "Seiten mit spezifischen Einstellungen",
   "settings.darkSitesNote":
     "Diese Einstellungen gelten für jede Seite, sofern sie keine spezifischen Einstellungen hat. Lege sie bei einem Favoriten fest.",
-  "favorites.darkModeNote": "Überschreibt den allgemeinen Dunkelmodus für diese Seite.",
   "fab.darkMode":
     "Dunkelmodus. Tippen schaltet ihn für alle Seiten ein oder aus, gedrückt halten öffnet die allgemeinen Einstellungen.",
   "fab.darkModeSite":
     "Dunkelmodus für diese Seite. Tippen schaltet ihn ein oder aus, gedrückt halten öffnet seine Einstellungen.",
   "favorites.darkEffectiveOn": "Der Dunkelmodus ist für diese Seite an.",
   "favorites.darkEffectiveOff": "Der Dunkelmodus ist für diese Seite aus.",
+  "site.darkTitle": "Dunkelmodus: {name}",
+  "site.videoTitle": "Videosteuerung: {name}",
+  "site.subtitle":
+    "Gilt nur für diese Seite. Jede Einstellung folgt der allgemeinen, bis du sie hier änderst.",
+  "site.overridden": "Für diese Seite festgelegt",
+  "site.followGeneralFor": "Allgemein folgen: {setting}",
+  "site.resetAll": "Alles auf allgemein zurücksetzen",
+  "site.followsGeneral": "Folgt der allgemeinen Einstellung",
+  "site.overrideCount": "Spezifische Einstellungen: {count}",
+  "settings.videoControlsTitle": "Allgemeine Videosteuerung",
 };

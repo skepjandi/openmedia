@@ -71,15 +71,54 @@ describe("pages opened from Settings", () => {
   });
 });
 
-describe("a favorite's settings", () => {
-  it("opens Settings and keeps the favorite to expand until it is consumed", () => {
-    useApp.getState().openFavoriteSettings("f1");
-    expect(useApp.getState().sheet).toBe("settings");
-    expect(useApp.getState().focusFavoriteId).toBe("f1");
-    useApp.getState().clearFavoriteFocus();
-    expect(useApp.getState().focusFavoriteId).toBeNull();
+describe("a favorite's own pages", () => {
+  beforeEach(() => {
+    useApp.setState({ sheetSite: null, sheetSiteName: null, sheetSiteFavoriteId: null });
+    useApp.setState({ focusFavoriteId: null });
+  });
+
+  it.each(["site-dark-mode", "site-video"] as const)(
+    "%s opens on top of Settings and closes back to it with the favorite to expand",
+    (page) => {
+      useApp.getState().openSheet("settings");
+      useApp.getState().openSiteSheet(page, "reddit.com", "Reddit", "f1");
+      const opened = useApp.getState();
+      expect(opened.sheet).toBe(page);
+      expect(opened.sheetParent).toBe("settings");
+      expect([opened.sheetSite, opened.sheetSiteName]).toEqual(["reddit.com", "Reddit"]);
+      expect(selectSettingsOpen(opened)).toBe(true);
+
+      useApp.getState().closeSheet();
+      const closed = useApp.getState();
+      expect(closed.sheet).toBe("settings");
+      expect(closed.focusFavoriteId).toBe("f1");
+      expect([closed.sheetSite, closed.sheetSiteName, closed.sheetSiteFavoriteId]).toEqual([
+        null,
+        null,
+        null,
+      ]);
+      useApp.getState().clearFavoriteFocus();
+      useApp.getState().closeSheet();
+      expect(useApp.getState().sheet).toBe("none");
+    },
+  );
+
+  it("closes to the page when it was opened with Settings closed", () => {
+    useApp.getState().openSiteSheet("site-dark-mode", "reddit.com", "Reddit");
+    expect(useApp.getState().sheet).toBe("site-dark-mode");
+    expect(useApp.getState().sheetParent).toBe("none");
+    expect(selectSettingsOpen(useApp.getState())).toBe(false);
     useApp.getState().closeSheet();
     expect(useApp.getState().sheet).toBe("none");
+    expect(useApp.getState().focusFavoriteId).toBeNull();
+  });
+
+  it("does not expand a favorite when none was named", () => {
+    useApp.getState().openSheet("settings");
+    useApp.getState().openSiteSheet("site-video", "reddit.com", "Reddit");
+    useApp.getState().closeSheet();
+    expect(useApp.getState().sheet).toBe("settings");
+    expect(useApp.getState().focusFavoriteId).toBeNull();
   });
 });
 

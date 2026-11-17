@@ -471,20 +471,9 @@ export const ro: Messages = {
   "recipes.hubNote":
     "Un hub deschide mai multe site-uri deodată. Fiecare pagină este un site propriu, cu cookie-urile proprii.",
   "favorites.bottomMargin": "Margine inferioară",
-  "favorites.videoFull": "Și la videoclipurile complete",
-  "favorites.videoFullNote":
-    "Folosește comenzile și pe paginile de vizionare ale acestui site. Dezactivat, păstrează playerul propriu al site-ului.",
-  "favorites.videoHeight": "Înălțimea comenzilor video",
-  "favorites.videoHeightShared":
-    "Folosește înălțimea comună. Mută glisorul pentru a da acestui site una proprie.",
-  "favorites.videoHeightOwn": "Acest site are propria înălțime.",
-  "favorites.videoHeightLabel": "Înălțimea comenzilor video pentru {site}",
-  "favorites.videoUseShared": "Folosește setările video comune",
   "favorites.darkModeLabel": "Mod întunecat {site}",
   "favorites.darkOn": "Mereu activat",
   "favorites.darkOff": "Dezactivat",
-  "favorites.darkMethod": "Metodă pentru acest site",
-  "favorites.darkMethodDefault": "Metodă comună",
   "recipes.sharedMargin":
     "Folosește marginea comună. Mută glisorul pentru a da acestui site una proprie.",
   "recipes.ownMargin": "Acest site are propria margine.",
@@ -803,7 +792,6 @@ export const ro: Messages = {
   "settings.darkScheduleSystemNote": "Urmează setarea luminoasă sau întunecată a dispozitivului.",
   "favorites.videoPanel": "Panou de comenzi",
   "favorites.videoPanelLabel": "Panoul de comenzi video de pe {site}",
-  "favorites.darkMode": "Mod întunecat specific",
   "favorites.darkFollow": "Urmează generalul",
   "settings.darkModeNote": "Setări generale, implicite pentru fiecare site",
   "settings.darkModeTitle": "Mod întunecat general",
@@ -812,11 +800,20 @@ export const ro: Messages = {
   "settings.darkSites": "Site-uri cu setări specifice",
   "settings.darkSitesNote":
     "Aceste setări se aplică tuturor site-urilor, în afară de cazul în care un site are setări specifice. Setează-le într-un favorit.",
-  "favorites.darkModeNote": "Înlocuiește modul întunecat general pentru acest site.",
   "fab.darkMode":
     "Mod întunecat. Atinge pentru a-l porni sau opri pe toate site-urile, ține apăsat pentru setările generale.",
   "fab.darkModeSite":
     "Mod întunecat pentru acest site. Atinge pentru a-l porni sau opri, ține apăsat pentru setările lui.",
   "favorites.darkEffectiveOn": "Modul întunecat este activat pentru acest site.",
   "favorites.darkEffectiveOff": "Modul întunecat este dezactivat pentru acest site.",
+  "site.darkTitle": "Mod întunecat: {name}",
+  "site.videoTitle": "Comenzi video: {name}",
+  "site.subtitle":
+    "Se aplică doar acestui site. Fiecare setare urmează setarea generală până o schimbi aici.",
+  "site.overridden": "Setat pentru acest site",
+  "site.followGeneralFor": "Urmează generalul: {setting}",
+  "site.resetAll": "Resetează totul la general",
+  "site.followsGeneral": "Urmează generalul",
+  "site.overrideCount": "Setări specifice: {count}",
+  "settings.videoControlsTitle": "Comenzi video generale",
 };

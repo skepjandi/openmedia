@@ -463,20 +463,9 @@ export const cs: Messages = {
   "recipes.hubNote":
     "Hub otevře několik webů najednou. Každá stránka je vlastní web s vlastními cookies.",
   "favorites.bottomMargin": "Spodní okraj",
-  "favorites.videoFull": "I u celých videí",
-  "favorites.videoFullNote":
-    "Používejte ovládání i na stránkách přehrávání tohoto webu. Vypnuto ponechá přehrávač samotného webu.",
-  "favorites.videoHeight": "Výška ovládání videa",
-  "favorites.videoHeightShared":
-    "Používá sdílenou výšku. Posunutím jezdce dáte tomuto webu vlastní.",
-  "favorites.videoHeightOwn": "Tento web má vlastní výšku.",
-  "favorites.videoHeightLabel": "Výška ovládání videa na {site}",
-  "favorites.videoUseShared": "Použít sdílená nastavení videa",
   "favorites.darkModeLabel": "Tmavý režim: {site}",
   "favorites.darkOn": "Vždy zapnuto",
   "favorites.darkOff": "Vypnuto",
-  "favorites.darkMethod": "Metoda pro tento web",
-  "favorites.darkMethodDefault": "Sdílená metoda",
   "recipes.sharedMargin": "Používá sdílený okraj. Posunutím jezdce dáte tomuto webu vlastní.",
   "recipes.ownMargin": "Tento web má vlastní okraj.",
   "recipes.siteMarginLabel": "Spodní okraj webu {name}",
@@ -786,7 +775,6 @@ export const cs: Messages = {
   "settings.darkScheduleSystemNote": "Řídí se světlým nebo tmavým nastavením zařízení.",
   "favorites.videoPanel": "Panel ovládání",
   "favorites.videoPanelLabel": "Panel ovládání videa na {site}",
-  "favorites.darkMode": "Konkrétní tmavý režim",
   "favorites.darkFollow": "Podle obecného",
   "settings.darkModeNote": "Obecná nastavení, výchozí pro každý web",
   "settings.darkModeTitle": "Obecný tmavý režim",
@@ -795,11 +783,20 @@ export const cs: Messages = {
   "settings.darkSites": "Weby s konkrétním nastavením",
   "settings.darkSitesNote":
     "Tato nastavení platí pro všechny weby, pokud web nemá konkrétní nastavení. Nastavíte je u oblíbené položky.",
-  "favorites.darkModeNote": "Přebíjí obecný tmavý režim pro tento web.",
   "fab.darkMode":
     "Tmavý režim. Klepnutím ho zapnete nebo vypnete pro všechny weby, podržením otevřete obecná nastavení.",
   "fab.darkModeSite":
     "Tmavý režim pro tento web. Klepnutím ho zapnete nebo vypnete, podržením otevřete jeho nastavení.",
   "favorites.darkEffectiveOn": "Tmavý režim je pro tento web zapnutý.",
   "favorites.darkEffectiveOff": "Tmavý režim je pro tento web vypnutý.",
+  "site.darkTitle": "Tmavý režim: {name}",
+  "site.videoTitle": "Ovládání videa: {name}",
+  "site.subtitle":
+    "Platí jen pro tento web. Každé nastavení se řídí obecným, dokud ho tady nezměníte.",
+  "site.overridden": "Nastaveno pro tento web",
+  "site.followGeneralFor": "Podle obecného: {setting}",
+  "site.resetAll": "Vše vrátit na obecné",
+  "site.followsGeneral": "Podle obecného",
+  "site.overrideCount": "Konkrétní nastavení: {count}",
+  "settings.videoControlsTitle": "Obecné ovládání videa",
 };

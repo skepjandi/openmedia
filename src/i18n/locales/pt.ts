@@ -471,20 +471,9 @@ export const pt: Messages = {
   "recipes.hubNote":
     "Um hub abre vários sites ao mesmo tempo. Cada página é um site próprio, com os seus próprios cookies.",
   "favorites.bottomMargin": "Margem inferior",
-  "favorites.videoFull": "Também em vídeos completos",
-  "favorites.videoFullNote":
-    "Usa os controlos também nas páginas de visualização deste site. Desligado, mantém o leitor do próprio site.",
-  "favorites.videoHeight": "Altura dos controlos de vídeo",
-  "favorites.videoHeightShared":
-    "Usa a altura partilhada. Move o controlo deslizante para dar a este site a sua própria.",
-  "favorites.videoHeightOwn": "Este site tem a sua própria altura.",
-  "favorites.videoHeightLabel": "Altura dos controlos de vídeo de {site}",
-  "favorites.videoUseShared": "Usar as definições de vídeo partilhadas",
   "favorites.darkModeLabel": "Modo escuro de {site}",
   "favorites.darkOn": "Sempre ligado",
   "favorites.darkOff": "Desligado",
-  "favorites.darkMethod": "Método para este site",
-  "favorites.darkMethodDefault": "Método compartilhado",
   "recipes.sharedMargin":
     "Usa a margem compartilhada. Mova o controle deslizante para dar a este site sua própria margem.",
   "recipes.ownMargin": "Este site tem sua própria margem.",
@@ -796,7 +785,6 @@ export const pt: Messages = {
   "settings.darkScheduleSystemNote": "Segue a definição clara ou escura do dispositivo.",
   "favorites.videoPanel": "Painel de controles",
   "favorites.videoPanelLabel": "Painel de controles de vídeo de {site}",
-  "favorites.darkMode": "Modo escuro específico",
   "favorites.darkFollow": "Seguir o geral",
   "settings.darkModeNote": "Configurações gerais, o padrão de cada site",
   "settings.darkModeTitle": "Modo escuro geral",
@@ -805,11 +793,20 @@ export const pt: Messages = {
   "settings.darkSites": "Sites com configurações específicas",
   "settings.darkSitesNote":
     "Estas configurações valem para todos os sites, a menos que um site tenha configurações específicas. Defina-as em um favorito.",
-  "favorites.darkModeNote": "Substitui o modo escuro geral neste site.",
   "fab.darkMode":
     "Modo escuro. Toque para ligar ou desligar em todos os sites, mantenha pressionado para as configurações gerais.",
   "fab.darkModeSite":
     "Modo escuro deste site. Toque para ligar ou desligar, mantenha pressionado para as configurações dele.",
   "favorites.darkEffectiveOn": "O modo escuro está ligado neste site.",
   "favorites.darkEffectiveOff": "O modo escuro está desligado neste site.",
+  "site.darkTitle": "Modo escuro: {name}",
+  "site.videoTitle": "Controlos de vídeo: {name}",
+  "site.subtitle":
+    "Vale só para este site. Cada configuração segue a geral até você alterá-la aqui.",
+  "site.overridden": "Definido para este site",
+  "site.followGeneralFor": "Seguir o geral: {setting}",
+  "site.resetAll": "Restaurar tudo ao geral",
+  "site.followsGeneral": "Segue o geral",
+  "site.overrideCount": "Configurações específicas: {count}",
+  "settings.videoControlsTitle": "Controlos de vídeo gerais",
 };

@@ -467,20 +467,9 @@ export const ru: Messages = {
   "recipes.hubNote":
     "Хаб открывает несколько сайтов сразу. Каждая страница — отдельный сайт со своими cookie.",
   "favorites.bottomMargin": "Нижнее поле",
-  "favorites.videoFull": "Также в полных видео",
-  "favorites.videoFullNote":
-    "Использовать управление и на страницах просмотра этого сайта. Если выключено, остаётся собственный плеер сайта.",
-  "favorites.videoHeight": "Высота управления видео",
-  "favorites.videoHeightShared":
-    "Использует общую высоту. Сдвиньте ползунок, чтобы дать этому сайту свою.",
-  "favorites.videoHeightOwn": "У этого сайта своя высота.",
-  "favorites.videoHeightLabel": "Высота управления видео для {site}",
-  "favorites.videoUseShared": "Использовать общие настройки видео",
   "favorites.darkModeLabel": "Тёмный режим для {site}",
   "favorites.darkOn": "Всегда включён",
   "favorites.darkOff": "Выключен",
-  "favorites.darkMethod": "Метод для этого сайта",
-  "favorites.darkMethodDefault": "Общий метод",
   "recipes.sharedMargin": "Использует общее поле. Сдвиньте ползунок, чтобы дать этому сайту своё.",
   "recipes.ownMargin": "У этого сайта своё нижнее поле.",
   "recipes.siteMarginLabel": "Нижнее поле для {name}",
@@ -794,7 +783,6 @@ export const ru: Messages = {
   "settings.darkScheduleSystemNote": "Следует светлой или тёмной настройке устройства.",
   "favorites.videoPanel": "Панель управления",
   "favorites.videoPanelLabel": "Панель управления видео на {site}",
-  "favorites.darkMode": "Отдельный тёмный режим",
   "favorites.darkFollow": "Как в общем",
   "settings.darkModeNote": "Общие настройки, по умолчанию для каждого сайта",
   "settings.darkModeTitle": "Общий тёмный режим",
@@ -803,11 +791,20 @@ export const ru: Messages = {
   "settings.darkSites": "Сайты с отдельными настройками",
   "settings.darkSitesNote":
     "Эти настройки действуют на всех сайтах, если у сайта нет отдельных настроек. Задайте их в избранном.",
-  "favorites.darkModeNote": "Переопределяет общий тёмный режим для этого сайта.",
   "fab.darkMode":
     "Тёмный режим. Нажмите, чтобы включить или выключить его на всех сайтах, удерживайте для общих настроек.",
   "fab.darkModeSite":
     "Тёмный режим для этого сайта. Нажмите, чтобы включить или выключить, удерживайте для его настроек.",
   "favorites.darkEffectiveOn": "Тёмный режим для этого сайта включён.",
   "favorites.darkEffectiveOff": "Тёмный режим для этого сайта выключен.",
+  "site.darkTitle": "Тёмный режим: {name}",
+  "site.videoTitle": "Управление видео: {name}",
+  "site.subtitle":
+    "Действует только на этом сайте. Каждая настройка следует общей, пока вы не измените её здесь.",
+  "site.overridden": "Задано для этого сайта",
+  "site.followGeneralFor": "Как в общем: {setting}",
+  "site.resetAll": "Сбросить всё к общим",
+  "site.followsGeneral": "Как в общем",
+  "site.overrideCount": "Отдельных настроек: {count}",
+  "settings.videoControlsTitle": "Общее управление видео",
 };

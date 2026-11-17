@@ -668,11 +668,12 @@ impl Library {
     /// the site to the global settings.
     pub fn set_site_dark(&self, site: &str, dark: SiteDark) -> Result<()> {
         let site = checked_site(site)?;
+        dark.validate()?;
         let mut data = self.lock()?;
         if dark.is_empty() {
             data.dark_sites.remove(&site);
         } else {
-            data.dark_sites.insert(site, dark);
+            data.dark_sites.insert(site, dark.normalized());
         }
         self.save(&data)
     }
@@ -1063,7 +1064,7 @@ mod tests {
     use super::*;
     use crate::accessibility::{ReadingFont, Tint};
     use crate::ai::ProviderKind;
-    use crate::dark_mode::{DarkMethod, SiteDarkMode};
+    use crate::dark_mode::{DarkMethod, DarkSchedule, ScheduleKind, SiteDarkMode};
 
     fn library() -> (tempfile::TempDir, Library) {
         let dir = tempfile::tempdir().unwrap();
@@ -1601,6 +1602,9 @@ mod tests {
             panel: Some(false),
             height: Some(48),
             full_videos: Some(true),
+            remember: Some(true),
+            loop_off: Some(true),
+            auto_advance: Some(false),
         };
         library.set_site_video("YouTube.com", own).unwrap();
         assert_eq!(reload(&dir).video_sites().unwrap()["youtube.com"], own);
@@ -1610,15 +1614,23 @@ mod tests {
                     "youtube.com",
                     SiteVideo {
                         height: Some(201),
-                        panel: None,
-                        full_videos: None
+                        ..SiteVideo::default()
                     }
                 )
                 .is_err()
         );
+        let only_new = SiteVideo {
+            auto_advance: Some(true),
+            ..SiteVideo::default()
+        };
+        library.set_site_video("vimeo.com", only_new).unwrap();
+        assert_eq!(reload(&dir).video_sites().unwrap()["vimeo.com"], only_new);
         assert!(library.set_site_video("https://a.example/", own).is_err());
         library
             .set_site_video("youtube.com", SiteVideo::default())
+            .unwrap();
+        library
+            .set_site_video("vimeo.com", SiteVideo::default())
             .unwrap();
         assert!(reload(&dir).video_sites().unwrap().is_empty());
     }
@@ -1665,7 +1677,7 @@ mod tests {
                 "a.example",
                 SiteDark {
                     mode: Some(SiteDarkMode::On),
-                    method: None,
+                    ..SiteDark::default()
                 },
             )
             .unwrap();
@@ -1689,10 +1701,46 @@ mod tests {
         let own = SiteDark {
             mode: Some(SiteDarkMode::Off),
             method: Some(DarkMethod::Static),
+            brightness: Some(90),
+            text: Some("#ABCDEF".into()),
+            schedule: Some(DarkSchedule {
+                kind: ScheduleKind::Time,
+                from: "20:00".into(),
+                to: "06:00".into(),
+            }),
+            text_stroke: Some(2),
+            images: Some(false),
+            ..SiteDark::default()
         };
-        library.set_site_dark("YouTube.com", own).unwrap();
-        assert_eq!(reload(&dir).dark_sites().unwrap()["youtube.com"], own);
-        assert!(library.set_site_dark("https://a.example/", own).is_err());
+        library.set_site_dark("YouTube.com", own.clone()).unwrap();
+        let stored = reload(&dir).dark_sites().unwrap()["youtube.com"].clone();
+        assert_eq!(stored.text.as_deref(), Some("#abcdef"));
+        assert_eq!(stored, own.clone().normalized());
+        assert!(
+            library
+                .set_site_dark("https://a.example/", own.clone())
+                .is_err()
+        );
+        for bad in [
+            SiteDark {
+                brightness: Some(151),
+                ..SiteDark::default()
+            },
+            SiteDark {
+                background: Some("red".into()),
+                ..SiteDark::default()
+            },
+            SiteDark {
+                schedule: Some(DarkSchedule {
+                    from: "25:00".into(),
+                    ..DarkSchedule::default()
+                }),
+                ..SiteDark::default()
+            },
+        ] {
+            assert!(library.set_site_dark("youtube.com", bad).is_err());
+        }
+        assert_eq!(reload(&dir).dark_sites().unwrap()["youtube.com"], stored);
         library
             .set_site_dark("youtube.com", SiteDark::default())
             .unwrap();

@@ -41,6 +41,8 @@ const loadLibrary = () => import("../features/library/LibraryScreen");
 const loadShareRecipe = () => import("../features/library/ShareRecipeScreen");
 const loadVideoControls = () => import("../features/settings/VideoControlsScreen");
 const loadDarkMode = () => import("../features/settings/DarkModeScreen");
+const loadSiteVideoControls = () => import("../features/settings/SiteVideoControlsScreen");
+const loadSiteDarkMode = () => import("../features/settings/SiteDarkModeScreen");
 const loadIncognitoRecipes = () => import("../features/settings/IncognitoSections");
 const loadMoreFavorites = () => import("../features/settings/MoreFavoritesScreens");
 const MoreFavoritesScreen = lazy(() =>
@@ -60,6 +62,12 @@ const VideoControlsScreen = lazy(() =>
 );
 const DarkModeScreen = lazy(() =>
   loadDarkMode().then((module) => ({ default: module.DarkModeScreen })),
+);
+const SiteVideoControlsScreen = lazy(() =>
+  loadSiteVideoControls().then((module) => ({ default: module.SiteVideoControlsScreen })),
+);
+const SiteDarkModeScreen = lazy(() =>
+  loadSiteDarkMode().then((module) => ({ default: module.SiteDarkModeScreen })),
 );
 const SettingsScreen = lazy(() =>
   loadSettings().then((module) => ({ default: module.SettingsScreen })),
@@ -175,6 +183,8 @@ export function App() {
       <Suspense fallback={null}>{sheet === "share-recipe" && <ShareRecipeScreen />}</Suspense>
       <Suspense fallback={null}>{sheet === "video-controls" && <VideoControlsScreen />}</Suspense>
       <Suspense fallback={null}>{sheet === "dark-mode" && <DarkModeScreen />}</Suspense>
+      <Suspense fallback={null}>{sheet === "site-video" && <SiteVideoControlsScreen />}</Suspense>
+      <Suspense fallback={null}>{sheet === "site-dark-mode" && <SiteDarkModeScreen />}</Suspense>
       <Suspense fallback={null}>{(idle || sheet === "stats") && <StatsSheet />}</Suspense>
       <Suspense fallback={null}>{onboardingOpen && <Onboarding />}</Suspense>
       {sheet === "paywall" && <PaywallSheet />}

@@ -70,11 +70,25 @@ pub struct SiteVideo {
     pub height: Option<u32>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub full_videos: Option<bool>,
+    /// The speed and sound last chosen, applied to the next video.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub remember: Option<bool>,
+    /// Stops a video from restarting by itself when it ends.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub loop_off: Option<bool>,
+    /// Scrolls on to the next video when one ends.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub auto_advance: Option<bool>,
 }
 
 impl SiteVideo {
     pub fn is_empty(&self) -> bool {
-        self.panel.is_none() && self.height.is_none() && self.full_videos.is_none()
+        self.panel.is_none()
+            && self.height.is_none()
+            && self.full_videos.is_none()
+            && self.remember.is_none()
+            && self.loop_off.is_none()
+            && self.auto_advance.is_none()
     }
 }
 
@@ -134,8 +148,7 @@ mod tests {
             "youtube.com".to_owned(),
             SiteVideo {
                 panel: Some(false),
-                height: None,
-                full_videos: None,
+                ..SiteVideo::default()
             },
         );
         let script = VideoControls::default().page_script(&sites);
@@ -167,10 +180,41 @@ mod tests {
         assert!(
             !SiteVideo {
                 height: Some(40),
-                panel: None,
-                full_videos: None
+                ..SiteVideo::default()
             }
             .is_empty()
+        );
+    }
+
+    #[test]
+    fn every_new_field_makes_a_site_choice_non_empty_and_round_trips() {
+        for json in [
+            r#"{"remember":false}"#,
+            r#"{"loopOff":true}"#,
+            r#"{"autoAdvance":false}"#,
+        ] {
+            let site: SiteVideo = serde_json::from_str(json).unwrap();
+            assert!(!site.is_empty());
+            assert_eq!(serde_json::to_string(&site).unwrap(), json);
+        }
+        let full = SiteVideo {
+            panel: Some(true),
+            height: Some(20),
+            full_videos: Some(false),
+            remember: Some(true),
+            loop_off: Some(true),
+            auto_advance: Some(false),
+        };
+        assert_eq!(
+            serde_json::to_value(full).unwrap(),
+            serde_json::json!({
+                "panel": true,
+                "height": 20,
+                "fullVideos": false,
+                "remember": true,
+                "loopOff": true,
+                "autoAdvance": false
+            })
         );
     }
 }

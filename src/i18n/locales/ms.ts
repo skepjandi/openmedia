@@ -463,20 +463,9 @@ export const ms: Messages = {
   "recipes.hubNote":
     "Hab membuka beberapa laman sekali gus. Setiap halaman ialah laman sendiri, dengan cookie sendiri.",
   "favorites.bottomMargin": "Margin bawah",
-  "favorites.videoFull": "Juga pada video penuh",
-  "favorites.videoFullNote":
-    "Guna kawalan ini pada halaman tonton laman ini juga. Jika dimatikan, pemain asal laman kekal.",
-  "favorites.videoHeight": "Ketinggian kawalan video",
-  "favorites.videoHeightShared":
-    "Guna ketinggian bersama. Leret peluncur untuk memberi laman ini ketinggian sendiri.",
-  "favorites.videoHeightOwn": "Laman ini mempunyai ketinggian sendiri.",
-  "favorites.videoHeightLabel": "Ketinggian kawalan video {site}",
-  "favorites.videoUseShared": "Guna tetapan video bersama",
   "favorites.darkModeLabel": "Mod gelap {site}",
   "favorites.darkOn": "Sentiasa hidup",
   "favorites.darkOff": "Mati",
-  "favorites.darkMethod": "Kaedah untuk tapak ini",
-  "favorites.darkMethodDefault": "Kaedah dikongsi",
   "recipes.sharedMargin":
     "Guna margin bersama. Leret peluncur untuk memberi laman ini margin sendiri.",
   "recipes.ownMargin": "Laman ini mempunyai margin sendiri.",
@@ -793,7 +782,6 @@ export const ms: Messages = {
   "settings.darkScheduleSystemNote": "Mengikut tetapan cerah atau gelap peranti.",
   "favorites.videoPanel": "Panel kawalan",
   "favorites.videoPanelLabel": "Panel kawalan video {site}",
-  "favorites.darkMode": "Mod gelap khusus",
   "favorites.darkFollow": "Ikut tetapan umum",
   "settings.darkModeNote": "Tetapan umum, lalai untuk setiap tapak",
   "settings.darkModeTitle": "Mod gelap umum",
@@ -802,11 +790,20 @@ export const ms: Messages = {
   "settings.darkSites": "Tapak dengan tetapan khusus",
   "settings.darkSitesNote":
     "Tetapan ini digunakan pada setiap tapak melainkan tapak itu mempunyai tetapan khusus. Tetapkannya dalam kegemaran.",
-  "favorites.darkModeNote": "Mengatasi mod gelap umum untuk tapak ini.",
   "fab.darkMode":
     "Mod gelap. Ketik untuk menghidupkan atau mematikannya bagi semua tapak, tekan lama untuk tetapan umum.",
   "fab.darkModeSite":
     "Mod gelap untuk tapak ini. Ketik untuk menghidupkan atau mematikannya, tekan lama untuk tetapannya.",
   "favorites.darkEffectiveOn": "Mod gelap dihidupkan untuk tapak ini.",
   "favorites.darkEffectiveOff": "Mod gelap dimatikan untuk tapak ini.",
+  "site.darkTitle": "Mod gelap: {name}",
+  "site.videoTitle": "Kawalan video: {name}",
+  "site.subtitle":
+    "Hanya digunakan pada tapak ini. Setiap tetapan mengikut tetapan umum sehingga anda mengubahnya di sini.",
+  "site.overridden": "Ditetapkan untuk tapak ini",
+  "site.followGeneralFor": "Ikut tetapan umum: {setting}",
+  "site.resetAll": "Tetap semula semua kepada umum",
+  "site.followsGeneral": "Mengikut tetapan umum",
+  "site.overrideCount": "Tetapan khusus: {count}",
+  "settings.videoControlsTitle": "Kawalan video umum",
 };

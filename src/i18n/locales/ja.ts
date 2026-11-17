@@ -456,20 +456,9 @@ export const ja: Messages = {
   "recipes.hubNote":
     "ハブは複数のサイトを一度に開きます。各ページはそれぞれ独立したサイトで、Cookieも別々です。",
   "favorites.bottomMargin": "下余白",
-  "favorites.videoFull": "通常の動画でも使う",
-  "favorites.videoFullNote":
-    "このサイトの視聴ページでもこのコントロールを使います。オフにするとサイト標準のプレーヤーのままです。",
-  "favorites.videoHeight": "動画コントロールの高さ",
-  "favorites.videoHeightShared":
-    "共通の高さを使います。スライダーを動かすと、このサイト専用の値になります。",
-  "favorites.videoHeightOwn": "このサイトは専用の高さを使っています。",
-  "favorites.videoHeightLabel": "{site}の動画コントロールの高さ",
-  "favorites.videoUseShared": "共通の動画設定を使う",
   "favorites.darkModeLabel": "{site} のダークモード",
   "favorites.darkOn": "常にオン",
   "favorites.darkOff": "オフ",
-  "favorites.darkMethod": "このサイトの方式",
-  "favorites.darkMethodDefault": "共通の方式",
   "recipes.sharedMargin":
     "共通の下余白を使います。スライダーを動かすと、このサイト専用の値になります。",
   "recipes.ownMargin": "このサイトには独自の下余白があります。",
@@ -782,7 +771,6 @@ export const ja: Messages = {
   "settings.darkScheduleSystemNote": "デバイスのライト／ダーク設定に従います。",
   "favorites.videoPanel": "コントロールパネル",
   "favorites.videoPanelLabel": "{site}の動画コントロールパネル",
-  "favorites.darkMode": "個別のダークモード",
   "favorites.darkFollow": "全般に従う",
   "settings.darkModeNote": "全般の設定。すべてのサイトの既定です",
   "settings.darkModeTitle": "全般のダークモード",
@@ -791,11 +779,20 @@ export const ja: Messages = {
   "settings.darkSites": "個別設定のあるサイト",
   "settings.darkSitesNote":
     "サイトに個別設定がない限り、この設定がすべてのサイトに適用されます。個別設定はお気に入りで行えます。",
-  "favorites.darkModeNote": "このサイトでは全般のダークモードより優先されます。",
   "fab.darkMode":
     "ダークモード。タップですべてのサイトのオン／オフを切り替え、長押しで全般の設定を開きます。",
   "fab.darkModeSite":
     "このサイトのダークモード。タップでオン／オフを切り替え、長押しでこのサイトの設定を開きます。",
   "favorites.darkEffectiveOn": "このサイトではダークモードがオンです。",
   "favorites.darkEffectiveOff": "このサイトではダークモードがオフです。",
+  "site.darkTitle": "ダークモード: {name}",
+  "site.videoTitle": "動画コントロール: {name}",
+  "site.subtitle":
+    "このサイトにのみ適用されます。ここで変更するまで、各設定は全般の設定に従います。",
+  "site.overridden": "このサイト用に設定済み",
+  "site.followGeneralFor": "全般に従う: {setting}",
+  "site.resetAll": "すべてを全般に戻す",
+  "site.followsGeneral": "全般に従う",
+  "site.overrideCount": "個別設定: {count}",
+  "settings.videoControlsTitle": "全般の動画コントロール",
 };

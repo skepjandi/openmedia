@@ -440,19 +440,9 @@ export const th: Messages = {
   "recipes.hubNote":
     "ฮับเปิดหลายเว็บไซต์พร้อมกัน แต่ละหน้าเป็นเว็บไซต์ของตัวเอง พร้อมคุกกี้ของตัวเอง",
   "favorites.bottomMargin": "ขอบล่าง",
-  "favorites.videoFull": "ใช้กับวิดีโอเต็มด้วย",
-  "favorites.videoFullNote":
-    "ใช้ตัวควบคุมในหน้าดูวิดีโอของเว็บไซต์นี้ด้วย เมื่อปิดจะใช้เครื่องเล่นของเว็บไซต์เอง",
-  "favorites.videoHeight": "ความสูงของตัวควบคุมวิดีโอ",
-  "favorites.videoHeightShared": "ใช้ความสูงร่วมกัน เลื่อนแถบเพื่อกำหนดความสูงของเว็บไซต์นี้เอง",
-  "favorites.videoHeightOwn": "เว็บไซต์นี้มีความสูงของตัวเอง",
-  "favorites.videoHeightLabel": "ความสูงของตัวควบคุมวิดีโอ {site}",
-  "favorites.videoUseShared": "ใช้การตั้งค่าวิดีโอร่วมกัน",
   "favorites.darkModeLabel": "โหมดมืดของ {site}",
   "favorites.darkOn": "เปิดตลอด",
   "favorites.darkOff": "ปิด",
-  "favorites.darkMethod": "วิธีการสำหรับเว็บไซต์นี้",
-  "favorites.darkMethodDefault": "วิธีการที่ใช้ร่วมกัน",
   "recipes.sharedMargin": "ใช้ขอบล่างร่วมกัน เลื่อนแถบเพื่อกำหนดขอบของเว็บไซต์นี้เอง",
   "recipes.ownMargin": "เว็บไซต์นี้มีขอบล่างของตัวเอง",
   "recipes.siteMarginLabel": "ขอบล่างของ {name}",
@@ -751,7 +741,6 @@ export const th: Messages = {
   "settings.darkScheduleSystemNote": "ตามการตั้งค่าโหมดสว่างหรือมืดของอุปกรณ์",
   "favorites.videoPanel": "แผงควบคุม",
   "favorites.videoPanelLabel": "แผงควบคุมวิดีโอของ {site}",
-  "favorites.darkMode": "โหมดมืดเฉพาะ",
   "favorites.darkFollow": "ตามค่าทั่วไป",
   "settings.darkModeNote": "การตั้งค่าทั่วไป ค่าเริ่มต้นของทุกเว็บไซต์",
   "settings.darkModeTitle": "โหมดมืดทั่วไป",
@@ -760,10 +749,19 @@ export const th: Messages = {
   "settings.darkSites": "เว็บไซต์ที่มีการตั้งค่าเฉพาะ",
   "settings.darkSitesNote":
     "การตั้งค่านี้ใช้กับทุกเว็บไซต์ เว้นแต่เว็บไซต์นั้นมีการตั้งค่าเฉพาะ ตั้งค่าได้ในรายการโปรด",
-  "favorites.darkModeNote": "แทนที่โหมดมืดทั่วไปสำหรับเว็บไซต์นี้",
   "fab.darkMode": "โหมดมืด แตะเพื่อเปิดหรือปิดกับทุกเว็บไซต์ กดค้างเพื่อเปิดการตั้งค่าทั่วไป",
   "fab.darkModeSite":
     "โหมดมืดสำหรับเว็บไซต์นี้ แตะเพื่อเปิดหรือปิด กดค้างเพื่อเปิดการตั้งค่าของเว็บไซต์",
   "favorites.darkEffectiveOn": "โหมดมืดเปิดอยู่สำหรับเว็บไซต์นี้",
   "favorites.darkEffectiveOff": "โหมดมืดปิดอยู่สำหรับเว็บไซต์นี้",
+  "site.darkTitle": "โหมดมืด: {name}",
+  "site.videoTitle": "ตัวควบคุมวิดีโอ: {name}",
+  "site.subtitle":
+    "ใช้กับเว็บไซต์นี้เท่านั้น แต่ละการตั้งค่าจะตามค่าทั่วไปจนกว่าคุณจะเปลี่ยนที่นี่",
+  "site.overridden": "ตั้งค่าเฉพาะเว็บไซต์นี้",
+  "site.followGeneralFor": "ตามค่าทั่วไป: {setting}",
+  "site.resetAll": "รีเซ็ตทั้งหมดเป็นค่าทั่วไป",
+  "site.followsGeneral": "ตามค่าทั่วไป",
+  "site.overrideCount": "การตั้งค่าเฉพาะ: {count}",
+  "settings.videoControlsTitle": "ตัวควบคุมวิดีโอทั่วไป",
 };

@@ -2165,6 +2165,88 @@ describe("video controls", () => {
     expect(next.scrolledIntoView).toBe(0);
   });
 
+  it("lets a site's own remember, loop-off and auto-advance beat the shared ones", () => {
+    const video = new FakeVideo();
+    const loopOff = load({
+      videos: [video],
+      current: video,
+      sites: { "youtube.com": { loopOff: true } },
+    });
+    video.loop = true;
+    loopOff.fire("loadstart", { target: video });
+    expect(video.loop).toBe(false);
+
+    const loopKept = load({
+      controls: { loopOff: true },
+      videos: [video],
+      current: video,
+      sites: { "youtube.com": { loopOff: false } },
+    });
+    video.loop = true;
+    loopKept.fire("loadstart", { target: video });
+    expect(video.loop).toBe(true);
+
+    const other = load({
+      videos: [video],
+      current: video,
+      hostname: "www.notyoutube.com",
+      sites: { "youtube.com": { loopOff: true } },
+    });
+    video.loop = true;
+    other.fire("loadstart", { target: video });
+    expect(video.loop).toBe(true);
+
+    const sound = load({
+      videos: [video],
+      current: video,
+      sites: { "youtube.com": { remember: true } },
+    });
+    video.muted = true;
+    sound.fire("touchend");
+    sound.fire("volumechange", { target: video });
+    expect(JSON.parse(sound.storage.get("openmedia.video") ?? "{}").muted).toBe(true);
+
+    const forgotten = load({
+      controls: { remember: true },
+      videos: [video],
+      current: video,
+      sites: { "youtube.com": { remember: false } },
+    });
+    video.muted = true;
+    forgotten.fire("touchend");
+    forgotten.fire("volumechange", { target: video });
+    expect(forgotten.storage.get("openmedia.video")).toBeUndefined();
+  });
+
+  it("moves on when the site asks for it, and not when it turns it off, with loop off implied", () => {
+    const first = new FakeVideo(0);
+    const next = new FakeVideo(800);
+    const own = load({
+      videos: [first, next],
+      current: first,
+      sites: { "youtube.com": { autoAdvance: true } },
+    });
+    first.loop = true;
+    own.fire("loadstart", { target: first });
+    expect(first.loop).toBe(false);
+    own.fire("ended", { target: first });
+    expect(next.scrolledIntoView).toBe(1);
+
+    const quiet = new FakeVideo(0);
+    const after = new FakeVideo(800);
+    const off = load({
+      controls: wideOpen(),
+      videos: [quiet, after],
+      current: quiet,
+      sites: { "youtube.com": { autoAdvance: false, loopOff: false } },
+    });
+    quiet.loop = true;
+    off.fire("loadstart", { target: quiet });
+    expect(quiet.loop).toBe(true);
+    off.fire("ended", { target: quiet });
+    expect(after.scrolledIntoView).toBe(0);
+  });
+
   it("removes its controls when it is replaced", () => {
     const video = new FakeVideo();
     const page = load({ videos: [video], current: video });

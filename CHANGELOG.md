@@ -6,6 +6,14 @@ All notable changes to OpenMedia are documented here.
 >
 > **Wiki**: the [GitHub Wiki](https://github.com/skepjandi/openmedia/wiki) is the public-facing main wiki — architecture, recipe format, AI pipeline, security model, roadmap. Source-controlled editing surface is `docs/wiki/` in this repo; CI (`.github/workflows/sync-wiki.yml`) mirrors it to the GitHub Wiki on every merge to `main`. New single-PR changes belong here, not as new wiki pages.
 
+### feat(settings): specific dark mode and video controls are their own pages, as extensive as general
+
+**Area:** `feat(settings)`, `feat(dark-mode)`, `feat(video)`
+
+**Change:** Each favorite now has two rows that open their own pages, **Dark mode** and **Video controls** ("Dark mode: <name>", "Video controls: <name>"), replacing the short inline blocks. Each page has every control its general page has (dark: on/off for the site, method, brightness, contrast, sepia, grayscale, text stroke, scheme colours and presets, schedule, skip dark pages, dark controls, scrollbars, images; video: panel, full videos, panel height, remember, loop off, auto advance). A setting either follows general or overrides it: an overridden control shows a dot and a *Follow general* button, and *Reset all to general* clears the site. General stays the default; the moon button still overrides the site's on/off. The general screens and the specific pages render the same controls. Backend: `SiteDark` and `SiteVideo` entries now carry every setting as an optional field (validated in Rust); the dark engine and the video controls script overlay the site's entry on the general settings. Holding the moon opens the favorite's Dark mode page.
+
+**Verified:** frontend and Rust checks (940 web tests, 541 Rust tests), engine and video-controls tests for each overridable field. New translations are unreviewed (Sinhala, Tamil, Urdu and Bengali least certain).
+
 ### fix(siteview): picture-in-picture never started when leaving the app, and the volume bar could snap back (iOS)
 
 **Area:** `fix(siteview)`

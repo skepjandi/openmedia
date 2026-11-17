@@ -478,20 +478,9 @@ export const ta: Messages = {
   "recipes.hubNote":
     "ஒரு ஹப் ஒரே நேரத்தில் பல தளங்களைத் திறக்கிறது. ஒவ்வொரு பக்கமும் தனி தளம், தனது குக்கீகளுடன்.",
   "favorites.bottomMargin": "கீழ் விளிச்சை",
-  "favorites.videoFull": "முழு வீடியோக்களிலும்",
-  "favorites.videoFullNote":
-    "இந்தத் தளத்தின் பார்க்கும் பக்கங்களிலும் இந்தக் கட்டுப்பாடுகளைப் பயன்படுத்தவும். முடக்கினால் தளத்தின் சொந்த பிளேயர் தொடரும்.",
-  "favorites.videoHeight": "வீடியோ கட்டுப்பாடுகளின் உயரம்",
-  "favorites.videoHeightShared":
-    "பகிர்ந்த உயரத்தைப் பயன்படுத்துகிறது. இந்தத் தளத்திற்குத் தனி உயரம் கொடுக்க ஸ்லைடரை நகர்த்தவும்.",
-  "favorites.videoHeightOwn": "இந்தத் தளத்திற்கு தனி உயரம் உள்ளது.",
-  "favorites.videoHeightLabel": "{site} வீடியோ கட்டுப்பாடுகளின் உயரம்",
-  "favorites.videoUseShared": "பகிர்ந்த வீடியோ அமைப்புகளைப் பயன்படுத்து",
   "favorites.darkModeLabel": "{site} இருண்ட பயன்முறை",
   "favorites.darkOn": "எப்போதும் இயக்கம்",
   "favorites.darkOff": "முடக்கு",
-  "favorites.darkMethod": "இந்தத் தளத்துக்கான முறை",
-  "favorites.darkMethodDefault": "பொதுவான முறை",
   "recipes.sharedMargin":
     "பகிர்ந்த கீழ் விளிச்சையைப் பயன்படுத்துகிறது. இந்தத் தளத்திற்குத் தனி விளிச்சை கொடுக்கச் ச்ளைடரை நகர்த்தவும்.",
   "recipes.ownMargin": "இந்தத் தளத்திற்கு தனி விளிச்சை உள்ளது.",
@@ -810,7 +799,6 @@ export const ta: Messages = {
   "settings.darkScheduleSystemNote": "சாதனத்தின் வெளிர் அல்லது இருண்ட அமைப்பைப் பின்பற்றும்.",
   "favorites.videoPanel": "கட்டுப்பாட்டுப் பலகை",
   "favorites.videoPanelLabel": "{site} வீடியோ கட்டுப்பாட்டுப் பலகை",
-  "favorites.darkMode": "குறிப்பிட்ட இருண்ட பயன்முறை",
   "favorites.darkFollow": "பொதுவானதைப் பின்பற்று",
   "settings.darkModeNote": "பொது அமைப்புகள், எல்லா தளங்களுக்குமான இயல்புநிலை",
   "settings.darkModeTitle": "பொது இருண்ட பயன்முறை",
@@ -819,11 +807,20 @@ export const ta: Messages = {
   "settings.darkSites": "குறிப்பிட்ட அமைப்புகளுடன் உள்ள தளங்கள்",
   "settings.darkSitesNote":
     "ஒரு தளத்திற்குக் குறிப்பிட்ட அமைப்புகள் இல்லாதவரை இந்த அமைப்புகள் எல்லா தளங்களுக்கும் பொருந்தும். பிடித்தவையில் அவற்றை அமைக்கவும்.",
-  "favorites.darkModeNote": "இந்தத் தளத்துக்குப் பொது இருண்ட பயன்முறையை மீறும்.",
   "fab.darkMode":
     "இருண்ட பயன்முறை. எல்லா தளங்களுக்கும் இயக்க அல்லது அணைக்கத் தட்டவும், பொது அமைப்புகளுக்கு அழுத்திப் பிடிக்கவும்.",
   "fab.darkModeSite":
     "இந்தத் தளத்துக்கான இருண்ட பயன்முறை. இயக்க அல்லது அணைக்கத் தட்டவும், அதன் அமைப்புகளுக்கு அழுத்திப் பிடிக்கவும்.",
   "favorites.darkEffectiveOn": "இந்தத் தளத்தில் இருண்ட பயன்முறை இயக்கத்தில் உள்ளது.",
   "favorites.darkEffectiveOff": "இந்தத் தளத்தில் இருண்ட பயன்முறை அணைக்கப்பட்டுள்ளது.",
+  "site.darkTitle": "இருண்ட பயன்முறை: {name}",
+  "site.videoTitle": "வீடியோ கட்டுப்பாடுகள்: {name}",
+  "site.subtitle":
+    "இந்தத் தளத்திற்கு மட்டும் பொருந்தும். நீங்கள் இங்கே மாற்றும் வரை ஒவ்வொரு அமைப்பும் பொதுவானதைப் பின்பற்றும்.",
+  "site.overridden": "இந்தத் தளத்திற்காக அமைக்கப்பட்டது",
+  "site.followGeneralFor": "பொதுவானதைப் பின்பற்று: {setting}",
+  "site.resetAll": "அனைத்தையும் பொதுவானதற்கு மீட்டமை",
+  "site.followsGeneral": "பொதுவானதைப் பின்பற்றுகிறது",
+  "site.overrideCount": "குறிப்பிட்ட அமைப்புகள்: {count}",
+  "settings.videoControlsTitle": "பொது வீடியோ கட்டுப்பாடுகள்",
 };

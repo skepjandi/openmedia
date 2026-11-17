@@ -457,20 +457,9 @@ export const hi: Messages = {
   "recipes.openHubPage": "{label} खोलें",
   "recipes.hubNote": "हब एक साथ कई साइट खोलता है। हर पेज अपनी अलग साइट है, अपने कुकीज़ के साथ।",
   "favorites.bottomMargin": "निचली मार्जिन",
-  "favorites.videoFull": "पूरे वीडियो पर भी",
-  "favorites.videoFullNote":
-    "इस साइट के देखने वाले पेजों पर भी ये नियंत्रण इस्तेमाल करें। बंद रखने पर साइट का अपना प्लेयर रहता है।",
-  "favorites.videoHeight": "वीडियो नियंत्रण की ऊँचाई",
-  "favorites.videoHeightShared":
-    "साझा ऊँचाई का उपयोग हो रहा है। इस साइट को अलग ऊँचाई देने के लिए स्लाइडर हिलाएँ।",
-  "favorites.videoHeightOwn": "इस साइट की अपनी ऊँचाई है।",
-  "favorites.videoHeightLabel": "{site} के वीडियो नियंत्रण की ऊँचाई",
-  "favorites.videoUseShared": "साझा वीडियो सेटिंग इस्तेमाल करें",
   "favorites.darkModeLabel": "{site} का डार्क मोड",
   "favorites.darkOn": "हमेशा चालू",
   "favorites.darkOff": "बंद",
-  "favorites.darkMethod": "इस साइट के लिए तरीका",
-  "favorites.darkMethodDefault": "साझा तरीका",
   "recipes.sharedMargin":
     "साझा निचली मार्जिन का उपयोग हो रहा है। इस साइट को अलग मार्जिन देने के लिए स्लाइडर हिलाएँ।",
   "recipes.ownMargin": "इस साइट की अपनी निचली मार्जिन है।",
@@ -785,7 +774,6 @@ export const hi: Messages = {
   "settings.darkScheduleSystemNote": "डिवाइस की लाइट या डार्क सेटिंग का पालन करता है।",
   "favorites.videoPanel": "नियंत्रण पैनल",
   "favorites.videoPanelLabel": "{site} का वीडियो नियंत्रण पैनल",
-  "favorites.darkMode": "विशिष्ट डार्क मोड",
   "favorites.darkFollow": "सामान्य का पालन करें",
   "settings.darkModeNote": "सामान्य सेटिंग, हर साइट के लिए डिफ़ॉल्ट",
   "settings.darkModeTitle": "सामान्य डार्क मोड",
@@ -794,11 +782,20 @@ export const hi: Messages = {
   "settings.darkSites": "विशिष्ट सेटिंग वाली साइटें",
   "settings.darkSitesNote":
     "ये सेटिंग हर साइट पर लागू होती हैं, जब तक किसी साइट की विशिष्ट सेटिंग न हो। इन्हें किसी पसंदीदा में तय करें।",
-  "favorites.darkModeNote": "इस साइट के लिए सामान्य डार्क मोड को बदल देता है।",
   "fab.darkMode":
     "डार्क मोड। सभी साइटों के लिए चालू या बंद करने को टैप करें, सामान्य सेटिंग के लिए दबाए रखें।",
   "fab.darkModeSite":
     "इस साइट के लिए डार्क मोड। चालू या बंद करने को टैप करें, इसकी सेटिंग के लिए दबाए रखें।",
   "favorites.darkEffectiveOn": "इस साइट के लिए डार्क मोड चालू है।",
   "favorites.darkEffectiveOff": "इस साइट के लिए डार्क मोड बंद है।",
+  "site.darkTitle": "डार्क मोड: {name}",
+  "site.videoTitle": "वीडियो नियंत्रण: {name}",
+  "site.subtitle":
+    "केवल इस साइट पर लागू होता है। हर सेटिंग यहाँ बदलने तक सामान्य सेटिंग का पालन करती है।",
+  "site.overridden": "इस साइट के लिए तय",
+  "site.followGeneralFor": "सामान्य का पालन करें: {setting}",
+  "site.resetAll": "सब कुछ सामान्य पर रीसेट करें",
+  "site.followsGeneral": "सामान्य का पालन करता है",
+  "site.overrideCount": "विशिष्ट सेटिंग: {count}",
+  "settings.videoControlsTitle": "सामान्य वीडियो नियंत्रण",
 };

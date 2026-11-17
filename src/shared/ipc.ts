@@ -46,6 +46,12 @@ export interface SiteVideo {
   panel?: boolean;
   height?: number;
   fullVideos?: boolean;
+  /** The speed and sound last chosen, applied to the next video. */
+  remember?: boolean;
+  /** Stops a video from restarting by itself when it ends. */
+  loopOff?: boolean;
+  /** Scrolls on to the next video when one ends. */
+  autoAdvance?: boolean;
 }
 
 export type DarkMethod = "dynamic" | "filter" | "filterplus" | "static";
@@ -88,8 +94,29 @@ export interface DarkMode {
 
 /** One site's own dark mode choice (by registrable domain); a field that is missing follows the shared one. */
 export interface SiteDark {
+  /** `on` forces dark mode on whatever the schedule says; `off` keeps it off. */
   mode?: "on" | "off";
   method?: DarkMethod;
+  /** Percent, 50 to 150. */
+  brightness?: number;
+  /** Percent, 50 to 150. */
+  contrast?: number;
+  /** Percent, 0 to 100. */
+  sepia?: number;
+  /** Percent, 0 to 100. */
+  grayscale?: number;
+  /** `#rrggbb`. */
+  background?: string;
+  /** `#rrggbb`. */
+  text?: string;
+  /** Replaces the shared schedule as a whole. */
+  schedule?: DarkSchedule;
+  skipDarkPages?: boolean;
+  systemControls?: boolean;
+  scrollbars?: boolean;
+  images?: boolean;
+  /** Tenths of a pixel, 0 to 10. */
+  textStroke?: number;
 }
 
 export interface Favorite {

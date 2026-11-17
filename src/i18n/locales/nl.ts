@@ -463,20 +463,9 @@ export const nl: Messages = {
   "recipes.hubNote":
     "Een hub opent meerdere sites tegelijk. Elke pagina is een eigen site, met eigen cookies.",
   "favorites.bottomMargin": "Ondermarge",
-  "favorites.videoFull": "Ook bij volledige video’s",
-  "favorites.videoFullNote":
-    "Gebruik de bediening ook op de kijkpagina’s van deze site. Uit houdt de eigen speler van de site.",
-  "favorites.videoHeight": "Hoogte videobediening",
-  "favorites.videoHeightShared":
-    "Gebruikt de gedeelde hoogte. Beweeg de schuifregelaar om deze site een eigen hoogte te geven.",
-  "favorites.videoHeightOwn": "Deze site heeft een eigen hoogte.",
-  "favorites.videoHeightLabel": "Hoogte videobediening van {site}",
-  "favorites.videoUseShared": "Gedeelde video-instellingen gebruiken",
   "favorites.darkModeLabel": "Donkere modus voor {site}",
   "favorites.darkOn": "Altijd aan",
   "favorites.darkOff": "Uit",
-  "favorites.darkMethod": "Methode voor deze site",
-  "favorites.darkMethodDefault": "Gedeelde methode",
   "recipes.sharedMargin":
     "Gebruikt de gedeelde marge. Beweeg de schuifregelaar om deze site een eigen marge te geven.",
   "recipes.ownMargin": "Deze site heeft een eigen marge.",
@@ -797,7 +786,6 @@ export const nl: Messages = {
   "settings.darkScheduleSystemNote": "Volgt de lichte of donkere instelling van het apparaat.",
   "favorites.videoPanel": "Bedieningspaneel",
   "favorites.videoPanelLabel": "Videobedieningspaneel van {site}",
-  "favorites.darkMode": "Specifieke donkere modus",
   "favorites.darkFollow": "Algemeen volgen",
   "settings.darkModeNote": "Algemene instellingen, de standaard voor elke site",
   "settings.darkModeTitle": "Algemene donkere modus",
@@ -806,11 +794,20 @@ export const nl: Messages = {
   "settings.darkSites": "Sites met specifieke instellingen",
   "settings.darkSitesNote":
     "Deze instellingen gelden voor elke site, tenzij een site specifieke instellingen heeft. Stel ze in bij een favoriet.",
-  "favorites.darkModeNote": "Overschrijft de algemene donkere modus voor deze site.",
   "fab.darkMode":
     "Donkere modus. Tik om hem voor alle sites aan of uit te zetten, houd ingedrukt voor de algemene instellingen.",
   "fab.darkModeSite":
     "Donkere modus voor deze site. Tik om hem aan of uit te zetten, houd ingedrukt voor de instellingen ervan.",
   "favorites.darkEffectiveOn": "Donkere modus staat aan voor deze site.",
   "favorites.darkEffectiveOff": "Donkere modus staat uit voor deze site.",
+  "site.darkTitle": "Donkere modus: {name}",
+  "site.videoTitle": "Videobediening: {name}",
+  "site.subtitle":
+    "Geldt alleen voor deze site. Elke instelling volgt de algemene totdat je haar hier wijzigt.",
+  "site.overridden": "Ingesteld voor deze site",
+  "site.followGeneralFor": "Algemeen volgen: {setting}",
+  "site.resetAll": "Alles terugzetten naar algemeen",
+  "site.followsGeneral": "Volgt algemeen",
+  "site.overrideCount": "Specifieke instellingen: {count}",
+  "settings.videoControlsTitle": "Algemene videobediening",
 };

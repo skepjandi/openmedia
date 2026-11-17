@@ -461,20 +461,9 @@ export const en = {
   "recipes.hubNote":
     "A hub opens several sites at once. Each page is a site of its own, with its own cookies.",
   "favorites.bottomMargin": "Bottom margin",
-  "favorites.videoFull": "Also on full videos",
-  "favorites.videoFullNote":
-    "Use the controls on this site's watch pages too. Off keeps the site's own player.",
-  "favorites.videoHeight": "Video controls height",
-  "favorites.videoHeightShared":
-    "Uses the shared height. Move the slider to give this site its own.",
-  "favorites.videoHeightOwn": "This site has its own height.",
-  "favorites.videoHeightLabel": "{site} video controls height",
-  "favorites.videoUseShared": "Use the shared video settings",
   "favorites.darkModeLabel": "{site} dark mode",
   "favorites.darkOn": "Always on",
   "favorites.darkOff": "Off",
-  "favorites.darkMethod": "Method for this site",
-  "favorites.darkMethodDefault": "Shared method",
   "recipes.sharedMargin": "Uses the shared margin. Move the slider to give this site its own.",
   "recipes.ownMargin": "This site has its own margin.",
   "recipes.siteMarginLabel": "{name} bottom margin",
@@ -779,7 +768,6 @@ export const en = {
   "settings.darkScheduleSystemNote": "Follows the device's light or dark setting.",
   "favorites.videoPanel": "Controls panel",
   "favorites.videoPanelLabel": "{site} video controls panel",
-  "favorites.darkMode": "Specific dark mode",
   "favorites.darkFollow": "Follow general",
   "settings.darkModeNote": "General settings, the default for every site",
   "settings.darkModeTitle": "General dark mode",
@@ -788,9 +776,18 @@ export const en = {
   "settings.darkSites": "Sites with specific settings",
   "settings.darkSitesNote":
     "These settings apply to every site unless a site has specific settings. Set them in a favorite.",
-  "favorites.darkModeNote": "Overrides the general dark mode for this site.",
   "fab.darkMode": "Dark mode. Tap to turn on or off for every site, hold for general settings.",
   "fab.darkModeSite": "Dark mode for this site. Tap to turn on or off, hold for its settings.",
   "favorites.darkEffectiveOn": "Dark mode is on for this site.",
   "favorites.darkEffectiveOff": "Dark mode is off for this site.",
+  "site.darkTitle": "Dark mode: {name}",
+  "site.videoTitle": "Video controls: {name}",
+  "site.subtitle":
+    "Applies to this site only. Each setting follows the general one until you change it here.",
+  "site.overridden": "Set for this site",
+  "site.followGeneralFor": "Follow general: {setting}",
+  "site.resetAll": "Reset all to general",
+  "site.followsGeneral": "Follows general",
+  "site.overrideCount": "Specific settings: {count}",
+  "settings.videoControlsTitle": "General video controls",
 } as const;

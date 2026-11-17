@@ -1,5 +1,6 @@
 import type { MessageKey } from "../i18n/messages";
 import type { DarkMethod, DarkMode, DarkScheduleKind, SiteDark } from "./ipc";
+import { withOverrides } from "./overrides";
 
 /** What the app starts with, and what Rust holds until the user chooses. */
 export const DARK_MODE_DEFAULT: DarkMode = {
@@ -80,14 +81,13 @@ export function isClockTime(value: string): boolean {
   return /^([01]\d|2[0-3]):[0-5]\d$/.test(value);
 }
 
-/** The messages that say what a site's own choice is: its mode, then its method. */
-export function darkSiteLabel(dark: SiteDark): MessageKey[] {
-  const labels: MessageKey[] = [];
-  if (dark.mode === "on") labels.push("favorites.darkOn");
-  if (dark.mode === "off") labels.push("favorites.darkOff");
-  const method = DARK_METHODS.find((entry) => entry.value === dark.method);
-  if (method) labels.push(method.label);
-  return labels;
+/** The dark mode a site gets: its own fields laid over general, and its `mode` in place of the global switch. */
+export function effectiveDark(general: DarkMode, site: SiteDark | undefined): DarkMode {
+  const { mode, ...own } = site ?? {};
+  return {
+    ...withOverrides(general, own),
+    enabled: mode === undefined ? general.enabled : mode === "on",
+  };
 }
 
 /**

@@ -468,20 +468,9 @@ export const pl: Messages = {
   "recipes.hubNote":
     "Hub otwiera kilka stron naraz. Każda strona to osobna witryna, z własnymi plikami cookie.",
   "favorites.bottomMargin": "Dolny margines",
-  "favorites.videoFull": "Także w pełnych filmach",
-  "favorites.videoFullNote":
-    "Używaj sterowania także na stronach oglądania tej witryny. Wyłączone zachowuje własny odtwarzacz witryny.",
-  "favorites.videoHeight": "Wysokość sterowania wideo",
-  "favorites.videoHeightShared":
-    "Używa wspólnej wysokości. Przesuń suwak, aby ta witryna miała własną.",
-  "favorites.videoHeightOwn": "Ta witryna ma własną wysokość.",
-  "favorites.videoHeightLabel": "Wysokość sterowania wideo: {site}",
-  "favorites.videoUseShared": "Użyj wspólnych ustawień wideo",
   "favorites.darkModeLabel": "Tryb ciemny dla {site}",
   "favorites.darkOn": "Zawsze włączony",
   "favorites.darkOff": "Wyłączony",
-  "favorites.darkMethod": "Metoda dla tej witryny",
-  "favorites.darkMethodDefault": "Metoda wspólna",
   "recipes.sharedMargin": "Używa wspólnego marginesu. Przesuń suwak, aby ta witryna miała własny.",
   "recipes.ownMargin": "Ta witryna ma własny margines.",
   "recipes.siteMarginLabel": "Dolny margines: {name}",
@@ -792,7 +781,6 @@ export const pl: Messages = {
   "settings.darkScheduleSystemNote": "Stosuje się do jasnego lub ciemnego ustawienia urządzenia.",
   "favorites.videoPanel": "Panel sterowania",
   "favorites.videoPanelLabel": "Panel sterowania wideo w {site}",
-  "favorites.darkMode": "Szczegółowy tryb ciemny",
   "favorites.darkFollow": "Zgodnie z ogólnym",
   "settings.darkModeNote": "Ustawienia ogólne, domyślne dla każdej witryny",
   "settings.darkModeTitle": "Ogólny tryb ciemny",
@@ -801,11 +789,20 @@ export const pl: Messages = {
   "settings.darkSites": "Witryny z ustawieniami szczegółowymi",
   "settings.darkSitesNote":
     "Te ustawienia dotyczą każdej witryny, chyba że ma ona ustawienia szczegółowe. Ustaw je w ulubionej.",
-  "favorites.darkModeNote": "Zastępuje ogólny tryb ciemny dla tej witryny.",
   "fab.darkMode":
     "Tryb ciemny. Stuknij, aby włączyć lub wyłączyć go we wszystkich witrynach, przytrzymaj, aby otworzyć ustawienia ogólne.",
   "fab.darkModeSite":
     "Tryb ciemny tej witryny. Stuknij, aby go włączyć lub wyłączyć, przytrzymaj, aby otworzyć jego ustawienia.",
   "favorites.darkEffectiveOn": "Tryb ciemny jest włączony dla tej witryny.",
   "favorites.darkEffectiveOff": "Tryb ciemny jest wyłączony dla tej witryny.",
+  "site.darkTitle": "Tryb ciemny: {name}",
+  "site.videoTitle": "Sterowanie wideo: {name}",
+  "site.subtitle":
+    "Dotyczy tylko tej witryny. Każde ustawienie jest zgodne z ogólnym, dopóki nie zmienisz go tutaj.",
+  "site.overridden": "Ustawione dla tej witryny",
+  "site.followGeneralFor": "Zgodnie z ogólnym: {setting}",
+  "site.resetAll": "Przywróć wszystko do ogólnych",
+  "site.followsGeneral": "Zgodnie z ogólnym",
+  "site.overrideCount": "Ustawienia szczegółowe: {count}",
+  "settings.videoControlsTitle": "Ogólne sterowanie wideo",
 };

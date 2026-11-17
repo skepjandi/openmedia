@@ -452,20 +452,9 @@ export const bn: Messages = {
   "recipes.hubNote":
     "একটি হাব একসাথে কয়েকটি সাইট খোলে। প্রতিটি পৃষ্ঠা নিজস্ব সাইট, নিজস্ব কুকি সহ।",
   "favorites.bottomMargin": "নিচের মার্জিন",
-  "favorites.videoFull": "পূর্ণ ভিডিওতেও",
-  "favorites.videoFullNote":
-    "এই সাইটের ওয়াচ পেজেও নিয়ন্ত্রণ ব্যবহার করুন। বন্ধ থাকলে সাইটের নিজের প্লেয়ার থাকে।",
-  "favorites.videoHeight": "ভিডিও নিয়ন্ত্রণের উচ্চতা",
-  "favorites.videoHeightShared":
-    "সাধারণ উচ্চতা ব্যবহার করে। এই সাইটের নিজস্ব উচ্চতা দিতে স্লাইডারটি সরান।",
-  "favorites.videoHeightOwn": "এই সাইটের নিজস্ব উচ্চতা আছে।",
-  "favorites.videoHeightLabel": "{site}-এর ভিডিও নিয়ন্ত্রণের উচ্চতা",
-  "favorites.videoUseShared": "সাধারণ ভিডিও সেটিংস ব্যবহার করুন",
   "favorites.darkModeLabel": "{site} ডার্ক মোড",
   "favorites.darkOn": "সবসময় চালু",
   "favorites.darkOff": "বন্ধ",
-  "favorites.darkMethod": "এই সাইটের পদ্ধতি",
-  "favorites.darkMethodDefault": "সাধারণ পদ্ধতি",
   "recipes.sharedMargin":
     "সাধারণ মার্জিন ব্যবহার করে। এই সাইটের নিজস্ব মার্জিন দিতে স্লাইডারটি সরান।",
   "recipes.ownMargin": "এই সাইটের নিজস্ব মার্জিন আছে।",
@@ -775,7 +764,6 @@ export const bn: Messages = {
   "settings.darkScheduleSystemNote": "ডিভাইসের লাইট বা ডার্ক সেটিং অনুসরণ করে।",
   "favorites.videoPanel": "নিয়ন্ত্রণ প্যানেল",
   "favorites.videoPanelLabel": "{site} ভিডিও নিয়ন্ত্রণ প্যানেল",
-  "favorites.darkMode": "নির্দিষ্ট ডার্ক মোড",
   "favorites.darkFollow": "সাধারণ অনুসরণ করুন",
   "settings.darkModeNote": "সাধারণ সেটিংস, সব সাইটের ডিফল্ট",
   "settings.darkModeTitle": "সাধারণ ডার্ক মোড",
@@ -784,11 +772,20 @@ export const bn: Messages = {
   "settings.darkSites": "নির্দিষ্ট সেটিংসওয়ালা সাইট",
   "settings.darkSitesNote":
     "কোনো সাইটের নির্দিষ্ট সেটিংস না থাকলে এই সেটিংস সব সাইটে প্রযোজ্য। ফেভারিটে সেগুলো ঠিক করুন।",
-  "favorites.darkModeNote": "এই সাইটের জন্য সাধারণ ডার্ক মোডকে ছাপিয়ে যায়।",
   "fab.darkMode":
     "ডার্ক মোড। সব সাইটের জন্য চালু বা বন্ধ করতে ট্যাপ করুন, সাধারণ সেটিংসের জন্য চেপে ধরুন।",
   "fab.darkModeSite":
     "এই সাইটের ডার্ক মোড। চালু বা বন্ধ করতে ট্যাপ করুন, এর সেটিংসের জন্য চেপে ধরুন।",
   "favorites.darkEffectiveOn": "এই সাইটে ডার্ক মোড চালু আছে।",
   "favorites.darkEffectiveOff": "এই সাইটে ডার্ক মোড বন্ধ আছে।",
+  "site.darkTitle": "ডার্ক মোড: {name}",
+  "site.videoTitle": "ভিডিও নিয়ন্ত্রণ: {name}",
+  "site.subtitle":
+    "শুধু এই সাইটে প্রযোজ্য। এখানে বদলানো পর্যন্ত প্রতিটি সেটিং সাধারণ সেটিং অনুসরণ করে।",
+  "site.overridden": "এই সাইটের জন্য নির্দিষ্ট",
+  "site.followGeneralFor": "সাধারণ অনুসরণ করুন: {setting}",
+  "site.resetAll": "সবকিছু সাধারণে ফিরিয়ে দিন",
+  "site.followsGeneral": "সাধারণ অনুসরণ করে",
+  "site.overrideCount": "নির্দিষ্ট সেটিংস: {count}",
+  "settings.videoControlsTitle": "সাধারণ ভিডিও নিয়ন্ত্রণ",
 };

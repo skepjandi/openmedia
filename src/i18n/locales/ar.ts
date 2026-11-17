@@ -445,20 +445,9 @@ export const ar: Messages = {
   "recipes.hubNote":
     "يفتح المركز عدة مواقع في وقت واحد. كل صفحة موقع خاص بها بملفات تعريف الارتباط الخاصة به.",
   "favorites.bottomMargin": "الهامش السفلي",
-  "favorites.videoFull": "أيضًا في الفيديوهات الكاملة",
-  "favorites.videoFullNote":
-    "استخدم عناصر التحكم في صفحات المشاهدة لهذا الموقع أيضًا. الإيقاف يُبقي مشغّل الموقع نفسه.",
-  "favorites.videoHeight": "ارتفاع عناصر تحكم الفيديو",
-  "favorites.videoHeightShared":
-    "يستخدم الارتفاع المشترك. حرّك المؤشر ليمنح هذا الموقع ارتفاعًا خاصًا به.",
-  "favorites.videoHeightOwn": "لهذا الموقع ارتفاع خاص به.",
-  "favorites.videoHeightLabel": "ارتفاع عناصر تحكم الفيديو في {site}",
-  "favorites.videoUseShared": "استخدام إعدادات الفيديو المشتركة",
   "favorites.darkModeLabel": "الوضع الداكن لـ {site}",
   "favorites.darkOn": "مفعّل دائمًا",
   "favorites.darkOff": "إيقاف",
-  "favorites.darkMethod": "الطريقة لهذا الموقع",
-  "favorites.darkMethodDefault": "الطريقة المشتركة",
   "recipes.sharedMargin": "يستخدم الهامش المشترك. حرّك المؤشر ليمنح هذا الموقع هامشًا خاصًا به.",
   "recipes.ownMargin": "لهذا الموقع هامش خاص به.",
   "recipes.siteMarginLabel": "الهامش السفلي لـ {name}",
@@ -756,7 +745,6 @@ export const ar: Messages = {
   "settings.darkScheduleSystemNote": "يتبع الإعداد الفاتح أو الداكن للجهاز.",
   "favorites.videoPanel": "لوحة التحكم",
   "favorites.videoPanelLabel": "لوحة عناصر تحكم الفيديو في {site}",
-  "favorites.darkMode": "وضع داكن خاص",
   "favorites.darkFollow": "اتباع العام",
   "settings.darkModeNote": "الإعدادات العامة، الافتراضية لكل موقع",
   "settings.darkModeTitle": "الوضع الداكن العام",
@@ -765,10 +753,18 @@ export const ar: Messages = {
   "settings.darkSites": "مواقع بإعدادات خاصة",
   "settings.darkSitesNote":
     "تنطبق هذه الإعدادات على كل موقع ما لم تكن له إعدادات خاصة. اضبطها في المفضلة.",
-  "favorites.darkModeNote": "يتجاوز الوضع الداكن العام لهذا الموقع.",
   "fab.darkMode":
     "الوضع الداكن. اضغط لتشغيله أو إيقافه لكل المواقع، واضغط مطولًا للإعدادات العامة.",
   "fab.darkModeSite": "الوضع الداكن لهذا الموقع. اضغط لتشغيله أو إيقافه، واضغط مطولًا لإعداداته.",
   "favorites.darkEffectiveOn": "الوضع الداكن مفعّل لهذا الموقع.",
   "favorites.darkEffectiveOff": "الوضع الداكن متوقف لهذا الموقع.",
+  "site.darkTitle": "الوضع الداكن: {name}",
+  "site.videoTitle": "عناصر تحكم الفيديو: {name}",
+  "site.subtitle": "ينطبق على هذا الموقع فقط. كل إعداد يتبع الإعداد العام إلى أن تغيّره هنا.",
+  "site.overridden": "مخصّص لهذا الموقع",
+  "site.followGeneralFor": "اتباع العام: {setting}",
+  "site.resetAll": "إعادة كل شيء إلى العام",
+  "site.followsGeneral": "يتبع العام",
+  "site.overrideCount": "إعدادات خاصة: {count}",
+  "settings.videoControlsTitle": "عناصر تحكم الفيديو العامة",
 };

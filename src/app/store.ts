@@ -54,6 +54,7 @@ import { describeError } from "../i18n/errors";
 import { createTranslator } from "../i18n/translate";
 import type { Edge } from "../features/fab/geometry";
 import { loadPosition } from "../features/fab/position";
+import { overrideCount } from "../shared/overrides";
 import {
   iconForUrl,
   setIconCache,
@@ -77,7 +78,14 @@ export type Sheet =
   | "share-recipe"
   | "paywall"
   | "video-controls"
-  | "dark-mode";
+  | "dark-mode"
+  | "site-video"
+  | "site-dark-mode";
+
+/** The pages about one favorite's site, which `openSiteSheet` fills in. */
+export type SiteSheet = "site-dark-mode" | "site-video";
+const isSiteSheet = (sheet: Sheet): sheet is SiteSheet =>
+  sheet === "site-dark-mode" || sheet === "site-video";
 
 /** Pages that open on top of Settings. Closing one returns to Settings, which stays mounted beneath it. */
 const SETTINGS_CHILDREN: readonly Sheet[] = [
@@ -90,6 +98,8 @@ const SETTINGS_CHILDREN: readonly Sheet[] = [
   "paywall",
   "video-controls",
   "dark-mode",
+  "site-video",
+  "site-dark-mode",
 ];
 const isSettingsChild = (sheet: Sheet): boolean => SETTINGS_CHILDREN.includes(sheet);
 
@@ -138,8 +148,14 @@ export interface AppStore {
   sheet: Sheet;
   /** Where closing a child page of Settings returns to; `none` for every other sheet. */
   sheetParent: "none" | "settings";
-  /** The favorite Settings opens with expanded and in view, consumed once by the favorites list. */
+  /** The favorite whose editor Settings expands and scrolls into view, consumed once by the favorites list. */
   focusFavoriteId: string | null;
+  /** The site (registrable domain) the open site page is about; null when none is open. */
+  sheetSite: string | null;
+  /** The favorite's name, for that page's title. */
+  sheetSiteName: string | null;
+  /** The favorite whose editor is expanded again when that page closes back to Settings. */
+  sheetSiteFavoriteId: string | null;
   /** The recipe the Recipes page opens with expanded, set when a favorite sends the user there. */
   recipeFocus: string | null;
   onboardingOpen: boolean;
@@ -160,9 +176,12 @@ export interface AppStore {
   assistant: AssistantState;
   load: () => Promise<void>;
   openSheet: (sheet: Sheet) => void;
-  /** Opens Settings with this favorite's editor expanded and scrolled into view. */
-  openFavoriteSettings: (favoriteId: string) => void;
   clearFavoriteFocus: () => void;
+  /**
+   * Opens a favorite's own dark mode or video controls page. Closing it returns to where it was
+   * opened from; from Settings that is Settings, with `favoriteId` expanded again.
+   */
+  openSiteSheet: (sheet: SiteSheet, site: string, name: string, favoriteId?: string) => void;
   closeSheet: () => void;
   /** An empty page with the command bar open: a new tab. The sessions stay open underneath it. */
   openNewTab: () => void;
@@ -528,6 +547,9 @@ export const useApp = create<AppStore>((set, get) => {
     sheetParent: "none",
     recipeFocus: null,
     focusFavoriteId: null,
+    sheetSite: null,
+    sheetSiteName: null,
+    sheetSiteFavoriteId: null,
     onboardingOpen: false,
     sessions: [],
     activeId: null,
@@ -578,16 +600,31 @@ export const useApp = create<AppStore>((set, get) => {
     openNewTab: () => {
       set((current) => ({ ...showSheet(current, "assistant"), blankTab: true }));
     },
-    openFavoriteSettings: (favoriteId) => {
-      set((current) => ({ ...showSheet(current, "settings"), focusFavoriteId: favoriteId }));
-    },
     clearFavoriteFocus: () => set({ focusFavoriteId: null }),
-    closeSheet: () =>
+    openSiteSheet: (sheet, site, name, favoriteId) => {
       set((current) => ({
-        sheet: isSettingsChild(current.sheet) ? current.sheetParent : "none",
-        sheetParent: "none",
-        recipeFocus: null,
-      })),
+        ...showSheet(current, sheet),
+        sheetSite: site,
+        sheetSiteName: name,
+        sheetSiteFavoriteId: favoriteId ?? null,
+      }));
+    },
+    closeSheet: () =>
+      set((current) => {
+        const back = isSettingsChild(current.sheet) ? current.sheetParent : "none";
+        const focus = isSiteSheet(current.sheet) && back === "settings";
+        return {
+          sheet: back,
+          sheetParent: "none",
+          recipeFocus: null,
+          sheetSite: null,
+          sheetSiteName: null,
+          sheetSiteFavoriteId: null,
+          ...(focus && current.sheetSiteFavoriteId
+            ? { focusFavoriteId: current.sheetSiteFavoriteId }
+            : {}),
+        };
+      }),
 
     openRecipe: (recipeId) => {
       get().openSheet("recipes");
@@ -1019,8 +1056,7 @@ export const useApp = create<AppStore>((set, get) => {
     setSiteVideoControls: async (site, video) => {
       const previous = get().state?.videoSites;
       if (!previous) return;
-      const empty =
-        video.panel === undefined && video.height === undefined && video.fullVideos === undefined;
+      const empty = overrideCount(video) === 0;
       const others = Object.fromEntries(Object.entries(previous).filter(([key]) => key !== site));
       const next = empty ? others : { ...others, [site]: video };
       set((current) => ({ state: current.state && { ...current.state, videoSites: next } }));
@@ -1052,7 +1088,7 @@ export const useApp = create<AppStore>((set, get) => {
     setSiteDarkMode: async (site, dark) => {
       const previous = get().state?.darkSites;
       if (!previous) return;
-      const empty = dark.mode === undefined && dark.method === undefined;
+      const empty = overrideCount(dark) === 0;
       const others = Object.fromEntries(Object.entries(previous).filter(([key]) => key !== site));
       const next = empty ? others : { ...others, [site]: dark };
       set((current) => ({ state: current.state && { ...current.state, darkSites: next } }));

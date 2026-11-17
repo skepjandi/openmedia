@@ -476,20 +476,9 @@ export const el: Messages = {
   "recipes.hubNote":
     "Ένα hub ανοίγει πολλά site ταυτόχρονα. Κάθε σελίδα είναι δικό της site, με δικά της cookies.",
   "favorites.bottomMargin": "Κάτω περιθώριο",
-  "favorites.videoFull": "Και σε πλήρη βίντεο",
-  "favorites.videoFullNote":
-    "Χρησιμοποιήστε τα στοιχεία ελέγχου και στις σελίδες προβολής αυτού του ιστότοπου. Όταν είναι ανενεργό, μένει το δικό του πρόγραμμα αναπαραγωγής.",
-  "favorites.videoHeight": "Ύψος στοιχείων ελέγχου βίντεο",
-  "favorites.videoHeightShared":
-    "Χρησιμοποιεί το κοινό ύψος. Σύρετε τον ρυθμιστή για να δώσετε σε αυτό τον ιστότοπο δικό του.",
-  "favorites.videoHeightOwn": "Αυτός ο ιστότοπος έχει δικό του ύψος.",
-  "favorites.videoHeightLabel": "Ύψος στοιχείων ελέγχου βίντεο για {site}",
-  "favorites.videoUseShared": "Χρήση των κοινών ρυθμίσεων βίντεο",
   "favorites.darkModeLabel": "Σκοτεινή λειτουργία για {site}",
   "favorites.darkOn": "Πάντα ενεργό",
   "favorites.darkOff": "Ανενεργό",
-  "favorites.darkMethod": "Μέθοδος για αυτόν τον ιστότοπο",
-  "favorites.darkMethodDefault": "Κοινή μέθοδος",
   "recipes.sharedMargin":
     "Χρησιμοποιεί το κοινό περιθώριο. Σύρετε τον ρυθμιστή για να δώσετε σε αυτό τον ιστότοπο δικό του.",
   "recipes.ownMargin": "Αυτός ο ιστότοπος έχει δικό του κάτω περιθώριο.",
@@ -807,7 +796,6 @@ export const el: Messages = {
   "settings.darkScheduleSystemNote": "Ακολουθεί τη φωτεινή ή σκοτεινή ρύθμιση της συσκευής.",
   "favorites.videoPanel": "Πίνακας ελέγχου",
   "favorites.videoPanelLabel": "Πίνακας ελέγχου βίντεο στο {site}",
-  "favorites.darkMode": "Συγκεκριμένη σκοτεινή λειτουργία",
   "favorites.darkFollow": "Ακολουθεί τις γενικές",
   "settings.darkModeNote": "Γενικές ρυθμίσεις, η προεπιλογή για κάθε ιστότοπο",
   "settings.darkModeTitle": "Γενική σκοτεινή λειτουργία",
@@ -816,11 +804,20 @@ export const el: Messages = {
   "settings.darkSites": "Ιστότοποι με συγκεκριμένες ρυθμίσεις",
   "settings.darkSitesNote":
     "Αυτές οι ρυθμίσεις ισχύουν για κάθε ιστότοπο, εκτός αν ο ιστότοπος έχει συγκεκριμένες ρυθμίσεις. Ορίστε τις σε ένα αγαπημένο.",
-  "favorites.darkModeNote": "Παρακάμπτει τη γενική σκοτεινή λειτουργία για αυτόν τον ιστότοπο.",
   "fab.darkMode":
     "Σκοτεινή λειτουργία. Πατήστε για ενεργοποίηση ή απενεργοποίηση σε όλους τους ιστότοπους, παρατεταμένο πάτημα για γενικές ρυθμίσεις.",
   "fab.darkModeSite":
     "Σκοτεινή λειτουργία για αυτόν τον ιστότοπο. Πατήστε για ενεργοποίηση ή απενεργοποίηση, παρατεταμένο πάτημα για τις ρυθμίσεις του.",
   "favorites.darkEffectiveOn": "Η σκοτεινή λειτουργία είναι ενεργή για αυτόν τον ιστότοπο.",
   "favorites.darkEffectiveOff": "Η σκοτεινή λειτουργία είναι ανενεργή για αυτόν τον ιστότοπο.",
+  "site.darkTitle": "Σκοτεινή λειτουργία: {name}",
+  "site.videoTitle": "Στοιχεία ελέγχου βίντεο: {name}",
+  "site.subtitle":
+    "Ισχύει μόνο για αυτόν τον ιστότοπο. Κάθε ρύθμιση ακολουθεί τη γενική μέχρι να την αλλάξετε εδώ.",
+  "site.overridden": "Ορίστηκε για αυτόν τον ιστότοπο",
+  "site.followGeneralFor": "Ακολουθεί τις γενικές: {setting}",
+  "site.resetAll": "Επαναφορά όλων στις γενικές",
+  "site.followsGeneral": "Ακολουθεί τις γενικές",
+  "site.overrideCount": "Συγκεκριμένες ρυθμίσεις: {count}",
+  "settings.videoControlsTitle": "Γενικά στοιχεία ελέγχου βίντεο",
 };

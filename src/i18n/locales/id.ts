@@ -459,20 +459,9 @@ export const id: Messages = {
   "recipes.hubNote":
     "Hub membuka beberapa situs sekaligus. Setiap halaman adalah situsnya sendiri, dengan cookie sendiri.",
   "favorites.bottomMargin": "Margin bawah",
-  "favorites.videoFull": "Juga di video penuh",
-  "favorites.videoFullNote":
-    "Gunakan kontrol ini juga di halaman tonton situs ini. Jika mati, pemutar bawaan situs tetap dipakai.",
-  "favorites.videoHeight": "Tinggi kontrol video",
-  "favorites.videoHeightShared":
-    "Memakai tinggi bersama. Geser slider untuk memberi situs ini tinggi sendiri.",
-  "favorites.videoHeightOwn": "Situs ini punya tinggi sendiri.",
-  "favorites.videoHeightLabel": "Tinggi kontrol video {site}",
-  "favorites.videoUseShared": "Pakai pengaturan video bersama",
   "favorites.darkModeLabel": "Mode gelap {site}",
   "favorites.darkOn": "Selalu aktif",
   "favorites.darkOff": "Mati",
-  "favorites.darkMethod": "Metode untuk situs ini",
-  "favorites.darkMethodDefault": "Metode bersama",
   "recipes.sharedMargin":
     "Memakai margin bersama. Geser slider untuk memberi situs ini margin sendiri.",
   "recipes.ownMargin": "Situs ini punya margin sendiri.",
@@ -789,7 +778,6 @@ export const id: Messages = {
   "settings.darkScheduleSystemNote": "Mengikuti pengaturan terang atau gelap perangkat.",
   "favorites.videoPanel": "Panel kontrol",
   "favorites.videoPanelLabel": "Panel kontrol video {site}",
-  "favorites.darkMode": "Mode gelap khusus",
   "favorites.darkFollow": "Ikuti pengaturan umum",
   "settings.darkModeNote": "Pengaturan umum, bawaan untuk setiap situs",
   "settings.darkModeTitle": "Mode gelap umum",
@@ -798,11 +786,20 @@ export const id: Messages = {
   "settings.darkSites": "Situs dengan pengaturan khusus",
   "settings.darkSitesNote":
     "Pengaturan ini berlaku untuk semua situs kecuali situs tersebut punya pengaturan khusus. Atur di favorit.",
-  "favorites.darkModeNote": "Menggantikan mode gelap umum untuk situs ini.",
   "fab.darkMode":
     "Mode gelap. Ketuk untuk menyalakan atau mematikannya di semua situs, tahan untuk pengaturan umum.",
   "fab.darkModeSite":
     "Mode gelap untuk situs ini. Ketuk untuk menyalakan atau mematikannya, tahan untuk pengaturannya.",
   "favorites.darkEffectiveOn": "Mode gelap aktif untuk situs ini.",
   "favorites.darkEffectiveOff": "Mode gelap nonaktif untuk situs ini.",
+  "site.darkTitle": "Mode gelap: {name}",
+  "site.videoTitle": "Kontrol video: {name}",
+  "site.subtitle":
+    "Hanya berlaku untuk situs ini. Setiap pengaturan mengikuti pengaturan umum sampai Anda mengubahnya di sini.",
+  "site.overridden": "Diatur untuk situs ini",
+  "site.followGeneralFor": "Ikuti pengaturan umum: {setting}",
+  "site.resetAll": "Atur ulang semua ke umum",
+  "site.followsGeneral": "Mengikuti pengaturan umum",
+  "site.overrideCount": "Pengaturan khusus: {count}",
+  "settings.videoControlsTitle": "Kontrol video umum",
 };

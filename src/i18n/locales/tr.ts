@@ -466,20 +466,9 @@ export const tr: Messages = {
   "recipes.hubNote":
     "Bir hub aynı anda birkaç siteyi açar. Her sayfa kendi site'ıdır ve kendi çerezleri vardır.",
   "favorites.bottomMargin": "Alt kenar boşluğu",
-  "favorites.videoFull": "Tam videolarda da",
-  "favorites.videoFullNote":
-    "Kontrolleri bu sitenin izleme sayfalarında da kullanın. Kapalıyken sitenin kendi oynatıcısı kalır.",
-  "favorites.videoHeight": "Video kontrolleri yüksekliği",
-  "favorites.videoHeightShared":
-    "Paylaşılan yüksekliği kullanır. Bu siteye kendi yüksekliğini vermek için kaydırıcıyı hareket ettirin.",
-  "favorites.videoHeightOwn": "Bu sitenin kendi yüksekliği var.",
-  "favorites.videoHeightLabel": "{site} video kontrolleri yüksekliği",
-  "favorites.videoUseShared": "Paylaşılan video ayarlarını kullan",
   "favorites.darkModeLabel": "{site} koyu modu",
   "favorites.darkOn": "Her zaman açık",
   "favorites.darkOff": "Kapalı",
-  "favorites.darkMethod": "Bu site için yöntem",
-  "favorites.darkMethodDefault": "Ortak yöntem",
   "recipes.sharedMargin":
     "Paylaşılan boşluğu kullanır. Bu siteye kendi boşluğunu vermek için kaydırıcıyı hareket ettirin.",
   "recipes.ownMargin": "Bu sitenin kendi alt kenar boşluğu var.",
@@ -791,7 +780,6 @@ export const tr: Messages = {
   "settings.darkScheduleSystemNote": "Cihazın açık veya koyu ayarını izler.",
   "favorites.videoPanel": "Kontrol paneli",
   "favorites.videoPanelLabel": "{site} video kontrol paneli",
-  "favorites.darkMode": "Özel koyu mod",
   "favorites.darkFollow": "Genel olanı izle",
   "settings.darkModeNote": "Genel ayarlar, her sitenin varsayılanı",
   "settings.darkModeTitle": "Genel koyu mod",
@@ -800,11 +788,20 @@ export const tr: Messages = {
   "settings.darkSites": "Özel ayarlı siteler",
   "settings.darkSitesNote":
     "Bir sitenin özel ayarları yoksa bu ayarlar her siteye uygulanır. Bunları bir favoride belirleyin.",
-  "favorites.darkModeNote": "Bu site için genel koyu modun yerine geçer.",
   "fab.darkMode":
     "Koyu mod. Tüm siteler için açmak veya kapatmak üzere dokunun, genel ayarlar için basılı tutun.",
   "fab.darkModeSite":
     "Bu site için koyu mod. Açmak veya kapatmak için dokunun, ayarları için basılı tutun.",
   "favorites.darkEffectiveOn": "Bu site için koyu mod açık.",
   "favorites.darkEffectiveOff": "Bu site için koyu mod kapalı.",
+  "site.darkTitle": "Koyu mod: {name}",
+  "site.videoTitle": "Video kontrolleri: {name}",
+  "site.subtitle":
+    "Yalnızca bu siteye uygulanır. Siz burada değiştirene kadar her ayar genel olanı izler.",
+  "site.overridden": "Bu site için belirlendi",
+  "site.followGeneralFor": "Genel olanı izle: {setting}",
+  "site.resetAll": "Tümünü genele sıfırla",
+  "site.followsGeneral": "Genel olanı izliyor",
+  "site.overrideCount": "Özel ayarlar: {count}",
+  "settings.videoControlsTitle": "Genel video kontrolleri",
 };

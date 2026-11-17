@@ -822,6 +822,27 @@
     return best || {};
   }
 
+  var SITE_FIELDS = {
+    method: 'string', brightness: 'number', contrast: 'number', sepia: 'number', grayscale: 'number',
+    background: 'string', text: 'string', schedule: 'object', skipDarkPages: 'boolean',
+    systemControls: 'boolean', scrollbars: 'boolean', images: 'boolean', textStroke: 'number'
+  };
+
+  // The configuration for one page: the global one with every field of the site's entry laid over
+  // it (a schedule replaces the whole schedule). `enabled` and `mode` are not overlaid: mode is
+  // decided on its own.
+  function effectiveConfig(raw, site) {
+    var merged = Object.assign({}, raw || {});
+    var entry = site || {};
+    Object.keys(SITE_FIELDS).forEach(function (key) {
+      var value = entry[key];
+      if (value === undefined || value === null || typeof value !== SITE_FIELDS[key]) return;
+      if (key === 'method' && METHODS.indexOf(value) < 0) return;
+      merged[key] = value;
+    });
+    return normalise(merged);
+  }
+
   function minutesOf(text) {
     var match = /^(\d{1,2}):(\d{2})$/.exec(String(text));
     return match ? Number(match[1]) * 60 + Number(match[2]) : null;
@@ -859,7 +880,7 @@
       modifyBorder: modifyBorder, modifyFill: modifyFill,
       rewriteValue: rewriteValue, rewriteDeclaration: rewriteDeclaration,
       rewriteDeclarations: rewriteDeclarations, rulesToCss: rulesToCss,
-      scheduleActive: scheduleActive, resolveSite: resolveSite, mergeFixes: mergeFixes,
+      scheduleActive: scheduleActive, resolveSite: resolveSite, effectiveConfig: effectiveConfig, mergeFixes: mergeFixes,
       dynamicCss: dynamicCss, staticCss: staticCss, filterCss: filterCss, commonCss: commonCss,
       pageCss: pageCss, analysePixels: analysePixels
     };
@@ -873,9 +894,11 @@
   try {
     if (typeof document[KEY] === 'function') document[KEY]();
 
-    var cfg = normalise(config);
+    var global = normalise(config);
     var host = String((window.location && window.location.hostname) || '').toLowerCase();
-    var site = resolveSite(host, cfg.sites);
+    var site = resolveSite(host, global.sites);
+    // Every setting the site entry carries beats the global one; the rest follows global.
+    var cfg = effectiveConfig(config, site);
     var firstFixes = mergeFixes(document[FIXES]);
     var firstMode = site.mode || firstFixes.mode || null;
     // With everything off this only tears down what an earlier run left.
@@ -1636,7 +1659,7 @@
     function decide() {
       var fixes = mergeFixes(document[FIXES]);
       var mode = site.mode || fixes.mode;
-      var method = site.method || fixes.method || cfg.method;
+      var method = site.method || fixes.method || global.method;
       if (mode === 'off') return { on: false, reason: site.mode ? 'site-off' : 'recipe-off' };
       if (mode === 'on') return { on: true, method: method, forced: true, reason: site.mode ? 'site-on' : 'recipe-on' };
       if (!cfg.enabled) return { on: false, reason: 'disabled' };

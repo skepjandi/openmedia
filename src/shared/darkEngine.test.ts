@@ -40,6 +40,10 @@ interface Engine {
     prefersDark: boolean,
   ) => boolean;
   resolveSite: (host: string, sites: Record<string, unknown>) => Record<string, unknown>;
+  effectiveConfig: (
+    config: Record<string, unknown>,
+    site: Record<string, unknown>,
+  ) => Record<string, unknown>;
   mergeFixes: (list: unknown) => { mode: string | null; method: string | null; invert: string[] };
   dynamicCss: (theme: Theme) => string;
   staticCss: (theme: Theme) => string;
@@ -845,5 +849,132 @@ describe("run in a page", () => {
     expect(page.root.children).toHaveLength(0);
     expect(page.document[STATE]).toEqual({ active: false, reason: "schedule" });
     (page.document[KEY] as () => void)();
+  });
+});
+
+describe("a site's own settings over the global ones", () => {
+  const GLOBAL = {
+    enabled: true,
+    method: "dynamic",
+    brightness: 100,
+    contrast: 100,
+    sepia: 0,
+    grayscale: 0,
+    background: "#181a1b",
+    text: "#e8e6e3",
+    schedule: { kind: "system", from: "21:00", to: "07:00" },
+    skipDarkPages: true,
+    systemControls: true,
+    scrollbars: true,
+    images: true,
+    textStroke: 0,
+  };
+  const effective = (site: Record<string, unknown>) =>
+    E.effectiveConfig(GLOBAL, site) as Record<string, unknown>;
+
+  it("follows the global settings for every field the entry leaves out", () => {
+    expect(effective({})).toMatchObject(GLOBAL);
+    expect(effective({ mode: "on" })).toMatchObject(GLOBAL);
+  });
+
+  it.each([
+    ["method", "static"],
+    ["brightness", 120],
+    ["contrast", 70],
+    ["sepia", 30],
+    ["grayscale", 40],
+    ["background", "#000000"],
+    ["text", "#ffffff"],
+    ["skipDarkPages", false],
+    ["systemControls", false],
+    ["scrollbars", false],
+    ["images", false],
+    ["textStroke", 4],
+  ])("lets the site's %s beat the global one and nothing else", (key, value) => {
+    const result = effective({ [key]: value });
+    expect(result[key]).toBe(value);
+    for (const other of Object.keys(GLOBAL).filter((name) => name !== key)) {
+      expect(result[other], other).toEqual((GLOBAL as Record<string, unknown>)[other]);
+    }
+  });
+
+  it("replaces the schedule as a whole", () => {
+    const result = effective({ schedule: { kind: "time", from: "08:00", to: "09:00" } });
+    expect(result.schedule).toEqual({ kind: "time", from: "08:00", to: "09:00" });
+    expect(effective({ schedule: { kind: "always" } }).schedule).toEqual({
+      kind: "always",
+      from: "21:00",
+      to: "07:00",
+    });
+  });
+
+  it("ignores values of the wrong kind", () => {
+    expect(effective({ brightness: "bright", method: "sepia", images: 1 })).toMatchObject(GLOBAL);
+  });
+
+  it("themes a page with the site's colours and schedule", () => {
+    const plain = pageWithDocument({ background: "rgb(255, 255, 255)" });
+    plain.run({ ...GLOBAL, method: "static", schedule: { kind: "always" } });
+    expect(plain.root.children[0].textContent).toContain("#181a1b");
+
+    const own = pageWithDocument({ background: "rgb(255, 255, 255)" });
+    own.run({
+      ...GLOBAL,
+      method: "static",
+      schedule: { kind: "always" },
+      sites: { "example.com": { background: "#102030" } },
+    });
+    expect(own.root.children[0].textContent).toContain("#102030");
+    expect(own.root.children[0].textContent).not.toContain("#181a1b");
+  });
+
+  it("runs on the site's schedule, not the global one", () => {
+    const outside = pageWithDocument({ background: "rgb(255, 255, 255)" });
+    outside.run({ ...GLOBAL, method: "static" });
+    expect(outside.root.children).toHaveLength(0);
+    expect(outside.document[STATE]).toEqual({ active: false, reason: "schedule" });
+
+    const own = pageWithDocument({ background: "rgb(255, 255, 255)" });
+    own.run({
+      ...GLOBAL,
+      method: "static",
+      sites: { "example.com": { schedule: { kind: "always", from: "21:00", to: "07:00" } } },
+    });
+    expect(own.root.children).toHaveLength(1);
+    expect(own.document[STATE]).toEqual({ active: true, reason: "enabled" });
+
+    const global = pageWithDocument({ background: "rgb(255, 255, 255)" });
+    global.run({
+      ...GLOBAL,
+      method: "static",
+      schedule: { kind: "always" },
+      sites: { "example.com": { schedule: { kind: "system", from: "21:00", to: "07:00" } } },
+    });
+    expect(global.root.children).toHaveLength(0);
+  });
+
+  it("lets the site's skip-dark-pages choice decide whether a dark page is left alone", () => {
+    const skipped = pageWithDocument({ background: "rgb(18, 18, 18)" });
+    skipped.run({ ...GLOBAL, schedule: { kind: "always" } });
+    expect(skipped.document[STATE]).toEqual({ active: false, reason: "dark-page" });
+
+    const themed = pageWithDocument({ background: "rgb(18, 18, 18)" });
+    themed.run({
+      ...GLOBAL,
+      schedule: { kind: "always" },
+      sites: { "example.com": { skipDarkPages: false } },
+    });
+    expect(themed.document[STATE]).toEqual({ active: true, reason: "enabled" });
+  });
+
+  it("keeps recipe fixes below the site's method and above the global one", () => {
+    const page = pageWithDocument({ background: "rgb(255, 255, 255)" });
+    page.document[FIXES] = [{ method: "filter" }];
+    page.run({
+      ...GLOBAL,
+      schedule: { kind: "always" },
+      sites: { "example.com": { brightness: 120 } },
+    });
+    expect(page.root.children[0].textContent).toContain("html{filter:invert(1)");
   });
 });

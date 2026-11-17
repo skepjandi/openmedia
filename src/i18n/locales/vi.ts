@@ -458,20 +458,9 @@ export const vi: Messages = {
   "recipes.hubNote":
     "Một hub mở nhiều trang web cùng lúc. Mỗi trang là một trang web riêng, với cookie riêng.",
   "favorites.bottomMargin": "Lề dưới",
-  "favorites.videoFull": "Cả trên video đầy đủ",
-  "favorites.videoFullNote":
-    "Dùng điều khiển cả ở trang xem của trang này. Khi tắt, giữ trình phát riêng của trang.",
-  "favorites.videoHeight": "Độ cao điều khiển video",
-  "favorites.videoHeightShared":
-    "Dùng độ cao chung. Kéo thanh trượt để đặt độ cao riêng cho trang này.",
-  "favorites.videoHeightOwn": "Trang này có độ cao riêng.",
-  "favorites.videoHeightLabel": "Độ cao điều khiển video của {site}",
-  "favorites.videoUseShared": "Dùng cài đặt video chung",
   "favorites.darkModeLabel": "Chế độ tối của {site}",
   "favorites.darkOn": "Luôn bật",
   "favorites.darkOff": "Tắt",
-  "favorites.darkMethod": "Phương pháp cho trang này",
-  "favorites.darkMethodDefault": "Phương pháp dùng chung",
   "recipes.sharedMargin": "Dùng lề dưới chung. Kéo thanh trượt để đặt lề riêng cho trang này.",
   "recipes.ownMargin": "Trang này có lề dưới riêng.",
   "recipes.siteMarginLabel": "Lề dưới của {name}",
@@ -782,7 +771,6 @@ export const vi: Messages = {
   "settings.darkScheduleSystemNote": "Theo cài đặt sáng hoặc tối của thiết bị.",
   "favorites.videoPanel": "Bảng điều khiển",
   "favorites.videoPanelLabel": "Bảng điều khiển video của {site}",
-  "favorites.darkMode": "Chế độ tối riêng",
   "favorites.darkFollow": "Theo cài đặt chung",
   "settings.darkModeNote": "Cài đặt chung, mặc định cho mọi trang web",
   "settings.darkModeTitle": "Chế độ tối chung",
@@ -791,11 +779,20 @@ export const vi: Messages = {
   "settings.darkSites": "Trang web có cài đặt riêng",
   "settings.darkSitesNote":
     "Các cài đặt này áp dụng cho mọi trang web, trừ khi trang web có cài đặt riêng. Đặt chúng trong một mục yêu thích.",
-  "favorites.darkModeNote": "Ghi đè chế độ tối chung cho trang web này.",
   "fab.darkMode":
     "Chế độ tối. Chạm để bật hoặc tắt cho mọi trang web, nhấn giữ để mở cài đặt chung.",
   "fab.darkModeSite":
     "Chế độ tối cho trang web này. Chạm để bật hoặc tắt, nhấn giữ để mở cài đặt của nó.",
   "favorites.darkEffectiveOn": "Chế độ tối đang bật cho trang web này.",
   "favorites.darkEffectiveOff": "Chế độ tối đang tắt cho trang web này.",
+  "site.darkTitle": "Chế độ tối: {name}",
+  "site.videoTitle": "Điều khiển video: {name}",
+  "site.subtitle":
+    "Chỉ áp dụng cho trang web này. Mỗi cài đặt theo cài đặt chung cho đến khi bạn đổi tại đây.",
+  "site.overridden": "Đặt riêng cho trang web này",
+  "site.followGeneralFor": "Theo cài đặt chung: {setting}",
+  "site.resetAll": "Đặt lại tất cả về chung",
+  "site.followsGeneral": "Theo cài đặt chung",
+  "site.overrideCount": "Cài đặt riêng: {count}",
+  "settings.videoControlsTitle": "Điều khiển video chung",
 };
