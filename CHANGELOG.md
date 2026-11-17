@@ -6,6 +6,14 @@ All notable changes to OpenMedia are documented here.
 >
 > **Wiki**: the [GitHub Wiki](https://github.com/skepjandi/openmedia/wiki) is the public-facing main wiki — architecture, recipe format, AI pipeline, security model, roadmap. Source-controlled editing surface is `docs/wiki/` in this repo; CI (`.github/workflows/sync-wiki.yml`) mirrors it to the GitHub Wiki on every merge to `main`. New single-PR changes belong here, not as new wiki pages.
 
+### fix(video): seek knob, small player and speed fixes from a review of the video controls
+
+**Area:** `fix(video)`
+
+**Change:** `video_controls.js`: the seek knob follows the finger while the bar is dragged (it only moved on release) and a lost pointer capture ends the drag; closing the small player no longer restarts a video the reader paused in it, and pauses instead of playing on when the site removed the video's place; the small player no longer swallows the native background pause (`__openmediaHold`), so a minimized app is not left playing; the seek bar stops 0.25 s short of the end, which would fire `ended` and move a feed on; the speed button moves to the next speed up when the video runs at one the list lacks (1.1× no longer goes to 0.5×); a frame can lift itself into the small player only when it is the page's player frame.
+
+**Verified:** Vitest (6 new cases in `videoControls.test.ts`), iOS Simulator (drag moved the knob to the finger, mini player up and expanded on an Instagram reel). **Not verified:** the hold-with-mini case and the frame gating on a device; the remaining review findings (orientation change, accessibility labels and touch targets, live streams, `remember` gating the speed) are not changed.
+
 ### fix(shell): the keyboard stays up after an address is submitted; iOS no longer reports media loads as errors
 
 **Area:** `fix(shell)`, `fix(siteview)`

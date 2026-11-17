@@ -588,9 +588,16 @@
       line.appendChild(knob);
       track.appendChild(line);
       var drag = false;
+      function show(ratio) {
+        fill.style.width = ratio * 100 + '%';
+        knob.style.left = ratio * 100 + '%';
+      }
       function at(event) {
         var box = line.getBoundingClientRect();
-        onRatio(Math.min(1, Math.max(0, (event.clientX - box.left) / (box.width || 1))));
+        var ratio = Math.min(1, Math.max(0, (event.clientX - box.left) / (box.width || 1)));
+        // The knob follows the finger; `paint` leaves it alone while a drag is on.
+        show(ratio);
+        onRatio(ratio);
       }
       track.addEventListener('pointerdown', function (event) {
         stop(event);
@@ -614,13 +621,11 @@
       };
       track.addEventListener('pointerup', release);
       track.addEventListener('pointercancel', release);
+      track.addEventListener('lostpointercapture', release);
       return {
         track: track,
         line: line,
-        set: function (ratio) {
-          fill.style.width = ratio * 100 + '%';
-          knob.style.left = ratio * 100 + '%';
-        }
+        set: show
       };
     }
 
@@ -823,6 +828,8 @@
           if (keep) settleMini(function () { miniDrag(1); }, askAppToFloat);
           else settleMini(function () { miniDrag(0); }, miniOff);
         } else if (data.om === 'float') {
+          // Only the frame that is the page's player may lift itself into the small player.
+          if (frame !== playerFrame()) return;
           miniOnFrame(frame);
           askAppToFloat();
         } else if (data.om === 'unfloat') {
@@ -892,7 +899,7 @@
       state.undone = [];
       var nativePause = video.pause;
       video.pause = function () {
-        if (state.allowPause) return nativePause.apply(video, arguments);
+        if (state.allowPause || window.__openmediaHold) return nativePause.apply(video, arguments);
       };
       state.stops.push(function () { delete video.pause; });
       var toggle = miniButton(video.paused ? 'play' : 'pause', 34, 'left:6px;bottom:6px', function () {
@@ -915,10 +922,10 @@
       listen('pause', function () {
         var now = Date.now();
         state.undone = state.undone.filter(function (at) { return now - at < MINI_UNDO_WINDOW_MS; });
-        if (!state.wantsPlay || video.ended || state.undone.length >= MINI_UNDO_MAX) return;
+        if (window.__openmediaHold || !state.wantsPlay || video.ended || state.undone.length >= MINI_UNDO_MAX) return;
         state.undone.push(now);
         setTimeout(function () {
-          if (mini === state && state.wantsPlay && video.paused && !video.ended) {
+          if (mini === state && state.wantsPlay && !window.__openmediaHold && video.paused && !video.ended) {
             try { video.play().catch(function () {}); } catch (_) {}
           }
         }, 50);
@@ -1181,7 +1188,8 @@
         return;
       }
       var video = state.video;
-      var home = state.marker.parentNode;
+      // A marker whose container the site has removed is not a way home.
+      var home = state.marker.isConnected ? state.marker.parentNode : null;
       if (state.style === null) video.removeAttribute('style'); else video.setAttribute('style', state.style);
       if (home) {
         home.insertBefore(video, state.marker);
@@ -1191,7 +1199,7 @@
       }
       if (state.root.parentNode) state.root.parentNode.removeChild(state.root);
       if (miniWindowed) document.documentElement.style.visibility = 'hidden';
-      if (home && state.playing && video.paused && !video.ended) {
+      if (home && state.wantsPlay && video.paused && !video.ended) {
         try { video.play().catch(function () {}); } catch (_) {}
       }
     }
@@ -1272,7 +1280,7 @@
         stop(event);
         var target = focus();
         var rate = target ? target.playbackRate : 1;
-        var next = RATES[(RATES.indexOf(rate) + 1) % RATES.length];
+        var next = RATES.filter(function (candidate) { return candidate > rate + 0.001; })[0] || RATES[0];
         write({ rate: next });
         if (target) {
           target.defaultPlaybackRate = next;
@@ -1298,7 +1306,8 @@
       var seek = slider(30, function (ratio) {
         var target = focus();
         if (!target || !isFinite(target.duration) || !target.duration) return;
-        target.currentTime = ratio * target.duration;
+        // Not quite the end: the end would fire `ended`, which moves a feed on.
+        target.currentTime = Math.min(ratio * target.duration, Math.max(0, target.duration - 0.25));
         paint(target);
       });
       // The small player's button in the top left corner, full screen in the top right.
@@ -1355,6 +1364,7 @@
 
     function hide() {
       shown = false;
+      dragging = false;
       closeMenu();
       clearTimeout(hideTimer);
       if (ui) {

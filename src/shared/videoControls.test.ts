@@ -134,6 +134,12 @@ class FakeElement {
   style = { cssText: "" } as Record<string, string>;
   children: FakeElement[] = [];
   parentNode: FakeElement | null = null;
+  /** True when the page's script was told the element left the document, as a site's removal does. */
+  detached = false;
+
+  get isConnected(): boolean {
+    return !this.detached && (this.parentNode?.isConnected ?? true);
+  }
   private text = "";
   /** The icon the page last put on this element, as its script records it. */
   __icon?: string;
@@ -205,7 +211,6 @@ class FakeElement {
 
 /** A frame of the page: another site's player, which the page cannot reach into. */
 class FakeFrame extends FakeElement {
-  isConnected = true;
   sent: unknown[] = [];
   contentWindow = { postMessage: (message: unknown) => this.sent.push(message) };
   styles = new Map<string, string>();
@@ -1654,6 +1659,34 @@ describe("video controls", () => {
     expect(video.paused).toBe(false);
   });
 
+  it("does not start a video again on close when the reader paused it in the small player", () => {
+    const home = new FakeElement();
+    const video = new PlacedVideo();
+    home.appendChild(video as unknown as FakeElement);
+    const page = load({ videos: [video], current: video });
+    openPanel(page);
+    buttonWith(page, "pip").fire("pointerup");
+    const box = page.body.children.find((child) => "data-openmedia-mini" in child.attributes);
+    box?.children.find((child) => child.__icon === "pause")?.fire("pointerup");
+    expect(video.paused).toBe(true);
+    box?.children.find((child) => child.__icon === "close")?.fire("pointerup");
+    expect(video.parentNode).toBe(home);
+    expect(video.paused).toBe(true);
+  });
+
+  it("pauses, not plays on, when the closed small player's place was removed by the site", () => {
+    const home = new FakeElement();
+    const video = new PlacedVideo();
+    home.appendChild(video as unknown as FakeElement);
+    const page = load({ videos: [video], current: video });
+    openPanel(page);
+    buttonWith(page, "pip").fire("pointerup");
+    const box = page.body.children.find((child) => "data-openmedia-mini" in child.attributes);
+    home.detached = true;
+    box?.children.find((child) => child.__icon === "close")?.fire("pointerup");
+    expect(video.paused).toBe(true);
+  });
+
   it("is dragged by a finger on the box, inside the screen", () => {
     const home = new FakeElement();
     const video = new PlacedVideo();
@@ -1941,6 +1974,37 @@ describe("video controls", () => {
     track?.fire("pointerup");
     page.tick();
     expect(page.body.descendants().some((element) => element.textContent === "-0:05")).toBe(true);
+  });
+
+  it("moves the knob with the finger while the bar is dragged", () => {
+    const video = new FakeVideo();
+    const page = load({ videos: [video], current: video });
+    openPanel(page);
+    const track = sliders(page).at(-1);
+    const knob = track?.children[0]?.children[1];
+    track?.fire("pointerdown", { clientX: 100 });
+    expect(knob?.style.left).toBe("25%");
+    track?.fire("pointermove", { clientX: 300 });
+    expect(knob?.style.left).toBe("75%");
+    track?.fire("pointerup");
+  });
+
+  it("stops just short of the end, which would count as the video ending", () => {
+    const video = new FakeVideo();
+    const page = load({ videos: [video], current: video });
+    openPanel(page);
+    sliders(page).at(-1)?.fire("pointerdown", { clientX: 400 });
+    expect(video.currentTime).toBe(19.75);
+  });
+
+  it("goes to the next speed up when the video runs at one the list does not have", () => {
+    const video = new FakeVideo();
+    video.playbackRate = 1.1;
+    const page = load({ videos: [video], current: video });
+    openPanel(page);
+    const [pill] = page.body.descendants().filter((element) => element.textContent.endsWith("×"));
+    pill.fire("pointerup");
+    expect(video.playbackRate).toBe(1.25);
   });
 
   it("sits above the bottom edge and the home indicator by the height chosen for the site", () => {
