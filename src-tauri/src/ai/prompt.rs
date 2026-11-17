@@ -261,7 +261,8 @@ fn describe_options(out: &mut String, recipe: &Recipe, states: &BTreeMap<String,
                 Rule::Hide { label, .. }
                 | Rule::Css { label, .. }
                 | Rule::Script { label, .. }
-                | Rule::VideoMenu { label, .. } => clean(label, 60),
+                | Rule::VideoMenu { label, .. }
+                | Rule::Prune { label, .. } => clean(label, 60),
             })
             .collect();
         let (shown, tail) = match state {

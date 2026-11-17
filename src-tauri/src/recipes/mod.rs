@@ -1,6 +1,7 @@
 pub mod bundled;
 mod compile;
 mod matcher;
+mod prune;
 mod schema;
 pub mod script_policy;
 mod selector;
@@ -549,6 +550,63 @@ mod tests {
         assert!(with.contains("openmedia.videoMenus"));
         assert!(with.contains("li.level"));
         assert!(!with.contains("const menuRuntime = null;"));
+    }
+
+    fn prune_recipe(origin: &str, rules: &str) -> String {
+        TOGGLED
+            .replace("\"origin\":\"user\"", &format!("\"origin\":\"{origin}\""))
+            .replace("\"rules\":[", &format!("\"rules\":[{rules},"))
+    }
+
+    const PRUNE_RULE: &str = r#"{"id":"p","label":"Drop reels","type":"prune","option":"feed","urls":["/api/feed"],"remove":[{"path":"data.items[*]","when":{"key":"media_type","equals":2}}]}"#;
+
+    #[test]
+    fn prune_rules_follow_their_option_and_carry_their_runtime_only_when_one_applies() {
+        let recipe = Recipe::parse(&prune_recipe("user", PRUNE_RULE)).unwrap();
+        let off = page_script(std::slice::from_ref(&recipe), &OptionChoices::new()).unwrap();
+        assert!(off.contains("const pruneRuntime = null;"));
+        assert!(!off.contains("^/api/feed$"));
+        let on = OptionChoices::from([(
+            "t.default".to_owned(),
+            [("feed".to_owned(), OptionValue::Toggle(true))].into(),
+        )]);
+        let with = page_script(&[recipe], &on).unwrap();
+        assert!(with.contains("openmedia.prune"));
+        assert!(with.contains("^/api/feed$"));
+        assert!(!with.contains("const pruneRuntime = null;"));
+    }
+
+    #[test]
+    fn a_prune_rule_changes_only_what_the_page_reads_so_every_origin_may_have_one() {
+        for origin in ["user", "ai", "imported"] {
+            assert!(
+                Recipe::parse(&prune_recipe(origin, PRUNE_RULE)).is_ok(),
+                "{origin}"
+            );
+        }
+    }
+
+    #[test]
+    fn prune_rules_are_limited_and_closed() {
+        let numbered = |n: usize| {
+            PRUNE_RULE
+                .replacen("\"id\":\"p\"", &format!("\"id\":\"p{n}\""), 1)
+                .to_owned()
+        };
+        let nine: Vec<String> = (0..9).map(numbered).collect();
+        assert!(Recipe::parse(&prune_recipe("user", &nine.join(","))).is_err());
+        let eight: Vec<String> = (0..8).map(numbered).collect();
+        assert!(Recipe::parse(&prune_recipe("user", &eight.join(","))).is_ok());
+        for bad in [
+            PRUNE_RULE.replace("/api/feed", "https://other.example/api/feed"),
+            PRUNE_RULE.replace("data.items[*]", "data..items"),
+            PRUNE_RULE.replace("\"equals\":2", "\"equals\":{\"a\":1}"),
+            PRUNE_RULE.replace("\"when\":", "\"if\":"),
+            PRUNE_RULE.replace("\"urls\":[\"/api/feed\"]", "\"urls\":[]"),
+            PRUNE_RULE.replace("\"type\":\"prune\"", "\"type\":\"prune\",\"url\":\"/x\""),
+        ] {
+            assert!(Recipe::parse(&prune_recipe("user", &bad)).is_err(), "{bad}");
+        }
     }
 
     #[test]

@@ -9,6 +9,7 @@ use serde::Serialize;
 use url::Url;
 
 use super::matcher::Matcher;
+use super::prune;
 use super::schema::{Origin, Recipe, Rule};
 use crate::error::{Error, Result};
 
@@ -183,7 +184,8 @@ fn check_shared(recipe: &Recipe) -> Result<()> {
         Rule::Hide { label, .. }
         | Rule::Css { label, .. }
         | Rule::Script { label, .. }
-        | Rule::VideoMenu { label, .. } => label,
+        | Rule::VideoMenu { label, .. }
+        | Rule::Prune { label, .. } => label,
     });
     let tab_labels = recipe
         .hub
@@ -320,6 +322,18 @@ fn rule_preview(rule: &Rule) -> RulePreview {
             kind: "hide",
             selector: target.css.clone(),
             declarations: BTreeMap::new(),
+            code: None,
+        },
+        Rule::Prune {
+            label,
+            urls,
+            remove,
+            ..
+        } => RulePreview {
+            label: label.clone(),
+            kind: "prune",
+            selector: urls.join(", "),
+            declarations: BTreeMap::from([("remove".to_owned(), prune::describe(remove))]),
             code: None,
         },
         Rule::Script { label, code, .. } => RulePreview {
