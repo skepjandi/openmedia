@@ -154,6 +154,58 @@ export const fr: Messages = {
   "usage.partStatusReached": "Limite atteinte. Le temps passé ici n'est plus compté.",
   "usage.saveHint":
     "Les modifications sont enregistrées au relâchement. Le temps compte tant que le site est à l’écran et se réinitialise à minuit.",
+  "usage.adjustSchedule": "Ajuster le planning",
+  "usage.scheduleTitle": "Planning d’indisponibilité",
+  "usage.scheduleHint":
+    "Fermez ce site à des heures précises les jours de votre choix. Une plage peut dépasser minuit.",
+  "usage.scheduleAdd": "Ajouter une plage",
+  "usage.scheduleRemove": "Retirer",
+  "usage.scheduleDays": "Jours pour {host}",
+  "usage.scheduleStart": "Ferme à",
+  "usage.scheduleEnd": "Ouvre à",
+  "usage.scheduleNoDays": "Choisissez au moins un jour.",
+  "usage.scheduleSameTime": "Les heures de fermeture et d’ouverture doivent différer.",
+  "usage.scheduleClosed": "Fermé pour le moment",
+  "usage.scheduleNotice":
+    "{name} est fermé selon votre planning. Il ouvre à {time}. Les autres sites restent disponibles.",
+  "usage.scheduleNoticeAlways":
+    "{name} est fermé selon votre planning. Les autres sites restent disponibles.",
+  "usage.pauseScreenTitle": "Écran de pause",
+  "usage.pauseScreenHint":
+    "Patientez quelques secondes devant un cercle de respiration avant l’ouverture de ce site, ou quand vous y revenez.",
+  "usage.pauseAll": "Écrans de pause",
+  "usage.pauseAllHint":
+    "Désactivez ou activez tous les écrans de pause. Chaque site garde son propre délai.",
+  "usage.pauseAllEmptyHint":
+    "Aucun site n’a encore d’écran de pause. Ouvrez un site ci-dessous pour en ajouter un.",
+  "pause.label": "Pause avant d’ouvrir {name}",
+  "pause.title": "Prenez un instant",
+  "pause.breathe": "Inspirez, expirez. {name} attend.",
+  "pause.ready": "Quand vous voulez.",
+  "pause.continue": "Continuer",
+  "pause.continueIn": "Continuer dans {value}",
+  "pause.close": "Fermer le site",
+  "usage.lock.title": "Verrou des réglages",
+  "usage.lock.intro":
+    "Une promesse faite à vous-même. Tant qu’il est actif, les limites, plannings, écrans de pause et options protégées peuvent être durcis mais pas assouplis. Le déverrouillage prend 24 heures. Réinstaller l’app supprime le verrou : ce n’est donc pas une fonction de sécurité.",
+  "usage.lock.off": "Le verrou est désactivé.",
+  "usage.lock.locked":
+    "Verrouillé. Vous pouvez ajouter ou durcir des restrictions ; les assouplir est bloqué.",
+  "usage.lock.cooling": "Déverrouillage dans {value}. Rien ne peut être assoupli d’ici là.",
+  "usage.lock.ready":
+    "L’attente est terminée. Vous pouvez assouplir un réglage, et le verrou se lève dès que vous le faites.",
+  "usage.lock.enable": "Activer le verrou",
+  "usage.lock.requestUnlock": "Demander le déverrouillage",
+  "usage.lock.cancel": "Annuler le déverrouillage",
+  "usage.lock.keep": "Garder le verrou",
+  "usage.lock.lift": "Lever le verrou maintenant",
+  "usage.lock.refused":
+    "Le verrou des réglages est actif. Vous pouvez durcir ce réglage, pas l’assouplir. Demandez d’abord le déverrouillage.",
+  "usage.lock.reasonRequest":
+    "Confirmez que c’est vous pour lancer l’attente de 24 heures avant d’assouplir vos restrictions",
+  "usage.lock.reasonCancel": "Confirmez que c’est vous pour annuler la demande de déverrouillage",
+  "usage.lock.protectTitle": "Protéger avec le verrou des réglages",
+  "usage.lock.protectHint": "Tant que le verrou est actif, cette option garde sa valeur actuelle.",
 
   "onboarding.label": "Comment fonctionne OpenMedia",
   "onboarding.skip": "Passer",

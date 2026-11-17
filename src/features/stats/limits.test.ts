@@ -15,6 +15,7 @@ import {
   warnStops,
   withPreset,
 } from "./limits";
+import { NO_LIMITS } from "./policy";
 
 describe("slider stops", () => {
   it("keeps a saved value that is not a stop so its thumb can sit on it", () => {
@@ -166,6 +167,7 @@ describe("parts of a site", () => {
 
   it("lists every limited site and part, closest to its limit first", () => {
     const limits = {
+      ...NO_LIMITS,
       sites: { "a.test": { warnSeconds: null, limitSeconds: 600 } },
       sections: {
         "b.test": { "/watch": { warnSeconds: null, limitSeconds: 60 } },
@@ -185,7 +187,7 @@ describe("parts of a site", () => {
 
   it("leaves out the limits that are off", () => {
     const things = limitedThings(
-      { sites: { "a.test": { warnSeconds: 60, limitSeconds: null } }, sections: {} },
+      { ...NO_LIMITS, sites: { "a.test": { warnSeconds: 60, limitSeconds: null } } },
       { "a.test": 10 },
       {},
     );

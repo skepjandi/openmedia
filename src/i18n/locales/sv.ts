@@ -149,6 +149,58 @@ export const sv: Messages = {
   "usage.partStatusReached": "Gränsen nådd. Tiden här räknas inte längre.",
   "usage.saveHint":
     "Ändringar sparas när du släpper. Tiden räknas medan webbplatsen visas på skärmen och nollställs vid midnatt.",
+  "usage.adjustSchedule": "Justera schema",
+  "usage.scheduleTitle": "Schema för stängning",
+  "usage.scheduleHint":
+    "Stäng den här webbplatsen vid bestämda tider de dagar du väljer. Ett tidsfönster kan sträcka sig förbi midnatt.",
+  "usage.scheduleAdd": "Lägg till tidsfönster",
+  "usage.scheduleRemove": "Ta bort",
+  "usage.scheduleDays": "Dagar för {host}",
+  "usage.scheduleStart": "Stänger kl.",
+  "usage.scheduleEnd": "Öppnar kl.",
+  "usage.scheduleNoDays": "Välj minst en dag.",
+  "usage.scheduleSameTime": "Stängnings- och öppningstiden måste skilja sig åt.",
+  "usage.scheduleClosed": "Stängd just nu",
+  "usage.scheduleNotice":
+    "{name} är stängd enligt ditt schema. Den öppnar kl. {time}. Andra webbplatser är fortfarande tillgängliga.",
+  "usage.scheduleNoticeAlways":
+    "{name} är stängd enligt ditt schema. Andra webbplatser är fortfarande tillgängliga.",
+  "usage.pauseScreenTitle": "Pausskärm",
+  "usage.pauseScreenHint":
+    "Vänta några sekunder med en andande cirkel innan den här webbplatsen öppnas, eller när du kommer tillbaka till den.",
+  "usage.pauseAll": "Pausskärmar",
+  "usage.pauseAllHint":
+    "Stäng av eller slå på alla pausskärmar. Varje webbplats behåller sin egen fördröjning.",
+  "usage.pauseAllEmptyHint":
+    "Ingen webbplats har någon pausskärm än. Öppna en webbplats nedan för att lägga till en.",
+  "pause.label": "Paus innan {name} öppnas",
+  "pause.title": "Ta en stund",
+  "pause.breathe": "Andas in, andas ut. {name} väntar.",
+  "pause.ready": "Redo när du är det.",
+  "pause.continue": "Fortsätt",
+  "pause.continueIn": "Fortsätt om {value}",
+  "pause.close": "Stäng webbplatsen",
+  "usage.lock.title": "Inställningslås",
+  "usage.lock.intro":
+    "Ett löfte till dig själv. Medan det är på kan gränser, scheman, pausskärmar och skyddade alternativ bara göras strängare, inte lösare. Att låsa upp tar 24 timmar. Om du installerar om appen tas låset bort, så det är ingen säkerhetsfunktion.",
+  "usage.lock.off": "Låset är av.",
+  "usage.lock.locked":
+    "Låst. Du kan lägga till eller skärpa begränsningar; att lätta på dem är blockerat.",
+  "usage.lock.cooling": "Låses upp om {value}. Inget kan lösas upp före dess.",
+  "usage.lock.ready":
+    "Väntan är över. Du kan lätta på en inställning, och låset hävs när du gör det.",
+  "usage.lock.enable": "Slå på låset",
+  "usage.lock.requestUnlock": "Be om upplåsning",
+  "usage.lock.cancel": "Avbryt upplåsning",
+  "usage.lock.keep": "Behåll låset",
+  "usage.lock.lift": "Häv låset nu",
+  "usage.lock.refused":
+    "Inställningslåset är på. Du kan göra detta strängare, inte lösare. Be om upplåsning först.",
+  "usage.lock.reasonRequest":
+    "Bekräfta att det är du för att starta väntan på 24 timmar innan dina begränsningar kan lättas",
+  "usage.lock.reasonCancel": "Bekräfta att det är du för att avbryta upplåsningsbegäran",
+  "usage.lock.protectTitle": "Skydda med inställningslåset",
+  "usage.lock.protectHint": "Medan låset är på behåller det här alternativet sitt nuvarande värde.",
 
   "onboarding.label": "Så fungerar OpenMedia",
   "onboarding.skip": "Hoppa över",

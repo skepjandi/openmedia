@@ -149,6 +149,56 @@ export const ja: Messages = {
   "usage.partStatusReached": "制限に達しました。ここでの時間は集計されません。",
   "usage.saveHint":
     "指を離すと変更が保存されます。時間はサイトが画面に表示されている間だけカウントされ、午前0時にリセットされます。",
+  "usage.adjustSchedule": "スケジュールを調整",
+  "usage.scheduleTitle": "休止スケジュール",
+  "usage.scheduleHint":
+    "選んだ曜日の決めた時間帯に、このサイトを閉じます。時間帯は午前0時をまたげます。",
+  "usage.scheduleAdd": "時間帯を追加",
+  "usage.scheduleRemove": "削除",
+  "usage.scheduleDays": "{host} の曜日",
+  "usage.scheduleStart": "閉じる時刻",
+  "usage.scheduleEnd": "開く時刻",
+  "usage.scheduleNoDays": "曜日を1つ以上選んでください。",
+  "usage.scheduleSameTime": "閉じる時刻と開く時刻は別にしてください。",
+  "usage.scheduleClosed": "現在は閉じています",
+  "usage.scheduleNotice":
+    "{name} はスケジュールにより閉じています。{time} に開きます。他のサイトは引き続き利用できます。",
+  "usage.scheduleNoticeAlways":
+    "{name} はスケジュールにより閉じています。他のサイトは引き続き利用できます。",
+  "usage.pauseScreenTitle": "ひと息画面",
+  "usage.pauseScreenHint":
+    "サイトを開く前、または戻ってきたときに、呼吸する円とともに数秒待ちます。",
+  "usage.pauseAll": "ひと息画面",
+  "usage.pauseAllHint":
+    "すべてのひと息画面をオフ／オンにします。待ち時間はサイトごとに保持されます。",
+  "usage.pauseAllEmptyHint":
+    "ひと息画面があるサイトはまだありません。下のサイトを開いて追加してください。",
+  "pause.label": "{name} を開く前のひと息",
+  "pause.title": "ちょっと一息",
+  "pause.breathe": "息を吸って、吐いて。{name} が待っています。",
+  "pause.ready": "準備ができたらどうぞ。",
+  "pause.continue": "続ける",
+  "pause.continueIn": "{value} 後に続ける",
+  "pause.close": "サイトを閉じる",
+  "usage.lock.title": "設定ロック",
+  "usage.lock.intro":
+    "自分との約束です。オンの間、上限、スケジュール、ひと息画面、保護対象の設定は厳しくする方向にだけ変更できます。解除には24時間かかります。アプリを再インストールするとロックは外れるため、セキュリティ機能ではありません。",
+  "usage.lock.off": "ロックはオフです。",
+  "usage.lock.locked": "ロック中。制限の追加や強化はできますが、緩めることはできません。",
+  "usage.lock.cooling": "{value} 後に解除されます。それまでは何も緩められません。",
+  "usage.lock.ready":
+    "待機が終わりました。設定を1つ緩めることができ、緩めるとロックが解除されます。",
+  "usage.lock.enable": "ロックをオンにする",
+  "usage.lock.requestUnlock": "解除をリクエスト",
+  "usage.lock.cancel": "解除をキャンセル",
+  "usage.lock.keep": "ロックを維持",
+  "usage.lock.lift": "今すぐロックを解除",
+  "usage.lock.refused":
+    "設定ロックがオンです。厳しくする変更はできますが、緩めることはできません。先に解除をリクエストしてください。",
+  "usage.lock.reasonRequest": "本人確認をして、制限を緩める前の24時間の待機を開始します",
+  "usage.lock.reasonCancel": "本人確認をして、解除リクエストをキャンセルします",
+  "usage.lock.protectTitle": "設定ロックで保護",
+  "usage.lock.protectHint": "ロックがオンの間、このオプションは現在の値のままになります。",
 
   "onboarding.label": "OpenMedia の仕組み",
   "onboarding.skip": "スキップ",

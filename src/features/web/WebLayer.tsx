@@ -12,6 +12,7 @@ import { useEntitlementStore } from "../paywall/store";
 import { advanceTrail } from "./sessions";
 import { leftSearchForSite } from "../history/searchVisit";
 import { HubBar } from "../hubs/HubBar";
+import { PauseCover } from "../stats/PauseCover";
 import { LimitCover } from "../stats/UsageGuard";
 
 /** How often idle and surplus hidden sessions are swept. */
@@ -156,6 +157,7 @@ export function WebLayer() {
             </div>
           )}
           <LimitCover />
+          <PauseCover />
         </div>
       </div>
       <div

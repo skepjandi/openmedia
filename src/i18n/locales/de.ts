@@ -145,6 +145,59 @@ export const de: Messages = {
   "usage.partStatusReached": "Limit erreicht. Die Zeit hier wird nicht mehr gezählt.",
   "usage.saveHint":
     "Änderungen werden beim Loslassen gespeichert. Die Zeit läuft, solange die Website auf dem Bildschirm ist, und wird um Mitternacht zurückgesetzt.",
+  "usage.adjustSchedule": "Zeitplan anpassen",
+  "usage.scheduleTitle": "Sperrzeiten",
+  "usage.scheduleHint":
+    "Sperre diese Website zu festgelegten Zeiten an den gewählten Tagen. Ein Zeitfenster kann über Mitternacht hinausgehen.",
+  "usage.scheduleAdd": "Zeitfenster hinzufügen",
+  "usage.scheduleRemove": "Entfernen",
+  "usage.scheduleDays": "Tage für {host}",
+  "usage.scheduleStart": "Schließt um",
+  "usage.scheduleEnd": "Öffnet um",
+  "usage.scheduleNoDays": "Wähle mindestens einen Tag.",
+  "usage.scheduleSameTime": "Schließ- und Öffnungszeit müssen sich unterscheiden.",
+  "usage.scheduleClosed": "Gerade gesperrt",
+  "usage.scheduleNotice":
+    "{name} ist laut deinem Zeitplan gesperrt. Es öffnet um {time}. Andere Websites sind weiterhin verfügbar.",
+  "usage.scheduleNoticeAlways":
+    "{name} ist laut deinem Zeitplan gesperrt. Andere Websites sind weiterhin verfügbar.",
+  "usage.pauseScreenTitle": "Pausenbildschirm",
+  "usage.pauseScreenHint":
+    "Warte ein paar Sekunden bei einem Atemkreis, bevor sich diese Website öffnet oder wenn du zu ihr zurückkehrst.",
+  "usage.pauseAll": "Pausenbildschirme",
+  "usage.pauseAllHint":
+    "Schalte alle Pausenbildschirme aus oder ein. Jede Website behält ihre eigene Verzögerung.",
+  "usage.pauseAllEmptyHint":
+    "Noch keine Website hat einen Pausenbildschirm. Öffne unten eine Website, um einen hinzuzufügen.",
+  "pause.label": "Pause vor dem Öffnen von {name}",
+  "pause.title": "Nimm dir einen Moment",
+  "pause.breathe": "Einatmen, ausatmen. {name} wartet.",
+  "pause.ready": "Bereit, wenn du es bist.",
+  "pause.continue": "Weiter",
+  "pause.continueIn": "Weiter in {value}",
+  "pause.close": "Website schließen",
+  "usage.lock.title": "Einstellungssperre",
+  "usage.lock.intro":
+    "Ein Versprechen an dich selbst. Solange sie aktiv ist, lassen sich Limits, Zeitpläne, Pausenbildschirme und geschützte Optionen nur verschärfen, nicht lockern. Das Entsperren dauert 24 Stunden. Eine Neuinstallation der App entfernt die Sperre, sie ist also keine Sicherheitsfunktion.",
+  "usage.lock.off": "Die Sperre ist aus.",
+  "usage.lock.locked":
+    "Gesperrt. Du kannst Einschränkungen hinzufügen oder verschärfen; Lockern ist blockiert.",
+  "usage.lock.cooling": "Entsperrt in {value}. Bis dahin kann nichts gelockert werden.",
+  "usage.lock.ready":
+    "Die Wartezeit ist vorbei. Du kannst eine Einstellung lockern, und die Sperre hebt sich dabei auf.",
+  "usage.lock.enable": "Sperre einschalten",
+  "usage.lock.requestUnlock": "Entsperren anfragen",
+  "usage.lock.cancel": "Entsperren abbrechen",
+  "usage.lock.keep": "Sperre behalten",
+  "usage.lock.lift": "Sperre jetzt aufheben",
+  "usage.lock.refused":
+    "Die Einstellungssperre ist aktiv. Du kannst das verschärfen, nicht lockern. Frage zuerst das Entsperren an.",
+  "usage.lock.reasonRequest":
+    "Bestätige, dass du es bist, um die 24-Stunden-Wartezeit zu starten, bevor deine Einschränkungen gelockert werden können",
+  "usage.lock.reasonCancel": "Bestätige, dass du es bist, um die Entsperranfrage abzubrechen",
+  "usage.lock.protectTitle": "Mit der Einstellungssperre schützen",
+  "usage.lock.protectHint":
+    "Solange die Sperre aktiv ist, behält diese Option ihren aktuellen Wert.",
 
   "onboarding.label": "So funktioniert OpenMedia",
   "onboarding.skip": "Überspringen",

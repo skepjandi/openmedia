@@ -14,6 +14,7 @@ import { GuideLink } from "../guides/GuideLink";
 import { ChoiceRow } from "./ChoiceRow";
 import { Switch } from "./Switch";
 import { ImportedNotice } from "../library/Links";
+import { ProtectOptions } from "./ProtectOptions";
 import { Group, GroupLabel, quietButton } from "./ui";
 
 const GROUPS: { group: OptionGroup; title: MessageKey }[] = [
@@ -180,6 +181,7 @@ function SiteOptions({ site }: { site: SiteSettings }) {
         site={site}
         onChange={(optionId, value) => void setSiteOption(site.recipeId, optionId, value)}
       />
+      <ProtectOptions site={site} />
     </div>
   );
 }

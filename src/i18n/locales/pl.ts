@@ -152,6 +152,58 @@ export const pl: Messages = {
   "usage.partStatusReached": "Limit osiągnięty. Czas tutaj nie jest już liczony.",
   "usage.saveHint":
     "Zmiany zapisują się po puszczeniu suwaka. Czas jest liczony, gdy witryna jest na ekranie, i resetuje się o północy.",
+  "usage.adjustSchedule": "Dostosuj harmonogram",
+  "usage.scheduleTitle": "Harmonogram przerw",
+  "usage.scheduleHint":
+    "Zamykaj tę witrynę o ustalonych godzinach w wybrane dni. Przedział może przechodzić przez północ.",
+  "usage.scheduleAdd": "Dodaj przedział",
+  "usage.scheduleRemove": "Usuń",
+  "usage.scheduleDays": "Dni dla {host}",
+  "usage.scheduleStart": "Zamyka się o",
+  "usage.scheduleEnd": "Otwiera się o",
+  "usage.scheduleNoDays": "Wybierz co najmniej jeden dzień.",
+  "usage.scheduleSameTime": "Godziny zamknięcia i otwarcia muszą się różnić.",
+  "usage.scheduleClosed": "Na razie zamknięta",
+  "usage.scheduleNotice":
+    "Witryna {name} jest zamknięta zgodnie z harmonogramem. Otworzy się o {time}. Inne witryny są nadal dostępne.",
+  "usage.scheduleNoticeAlways":
+    "Witryna {name} jest zamknięta zgodnie z harmonogramem. Inne witryny są nadal dostępne.",
+  "usage.pauseScreenTitle": "Ekran pauzy",
+  "usage.pauseScreenHint":
+    "Poczekaj kilka sekund przy oddychającym kółku, zanim ta witryna się otworzy lub gdy do niej wrócisz.",
+  "usage.pauseAll": "Ekrany pauzy",
+  "usage.pauseAllHint":
+    "Wyłącz lub włącz wszystkie ekrany pauzy. Każda witryna zachowuje własne opóźnienie.",
+  "usage.pauseAllEmptyHint":
+    "Żadna witryna nie ma jeszcze ekranu pauzy. Otwórz witrynę poniżej, aby go dodać.",
+  "pause.label": "Pauza przed otwarciem {name}",
+  "pause.title": "Zatrzymaj się na chwilę",
+  "pause.breathe": "Wdech, wydech. {name} czeka.",
+  "pause.ready": "Gotowe, gdy będziesz gotowy.",
+  "pause.continue": "Kontynuuj",
+  "pause.continueIn": "Kontynuuj za {value}",
+  "pause.close": "Zamknij witrynę",
+  "usage.lock.title": "Blokada ustawień",
+  "usage.lock.intro":
+    "Obietnica dla siebie. Gdy jest włączona, limity, harmonogramy, ekrany pauzy i chronione opcje można tylko zaostrzać, nie łagodzić. Odblokowanie trwa 24 godziny. Ponowna instalacja aplikacji usuwa blokadę, więc to nie jest zabezpieczenie.",
+  "usage.lock.off": "Blokada jest wyłączona.",
+  "usage.lock.locked":
+    "Zablokowane. Możesz dodawać lub zaostrzać ograniczenia; łagodzenie jest zablokowane.",
+  "usage.lock.cooling": "Odblokowanie za {value}. Do tego czasu nic nie można złagodzić.",
+  "usage.lock.ready":
+    "Czas oczekiwania minął. Możesz złagodzić jedno ustawienie, a blokada zostanie zdjęta.",
+  "usage.lock.enable": "Włącz blokadę",
+  "usage.lock.requestUnlock": "Poproś o odblokowanie",
+  "usage.lock.cancel": "Anuluj odblokowanie",
+  "usage.lock.keep": "Zachowaj blokadę",
+  "usage.lock.lift": "Zdejmij blokadę teraz",
+  "usage.lock.refused":
+    "Blokada ustawień jest włączona. Możesz to zaostrzyć, ale nie złagodzić. Najpierw poproś o odblokowanie.",
+  "usage.lock.reasonRequest":
+    "Potwierdź, że to ty, aby rozpocząć 24-godzinne oczekiwanie przed złagodzeniem ograniczeń",
+  "usage.lock.reasonCancel": "Potwierdź, że to ty, aby anulować prośbę o odblokowanie",
+  "usage.lock.protectTitle": "Chroń blokadą ustawień",
+  "usage.lock.protectHint": "Gdy blokada jest włączona, ta opcja zachowuje obecną wartość.",
 
   "onboarding.label": "Jak działa OpenMedia",
   "onboarding.skip": "Pomiń",

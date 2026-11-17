@@ -414,6 +414,8 @@ pub async fn set_site_option(
                 .is_some_and(|option| option.accepts(&value))
         })
         .ok_or(Error::UnknownOption)?;
+    app.state::<Usage>()
+        .check_option_write(&recipe_id, &option_id, &value)?;
     let mode = Mode::from(incognito);
     library.set_site_option(mode, &recipe_id, &option_id, value)?;
     if mode == app.state::<Incognito>().mode() {
@@ -854,6 +856,7 @@ pub async fn ai_accept(
     library: State<'_, Library>,
     recipes: State<'_, Recipes>,
     agent: State<'_, Agent>,
+    usage: State<'_, Usage>,
     entitlement: State<'_, Entitlement>,
     id: Uuid,
 ) -> Result<()> {
@@ -863,12 +866,15 @@ pub async fn ai_accept(
             recipe_id,
             option_id,
             value,
-        } => library.set_site_option(
-            app.state::<Incognito>().mode(),
-            &recipe_id,
-            &option_id,
-            value,
-        )?,
+        } => {
+            usage.check_option_write(&recipe_id, &option_id, &value)?;
+            library.set_site_option(
+                app.state::<Incognito>().mode(),
+                &recipe_id,
+                &option_id,
+                value,
+            )?
+        }
         Accepted::SaveRecipe(recipe) => {
             recipes.save_made(&recipe)?;
         }

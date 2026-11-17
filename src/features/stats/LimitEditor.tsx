@@ -17,6 +17,7 @@ import {
   withPreset,
   type Thresholds,
 } from "./limits";
+import { policyRelaxes, refusesRelaxing, useUsageLock } from "./lock";
 import { usageLimits, type UsagePolicy } from "./policy";
 import { MeterCaption, UsageMeter } from "./UsageMeter";
 
@@ -68,6 +69,7 @@ export function LimitEditor({ host, section, policy, spentSeconds }: LimitEditor
   const t = useT();
   const [draft, setDraft] = useState<Thresholds | null>(null);
   const [error, setError] = useState("");
+  const phase = useUsageLock((state) => state.status.phase);
   const saves = useRef(0);
   const committed = thresholdsOf(policy);
   const shown = draft ?? committed;
@@ -78,6 +80,11 @@ export function LimitEditor({ host, section, policy, spentSeconds }: LimitEditor
   const save = async (next: Thresholds) => {
     if (next.warn === committed.warn && next.limit === committed.limit) {
       setDraft(null);
+      return;
+    }
+    if (refusesRelaxing(phase) && policyRelaxes(policy, policyOf(next))) {
+      setDraft(null);
+      setError(t("usage.lock.refused"));
       return;
     }
     const id = ++saves.current;

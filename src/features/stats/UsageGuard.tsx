@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 import { invoke } from "@tauri-apps/api/core";
-import { appError, selectPage, useApp } from "../../app/store";
+import { appError, selectLocale, selectPage, useApp } from "../../app/store";
 import { useT } from "../../i18n/useT";
 import { primaryButton, quietButton } from "../settings/ui";
 import { formatDuration, sectionLabel } from "./format";
 import { limitStatus, secondsUntilMidnight } from "./limits";
 import {
+  closesSite,
   pageLock,
   policyForHost,
   policyForSection,
@@ -15,6 +16,7 @@ import {
   type PageLock,
   type UsagePolicy,
 } from "./policy";
+import { formatOpening } from "./schedule";
 import { usageTargetOf } from "./section";
 import { nameForHost, SiteBadge, useFavorites } from "./SiteBadge";
 import { UsageMeter } from "./UsageMeter";
@@ -136,8 +138,10 @@ function LimitReached({
   const favorites = useFavorites();
   const openSheet = useApp((state) => state.openSheet);
   const now = useNow(30_000);
+  const locale = useApp(selectLocale);
   const site = nameForHost(host, favorites);
   const name = lock.kind === "part" && part ? `${part} · ${site}` : site;
+  const scheduled = lock.kind === "schedule";
   return (
     <div
       data-hit=""
@@ -151,13 +155,22 @@ function LimitReached({
         <div className="flex justify-center">
           <SiteBadge host={host} name={site} />
         </div>
-        <h1 className="mt-4 text-xl font-semibold">{t("usage.limitReached")}</h1>
+        <h1 className="mt-4 text-xl font-semibold">
+          {scheduled ? t("usage.scheduleClosed") : t("usage.limitReached")}
+        </h1>
         <p className="mt-2 break-words text-sm leading-relaxed text-paper/70">
-          {t("usage.pausedNotice", {
-            name,
-            value: formatDuration(Math.floor(lock.spent), t),
-            left: formatDuration(secondsUntilMidnight(now), t),
-          })}
+          {lock.kind === "schedule"
+            ? lock.opensAt === null
+              ? t("usage.scheduleNoticeAlways", { name })
+              : t("usage.scheduleNotice", {
+                  name,
+                  time: formatOpening(lock.opensAt, now, locale),
+                })
+            : t("usage.pausedNotice", {
+                name,
+                value: formatDuration(Math.floor(lock.spent), t),
+                left: formatDuration(secondsUntilMidnight(now), t),
+              })}
         </p>
         <div className="mt-5 flex flex-col gap-2">
           {lock.kind === "part" && (
@@ -170,7 +183,7 @@ function LimitReached({
             onClick={() => openLimits(host)}
             className={`${lock.kind === "part" ? quietButton : primaryButton} py-3`}
           >
-            {t("usage.adjust")}
+            {scheduled ? t("usage.adjustSchedule") : t("usage.adjust")}
           </button>
           <button
             type="button"
@@ -188,6 +201,7 @@ function LimitReached({
 /** Whether a limit has closed the page in front, and the figures that decided it. */
 export function useLimitBlock() {
   const control = useUsageControl();
+  const now = useNow(15_000);
   const page = useApp(selectPage);
   const isPro = useEntitlementStore((state) => state.status === "pro");
   const target = page ? usageTargetOf(page.url ?? page.openedUrl, page.scope) : null;
@@ -196,9 +210,9 @@ export function useLimitBlock() {
   const policy = host ? policyForHost(control.limits.sites, host) : undefined;
   const lock =
     isPro && control.ready && target
-      ? pageLock(control.limits, control.seconds, control.sectionSeconds, target)
+      ? pageLock(control.limits, control.seconds, control.sectionSeconds, target, now)
       : null;
-  return { control, isPro, host, target, seconds, policy, lock, blocked: lock?.kind === "site" };
+  return { control, isPro, host, target, seconds, policy, lock, now, blocked: closesSite(lock) };
 }
 
 /**
@@ -233,7 +247,7 @@ export function LimitCover() {
 }
 
 export function UsageGuard() {
-  const { control, isPro, seconds, policy, target, blocked } = useLimitBlock();
+  const { control, isPro, seconds, policy, target, blocked, now } = useLimitBlock();
   const sessions = useApp((state) => state.sessions);
   const sheet = useApp((state) => state.sheet);
   const onboarding = useApp((state) => state.onboardingOpen);
@@ -263,8 +277,9 @@ export function UsageGuard() {
       const shouldBlock =
         isPro &&
         !!sessionTarget &&
-        pageLock(control.limits, control.seconds, control.sectionSeconds, sessionTarget)?.kind ===
-          "site";
+        closesSite(
+          pageLock(control.limits, control.seconds, control.sectionSeconds, sessionTarget, now),
+        );
       const previous = requested.current.get(session.id);
       if (previous === shouldBlock || (previous === undefined && !shouldBlock)) continue;
       requested.current.set(session.id, shouldBlock);
@@ -277,7 +292,7 @@ export function UsageGuard() {
         });
       queues.current.set(session.id, queued);
     }
-  }, [control, sessions, reportError, isPro]);
+  }, [control, sessions, reportError, isPro, now]);
 
   useEffect(() => {
     if (!control.ready || !target) return;

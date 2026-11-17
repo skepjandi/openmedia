@@ -154,6 +154,58 @@ export const it: Messages = {
   "usage.partStatusReached": "Limite raggiunto. Qui il tempo non viene più contato.",
   "usage.saveHint":
     "Le modifiche si salvano quando rilasci. Il tempo conta mentre il sito è sullo schermo e si azzera a mezzanotte.",
+  "usage.adjustSchedule": "Modifica orario",
+  "usage.scheduleTitle": "Orari di blocco",
+  "usage.scheduleHint":
+    "Chiudi questo sito a orari fissi nei giorni che scegli. Una fascia può superare la mezzanotte.",
+  "usage.scheduleAdd": "Aggiungi una fascia",
+  "usage.scheduleRemove": "Rimuovi",
+  "usage.scheduleDays": "Giorni per {host}",
+  "usage.scheduleStart": "Chiude alle",
+  "usage.scheduleEnd": "Apre alle",
+  "usage.scheduleNoDays": "Scegli almeno un giorno.",
+  "usage.scheduleSameTime": "L’orario di chiusura e quello di apertura devono essere diversi.",
+  "usage.scheduleClosed": "Chiuso per ora",
+  "usage.scheduleNotice":
+    "{name} è chiuso dal tuo orario. Riapre alle {time}. Gli altri siti restano disponibili.",
+  "usage.scheduleNoticeAlways":
+    "{name} è chiuso dal tuo orario. Gli altri siti restano disponibili.",
+  "usage.pauseScreenTitle": "Schermata di pausa",
+  "usage.pauseScreenHint":
+    "Attendi qualche secondo con un cerchio che respira prima che questo sito si apra, o quando ci torni.",
+  "usage.pauseAll": "Schermate di pausa",
+  "usage.pauseAllHint":
+    "Disattiva o attiva tutte le schermate di pausa. Ogni sito mantiene la propria attesa.",
+  "usage.pauseAllEmptyHint":
+    "Nessun sito ha ancora una schermata di pausa. Apri un sito qui sotto per aggiungerla.",
+  "pause.label": "Pausa prima di aprire {name}",
+  "pause.title": "Prenditi un momento",
+  "pause.breathe": "Inspira, espira. {name} ti aspetta.",
+  "pause.ready": "Pronto quando vuoi.",
+  "pause.continue": "Continua",
+  "pause.continueIn": "Continua tra {value}",
+  "pause.close": "Chiudi il sito",
+  "usage.lock.title": "Blocco impostazioni",
+  "usage.lock.intro":
+    "Una promessa a te stesso. Finché è attivo, limiti, orari, schermate di pausa e opzioni protette si possono rendere più severi ma non più permissivi. Lo sblocco richiede 24 ore. Reinstallare l’app rimuove il blocco, quindi non è una funzione di sicurezza.",
+  "usage.lock.off": "Il blocco è disattivato.",
+  "usage.lock.locked":
+    "Bloccato. Puoi aggiungere o inasprire le restrizioni; allentarle non è consentito.",
+  "usage.lock.cooling": "Si sblocca tra {value}. Fino ad allora non si può allentare nulla.",
+  "usage.lock.ready":
+    "L’attesa è finita. Puoi allentare una impostazione e il blocco si toglie quando lo fai.",
+  "usage.lock.enable": "Attiva il blocco",
+  "usage.lock.requestUnlock": "Chiedi lo sblocco",
+  "usage.lock.cancel": "Annulla lo sblocco",
+  "usage.lock.keep": "Mantieni il blocco",
+  "usage.lock.lift": "Togli il blocco ora",
+  "usage.lock.refused":
+    "Il blocco impostazioni è attivo. Puoi rendere questa impostazione più severa, non più permissiva. Chiedi prima lo sblocco.",
+  "usage.lock.reasonRequest":
+    "Conferma che sei tu per avviare l’attesa di 24 ore prima di poter allentare le restrizioni",
+  "usage.lock.reasonCancel": "Conferma che sei tu per annullare la richiesta di sblocco",
+  "usage.lock.protectTitle": "Proteggi con il blocco impostazioni",
+  "usage.lock.protectHint": "Finché il blocco è attivo, questa opzione mantiene il valore attuale.",
 
   "onboarding.label": "Come funziona OpenMedia",
   "onboarding.skip": "Salta",

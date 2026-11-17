@@ -13,12 +13,14 @@ mod link_clean;
 mod ota;
 mod recipe_library;
 pub mod recipes;
+mod schedule;
 mod secrets;
 mod self_update;
 mod share;
 mod sites;
 mod usage;
 mod usage_commands;
+mod usage_lock;
 mod video_controls;
 
 use tauri::Manager;
@@ -102,6 +104,16 @@ pub fn run() {
             usage_commands::set_usage_limit,
             usage_commands::set_usage_section_limit,
             usage_commands::set_usage_blocked,
+            usage_commands::set_usage_schedule,
+            usage_commands::set_usage_pause,
+            usage_commands::set_usage_pause_enabled,
+            usage_commands::get_usage_lock,
+            usage_commands::enable_usage_lock,
+            usage_commands::request_usage_unlock,
+            usage_commands::cancel_usage_unlock,
+            usage_commands::lift_usage_lock,
+            usage_commands::protect_usage_option,
+            usage_commands::unprotect_usage_option,
             incognito::unlock_incognito,
             incognito::biometry_kind,
             incognito::enter_incognito,

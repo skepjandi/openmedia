@@ -151,6 +151,58 @@ export const tr: Messages = {
   "usage.partStatusReached": "Sınıra ulaşıldı. Buradaki süre artık sayılmıyor.",
   "usage.saveHint":
     "Parmağınızı çektiğinizde değişiklikler kaydedilir. Süre, site ekrandayken sayılır ve gece yarısı sıfırlanır.",
+  "usage.adjustSchedule": "Programı ayarla",
+  "usage.scheduleTitle": "Kapalı kalma programı",
+  "usage.scheduleHint":
+    "Bu siteyi seçtiğiniz günlerde belirlenen saatlerde kapatın. Bir zaman aralığı gece yarısını aşabilir.",
+  "usage.scheduleAdd": "Aralık ekle",
+  "usage.scheduleRemove": "Kaldır",
+  "usage.scheduleDays": "{host} için günler",
+  "usage.scheduleStart": "Kapanma saati",
+  "usage.scheduleEnd": "Açılma saati",
+  "usage.scheduleNoDays": "En az bir gün seçin.",
+  "usage.scheduleSameTime": "Kapanma ve açılma saatleri farklı olmalı.",
+  "usage.scheduleClosed": "Şimdilik kapalı",
+  "usage.scheduleNotice":
+    "{name}, programınız nedeniyle kapalı. {time} saatinde açılır. Diğer siteler hâlâ kullanılabilir.",
+  "usage.scheduleNoticeAlways":
+    "{name}, programınız nedeniyle kapalı. Diğer siteler hâlâ kullanılabilir.",
+  "usage.pauseScreenTitle": "Duraklatma ekranı",
+  "usage.pauseScreenHint":
+    "Bu site açılmadan önce ya da siteye geri döndüğünüzde, nefes alan bir daireyle birkaç saniye bekleyin.",
+  "usage.pauseAll": "Duraklatma ekranları",
+  "usage.pauseAllHint":
+    "Tüm duraklatma ekranlarını açın veya kapatın. Her site kendi gecikmesini korur.",
+  "usage.pauseAllEmptyHint":
+    "Henüz hiçbir sitede duraklatma ekranı yok. Eklemek için aşağıdan bir site açın.",
+  "pause.label": "{name} açılmadan önce duraklat",
+  "pause.title": "Bir an durun",
+  "pause.breathe": "Nefes alın, nefes verin. {name} bekliyor.",
+  "pause.ready": "Hazır olduğunuzda.",
+  "pause.continue": "Devam et",
+  "pause.continueIn": "{value} sonra devam et",
+  "pause.close": "Siteyi kapat",
+  "usage.lock.title": "Ayar kilidi",
+  "usage.lock.intro":
+    "Kendinize verilmiş bir söz. Açıkken sınırlar, programlar, duraklatma ekranları ve korunan seçenekler sıkılaştırılabilir ama gevşetilemez. Kilidi açmak 24 saat sürer. Uygulamayı yeniden yüklemek kilidi kaldırır, bu yüzden bir güvenlik özelliği değildir.",
+  "usage.lock.off": "Kilit kapalı.",
+  "usage.lock.locked":
+    "Kilitli. Kısıtlama ekleyebilir veya sıkılaştırabilirsiniz; gevşetmek engellenir.",
+  "usage.lock.cooling": "Kilit {value} içinde açılır. O zamana kadar hiçbir şey gevşetilemez.",
+  "usage.lock.ready":
+    "Bekleme bitti. Bir ayarı gevşetebilirsiniz ve bunu yaptığınızda kilit kalkar.",
+  "usage.lock.enable": "Kilidi aç",
+  "usage.lock.requestUnlock": "Kilit açmayı iste",
+  "usage.lock.cancel": "Kilit açmayı iptal et",
+  "usage.lock.keep": "Kilidi koru",
+  "usage.lock.lift": "Kilidi şimdi kaldır",
+  "usage.lock.refused":
+    "Ayar kilidi açık. Bunu sıkılaştırabilirsiniz, gevşetemezsiniz. Önce kilit açmayı isteyin.",
+  "usage.lock.reasonRequest":
+    "Kısıtlamalarınız gevşetilebilmeden önce 24 saatlik beklemeyi başlatmak için sizin olduğunuzu doğrulayın",
+  "usage.lock.reasonCancel": "Kilit açma isteğini iptal etmek için sizin olduğunuzu doğrulayın",
+  "usage.lock.protectTitle": "Ayar kilidiyle koru",
+  "usage.lock.protectHint": "Kilit açıkken bu seçenek mevcut değerini korur.",
 
   "onboarding.label": "OpenMedia nasıl çalışır",
   "onboarding.skip": "Atla",

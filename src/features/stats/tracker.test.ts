@@ -30,7 +30,7 @@ import { useApp } from "../../app/store";
 import type { Session } from "../web/sessions";
 import { settleUsageWrites, startUsageTracking } from "./tracker";
 import { localDay } from "./format";
-import { usageLimits, useUsageControl } from "./policy";
+import { NO_LIMITS, usageLimits, useUsageControl } from "./policy";
 import { useEntitlementStore } from "../paywall/store";
 
 const policies = {
@@ -69,7 +69,7 @@ beforeEach(() => {
   vi.useFakeTimers();
   vi.setSystemTime(new Date(2026, 10, 8, 12, 0, 0));
   ledger.clear();
-  vi.spyOn(usageLimits, "get").mockResolvedValue({ sites: policies, sections: {} });
+  vi.spyOn(usageLimits, "get").mockResolvedValue({ ...NO_LIMITS, sites: policies });
   documentTarget = new EventTarget();
   windowTarget = new EventTarget();
   Object.defineProperty(documentTarget, "visibilityState", { get: () => visibility });
@@ -90,7 +90,7 @@ beforeEach(() => {
   });
   useUsageControl.setState({
     day: localDay(new Date()),
-    limits: { sites: {}, sections: {} },
+    limits: NO_LIMITS,
     seconds: {},
     sectionSeconds: {},
     ready: false,
@@ -151,7 +151,7 @@ describe("usage tracking", () => {
 
   it("stops counting a part at its limit while the rest of the site keeps counting", async () => {
     vi.spyOn(usageLimits, "get").mockResolvedValue({
-      sites: {},
+      ...NO_LIMITS,
       sections: { "example.com": { "/watch": { warnSeconds: null, limitSeconds: 2 } } },
     });
     useApp.setState({
@@ -177,10 +177,10 @@ describe("usage tracking", () => {
 
   it("splits elapsed foreground time across local midnight", async () => {
     vi.setSystemTime(new Date(2026, 10, 8, 23, 59, 59));
-    vi.spyOn(usageLimits, "get").mockResolvedValue({ sites: {}, sections: {} });
+    vi.spyOn(usageLimits, "get").mockResolvedValue(NO_LIMITS);
     useUsageControl.setState({
       day: localDay(new Date()),
-      limits: { sites: {}, sections: {} },
+      limits: NO_LIMITS,
       seconds: {},
       sectionSeconds: {},
       ready: false,

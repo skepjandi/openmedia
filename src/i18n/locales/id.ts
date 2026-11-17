@@ -145,6 +145,57 @@ export const id: Messages = {
   "usage.partStatusReached": "Batas tercapai. Waktu di sini tidak dihitung lagi.",
   "usage.saveHint":
     "Perubahan tersimpan saat Anda melepaskan. Waktu dihitung selama situs tampil di layar dan diatur ulang saat tengah malam.",
+  "usage.adjustSchedule": "Ubah jadwal",
+  "usage.scheduleTitle": "Jadwal waktu tutup",
+  "usage.scheduleHint":
+    "Tutup situs ini pada jam tertentu di hari yang Anda pilih. Satu rentang waktu bisa melewati tengah malam.",
+  "usage.scheduleAdd": "Tambah rentang waktu",
+  "usage.scheduleRemove": "Hapus",
+  "usage.scheduleDays": "Hari untuk {host}",
+  "usage.scheduleStart": "Tutup pukul",
+  "usage.scheduleEnd": "Buka pukul",
+  "usage.scheduleNoDays": "Pilih setidaknya satu hari.",
+  "usage.scheduleSameTime": "Waktu tutup dan waktu buka harus berbeda.",
+  "usage.scheduleClosed": "Sedang ditutup",
+  "usage.scheduleNotice":
+    "{name} ditutup oleh jadwal Anda. Situs ini dibuka pukul {time}. Situs lain tetap tersedia.",
+  "usage.scheduleNoticeAlways": "{name} ditutup oleh jadwal Anda. Situs lain tetap tersedia.",
+  "usage.pauseScreenTitle": "Layar jeda",
+  "usage.pauseScreenHint":
+    "Tunggu beberapa detik dengan lingkaran pernapasan sebelum situs ini terbuka, atau saat Anda kembali ke sana.",
+  "usage.pauseAll": "Layar jeda",
+  "usage.pauseAllHint":
+    "Matikan atau nyalakan semua layar jeda. Setiap situs menyimpan jedanya sendiri.",
+  "usage.pauseAllEmptyHint":
+    "Belum ada situs dengan layar jeda. Buka situs di bawah untuk menambahkannya.",
+  "pause.label": "Jeda sebelum membuka {name}",
+  "pause.title": "Tenangkan diri sejenak",
+  "pause.breathe": "Tarik napas, hembuskan. {name} menunggu.",
+  "pause.ready": "Siap saat Anda siap.",
+  "pause.continue": "Lanjutkan",
+  "pause.continueIn": "Lanjutkan dalam {value}",
+  "pause.close": "Tutup situs",
+  "usage.lock.title": "Kunci pengaturan",
+  "usage.lock.intro":
+    "Janji pada diri sendiri. Selama aktif, batas, jadwal, layar jeda, dan opsi yang dilindungi hanya bisa diperketat, tidak dilonggarkan. Membuka kunci memerlukan 24 jam. Memasang ulang aplikasi menghapus kunci, jadi ini bukan fitur keamanan.",
+  "usage.lock.off": "Kunci mati.",
+  "usage.lock.locked":
+    "Terkunci. Anda dapat menambah atau memperketat pembatasan; melonggarkannya diblokir.",
+  "usage.lock.cooling": "Terbuka dalam {value}. Tidak ada yang bisa dilonggarkan sampai saat itu.",
+  "usage.lock.ready":
+    "Masa tunggu selesai. Anda dapat melonggarkan satu pengaturan, dan kunci terlepas saat Anda melakukannya.",
+  "usage.lock.enable": "Aktifkan kunci",
+  "usage.lock.requestUnlock": "Minta buka kunci",
+  "usage.lock.cancel": "Batalkan buka kunci",
+  "usage.lock.keep": "Pertahankan kunci",
+  "usage.lock.lift": "Lepas kunci sekarang",
+  "usage.lock.refused":
+    "Kunci pengaturan aktif. Anda dapat memperketat ini, bukan melonggarkan. Minta buka kunci dulu.",
+  "usage.lock.reasonRequest":
+    "Konfirmasi bahwa ini Anda untuk memulai masa tunggu 24 jam sebelum pembatasan dapat dilonggarkan",
+  "usage.lock.reasonCancel": "Konfirmasi bahwa ini Anda untuk membatalkan permintaan buka kunci",
+  "usage.lock.protectTitle": "Lindungi dengan kunci pengaturan",
+  "usage.lock.protectHint": "Selama kunci aktif, opsi ini mempertahankan nilainya saat ini.",
 
   "onboarding.label": "Cara kerja OpenMedia",
   "onboarding.skip": "Lewati",
