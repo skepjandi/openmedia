@@ -6,6 +6,14 @@ All notable changes to OpenMedia are documented here.
 >
 > **Wiki**: the [GitHub Wiki](https://github.com/skepjandi/openmedia/wiki) is the public-facing main wiki — architecture, recipe format, AI pipeline, security model, roadmap. Source-controlled editing surface is `docs/wiki/` in this repo; CI (`.github/workflows/sync-wiki.yml`) mirrors it to the GitHub Wiki on every merge to `main`. New single-PR changes belong here, not as new wiki pages.
 
+### feat(video): a volume bar in the panel; fix(video): the small player's black corners; fix: float of an embedded player
+
+**Area:** `feat(video)`, `fix(video)`, `fix(siteview)`
+
+**Change:** The panel's sound control was a mute button only. It now has a volume bar beside it that works in feeds (Reels, Shorts) and on watch pages, in frames too: on iOS and Android it sets the device's media volume through a new page-to-app handler, `openmediaVolume` (`get` and `set:<0 to 1>`; iOS cannot set a video's volume from a page and Android sites reset it), and dragging it up unmutes the video; elsewhere (desktop) it sets the video's own volume. Documented in `security.md`. The small player no longer leaves black pointed corners behind its rounded video: the corner window is clipped natively to the box's radius on iOS, and the box and an embedded player's frame are masked so WebKit clips the video layer. The gate on which frame may float, added in #280, is removed: it stopped an embedded player (Miruro) from floating at all.
+
+**Verified:** iOS Simulator: dragging the bar on an Instagram reel and on Miruro's embedded player sent `set:` values to the app, moved the knob, switched the mute icon off and left the reel playing and in place; corners of the corner window and of an embedded player's small player are rounded with no black points. Android emulator: `set:0.8` through the page bridge moved the stream volume from 5 to 12 of 15 and answered `0.8`. Vitest for both volume paths. **Not verified:** a real device (the Simulator's volume cannot be moved, so the bar was checked by what the app received), macOS, the video bar on Android in a feed, and whether the black corners seen before were the ones this fixes on a system picture-in-picture window (those are drawn by the OS).
+
 ### fix(siteview): switching to another site or a new tab keeps playing the old page's audio
 
 **Area:** `fix(siteview)`, `fix(shell)`

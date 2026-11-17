@@ -12,6 +12,7 @@ import android.content.res.Configuration
 import android.graphics.Color
 import android.graphics.Rect
 import android.graphics.RectF
+import android.media.AudioManager
 import android.net.Uri
 import android.os.Build
 import android.os.Message
@@ -1182,6 +1183,30 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
         ) { _, message: WebMessageCompat, _: Uri, isMainFrame: Boolean, _ ->
             if (isMainFrame) session.innerScrolled = message.data == "1"
         }
+        WebViewCompat.addWebMessageListener(
+            session.view,
+            VOLUME_OBJECT,
+            setOf("*"),
+        ) { _, message: WebMessageCompat, _: Uri, _: Boolean, replyProxy ->
+            replyProxy.postMessage(handleVolume(message.data ?: ""))
+        }
+    }
+
+    /**
+     * The page's volume control: `get` answers the device's media volume (0 to 1, as text) and
+     * `set:<0 to 1>` sets it and answers what is set. A site's player resets the volume of its own
+     * video, so the control is the device's, as the volume keys are.
+     */
+    private fun handleVolume(request: String): String {
+        val audio = activity.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+        val max = audio.getStreamMaxVolume(AudioManager.STREAM_MUSIC).coerceAtLeast(1)
+        if (request.startsWith("set:")) {
+            val wanted = request.substring(4).toFloatOrNull()?.coerceIn(0f, 1f)
+            if (wanted != null) {
+                audio.setStreamVolume(AudioManager.STREAM_MUSIC, Math.round(wanted * max), 0)
+            }
+        }
+        return (audio.getStreamVolume(AudioManager.STREAM_MUSIC).toFloat() / max).toString()
     }
 
     /** True for a JSON object or array, the only shapes the bridge carries. */
@@ -1748,6 +1773,7 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
                 "down(on)})})()"
         private const val PAINT_OBJECT = "openmediaPaint"
         private const val SCROLL_OBJECT = "openmediaScroll"
+        private const val VOLUME_OBJECT = "openmediaVolume"
         private const val OPENER_OBJECT = "openmediaOpener"
         private const val NOTIFICATION_CHANNEL = "openmedia-siteview"
         private const val NOTIFICATION_SESSION = "openmedia.session"

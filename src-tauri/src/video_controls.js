@@ -157,6 +157,64 @@
     var mutedAtDown = null;
     var panelSound = null; // what the reader last chose with the panel's mute button, until the page closes
 
+    // The device's media volume, for phones: iOS gives a page no way to set a video's own volume
+    // (it is read-only there), and a site's player resets it where it can be set. The app answers
+    // for the device: a message handler on iOS, a message port on Android. Without either (a
+    // desktop), the video's own volume is used.
+    var volumeBridge = null;
+    var deviceVolume = null; // 0 to 1 as last heard from the device
+    var volumeAskedAt = 0;
+    var volumeSetAt = 0;
+    try {
+      if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.openmediaVolume) {
+        volumeBridge = 'ios';
+      } else if (window.openmediaVolume && typeof window.openmediaVolume.postMessage === 'function') {
+        volumeBridge = 'android';
+        window.openmediaVolume.onmessage = function (event) { heardVolume(event.data); };
+      }
+    } catch (_) {}
+
+    function heardVolume(text) {
+      var value = parseFloat(text);
+      // The device is slow to report what was just set: until it has, the answer is not news.
+      if (value >= 0 && value <= 1 && Date.now() - volumeSetAt > 800) deviceVolume = value;
+    }
+
+    function askDevice(text) {
+      try {
+        if (volumeBridge === 'ios') {
+          window.webkit.messageHandlers.openmediaVolume.postMessage(text).then(heardVolume, function () {});
+        } else {
+          window.openmediaVolume.postMessage(text);
+        }
+      } catch (_) {}
+    }
+
+    /** Asks the device for its volume, at most twice a second. */
+    function readVolume() {
+      var now = Date.now();
+      if (now - volumeAskedAt < 500) return;
+      volumeAskedAt = now;
+      askDevice('get');
+    }
+
+    /** What the volume control shows: the device's, or the video's (0 while it is muted). */
+    function shownVolume(video) {
+      if (volumeBridge) return deviceVolume === null ? 1 : deviceVolume;
+      return video.muted ? 0 : video.volume;
+    }
+
+    function setVolume(video, ratio) {
+      if (volumeBridge) {
+        deviceVolume = ratio;
+        volumeSetAt = Date.now();
+        askDevice('set:' + ratio.toFixed(3));
+      } else {
+        try { video.volume = ratio; } catch (_) {}
+        video.muted = ratio === 0;
+      }
+    }
+
     function read() {
       try { return JSON.parse(localStorage.getItem(STORE) || '{}') || {}; } catch (_) { return {}; }
     }
@@ -783,6 +841,7 @@
       frame.style.setProperty('max-height', 'none', 'important');
       frame.style.setProperty('transform', 'none', 'important');
       frame.style.setProperty('overflow', 'hidden', 'important');
+      frame.style.setProperty('-webkit-mask-image', '-webkit-radial-gradient(white, black)', 'important');
       frame.style.setProperty('left', 'auto', 'important');
       frame.style.setProperty('top', 'auto', 'important');
       frame.style.setProperty('box-shadow', '0 6px 24px rgba(0,0,0,.5)', 'important');
@@ -828,8 +887,6 @@
           if (keep) settleMini(function () { miniDrag(1); }, askAppToFloat);
           else settleMini(function () { miniDrag(0); }, miniOff);
         } else if (data.om === 'float') {
-          // Only the frame that is the page's player may lift itself into the small player.
-          if (frame !== playerFrame()) return;
           miniOnFrame(frame);
           askAppToFloat();
         } else if (data.om === 'unfloat') {
@@ -869,7 +926,9 @@
         'position:fixed;right:' + (start ? start.right : MINI_EDGE) + 'px;bottom:' + (start ? start.bottom : MINI_BOTTOM) +
         'px;width:' + (start ? start.width : width) + 'px;height:' + (start ? start.height : height) +
         'px;z-index:2147483647;background:#000;border-radius:' + (start ? 0 : 12) + 'px;overflow:hidden;' +
-        'box-shadow:0 6px 24px rgba(0,0,0,.5);touch-action:none;-webkit-user-select:none;user-select:none');
+        'box-shadow:0 6px 24px rgba(0,0,0,.5);touch-action:none;-webkit-user-select:none;user-select:none;' +
+        // WebKit draws a video layer over its container's rounded corners unless the container is masked.
+        '-webkit-mask-image:-webkit-radial-gradient(white,black)');
       root.setAttribute('data-openmedia-mini', '');
       var state = {
         video: video,
@@ -1253,12 +1312,23 @@
       transport.appendChild(back);
       transport.appendChild(toggle);
       transport.appendChild(forward);
-      var row = make('div', 'display:flex;align-items:center;gap:10px;padding:2px 0');
+      var row = make('div', 'display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:2px 0');
       var mute = button(32, 'sound', function (target) {
         target.muted = !target.muted;
-        if (!target.muted && target.volume === 0) target.volume = 1;
+        if (!target.muted && shownVolume(target) === 0) setVolume(target, 1);
         panelSound = { muted: target.muted, volume: target.volume };
       });
+      // The volume of the device on a phone, where a page cannot set a video's own; the video's
+      // own volume elsewhere. Dragging it up unmutes the video.
+      var volume = slider(30, function (ratio) {
+        var target = focus();
+        if (!target) return;
+        setVolume(target, ratio);
+        if (ratio > 0 && target.muted) target.muted = false;
+        panelSound = { muted: target.muted, volume: target.volume };
+        paint(target);
+      });
+      volume.track.style.cssText += ';flex:1 1 70px;min-width:56px;max-width:120px';
       var floatButton = button(32, 'pip', function (target) {
         if (framed) {
           toPage({ om: parentMini ? 'unfloat' : 'float' });
@@ -1297,6 +1367,7 @@
       cc.style.display = 'none';
       audio.style.display = 'none';
       row.appendChild(mute);
+      row.appendChild(volume.track);
       row.appendChild(cc);
       row.appendChild(audio);
       row.appendChild(note);
@@ -1331,7 +1402,7 @@
       });
       parent.appendChild(root);
       ui = {
-        root: root, toggle: toggle, mute: mute, cc: cc, audio: audio, note: note, extras: extras, menu: menu, left: left, pill: pill, seek: seek
+        root: root, toggle: toggle, mute: mute, volume: volume, cc: cc, audio: audio, note: note, extras: extras, menu: menu, left: left, pill: pill, seek: seek
       };
       return ui;
     }
@@ -1349,7 +1420,9 @@
       var rate = video.playbackRate || 1;
       ui.pill.textContent = (Math.round(rate * 100) / 100) + '\u00d7';
       setIcon(ui.toggle, video.paused ? 'play' : 'pause');
-      setIcon(ui.mute, video.muted || video.volume === 0 ? 'muted' : 'sound');
+      setIcon(ui.mute, video.muted || shownVolume(video) === 0 ? 'muted' : 'sound');
+      if (!dragging) ui.volume.set(shownVolume(video));
+      if (volumeBridge) readVolume();
       var texts = textTracksOf(video);
       var showing = texts.filter(function (track) { return track.mode === 'showing'; })[0];
       syncOptions(video);

@@ -1868,13 +1868,6 @@ describe("video controls", () => {
     expect(video.muted).toBe(false);
   });
 
-  it("has a mute button and no volume bar, which sites undo", () => {
-    const video = new FakeVideo();
-    const page = load({ videos: [video], current: video });
-    openPanel(page);
-    expect(sliders(page)).toHaveLength(1);
-  });
-
   it("leaves a page about one video, and its own controls, alone unless asked", () => {
     const watch = new FakeVideo();
     watch.box = { top: 100, left: 0, width: 400, height: 225, bottom: 325, right: 400 };
@@ -1995,6 +1988,52 @@ describe("video controls", () => {
     openPanel(page);
     sliders(page).at(-1)?.fire("pointerdown", { clientX: 400 });
     expect(video.currentTime).toBe(19.75);
+  });
+
+  it("sets the video's own volume from the volume bar where the page can, and mutes at the bottom", () => {
+    const video = new FakeVideo();
+    video.muted = true;
+    video.volume = 1;
+    const page = load({ videos: [video], current: video });
+    openPanel(page);
+    const bar = sliders(page)[0];
+    bar?.fire("pointerdown", { clientX: 100 });
+    expect(video.volume).toBe(0.25);
+    expect(video.muted).toBe(false);
+    bar?.fire("pointermove", { clientX: 0 });
+    expect(video.muted).toBe(true);
+    bar?.fire("pointerup");
+  });
+
+  it("moves the device's volume, not the video's, where the app answers for it, and unmutes", async () => {
+    const asked: string[] = [];
+    const video = new FakeVideo();
+    video.muted = true;
+    const page = load({
+      videos: [video],
+      current: video,
+      win: {
+        webkit: {
+          messageHandlers: {
+            openmediaMini: { postMessage: () => {} },
+            openmediaVolume: {
+              postMessage: (text: string) => {
+                asked.push(text);
+                return Promise.resolve("0.4");
+              },
+            },
+          },
+        },
+      },
+    });
+    openPanel(page);
+    const bar = sliders(page)[0];
+    bar?.fire("pointerdown", { clientX: 300 });
+    expect(asked).toContain("set:0.750");
+    expect(video.muted).toBe(false);
+    expect(video.volume).toBe(1);
+    bar?.fire("pointerup");
+    await Promise.resolve();
   });
 
   it("goes to the next speed up when the video runs at one the list does not have", () => {
