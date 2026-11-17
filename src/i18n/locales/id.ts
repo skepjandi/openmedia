@@ -400,7 +400,6 @@ export const id: Messages = {
   "recipes.removeFavorite": "Hapus {name} dari favorit",
   "recipes.hub": "Hub",
   "settings.darkMode": "Mode gelap",
-  "settings.darkModeNote": "Menggelapkan halaman yang Anda buka.",
   "settings.darkEnabled": "Gelapkan halaman",
   "settings.darkEnabledNote":
     "Mengaktifkan mode gelap untuk setiap situs yang tidak punya pilihan sendiri.",
@@ -449,7 +448,6 @@ export const id: Messages = {
   "settings.darkImages": "Sesuaikan gambar",
   "settings.darkImagesNote":
     "Membalik ikon dan logo gelap pada latar transparan serta meredam diagram terang yang besar.",
-  "settings.darkSites": "Situs dengan pilihan sendiri",
   "settings.darkSitesEmpty": "Belum ada.",
   "settings.darkSiteRemove": "Hapus pilihan mode gelap untuk {site}",
   "settings.darkReset": "Atur ulang ke default",
@@ -468,9 +466,7 @@ export const id: Messages = {
   "favorites.videoHeightOwn": "Situs ini punya tinggi sendiri.",
   "favorites.videoHeightLabel": "Tinggi kontrol video {site}",
   "favorites.videoUseShared": "Pakai pengaturan video bersama",
-  "favorites.darkMode": "Mode gelap",
   "favorites.darkModeLabel": "Mode gelap {site}",
-  "favorites.darkFollow": "Ikuti pengaturan",
   "favorites.darkOn": "Selalu aktif",
   "favorites.darkOff": "Mati",
   "favorites.darkMethod": "Metode untuk situs ini",
@@ -789,17 +785,22 @@ export const id: Messages = {
   "settings.appearanceNote": "Hanya berlaku untuk aplikasi. Tampilan halaman diatur di Mode gelap.",
   "settings.darkScheduleSystem": "Sistem",
   "settings.darkScheduleSystemNote": "Mengikuti pengaturan terang atau gelap perangkat.",
-  "settings.darkSitesNote":
-    "Pengaturan ini berlaku untuk semua situs kecuali situs tersebut punya pilihan sendiri. Atur di pengaturan halaman situs.",
-  "fab.darkMode":
-    "Mode gelap. Ketuk untuk menyalakan atau mematikannya di halaman ini, tahan untuk opsi.",
-  "favorites.pageSettings": "Pengaturan halaman",
-  "siteSettings.darkNote": "Mode gelap hanya untuk situs ini.",
-  "siteSettings.videoNote": "Kontrol video hanya untuk situs ini.",
-  "siteDark.effectiveOn": "Mode gelap aktif untuk situs ini.",
-  "siteDark.effectiveOff": "Mode gelap nonaktif untuk situs ini.",
-  "siteDark.openShared": "Pengaturan mode gelap",
-  "siteDark.openSharedNote": "Warna, jadwal, dan metode bersama untuk semua situs.",
   "favorites.videoPanel": "Panel kontrol",
   "favorites.videoPanelLabel": "Panel kontrol video {site}",
+  "favorites.darkMode": "Mode gelap khusus",
+  "favorites.darkFollow": "Ikuti pengaturan umum",
+  "settings.darkModeNote": "Pengaturan umum, bawaan untuk setiap situs",
+  "settings.darkModeTitle": "Mode gelap umum",
+  "settings.darkModeSubtitle":
+    "Bawaan untuk setiap situs. Pilihan mode gelap milik favorit menggantikannya.",
+  "settings.darkSites": "Situs dengan pengaturan khusus",
+  "settings.darkSitesNote":
+    "Pengaturan ini berlaku untuk semua situs kecuali situs tersebut punya pengaturan khusus. Atur di favorit.",
+  "favorites.darkModeNote": "Menggantikan mode gelap umum untuk situs ini.",
+  "fab.darkMode":
+    "Mode gelap. Ketuk untuk menyalakan atau mematikannya di semua situs, tahan untuk pengaturan umum.",
+  "fab.darkModeSite":
+    "Mode gelap untuk situs ini. Ketuk untuk menyalakan atau mematikannya, tahan untuk pengaturannya.",
+  "favorites.darkEffectiveOn": "Mode gelap aktif untuk situs ini.",
+  "favorites.darkEffectiveOff": "Mode gelap nonaktif untuk situs ini.",
 };

@@ -400,7 +400,6 @@ export const hi: Messages = {
   "recipes.removeFavorite": "{name} को पसंदीदा से हटाएँ",
   "recipes.hub": "हब",
   "settings.darkMode": "डार्क मोड",
-  "settings.darkModeNote": "आपके खोले गए पेजों को गहरा करता है।",
   "settings.darkEnabled": "पेज गहरे करें",
   "settings.darkEnabledNote": "हर उस साइट पर डार्क मोड चालू करता है जिसकी अपनी कोई पसंद नहीं है।",
   "settings.darkMethod": "तरीका",
@@ -448,7 +447,6 @@ export const hi: Messages = {
   "settings.darkImages": "छवियाँ समायोजित करें",
   "settings.darkImagesNote":
     "पारदर्शी बैकग्राउंड पर गहरे आइकन और लोगो को उलट देता है और बड़े हल्के डायग्राम की चमक घटाता है।",
-  "settings.darkSites": "अपनी पसंद वाली साइटें",
   "settings.darkSitesEmpty": "अभी तक कोई नहीं।",
   "settings.darkSiteRemove": "{site} के लिए डार्क मोड की पसंद हटाएँ",
   "settings.darkReset": "डिफ़ॉल्ट पर रीसेट करें",
@@ -466,9 +464,7 @@ export const hi: Messages = {
   "favorites.videoHeightOwn": "इस साइट की अपनी ऊँचाई है।",
   "favorites.videoHeightLabel": "{site} के वीडियो नियंत्रण की ऊँचाई",
   "favorites.videoUseShared": "साझा वीडियो सेटिंग इस्तेमाल करें",
-  "favorites.darkMode": "डार्क मोड",
   "favorites.darkModeLabel": "{site} का डार्क मोड",
-  "favorites.darkFollow": "सेटिंग का पालन करें",
   "favorites.darkOn": "हमेशा चालू",
   "favorites.darkOff": "बंद",
   "favorites.darkMethod": "इस साइट के लिए तरीका",
@@ -785,17 +781,22 @@ export const hi: Messages = {
     "यह केवल ऐप पर लागू होता है। पेज कैसे दिखें, यह डार्क मोड में तय होता है।",
   "settings.darkScheduleSystem": "सिस्टम",
   "settings.darkScheduleSystemNote": "डिवाइस की लाइट या डार्क सेटिंग का पालन करता है।",
-  "settings.darkSitesNote":
-    "ये सेटिंग हर साइट पर लागू होती हैं, जब तक किसी साइट की अपनी पसंद न हो। इसे साइट की पेज सेटिंग में तय करें।",
-  "fab.darkMode":
-    "डार्क मोड। इस पेज के लिए चालू या बंद करने को टैप करें, विकल्पों के लिए दबाए रखें।",
-  "favorites.pageSettings": "पेज सेटिंग",
-  "siteSettings.darkNote": "केवल इस साइट के लिए डार्क मोड।",
-  "siteSettings.videoNote": "केवल इस साइट के लिए वीडियो नियंत्रण।",
-  "siteDark.effectiveOn": "इस साइट के लिए डार्क मोड चालू है।",
-  "siteDark.effectiveOff": "इस साइट के लिए डार्क मोड बंद है।",
-  "siteDark.openShared": "डार्क मोड सेटिंग",
-  "siteDark.openSharedNote": "रंग, समय-सारणी और सभी साइटों का साझा तरीका।",
   "favorites.videoPanel": "नियंत्रण पैनल",
   "favorites.videoPanelLabel": "{site} का वीडियो नियंत्रण पैनल",
+  "favorites.darkMode": "विशिष्ट डार्क मोड",
+  "favorites.darkFollow": "सामान्य का पालन करें",
+  "settings.darkModeNote": "सामान्य सेटिंग, हर साइट के लिए डिफ़ॉल्ट",
+  "settings.darkModeTitle": "सामान्य डार्क मोड",
+  "settings.darkModeSubtitle":
+    "हर साइट के लिए डिफ़ॉल्ट। किसी पसंदीदा की अपनी डार्क मोड पसंद इसे बदल देती है।",
+  "settings.darkSites": "विशिष्ट सेटिंग वाली साइटें",
+  "settings.darkSitesNote":
+    "ये सेटिंग हर साइट पर लागू होती हैं, जब तक किसी साइट की विशिष्ट सेटिंग न हो। इन्हें किसी पसंदीदा में तय करें।",
+  "favorites.darkModeNote": "इस साइट के लिए सामान्य डार्क मोड को बदल देता है।",
+  "fab.darkMode":
+    "डार्क मोड। सभी साइटों के लिए चालू या बंद करने को टैप करें, सामान्य सेटिंग के लिए दबाए रखें।",
+  "fab.darkModeSite":
+    "इस साइट के लिए डार्क मोड। चालू या बंद करने को टैप करें, इसकी सेटिंग के लिए दबाए रखें।",
+  "favorites.darkEffectiveOn": "इस साइट के लिए डार्क मोड चालू है।",
+  "favorites.darkEffectiveOff": "इस साइट के लिए डार्क मोड बंद है।",
 };

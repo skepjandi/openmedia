@@ -405,7 +405,6 @@ export const cs: Messages = {
   "recipes.removeFavorite": "Odebrat {name} z oblíbených",
   "recipes.hub": "Hub",
   "settings.darkMode": "Tmavý režim",
-  "settings.darkModeNote": "Ztmaví stránky, které otevřete.",
   "settings.darkEnabled": "Ztmavit stránky",
   "settings.darkEnabledNote": "Zapne tmavý režim na všech webech, které nemají vlastní volbu.",
   "settings.darkMethod": "Metoda",
@@ -453,7 +452,6 @@ export const cs: Messages = {
   "settings.darkImages": "Upravit obrázky",
   "settings.darkImagesNote":
     "Invertuje tmavé ikony a loga na průhledném pozadí a zjemní velké světlé diagramy.",
-  "settings.darkSites": "Weby s vlastní volbou",
   "settings.darkSitesEmpty": "Zatím žádné.",
   "settings.darkSiteRemove": "Odebrat volbu tmavého režimu pro {site}",
   "settings.darkReset": "Obnovit výchozí hodnoty",
@@ -472,9 +470,7 @@ export const cs: Messages = {
   "favorites.videoHeightOwn": "Tento web má vlastní výšku.",
   "favorites.videoHeightLabel": "Výška ovládání videa na {site}",
   "favorites.videoUseShared": "Použít sdílená nastavení videa",
-  "favorites.darkMode": "Tmavý režim",
   "favorites.darkModeLabel": "Tmavý režim: {site}",
-  "favorites.darkFollow": "Podle nastavení",
   "favorites.darkOn": "Vždy zapnuto",
   "favorites.darkOff": "Vypnuto",
   "favorites.darkMethod": "Metoda pro tento web",
@@ -786,17 +782,22 @@ export const cs: Messages = {
   "settings.appearanceNote": "Platí jen pro aplikaci. Vzhled stránek se nastavuje v tmavém režimu.",
   "settings.darkScheduleSystem": "Systém",
   "settings.darkScheduleSystemNote": "Řídí se světlým nebo tmavým nastavením zařízení.",
-  "settings.darkSitesNote":
-    "Tato nastavení platí pro všechny weby, pokud web nemá vlastní volbu. Nastavíte ji v nastavení stránky daného webu.",
-  "fab.darkMode":
-    "Tmavý režim. Klepnutím ho pro tuto stránku zapnete nebo vypnete, podržením otevřete možnosti.",
-  "favorites.pageSettings": "Nastavení stránky",
-  "siteSettings.darkNote": "Tmavý režim jen pro tento web.",
-  "siteSettings.videoNote": "Ovládání videa jen pro tento web.",
-  "siteDark.effectiveOn": "Tmavý režim je pro tento web zapnutý.",
-  "siteDark.effectiveOff": "Tmavý režim je pro tento web vypnutý.",
-  "siteDark.openShared": "Nastavení tmavého režimu",
-  "siteDark.openSharedNote": "Barvy, plán a sdílená metoda pro všechny weby.",
   "favorites.videoPanel": "Panel ovládání",
   "favorites.videoPanelLabel": "Panel ovládání videa na {site}",
+  "favorites.darkMode": "Konkrétní tmavý režim",
+  "favorites.darkFollow": "Podle obecného",
+  "settings.darkModeNote": "Obecná nastavení, výchozí pro každý web",
+  "settings.darkModeTitle": "Obecný tmavý režim",
+  "settings.darkModeSubtitle":
+    "Výchozí pro každý web. Vlastní volba tmavého režimu u oblíbené položky ji přebíjí.",
+  "settings.darkSites": "Weby s konkrétním nastavením",
+  "settings.darkSitesNote":
+    "Tato nastavení platí pro všechny weby, pokud web nemá konkrétní nastavení. Nastavíte je u oblíbené položky.",
+  "favorites.darkModeNote": "Přebíjí obecný tmavý režim pro tento web.",
+  "fab.darkMode":
+    "Tmavý režim. Klepnutím ho zapnete nebo vypnete pro všechny weby, podržením otevřete obecná nastavení.",
+  "fab.darkModeSite":
+    "Tmavý režim pro tento web. Klepnutím ho zapnete nebo vypnete, podržením otevřete jeho nastavení.",
+  "favorites.darkEffectiveOn": "Tmavý režim je pro tento web zapnutý.",
+  "favorites.darkEffectiveOff": "Tmavý režim je pro tento web vypnutý.",
 };

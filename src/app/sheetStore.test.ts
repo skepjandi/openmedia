@@ -8,7 +8,7 @@ import { newSession } from "../features/web/sessions";
 import { useEntitlementStore } from "../features/paywall/store";
 
 beforeEach(() => {
-  useApp.setState({ sheet: "none", sheetParent: "none", sheetBack: [], sheetSite: null });
+  useApp.setState({ sheet: "none", sheetParent: "none" });
   useEntitlementStore.setState({ status: "free", configured: true, snapshot: null });
 });
 
@@ -71,74 +71,15 @@ describe("pages opened from Settings", () => {
   });
 });
 
-describe("pages about one site", () => {
-  const store = () => useApp.getState();
-
-  it("goes hub, then dark mode, and back to the hub, then to Settings", () => {
-    store().openSheet("settings");
-    store().openSiteSheet("site-settings", "example.com");
-    expect(store().sheetSite).toBe("example.com");
-    expect(selectSettingsOpen(store())).toBe(true);
-    store().openSiteSheet("site-dark-mode", "example.com");
-    expect(store().sheet).toBe("site-dark-mode");
-    expect(selectSettingsOpen(store())).toBe(true);
-    store().closeSheet();
-    expect(store().sheet).toBe("site-settings");
-    expect(store().sheetSite).toBe("example.com");
-    expect(selectSettingsOpen(store())).toBe(true);
-    store().closeSheet();
-    expect(store().sheet).toBe("settings");
-    expect(store().sheetSite).toBeNull();
-    store().closeSheet();
-    expect(store().sheet).toBe("none");
-  });
-
-  it("goes from the hub to the video page and back", () => {
-    store().openSheet("settings");
-    store().openSiteSheet("site-settings", "example.com");
-    store().openSiteSheet("site-video", "example.com");
-    expect(store().sheet).toBe("site-video");
-    store().closeSheet();
-    expect(store().sheet).toBe("site-settings");
-  });
-
-  it("closes to the page when opened from the floating button", () => {
-    store().openSiteSheet("site-dark-mode", "example.com");
-    expect(store().sheet).toBe("site-dark-mode");
-    expect(selectSettingsOpen(store())).toBe(false);
-    expect(store().sheetBack).toEqual([]);
-    store().closeSheet();
-    expect(store().sheet).toBe("none");
-    expect(store().sheetSite).toBeNull();
-  });
-
-  it("returns from the shared dark mode page to the site's page, whatever sits beneath", () => {
-    store().openSiteSheet("site-dark-mode", "example.com");
-    store().openSheet("dark-mode");
-    expect(store().sheet).toBe("dark-mode");
-    store().closeSheet();
-    expect(store().sheet).toBe("site-dark-mode");
-    expect(store().sheetSite).toBe("example.com");
-    store().closeSheet();
-    expect(store().sheet).toBe("none");
-
-    store().openSheet("settings");
-    store().openSiteSheet("site-settings", "example.com");
-    store().openSiteSheet("site-dark-mode", "example.com");
-    store().openSheet("dark-mode");
-    store().closeSheet();
-    expect(store().sheet).toBe("site-dark-mode");
-    store().closeSheet();
-    expect(store().sheet).toBe("site-settings");
-    store().closeSheet();
-    expect(store().sheet).toBe("settings");
-  });
-
-  it("opens the shared dark mode page from the home screen without a way back to a site", () => {
-    store().openSheet("dark-mode");
-    expect(store().sheetBack).toEqual([]);
-    store().closeSheet();
-    expect(store().sheet).toBe("none");
+describe("a favorite's settings", () => {
+  it("opens Settings and keeps the favorite to expand until it is consumed", () => {
+    useApp.getState().openFavoriteSettings("f1");
+    expect(useApp.getState().sheet).toBe("settings");
+    expect(useApp.getState().focusFavoriteId).toBe("f1");
+    useApp.getState().clearFavoriteFocus();
+    expect(useApp.getState().focusFavoriteId).toBeNull();
+    useApp.getState().closeSheet();
+    expect(useApp.getState().sheet).toBe("none");
   });
 });
 

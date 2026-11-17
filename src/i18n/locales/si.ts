@@ -400,7 +400,6 @@ export const si: Messages = {
   "recipes.removeFavorite": "{name} ආදරණීය අයිතිතයෙන් ඉවත් කරන්න",
   "recipes.hub": "හබ්",
   "settings.darkMode": "අඳුරු ප්‍රකාරය",
-  "settings.darkModeNote": "ඔබ විවෘත කරන පිටු අඳුරු කරයි.",
   "settings.darkEnabled": "පිටු අඳුරු කරන්න",
   "settings.darkEnabledNote": "තමන්ගේම තේරීමක් නැති සියලු අඩවිවල අඳුරු ප්‍රකාරය සක්‍රිය කරයි.",
   "settings.darkMethod": "ක්‍රමය",
@@ -448,7 +447,6 @@ export const si: Messages = {
   "settings.darkImages": "රූප සකසන්න",
   "settings.darkImagesNote":
     "විනිවිද පෙනෙන පසුබිම්වල ඇති අඳුරු නිරූපක සහ ලාංඡන ප්‍රතිවර්තනය කර විශාල ලා රූප සටහන් මෘදු කරයි.",
-  "settings.darkSites": "තමන්ගේම තේරීමක් ඇති අඩවි",
   "settings.darkSitesEmpty": "තවම නැත.",
   "settings.darkSiteRemove": "{site} සඳහා අඳුරු ප්‍රකාර තේරීම ඉවත් කරන්න",
   "settings.darkReset": "පෙරනිමිවලට යළි සකසන්න",
@@ -467,9 +465,7 @@ export const si: Messages = {
   "favorites.videoHeightOwn": "මෙම අඩවියට එකම උසක් ඇත.",
   "favorites.videoHeightLabel": "{site} වීඩියෝ පාලන උස",
   "favorites.videoUseShared": "මූලික වීඩියෝ සැකසුම් භාවිතය කරන්න",
-  "favorites.darkMode": "අඳුරු ප්‍රකාරය",
   "favorites.darkModeLabel": "{site} අඳුරු ප්‍රකාරය",
-  "favorites.darkFollow": "සැකසුම් අනුගමනය කරන්න",
   "favorites.darkOn": "සෑම විටම සක්‍රිය",
   "favorites.darkOff": "අක්‍රිය",
   "favorites.darkMethod": "මෙම අඩවිය සඳහා ක්‍රමය",
@@ -784,17 +780,22 @@ export const si: Messages = {
   "settings.appearanceNote": "යෙදුමට පමණක් අදාළ වේ. පිටු පෙනෙන ආකාරය අඳුරු ප්‍රකාරයෙන් සකසයි.",
   "settings.darkScheduleSystem": "පද්ධතිය",
   "settings.darkScheduleSystemNote": "උපාංගයේ ආලෝක හෝ අඳුරු සැකසුම අනුගමනය කරයි.",
-  "settings.darkSitesNote":
-    "අඩවියකට තමන්ගේම තේරීමක් නොමැති නම් මෙම සැකසුම් සියලු අඩවිවලට අදාළ වේ. අඩවියේ පිටු සැකසුම්වල එය සකසන්න.",
-  "fab.darkMode":
-    "අඳුරු ප්‍රකාරය. මෙම පිටුව සඳහා සක්‍රිය හෝ අක්‍රිය කිරීමට තට්ටු කරන්න, විකල්ප සඳහා අල්ලාගෙන සිටින්න.",
-  "favorites.pageSettings": "පිටු සැකසුම්",
-  "siteSettings.darkNote": "මෙම අඩවිය සඳහා පමණක් අඳුරු ප්‍රකාරය.",
-  "siteSettings.videoNote": "මෙම අඩවිය සඳහා පමණක් වීඩියෝ පාලන.",
-  "siteDark.effectiveOn": "මෙම අඩවිය සඳහා අඳුරු ප්‍රකාරය සක්‍රියයි.",
-  "siteDark.effectiveOff": "මෙම අඩවිය සඳහා අඳුරු ප්‍රකාරය අක්‍රියයි.",
-  "siteDark.openShared": "අඳුරු ප්‍රකාර සැකසුම්",
-  "siteDark.openSharedNote": "වර්ණ, කාලසටහන සහ සියලු අඩවි සඳහා බෙදාගත් ක්‍රමය.",
   "favorites.videoPanel": "පාලන පුවරුව",
   "favorites.videoPanelLabel": "{site} වීඩියෝ පාලන පුවරුව",
+  "favorites.darkMode": "විශේෂිත අඳුරු ප්‍රකාරය",
+  "favorites.darkFollow": "සාමාන්‍ය අනුගමනය කරන්න",
+  "settings.darkModeNote": "සාමාන්‍ය සැකසුම්, සියලු අඩවි සඳහා පෙරනිමිය",
+  "settings.darkModeTitle": "සාමාන්‍ය අඳුරු ප්‍රකාරය",
+  "settings.darkModeSubtitle":
+    "සියලු අඩවි සඳහා පෙරනිමිය. ආදරණීයයක තමන්ගේම අඳුරු ප්‍රකාර තේරීම මෙය අභිබවයි.",
+  "settings.darkSites": "විශේෂිත සැකසුම් ඇති අඩවි",
+  "settings.darkSitesNote":
+    "අඩවියකට විශේෂිත සැකසුම් නොමැති නම් මෙම සැකසුම් සියලු අඩවිවලට අදාළ වේ. ආදරණීයයක ඒවා සකසන්න.",
+  "favorites.darkModeNote": "මෙම අඩවිය සඳහා සාමාන්‍ය අඳුරු ප්‍රකාරය අභිබවයි.",
+  "fab.darkMode":
+    "අඳුරු ප්‍රකාරය. සියලු අඩවි සඳහා සක්‍රිය හෝ අක්‍රිය කිරීමට තට්ටු කරන්න, සාමාන්‍ය සැකසුම් සඳහා අල්ලාගෙන සිටින්න.",
+  "fab.darkModeSite":
+    "මෙම අඩවිය සඳහා අඳුරු ප්‍රකාරය. සක්‍රිය හෝ අක්‍රිය කිරීමට තට්ටු කරන්න, එහි සැකසුම් සඳහා අල්ලාගෙන සිටින්න.",
+  "favorites.darkEffectiveOn": "මෙම අඩවිය සඳහා අඳුරු ප්‍රකාරය සක්‍රියයි.",
+  "favorites.darkEffectiveOff": "මෙම අඩවිය සඳහා අඳුරු ප්‍රකාරය අක්‍රියයි.",
 };

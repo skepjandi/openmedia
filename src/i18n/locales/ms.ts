@@ -405,7 +405,6 @@ export const ms: Messages = {
   "recipes.removeFavorite": "Buang {name} daripada kegemaran",
   "recipes.hub": "Hab",
   "settings.darkMode": "Mod gelap",
-  "settings.darkModeNote": "Menggelapkan laman yang anda buka.",
   "settings.darkEnabled": "Gelapkan laman",
   "settings.darkEnabledNote":
     "Menghidupkan mod gelap untuk setiap tapak yang tiada pilihan sendiri.",
@@ -453,7 +452,6 @@ export const ms: Messages = {
   "settings.darkImages": "Laraskan imej",
   "settings.darkImagesNote":
     "Menyongsangkan ikon dan logo gelap pada latar belakang lutsinar dan melembutkan gambar rajah cerah yang besar.",
-  "settings.darkSites": "Tapak dengan pilihan sendiri",
   "settings.darkSitesEmpty": "Belum ada.",
   "settings.darkSiteRemove": "Alih keluar pilihan mod gelap untuk {site}",
   "settings.darkReset": "Tetapkan semula kepada lalai",
@@ -472,9 +470,7 @@ export const ms: Messages = {
   "favorites.videoHeightOwn": "Laman ini mempunyai ketinggian sendiri.",
   "favorites.videoHeightLabel": "Ketinggian kawalan video {site}",
   "favorites.videoUseShared": "Guna tetapan video bersama",
-  "favorites.darkMode": "Mod gelap",
   "favorites.darkModeLabel": "Mod gelap {site}",
-  "favorites.darkFollow": "Ikut tetapan",
   "favorites.darkOn": "Sentiasa hidup",
   "favorites.darkOff": "Mati",
   "favorites.darkMethod": "Kaedah untuk tapak ini",
@@ -793,17 +789,22 @@ export const ms: Messages = {
   "settings.appearanceNote": "Hanya terpakai pada aplikasi. Rupa laman ditetapkan dalam Mod gelap.",
   "settings.darkScheduleSystem": "Sistem",
   "settings.darkScheduleSystemNote": "Mengikut tetapan cerah atau gelap peranti.",
-  "settings.darkSitesNote":
-    "Tetapan ini digunakan pada setiap tapak melainkan tapak itu mempunyai pilihan sendiri. Tetapkannya dalam tetapan halaman tapak itu.",
-  "fab.darkMode":
-    "Mod gelap. Ketik untuk menghidupkan atau mematikannya bagi halaman ini, tekan lama untuk pilihan.",
-  "favorites.pageSettings": "Tetapan halaman",
-  "siteSettings.darkNote": "Mod gelap untuk tapak ini sahaja.",
-  "siteSettings.videoNote": "Kawalan video untuk tapak ini sahaja.",
-  "siteDark.effectiveOn": "Mod gelap dihidupkan untuk tapak ini.",
-  "siteDark.effectiveOff": "Mod gelap dimatikan untuk tapak ini.",
-  "siteDark.openShared": "Tetapan mod gelap",
-  "siteDark.openSharedNote": "Warna, jadual dan kaedah dikongsi untuk semua tapak.",
   "favorites.videoPanel": "Panel kawalan",
   "favorites.videoPanelLabel": "Panel kawalan video {site}",
+  "favorites.darkMode": "Mod gelap khusus",
+  "favorites.darkFollow": "Ikut tetapan umum",
+  "settings.darkModeNote": "Tetapan umum, lalai untuk setiap tapak",
+  "settings.darkModeTitle": "Mod gelap umum",
+  "settings.darkModeSubtitle":
+    "Lalai untuk setiap tapak. Pilihan mod gelap kegemaran itu sendiri mengatasinya.",
+  "settings.darkSites": "Tapak dengan tetapan khusus",
+  "settings.darkSitesNote":
+    "Tetapan ini digunakan pada setiap tapak melainkan tapak itu mempunyai tetapan khusus. Tetapkannya dalam kegemaran.",
+  "favorites.darkModeNote": "Mengatasi mod gelap umum untuk tapak ini.",
+  "fab.darkMode":
+    "Mod gelap. Ketik untuk menghidupkan atau mematikannya bagi semua tapak, tekan lama untuk tetapan umum.",
+  "fab.darkModeSite":
+    "Mod gelap untuk tapak ini. Ketik untuk menghidupkan atau mematikannya, tekan lama untuk tetapannya.",
+  "favorites.darkEffectiveOn": "Mod gelap dihidupkan untuk tapak ini.",
+  "favorites.darkEffectiveOff": "Mod gelap dimatikan untuk tapak ini.",
 };

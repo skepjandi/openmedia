@@ -411,7 +411,6 @@ export const it: Messages = {
   "recipes.removeFavorite": "Rimuovi {name} dai preferiti",
   "recipes.hub": "Hub",
   "settings.darkMode": "Modalità scura",
-  "settings.darkModeNote": "Scurisce le pagine che apri.",
   "settings.darkEnabled": "Scurisci le pagine",
   "settings.darkEnabledNote":
     "Attiva la modalità scura su ogni sito che non ha una scelta propria.",
@@ -461,7 +460,6 @@ export const it: Messages = {
   "settings.darkImages": "Regola le immagini",
   "settings.darkImagesNote":
     "Inverte icone e loghi scuri su sfondo trasparente e attenua i grandi diagrammi chiari.",
-  "settings.darkSites": "Siti con scelta propria",
   "settings.darkSitesEmpty": "Nessuno per ora.",
   "settings.darkSiteRemove": "Rimuovi la scelta della modalità scura per {site}",
   "settings.darkReset": "Ripristina i valori predefiniti",
@@ -479,9 +477,7 @@ export const it: Messages = {
   "favorites.videoHeightOwn": "Questo sito ha una propria altezza.",
   "favorites.videoHeightLabel": "Altezza dei controlli video di {site}",
   "favorites.videoUseShared": "Usa le impostazioni video condivise",
-  "favorites.darkMode": "Modalità scura",
   "favorites.darkModeLabel": "Modalità scura di {site}",
-  "favorites.darkFollow": "Segui le impostazioni",
   "favorites.darkOn": "Sempre attiva",
   "favorites.darkOff": "Disattivata",
   "favorites.darkMethod": "Metodo per questo sito",
@@ -801,17 +797,22 @@ export const it: Messages = {
     "Si applica solo all’app. L’aspetto delle pagine si imposta nella modalità scura.",
   "settings.darkScheduleSystem": "Sistema",
   "settings.darkScheduleSystemNote": "Segue l'impostazione chiara o scura del dispositivo.",
-  "settings.darkSitesNote":
-    "Queste impostazioni valgono per ogni sito, a meno che un sito non abbia una scelta propria. Impostala nelle impostazioni della pagina del sito.",
-  "fab.darkMode":
-    "Modalità scura. Tocca per attivarla o disattivarla in questa pagina, tieni premuto per le opzioni.",
-  "favorites.pageSettings": "Impostazioni della pagina",
-  "siteSettings.darkNote": "Modalità scura solo per questo sito.",
-  "siteSettings.videoNote": "Controlli video solo per questo sito.",
-  "siteDark.effectiveOn": "La modalità scura è attiva per questo sito.",
-  "siteDark.effectiveOff": "La modalità scura è disattivata per questo sito.",
-  "siteDark.openShared": "Impostazioni della modalità scura",
-  "siteDark.openSharedNote": "Colori, orario e metodo condiviso per tutti i siti.",
   "favorites.videoPanel": "Pannello dei controlli",
   "favorites.videoPanelLabel": "Pannello dei controlli video di {site}",
+  "favorites.darkMode": "Modalità scura specifica",
+  "favorites.darkFollow": "Segui quella generale",
+  "settings.darkModeNote": "Impostazioni generali, il valore predefinito per ogni sito",
+  "settings.darkModeTitle": "Modalità scura generale",
+  "settings.darkModeSubtitle":
+    "Il valore predefinito per ogni sito. La scelta di modalità scura propria di un preferito lo sostituisce.",
+  "settings.darkSites": "Siti con impostazioni specifiche",
+  "settings.darkSitesNote":
+    "Queste impostazioni valgono per ogni sito, a meno che un sito non abbia impostazioni specifiche. Impostale in un preferito.",
+  "favorites.darkModeNote": "Sostituisce la modalità scura generale per questo sito.",
+  "fab.darkMode":
+    "Modalità scura. Tocca per attivarla o disattivarla per tutti i siti, tieni premuto per le impostazioni generali.",
+  "fab.darkModeSite":
+    "Modalità scura per questo sito. Tocca per attivarla o disattivarla, tieni premuto per le sue impostazioni.",
+  "favorites.darkEffectiveOn": "La modalità scura è attiva per questo sito.",
+  "favorites.darkEffectiveOff": "La modalità scura è disattivata per questo sito.",
 };

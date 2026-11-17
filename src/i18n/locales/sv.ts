@@ -408,7 +408,6 @@ export const sv: Messages = {
   "recipes.removeFavorite": "Ta bort {name} från favoriter",
   "recipes.hub": "Hubb",
   "settings.darkMode": "Mörkt läge",
-  "settings.darkModeNote": "Gör sidorna du öppnar mörkare.",
   "settings.darkEnabled": "Mörka sidor",
   "settings.darkEnabledNote":
     "Aktiverar mörkt läge för alla webbplatser som inte har ett eget val.",
@@ -457,7 +456,6 @@ export const sv: Messages = {
   "settings.darkImages": "Justera bilder",
   "settings.darkImagesNote":
     "Inverterar mörka ikoner och logotyper på genomskinliga bakgrunder och dämpar stora ljusa diagram.",
-  "settings.darkSites": "Webbplatser med eget val",
   "settings.darkSitesEmpty": "Inga ännu.",
   "settings.darkSiteRemove": "Ta bort valet av mörkt läge för {site}",
   "settings.darkReset": "Återställ till standard",
@@ -476,9 +474,7 @@ export const sv: Messages = {
   "favorites.videoHeightOwn": "Den här webbplatsen har en egen höjd.",
   "favorites.videoHeightLabel": "Videokontrollernas höjd för {site}",
   "favorites.videoUseShared": "Använd de delade videoinställningarna",
-  "favorites.darkMode": "Mörkt läge",
   "favorites.darkModeLabel": "Mörkt läge för {site}",
-  "favorites.darkFollow": "Följ inställningarna",
   "favorites.darkOn": "Alltid på",
   "favorites.darkOff": "Av",
   "favorites.darkMethod": "Metod för den här webbplatsen",
@@ -791,17 +787,22 @@ export const sv: Messages = {
   "settings.appearanceNote": "Gäller bara appen. Hur sidor ser ut ställs in under Mörkt läge.",
   "settings.darkScheduleSystem": "System",
   "settings.darkScheduleSystemNote": "Följer enhetens ljusa eller mörka inställning.",
-  "settings.darkSitesNote":
-    "Inställningarna gäller alla webbplatser, om inte en webbplats har ett eget val. Ange det i webbplatsens sidinställningar.",
-  "fab.darkMode":
-    "Mörkt läge. Tryck för att slå på eller av för den här sidan, håll nedtryckt för alternativ.",
-  "favorites.pageSettings": "Sidinställningar",
-  "siteSettings.darkNote": "Mörkt läge bara för den här webbplatsen.",
-  "siteSettings.videoNote": "Videokontroller bara för den här webbplatsen.",
-  "siteDark.effectiveOn": "Mörkt läge är på för den här webbplatsen.",
-  "siteDark.effectiveOff": "Mörkt läge är av för den här webbplatsen.",
-  "siteDark.openShared": "Inställningar för mörkt läge",
-  "siteDark.openSharedNote": "Färger, schema och den delade metoden för alla webbplatser.",
   "favorites.videoPanel": "Kontrollpanel",
   "favorites.videoPanelLabel": "Videokontrollpanel för {site}",
+  "favorites.darkMode": "Specifikt mörkt läge",
+  "favorites.darkFollow": "Följ det allmänna",
+  "settings.darkModeNote": "Allmänna inställningar, standard för alla webbplatser",
+  "settings.darkModeTitle": "Allmänt mörkt läge",
+  "settings.darkModeSubtitle":
+    "Standard för alla webbplatser. En favorits eget val av mörkt läge åsidosätter det.",
+  "settings.darkSites": "Webbplatser med specifika inställningar",
+  "settings.darkSitesNote":
+    "Inställningarna gäller alla webbplatser, om inte en webbplats har specifika inställningar. Ange dem i en favorit.",
+  "favorites.darkModeNote": "Åsidosätter det allmänna mörka läget för den här webbplatsen.",
+  "fab.darkMode":
+    "Mörkt läge. Tryck för att slå på eller av för alla webbplatser, håll nedtryckt för allmänna inställningar.",
+  "fab.darkModeSite":
+    "Mörkt läge för den här webbplatsen. Tryck för att slå på eller av, håll nedtryckt för dess inställningar.",
+  "favorites.darkEffectiveOn": "Mörkt läge är på för den här webbplatsen.",
+  "favorites.darkEffectiveOff": "Mörkt läge är av för den här webbplatsen.",
 };

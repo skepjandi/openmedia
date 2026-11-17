@@ -405,7 +405,6 @@ export const ur: Messages = {
   "recipes.removeFavorite": "{name} کو پسندیدہ سے ہٹائیں",
   "recipes.hub": "ہاب",
   "settings.darkMode": "ڈارک موڈ",
-  "settings.darkModeNote": "آپ کے کھولے ہوئے صفحات کو گہرا کرتا ہے۔",
   "settings.darkEnabled": "صفحات گہرے کریں",
   "settings.darkEnabledNote": "ہر اس سائٹ پر ڈارک موڈ آن کرتا ہے جس کی اپنی کوئی پسند نہیں۔",
   "settings.darkMethod": "طریقہ",
@@ -453,7 +452,6 @@ export const ur: Messages = {
   "settings.darkImages": "تصاویر ایڈجسٹ کریں",
   "settings.darkImagesNote":
     "شفاف پس منظر پر گہرے آئیکن اور لوگو الٹ دیتا ہے اور بڑے ہلکے ڈایاگرام کی چمک کم کرتا ہے۔",
-  "settings.darkSites": "اپنی پسند والی سائٹس",
   "settings.darkSitesEmpty": "ابھی تک کوئی نہیں۔",
   "settings.darkSiteRemove": "{site} کے لیے ڈارک موڈ کی پسند ہٹائیں",
   "settings.darkReset": "ڈیفالٹ پر ری سیٹ کریں",
@@ -472,9 +470,7 @@ export const ur: Messages = {
   "favorites.videoHeightOwn": "اس سائٹ کی اپنی اونچائی ہے۔",
   "favorites.videoHeightLabel": "{site} ویڈیو کنٹرولز کی اونچائی",
   "favorites.videoUseShared": "مشترکہ ویڈیو سیٹنگز استعمال کریں",
-  "favorites.darkMode": "ڈارک موڈ",
   "favorites.darkModeLabel": "{site} کا ڈارک موڈ",
-  "favorites.darkFollow": "سیٹنگز کی پیروی کریں",
   "favorites.darkOn": "ہمیشہ آن",
   "favorites.darkOff": "بند",
   "favorites.darkMethod": "اس سائٹ کے لیے طریقہ",
@@ -785,17 +781,22 @@ export const ur: Messages = {
     "صرف ایپ پر لاگو ہوتا ہے۔ صفحات کیسے نظر آئیں، یہ ڈارک موڈ میں طے ہوتا ہے۔",
   "settings.darkScheduleSystem": "سسٹم",
   "settings.darkScheduleSystemNote": "ڈیوائس کی ہلکی یا گہری سیٹنگ کی پیروی کرتا ہے۔",
-  "settings.darkSitesNote":
-    "یہ سیٹنگز ہر سائٹ پر لاگو ہوتی ہیں جب تک کسی سائٹ کی اپنی پسند نہ ہو۔ اسے سائٹ کی صفحہ سیٹنگز میں طے کریں۔",
-  "fab.darkMode":
-    "ڈارک موڈ۔ اس صفحے کے لیے آن یا آف کرنے کو ٹیپ کریں، اختیارات کے لیے دبائے رکھیں۔",
-  "favorites.pageSettings": "صفحہ سیٹنگز",
-  "siteSettings.darkNote": "صرف اس سائٹ کے لیے ڈارک موڈ۔",
-  "siteSettings.videoNote": "صرف اس سائٹ کے لیے ویڈیو کنٹرولز۔",
-  "siteDark.effectiveOn": "اس سائٹ کے لیے ڈارک موڈ آن ہے۔",
-  "siteDark.effectiveOff": "اس سائٹ کے لیے ڈارک موڈ بند ہے۔",
-  "siteDark.openShared": "ڈارک موڈ سیٹنگز",
-  "siteDark.openSharedNote": "رنگ، شیڈول اور تمام سائٹس کا مشترکہ طریقہ۔",
   "favorites.videoPanel": "کنٹرول پینل",
   "favorites.videoPanelLabel": "{site} کا ویڈیو کنٹرول پینل",
+  "favorites.darkMode": "مخصوص ڈارک موڈ",
+  "favorites.darkFollow": "عمومی کی پیروی کریں",
+  "settings.darkModeNote": "عمومی سیٹنگز، ہر سائٹ کے لیے طے شدہ",
+  "settings.darkModeTitle": "عمومی ڈارک موڈ",
+  "settings.darkModeSubtitle":
+    "ہر سائٹ کے لیے طے شدہ۔ کسی پسندیدہ کی اپنی ڈارک موڈ پسند اسے بدل دیتی ہے۔",
+  "settings.darkSites": "مخصوص سیٹنگز والی سائٹس",
+  "settings.darkSitesNote":
+    "یہ سیٹنگز ہر سائٹ پر لاگو ہوتی ہیں جب تک کسی سائٹ کی مخصوص سیٹنگز نہ ہوں۔ انہیں کسی پسندیدہ میں طے کریں۔",
+  "favorites.darkModeNote": "اس سائٹ کے لیے عمومی ڈارک موڈ کو بدل دیتا ہے۔",
+  "fab.darkMode":
+    "ڈارک موڈ۔ تمام سائٹس کے لیے آن یا آف کرنے کو ٹیپ کریں، عمومی سیٹنگز کے لیے دبائے رکھیں۔",
+  "fab.darkModeSite":
+    "اس سائٹ کے لیے ڈارک موڈ۔ آن یا آف کرنے کو ٹیپ کریں، اس کی سیٹنگز کے لیے دبائے رکھیں۔",
+  "favorites.darkEffectiveOn": "اس سائٹ کے لیے ڈارک موڈ آن ہے۔",
+  "favorites.darkEffectiveOff": "اس سائٹ کے لیے ڈارک موڈ بند ہے۔",
 };

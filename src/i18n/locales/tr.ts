@@ -408,7 +408,6 @@ export const tr: Messages = {
   "recipes.removeFavorite": "{name} öğesini favorilerden çıkar",
   "recipes.hub": "Hub",
   "settings.darkMode": "Koyu mod",
-  "settings.darkModeNote": "Açtığınız sayfaları koyulaştırır.",
   "settings.darkEnabled": "Sayfaları koyulaştır",
   "settings.darkEnabledNote": "Kendi seçimi olmayan her sitede koyu modu açar.",
   "settings.darkMethod": "Yöntem",
@@ -456,7 +455,6 @@ export const tr: Messages = {
   "settings.darkImages": "Görselleri ayarla",
   "settings.darkImagesNote":
     "Saydam arka plandaki koyu simgeleri ve logoları ters çevirir, büyük açık renkli diyagramları yumuşatır.",
-  "settings.darkSites": "Kendi seçimi olan siteler",
   "settings.darkSitesEmpty": "Henüz yok.",
   "settings.darkSiteRemove": "{site} için koyu mod seçimini kaldır",
   "settings.darkReset": "Varsayılanlara sıfırla",
@@ -475,9 +473,7 @@ export const tr: Messages = {
   "favorites.videoHeightOwn": "Bu sitenin kendi yüksekliği var.",
   "favorites.videoHeightLabel": "{site} video kontrolleri yüksekliği",
   "favorites.videoUseShared": "Paylaşılan video ayarlarını kullan",
-  "favorites.darkMode": "Koyu mod",
   "favorites.darkModeLabel": "{site} koyu modu",
-  "favorites.darkFollow": "Ayarları izle",
   "favorites.darkOn": "Her zaman açık",
   "favorites.darkOff": "Kapalı",
   "favorites.darkMethod": "Bu site için yöntem",
@@ -791,17 +787,22 @@ export const tr: Messages = {
     "Yalnızca uygulama için geçerlidir. Sayfaların görünümü Koyu mod'da ayarlanır.",
   "settings.darkScheduleSystem": "Sistem",
   "settings.darkScheduleSystemNote": "Cihazın açık veya koyu ayarını izler.",
-  "settings.darkSitesNote":
-    "Bir sitenin kendi seçimi yoksa bu ayarlar her siteye uygulanır. Bunu sitenin sayfa ayarlarından belirleyin.",
-  "fab.darkMode":
-    "Koyu mod. Bu sayfada açmak veya kapatmak için dokunun, seçenekler için basılı tutun.",
-  "favorites.pageSettings": "Sayfa ayarları",
-  "siteSettings.darkNote": "Yalnızca bu site için koyu mod.",
-  "siteSettings.videoNote": "Yalnızca bu site için video kontrolleri.",
-  "siteDark.effectiveOn": "Bu site için koyu mod açık.",
-  "siteDark.effectiveOff": "Bu site için koyu mod kapalı.",
-  "siteDark.openShared": "Koyu mod ayarları",
-  "siteDark.openSharedNote": "Renkler, zamanlama ve tüm siteler için ortak yöntem.",
   "favorites.videoPanel": "Kontrol paneli",
   "favorites.videoPanelLabel": "{site} video kontrol paneli",
+  "favorites.darkMode": "Özel koyu mod",
+  "favorites.darkFollow": "Genel olanı izle",
+  "settings.darkModeNote": "Genel ayarlar, her sitenin varsayılanı",
+  "settings.darkModeTitle": "Genel koyu mod",
+  "settings.darkModeSubtitle":
+    "Her sitenin varsayılanı. Bir favorinin kendi koyu mod seçimi bunun yerine geçer.",
+  "settings.darkSites": "Özel ayarlı siteler",
+  "settings.darkSitesNote":
+    "Bir sitenin özel ayarları yoksa bu ayarlar her siteye uygulanır. Bunları bir favoride belirleyin.",
+  "favorites.darkModeNote": "Bu site için genel koyu modun yerine geçer.",
+  "fab.darkMode":
+    "Koyu mod. Tüm siteler için açmak veya kapatmak üzere dokunun, genel ayarlar için basılı tutun.",
+  "fab.darkModeSite":
+    "Bu site için koyu mod. Açmak veya kapatmak için dokunun, ayarları için basılı tutun.",
+  "favorites.darkEffectiveOn": "Bu site için koyu mod açık.",
+  "favorites.darkEffectiveOff": "Bu site için koyu mod kapalı.",
 };

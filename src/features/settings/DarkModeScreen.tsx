@@ -1,4 +1,4 @@
-import { selectSheetHasBack, useApp } from "../../app/store";
+import { useApp } from "../../app/store";
 import type { MessageKey } from "../../i18n/messages";
 import { useT } from "../../i18n/useT";
 import {
@@ -73,12 +73,12 @@ const SLIDERS: readonly SliderSpec[] = [
 
 /**
  * Dark mode for the pages the user opens: on or off, how pages are darkened, the colours and when
- * it applies. A site can have its own choice, set in its page settings.
+ * it applies. A favorite can have its own choice.
  */
 export function DarkModeScreen() {
   const open = useApp((s) => s.sheet === "dark-mode");
   const closeSheet = useApp((s) => s.closeSheet);
-  const back = useApp((s) => s.sheetParent === "settings" || selectSheetHasBack(s));
+  const parent = useApp((s) => s.sheetParent);
   const dark = useApp((s) => s.state?.darkMode ?? DARK_MODE_DEFAULT);
   const setDarkMode = useApp((s) => s.setDarkMode);
   const t = useT();
@@ -93,11 +93,11 @@ export function DarkModeScreen() {
 
   return (
     <Screen
-      title={t("settings.darkMode")}
-      subtitle={t("settings.darkModeNote")}
-      closeLabel={t(back ? "common.back" : "settings.close")}
+      title={t("settings.darkModeTitle")}
+      subtitle={t("settings.darkModeSubtitle")}
+      closeLabel={t(parent === "settings" ? "common.back" : "settings.close")}
       onClose={closeSheet}
-      back={back}
+      back={parent === "settings"}
     >
       <div className="flex flex-col gap-9">
         <div className="flex flex-col gap-2">

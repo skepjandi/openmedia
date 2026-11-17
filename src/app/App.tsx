@@ -41,7 +41,6 @@ const loadLibrary = () => import("../features/library/LibraryScreen");
 const loadShareRecipe = () => import("../features/library/ShareRecipeScreen");
 const loadVideoControls = () => import("../features/settings/VideoControlsScreen");
 const loadDarkMode = () => import("../features/settings/DarkModeScreen");
-const loadSiteSettings = () => import("../features/settings/SiteSettingsScreens");
 const loadIncognitoRecipes = () => import("../features/settings/IncognitoSections");
 const loadMoreFavorites = () => import("../features/settings/MoreFavoritesScreens");
 const MoreFavoritesScreen = lazy(() =>
@@ -61,15 +60,6 @@ const VideoControlsScreen = lazy(() =>
 );
 const DarkModeScreen = lazy(() =>
   loadDarkMode().then((module) => ({ default: module.DarkModeScreen })),
-);
-const SiteSettingsScreen = lazy(() =>
-  loadSiteSettings().then((module) => ({ default: module.SiteSettingsScreen })),
-);
-const SiteDarkModeScreen = lazy(() =>
-  loadSiteSettings().then((module) => ({ default: module.SiteDarkModeScreen })),
-);
-const SiteVideoScreen = lazy(() =>
-  loadSiteSettings().then((module) => ({ default: module.SiteVideoScreen })),
 );
 const SettingsScreen = lazy(() =>
   loadSettings().then((module) => ({ default: module.SettingsScreen })),
@@ -185,9 +175,6 @@ export function App() {
       <Suspense fallback={null}>{sheet === "share-recipe" && <ShareRecipeScreen />}</Suspense>
       <Suspense fallback={null}>{sheet === "video-controls" && <VideoControlsScreen />}</Suspense>
       <Suspense fallback={null}>{sheet === "dark-mode" && <DarkModeScreen />}</Suspense>
-      <Suspense fallback={null}>{sheet === "site-settings" && <SiteSettingsScreen />}</Suspense>
-      <Suspense fallback={null}>{sheet === "site-dark-mode" && <SiteDarkModeScreen />}</Suspense>
-      <Suspense fallback={null}>{sheet === "site-video" && <SiteVideoScreen />}</Suspense>
       <Suspense fallback={null}>{(idle || sheet === "stats") && <StatsSheet />}</Suspense>
       <Suspense fallback={null}>{onboardingOpen && <Onboarding />}</Suspense>
       {sheet === "paywall" && <PaywallSheet />}

@@ -411,7 +411,6 @@ export const ro: Messages = {
   "recipes.removeFavorite": "Elimină {name} din favorite",
   "recipes.hub": "Hub",
   "settings.darkMode": "Mod întunecat",
-  "settings.darkModeNote": "Întunecă paginile pe care le deschizi.",
   "settings.darkEnabled": "Întunecă paginile",
   "settings.darkEnabledNote":
     "Activează modul întunecat pentru fiecare site care nu are o alegere proprie.",
@@ -461,7 +460,6 @@ export const ro: Messages = {
   "settings.darkImages": "Ajustează imaginile",
   "settings.darkImagesNote":
     "Inversează pictogramele și logourile închise de pe fundaluri transparente și atenuează diagramele mari și luminoase.",
-  "settings.darkSites": "Site-uri cu alegere proprie",
   "settings.darkSitesEmpty": "Încă niciunul.",
   "settings.darkSiteRemove": "Elimină alegerea modului întunecat pentru {site}",
   "settings.darkReset": "Resetează la valorile implicite",
@@ -480,9 +478,7 @@ export const ro: Messages = {
   "favorites.videoHeightOwn": "Acest site are propria înălțime.",
   "favorites.videoHeightLabel": "Înălțimea comenzilor video pentru {site}",
   "favorites.videoUseShared": "Folosește setările video comune",
-  "favorites.darkMode": "Mod întunecat",
   "favorites.darkModeLabel": "Mod întunecat {site}",
-  "favorites.darkFollow": "Urmează setările",
   "favorites.darkOn": "Mereu activat",
   "favorites.darkOff": "Dezactivat",
   "favorites.darkMethod": "Metodă pentru acest site",
@@ -803,17 +799,22 @@ export const ro: Messages = {
     "Se aplică doar aplicației. Aspectul paginilor se stabilește în Modul întunecat.",
   "settings.darkScheduleSystem": "Sistem",
   "settings.darkScheduleSystemNote": "Urmează setarea luminoasă sau întunecată a dispozitivului.",
-  "settings.darkSitesNote":
-    "Aceste setări se aplică tuturor site-urilor, în afară de cazul în care un site are alegerea lui. Setează-o în setările paginii site-ului.",
-  "fab.darkMode":
-    "Mod întunecat. Atinge pentru a-l porni sau opri pe această pagină, ține apăsat pentru opțiuni.",
-  "favorites.pageSettings": "Setările paginii",
-  "siteSettings.darkNote": "Mod întunecat doar pentru acest site.",
-  "siteSettings.videoNote": "Comenzi video doar pentru acest site.",
-  "siteDark.effectiveOn": "Modul întunecat este activat pentru acest site.",
-  "siteDark.effectiveOff": "Modul întunecat este dezactivat pentru acest site.",
-  "siteDark.openShared": "Setări mod întunecat",
-  "siteDark.openSharedNote": "Culori, program și metoda comună pentru toate site-urile.",
   "favorites.videoPanel": "Panou de comenzi",
   "favorites.videoPanelLabel": "Panoul de comenzi video de pe {site}",
+  "favorites.darkMode": "Mod întunecat specific",
+  "favorites.darkFollow": "Urmează generalul",
+  "settings.darkModeNote": "Setări generale, implicite pentru fiecare site",
+  "settings.darkModeTitle": "Mod întunecat general",
+  "settings.darkModeSubtitle":
+    "Implicit pentru fiecare site. Alegerea proprie a unui favorit îl înlocuiește.",
+  "settings.darkSites": "Site-uri cu setări specifice",
+  "settings.darkSitesNote":
+    "Aceste setări se aplică tuturor site-urilor, în afară de cazul în care un site are setări specifice. Setează-le într-un favorit.",
+  "favorites.darkModeNote": "Înlocuiește modul întunecat general pentru acest site.",
+  "fab.darkMode":
+    "Mod întunecat. Atinge pentru a-l porni sau opri pe toate site-urile, ține apăsat pentru setările generale.",
+  "fab.darkModeSite":
+    "Mod întunecat pentru acest site. Atinge pentru a-l porni sau opri, ține apăsat pentru setările lui.",
+  "favorites.darkEffectiveOn": "Modul întunecat este activat pentru acest site.",
+  "favorites.darkEffectiveOff": "Modul întunecat este dezactivat pentru acest site.",
 };

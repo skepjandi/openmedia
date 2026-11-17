@@ -94,12 +94,13 @@ export function Fab() {
   const setVideoControls = useApp((s) => s.setVideoControls);
   const darkMode = useApp((s) => s.state?.darkMode ?? DARK_MODE_DEFAULT);
   const darkSites = useApp((s) => s.state?.darkSites);
+  const savedFavorites = useApp((s) => s.state?.favorites);
   const pageUrl = useApp((s) => selectPage(s)?.url);
   const pageSite = pageUrl ? siteOf(pageUrl) : null;
   const darkOn = darkActiveFor(darkMode, darkSites ?? {}, pageSite);
   const setDarkMode = useApp((s) => s.setDarkMode);
   const setSiteDarkMode = useApp((s) => s.setSiteDarkMode);
-  const openSiteSheet = useApp((s) => s.openSiteSheet);
+  const openFavoriteSettings = useApp((s) => s.openFavoriteSettings);
   // The page script runs through native code that desktop has no site view for.
   const colorPickerOn = useApp((s) => (s.state?.colorPicker ?? false) && !s.desktop);
   const techDetectorOn = useApp((s) => (s.state?.techDetector ?? false) && !s.desktop);
@@ -519,7 +520,7 @@ export function Fab() {
         type="button"
         data-open={fanOpen}
         data-active={darkOn}
-        aria-label={t("fab.darkMode")}
+        aria-label={t(pageSite ? "fab.darkModeSite" : "fab.darkMode")}
         aria-pressed={darkOn}
         tabIndex={fanOpen ? 0 : -1}
         data-hold={darkCharging ? "charging" : "idle"}
@@ -529,7 +530,9 @@ export function Fab() {
           darkHold.current = window.setTimeout(() => {
             darkHeld.current = true;
             setDarkCharging(false);
-            if (pageSite) openSiteSheet("site-dark-mode", pageSite);
+            const own = pageSite ? usableQuickAccess(savedFavorites ?? [], isPro) : [];
+            const match = own.find((favorite) => siteOf(favorite.url) === pageSite);
+            if (match && !incognito.active) openFavoriteSettings(match.id);
             else openSheet("dark-mode");
             dispatch({ type: "dismiss" });
           }, HOLD_MS);

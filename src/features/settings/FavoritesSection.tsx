@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useApp } from "../../app/store";
 import { useT } from "../../i18n/useT";
 import {
@@ -9,7 +9,9 @@ import {
   resolveLanding,
 } from "../../shared/favorites";
 import { DownIcon, ForwardIcon, ProIcon, PlusIcon, StarIcon, UpIcon } from "../../shared/icons";
-import type { Favorite, FavoriteInput, SiteSettings } from "../../shared/ipc";
+import type { DarkMethod, Favorite, FavoriteInput, SiteSettings } from "../../shared/ipc";
+import { DARK_METHODS, DARK_MODE_DEFAULT, darkActiveFor } from "../../shared/darkMode";
+import { VIDEO_CONTROLS_DEFAULT } from "../../shared/videoControls";
 import { SiteTile } from "../../shared/SiteTile";
 import { siteOf } from "../../shared/site";
 import { isIos } from "../../shared/platform";
@@ -17,6 +19,8 @@ import { normalizeWebUrl } from "../../shared/url";
 import { useEntitlementStore } from "../paywall/store";
 import { describeAddress } from "../history/address";
 import { MarginSlider } from "./MarginSlider";
+import { Picker } from "./Picker";
+import { Segmented } from "./Segmented";
 import { MAX_FAVORITE_NAME } from "./presets";
 import { Switch } from "./Switch";
 import { Group, GroupLabel, Section, field, primaryButton, quietButton } from "./ui";
@@ -75,10 +79,32 @@ export function FavoritesEditor({
   const openSheet = useApp((s) => s.openSheet);
   const openRecipe = useApp((s) => s.openRecipe);
   const isPro = useEntitlementStore((s) => s.status === "pro");
+  const focusFavoriteId = useApp((s) => s.focusFavoriteId);
+  const clearFavoriteFocus = useApp((s) => s.clearFavoriteFocus);
   const [editing, setEditing] = useState<number | "new" | null>(null);
   const t = useT();
 
   const limit = isPro ? QUICK_ACCESS_LIMIT : FREE_QUICK_ACCESS_LIMIT;
+  const focusIndex =
+    focusFavoriteId && part !== "more" && recipeSheet === "recipes"
+      ? favorites.slice(0, limit).findIndex((favorite) => favorite.id === focusFavoriteId)
+      : -1;
+  const [shownFocus, setShownFocus] = useState<string | null>(null);
+  if (focusFavoriteId && focusIndex >= 0 && shownFocus !== focusFavoriteId) {
+    setShownFocus(focusFavoriteId);
+    setEditing(focusIndex);
+  } else if (!focusFavoriteId && shownFocus !== null) {
+    setShownFocus(null);
+  }
+  useEffect(() => {
+    if (!focusFavoriteId || shownFocus !== focusFavoriteId) return;
+    clearFavoriteFocus();
+    requestAnimationFrame(() =>
+      document
+        .querySelector(`[data-favorite="${CSS.escape(focusFavoriteId)}"]`)
+        ?.scrollIntoView({ block: "center" }),
+    );
+  }, [focusFavoriteId, shownFocus, clearFavoriteFocus]);
   const quick = favorites.slice(0, limit);
   const lockedSlots = isPro
     ? []
@@ -315,7 +341,7 @@ function FavoriteRow({
   const t = useT();
 
   return (
-    <div>
+    <div data-favorite={favorite.id}>
       <div className="flex items-center pe-1">
         <button
           type="button"
@@ -485,7 +511,8 @@ function FavoriteEditor({
       )}
       {playsInBackground && <BackgroundMedia url={url} />}
       {playsInBackground && isIos() && <PictureInPicture url={url} />}
-      <PageSettingsButton url={url} />
+      {playsInBackground && <SiteVideoControls url={url} />}
+      <SiteDarkMode url={url} />
       {(problem ?? hint) && (
         <p className={`text-sm ${problem ? "text-accent" : "text-paper/55"}`}>{problem ?? hint}</p>
       )}
@@ -542,21 +569,131 @@ function FavoriteMargin({ site }: { site: SiteSettings }) {
   );
 }
 
-/** Opens the page settings of the site the address belongs to: its dark mode and video controls. */
-function PageSettingsButton({ url }: { url: string }) {
+/**
+ * This site's own video controls: whether the tap panel shows on it, whether it also covers full
+ * videos, and how high it sits. A site with no choice follows the shared one in Settings. It saves
+ * at once, not with Save.
+ */
+function SiteVideoControls({ url }: { url: string }) {
   const site = siteOf(url);
-  const openSiteSheet = useApp((s) => s.openSiteSheet);
+  const shared = useApp((s) => s.state?.videoControls ?? VIDEO_CONTROLS_DEFAULT);
+  const own = useApp((s) => (site ? s.state?.videoSites[site] : undefined));
+  const setSiteVideoControls = useApp((s) => s.setSiteVideoControls);
   const t = useT();
   if (!site) return null;
+  const panel = own?.panel ?? shared.panel;
+  const choice = own?.panel === undefined ? "follow" : own.panel ? "on" : "off";
   return (
-    <button
-      type="button"
-      onClick={() => openSiteSheet("site-settings", site)}
-      className={`self-start ${quietButton}`}
-    >
-      {t("favorites.pageSettings")}
-    </button>
+    <div className="flex flex-col gap-2">
+      <div className="text-sm font-medium">{t("favorites.videoPanel")}</div>
+      <Segmented
+        label={t("favorites.videoPanelLabel", { site })}
+        value={choice}
+        options={[
+          { value: "follow", label: t("favorites.darkFollow") },
+          { value: "on", label: t("favorites.darkOn") },
+          { value: "off", label: t("favorites.darkOff") },
+        ]}
+        onChange={(next) =>
+          void setSiteVideoControls(site, {
+            ...own,
+            panel: next === "follow" ? undefined : next === "on",
+          })
+        }
+      />
+      {panel && (
+        <div className="-mx-4">
+          <Switch
+            label={t("favorites.videoFull")}
+            description={t("favorites.videoFullNote")}
+            checked={own?.fullVideos ?? shared.fullVideos}
+            onChange={(next) => void setSiteVideoControls(site, { ...own, fullVideos: next })}
+          />
+        </div>
+      )}
+      {panel && (
+        <>
+          <div className="text-sm font-medium">{t("favorites.videoHeight")}</div>
+          <p className="text-sm leading-snug text-paper/55">
+            {own?.height === undefined
+              ? t("favorites.videoHeightShared")
+              : t("favorites.videoHeightOwn")}
+          </p>
+          <MarginSlider
+            label={t("favorites.videoHeightLabel", { site })}
+            value={own?.height ?? shared.height}
+            onCommit={(pixels) => void setSiteVideoControls(site, { ...own, height: pixels })}
+          />
+        </>
+      )}
+      {own && (
+        <button
+          type="button"
+          onClick={() => void setSiteVideoControls(site, {})}
+          className={`self-start ${quietButton}`}
+        >
+          {t("favorites.videoUseShared")}
+        </button>
+      )}
+    </div>
   );
+}
+
+/**
+ * This site's specific dark mode: always on, off, or following the general one in Settings, and
+ * the method it darkens with. The floating button's moon sets the mode here too. It saves at
+ * once, not with Save.
+ */
+function SiteDarkMode({ url }: { url: string }) {
+  const site = siteOf(url);
+  const general = useApp((s) => s.state?.darkMode ?? DARK_MODE_DEFAULT);
+  const sites = useApp((s) => s.state?.darkSites);
+  const setSiteDarkMode = useApp((s) => s.setSiteDarkMode);
+  const t = useT();
+  if (!site) return null;
+  const own = sites?.[site];
+  const mode = own?.mode ?? "follow";
+  return (
+    <div className="flex flex-col gap-2">
+      <div className="text-sm font-medium">{t("favorites.darkMode")}</div>
+      <p className="text-sm leading-snug text-paper/55">{t("favorites.darkModeNote")}</p>
+      <Segmented
+        label={t("favorites.darkModeLabel", { site })}
+        value={mode}
+        options={[
+          { value: "follow", label: t("favorites.darkFollow") },
+          { value: "on", label: t("favorites.darkOn") },
+          { value: "off", label: t("favorites.darkOff") },
+        ]}
+        onChange={(next) =>
+          void setSiteDarkMode(site, { ...own, mode: next === "follow" ? undefined : next })
+        }
+      />
+      <p className="text-sm leading-snug text-paper/55">
+        {t(
+          darkActiveFor(general, sites ?? {}, site)
+            ? "favorites.darkEffectiveOn"
+            : "favorites.darkEffectiveOff",
+        )}
+      </p>
+      {mode !== "off" && (
+        <Picker
+          label={t("favorites.darkMethod")}
+          value={own?.method ?? ""}
+          options={[
+            { value: "", label: t("favorites.darkMethodDefault") },
+            ...DARK_METHODS.map((entry) => ({ value: entry.value, label: t(entry.label) })),
+          ]}
+          onChange={(next) => void setSiteDarkMode(site, { ...own, method: methodOf(next) })}
+        />
+      )}
+    </div>
+  );
+}
+
+/** The method a picker value names; an empty value follows the general one. */
+function methodOf(value: string): DarkMethod | undefined {
+  return DARK_METHODS.find((entry) => entry.value === value)?.value;
 }
 
 /** Whether the site's audio and video keep playing once its page is hidden or the app is left. It saves at once, not with Save. */

@@ -26,9 +26,11 @@ A file saved before this existed has none of these keys and loads with the defau
 
 ## Where the reader turns it on
 
-- **Settings → Dark mode:** every choice above, for every site that has no choice of its own.
-- **The floating button:** a moon button in the fan, after Incognito and the video controls switch. A tap turns dark mode on or off for the page in view (it sets that site's `mode`; with no page open it flips the global `enabled`); holding it opens that page's dark mode settings, or the global ones when no page is open.
-- **Settings → Favorites → Page settings:** one page per site with its Dark mode and Video controls pages. The per-site dark page holds Follow settings / Always on / Off and a method of its own.
+Three layers, the last one winning:
+
+1. **General** (Settings → Dark mode): every choice above, the default for every site.
+2. **Specific** (Settings → Favorites, in the expanded favorite): Follow general / Always on / Off for that site and a method of its own. It overrides general.
+3. **The floating button:** a moon button in the fan, after Incognito and the video controls switch. A tap turns dark mode on or off for the page in view and overrides what the favorite says (it writes that site's specific `mode`; with no page open it flips the general `enabled`). Holding it opens the favorite's settings for that site when the page is a favorite, and the general page otherwise.
 
 ## The methods
 

@@ -401,7 +401,6 @@ export const vi: Messages = {
   "recipes.removeFavorite": "Gỡ {name} khỏi yêu thích",
   "recipes.hub": "Hub",
   "settings.darkMode": "Chế độ tối",
-  "settings.darkModeNote": "Làm tối các trang bạn mở.",
   "settings.darkEnabled": "Làm tối trang",
   "settings.darkEnabledNote": "Bật chế độ tối cho mọi trang web không có lựa chọn riêng.",
   "settings.darkMethod": "Phương pháp",
@@ -448,7 +447,6 @@ export const vi: Messages = {
   "settings.darkImages": "Điều chỉnh hình ảnh",
   "settings.darkImagesNote":
     "Đảo màu biểu tượng và logo tối trên nền trong suốt, đồng thời làm dịu các sơ đồ sáng lớn.",
-  "settings.darkSites": "Trang web có lựa chọn riêng",
   "settings.darkSitesEmpty": "Chưa có.",
   "settings.darkSiteRemove": "Xóa lựa chọn chế độ tối của {site}",
   "settings.darkReset": "Đặt lại về mặc định",
@@ -467,9 +465,7 @@ export const vi: Messages = {
   "favorites.videoHeightOwn": "Trang này có độ cao riêng.",
   "favorites.videoHeightLabel": "Độ cao điều khiển video của {site}",
   "favorites.videoUseShared": "Dùng cài đặt video chung",
-  "favorites.darkMode": "Chế độ tối",
   "favorites.darkModeLabel": "Chế độ tối của {site}",
-  "favorites.darkFollow": "Theo cài đặt",
   "favorites.darkOn": "Luôn bật",
   "favorites.darkOff": "Tắt",
   "favorites.darkMethod": "Phương pháp cho trang này",
@@ -782,16 +778,22 @@ export const vi: Messages = {
     "Chỉ áp dụng cho ứng dụng. Giao diện của các trang được đặt trong Chế độ tối.",
   "settings.darkScheduleSystem": "Hệ thống",
   "settings.darkScheduleSystemNote": "Theo cài đặt sáng hoặc tối của thiết bị.",
-  "settings.darkSitesNote":
-    "Các cài đặt này áp dụng cho mọi trang web, trừ khi trang web có lựa chọn riêng. Đặt lựa chọn đó trong cài đặt trang của trang web.",
-  "fab.darkMode": "Chế độ tối. Chạm để bật hoặc tắt cho trang này, nhấn giữ để xem tùy chọn.",
-  "favorites.pageSettings": "Cài đặt trang",
-  "siteSettings.darkNote": "Chế độ tối chỉ cho trang web này.",
-  "siteSettings.videoNote": "Điều khiển video chỉ cho trang web này.",
-  "siteDark.effectiveOn": "Chế độ tối đang bật cho trang web này.",
-  "siteDark.effectiveOff": "Chế độ tối đang tắt cho trang web này.",
-  "siteDark.openShared": "Cài đặt chế độ tối",
-  "siteDark.openSharedNote": "Màu sắc, lịch trình và phương pháp dùng chung cho mọi trang web.",
   "favorites.videoPanel": "Bảng điều khiển",
   "favorites.videoPanelLabel": "Bảng điều khiển video của {site}",
+  "favorites.darkMode": "Chế độ tối riêng",
+  "favorites.darkFollow": "Theo cài đặt chung",
+  "settings.darkModeNote": "Cài đặt chung, mặc định cho mọi trang web",
+  "settings.darkModeTitle": "Chế độ tối chung",
+  "settings.darkModeSubtitle":
+    "Mặc định cho mọi trang web. Lựa chọn chế độ tối riêng của mục yêu thích sẽ ghi đè.",
+  "settings.darkSites": "Trang web có cài đặt riêng",
+  "settings.darkSitesNote":
+    "Các cài đặt này áp dụng cho mọi trang web, trừ khi trang web có cài đặt riêng. Đặt chúng trong một mục yêu thích.",
+  "favorites.darkModeNote": "Ghi đè chế độ tối chung cho trang web này.",
+  "fab.darkMode":
+    "Chế độ tối. Chạm để bật hoặc tắt cho mọi trang web, nhấn giữ để mở cài đặt chung.",
+  "fab.darkModeSite":
+    "Chế độ tối cho trang web này. Chạm để bật hoặc tắt, nhấn giữ để mở cài đặt của nó.",
+  "favorites.darkEffectiveOn": "Chế độ tối đang bật cho trang web này.",
+  "favorites.darkEffectiveOff": "Chế độ tối đang tắt cho trang web này.",
 };

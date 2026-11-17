@@ -416,7 +416,6 @@ export const fr: Messages = {
   "recipes.removeFavorite": "Retirer {name} des favoris",
   "recipes.hub": "Hub",
   "settings.darkMode": "Mode sombre",
-  "settings.darkModeNote": "Assombrit les pages que vous ouvrez.",
   "settings.darkEnabled": "Assombrir les pages",
   "settings.darkEnabledNote":
     "Active le mode sombre sur tous les sites qui n'ont pas de choix propre.",
@@ -467,7 +466,6 @@ export const fr: Messages = {
   "settings.darkImages": "Ajuster les images",
   "settings.darkImagesNote":
     "Inverse les icônes et logos sombres sur fond transparent et atténue les grands schémas clairs.",
-  "settings.darkSites": "Sites avec un choix propre",
   "settings.darkSitesEmpty": "Aucun pour l'instant.",
   "settings.darkSiteRemove": "Supprimer le choix du mode sombre pour {site}",
   "settings.darkReset": "Rétablir les valeurs par défaut",
@@ -486,9 +484,7 @@ export const fr: Messages = {
   "favorites.videoHeightOwn": "Ce site a sa propre hauteur.",
   "favorites.videoHeightLabel": "Hauteur des commandes vidéo de {site}",
   "favorites.videoUseShared": "Utiliser les réglages vidéo partagés",
-  "favorites.darkMode": "Mode sombre",
   "favorites.darkModeLabel": "Mode sombre de {site}",
-  "favorites.darkFollow": "Suivre les réglages",
   "favorites.darkOn": "Toujours activé",
   "favorites.darkOff": "Désactivé",
   "favorites.darkMethod": "Méthode pour ce site",
@@ -811,17 +807,22 @@ export const fr: Messages = {
     "S’applique uniquement à l’application. L’aspect des pages se règle dans le mode sombre.",
   "settings.darkScheduleSystem": "Système",
   "settings.darkScheduleSystemNote": "Suit le réglage clair ou sombre de l’appareil.",
-  "settings.darkSitesNote":
-    "Ces réglages s'appliquent à tous les sites, sauf si un site a son propre choix. Définissez-en un dans les réglages de page du site.",
-  "fab.darkMode":
-    "Mode sombre. Touchez pour l’activer ou le désactiver sur cette page, maintenez pour les options.",
-  "favorites.pageSettings": "Réglages de la page",
-  "siteSettings.darkNote": "Mode sombre pour ce site uniquement.",
-  "siteSettings.videoNote": "Commandes vidéo pour ce site uniquement.",
-  "siteDark.effectiveOn": "Le mode sombre est activé pour ce site.",
-  "siteDark.effectiveOff": "Le mode sombre est désactivé pour ce site.",
-  "siteDark.openShared": "Réglages du mode sombre",
-  "siteDark.openSharedNote": "Couleurs, horaire et méthode commune à tous les sites.",
   "favorites.videoPanel": "Panneau de commandes",
   "favorites.videoPanelLabel": "Panneau des commandes vidéo de {site}",
+  "favorites.darkMode": "Mode sombre spécifique",
+  "favorites.darkFollow": "Suivre le général",
+  "settings.darkModeNote": "Réglages généraux, la valeur par défaut de chaque site",
+  "settings.darkModeTitle": "Mode sombre général",
+  "settings.darkModeSubtitle":
+    "La valeur par défaut de chaque site. Le choix propre d’un favori la remplace.",
+  "settings.darkSites": "Sites avec réglages spécifiques",
+  "settings.darkSitesNote":
+    "Ces réglages s'appliquent à tous les sites, sauf si un site a des réglages spécifiques. Définissez-les dans un favori.",
+  "favorites.darkModeNote": "Remplace le mode sombre général pour ce site.",
+  "fab.darkMode":
+    "Mode sombre. Touchez pour l’activer ou le désactiver sur tous les sites, maintenez pour les réglages généraux.",
+  "fab.darkModeSite":
+    "Mode sombre de ce site. Touchez pour l’activer ou le désactiver, maintenez pour ses réglages.",
+  "favorites.darkEffectiveOn": "Le mode sombre est activé pour ce site.",
+  "favorites.darkEffectiveOff": "Le mode sombre est désactivé pour ce site.",
 };
