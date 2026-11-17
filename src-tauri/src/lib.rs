@@ -160,6 +160,7 @@ pub fn run() {
             commands::set_color_picker,
             commands::color_pick_start,
             commands::color_pick_read,
+            commands::color_pick_accept,
             commands::color_pick_cancel,
             commands::set_tech_detector,
             commands::tech_detect,

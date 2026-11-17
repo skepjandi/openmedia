@@ -40,7 +40,7 @@ export const de: Messages = {
   "fab.assistant": "Assistent. Für Favoriten gedrückt halten.",
   "fab.videoControls":
     "Videosteuerung. Tippen zum Ein- oder Ausschalten, gedrückt halten für Optionen.",
-  "fab.colorPicker": "Farbwähler. Tippen, dann etwas auf der Seite antippen.",
+  "fab.colorPicker": "Farbwähler. Ziehe den Kreis über eine Farbe.",
   "fab.techDetector": "Website-Technologien. Tippen, um zu sehen, womit die Seite erstellt wurde.",
 
   "history.title": "Verlauf",
@@ -262,11 +262,13 @@ export const de: Messages = {
     "Immer sichtbar. Schließt zuerst die Einstellungen und andere Ansichten, danach geht es auf der Seite zurück.",
   "settings.colorPicker": "Farbwähler",
   "settings.colorPickerNote":
-    "Fügt dem schwebenden Button einen Farbwähler hinzu. Tippe ihn an und dann etwas auf der Seite, um dessen Farbe zu lesen.",
+    "Fügt dem schwebenden Button einen Farbwähler hinzu. Tippe ihn an, ziehe den Kreis über eine Farbe und übernimm sie, um sie zu lesen.",
   "settings.techDetector": "Technologie-Erkennung",
   "settings.techDetectorNote":
     "Fügt dem schwebenden Button eine Schaltfläche hinzu, die die Technologien der Seite auflistet: Frameworks, CMS, Analytics und mehr.",
-  "colorPicker.hint": "Tippe etwas auf der Seite an, um dessen Farbe zu lesen.",
+  "colorPicker.hint": "Ziehe den Kreis über eine Farbe und tippe dann auf Übernehmen.",
+  "colorPicker.accept": "Übernehmen",
+  "colorPicker.copyRgb": "RGB kopieren",
   "colorPicker.copy": "Kopieren",
   "colorPicker.copied": "Kopiert",
   "tech.title": "Erstellt mit",

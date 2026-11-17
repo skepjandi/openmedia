@@ -44,7 +44,7 @@ export const ko: Messages = {
   "fab.settings": "설정",
   "fab.assistant": "어시스턴트. 길게 누르면 즐겨찾기가 나타납니다.",
   "fab.videoControls": "동영상 컨트롤. 탭하여 켜거나 끄고, 길게 눌러 옵션을 엽니다.",
-  "fab.colorPicker": "색상 선택기. 탭한 다음 페이지의 아무 곳이나 탭하세요.",
+  "fab.colorPicker": "색상 선택기. 원을 색상 위로 드래그하세요.",
   "fab.techDetector": "사이트 기술. 탭하여 페이지가 무엇으로 만들어졌는지 확인하세요.",
 
   "history.title": "기록",
@@ -258,11 +258,13 @@ export const ko: Messages = {
     "항상 표시됩니다. 설정 등 시트를 먼저 닫고, 그다음 페이지에서 뒤로 갑니다.",
   "settings.colorPicker": "색상 선택기",
   "settings.colorPickerNote":
-    "플로팅 버튼에 색상 선택기를 추가합니다. 탭한 다음 페이지의 아무 곳이나 탭하면 색상을 읽습니다.",
+    "플로팅 버튼에 색상 선택기를 추가합니다. 탭한 다음 원을 색상 위로 드래그하고 수락하면 색상을 읽습니다.",
   "settings.techDetector": "기술 감지기",
   "settings.techDetectorNote":
     "플로팅 버튼에 페이지에 사용된 기술(프레임워크, CMS, 분석 등)을 보여 주는 버튼을 추가합니다.",
-  "colorPicker.hint": "페이지의 아무 곳이나 탭하면 색상을 읽습니다.",
+  "colorPicker.hint": "원을 색상 위로 드래그한 다음 수락을 탭하세요.",
+  "colorPicker.accept": "수락",
+  "colorPicker.copyRgb": "RGB 복사",
   "colorPicker.copy": "복사",
   "colorPicker.copied": "복사됨",
   "tech.title": "사용된 기술",

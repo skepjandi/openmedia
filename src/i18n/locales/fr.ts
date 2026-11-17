@@ -46,7 +46,7 @@ export const fr: Messages = {
   "fab.assistant": "Assistant. Maintenez pour afficher les favoris.",
   "fab.videoControls":
     "Commandes vidéo. Touchez pour activer ou désactiver, maintenez pour les options.",
-  "fab.colorPicker": "Sélecteur de couleur. Touchez, puis touchez n'importe quoi sur la page.",
+  "fab.colorPicker": "Sélecteur de couleur. Faites glisser le cercle sur une couleur.",
   "fab.techDetector": "Technologies du site. Touchez pour voir avec quoi la page est construite.",
 
   "history.title": "Historique",
@@ -270,11 +270,13 @@ export const fr: Messages = {
     "Toujours visible. Elle ferme d'abord les Réglages et les autres feuilles, puis revient en arrière dans la page.",
   "settings.colorPicker": "Sélecteur de couleur",
   "settings.colorPickerNote":
-    "Ajoute un sélecteur de couleur au bouton flottant. Touchez-le, puis touchez n'importe quoi sur la page pour lire sa couleur.",
+    "Ajoute un sélecteur de couleur au bouton flottant. Touchez-le, faites glisser le cercle sur une couleur, puis acceptez pour la lire.",
   "settings.techDetector": "Détecteur de technologies",
   "settings.techDetectorNote":
     "Ajoute un bouton au bouton flottant qui liste les technologies d'une page : frameworks, CMS, analytique et plus.",
-  "colorPicker.hint": "Touchez n'importe quoi sur la page pour lire sa couleur.",
+  "colorPicker.hint": "Faites glisser le cercle sur une couleur, puis touchez Accepter.",
+  "colorPicker.accept": "Accepter",
+  "colorPicker.copyRgb": "Copier le RVB",
   "colorPicker.copy": "Copier",
   "colorPicker.copied": "Copié",
   "tech.title": "Construit avec",

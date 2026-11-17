@@ -11,7 +11,7 @@ use crate::events::{
 };
 use crate::models::*;
 use crate::validate::{
-    check_auth_reason, check_evaluate_result, parse_bridge_body, parse_session_id,
+    check_auth_reason, check_evaluate_result, is_color_hex, parse_bridge_body, parse_session_id,
     wrap_evaluate_script,
 };
 use crate::{Error, Result};
@@ -231,9 +231,22 @@ impl<R: Runtime> Siteview<R> {
     /// permission, so no webview can call it. The result is hostile page data.
     pub fn evaluate(&self, request: EvaluateRequest) -> Result<String> {
         let script = wrap_evaluate_script(&request.script)?;
-        let response: EvaluateResponse =
-            self.run("evaluate", serde_json::json!({ "script": script }))?;
+        let response: EvaluateResponse = self.run(
+            "evaluate",
+            serde_json::json!({ "script": script, "pageWorld": request.page_world }),
+        )?;
         check_evaluate_result(response.json)
+    }
+
+    /// The color the active session's web view actually shows at `request`, as `#rrggbb`
+    /// lowercase, or `None` when it cannot be read. Rust-only like `evaluate`: no webview can
+    /// call it.
+    pub fn sample_color(&self, request: SampleColorRequest) -> Result<Option<String>> {
+        let response: SampleColorResponse = self.run(
+            "sampleColor",
+            serde_json::json!({ "x": request.x, "y": request.y }),
+        )?;
+        Ok(Some(response.hex).filter(|hex| is_color_hex(hex)))
     }
 }
 

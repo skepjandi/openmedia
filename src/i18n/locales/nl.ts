@@ -44,7 +44,7 @@ export const nl: Messages = {
   "fab.settings": "Instellingen",
   "fab.assistant": "Assistent. Houd ingedrukt voor favorieten.",
   "fab.videoControls": "Videobediening. Tik om aan of uit te zetten, houd ingedrukt voor opties.",
-  "fab.colorPicker": "Kleurkiezer. Tik erop en tik dan op iets op de pagina.",
+  "fab.colorPicker": "Kleurkiezer. Sleep de cirkel over een kleur.",
   "fab.techDetector": "Sitetechnologieën. Tik om te zien waarmee de pagina is gebouwd.",
 
   "history.title": "Geschiedenis",
@@ -264,11 +264,13 @@ export const nl: Messages = {
     "Altijd zichtbaar. Sluit eerst Instellingen en andere schermen, en gaat daarna terug in de pagina.",
   "settings.colorPicker": "Kleurkiezer",
   "settings.colorPickerNote":
-    "Voegt een kleurkiezer toe aan de zwevende knop. Tik erop en tik dan op iets op de pagina om de kleur te lezen.",
+    "Voegt een kleurkiezer toe aan de zwevende knop. Tik erop, sleep de cirkel over een kleur en accepteer om de kleur te lezen.",
   "settings.techDetector": "Technologiedetector",
   "settings.techDetectorNote":
     "Voegt een knop toe aan de zwevende knop die de technologieën van een pagina toont: frameworks, CMS, analytics en meer.",
-  "colorPicker.hint": "Tik op iets op de pagina om de kleur te lezen.",
+  "colorPicker.hint": "Sleep de cirkel over een kleur en tik op Accepteren.",
+  "colorPicker.accept": "Accepteren",
+  "colorPicker.copyRgb": "RGB kopiëren",
   "colorPicker.copy": "Kopiëren",
   "colorPicker.copied": "Gekopieerd",
   "tech.title": "Gebouwd met",

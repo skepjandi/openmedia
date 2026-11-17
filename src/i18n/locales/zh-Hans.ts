@@ -44,7 +44,7 @@ export const zhHans: Messages = {
   "fab.settings": "设置",
   "fab.assistant": "助手。长按可打开收藏。",
   "fab.videoControls": "视频控制。轻点开启或关闭，长按查看选项。",
-  "fab.colorPicker": "取色器。点按后，再点按页面上的任意内容。",
+  "fab.colorPicker": "取色器。将圆圈拖到某种颜色上。",
   "fab.techDetector": "网站技术。点按即可查看此页面使用的技术。",
 
   "history.title": "历史",
@@ -239,11 +239,13 @@ export const zhHans: Messages = {
   "settings.backButtonNote": "始终显示。先关闭设置等面板，再在页面中后退。",
   "settings.colorPicker": "取色器",
   "settings.colorPickerNote":
-    "为悬浮按钮添加取色器。点按它，再点按页面上的任意内容即可读取其颜色。",
+    "在悬浮按钮上添加取色器。点按后将圆圈拖到某种颜色上，接受即可读取该颜色。",
   "settings.techDetector": "技术检测器",
   "settings.techDetectorNote":
     "在悬浮按钮中添加一个按钮，列出页面使用的技术：框架、CMS、分析工具等。",
-  "colorPicker.hint": "点按页面上的任意内容即可读取其颜色。",
+  "colorPicker.hint": "将圆圈拖到某种颜色上，然后点按“接受”。",
+  "colorPicker.accept": "接受",
+  "colorPicker.copyRgb": "复制 RGB",
   "colorPicker.copy": "复制",
   "colorPicker.copied": "已复制",
   "tech.title": "构建技术",

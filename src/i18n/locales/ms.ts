@@ -42,7 +42,7 @@ export const ms: Messages = {
   "fab.assistant": "Pembantu. Tekan panjang untuk kegemaran.",
   "fab.videoControls":
     "Kawalan video. Ketik untuk hidup atau matikan, tekan panjang untuk pilihan.",
-  "fab.colorPicker": "Pemilih warna. Ketik, kemudian ketik apa-apa pada halaman.",
+  "fab.colorPicker": "Pemilih warna. Seret bulatan ke atas warna.",
   "fab.techDetector": "Teknologi tapak. Ketik untuk melihat apa yang membina halaman ini.",
 
   "history.title": "Sejarah",
@@ -262,11 +262,13 @@ export const ms: Messages = {
     "Sentiasa dipaparkan. Menutup Tetapan dan helaian lain dahulu, kemudian kembali dalam halaman.",
   "settings.colorPicker": "Pemilih warna",
   "settings.colorPickerNote":
-    "Menambah pemilih warna pada butang terapung. Ketik, kemudian ketik apa-apa pada halaman untuk membaca warnanya.",
+    "Menambah pemilih warna pada butang terapung. Ketik, seret bulatan ke atas warna, kemudian terima untuk membacanya.",
   "settings.techDetector": "Pengesan teknologi",
   "settings.techDetectorNote":
     "Menambah butang pada butang terapung yang menyenaraikan teknologi halaman: rangka kerja, CMS, analitik dan banyak lagi.",
-  "colorPicker.hint": "Ketik apa-apa pada halaman untuk membaca warnanya.",
+  "colorPicker.hint": "Seret bulatan ke atas warna, kemudian ketik Terima.",
+  "colorPicker.accept": "Terima",
+  "colorPicker.copyRgb": "Salin RGB",
   "colorPicker.copy": "Salin",
   "colorPicker.copied": "Disalin",
   "tech.title": "Dibina dengan",

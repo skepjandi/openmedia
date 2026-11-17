@@ -46,7 +46,7 @@ export const it: Messages = {
   "fab.assistant": "Assistente. Tieni premuto per i preferiti.",
   "fab.videoControls":
     "Controlli video. Tocca per attivare o disattivare, tieni premuto per le opzioni.",
-  "fab.colorPicker": "Selettore colore. Tocca, poi tocca qualsiasi cosa nella pagina.",
+  "fab.colorPicker": "Selettore colore. Trascina il cerchio su un colore.",
   "fab.techDetector": "Tecnologie del sito. Tocca per vedere con cosa è costruita la pagina.",
 
   "history.title": "Cronologia",
@@ -269,11 +269,13 @@ export const it: Messages = {
     "Sempre visibile. Chiude prima Impostazioni e gli altri pannelli, poi torna indietro nella pagina.",
   "settings.colorPicker": "Selettore colore",
   "settings.colorPickerNote":
-    "Aggiunge un selettore colore al pulsante flottante. Toccalo, poi tocca qualsiasi cosa nella pagina per leggerne il colore.",
+    "Aggiunge un selettore colore al pulsante mobile. Toccalo, trascina il cerchio su un colore e accetta per leggerlo.",
   "settings.techDetector": "Rilevatore di tecnologie",
   "settings.techDetectorNote":
     "Aggiunge un pulsante al pulsante flottante che elenca le tecnologie della pagina: framework, CMS, analytics e altro.",
-  "colorPicker.hint": "Tocca qualsiasi cosa nella pagina per leggerne il colore.",
+  "colorPicker.hint": "Trascina il cerchio su un colore, poi tocca Accetta.",
+  "colorPicker.accept": "Accetta",
+  "colorPicker.copyRgb": "Copia RGB",
   "colorPicker.copy": "Copia",
   "colorPicker.copied": "Copiato",
   "tech.title": "Realizzato con",

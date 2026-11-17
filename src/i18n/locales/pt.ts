@@ -46,7 +46,7 @@ export const pt: Messages = {
   "fab.assistant": "Assistente. Mantenha pressionado para ver os favoritos.",
   "fab.videoControls":
     "Controles de vídeo. Toque para ligar ou desligar, mantenha pressionado para ver as opções.",
-  "fab.colorPicker": "Seletor de cor. Toque e depois toque em qualquer coisa na página.",
+  "fab.colorPicker": "Seletor de cor. Arraste o círculo sobre uma cor.",
   "fab.techDetector": "Tecnologias do site. Toque para ver com o que a página foi criada.",
 
   "history.title": "Histórico",
@@ -268,11 +268,13 @@ export const pt: Messages = {
     "Sempre visível. Fecha primeiro as Definições e outras folhas e depois volta na página.",
   "settings.colorPicker": "Seletor de cor",
   "settings.colorPickerNote":
-    "Adiciona um seletor de cor ao botão flutuante. Toque nele e depois em qualquer coisa na página para ler a cor.",
+    "Adiciona um seletor de cor ao botão flutuante. Toque nele, arraste o círculo sobre uma cor e aceite para lê-la.",
   "settings.techDetector": "Detetor de tecnologias",
   "settings.techDetectorNote":
     "Adiciona um botão ao botão flutuante que lista as tecnologias da página: frameworks, CMS, análise e mais.",
-  "colorPicker.hint": "Toque em qualquer coisa na página para ler a cor.",
+  "colorPicker.hint": "Arraste o círculo sobre uma cor e toque em Aceitar.",
+  "colorPicker.accept": "Aceitar",
+  "colorPicker.copyRgb": "Copiar RGB",
   "colorPicker.copy": "Copiar",
   "colorPicker.copied": "Copiado",
   "tech.title": "Criado com",

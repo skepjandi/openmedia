@@ -46,7 +46,7 @@ export const cs: Messages = {
   "fab.assistant": "Asistent. Podržením zobrazíte oblíbené.",
   "fab.videoControls":
     "Ovládání videa. Klepnutím zapnete nebo vypnete, podržením otevřete možnosti.",
-  "fab.colorPicker": "Výběr barvy. Klepněte a pak klepněte na cokoli na stránce.",
+  "fab.colorPicker": "Výběr barvy. Přetáhněte kruh na barvu.",
   "fab.techDetector": "Technologie webu. Klepnutím zjistíte, na čem je stránka postavená.",
 
   "history.title": "Historie",
@@ -263,11 +263,13 @@ export const cs: Messages = {
     "Vždy viditelné. Nejdřív zavře Nastavení a další panely, potom se vrátí na předchozí stránku.",
   "settings.colorPicker": "Výběr barvy",
   "settings.colorPickerNote":
-    "Přidá k plovoucímu tlačítku výběr barvy. Klepněte na něj a pak na cokoli na stránce, abyste zjistili jeho barvu.",
+    "Přidá na plovoucí tlačítko výběr barvy. Klepněte na něj, přetáhněte kruh na barvu a potvrďte její přečtení.",
   "settings.techDetector": "Detektor technologií",
   "settings.techDetectorNote":
     "Přidá k plovoucímu tlačítku tlačítko, které zobrazí technologie použité na stránce: frameworky, CMS, analytiku a další.",
-  "colorPicker.hint": "Klepnutím na cokoli na stránce zjistíte jeho barvu.",
+  "colorPicker.hint": "Přetáhněte kruh na barvu a klepněte na Přijmout.",
+  "colorPicker.accept": "Přijmout",
+  "colorPicker.copyRgb": "Kopírovat RGB",
   "colorPicker.copy": "Kopírovat",
   "colorPicker.copied": "Zkopírováno",
   "tech.title": "Postaveno na",

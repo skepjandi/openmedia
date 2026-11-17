@@ -4,8 +4,9 @@ use serde::{Deserialize, Serialize};
 use tauri::{AppHandle, Emitter, Manager, State, ipc::Channel};
 use tauri_plugin_siteview::{
     ColorScheme, ContentRuleList, EvaluateRequest, FetchFaviconRequest, OpenRequest, Rect,
-    SessionRequest, SetBackgroundMediaRequest, SetColorSchemeRequest, SetContentRuleListsRequest,
-    SetDocumentStartScriptRequest, SetPictureInPictureRequest, SetRectRequest, SiteviewExt,
+    SampleColorRequest, SessionRequest, SetBackgroundMediaRequest, SetColorSchemeRequest,
+    SetContentRuleListsRequest, SetDocumentStartScriptRequest, SetPictureInPictureRequest,
+    SetRectRequest, SiteviewExt,
     validate::{parse_session_id, parse_web_url},
 };
 use url::Url;
@@ -559,12 +560,40 @@ pub async fn color_pick_start(app: AppHandle) -> Result<()> {
     Ok(())
 }
 
-/// What the picking layer found so far.
+/// The color under the loupe so far, or the final pick.
 #[tauri::command]
 pub async fn color_pick_read(app: AppHandle) -> Result<color_pick::Reading> {
-    Ok(color_pick::parse_reading(
-        &LivePage(&app).evaluate(color_pick::READ_SCRIPT.to_owned())?,
-    ))
+    read_color_pick(&app, color_pick::READ_SCRIPT)
+}
+
+/// Ends the pick on the color the loupe last read and returns it.
+#[tauri::command]
+pub async fn color_pick_accept(app: AppHandle) -> Result<color_pick::Reading> {
+    read_color_pick(&app, color_pick::ACCEPT_SCRIPT)
+}
+
+/// Runs one of the picker's fixed scripts, then swaps the page's guess for the pixel the web
+/// view shows at the loupe's center (the page cannot read cross-origin media, video, gradients
+/// or text). A color that cannot be read natively leaves the page's own, and a waiting loupe is
+/// handed the native one so its ring shows it. Only the async commands above call it: the iOS
+/// plugin answers from the main thread, so a synchronous command would wait for itself.
+fn read_color_pick(app: &AppHandle, script: &str) -> Result<color_pick::Reading> {
+    let page = color_pick::parse_page_reading(&LivePage(app).evaluate(script.to_owned())?);
+    let Some((x, y)) = page.point else {
+        return Ok(page.reading);
+    };
+    let Ok(Some(hex)) = app.siteview().sample_color(SampleColorRequest { x, y }) else {
+        return Ok(page.reading);
+    };
+    if !page.reading.differs_from(&hex) {
+        return Ok(page.reading);
+    }
+    if matches!(page.reading, color_pick::Reading::Waiting { .. })
+        && let Some(push) = color_pick::set_hex_script(&hex)
+    {
+        let _ = LivePage(app).evaluate(push);
+    }
+    Ok(page.reading.with_hex(&hex))
 }
 
 /// Takes the picking layer down.
@@ -581,9 +610,15 @@ pub fn set_tech_detector(library: State<'_, Library>, enabled: bool) -> Result<(
 }
 
 /// What the page in front is built with, matched in Rust against its own table of technologies.
+/// The evidence script runs in the page's own world, where its globals and the properties its
+/// libraries leave on elements are visible; the page can forge what it returns, but only into
+/// names the table already has. Async like every command that evaluates in the page.
 #[tauri::command]
 pub async fn tech_detect(app: AppHandle) -> Result<Vec<tech_detect::Detected>> {
-    let evidence = LivePage(&app).evaluate(tech_detect::script())?;
+    let evidence = app.siteview().evaluate(EvaluateRequest {
+        script: tech_detect::script(),
+        page_world: true,
+    })?;
     Ok(tech_detect::detect(&evidence))
 }
 
@@ -795,7 +830,10 @@ struct LivePage<'a>(&'a AppHandle);
 
 impl Page for LivePage<'_> {
     fn evaluate(&self, script: String) -> Result<String> {
-        Ok(self.0.siteview().evaluate(EvaluateRequest { script })?)
+        Ok(self.0.siteview().evaluate(EvaluateRequest {
+            script,
+            page_world: false,
+        })?)
     }
 }
 

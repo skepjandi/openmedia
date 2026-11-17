@@ -46,7 +46,7 @@ export const pl: Messages = {
   "fab.assistant": "Asystent. Przytrzymaj, aby zobaczyć ulubione.",
   "fab.videoControls":
     "Sterowanie wideo. Dotknij, aby włączyć lub wyłączyć, przytrzymaj, aby zobaczyć opcje.",
-  "fab.colorPicker": "Próbnik kolorów. Dotknij, a potem dotknij czegokolwiek na stronie.",
+  "fab.colorPicker": "Próbnik kolorów. Przeciągnij okrąg na kolor.",
   "fab.techDetector": "Technologie witryny. Dotknij, aby zobaczyć, na czym zbudowano stronę.",
 
   "history.title": "Historia",
@@ -267,11 +267,13 @@ export const pl: Messages = {
     "Zawsze widoczny. Najpierw zamyka Ustawienia i inne panele, a potem cofa na stronie.",
   "settings.colorPicker": "Próbnik kolorów",
   "settings.colorPickerNote":
-    "Dodaje próbnik kolorów do pływającego przycisku. Dotknij go, a potem czegokolwiek na stronie, aby odczytać kolor.",
+    "Dodaje próbnik kolorów do pływającego przycisku. Dotknij go, przeciągnij okrąg na kolor i zaakceptuj, aby go odczytać.",
   "settings.techDetector": "Wykrywacz technologii",
   "settings.techDetectorNote":
     "Dodaje przycisk do pływającego przycisku, który wyświetla technologie strony: frameworki, CMS, analitykę i inne.",
-  "colorPicker.hint": "Dotknij czegokolwiek na stronie, aby odczytać kolor.",
+  "colorPicker.hint": "Przeciągnij okrąg na kolor, a potem dotknij Zaakceptuj.",
+  "colorPicker.accept": "Zaakceptuj",
+  "colorPicker.copyRgb": "Kopiuj RGB",
   "colorPicker.copy": "Kopiuj",
   "colorPicker.copied": "Skopiowano",
   "tech.title": "Zbudowano przy użyciu",

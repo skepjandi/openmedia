@@ -13,7 +13,7 @@ use serde::{Deserialize, Serialize};
 const SCRIPT_TEMPLATE: &str = include_str!("tech_detect.js");
 
 /// How much of each list the page may hand back.
-const MAX_ITEMS: usize = 600;
+const MAX_ITEMS: usize = 1000;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -40,6 +40,11 @@ struct Technology {
     generator: &'static [&'static str],
     /// Cookie name prefixes.
     cookies: &'static [&'static str],
+    /// Property-name prefixes a library leaves on the elements it renders into. Read from the
+    /// page's own world, so they are found only where the plugin can run a script there.
+    expandos: &'static [&'static str],
+    /// Custom properties (`--name`) its stylesheet defines on the root.
+    props: &'static [&'static str],
 }
 
 const NONE: &[&str] = &[];
@@ -53,6 +58,8 @@ const fn tech(name: &'static str, category: Category) -> Technology {
         urls: NONE,
         generator: NONE,
         cookies: NONE,
+        expandos: NONE,
+        props: NONE,
     }
 }
 
@@ -63,12 +70,14 @@ static TECHNOLOGIES: &[Technology] = &[
         globals: &["React", "__REACT_DEVTOOLS_GLOBAL_HOOK__"],
         selectors: &["[data-reactroot]"],
         urls: &["/react.", "react-dom"],
+        expandos: &["__reactContainer$", "__reactFiber$", "_reactRootContainer"],
         ..tech("React", Framework)
     },
     Technology {
         globals: &["Vue", "__VUE__"],
         selectors: &["[data-v-app]"],
         urls: &["/vue.", "vue.runtime"],
+        expandos: &["__vue_app__", "__vue__"],
         ..tech("Vue.js", Framework)
     },
     Technology {
@@ -405,10 +414,12 @@ static TECHNOLOGIES: &[Technology] = &[
         selectors: &["[class*='bootstrap']"],
         urls: &["bootstrap"],
         globals: &["bootstrap"],
+        props: &["--bs-blue"],
         ..tech("Bootstrap", Design)
     },
     Technology {
         urls: &["tailwind"],
+        props: &["--tw-ring-offset-width", "--tw-translate-x"],
         ..tech("Tailwind CSS", Design)
     },
     Technology {
@@ -485,6 +496,103 @@ static TECHNOLOGIES: &[Technology] = &[
         urls: &["res.cloudinary.com"],
         ..tech("Cloudinary", Delivery)
     },
+    Technology {
+        globals: &["__PREACT_DEVTOOLS__", "preact"],
+        urls: &["preact"],
+        ..tech("Preact", Framework)
+    },
+    Technology {
+        globals: &[
+            "litElementVersions",
+            "litHtmlVersions",
+            "reactiveElementVersions",
+        ],
+        urls: &["/lit-html", "/lit-element", "lit@"],
+        ..tech("Lit", Framework)
+    },
+    Technology {
+        globals: &["_$HY"],
+        urls: &["solid-js"],
+        ..tech("Solid", Framework)
+    },
+    Technology {
+        selectors: &["[q\\:container]"],
+        urls: &["/qwik"],
+        ..tech("Qwik", Framework)
+    },
+    Technology {
+        globals: &["requireLazy"],
+        ..tech("Meta Comet", Framework)
+    },
+    Technology {
+        globals: &["google.maps"],
+        urls: &["maps.googleapis.com", "maps.gstatic.com"],
+        ..tech("Google Maps", Service)
+    },
+    Technology {
+        globals: &["mapboxgl"],
+        urls: &["api.mapbox.com"],
+        ..tech("Mapbox", Service)
+    },
+    Technology {
+        globals: &["L.version"],
+        urls: &["leaflet"],
+        ..tech("Leaflet", Framework)
+    },
+    Technology {
+        globals: &["Chart.version"],
+        urls: &["chart.js", "chartjs"],
+        ..tech("Chart.js", Framework)
+    },
+    Technology {
+        globals: &["d3.version"],
+        urls: &["/d3.", "d3.min", "d3-"],
+        ..tech("D3", Framework)
+    },
+    Technology {
+        globals: &["videojs"],
+        urls: &["video.js", "videojs"],
+        ..tech("Video.js", Framework)
+    },
+    Technology {
+        globals: &["Hls"],
+        urls: &["hls.js", "hls.min"],
+        ..tech("hls.js", Framework)
+    },
+    Technology {
+        globals: &["shaka"],
+        urls: &["shaka-player"],
+        ..tech("Shaka Player", Framework)
+    },
+    Technology {
+        globals: &["firebase"],
+        urls: &[
+            "firebaseapp.com",
+            "firebaseio.com",
+            "gstatic.com/firebasejs",
+        ],
+        ..tech("Firebase", Service)
+    },
+    Technology {
+        globals: &["io.protocol"],
+        urls: &["socket.io"],
+        ..tech("Socket.IO", Framework)
+    },
+    Technology {
+        globals: &["lottie"],
+        urls: &["lottie"],
+        ..tech("Lottie", Framework)
+    },
+    Technology {
+        globals: &["Swiper"],
+        urls: &["swiper"],
+        ..tech("Swiper", Framework)
+    },
+    Technology {
+        globals: &["axios"],
+        urls: &["axios"],
+        ..tech("Axios", Framework)
+    },
 ];
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
@@ -495,15 +603,18 @@ pub struct Detected {
 
 /// The script to run in the page: the table's globals and selectors go in as the probe list.
 pub fn script() -> String {
-    let globals: BTreeSet<&str> = TECHNOLOGIES
-        .iter()
-        .flat_map(|t| t.globals.iter().copied())
-        .collect();
-    let selectors: BTreeSet<&str> = TECHNOLOGIES
-        .iter()
-        .flat_map(|t| t.selectors.iter().copied())
-        .collect();
-    let probes = serde_json::json!({ "globals": globals, "selectors": selectors });
+    let collect = |pick: fn(&Technology) -> &'static [&'static str]| -> BTreeSet<&'static str> {
+        TECHNOLOGIES
+            .iter()
+            .flat_map(|t| pick(t).iter().copied())
+            .collect()
+    };
+    let probes = serde_json::json!({
+        "globals": collect(|t| t.globals),
+        "selectors": collect(|t| t.selectors),
+        "expandos": collect(|t| t.expandos),
+        "props": collect(|t| t.props),
+    });
     SCRIPT_TEMPLATE.replace("__PROBES__", &probes.to_string())
 }
 
@@ -515,6 +626,8 @@ struct Evidence {
     urls: Vec<String>,
     generator: String,
     cookies: Vec<String>,
+    expandos: Vec<String>,
+    props: Vec<String>,
 }
 
 /// Matches the page's evidence to the table. Unreadable evidence finds nothing.
@@ -526,6 +639,8 @@ pub fn detect(json: &str) -> Vec<Detected> {
     evidence.selectors.truncate(MAX_ITEMS);
     evidence.urls.truncate(MAX_ITEMS);
     evidence.cookies.truncate(MAX_ITEMS);
+    evidence.expandos.truncate(MAX_ITEMS);
+    evidence.props.truncate(MAX_ITEMS);
     let urls: Vec<String> = evidence.urls.iter().map(|u| u.to_lowercase()).collect();
     let generator = evidence.generator.to_lowercase();
 
@@ -543,6 +658,12 @@ pub fn detect(json: &str) -> Vec<Detected> {
                 || t.cookies
                     .iter()
                     .any(|p| evidence.cookies.iter().any(|c| c.starts_with(p)))
+                || t.expandos
+                    .iter()
+                    .any(|x| evidence.expandos.iter().any(|e| e == x))
+                || t.props
+                    .iter()
+                    .any(|p| evidence.props.iter().any(|e| e == p))
         })
         .map(|t| Detected {
             name: t.name,
@@ -605,6 +726,25 @@ mod tests {
     }
 
     #[test]
+    fn the_script_probes_what_libraries_leave_on_elements_and_in_styles() {
+        let script = script();
+        assert!(script.contains("\"__reactContainer$\""));
+        assert!(script.contains("\"--tw-ring-offset-width\""));
+    }
+
+    #[test]
+    fn a_bundled_page_is_known_by_what_its_libraries_leave_behind() {
+        let found = detect(
+            r#"{"expandos":["__reactContainer$"],"props":["--tw-ring-offset-width"],
+                "urls":["https://static.example.com/rsrc.php/v4/app.js","https://x.com/cdn-cgi/trace"]}"#,
+        );
+        let names: Vec<_> = found.iter().map(|d| d.name).collect();
+        for expected in ["React", "Tailwind CSS", "Cloudflare"] {
+            assert!(names.contains(&expected), "{expected} in {names:?}");
+        }
+    }
+
+    #[test]
     fn every_technology_has_a_signature_and_a_unique_name() {
         let mut names = BTreeSet::new();
         for t in TECHNOLOGIES {
@@ -614,7 +754,9 @@ mod tests {
                     && t.selectors.is_empty()
                     && t.urls.is_empty()
                     && t.generator.is_empty()
-                    && t.cookies.is_empty()),
+                    && t.cookies.is_empty()
+                    && t.expandos.is_empty()
+                    && t.props.is_empty()),
                 "{} has no signature",
                 t.name
             );

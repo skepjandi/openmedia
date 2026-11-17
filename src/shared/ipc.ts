@@ -296,14 +296,17 @@ export const techDetect = {
   run: () => invoke<DetectedTech[]>("tech_detect"),
 };
 
-/** What the picking layer on the page has found; `hex` is `#rrggbb`, lowercase. */
+/** What the picking layer on the page has found; `hex` is `#rrggbb`, lowercase. While waiting it is the color under the loupe. */
 export type ColorReading =
-  { status: "idle" | "waiting" | "cancelled" } | { status: "done"; hex: string };
+  | { status: "idle" | "cancelled" }
+  | { status: "waiting"; hex: string | null }
+  | { status: "done"; hex: string };
 
-/** The color picker: a layer on the page in front that reports the color under the next tap. */
+/** The color picker: a loupe on the page in front, dragged over a color and accepted. */
 export const colorPick = {
   start: () => command("color_pick_start"),
   read: () => invoke<ColorReading>("color_pick_read"),
+  accept: () => invoke<ColorReading>("color_pick_accept"),
   cancel: () => command("color_pick_cancel"),
 };
 

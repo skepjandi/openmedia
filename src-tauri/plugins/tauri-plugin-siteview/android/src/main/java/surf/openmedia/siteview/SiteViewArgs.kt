@@ -108,6 +108,15 @@ class AuthenticateArgs {
 @InvokeArg
 class EvaluateArgs {
     var script: String = ""
+
+    /** Android has one JavaScript world, so every script already runs in the page's own. */
+    var pageWorld: Boolean = false
+}
+
+@InvokeArg
+class SampleColorArgs {
+    var x: Double = 0.0
+    var y: Double = 0.0
 }
 
 @InvokeArg

@@ -1046,6 +1046,11 @@ impl<R: Runtime> Siteview<R> {
             serde_json::from_str(&answer).map_err(|_| Error::BridgeMessageInvalid)?;
         check_evaluate_result(json)
     }
+
+    /// Reads no pixel: the page script's own color is used on the Mac. Rust-only like `evaluate`.
+    pub fn sample_color(&self, _request: SampleColorRequest) -> Result<Option<String>> {
+        Ok(None)
+    }
 }
 
 #[cfg(test)]

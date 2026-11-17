@@ -104,4 +104,8 @@ impl<R: Runtime> Siteview<R> {
     pub fn evaluate(&self, _request: EvaluateRequest) -> Result<String> {
         Err(Error::DesktopUnsupported("site views"))
     }
+
+    pub fn sample_color(&self, _request: SampleColorRequest) -> Result<Option<String>> {
+        Ok(None)
+    }
 }

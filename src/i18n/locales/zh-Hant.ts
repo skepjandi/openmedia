@@ -44,7 +44,7 @@ export const zhHant: Messages = {
   "fab.settings": "設定",
   "fab.assistant": "助理。長按可開啟我的最愛。",
   "fab.videoControls": "影片控制。輕點開啟或關閉，長按檢視選項。",
-  "fab.colorPicker": "取色器。點按後，再點按頁面上的任何內容。",
+  "fab.colorPicker": "取色器。將圓圈拖到某種顏色上。",
   "fab.techDetector": "網站技術。點一下即可查看此頁面使用的技術。",
 
   "history.title": "記錄",
@@ -240,11 +240,13 @@ export const zhHant: Messages = {
   "settings.backButtonNote": "一律顯示。先關閉設定等面板，再在頁面中返回。",
   "settings.colorPicker": "取色器",
   "settings.colorPickerNote":
-    "為浮動按鈕加入取色器。點按它，再點按頁面上的任何內容即可讀取其顏色。",
+    "在浮動按鈕上加入取色器。點一下後將圓圈拖到某種顏色上，接受即可讀取該顏色。",
   "settings.techDetector": "技術偵測器",
   "settings.techDetectorNote":
     "在浮動按鈕中新增一個按鈕，列出頁面使用的技術：框架、CMS、分析工具等。",
-  "colorPicker.hint": "點按頁面上的任何內容即可讀取其顏色。",
+  "colorPicker.hint": "將圓圈拖到某種顏色上，然後點一下「接受」。",
+  "colorPicker.accept": "接受",
+  "colorPicker.copyRgb": "拷貝 RGB",
   "colorPicker.copy": "拷貝",
   "colorPicker.copied": "已拷貝",
   "tech.title": "建置技術",

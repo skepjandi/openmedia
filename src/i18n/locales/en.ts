@@ -50,7 +50,7 @@ export const en = {
   "fab.settings": "Settings",
   "fab.assistant": "Assistant. Hold for favorites.",
   "fab.videoControls": "Video controls. Tap to turn on or off, hold for options.",
-  "fab.colorPicker": "Color picker. Tap, then tap anything on the page.",
+  "fab.colorPicker": "Color picker. Drag the circle over a color.",
   "fab.techDetector": "Site technologies. Tap to see what the page is built with.",
 
   "history.title": "History",
@@ -262,11 +262,13 @@ export const en = {
     "Always shown. Closes Settings and other sheets first, then goes back in the page.",
   "settings.colorPicker": "Color picker",
   "settings.colorPickerNote":
-    "Adds a color picker to the floating button. Tap it, then tap anything on the page to read its color.",
+    "Adds a color picker to the floating button. Tap it, drag the circle over a color, then accept to read it.",
   "settings.techDetector": "Technology detector",
   "settings.techDetectorNote":
     "Adds a button to the floating button that lists the technologies a page is built with: frameworks, CMS, analytics and more.",
-  "colorPicker.hint": "Tap anything on the page to read its color.",
+  "colorPicker.hint": "Drag the circle over a color, then tap Accept.",
+  "colorPicker.accept": "Accept",
+  "colorPicker.copyRgb": "Copy RGB",
   "colorPicker.copy": "Copy",
   "colorPicker.copied": "Copied",
   "tech.title": "Built with",

@@ -41,7 +41,7 @@ export const vi: Messages = {
   "fab.settings": "Cài đặt",
   "fab.assistant": "Trợ lý. Giữ để xem yêu thích.",
   "fab.videoControls": "Điều khiển video. Chạm để bật hoặc tắt, giữ để xem tùy chọn.",
-  "fab.colorPicker": "Công cụ chọn màu. Chạm, rồi chạm vào bất kỳ thứ gì trên trang.",
+  "fab.colorPicker": "Công cụ chọn màu. Kéo vòng tròn lên một màu.",
   "fab.techDetector": "Công nghệ của trang. Nhấn để xem trang được xây dựng bằng gì.",
 
   "history.title": "Lịch sử",
@@ -258,11 +258,13 @@ export const vi: Messages = {
     "Luôn hiển thị. Đóng Cài đặt và các bảng khác trước, sau đó quay lại trong trang.",
   "settings.colorPicker": "Công cụ chọn màu",
   "settings.colorPickerNote":
-    "Thêm công cụ chọn màu vào nút nổi. Chạm vào nút đó, rồi chạm vào bất kỳ thứ gì trên trang để đọc màu của nó.",
+    "Thêm công cụ chọn màu vào nút nổi. Chạm vào, kéo vòng tròn lên một màu rồi chấp nhận để đọc màu đó.",
   "settings.techDetector": "Trình phát hiện công nghệ",
   "settings.techDetectorNote":
     "Thêm một nút vào nút nổi, liệt kê các công nghệ của trang: framework, CMS, phân tích và hơn thế nữa.",
-  "colorPicker.hint": "Chạm vào bất kỳ thứ gì trên trang để đọc màu của nó.",
+  "colorPicker.hint": "Kéo vòng tròn lên một màu, rồi chạm Chấp nhận.",
+  "colorPicker.accept": "Chấp nhận",
+  "colorPicker.copyRgb": "Sao chép RGB",
   "colorPicker.copy": "Sao chép",
   "colorPicker.copied": "Đã sao chép",
   "tech.title": "Được xây dựng với",

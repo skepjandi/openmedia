@@ -74,6 +74,15 @@ pub fn check_evaluate_result(json: String) -> Result<String> {
     Ok(json)
 }
 
+/// A color as `#rrggbb` in lowercase: the only shape a sampled or page-reported color may take.
+pub fn is_color_hex(text: &str) -> bool {
+    text.len() == 7
+        && text.starts_with('#')
+        && text[1..]
+            .bytes()
+            .all(|b| matches!(b, b'0'..=b'9' | b'a'..=b'f'))
+}
+
 /// The text of the system's authentication prompt: short, one line, and not blank.
 pub fn check_auth_reason(reason: &str) -> Result<&str> {
     let reason = reason.trim();
@@ -268,6 +277,16 @@ mod tests {
             );
         }
         assert!(check_auth_reason(&"é".repeat(MAX_AUTH_REASON_CHARS)).is_ok());
+    }
+
+    #[test]
+    fn a_color_is_seven_lowercase_hex_characters() {
+        assert!(is_color_hex("#0a1b2c"));
+        for bad in [
+            "#0A1B2C", "#0a1b2", "#0a1b2c3", "0a1b2c1", "#0a1b2g", "", "#é12345",
+        ] {
+            assert!(!is_color_hex(bad), "{bad}");
+        }
     }
 
     #[test]

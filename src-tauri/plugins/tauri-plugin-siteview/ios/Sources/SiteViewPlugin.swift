@@ -328,6 +328,12 @@ class AuthenticateArgs: Decodable {
 
 class EvaluateArgs: Decodable {
   let script: String
+  let pageWorld: Bool?
+}
+
+class SampleColorArgs: Decodable {
+  let x: Double
+  let y: Double
 }
 
 struct StateEvent: Encodable {
@@ -1465,7 +1471,8 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
       DispatchQueue.main.asyncAfter(deadline: .now() + evaluateTimeout) {
         finish { invoke.reject("the page did not answer in time") }
       }
-      session.view.evaluateJavaScript(args.script, in: nil, in: .defaultClient) { result in
+      let world: WKContentWorld = args.pageWorld == true ? .page : .defaultClient
+      session.view.evaluateJavaScript(args.script, in: nil, in: world) { result in
         DispatchQueue.main.async {
           finish {
             switch result {
@@ -1486,6 +1493,75 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
         }
       }
     }
+  }
+
+  /// Resolves with the color the active session's web view shows at a point of its visible
+  /// viewport, as `{"hex": "#rrggbb"}`: a one-pixel snapshot of what WebKit rendered, so images,
+  /// video frames, gradients and text read as well as backgrounds do. Web view points equal CSS
+  /// pixels at page zoom 1; a pinch-zoomed page is read at the point, unscaled. Rust-only: no Tauri
+  /// command or permission exposes it, so neither the shell nor a site view can read the screen.
+  @objc public func sampleColor(_ invoke: Invoke) throws {
+    let args = try invoke.parseArgs(SampleColorArgs.self)
+    DispatchQueue.main.async {
+      guard let id = self.activeId, let session = self.sessions[id], !session.blocked else {
+        invoke.reject("no site view is open")
+        return
+      }
+      let bounds = session.view.bounds
+      guard args.x.isFinite, args.y.isFinite, bounds.width >= 1, bounds.height >= 1 else {
+        invoke.reject("the point is outside the site view")
+        return
+      }
+      var finished = false
+      func finish(_ run: () -> Void) {
+        guard !finished else { return }
+        finished = true
+        run()
+      }
+      DispatchQueue.main.asyncAfter(deadline: .now() + evaluateTimeout) {
+        finish { invoke.reject("the page did not answer in time") }
+      }
+      let configuration = WKSnapshotConfiguration()
+      configuration.rect = CGRect(
+        x: min(max(args.x.rounded(.down), 0), bounds.width - 1),
+        y: min(max(args.y.rounded(.down), 0), bounds.height - 1),
+        width: 1, height: 1)
+      configuration.snapshotWidth = 1
+      session.view.takeSnapshot(with: configuration) { image, _ in
+        DispatchQueue.main.async {
+          finish {
+            guard let hex = image.flatMap(Self.pixelHex) else {
+              invoke.reject("the pixel could not be read")
+              return
+            }
+            invoke.resolve(["hex": hex])
+          }
+        }
+      }
+    }
+  }
+
+  /// The color of an image's pixel as `#rrggbb`, drawn over white so a see-through pixel reads
+  /// as it looks on a page.
+  private static func pixelHex(_ image: UIImage) -> String? {
+    guard let cgImage = image.cgImage, let space = CGColorSpace(name: CGColorSpace.sRGB) else {
+      return nil
+    }
+    var pixel = [UInt8](repeating: 0, count: 4)
+    let drawn = pixel.withUnsafeMutableBytes { buffer -> Bool in
+      guard
+        let context = CGContext(
+          data: buffer.baseAddress, width: 1, height: 1, bitsPerComponent: 8, bytesPerRow: 4,
+          space: space, bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue)
+      else { return false }
+      context.setFillColor(red: 1, green: 1, blue: 1, alpha: 1)
+      context.fill(CGRect(x: 0, y: 0, width: 1, height: 1))
+      context.interpolationQuality = .none
+      context.draw(cgImage, in: CGRect(x: 0, y: 0, width: 1, height: 1))
+      return true
+    }
+    guard drawn else { return nil }
+    return String(format: "#%02x%02x%02x", pixel[0], pixel[1], pixel[2])
   }
 
   // MARK: Bridge

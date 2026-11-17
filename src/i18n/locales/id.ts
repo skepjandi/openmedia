@@ -41,7 +41,7 @@ export const id: Messages = {
   "fab.settings": "Pengaturan",
   "fab.assistant": "Asisten. Tahan untuk favorit.",
   "fab.videoControls": "Kontrol video. Ketuk untuk menyalakan atau mematikan, tahan untuk opsi.",
-  "fab.colorPicker": "Pemilih warna. Ketuk, lalu ketuk apa saja di halaman.",
+  "fab.colorPicker": "Pemilih warna. Seret lingkaran ke atas warna.",
   "fab.techDetector": "Teknologi situs. Ketuk untuk melihat apa yang membangun halaman ini.",
 
   "history.title": "Riwayat",
@@ -259,11 +259,13 @@ export const id: Messages = {
     "Selalu tampil. Menutup Pengaturan dan lembar lain lebih dulu, lalu mundur di halaman.",
   "settings.colorPicker": "Pemilih warna",
   "settings.colorPickerNote":
-    "Menambahkan pemilih warna ke tombol mengambang. Ketuk, lalu ketuk apa saja di halaman untuk membaca warnanya.",
+    "Menambahkan pemilih warna ke tombol mengambang. Ketuk, seret lingkaran ke atas warna, lalu terima untuk membacanya.",
   "settings.techDetector": "Pendeteksi teknologi",
   "settings.techDetectorNote":
     "Menambahkan tombol ke tombol mengambang yang mencantumkan teknologi halaman: framework, CMS, analitik, dan lainnya.",
-  "colorPicker.hint": "Ketuk apa saja di halaman untuk membaca warnanya.",
+  "colorPicker.hint": "Seret lingkaran ke atas warna, lalu ketuk Terima.",
+  "colorPicker.accept": "Terima",
+  "colorPicker.copyRgb": "Salin RGB",
   "colorPicker.copy": "Salin",
   "colorPicker.copied": "Tersalin",
   "tech.title": "Dibangun dengan",

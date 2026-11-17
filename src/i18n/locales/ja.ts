@@ -44,7 +44,7 @@ export const ja: Messages = {
   "fab.settings": "設定",
   "fab.assistant": "アシスタント。長押しでお気に入り。",
   "fab.videoControls": "動画コントロール。タップでオン/オフ、長押しでオプション。",
-  "fab.colorPicker": "カラーピッカー。タップしてから、ページ上の好きな場所をタップします。",
+  "fab.colorPicker": "カラーピッカー。円を色の上までドラッグします。",
   "fab.techDetector": "サイトの技術。タップしてページの構築に使われている技術を確認します。",
 
   "history.title": "履歴",
@@ -260,11 +260,13 @@ export const ja: Messages = {
     "常に表示されます。まず設定などのシートを閉じ、その後ページを戻ります。",
   "settings.colorPicker": "カラーピッカー",
   "settings.colorPickerNote":
-    "フローティングボタンにカラーピッカーを追加します。タップしてから、ページ上の好きな場所をタップすると色を読み取れます。",
+    "フローティングボタンにカラーピッカーを追加します。タップして円を色の上までドラッグし、決定すると色を読み取れます。",
   "settings.techDetector": "技術検出",
   "settings.techDetectorNote":
     "フローティングボタンに、ページで使われている技術（フレームワーク、CMS、アナリティクスなど）を一覧表示するボタンを追加します。",
-  "colorPicker.hint": "ページ上の好きな場所をタップすると色を読み取れます。",
+  "colorPicker.hint": "円を色の上までドラッグして、「決定」をタップします。",
+  "colorPicker.accept": "決定",
+  "colorPicker.copyRgb": "RGBをコピー",
   "colorPicker.copy": "コピー",
   "colorPicker.copied": "コピーしました",
   "tech.title": "使用技術",

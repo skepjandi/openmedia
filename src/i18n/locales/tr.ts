@@ -45,7 +45,7 @@ export const tr: Messages = {
   "fab.assistant": "Asistan. Favoriler için basılı tutun.",
   "fab.videoControls":
     "Video denetimleri. Açmak veya kapatmak için dokunun, seçenekler için basılı tutun.",
-  "fab.colorPicker": "Renk seçici. Dokunun, sonra sayfada herhangi bir şeye dokunun.",
+  "fab.colorPicker": "Renk seçici. Daireyi bir rengin üzerine sürükleyin.",
   "fab.techDetector": "Site teknolojileri. Sayfanın neyle yapıldığını görmek için dokunun.",
 
   "history.title": "Geçmiş",
@@ -266,11 +266,13 @@ export const tr: Messages = {
     "Her zaman görünür. Önce Ayarlar ve diğer sayfaları kapatır, sonra sayfada geri gider.",
   "settings.colorPicker": "Renk seçici",
   "settings.colorPickerNote":
-    "Yüzen düğmeye bir renk seçici ekler. Ona dokunun, sonra rengini okumak için sayfada herhangi bir şeye dokunun.",
+    "Yüzen düğmeye bir renk seçici ekler. Dokunun, daireyi bir rengin üzerine sürükleyin ve rengi okumak için kabul edin.",
   "settings.techDetector": "Teknoloji algılayıcı",
   "settings.techDetectorNote":
     "Kayan düğmeye, sayfanın teknolojilerini listeleyen bir düğme ekler: çerçeveler, CMS, analitik ve daha fazlası.",
-  "colorPicker.hint": "Rengini okumak için sayfada herhangi bir şeye dokunun.",
+  "colorPicker.hint": "Daireyi bir rengin üzerine sürükleyin, ardından Kabul et'e dokunun.",
+  "colorPicker.accept": "Kabul et",
+  "colorPicker.copyRgb": "RGB'yi kopyala",
   "colorPicker.copy": "Kopyala",
   "colorPicker.copied": "Kopyalandı",
   "tech.title": "Şununla oluşturuldu",

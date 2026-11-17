@@ -113,7 +113,8 @@ export type SessionAction = { nonce: number } & (
 );
 
 /** The picker's progress: the layer waits for a tap, then the color it read is shown. */
-export type ColorPickState = { status: "waiting" } | { status: "done"; hex: string };
+export type ColorPickState =
+  { status: "waiting"; hex: string | null } | { status: "done"; hex: string };
 
 /** The detector's progress: the page is being read, then its technologies are listed. */
 export type TechState = { status: "loading" } | { status: "done"; items: DetectedTech[] };
@@ -233,6 +234,8 @@ export interface AppStore {
   startColorPick: () => Promise<void>;
   /** Takes the picking layer down and clears the result. */
   endColorPick: () => void;
+  /** Ends the pick on the color under the loupe and shows it. */
+  acceptColorPick: () => Promise<void>;
   /** Records what the layer found. */
   setColorPick: (next: ColorPickState | null) => void;
   /** Changes some of the accessibility choices; the rest keep their value. */
@@ -941,7 +944,7 @@ export const useApp = create<AppStore>((set, get) => {
     endTechDetect: () => set({ tech: null }),
 
     startColorPick: async () => {
-      set({ colorPick: { status: "waiting" } });
+      set({ colorPick: { status: "waiting", hex: null } });
       try {
         await colorPick.start();
       } catch (error) {
@@ -952,6 +955,17 @@ export const useApp = create<AppStore>((set, get) => {
     endColorPick: () => {
       if (get().colorPick?.status === "waiting") void colorPick.cancel().catch(() => {});
       set({ colorPick: null });
+    },
+
+    acceptColorPick: async () => {
+      try {
+        const reading = await colorPick.accept();
+        if (get().colorPick?.status !== "waiting") return;
+        set({ colorPick: reading.status === "done" ? reading : null });
+      } catch (error) {
+        set({ colorPick: null });
+        get().reportError(appError(error));
+      }
     },
 
     setColorPick: (next) => set({ colorPick: next }),

@@ -9,6 +9,8 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.Configuration
+import android.graphics.Bitmap
+import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Rect
 import android.graphics.RectF
@@ -805,6 +807,46 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
                     payload.put("json", text)
                     invoke.resolve(payload)
                 }
+            }
+        }
+    }
+
+    /**
+     * Resolves with the color the active session's WebView shows at a point of its viewport, as
+     * `{hex}`: the view is drawn into a one-pixel software bitmap shifted to the point (not
+     * `PixelCopy`, which needs the window region and a handler round trip), so images, gradients
+     * and text read as well as backgrounds do. Rust-only: no Tauri command or permission exposes it.
+     */
+    @Command
+    fun sampleColor(invoke: Invoke) {
+        val args = invoke.parseArgs(SampleColorArgs::class.java)
+        val session = activeSession()
+        if (session == null || session.blocked) {
+            invoke.reject("no site view is open")
+            return
+        }
+        val view = session.view
+        activity.runOnUiThread {
+            if (!args.x.isFinite() || !args.y.isFinite() || view.width < 1 || view.height < 1) {
+                invoke.reject("the point is outside the site view")
+                return@runOnUiThread
+            }
+            val density = view.resources.displayMetrics.density
+            val px = (args.x * density).toInt().coerceIn(0, view.width - 1)
+            val py = (args.y * density).toInt().coerceIn(0, view.height - 1)
+            val bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888)
+            try {
+                bitmap.eraseColor(Color.WHITE)
+                val canvas = Canvas(bitmap)
+                canvas.translate(-px.toFloat(), -py.toFloat())
+                view.draw(canvas)
+                val payload = JSObject()
+                payload.put("hex", String.format("#%06x", bitmap.getPixel(0, 0) and 0xFFFFFF))
+                invoke.resolve(payload)
+            } catch (e: RuntimeException) {
+                invoke.reject("the pixel could not be read")
+            } finally {
+                bitmap.recycle()
             }
         }
     }

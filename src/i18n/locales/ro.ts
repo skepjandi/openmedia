@@ -45,7 +45,7 @@ export const ro: Messages = {
   "fab.assistant": "Asistent. Ține apăsat pentru favorite.",
   "fab.videoControls":
     "Comenzi video. Atinge pentru a activa sau dezactiva, ține apăsat pentru opțiuni.",
-  "fab.colorPicker": "Selector de culoare. Atingeți, apoi atingeți orice de pe pagină.",
+  "fab.colorPicker": "Selector de culoare. Trage cercul peste o culoare.",
   "fab.techDetector": "Tehnologiile site-ului. Atinge pentru a vedea cu ce este construită pagina.",
 
   "history.title": "Istoric",
@@ -266,11 +266,13 @@ export const ro: Messages = {
     "Mereu vizibil. Închide mai întâi Setările și alte panouri, apoi revine în pagină.",
   "settings.colorPicker": "Selector de culoare",
   "settings.colorPickerNote":
-    "Adaugă un selector de culoare la butonul plutitor. Atingeți-l, apoi atingeți orice de pe pagină pentru a-i citi culoarea.",
+    "Adaugă un selector de culoare pe butonul plutitor. Atinge-l, trage cercul peste o culoare și acceptă pentru a o citi.",
   "settings.techDetector": "Detector de tehnologii",
   "settings.techDetectorNote":
     "Adaugă un buton la butonul plutitor care listează tehnologiile paginii: framework-uri, CMS, analiză și altele.",
-  "colorPicker.hint": "Atingeți orice de pe pagină pentru a-i citi culoarea.",
+  "colorPicker.hint": "Trage cercul peste o culoare, apoi atinge Acceptă.",
+  "colorPicker.accept": "Acceptă",
+  "colorPicker.copyRgb": "Copiază RGB",
   "colorPicker.copy": "Copiază",
   "colorPicker.copied": "Copiat",
   "tech.title": "Construit cu",

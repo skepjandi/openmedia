@@ -45,7 +45,7 @@ export const sv: Messages = {
   "fab.settings": "Inställningar",
   "fab.assistant": "Assistent. Håll in för favoriter.",
   "fab.videoControls": "Videokontroller. Tryck för att slå på eller av, håll in för alternativ.",
-  "fab.colorPicker": "Färgväljare. Tryck och tryck sedan på något på sidan.",
+  "fab.colorPicker": "Färgväljare. Dra cirkeln över en färg.",
   "fab.techDetector": "Webbplatsens teknik. Tryck för att se vad sidan är byggd med.",
 
   "history.title": "Historik",
@@ -264,11 +264,13 @@ export const sv: Messages = {
     "Alltid synlig. Stänger först Inställningar och andra vyer, och går sedan bakåt på sidan.",
   "settings.colorPicker": "Färgväljare",
   "settings.colorPickerNote":
-    "Lägger till en färgväljare på den flytande knappen. Tryck på den och sedan på något på sidan för att läsa dess färg.",
+    "Lägger till en färgväljare på den flytande knappen. Tryck på den, dra cirkeln över en färg och godkänn för att läsa av den.",
   "settings.techDetector": "Teknikdetektor",
   "settings.techDetectorNote":
     "Lägger till en knapp i den flytande knappen som listar sidans teknik: ramverk, CMS, analys och mer.",
-  "colorPicker.hint": "Tryck på något på sidan för att läsa dess färg.",
+  "colorPicker.hint": "Dra cirkeln över en färg och tryck sedan på Godkänn.",
+  "colorPicker.accept": "Godkänn",
+  "colorPicker.copyRgb": "Kopiera RGB",
   "colorPicker.copy": "Kopiera",
   "colorPicker.copied": "Kopierat",
   "tech.title": "Byggd med",

@@ -211,11 +211,32 @@ pub struct SetPictureInPictureRequest {
 pub struct EvaluateRequest {
     /// A JavaScript expression whose value is JSON-serializable.
     pub script: String,
+    /// Run in the page's own JavaScript world instead of the app's isolated one, so the script
+    /// can see what the page's scripts define (globals, properties on elements). The page can
+    /// then tamper with what the script reads and returns, so only a fixed, read-only script
+    /// whose answer is matched against a table of the caller's own may use it. Android and macOS
+    /// have one world and ignore this.
+    #[serde(default)]
+    pub page_world: bool,
 }
 
 #[derive(Debug, Clone, Deserialize)]
 pub struct EvaluateResponse {
     pub json: String,
+}
+
+/// A point in the active page's visible viewport, in CSS pixels, whose rendered color is wanted.
+/// Rust-only: it is deliberately not a Tauri command and has no permission, so no webview can
+/// call it.
+#[derive(Debug, Clone, Copy, Deserialize)]
+pub struct SampleColorRequest {
+    pub x: f64,
+    pub y: f64,
+}
+
+#[derive(Debug, Clone, Deserialize)]
+pub struct SampleColorResponse {
+    pub hex: String,
 }
 
 /// Asks the device owner to prove they are present: Face ID or Touch ID, with the device
