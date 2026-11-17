@@ -147,6 +147,57 @@ export const hi: Messages = {
   "usage.partStatusReached": "सीमा पूरी हो गई। यहाँ का समय अब नहीं गिना जाता।",
   "usage.saveHint":
     "उँगली हटाते ही बदलाव सेव हो जाते हैं। समय तब गिना जाता है जब साइट स्क्रीन पर हो, और आधी रात को रीसेट हो जाता है।",
+  "usage.adjustSchedule": "शेड्यूल बदलें",
+  "usage.scheduleTitle": "डाउनटाइम शेड्यूल",
+  "usage.scheduleHint":
+    "चुने हुए दिनों में तय समय पर इस साइट को बंद रखें। कोई समय अवधि आधी रात के पार भी जा सकती है।",
+  "usage.scheduleAdd": "समय अवधि जोड़ें",
+  "usage.scheduleRemove": "हटाएँ",
+  "usage.scheduleDays": "{host} के दिन",
+  "usage.scheduleStart": "बंद होने का समय",
+  "usage.scheduleEnd": "खुलने का समय",
+  "usage.scheduleNoDays": "कम से कम एक दिन चुनें।",
+  "usage.scheduleSameTime": "बंद होने और खुलने का समय अलग-अलग होना चाहिए।",
+  "usage.scheduleClosed": "अभी बंद है",
+  "usage.scheduleNotice":
+    "{name} आपके शेड्यूल के अनुसार बंद है। यह {time} पर खुलेगी। दूसरी साइटें अभी भी उपलब्ध हैं।",
+  "usage.scheduleNoticeAlways":
+    "{name} आपके शेड्यूल के अनुसार बंद है। दूसरी साइटें अभी भी उपलब्ध हैं।",
+  "usage.pauseScreenTitle": "पॉज़ स्क्रीन",
+  "usage.pauseScreenHint":
+    "साइट खुलने से पहले, या उस पर लौटने पर, साँस लेने वाले गोले के साथ कुछ सेकंड रुकें।",
+  "usage.pauseAll": "पॉज़ स्क्रीन",
+  "usage.pauseAllHint": "सभी पॉज़ स्क्रीन बंद या चालू करें। हर साइट की अपनी देरी बनी रहती है।",
+  "usage.pauseAllEmptyHint":
+    "अभी किसी साइट पर पॉज़ स्क्रीन नहीं है। जोड़ने के लिए नीचे कोई साइट खोलें।",
+  "pause.label": "{name} खोलने से पहले विराम",
+  "pause.title": "ज़रा रुकिए",
+  "pause.breathe": "साँस लें, साँस छोड़ें। {name} इंतज़ार कर रही है।",
+  "pause.ready": "जब आप तैयार हों।",
+  "pause.continue": "जारी रखें",
+  "pause.continueIn": "{value} में जारी रखें",
+  "pause.close": "साइट बंद करें",
+  "usage.lock.title": "सेटिंग लॉक",
+  "usage.lock.intro":
+    "खुद से किया एक वादा। इसके चालू रहते सीमाएँ, शेड्यूल, पॉज़ स्क्रीन और सुरक्षित विकल्प और सख़्त किए जा सकते हैं, ढीले नहीं। अनलॉक होने में 24 घंटे लगते हैं। ऐप दोबारा इंस्टॉल करने से लॉक हट जाता है, इसलिए यह सुरक्षा सुविधा नहीं है।",
+  "usage.lock.off": "लॉक बंद है।",
+  "usage.lock.locked":
+    "लॉक है। आप पाबंदियाँ जोड़ या सख़्त कर सकते हैं; उन्हें ढीला करना रोका गया है।",
+  "usage.lock.cooling": "{value} में अनलॉक होगा। तब तक कुछ भी ढीला नहीं किया जा सकता।",
+  "usage.lock.ready":
+    "इंतज़ार पूरा हुआ। आप एक सेटिंग ढीली कर सकते हैं, और ऐसा करते ही लॉक हट जाएगा।",
+  "usage.lock.enable": "लॉक चालू करें",
+  "usage.lock.requestUnlock": "अनलॉक का अनुरोध करें",
+  "usage.lock.cancel": "अनलॉक रद्द करें",
+  "usage.lock.keep": "लॉक रखें",
+  "usage.lock.lift": "लॉक अभी हटाएँ",
+  "usage.lock.refused":
+    "सेटिंग लॉक चालू है। आप इसे और सख़्त कर सकते हैं, ढीला नहीं। पहले अनलॉक का अनुरोध करें।",
+  "usage.lock.reasonRequest":
+    "पाबंदियाँ ढीली करने से पहले 24 घंटे का इंतज़ार शुरू करने के लिए पुष्टि करें कि यह आप हैं",
+  "usage.lock.reasonCancel": "अनलॉक का अनुरोध रद्द करने के लिए पुष्टि करें कि यह आप हैं",
+  "usage.lock.protectTitle": "सेटिंग लॉक से सुरक्षित करें",
+  "usage.lock.protectHint": "लॉक चालू रहने तक यह विकल्प अपनी मौजूदा वैल्यू पर रहता है।",
 
   "onboarding.label": "OpenMedia कैसे काम करता है",
   "onboarding.skip": "छोड़ें",

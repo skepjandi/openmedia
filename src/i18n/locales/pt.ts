@@ -153,6 +153,58 @@ export const pt: Messages = {
   "usage.partStatusReached": "Limite atingido. O tempo aqui já não é contado.",
   "usage.saveHint":
     "As alterações são salvas ao soltar. O tempo conta enquanto o site está na tela e zera à meia-noite.",
+  "usage.adjustSchedule": "Ajustar horário",
+  "usage.scheduleTitle": "Horário de pausa",
+  "usage.scheduleHint":
+    "Feche este site em horários definidos nos dias que você escolher. Uma janela pode passar da meia-noite.",
+  "usage.scheduleAdd": "Adicionar janela",
+  "usage.scheduleRemove": "Remover",
+  "usage.scheduleDays": "Dias para {host}",
+  "usage.scheduleStart": "Fecha às",
+  "usage.scheduleEnd": "Abre às",
+  "usage.scheduleNoDays": "Escolha pelo menos um dia.",
+  "usage.scheduleSameTime": "Os horários de fechamento e abertura devem ser diferentes.",
+  "usage.scheduleClosed": "Fechado por enquanto",
+  "usage.scheduleNotice":
+    "{name} está fechado pelo seu horário. Abre às {time}. Os outros sites continuam disponíveis.",
+  "usage.scheduleNoticeAlways":
+    "{name} está fechado pelo seu horário. Os outros sites continuam disponíveis.",
+  "usage.pauseScreenTitle": "Tela de pausa",
+  "usage.pauseScreenHint":
+    "Espere alguns segundos com um círculo de respiração antes de este site abrir ou quando você voltar a ele.",
+  "usage.pauseAll": "Telas de pausa",
+  "usage.pauseAllHint":
+    "Desative ou ative todas as telas de pausa. Cada site mantém o próprio atraso.",
+  "usage.pauseAllEmptyHint":
+    "Nenhum site tem tela de pausa ainda. Abra um site abaixo para adicionar uma.",
+  "pause.label": "Pausa antes de abrir {name}",
+  "pause.title": "Respire um instante",
+  "pause.breathe": "Inspire, expire. {name} está esperando.",
+  "pause.ready": "Pronto quando você estiver.",
+  "pause.continue": "Continuar",
+  "pause.continueIn": "Continuar em {value}",
+  "pause.close": "Fechar site",
+  "usage.lock.title": "Bloqueio de configurações",
+  "usage.lock.intro":
+    "Uma promessa a si mesmo. Enquanto estiver ativo, limites, horários, telas de pausa e opções protegidas só podem ficar mais rígidos, não mais flexíveis. Desbloquear leva 24 horas. Reinstalar o app remove o bloqueio, então ele não é um recurso de segurança.",
+  "usage.lock.off": "O bloqueio está desativado.",
+  "usage.lock.locked":
+    "Bloqueado. Você pode adicionar ou reforçar restrições; afrouxá-las está bloqueado.",
+  "usage.lock.cooling": "Desbloqueia em {value}. Nada pode ser afrouxado até lá.",
+  "usage.lock.ready":
+    "A espera acabou. Você pode afrouxar uma configuração, e o bloqueio é removido quando fizer isso.",
+  "usage.lock.enable": "Ativar o bloqueio",
+  "usage.lock.requestUnlock": "Pedir desbloqueio",
+  "usage.lock.cancel": "Cancelar desbloqueio",
+  "usage.lock.keep": "Manter o bloqueio",
+  "usage.lock.lift": "Remover o bloqueio agora",
+  "usage.lock.refused":
+    "O bloqueio de configurações está ativo. Você pode deixar isto mais rígido, não mais flexível. Peça o desbloqueio primeiro.",
+  "usage.lock.reasonRequest":
+    "Confirme que é você para iniciar a espera de 24 horas antes de afrouxar suas restrições",
+  "usage.lock.reasonCancel": "Confirme que é você para cancelar o pedido de desbloqueio",
+  "usage.lock.protectTitle": "Proteger com o bloqueio de configurações",
+  "usage.lock.protectHint": "Enquanto o bloqueio estiver ativo, esta opção mantém o valor atual.",
 
   "onboarding.label": "Como funciona o OpenMedia",
   "onboarding.skip": "Pular",

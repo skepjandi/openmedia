@@ -151,6 +151,58 @@ export const ro: Messages = {
   "usage.partStatusReached": "Limită atinsă. Timpul de aici nu mai este numărat.",
   "usage.saveHint":
     "Modificările se salvează când dai drumul. Timpul se contorizează cât site-ul este pe ecran și se resetează la miezul nopții.",
+  "usage.adjustSchedule": "Ajustează programul",
+  "usage.scheduleTitle": "Program de pauză",
+  "usage.scheduleHint":
+    "Închide acest site la ore stabilite, în zilele alese. Un interval poate trece de miezul nopții.",
+  "usage.scheduleAdd": "Adaugă un interval",
+  "usage.scheduleRemove": "Șterge",
+  "usage.scheduleDays": "Zile pentru {host}",
+  "usage.scheduleStart": "Se închide la",
+  "usage.scheduleEnd": "Se deschide la",
+  "usage.scheduleNoDays": "Alege cel puțin o zi.",
+  "usage.scheduleSameTime": "Orele de închidere și de deschidere trebuie să difere.",
+  "usage.scheduleClosed": "Închis deocamdată",
+  "usage.scheduleNotice":
+    "{name} este închis conform programului tău. Se deschide la {time}. Celelalte site-uri rămân disponibile.",
+  "usage.scheduleNoticeAlways":
+    "{name} este închis conform programului tău. Celelalte site-uri rămân disponibile.",
+  "usage.pauseScreenTitle": "Ecran de pauză",
+  "usage.pauseScreenHint":
+    "Așteaptă câteva secunde cu un cerc care respiră înainte ca acest site să se deschidă sau când revii la el.",
+  "usage.pauseAll": "Ecrane de pauză",
+  "usage.pauseAllHint":
+    "Dezactivează sau activează toate ecranele de pauză. Fiecare site își păstrează propria întârziere.",
+  "usage.pauseAllEmptyHint":
+    "Niciun site nu are încă ecran de pauză. Deschide un site de mai jos pentru a adăuga unul.",
+  "pause.label": "Pauză înainte de a deschide {name}",
+  "pause.title": "Fă o pauză",
+  "pause.breathe": "Inspiră, expiră. {name} așteaptă.",
+  "pause.ready": "Gata când ești și tu.",
+  "pause.continue": "Continuă",
+  "pause.continueIn": "Continuă în {value}",
+  "pause.close": "Închide site-ul",
+  "usage.lock.title": "Blocarea setărilor",
+  "usage.lock.intro":
+    "O promisiune față de tine. Cât timp este activă, limitele, programele, ecranele de pauză și opțiunile protejate pot fi făcute mai stricte, dar nu mai relaxate. Deblocarea durează 24 de ore. Reinstalarea aplicației elimină blocarea, deci nu este o funcție de securitate.",
+  "usage.lock.off": "Blocarea este dezactivată.",
+  "usage.lock.locked": "Blocat. Poți adăuga sau înăspri restricții; relaxarea lor este blocată.",
+  "usage.lock.cooling": "Se deblochează în {value}. Până atunci nimic nu poate fi relaxat.",
+  "usage.lock.ready":
+    "Așteptarea s-a încheiat. Poți relaxa o setare, iar blocarea se ridică atunci.",
+  "usage.lock.enable": "Activează blocarea",
+  "usage.lock.requestUnlock": "Cere deblocarea",
+  "usage.lock.cancel": "Anulează deblocarea",
+  "usage.lock.keep": "Păstrează blocarea",
+  "usage.lock.lift": "Ridică blocarea acum",
+  "usage.lock.refused":
+    "Blocarea setărilor este activă. Poți înăspri aceasta, nu o poți relaxa. Cere mai întâi deblocarea.",
+  "usage.lock.reasonRequest":
+    "Confirmă că ești tu pentru a începe așteptarea de 24 de ore înainte de relaxarea restricțiilor",
+  "usage.lock.reasonCancel": "Confirmă că ești tu pentru a anula cererea de deblocare",
+  "usage.lock.protectTitle": "Protejează cu blocarea setărilor",
+  "usage.lock.protectHint":
+    "Cât timp blocarea este activă, această opțiune își păstrează valoarea curentă.",
 
   "onboarding.label": "Cum funcționează OpenMedia",
   "onboarding.skip": "Omite",

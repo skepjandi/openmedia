@@ -152,6 +152,55 @@ export const en = {
   "usage.partStatusReached": "Limit reached. Time here is no longer counted.",
   "usage.saveHint":
     "Changes save when you let go. Time counts while the site is on screen and resets at midnight.",
+  "usage.adjustSchedule": "Adjust schedule",
+  "usage.scheduleTitle": "Downtime schedule",
+  "usage.scheduleHint":
+    "Close this site at set times on the days you choose. A window can run past midnight.",
+  "usage.scheduleAdd": "Add a window",
+  "usage.scheduleRemove": "Remove",
+  "usage.scheduleDays": "Days for {host}",
+  "usage.scheduleStart": "Closes at",
+  "usage.scheduleEnd": "Opens at",
+  "usage.scheduleNoDays": "Pick at least one day.",
+  "usage.scheduleSameTime": "The closing and opening times must differ.",
+  "usage.scheduleClosed": "Closed for now",
+  "usage.scheduleNotice":
+    "{name} is closed by your schedule. It opens at {time}. Other sites are still available.",
+  "usage.scheduleNoticeAlways":
+    "{name} is closed by your schedule. Other sites are still available.",
+  "usage.pauseScreenTitle": "Pause screen",
+  "usage.pauseScreenHint":
+    "Wait a few seconds with a breathing circle before this site opens, or when you come back to it.",
+  "usage.pauseAll": "Pause screens",
+  "usage.pauseAllHint": "Turn every pause screen off or on. Each site keeps its own delay.",
+  "usage.pauseAllEmptyHint": "No site has a pause screen yet. Open a site below to add one.",
+  "pause.label": "Pause before opening {name}",
+  "pause.title": "Take a moment",
+  "pause.breathe": "Breathe in, breathe out. {name} is waiting.",
+  "pause.ready": "Ready when you are.",
+  "pause.continue": "Continue",
+  "pause.continueIn": "Continue in {value}",
+  "pause.close": "Close site",
+  "usage.lock.title": "Settings lock",
+  "usage.lock.intro":
+    "A promise to yourself. While it is on, limits, schedules, pause screens and protected options can be made stricter but not looser. Unlocking takes 24 hours. Reinstalling the app removes the lock, so it is not a security feature.",
+  "usage.lock.off": "The lock is off.",
+  "usage.lock.locked": "Locked. You can add or tighten restrictions; loosening them is blocked.",
+  "usage.lock.cooling": "Unlocks in {value}. Nothing can be loosened until then.",
+  "usage.lock.ready":
+    "The wait is over. You can loosen one setting, and the lock lifts when you do.",
+  "usage.lock.enable": "Turn on the lock",
+  "usage.lock.requestUnlock": "Ask to unlock",
+  "usage.lock.cancel": "Cancel unlock",
+  "usage.lock.keep": "Keep the lock",
+  "usage.lock.lift": "Lift the lock now",
+  "usage.lock.refused":
+    "The settings lock is on. You can make this stricter, not looser. Ask to unlock first.",
+  "usage.lock.reasonRequest":
+    "Confirm it is you to start the 24 hour wait before your restrictions can be loosened",
+  "usage.lock.reasonCancel": "Confirm it is you to cancel the unlock request",
+  "usage.lock.protectTitle": "Protect with the settings lock",
+  "usage.lock.protectHint": "While the lock is on, this option keeps its current value.",
 
   "onboarding.label": "How OpenMedia works",
   "onboarding.skip": "Skip",

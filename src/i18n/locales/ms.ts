@@ -147,6 +147,58 @@ export const ms: Messages = {
   "usage.partStatusReached": "Had dicapai. Masa di sini tidak lagi dikira.",
   "usage.saveHint":
     "Perubahan disimpan apabila anda melepaskan. Masa dikira semasa laman berada di skrin dan ditetapkan semula pada tengah malam.",
+  "usage.adjustSchedule": "Laras jadual",
+  "usage.scheduleTitle": "Jadual masa henti",
+  "usage.scheduleHint":
+    "Tutup laman ini pada masa tertentu pada hari yang anda pilih. Satu tetingkap masa boleh melepasi tengah malam.",
+  "usage.scheduleAdd": "Tambah tetingkap masa",
+  "usage.scheduleRemove": "Buang",
+  "usage.scheduleDays": "Hari untuk {host}",
+  "usage.scheduleStart": "Ditutup pada",
+  "usage.scheduleEnd": "Dibuka pada",
+  "usage.scheduleNoDays": "Pilih sekurang-kurangnya satu hari.",
+  "usage.scheduleSameTime": "Masa tutup dan masa buka mesti berbeza.",
+  "usage.scheduleClosed": "Ditutup buat masa ini",
+  "usage.scheduleNotice":
+    "{name} ditutup oleh jadual anda. Ia dibuka pada {time}. Laman lain masih tersedia.",
+  "usage.scheduleNoticeAlways": "{name} ditutup oleh jadual anda. Laman lain masih tersedia.",
+  "usage.pauseScreenTitle": "Skrin jeda",
+  "usage.pauseScreenHint":
+    "Tunggu beberapa saat dengan bulatan pernafasan sebelum laman ini dibuka, atau apabila anda kembali kepadanya.",
+  "usage.pauseAll": "Skrin jeda",
+  "usage.pauseAllHint":
+    "Matikan atau hidupkan semua skrin jeda. Setiap laman mengekalkan kelewatannya sendiri.",
+  "usage.pauseAllEmptyHint":
+    "Belum ada laman dengan skrin jeda. Buka laman di bawah untuk menambahnya.",
+  "pause.label": "Jeda sebelum membuka {name}",
+  "pause.title": "Ambil sejenak",
+  "pause.breathe": "Tarik nafas, hembus nafas. {name} sedang menunggu.",
+  "pause.ready": "Sedia bila anda sedia.",
+  "pause.continue": "Teruskan",
+  "pause.continueIn": "Teruskan dalam {value}",
+  "pause.close": "Tutup laman",
+  "usage.lock.title": "Kunci tetapan",
+  "usage.lock.intro":
+    "Janji kepada diri sendiri. Semasa ia dihidupkan, had, jadual, skrin jeda dan pilihan yang dilindungi hanya boleh diperketatkan, bukan dilonggarkan. Membuka kunci mengambil masa 24 jam. Memasang semula aplikasi membuang kunci, jadi ia bukan ciri keselamatan.",
+  "usage.lock.off": "Kunci dimatikan.",
+  "usage.lock.locked":
+    "Dikunci. Anda boleh menambah atau memperketat sekatan; melonggarkannya disekat.",
+  "usage.lock.cooling":
+    "Dibuka kunci dalam {value}. Tiada apa-apa boleh dilonggarkan sehingga itu.",
+  "usage.lock.ready":
+    "Penantian tamat. Anda boleh melonggarkan satu tetapan, dan kunci ditanggalkan apabila anda berbuat demikian.",
+  "usage.lock.enable": "Hidupkan kunci",
+  "usage.lock.requestUnlock": "Minta buka kunci",
+  "usage.lock.cancel": "Batal buka kunci",
+  "usage.lock.keep": "Kekalkan kunci",
+  "usage.lock.lift": "Tanggalkan kunci sekarang",
+  "usage.lock.refused":
+    "Kunci tetapan dihidupkan. Anda boleh memperketat ini, bukan melonggarkan. Minta buka kunci dahulu.",
+  "usage.lock.reasonRequest":
+    "Sahkan ini anda untuk memulakan penantian 24 jam sebelum sekatan anda boleh dilonggarkan",
+  "usage.lock.reasonCancel": "Sahkan ini anda untuk membatalkan permintaan buka kunci",
+  "usage.lock.protectTitle": "Lindungi dengan kunci tetapan",
+  "usage.lock.protectHint": "Semasa kunci dihidupkan, pilihan ini mengekalkan nilainya sekarang.",
 
   "onboarding.label": "Cara OpenMedia berfungsi",
   "onboarding.skip": "Langkau",

@@ -150,6 +150,57 @@ export const nl: Messages = {
   "usage.partStatusReached": "Limiet bereikt. De tijd hier wordt niet meer geteld.",
   "usage.saveHint":
     "Wijzigingen worden opgeslagen als je loslaat. De tijd telt zolang de site in beeld is en wordt om middernacht gereset.",
+  "usage.adjustSchedule": "Schema aanpassen",
+  "usage.scheduleTitle": "Sluitingsschema",
+  "usage.scheduleHint":
+    "Sluit deze site op vaste tijden op de dagen die je kiest. Een tijdvak mag over middernacht heen lopen.",
+  "usage.scheduleAdd": "Tijdvak toevoegen",
+  "usage.scheduleRemove": "Verwijderen",
+  "usage.scheduleDays": "Dagen voor {host}",
+  "usage.scheduleStart": "Sluit om",
+  "usage.scheduleEnd": "Opent om",
+  "usage.scheduleNoDays": "Kies minstens één dag.",
+  "usage.scheduleSameTime": "De sluitings- en openingstijd moeten verschillen.",
+  "usage.scheduleClosed": "Nu gesloten",
+  "usage.scheduleNotice":
+    "{name} is gesloten volgens je schema. De site opent om {time}. Andere sites zijn nog beschikbaar.",
+  "usage.scheduleNoticeAlways":
+    "{name} is gesloten volgens je schema. Andere sites zijn nog beschikbaar.",
+  "usage.pauseScreenTitle": "Pauzescherm",
+  "usage.pauseScreenHint":
+    "Wacht een paar seconden met een ademhalingscirkel voordat deze site opent, of als je ernaar terugkeert.",
+  "usage.pauseAll": "Pauzeschermen",
+  "usage.pauseAllHint": "Zet alle pauzeschermen uit of aan. Elke site houdt zijn eigen wachttijd.",
+  "usage.pauseAllEmptyHint":
+    "Nog geen enkele site heeft een pauzescherm. Open hieronder een site om er een toe te voegen.",
+  "pause.label": "Pauze voordat {name} opent",
+  "pause.title": "Neem even de tijd",
+  "pause.breathe": "Adem in, adem uit. {name} wacht op je.",
+  "pause.ready": "Klaar wanneer jij dat bent.",
+  "pause.continue": "Doorgaan",
+  "pause.continueIn": "Doorgaan over {value}",
+  "pause.close": "Site sluiten",
+  "usage.lock.title": "Instellingenslot",
+  "usage.lock.intro":
+    "Een belofte aan jezelf. Zolang het aan staat, kunnen limieten, schema’s, pauzeschermen en beschermde opties strenger worden gemaakt, maar niet losser. Ontgrendelen duurt 24 uur. Als je de app opnieuw installeert, verdwijnt het slot, dus het is geen beveiligingsfunctie.",
+  "usage.lock.off": "Het slot staat uit.",
+  "usage.lock.locked":
+    "Vergrendeld. Je kunt beperkingen toevoegen of aanscherpen; versoepelen is geblokkeerd.",
+  "usage.lock.cooling": "Ontgrendelt over {value}. Tot die tijd kan niets worden versoepeld.",
+  "usage.lock.ready":
+    "De wachttijd is voorbij. Je kunt één instelling versoepelen, en het slot gaat eraf zodra je dat doet.",
+  "usage.lock.enable": "Slot aanzetten",
+  "usage.lock.requestUnlock": "Ontgrendeling aanvragen",
+  "usage.lock.cancel": "Ontgrendeling annuleren",
+  "usage.lock.keep": "Slot houden",
+  "usage.lock.lift": "Slot nu opheffen",
+  "usage.lock.refused":
+    "Het instellingenslot staat aan. Je kunt dit strenger maken, niet losser. Vraag eerst om te ontgrendelen.",
+  "usage.lock.reasonRequest":
+    "Bevestig dat jij het bent om de wachttijd van 24 uur te starten voordat je beperkingen kunnen worden versoepeld",
+  "usage.lock.reasonCancel": "Bevestig dat jij het bent om het ontgrendelverzoek te annuleren",
+  "usage.lock.protectTitle": "Beschermen met het instellingenslot",
+  "usage.lock.protectHint": "Zolang het slot aan staat, behoudt deze optie zijn huidige waarde.",
 
   "onboarding.label": "Hoe OpenMedia werkt",
   "onboarding.skip": "Overslaan",

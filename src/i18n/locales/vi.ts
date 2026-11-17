@@ -147,6 +147,55 @@ export const vi: Messages = {
   "usage.partStatusReached": "Đã đạt giới hạn. Thời gian ở đây không còn được tính.",
   "usage.saveHint":
     "Thay đổi được lưu khi bạn thả tay. Thời gian được tính khi trang đang hiển thị trên màn hình và đặt lại vào nửa đêm.",
+  "usage.adjustSchedule": "Chỉnh lịch",
+  "usage.scheduleTitle": "Lịch ngừng truy cập",
+  "usage.scheduleHint":
+    "Đóng trang này vào những giờ đã đặt, vào các ngày bạn chọn. Một khung giờ có thể kéo dài qua nửa đêm.",
+  "usage.scheduleAdd": "Thêm khung giờ",
+  "usage.scheduleRemove": "Xóa",
+  "usage.scheduleDays": "Các ngày cho {host}",
+  "usage.scheduleStart": "Đóng lúc",
+  "usage.scheduleEnd": "Mở lúc",
+  "usage.scheduleNoDays": "Hãy chọn ít nhất một ngày.",
+  "usage.scheduleSameTime": "Giờ đóng và giờ mở phải khác nhau.",
+  "usage.scheduleClosed": "Tạm đóng",
+  "usage.scheduleNotice":
+    "{name} đang đóng theo lịch của bạn. Sẽ mở lúc {time}. Các trang khác vẫn dùng được.",
+  "usage.scheduleNoticeAlways": "{name} đang đóng theo lịch của bạn. Các trang khác vẫn dùng được.",
+  "usage.pauseScreenTitle": "Màn hình tạm dừng",
+  "usage.pauseScreenHint":
+    "Chờ vài giây cùng vòng tròn hít thở trước khi trang này mở, hoặc khi bạn quay lại trang.",
+  "usage.pauseAll": "Màn hình tạm dừng",
+  "usage.pauseAllHint": "Bật hoặc tắt mọi màn hình tạm dừng. Mỗi trang giữ độ trễ riêng.",
+  "usage.pauseAllEmptyHint":
+    "Chưa có trang nào có màn hình tạm dừng. Hãy mở một trang bên dưới để thêm.",
+  "pause.label": "Tạm dừng trước khi mở {name}",
+  "pause.title": "Dừng lại một chút",
+  "pause.breathe": "Hít vào, thở ra. {name} đang chờ bạn.",
+  "pause.ready": "Sẵn sàng khi bạn sẵn sàng.",
+  "pause.continue": "Tiếp tục",
+  "pause.continueIn": "Tiếp tục sau {value}",
+  "pause.close": "Đóng trang",
+  "usage.lock.title": "Khóa cài đặt",
+  "usage.lock.intro":
+    "Một lời hứa với chính bạn. Khi khóa bật, giới hạn, lịch, màn hình tạm dừng và các tùy chọn được bảo vệ chỉ có thể siết chặt hơn chứ không nới lỏng. Mở khóa mất 24 giờ. Cài lại ứng dụng sẽ gỡ khóa, nên đây không phải tính năng bảo mật.",
+  "usage.lock.off": "Khóa đang tắt.",
+  "usage.lock.locked": "Đã khóa. Bạn có thể thêm hoặc siết chặt hạn chế; việc nới lỏng bị chặn.",
+  "usage.lock.cooling": "Mở khóa sau {value}. Đến lúc đó không thể nới lỏng gì.",
+  "usage.lock.ready":
+    "Đã hết thời gian chờ. Bạn có thể nới lỏng một cài đặt, và khóa sẽ được gỡ khi bạn làm vậy.",
+  "usage.lock.enable": "Bật khóa",
+  "usage.lock.requestUnlock": "Yêu cầu mở khóa",
+  "usage.lock.cancel": "Hủy mở khóa",
+  "usage.lock.keep": "Giữ khóa",
+  "usage.lock.lift": "Gỡ khóa ngay",
+  "usage.lock.refused":
+    "Khóa cài đặt đang bật. Bạn có thể siết chặt mục này chứ không nới lỏng. Hãy yêu cầu mở khóa trước.",
+  "usage.lock.reasonRequest":
+    "Xác nhận là bạn để bắt đầu 24 giờ chờ trước khi các hạn chế có thể được nới lỏng",
+  "usage.lock.reasonCancel": "Xác nhận là bạn để hủy yêu cầu mở khóa",
+  "usage.lock.protectTitle": "Bảo vệ bằng khóa cài đặt",
+  "usage.lock.protectHint": "Khi khóa bật, tùy chọn này giữ nguyên giá trị hiện tại.",
 
   "onboarding.label": "OpenMedia hoạt động thế nào",
   "onboarding.skip": "Bỏ qua",

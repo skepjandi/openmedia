@@ -151,6 +151,56 @@ export const cs: Messages = {
   "usage.partStatusReached": "Limit dosažen. Čas zde se už nepočítá.",
   "usage.saveHint":
     "Změny se uloží po uvolnění. Čas se počítá, dokud je web na obrazovce, a o půlnoci se vynuluje.",
+  "usage.adjustSchedule": "Upravit rozvrh",
+  "usage.scheduleTitle": "Rozvrh nedostupnosti",
+  "usage.scheduleHint":
+    "Zavřete tento web v nastavených časech ve vybrané dny. Časové okno může přesáhnout půlnoc.",
+  "usage.scheduleAdd": "Přidat okno",
+  "usage.scheduleRemove": "Odebrat",
+  "usage.scheduleDays": "Dny pro {host}",
+  "usage.scheduleStart": "Zavře se v",
+  "usage.scheduleEnd": "Otevře se v",
+  "usage.scheduleNoDays": "Vyberte alespoň jeden den.",
+  "usage.scheduleSameTime": "Čas zavření a otevření se musí lišit.",
+  "usage.scheduleClosed": "Nyní zavřeno",
+  "usage.scheduleNotice":
+    "Web {name} je podle rozvrhu zavřený. Otevře se v {time}. Ostatní weby jsou stále dostupné.",
+  "usage.scheduleNoticeAlways":
+    "Web {name} je podle rozvrhu zavřený. Ostatní weby jsou stále dostupné.",
+  "usage.pauseScreenTitle": "Pauzová obrazovka",
+  "usage.pauseScreenHint":
+    "Před otevřením tohoto webu nebo při návratu na něj chvíli počkejte u dýchajícího kruhu.",
+  "usage.pauseAll": "Pauzové obrazovky",
+  "usage.pauseAllHint":
+    "Vypněte nebo zapněte všechny pauzové obrazovky. Každý web si ponechá vlastní prodlevu.",
+  "usage.pauseAllEmptyHint":
+    "Žádný web zatím nemá pauzovou obrazovku. Otevřete web níže a přidejte ji.",
+  "pause.label": "Pauza před otevřením webu {name}",
+  "pause.title": "Na chvíli se zastavte",
+  "pause.breathe": "Nádech, výdech. {name} čeká.",
+  "pause.ready": "Až budete připraveni.",
+  "pause.continue": "Pokračovat",
+  "pause.continueIn": "Pokračovat za {value}",
+  "pause.close": "Zavřít web",
+  "usage.lock.title": "Zámek nastavení",
+  "usage.lock.intro":
+    "Slib sám sobě. Dokud je zapnutý, lze limity, rozvrhy, pauzové obrazovky a chráněné volby jen zpřísnit, ne uvolnit. Odemknutí trvá 24 hodin. Přeinstalace aplikace zámek odstraní, takže nejde o bezpečnostní funkci.",
+  "usage.lock.off": "Zámek je vypnutý.",
+  "usage.lock.locked": "Zamknuto. Omezení můžete přidávat nebo zpřísňovat; uvolňovat je nelze.",
+  "usage.lock.cooling": "Odemkne se za {value}. Do té doby nelze nic uvolnit.",
+  "usage.lock.ready": "Čekání skončilo. Můžete uvolnit jedno nastavení a zámek se tím zruší.",
+  "usage.lock.enable": "Zapnout zámek",
+  "usage.lock.requestUnlock": "Požádat o odemknutí",
+  "usage.lock.cancel": "Zrušit odemknutí",
+  "usage.lock.keep": "Ponechat zámek",
+  "usage.lock.lift": "Zrušit zámek hned",
+  "usage.lock.refused":
+    "Zámek nastavení je zapnutý. Můžete to zpřísnit, ne uvolnit. Nejdřív požádejte o odemknutí.",
+  "usage.lock.reasonRequest":
+    "Potvrďte, že jste to vy, a spusťte 24hodinové čekání, než půjde omezení uvolnit",
+  "usage.lock.reasonCancel": "Potvrďte, že jste to vy, a zrušte žádost o odemknutí",
+  "usage.lock.protectTitle": "Chránit zámkem nastavení",
+  "usage.lock.protectHint": "Dokud je zámek zapnutý, tato volba si ponechá svou aktuální hodnotu.",
 
   "onboarding.label": "Jak OpenMedia funguje",
   "onboarding.skip": "Přeskočit",
