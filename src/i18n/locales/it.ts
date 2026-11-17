@@ -434,7 +434,9 @@ export const it: Messages = {
   "library.review.options": "Interruttori",
   "library.review.rules": "Cosa cambia",
   "library.review.hides": "Nasconde",
+  "library.review.redirects": "Reindirizza",
   "library.review.restyles": "Cambia l’aspetto di",
+  "library.review.prunes": "Rimuove",
   "library.review.runsCode": "Esegue codice",
   "library.review.showCode": "Mostra il codice",
   "library.review.hideCode": "Nascondi il codice",
@@ -680,6 +682,12 @@ export const it: Messages = {
   "favorites.backgroundMedia": "Continua la riproduzione in background",
   "favorites.backgroundMediaNote":
     "Disattivato: audio e video vanno in pausa quando passi a un altro sito o lasci l'app. Attivato: questo sito continua a riprodurre.",
+  "favorites.landingLabel": "Pagina iniziale",
+  "favorites.landingNote":
+    "La pagina che questo preferito apre per prima. Deve essere dello stesso sito. Lascia vuoto per aprire l'indirizzo qui sopra.",
+  "favorites.landingPlaceholder": "Uguale all'indirizzo",
+  "favorites.landingReset": "Usa l'indirizzo",
+  "favorites.landingInvalid": "La pagina iniziale deve essere una pagina dello stesso sito.",
   "favorites.pictureInPicture": "Video picture-in-picture",
   "favorites.pictureInPictureNote":
     "Disattivato: i video restano nella pagina. Attivato: un video in riproduzione fluttua in una piccola finestra quando lasci l'app, e puoi farlo fluttuare anche dal suo lettore.",

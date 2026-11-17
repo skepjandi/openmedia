@@ -2,11 +2,14 @@ import { describe, expect, it } from "vitest";
 import {
   MAX_FAVORITE_NAME_CHARS,
   QUICK_ACCESS_LIMIT,
+  asInput,
   displayHost,
+  favoriteStartUrl,
   isFavoriteSite,
   quickAccess,
   quickSlots,
   recipeForFavorite,
+  resolveLanding,
   toggleSiteFavorite,
   usableQuickAccess,
 } from "./favorites";
@@ -149,5 +152,52 @@ describe("recipeForFavorite", () => {
     expect(recipeForFavorite(sites, "https://example.org/")).toBeUndefined();
     expect(recipeForFavorite(sites, "not a url")).toBeUndefined();
     expect(recipeForFavorite(sites, "https://bob.github.io/")).toBeUndefined();
+  });
+});
+
+describe("landing pages", () => {
+  const home = "https://m.youtube.com/";
+
+  it("opens the address unless the favorite has a landing page", () => {
+    expect(favoriteStartUrl({ url: home })).toBe(home);
+    expect(favoriteStartUrl({ url: home, landing: null })).toBe(home);
+    expect(favoriteStartUrl({ url: home, landing: "" })).toBe(home);
+    expect(favoriteStartUrl({ url: home, landing: "https://m.youtube.com/feed" })).toBe(
+      "https://m.youtube.com/feed",
+    );
+  });
+
+  it("reads a blank field as none, so clearing it returns the favorite to its address", () => {
+    expect(resolveLanding("", home)).toBeNull();
+    expect(resolveLanding("   ", home)).toBeNull();
+  });
+
+  it("takes a path or an address on the favorite's own site", () => {
+    expect(resolveLanding("/feed/subscriptions", home)).toBe(
+      "https://m.youtube.com/feed/subscriptions",
+    );
+    expect(resolveLanding("https://www.youtube.com/feed", home)).toBe(
+      "https://www.youtube.com/feed",
+    );
+  });
+
+  it("refuses another site, another scheme and text that is not an address", () => {
+    for (const input of [
+      "https://evil.example/",
+      "//evil.example/",
+      "javascript:alert(1)",
+      "ftp://m.youtube.com/",
+      "/a b",
+      "not a url",
+    ]) {
+      expect(resolveLanding(input, home), input).toBeUndefined();
+    }
+  });
+
+  it("keeps a favorite's landing page when the list is rewritten", () => {
+    const favorite = { name: "YouTube", url: home, notify: true, landing: "/feed" };
+    expect(asInput(favorite)).toEqual(favorite);
+    const kept = toggleSiteFavorite([favorite], "https://example.com/");
+    expect(kept[0]?.landing).toBe("/feed");
   });
 });

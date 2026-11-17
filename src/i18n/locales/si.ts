@@ -422,7 +422,9 @@ export const si: Messages = {
   "library.review.options": "ස්විච",
   "library.review.rules": "වෙනස් කරන දේ",
   "library.review.hides": "සඟවයි",
+  "library.review.redirects": "යළි යොමු කරයි",
   "library.review.restyles": "පෙනුම වෙනස් කරයි",
+  "library.review.prunes": "ඉවත් කරයි",
   "library.review.runsCode": "කේතය ධාවනය කරයි",
   "library.review.showCode": "කේතය පෙන්වන්න",
   "library.review.hideCode": "කේතය සඟවන්න",
@@ -665,6 +667,12 @@ export const si: Messages = {
   "favorites.backgroundMedia": "පසුබිමේ දිගටම වාදනය කරන්න",
   "favorites.backgroundMediaNote":
     "ක්‍රියාවිරහිත: වෙනත් අඩවියකට මාරු වූ විට හෝ යෙදුමෙන් ඉවත් වූ විට ශ්‍රව්‍ය සහ වීඩියෝ විරාමයට පත් වේ. ක්‍රියාත්මක: මෙම අඩවිය දිගටම වාදනය වේ.",
+  "favorites.landingLabel": "ආරම්භක පිටුව",
+  "favorites.landingNote":
+    "මෙම ප්‍රියතමය මුලින්ම විවෘත කරන පිටුව. එය එම අඩවියේම විය යුතුය. ඉහත ලිපිනය විවෘත කිරීමට හිස්ව තබන්න.",
+  "favorites.landingPlaceholder": "ලිපිනයට සමානයි",
+  "favorites.landingReset": "ලිපිනය භාවිත කරන්න",
+  "favorites.landingInvalid": "ආරම්භක පිටුව එම අඩවියේම පිටුවක් විය යුතුය.",
   "favorites.pictureInPicture": "පින්තූරයේ-පින්තූරය වීඩියෝ",
   "favorites.pictureInPictureNote":
     "ක්‍රියාවිරහිත: වීඩියෝ පිටුව තුළම පවතී. ක්‍රියාත්මක: යෙදුමෙන් ඉවත් වූ විට වාදනය වන වීඩියෝව කුඩා පාවෙන කවුළුවක පෙන්වයි, ඔබට එය වාදකයෙන්ද පාවීමට හැක.",

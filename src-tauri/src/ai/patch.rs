@@ -741,7 +741,10 @@ pub fn option_css(recipe: &Recipe, option_id: &str, choice: Option<&str>) -> Str
                 declarations,
                 ..
             } => append_rule_css(&mut css, &target.css, Some(declarations)),
-            Rule::Script { .. } | Rule::VideoMenu { .. } => {}
+            Rule::Script { .. }
+            | Rule::VideoMenu { .. }
+            | Rule::Prune { .. }
+            | Rule::Redirect { .. } => {}
         }
     }
     css

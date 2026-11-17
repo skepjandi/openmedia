@@ -26,13 +26,20 @@ The recipe bundle is delivered with the script (embedded as a JSON literal in th
 
 Instagram, YouTube, X and Facebook mostly navigate without page loads. The engine:
 
-- wraps `history.pushState` / `replaceState` and listens for `popstate` and `hashchange`;
-- re-evaluates `when.path` conditions and `redirect` rules on every virtual navigation;
+- wraps `history.pushState` / `replaceState` and listens for `popstate` and `hashchange` (today only the redirect runtime does; recipe CSS and scripts are chosen once per document);
+- re-evaluates `redirect` rules on every virtual navigation (see [Redirect rules](#redirect-rules); `when.path` conditions on other rule types are not implemented);
 - reports the new URL to Core so recipe resolution can switch bundles when the pattern set changes.
 
 ## Redirect rules
 
-Evaluated on load and on virtual navigation. Same-origin only. Uses `location.replace` so the blocked route does not stay in history. Guards against redirect loops (max 3 per second per rule, then the rule is suspended and flagged).
+Implemented in `src-tauri/src/route_redirect.js`, embedded in the page script (`compile.rs`) only when an applying recipe has a `redirect` rule. Rust compiles each rule's glob to a regular expression (`route.rs`) and the page tests the same string. The script:
+
+- checks every rule on load and after each `history.pushState`, `history.replaceState`, `popstate` and `hashchange`; a rule applies when its recipe's `match` patterns (or its `on` subset) cover the current location and `when.path` selects the path;
+- resolves `to` against the page's origin and refuses any result on another origin, then calls `location.replace`, so the blocked route does not stay in history;
+- runs in the top frame only;
+- allows 3 redirects per second per rule, keyed by recipe and rule id and counted in `sessionStorage` so a site that sends the page straight back cannot loop across reloads either; one more and the rule is suspended for the rest of that session (tab). There is no on-screen flag for a suspended rule yet.
+
+Only rules whose option (and `choice`) is on reach the script, so switching the option off removes the redirect the next time the page script is built, like every other rule. Tested in `src/shared/routeRedirect.test.ts` (load, no match, single-page navigation, loop guard, negation, cross-origin refusal, top frame) and in `recipes/mod.rs`.
 
 ## Element picker
 
@@ -62,6 +69,17 @@ Options beyond the browser's tracks come from three places, in this order (`read
 - **Move on** (`autoAdvance`, which implies loop off): on `ended` it scrolls, as a swipe would: `scrollIntoView` to the next video below, or one screen down inside the feed's scroller. It never clicks the site's own next button, and does nothing in calm mode. A feed that swipes with touch handlers instead of scrolling (m.youtube.com Shorts) cannot be moved this way, so it stays on the last frame.
 
 The feed pages are the ones the feed player knows. A page it does not know is added by a script rule from the assistant, `document[Symbol.for('openmedia.feedPaths')] = ['^/clips/']` (up to 8 case-insensitive path patterns), which also turns on the autoplay of the feed player there. Hiding parts of a feed (title, channel, buttons) is ordinary `hide` rules.
+
+## Prune rules
+
+`src-tauri/src/prune_runtime.js` is a function expression, embedded in the document-start script (like `video_menu.js`) only when a rule that currently applies is a `prune` rule. The page script hands it the rules of every recipe entry matching the page: each rule's `urls` compiled by Rust to anchored path regexes (`recipes/prune.rs`) and each `remove` path parsed by Rust into steps (a string is a key, `"*"` every array element, a number an index), so the page never parses the grammar. It runs in every frame whose own URL a recipe matches, in the page's own world, because that is where the page's `fetch` lives.
+
+- **Wrapping.** `window.fetch`, `XMLHttpRequest.prototype.open` and the `responseText`/`response` getters are wrapped once per window; the wrapper state lives under `Symbol.for('openmedia.prune')`. A second run (a toggled option, a swapped recipe, `set_document_start_script`'s live eval) finds the state and only replaces its rules; the page script runs `state.rules = []` when no prune rule applies any more, so the effect stops on the next response with no reload. Wrapping is never removed (the wrapper with no rules returns the page's own promise or value).
+- **What it reads.** The request's URL (a string, `URL` or `Request.url`; never a body, header or option) and the response the page already asked for. It must be on the page's own origin both as requested and as finally answered (a redirect elsewhere is left alone), its path must match a rule, and the response must be `ok`, `basic`/`default` type, JSON-typed (or empty or `text/plain`), and buffered within 2 MiB. For `fetch` it reads a **clone** (`response.clone()`), counting bytes chunk by chunk and giving up past the cap or at a larger `Content-Length`, so the page's own response is never consumed. For XHR it acts only at `readyState` 4 on text and `json` response types.
+- **What it returns.** If a path removed anything, a new `Response` (same status, status text and headers, minus `Content-Length` and `Content-Encoding`, `url` kept) holding the re-serialised JSON, or for XHR the pruned text or object. In every other case, including every parse error, shape mismatch and exception, the page gets the original response object or value.
+- **What it never does.** Start, change, delay beyond buffering, or read the body of a request, touch the bridge, or send anything. The wait: for a matching request the page's `fetch` promise resolves when the body has been buffered, not when the headers arrive.
+- **Circuit breaker.** An unexpected exception (not a parse failure, which is normal) counts as a fault; after 5 the rules are emptied and the page is left as the site made it until the next run of the page script.
+- Tested in `src/shared/pruneRuntime.test.ts` (stub `fetch`/XHR, no site) and `recipes/prune.rs` / `recipes/mod.rs` (validation and delivery).
 
 ## Snapshot
 

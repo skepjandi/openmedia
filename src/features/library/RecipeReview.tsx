@@ -120,6 +120,13 @@ function Notes({ source }: { source: string }) {
   );
 }
 
+const REVIEW_VERBS = {
+  hide: "library.review.hides",
+  css: "library.review.restyles",
+  redirect: "library.review.redirects",
+  prune: "library.review.prunes",
+} as const;
+
 function RuleRow({ rule }: { rule: RulePreview }) {
   const t = useT();
   if (rule.kind === "script") return <ScriptRuleRow rule={rule} />;
@@ -128,10 +135,7 @@ function RuleRow({ rule }: { rule: RulePreview }) {
   return (
     <div className="px-4 py-3">
       <span className="block text-base">
-        <span className="text-paper/55">
-          {t(rule.kind === "hide" ? "library.review.hides" : "library.review.restyles")}
-        </span>{" "}
-        {rule.label}
+        <span className="text-paper/55">{t(REVIEW_VERBS[rule.kind])}</span> {rule.label}
       </span>
       <code className="mt-1 block text-[13px] leading-snug break-all text-paper/70">
         {rule.selector}

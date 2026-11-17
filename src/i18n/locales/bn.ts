@@ -415,7 +415,9 @@ export const bn: Messages = {
   "library.review.options": "সুইচ",
   "library.review.rules": "যা বদলায়",
   "library.review.hides": "লুকায়",
+  "library.review.redirects": "পুনঃনির্দেশ করে",
   "library.review.restyles": "দেখতে বদলায়",
+  "library.review.prunes": "সরায়",
   "library.review.runsCode": "কোড চালায়",
   "library.review.showCode": "কোড দেখান",
   "library.review.hideCode": "কোড লুকান",
@@ -658,6 +660,12 @@ export const bn: Messages = {
   "favorites.backgroundMedia": "ব্যাকগ্রাউন্ডে চালানো চালিয়ে যান",
   "favorites.backgroundMediaNote":
     "বন্ধ: অন্য সাইটে গেলে বা অ্যাপ ছাড়লে অডিও ও ভিডিও থেমে যায়। চালু: এই সাইট চলতে থাকে।",
+  "favorites.landingLabel": "ল্যান্ডিং পেজ",
+  "favorites.landingNote":
+    "এই পছন্দের সাইটটি প্রথমে যে পৃষ্ঠা খোলে। এটি একই সাইটের হতে হবে। উপরের ঠিকানা খুলতে ফাঁকা রাখুন।",
+  "favorites.landingPlaceholder": "ঠিকানার মতোই",
+  "favorites.landingReset": "ঠিকানা ব্যবহার করুন",
+  "favorites.landingInvalid": "ল্যান্ডিং পেজ অবশ্যই একই সাইটের একটি পৃষ্ঠা হতে হবে।",
   "favorites.pictureInPicture": "পিকচার-ইন-পিকচার ভিডিও",
   "favorites.pictureInPictureNote":
     "বন্ধ: ভিডিও পেজের মধ্যেই থাকে। চালু: অ্যাপ ছাড়লে চলমান ভিডিও ছোট ভাসমান উইন্ডোতে চলে, আর প্লেয়ার থেকেও আপনি সেটি ভাসাতে পারেন।",

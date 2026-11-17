@@ -56,7 +56,7 @@ export function FavoritesSheet() {
               key={favorite.id}
               favorite={favorite}
               live={sessionForFavorite(sessions, favorite.url, sites) !== undefined}
-              onOpen={() => openFavorite(favorite.url)}
+              onOpen={() => openFavorite(favorite)}
             />
           ),
         )}

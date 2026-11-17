@@ -391,7 +391,9 @@ export const zhHant: Messages = {
   "library.review.options": "開關",
   "library.review.rules": "變更內容",
   "library.review.hides": "隱藏",
+  "library.review.redirects": "重新導向",
   "library.review.restyles": "調整樣式",
+  "library.review.prunes": "移除",
   "library.review.runsCode": "執行程式碼",
   "library.review.showCode": "顯示程式碼",
   "library.review.hideCode": "隱藏程式碼",
@@ -616,6 +618,11 @@ export const zhHant: Messages = {
   "favorites.backgroundMedia": "在背景繼續播放",
   "favorites.backgroundMediaNote":
     "關閉：切換到其他網站或離開 App 時，音訊和影片會暫停。開啟：此網站繼續播放。",
+  "favorites.landingLabel": "起始頁",
+  "favorites.landingNote": "此我的最愛首先開啟的頁面。必須在同一網站上。留空則開啟上方的網址。",
+  "favorites.landingPlaceholder": "與網址相同",
+  "favorites.landingReset": "使用網址",
+  "favorites.landingInvalid": "起始頁必須是同一網站的頁面。",
   "favorites.pictureInPicture": "子母畫面影片",
   "favorites.pictureInPictureNote":
     "關閉：影片留在頁面內。開啟：離開 App 時，正在播放的影片會以小視窗浮動，也可以從播放器中手動浮動。",

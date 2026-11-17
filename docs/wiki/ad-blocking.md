@@ -53,6 +53,8 @@ flowchart LR
 
 Rust (`link_clean.rs`) validates the three JSON files and puts them in front of the script as `window.__openmediaLinkRules`; the script deletes that global before the page can run. It never navigates, clicks or requests anything, and no IPC is reachable from it. It does not touch an address typed in the shell, a server redirect, or navigation the page's own script starts. Tested in `src/shared/linkCleaner.test.ts` against the bundled data.
 
+> Recipes have the same primitive as data: a [`prune` rule](./recipe-format.md#the-prune-rule) removes items from the JSON of the page's own same-origin `fetch`/`XMLHttpRequest` responses (the `json-prune` idea, but a declarative recipe rule with an off switch, not a scriptlet). The ad-blocking scriptlets here stay in the filter lists; `prune` is for the content a user chooses to remove from a feed.
+
 ## YouTube ads
 
 Why the earlier setup left a black screen: the ad **media** come from the same `googlevideo.com` hosts as the video, so the only network rule that can hit them (Brave iOS Specific, `ctier=L`) leaves the player holding an ad it can never play. The uBlock Origin scriptlets that Brave's lists use to remove the ad from the player response (`json-prune`, `set`, `trusted-replace-xhr-response`) were also inert: the bundled Brave resource bundle holds only Brave's own scriptlets, and a rule naming a scriptlet the engine does not have injects nothing. Android bundles no YouTube rules at all.

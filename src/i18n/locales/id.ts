@@ -425,7 +425,9 @@ export const id: Messages = {
   "library.review.options": "Sakelar",
   "library.review.rules": "Yang diubah",
   "library.review.hides": "Menyembunyikan",
+  "library.review.redirects": "Mengalihkan",
   "library.review.restyles": "Mengubah tampilan",
+  "library.review.prunes": "Menghapus",
   "library.review.runsCode": "Menjalankan kode",
   "library.review.showCode": "Tampilkan kode",
   "library.review.hideCode": "Sembunyikan kode",
@@ -670,6 +672,12 @@ export const id: Messages = {
   "favorites.backgroundMedia": "Tetap putar di latar belakang",
   "favorites.backgroundMediaNote":
     "Mati: audio dan video berhenti sejenak saat Anda pindah ke situs lain atau meninggalkan aplikasi. Hidup: situs ini terus diputar.",
+  "favorites.landingLabel": "Halaman awal",
+  "favorites.landingNote":
+    "Halaman yang pertama dibuka favorit ini. Harus berada di situs yang sama. Kosongkan untuk membuka alamat di atas.",
+  "favorites.landingPlaceholder": "Sama dengan alamat",
+  "favorites.landingReset": "Gunakan alamat",
+  "favorites.landingInvalid": "Halaman awal harus berupa halaman dari situs yang sama.",
   "favorites.pictureInPicture": "Video gambar-dalam-gambar",
   "favorites.pictureInPictureNote":
     "Mati: video tetap di dalam halaman. Hidup: video yang sedang diputar mengambang di jendela kecil saat Anda meninggalkan aplikasi, dan Anda juga bisa mengambangkannya dari pemutarnya.",

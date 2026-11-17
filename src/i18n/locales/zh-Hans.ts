@@ -390,7 +390,9 @@ export const zhHans: Messages = {
   "library.review.options": "开关",
   "library.review.rules": "改动内容",
   "library.review.hides": "隐藏",
+  "library.review.redirects": "重定向",
   "library.review.restyles": "调整样式",
+  "library.review.prunes": "移除",
   "library.review.runsCode": "运行代码",
   "library.review.showCode": "显示代码",
   "library.review.hideCode": "隐藏代码",
@@ -614,6 +616,11 @@ export const zhHans: Messages = {
   "favorites.backgroundMedia": "在后台继续播放",
   "favorites.backgroundMediaNote":
     "关闭：切换到其他网站或离开应用时，音频和视频会暂停。开启：此网站继续播放。",
+  "favorites.landingLabel": "起始页",
+  "favorites.landingNote": "此收藏首先打开的页面。必须在同一网站上。留空则打开上方的地址。",
+  "favorites.landingPlaceholder": "与地址相同",
+  "favorites.landingReset": "使用地址",
+  "favorites.landingInvalid": "起始页必须是同一网站的页面。",
   "favorites.pictureInPicture": "画中画视频",
   "favorites.pictureInPictureNote":
     "关闭：视频留在页面内。开启：离开应用时，正在播放的视频会以小窗悬浮，也可以从播放器中手动悬浮。",

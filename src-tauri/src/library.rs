@@ -11,6 +11,7 @@ use std::{
 
 use serde::{Deserialize, Serialize};
 use tauri_plugin_siteview::validate::parse_web_url;
+use url::Url;
 use uuid::Uuid;
 
 use crate::accessibility::Accessibility;
@@ -115,6 +116,18 @@ pub struct Favorite {
     /// so favorites saved before the setting existed keep notifying.
     #[serde(default = "enabled")]
     pub notify: bool,
+    /// Where a new session of this favorite starts instead of `url`; always an address on the
+    /// favorite's own registrable domain. None opens `url`, which is also what a file saved
+    /// before landing pages existed means.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub landing: Option<String>,
+}
+
+impl Favorite {
+    /// The address a new session of this favorite opens.
+    pub fn start_url(&self) -> &str {
+        self.landing.as_deref().unwrap_or(&self.url)
+    }
 }
 
 #[derive(Debug, Clone, Deserialize)]
@@ -123,6 +136,9 @@ pub struct FavoriteInput {
     pub url: String,
     #[serde(default = "enabled")]
     pub notify: bool,
+    /// An address, or a path such as `/feed` on the favorite's own site; blank means none.
+    #[serde(default)]
+    pub landing: Option<String>,
 }
 
 /// Everything the shell needs at startup.
@@ -270,9 +286,10 @@ impl Library {
         Ok(data
             .last_url
             .iter()
-            .chain(data.favorites.iter().map(|favorite| &favorite.url))
+            .map(String::as_str)
+            .chain(data.favorites.iter().map(Favorite::start_url))
             .find(|url| parse_web_url(url).is_ok())
-            .cloned())
+            .map(str::to_owned))
     }
 
     pub fn state(&self) -> Result<AppState> {
@@ -819,15 +836,51 @@ fn parse(text: &str) -> Result<(LibraryData, bool)> {
                     name: YOUTUBE_FAVORITE.0.to_owned(),
                     url: YOUTUBE_FAVORITE.1.to_owned(),
                     notify: true,
+                    landing: None,
                 })?);
             }
         }
         3 | FORMAT_VERSION => {}
         version => return Err(Error::UnsupportedVersion(version)),
     }
-    let migrated = data.version != FORMAT_VERSION;
+    let dropped = drop_foreign_landings(&mut data.favorites)
+        | data
+            .incognito_favorites
+            .as_deref_mut()
+            .is_some_and(drop_foreign_landings);
+    let migrated = data.version != FORMAT_VERSION || dropped;
     data.version = FORMAT_VERSION;
     Ok((data, migrated))
+}
+
+/// A landing page the favorite's own site does not own can only come from a hand-edited file:
+/// it is dropped, so the favorite opens its address. True when any was.
+fn drop_foreign_landings(favorites: &mut [Favorite]) -> bool {
+    let mut dropped = false;
+    for favorite in favorites {
+        let kept = favorite
+            .landing
+            .as_deref()
+            .is_some_and(|landing| landing_on_site(&favorite.url, landing).is_some());
+        if favorite.landing.is_some() && !kept {
+            favorite.landing = None;
+            dropped = true;
+        }
+    }
+    dropped
+}
+
+/// A landing page for the favorite at `url`: an address, or a path of the favorite's own origin,
+/// that is a web address on the same registrable domain, so a session never leaves its site.
+fn landing_on_site(url: &str, landing: &str) -> Option<String> {
+    let base = parse_web_url(url).ok()?;
+    let landing = if landing.starts_with('/') && !landing.starts_with("//") {
+        base.join(landing).ok()?
+    } else {
+        parse_web_url(landing).ok()?
+    };
+    let site = |url: &Url| url.host_str().map(site_of_host);
+    (site(&base)? == site(&landing)?).then(|| landing.to_string())
 }
 
 fn default_favorites() -> Vec<Favorite> {
@@ -839,6 +892,7 @@ fn default_favorites() -> Vec<Favorite> {
             url: (*url).to_owned(),
             icon: None,
             notify: true,
+            landing: None,
         })
         .collect()
 }
@@ -878,12 +932,18 @@ fn favorite_from_input(input: FavoriteInput) -> Result<Favorite> {
     if name.is_empty() || name.chars().count() > MAX_FAVORITE_NAME_CHARS {
         return Err(Error::InvalidFavoriteName);
     }
+    let url = parse_web_url(&input.url)?.to_string();
+    let landing = match input.landing.as_deref().map(str::trim) {
+        None | Some("") => None,
+        Some(landing) => Some(landing_on_site(&url, landing).ok_or(Error::InvalidLanding)?),
+    };
     Ok(Favorite {
         id: Uuid::new_v4(),
         name: name.to_owned(),
-        url: parse_web_url(&input.url)?.to_string(),
+        url,
         icon: None,
         notify: input.notify,
+        landing,
     })
 }
 
@@ -929,6 +989,7 @@ mod tests {
             name: name.into(),
             url: url.into(),
             notify: true,
+            landing: None,
         }
     }
 
@@ -951,6 +1012,7 @@ mod tests {
                 url: (*url).to_owned(),
                 icon: None,
                 notify: true,
+                landing: None,
             })
             .collect()
     }
@@ -1037,6 +1099,118 @@ mod tests {
             Some("https://m.youtube.com/feed")
         );
         assert_eq!(state.last_back, ["https://m.youtube.com/"]);
+    }
+
+    fn with_landing(name: &str, url: &str, landing: &str) -> FavoriteInput {
+        FavoriteInput {
+            landing: Some(landing.into()),
+            ..input(name, url)
+        }
+    }
+
+    #[test]
+    fn a_landing_page_on_the_favorites_own_site_is_kept_across_a_reload() {
+        let (dir, library) = library();
+        let saved = library
+            .set_favorites(vec![
+                with_landing("YouTube", "https://m.youtube.com/", "/feed/subscriptions"),
+                with_landing(
+                    "Docs",
+                    "https://example.com/",
+                    "https://docs.example.com/start",
+                ),
+                input("Plain", "https://plain.example/"),
+                with_landing("Blank", "https://blank.example/", "  "),
+            ])
+            .unwrap();
+        let landings: Vec<_> = saved.iter().map(|f| f.landing.as_deref()).collect();
+        assert_eq!(
+            landings,
+            [
+                Some("https://m.youtube.com/feed/subscriptions"),
+                Some("https://docs.example.com/start"),
+                None,
+                None
+            ]
+        );
+        let again = reload(&dir).state().unwrap().favorites;
+        assert_eq!(
+            again[0].start_url(),
+            "https://m.youtube.com/feed/subscriptions"
+        );
+        assert_eq!(again[2].start_url(), "https://plain.example/");
+    }
+
+    #[test]
+    fn a_landing_page_cannot_leave_the_favorites_site() {
+        let (_dir, library) = library();
+        for landing in [
+            "https://evil.example/",
+            "//evil.example/",
+            "javascript:alert(1)",
+            "ftp://m.youtube.com/",
+            "/\\evil.example",
+            "not a url",
+        ] {
+            let result = library.set_favorites(vec![with_landing(
+                "YouTube",
+                "https://m.youtube.com/",
+                landing,
+            )]);
+            assert!(matches!(result, Err(Error::InvalidLanding)), "{landing}");
+        }
+        assert_eq!(library.favorites().unwrap().len(), 1);
+    }
+
+    #[test]
+    fn incognito_favorites_follow_the_same_landing_rules() {
+        let (_dir, library) = library();
+        let saved = library
+            .set_incognito_favorites(vec![with_landing("A", "https://a.example/", "/inbox")])
+            .unwrap();
+        assert_eq!(saved[0].landing.as_deref(), Some("https://a.example/inbox"));
+        assert!(
+            library
+                .set_incognito_favorites(vec![with_landing(
+                    "A",
+                    "https://a.example/",
+                    "https://b.example/"
+                )])
+                .is_err()
+        );
+    }
+
+    #[test]
+    fn a_file_without_landing_pages_loads_unchanged_and_a_foreign_one_is_dropped() {
+        let (dir, library) = library();
+        library
+            .set_favorites(vec![input("A", "https://a.example/")])
+            .unwrap();
+        let path = dir.path().join("library.json");
+        let mut saved: serde_json::Value =
+            serde_json::from_str(&fs::read_to_string(&path).unwrap()).unwrap();
+        assert!(saved["favorites"][0].get("landing").is_none());
+        let before = fs::read_to_string(&path).unwrap();
+        assert_eq!(reload(&dir).favorites().unwrap()[0].landing, None);
+        assert_eq!(fs::read_to_string(&path).unwrap(), before);
+
+        saved["favorites"][0]["landing"] = "https://evil.example/".into();
+        fs::write(&path, saved.to_string()).unwrap();
+        assert_eq!(reload(&dir).favorites().unwrap()[0].landing, None);
+        let rewritten = fs::read_to_string(&path).unwrap();
+        assert!(!rewritten.contains("evil.example"));
+    }
+
+    #[test]
+    fn the_first_launch_opens_the_first_favorites_landing_page() {
+        let (_dir, library) = library();
+        library
+            .set_favorites(vec![with_landing("A", "https://a.example/", "/inbox")])
+            .unwrap();
+        assert_eq!(
+            library.start_url().unwrap().as_deref(),
+            Some("https://a.example/inbox")
+        );
     }
 
     #[test]

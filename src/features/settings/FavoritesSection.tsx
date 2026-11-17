@@ -6,6 +6,7 @@ import {
   QUICK_ACCESS_LIMIT,
   asInput,
   recipeForFavorite,
+  resolveLanding,
 } from "../../shared/favorites";
 import { DownIcon, ForwardIcon, ProIcon, PlusIcon, StarIcon, UpIcon } from "../../shared/icons";
 import type { Favorite, FavoriteInput, SiteSettings } from "../../shared/ipc";
@@ -360,7 +361,12 @@ function FavoriteRow({
       </div>
       {editing && (
         <FavoriteEditor
-          initial={{ name: favorite.name, url: favorite.url, notify: favorite.notify }}
+          initial={{
+            name: favorite.name,
+            url: favorite.url,
+            notify: favorite.notify,
+            landing: favorite.landing,
+          }}
           showNotify={showNotify}
           onCommit={onCommit}
           onCancel={onEdit}
@@ -399,6 +405,7 @@ function FavoriteEditor({
 }: EditorProps) {
   const [name, setName] = useState(initial.name);
   const [url, setUrl] = useState(initial.url);
+  const [landing, setLanding] = useState(initial.landing ?? "");
   const [notify, setNotify] = useState(initial.notify ?? true);
   const [problem, setProblem] = useState<string | null>(null);
   const t = useT();
@@ -409,7 +416,12 @@ function FavoriteEditor({
       setProblem(t("favorites.invalid"));
       return;
     }
-    await onCommit({ name: name.trim(), url: address, notify });
+    const resolved = resolveLanding(landing, address);
+    if (resolved === undefined) {
+      setProblem(t("favorites.landingInvalid"));
+      return;
+    }
+    await onCommit({ name: name.trim(), url: address, notify, landing: resolved });
   };
 
   return (
@@ -438,6 +450,35 @@ function FavoriteEditor({
           setUrl(event.target.value);
         }}
       />
+      <div className="flex flex-col gap-1.5">
+        <div className="text-sm font-medium">{t("favorites.landingLabel")}</div>
+        <p className="text-sm leading-snug text-paper/55">{t("favorites.landingNote")}</p>
+        <input
+          aria-label={t("favorites.landingLabel")}
+          className={field}
+          autoCapitalize="none"
+          autoCorrect="off"
+          inputMode="url"
+          placeholder={t("favorites.landingPlaceholder")}
+          value={landing}
+          onChange={(event) => {
+            setProblem(null);
+            setLanding(event.target.value);
+          }}
+        />
+        {landing.trim() !== "" && (
+          <button
+            type="button"
+            onClick={() => {
+              setProblem(null);
+              setLanding("");
+            }}
+            className={`self-start ${quietButton}`}
+          >
+            {t("favorites.landingReset")}
+          </button>
+        )}
+      </div>
       {showNotify && (
         <div className="-mx-4">
           <Switch label={t("favorites.notify")} checked={notify} onChange={setNotify} />

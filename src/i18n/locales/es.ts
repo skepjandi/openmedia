@@ -435,7 +435,9 @@ export const es: Messages = {
   "library.review.options": "Interruptores",
   "library.review.rules": "Qué cambia",
   "library.review.hides": "Oculta",
+  "library.review.redirects": "Redirige",
   "library.review.restyles": "Cambia el aspecto de",
+  "library.review.prunes": "Elimina",
   "library.review.runsCode": "Ejecuta código",
   "library.review.showCode": "Mostrar el código",
   "library.review.hideCode": "Ocultar el código",
@@ -682,6 +684,12 @@ export const es: Messages = {
   "favorites.backgroundMedia": "Seguir reproduciendo en segundo plano",
   "favorites.backgroundMediaNote":
     "Desactivado: el audio y el vídeo se pausan al cambiar de sitio o salir de la app. Activado: este sitio sigue reproduciéndose.",
+  "favorites.landingLabel": "Página de inicio",
+  "favorites.landingNote":
+    "La página que este favorito abre primero. Debe ser del mismo sitio. Déjala vacía para abrir la dirección de arriba.",
+  "favorites.landingPlaceholder": "Igual que la dirección",
+  "favorites.landingReset": "Usar la dirección",
+  "favorites.landingInvalid": "La página de inicio debe ser una página del mismo sitio.",
   "favorites.pictureInPicture": "Vídeo en imagen en imagen",
   "favorites.pictureInPictureNote":
     "Desactivado: los vídeos se quedan en la página. Activado: un vídeo en reproducción flota en una ventana pequeña al salir de la app, y también puedes hacerlo flotar desde su reproductor.",

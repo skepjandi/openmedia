@@ -433,7 +433,9 @@ export const ro: Messages = {
   "library.review.options": "Comutatoare",
   "library.review.rules": "Ce modifică",
   "library.review.hides": "Ascunde",
+  "library.review.redirects": "Redirecționează",
   "library.review.restyles": "Schimbă aspectul",
+  "library.review.prunes": "Elimină",
   "library.review.runsCode": "Rulează cod",
   "library.review.showCode": "Arată codul",
   "library.review.hideCode": "Ascunde codul",
@@ -682,6 +684,12 @@ export const ro: Messages = {
   "favorites.backgroundMedia": "Continuă redarea în fundal",
   "favorites.backgroundMediaNote":
     "Dezactivat: sunetul și videoclipul se opresc când treci la alt site sau părăsești aplicația. Activat: acest site continuă să redea.",
+  "favorites.landingLabel": "Pagina de pornire",
+  "favorites.landingNote":
+    "Pagina pe care o deschide mai întâi acest favorit. Trebuie să fie pe același site. Lasă gol pentru a deschide adresa de mai sus.",
+  "favorites.landingPlaceholder": "La fel ca adresa",
+  "favorites.landingReset": "Folosește adresa",
+  "favorites.landingInvalid": "Pagina de pornire trebuie să fie o pagină a aceluiași site.",
   "favorites.pictureInPicture": "Videoclip picture-in-picture",
   "favorites.pictureInPictureNote":
     "Dezactivat: videoclipurile rămân în pagină. Activat: un videoclip în redare plutește într-o fereastră mică când părăsești aplicația, și îl poți face să plutească și din player.",

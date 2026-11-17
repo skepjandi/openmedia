@@ -74,6 +74,16 @@ Shared recipes are untrusted until validated on the device. **Bundled recipes** 
 
 **Updates.** `ota_status`, `ota_confirm`, `ota_check`, `app_update_check` and `app_update_install` are shell-only app commands like the rest; none takes a URL or a key. The web bundle is accepted only with a valid Ed25519 signature from the key compiled into the app, built for the app's own version, and is served in place of the embedded shell, so the signing key is as sensitive as the app's store signing: whoever holds it can change what the shell does. The desktop updater's Minisign key is the same kind of secret, and the plugin's own JS commands have no capability. Both fetch from GitHub releases over HTTPS and send nothing about the user ([Updates](./updates.md)).
 
+### Prune rules
+
+A `prune` rule ([Recipe Format](./recipe-format.md#the-prune-rule)) may be in any recipe, including bundled and shared ones, though a `script` that wraps `fetch` may not ([Script Policy](./script-policy.md)). Why that is consistent with the invariants:
+
+- **Invariant 7 (customize, never automate).** The rule changes only what the page reads from responses to requests the page itself makes: the same effect a `hide` rule has on what the user sees, applied earlier. It starts no request, does not change a request (URL, method, headers, body, credentials), does not read a request body, clicks nothing and navigates nowhere. The page's own code decides what to ask for; it merely gets fewer items back.
+- **Invariants 1 and 3 (no egress, hostile site).** The runtime has no way to send data: it holds no network call of its own (it calls only the page's original `fetch`, with the page's own arguments, which the page would have made anyway), no bridge handle, and no storage access. The rule is data in a closed grammar (paths on the page's own origin, keys, `[*]`, `[n]`, one `key == scalar` condition), validated in Rust (`recipes/prune.rs`) and in the Worker, with caps (8 rules, 8 urls and 8 removals each, 120-character paths, no control or direction-override characters). The site's code can see that `fetch` is wrapped, as with any content blocker; that tells it nothing it could not learn from its own responses.
+- **Same origin only.** `urls` are paths, so a host cannot be written; the runtime also compares the origin of the request and of the final response with the page's. A cross-origin response is never read or changed.
+- **Fail open.** Any parse failure, shape mismatch, size over 2 MiB or unexpected exception returns the original response; five unexpected exceptions switch the runtime off.
+- **What it can still do wrong.** A recipe can remove items the user needs (an unread message, a security notice), as a `hide` rule can; rule-by-rule review shows the paths and conditions before a shared recipe is saved, and a rule belongs to an option the user can switch off.
+
 
 
 ## Ad blocking

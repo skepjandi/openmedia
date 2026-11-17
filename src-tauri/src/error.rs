@@ -10,6 +10,8 @@ pub type Result<T> = std::result::Result<T, Error>;
 pub enum Error {
     #[error("a favorite needs a name of 1-20 characters")]
     InvalidFavoriteName,
+    #[error("a landing page must be an address on the favorite's own site")]
+    InvalidLanding,
     #[error("no such site to favorite")]
     UnknownSite,
     #[error("the bottom margin can be at most {0} pixels")]

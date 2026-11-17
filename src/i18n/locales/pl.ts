@@ -430,7 +430,9 @@ export const pl: Messages = {
   "library.review.options": "Przełączniki",
   "library.review.rules": "Co zmienia",
   "library.review.hides": "Ukrywa",
+  "library.review.redirects": "Przekierowuje",
   "library.review.restyles": "Zmienia wygląd",
+  "library.review.prunes": "Usuwa",
   "library.review.runsCode": "Uruchamia kod",
   "library.review.showCode": "Pokaż kod",
   "library.review.hideCode": "Ukryj kod",
@@ -673,6 +675,12 @@ export const pl: Messages = {
   "favorites.backgroundMedia": "Odtwarzaj w tle",
   "favorites.backgroundMediaNote":
     "Wyłączone: dźwięk i wideo wstrzymują się po przejściu do innej witryny lub wyjściu z aplikacji. Włączone: ta witryna gra dalej.",
+  "favorites.landingLabel": "Strona startowa",
+  "favorites.landingNote":
+    "Strona, którą ten ulubiony otwiera jako pierwszą. Musi należeć do tej samej witryny. Zostaw puste, aby otworzyć adres powyżej.",
+  "favorites.landingPlaceholder": "Taka sama jak adres",
+  "favorites.landingReset": "Użyj adresu",
+  "favorites.landingInvalid": "Strona startowa musi być stroną tej samej witryny.",
   "favorites.pictureInPicture": "Wideo obraz w obrazie",
   "favorites.pictureInPictureNote":
     "Wyłączone: wideo zostaje na stronie. Włączone: odtwarzane wideo unosi się w małym oknie po wyjściu z aplikacji, a możesz je też unieść z jego odtwarzacza.",

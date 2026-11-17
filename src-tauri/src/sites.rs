@@ -111,6 +111,7 @@ pub fn with_site_favorite(
             name: existing.name.clone(),
             url: existing.url.clone(),
             notify: existing.notify,
+            landing: existing.landing.clone(),
         })
         .collect();
     if favorite && !already {
@@ -118,6 +119,7 @@ pub fn with_site_favorite(
             name: recipe.name.clone(),
             url: recipe.homepage().ok_or(Error::UnknownSite)?.to_owned(),
             notify: true,
+            landing: None,
         });
     }
     Ok(inputs)
@@ -281,6 +283,7 @@ mod tests {
             url: url.to_owned(),
             icon: None,
             notify: true,
+            landing: None,
         }
     }
 

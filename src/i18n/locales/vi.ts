@@ -420,7 +420,9 @@ export const vi: Messages = {
   "library.review.options": "Công tắc",
   "library.review.rules": "Những gì nó thay đổi",
   "library.review.hides": "Ẩn",
+  "library.review.redirects": "Chuyển hướng",
   "library.review.restyles": "Đổi kiểu dáng",
+  "library.review.prunes": "Xóa",
   "library.review.runsCode": "Chạy mã",
   "library.review.showCode": "Xem mã",
   "library.review.hideCode": "Ẩn mã",
@@ -663,6 +665,12 @@ export const vi: Messages = {
   "favorites.backgroundMedia": "Tiếp tục phát ở chế độ nền",
   "favorites.backgroundMediaNote":
     "Tắt: âm thanh và video tạm dừng khi bạn chuyển sang trang khác hoặc rời ứng dụng. Bật: trang này tiếp tục phát.",
+  "favorites.landingLabel": "Trang đích",
+  "favorites.landingNote":
+    "Trang mà mục yêu thích này mở đầu tiên. Phải thuộc cùng một trang web. Để trống để mở địa chỉ ở trên.",
+  "favorites.landingPlaceholder": "Giống địa chỉ",
+  "favorites.landingReset": "Dùng địa chỉ",
+  "favorites.landingInvalid": "Trang đích phải là một trang của cùng trang web.",
   "favorites.pictureInPicture": "Video hình trong hình",
   "favorites.pictureInPictureNote":
     "Tắt: video ở lại trong trang. Bật: video đang phát nổi trong cửa sổ nhỏ khi bạn rời ứng dụng, và bạn cũng có thể cho nổi từ trình phát.",
