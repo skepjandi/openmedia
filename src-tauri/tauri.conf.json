@@ -36,15 +36,15 @@
     ],
     "iOS": {
       "minimumSystemVersion": "17.0",
-      "bundleVersion": "1014"
+      "bundleVersion": "1016"
     },
     "macOS": {
       "minimumSystemVersion": "14.0",
-      "bundleVersion": "1014"
+      "bundleVersion": "1016"
     },
     "android": {
       "minSdkVersion": 24,
-      "versionCode": 1014
+      "versionCode": 1016
     },
     "category": "Utility",
     "publisher": "OpenMedia contributors",
