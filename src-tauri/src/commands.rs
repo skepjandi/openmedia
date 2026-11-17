@@ -550,16 +550,18 @@ pub fn set_color_picker(library: State<'_, Library>, enabled: bool) -> Result<()
 }
 
 /// Puts the picking layer over the page in front. The scripts are fixed: the webview chooses
-/// nothing but when to run them.
+/// nothing but when to run them. Async, like every command that evaluates in the page: the iOS
+/// plugin answers from the main thread, so a synchronous command (which runs there) would wait
+/// for itself and freeze the app.
 #[tauri::command]
-pub fn color_pick_start(app: AppHandle) -> Result<()> {
+pub async fn color_pick_start(app: AppHandle) -> Result<()> {
     LivePage(&app).evaluate(color_pick::START_SCRIPT.to_owned())?;
     Ok(())
 }
 
 /// What the picking layer found so far.
 #[tauri::command]
-pub fn color_pick_read(app: AppHandle) -> Result<color_pick::Reading> {
+pub async fn color_pick_read(app: AppHandle) -> Result<color_pick::Reading> {
     Ok(color_pick::parse_reading(
         &LivePage(&app).evaluate(color_pick::READ_SCRIPT.to_owned())?,
     ))
@@ -567,7 +569,7 @@ pub fn color_pick_read(app: AppHandle) -> Result<color_pick::Reading> {
 
 /// Takes the picking layer down.
 #[tauri::command]
-pub fn color_pick_cancel(app: AppHandle) -> Result<()> {
+pub async fn color_pick_cancel(app: AppHandle) -> Result<()> {
     LivePage(&app).evaluate(color_pick::CANCEL_SCRIPT.to_owned())?;
     Ok(())
 }
@@ -580,7 +582,7 @@ pub fn set_tech_detector(library: State<'_, Library>, enabled: bool) -> Result<(
 
 /// What the page in front is built with, matched in Rust against its own table of technologies.
 #[tauri::command]
-pub fn tech_detect(app: AppHandle) -> Result<Vec<tech_detect::Detected>> {
+pub async fn tech_detect(app: AppHandle) -> Result<Vec<tech_detect::Detected>> {
     let evidence = LivePage(&app).evaluate(tech_detect::script())?;
     Ok(tech_detect::detect(&evidence))
 }

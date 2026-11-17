@@ -6,6 +6,16 @@ All notable changes to OpenMedia are documented here.
 >
 > **Wiki**: the [GitHub Wiki](https://github.com/skepjandi/openmedia/wiki) is the public-facing main wiki — architecture, recipe format, AI pipeline, security model, roadmap. Source-controlled editing surface is `docs/wiki/` in this repo; CI (`.github/workflows/sync-wiki.yml`) mirrors it to the GitHub Wiki on every merge to `main`. New single-PR changes belong here, not as new wiki pages.
 
+### fix(fab): the technology detector and the color picker froze the app on iOS, and the picker could not pick by touch
+
+**Area:** `fix(fab)`, `fix(siteview)`
+
+**Cause:** `color_pick_start`, `color_pick_read`, `color_pick_cancel` and `tech_detect` were synchronous Tauri commands. Synchronous commands run on the main thread, and the iOS plugin answers `evaluate` from the main thread, so the command waited for itself and the whole app stopped. The picker had a second fault: it chose on `click`, but its layer cancelled `touchend`, and a cancelled `touchend` never produces a click on iOS or Android, so a tap could not pick a color.
+
+**Change:** The four commands are `async`, like every other command that evaluates in the page. The picker chooses when the finger lifts (`pointerup`), keeps its layer for 400 ms so the click that follows is swallowed and never reaches the page, and no longer cancels `touchend`.
+
+**Verified:** on the iOS 26.5 simulator, driven with idb: before, tapping the technology detector left the fan open and the app unresponsive; after, the "Built with" sheet opens (jQuery, jsDelivr for a fixture page) and the color picker arms and reads `#FFFFFF` from a tap. Rust checks pass. **Not verified:** a device, and the picker on pages with images, video or canvas.
+
 ### feat(dark-mode): a dark mode button in the fan, general and specific dark mode, and Appearance for the app only
 
 **Area:** `feat(fab)`, `feat(settings)`, `fix(siteview)`

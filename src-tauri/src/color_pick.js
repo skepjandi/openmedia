@@ -69,8 +69,17 @@
     return hex(rgb[0], rgb[1], rgb[2]);
   }
 
+  var chosen = false;
+
+  /**
+   * Reads the colour when the finger lifts. A touch that is cancelled at `touchend` never turns
+   * into a click on iOS and Android, so choosing on `click` could not be done by touch at all.
+   * The layer stays a moment longer so the click that follows is swallowed here and never
+   * reaches the page underneath.
+   */
   function choose(event) {
-    event.preventDefault();
+    if (chosen) return;
+    chosen = true;
     event.stopPropagation();
     layer.style.display = 'none';
     var el = document.elementFromPoint(event.clientX, event.clientY) || document.documentElement;
@@ -81,11 +90,12 @@
     } catch (e) {
       pick.status = 'cancelled';
     }
-    stop();
+    setTimeout(stop, 400);
   }
 
-  layer.addEventListener('click', choose, true);
-  ['pointerdown', 'pointerup', 'touchstart', 'touchend', 'mousedown', 'mouseup'].forEach(function (type) {
+  layer.addEventListener('pointerup', choose, true);
+  layer.addEventListener('touchend', function (event) { event.stopPropagation(); }, true);
+  ['pointerdown', 'touchstart', 'mousedown', 'mouseup', 'click'].forEach(function (type) {
     layer.addEventListener(type, function (event) {
       event.stopPropagation();
       if (event.cancelable) event.preventDefault();
