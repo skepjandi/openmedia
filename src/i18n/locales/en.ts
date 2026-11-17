@@ -374,6 +374,7 @@ export const en = {
   "library.review.options": "Switches",
   "library.review.rules": "What it changes",
   "library.review.hides": "Hides",
+  "library.review.redirects": "Redirects",
   "library.review.restyles": "Restyles",
   "library.review.prunes": "Removes",
   "library.review.runsCode": "Runs code",
@@ -614,6 +615,12 @@ export const en = {
   "favorites.backgroundMedia": "Keep playing in the background",
   "favorites.backgroundMediaNote":
     "Off: audio and video pause when you switch to another site or leave the app. On: this site keeps playing.",
+  "favorites.landingLabel": "Landing page",
+  "favorites.landingNote":
+    "The page this favorite opens first. It must be on the same site. Leave it empty to open the address above.",
+  "favorites.landingPlaceholder": "Same as the address",
+  "favorites.landingReset": "Use the address",
+  "favorites.landingInvalid": "The landing page must be a page of the same site.",
   "favorites.pictureInPicture": "Picture-in-picture video",
   "favorites.pictureInPictureNote":
     "Off: videos stay in the page. On: a playing video floats in a small window when you leave the app, and you can float it from its player.",

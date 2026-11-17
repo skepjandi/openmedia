@@ -386,6 +386,7 @@ export const fr: Messages = {
   "library.review.options": "Interrupteurs",
   "library.review.rules": "Ce qu’elle modifie",
   "library.review.hides": "Masque",
+  "library.review.redirects": "Redirige",
   "library.review.restyles": "Change l’apparence de",
   "library.review.prunes": "Supprime",
   "library.review.runsCode": "Exécute du code",
@@ -638,6 +639,12 @@ export const fr: Messages = {
   "favorites.backgroundMedia": "Continuer la lecture en arrière-plan",
   "favorites.backgroundMediaNote":
     "Désactivé : l'audio et la vidéo se mettent en pause quand vous changez de site ou quittez l'app. Activé : ce site continue de jouer.",
+  "favorites.landingLabel": "Page d'accueil",
+  "favorites.landingNote":
+    "La page que ce favori ouvre en premier. Elle doit être sur le même site. Laissez vide pour ouvrir l'adresse ci-dessus.",
+  "favorites.landingPlaceholder": "Identique à l'adresse",
+  "favorites.landingReset": "Utiliser l'adresse",
+  "favorites.landingInvalid": "La page d'accueil doit être une page du même site.",
   "favorites.pictureInPicture": "Vidéo en image dans l'image",
   "favorites.pictureInPictureNote":
     "Désactivé : les vidéos restent dans la page. Activé : une vidéo en lecture flotte dans une petite fenêtre quand vous quittez l'app, et vous pouvez aussi la faire flotter depuis son lecteur.",

@@ -376,6 +376,7 @@ export const tr: Messages = {
   "library.review.options": "Anahtarlar",
   "library.review.rules": "Neyi değiştirir",
   "library.review.hides": "Gizler",
+  "library.review.redirects": "Yönlendirir",
   "library.review.restyles": "Yeniden biçimlendirir",
   "library.review.prunes": "Kaldırır",
   "library.review.runsCode": "Kod çalıştırır",
@@ -620,6 +621,12 @@ export const tr: Messages = {
   "favorites.backgroundMedia": "Arka planda oynatmaya devam et",
   "favorites.backgroundMediaNote":
     "Kapalı: başka bir siteye geçtiğinizde veya uygulamadan çıktığınızda ses ve video duraklar. Açık: bu site oynatmaya devam eder.",
+  "favorites.landingLabel": "Açılış sayfası",
+  "favorites.landingNote":
+    "Bu favorinin ilk açtığı sayfa. Aynı sitede olmalıdır. Yukarıdaki adresi açmak için boş bırakın.",
+  "favorites.landingPlaceholder": "Adresle aynı",
+  "favorites.landingReset": "Adresi kullan",
+  "favorites.landingInvalid": "Açılış sayfası aynı sitenin bir sayfası olmalıdır.",
   "favorites.pictureInPicture": "Pencere içinde pencere video",
   "favorites.pictureInPictureNote":
     "Kapalı: videolar sayfanın içinde kalır. Açık: oynayan video, uygulamadan çıktığınızda küçük bir yüzen pencerede kalır; oynatıcısından da yüzdürebilirsiniz.",

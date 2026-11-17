@@ -138,7 +138,7 @@ export function Fab() {
     else {
       const slot = list[target.index];
       if (slot?.locked) openSheet("paywall");
-      else if (slot?.favorite) openFavorite(slot.favorite.url);
+      else if (slot?.favorite) openFavorite(slot.favorite);
     }
   };
 

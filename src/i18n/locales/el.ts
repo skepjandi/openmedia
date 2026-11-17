@@ -385,6 +385,7 @@ export const el: Messages = {
   "library.review.options": "Διακόπτες",
   "library.review.rules": "Τι αλλάζει",
   "library.review.hides": "Κρύβει",
+  "library.review.redirects": "Ανακατευθύνει",
   "library.review.restyles": "Αλλάζει την εμφάνιση",
   "library.review.prunes": "Αφαιρεί",
   "library.review.runsCode": "Εκτελεί κώδικα",
@@ -634,6 +635,12 @@ export const el: Messages = {
   "favorites.backgroundMedia": "Συνέχιση αναπαραγωγής στο παρασκήνιο",
   "favorites.backgroundMediaNote":
     "Ανενεργό: ο ήχος και το βίντεο σταματούν όταν αλλάζετε ιστότοπο ή αφήνετε την εφαρμογή. Ενεργό: ο ιστότοπος συνεχίζει να παίζει.",
+  "favorites.landingLabel": "Σελίδα προορισμού",
+  "favorites.landingNote":
+    "Η σελίδα που ανοίγει πρώτη αυτό το αγαπημένο. Πρέπει να ανήκει στον ίδιο ιστότοπο. Αφήστε το κενό για να ανοίγει η διεύθυνση παραπάνω.",
+  "favorites.landingPlaceholder": "Ίδια με τη διεύθυνση",
+  "favorites.landingReset": "Χρήση της διεύθυνσης",
+  "favorites.landingInvalid": "Η σελίδα προορισμού πρέπει να είναι σελίδα του ίδιου ιστότοπου.",
   "favorites.pictureInPicture": "Βίντεο picture-in-picture",
   "favorites.pictureInPictureNote":
     "Ανενεργό: τα βίντεο μένουν μέσα στη σελίδα. Ενεργό: ένα βίντεο που παίζει εμφανίζεται σε μικρό αιωρούμενο παράθυρο όταν αφήνετε την εφαρμογή, και μπορείτε να το αιωρήσετε και από το πρόγραμμα αναπαραγωγής του.",

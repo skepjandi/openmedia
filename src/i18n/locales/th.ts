@@ -357,6 +357,7 @@ export const th: Messages = {
   "library.review.options": "ตัวเลือก",
   "library.review.rules": "สิ่งที่เปลี่ยน",
   "library.review.hides": "ซ่อน",
+  "library.review.redirects": "เปลี่ยนเส้นทาง",
   "library.review.restyles": "ปรับรูปลักษณ์",
   "library.review.prunes": "นำออก",
   "library.review.runsCode": "เรียกใช้โค้ด",
@@ -591,6 +592,12 @@ export const th: Messages = {
   "favorites.backgroundMedia": "เล่นต่อในเบื้องหลัง",
   "favorites.backgroundMediaNote":
     "ปิด: เสียงและวิดีโอจะหยุดชั่วคราวเมื่อสลับไปไซต์อื่นหรือออกจากแอป เปิด: ไซต์นี้เล่นต่อไป",
+  "favorites.landingLabel": "หน้าเริ่มต้น",
+  "favorites.landingNote":
+    "หน้าที่รายการโปรดนี้เปิดเป็นหน้าแรก ต้องอยู่ในเว็บไซต์เดียวกัน เว้นว่างไว้เพื่อเปิดที่อยู่ด้านบน",
+  "favorites.landingPlaceholder": "เหมือนที่อยู่",
+  "favorites.landingReset": "ใช้ที่อยู่",
+  "favorites.landingInvalid": "หน้าเริ่มต้นต้องเป็นหน้าของเว็บไซต์เดียวกัน",
   "favorites.pictureInPicture": "วิดีโอภาพซ้อนภาพ",
   "favorites.pictureInPictureNote":
     "ปิด: วิดีโออยู่ในหน้าเว็บ เปิด: วิดีโอที่กำลังเล่นจะลอยในหน้าต่างเล็กเมื่อคุณออกจากแอป และคุณสั่งให้ลอยจากเครื่องเล่นได้เช่นกัน",

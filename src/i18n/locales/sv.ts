@@ -378,6 +378,7 @@ export const sv: Messages = {
   "library.review.options": "Reglage",
   "library.review.rules": "Vad det ändrar",
   "library.review.hides": "Döljer",
+  "library.review.redirects": "Omdirigerar",
   "library.review.restyles": "Ändrar utseendet",
   "library.review.prunes": "Tar bort",
   "library.review.runsCode": "Kör kod",
@@ -620,6 +621,12 @@ export const sv: Messages = {
   "favorites.backgroundMedia": "Fortsätt spela i bakgrunden",
   "favorites.backgroundMediaNote":
     "Av: ljud och video pausas när du byter webbplats eller lämnar appen. På: den här webbplatsen fortsätter spela.",
+  "favorites.landingLabel": "Startsida",
+  "favorites.landingNote":
+    "Sidan som den här favoriten öppnar först. Den måste vara på samma webbplats. Lämna tomt för att öppna adressen ovan.",
+  "favorites.landingPlaceholder": "Samma som adressen",
+  "favorites.landingReset": "Använd adressen",
+  "favorites.landingInvalid": "Startsidan måste vara en sida på samma webbplats.",
   "favorites.pictureInPicture": "Bild-i-bild-video",
   "favorites.pictureInPictureNote":
     "Av: videor stannar på sidan. På: en video som spelas flyter i ett litet fönster när du lämnar appen, och du kan även låta den flyta från spelaren.",

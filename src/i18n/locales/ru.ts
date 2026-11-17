@@ -379,6 +379,7 @@ export const ru: Messages = {
   "library.review.options": "Переключатели",
   "library.review.rules": "Что меняет",
   "library.review.hides": "Скрывает",
+  "library.review.redirects": "Перенаправляет",
   "library.review.restyles": "Меняет оформление",
   "library.review.prunes": "Удаляет",
   "library.review.runsCode": "Запускает код",
@@ -625,6 +626,12 @@ export const ru: Messages = {
   "favorites.backgroundMedia": "Продолжать воспроизведение в фоне",
   "favorites.backgroundMediaNote":
     "Выкл.: звук и видео ставятся на паузу при переходе на другой сайт или выходе из приложения. Вкл.: этот сайт продолжает играть.",
+  "favorites.landingLabel": "Стартовая страница",
+  "favorites.landingNote":
+    "Страница, которую это избранное открывает первой. Она должна быть на том же сайте. Оставьте пустым, чтобы открывался адрес выше.",
+  "favorites.landingPlaceholder": "Как адрес",
+  "favorites.landingReset": "Использовать адрес",
+  "favorites.landingInvalid": "Стартовая страница должна быть страницей того же сайта.",
   "favorites.pictureInPicture": "Видео «картинка в картинке»",
   "favorites.pictureInPictureNote":
     "Выкл.: видео остаётся на странице. Вкл.: воспроизводимое видео выходит в маленькое плавающее окно, когда вы покидаете приложение, и его можно вывести так же из плеера.",

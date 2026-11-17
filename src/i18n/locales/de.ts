@@ -377,6 +377,7 @@ export const de: Messages = {
   "library.review.options": "Schalter",
   "library.review.rules": "Was es ändert",
   "library.review.hides": "Blendet aus",
+  "library.review.redirects": "Leitet um",
   "library.review.restyles": "Ändert das Aussehen von",
   "library.review.prunes": "Entfernt",
   "library.review.runsCode": "Führt Code aus",
@@ -636,6 +637,12 @@ export const de: Messages = {
   "favorites.backgroundMedia": "Im Hintergrund weiterspielen",
   "favorites.backgroundMediaNote":
     "Aus: Audio und Video pausieren, wenn du zu einer anderen Seite wechselst oder die App verlässt. An: Diese Seite spielt weiter.",
+  "favorites.landingLabel": "Startseite",
+  "favorites.landingNote":
+    "Die Seite, die dieser Favorit zuerst öffnet. Sie muss auf derselben Website liegen. Leer lassen, um die Adresse oben zu öffnen.",
+  "favorites.landingPlaceholder": "Wie die Adresse",
+  "favorites.landingReset": "Adresse verwenden",
+  "favorites.landingInvalid": "Die Startseite muss eine Seite derselben Website sein.",
   "favorites.pictureInPicture": "Bild-in-Bild-Video",
   "favorites.pictureInPictureNote":
     "Aus: Videos bleiben in der Seite. An: Ein laufendes Video schwebt in einem kleinen Fenster, wenn du die App verlässt, und du kannst es auch über den Player schweben lassen.",

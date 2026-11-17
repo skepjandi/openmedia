@@ -379,6 +379,7 @@ export const nl: Messages = {
   "library.review.options": "Schakelaars",
   "library.review.rules": "Wat het verandert",
   "library.review.hides": "Verbergt",
+  "library.review.redirects": "Leidt om",
   "library.review.restyles": "Past de stijl aan van",
   "library.review.prunes": "Verwijdert",
   "library.review.runsCode": "Voert code uit",
@@ -628,6 +629,12 @@ export const nl: Messages = {
   "favorites.backgroundMedia": "Op de achtergrond blijven afspelen",
   "favorites.backgroundMediaNote":
     "Uit: audio en video pauzeren als je naar een andere site gaat of de app verlaat. Aan: deze site blijft afspelen.",
+  "favorites.landingLabel": "Startpagina",
+  "favorites.landingNote":
+    "De pagina die deze favoriet als eerste opent. Hij moet op dezelfde site staan. Laat leeg om het adres hierboven te openen.",
+  "favorites.landingPlaceholder": "Hetzelfde als het adres",
+  "favorites.landingReset": "Adres gebruiken",
+  "favorites.landingInvalid": "De startpagina moet een pagina van dezelfde site zijn.",
   "favorites.pictureInPicture": "Beeld-in-beeld-video",
   "favorites.pictureInPictureNote":
     "Uit: video's blijven in de pagina. Aan: een lopende video zweeft in een klein venster als je de app verlaat, en je kunt hem ook via de speler laten zweven.",

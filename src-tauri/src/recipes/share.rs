@@ -185,7 +185,8 @@ fn check_shared(recipe: &Recipe) -> Result<()> {
         | Rule::Css { label, .. }
         | Rule::Script { label, .. }
         | Rule::VideoMenu { label, .. }
-        | Rule::Prune { label, .. } => label,
+        | Rule::Prune { label, .. }
+        | Rule::Redirect { label, .. } => label,
     });
     let tab_labels = recipe
         .hub
@@ -358,6 +359,15 @@ fn rule_preview(rule: &Rule) -> RulePreview {
                     .join(", then "),
                 items.css
             )),
+        },
+        Rule::Redirect {
+            label, when, to, ..
+        } => RulePreview {
+            label: label.clone(),
+            kind: "redirect",
+            selector: format!("{} → {to}", when.path),
+            declarations: BTreeMap::new(),
+            code: None,
         },
         Rule::Css {
             label,

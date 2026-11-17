@@ -362,6 +362,7 @@ export const ar: Messages = {
   "library.review.options": "المفاتيح",
   "library.review.rules": "ما تغيّره",
   "library.review.hides": "تُخفي",
+  "library.review.redirects": "تعيد التوجيه",
   "library.review.restyles": "تُغيّر المظهر",
   "library.review.prunes": "تُزيل",
   "library.review.runsCode": "يشغّل شيفرة",
@@ -595,6 +596,12 @@ export const ar: Messages = {
   "favorites.backgroundMedia": "متابعة التشغيل في الخلفية",
   "favorites.backgroundMediaNote":
     "متوقف: يتوقف الصوت والفيديو مؤقتًا عند الانتقال إلى موقع آخر أو مغادرة التطبيق. مفعّل: يواصل هذا الموقع التشغيل.",
+  "favorites.landingLabel": "صفحة الهبوط",
+  "favorites.landingNote":
+    "الصفحة التي يفتحها هذا المفضّل أولاً. يجب أن تكون على الموقع نفسه. اتركها فارغة لفتح العنوان أعلاه.",
+  "favorites.landingPlaceholder": "نفس العنوان",
+  "favorites.landingReset": "استخدم العنوان",
+  "favorites.landingInvalid": "يجب أن تكون صفحة الهبوط صفحة من الموقع نفسه.",
   "favorites.pictureInPicture": "فيديو صورة داخل صورة",
   "favorites.pictureInPictureNote":
     "متوقف: يبقى الفيديو داخل الصفحة. مفعّل: يظهر الفيديو الجاري تشغيله في نافذة صغيرة عائمة عند مغادرة التطبيق، ويمكنك إظهاره كذلك من مشغّله.",

@@ -376,6 +376,7 @@ export const cs: Messages = {
   "library.review.options": "Přepínače",
   "library.review.rules": "Co mění",
   "library.review.hides": "Skrývá",
+  "library.review.redirects": "Přesměrovává",
   "library.review.restyles": "Mění vzhled",
   "library.review.prunes": "Odstraňuje",
   "library.review.runsCode": "Spouští kód",
@@ -620,6 +621,12 @@ export const cs: Messages = {
   "favorites.backgroundMedia": "Přehrávat na pozadí",
   "favorites.backgroundMediaNote":
     "Vypnuto: zvuk a video se pozastaví, když přepnete na jiný web nebo opustíte aplikaci. Zapnuto: tento web hraje dál.",
+  "favorites.landingLabel": "Úvodní stránka",
+  "favorites.landingNote":
+    "Stránka, kterou tento oblíbený web otevře jako první. Musí být na stejném webu. Nechte prázdné, aby se otevřela adresa výše.",
+  "favorites.landingPlaceholder": "Stejná jako adresa",
+  "favorites.landingReset": "Použít adresu",
+  "favorites.landingInvalid": "Úvodní stránka musí být stránkou stejného webu.",
   "favorites.pictureInPicture": "Video obraz v obraze",
   "favorites.pictureInPictureNote":
     "Vypnuto: videa zůstávají ve stránce. Zapnuto: přehrávané video se při opuštění aplikace zobrazí v malém plovoucím okně a můžete ho tak zobrazit i z přehrávače.",

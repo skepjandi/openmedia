@@ -93,11 +93,39 @@ export function toggleSiteFavorite(
 }
 
 /** What the library takes for a favorite: the id and icon are Rust's to keep. */
-export const asInput = ({ name, url, notify }: FavoriteInput): FavoriteInput => ({
+export const asInput = ({ name, url, notify, landing }: FavoriteInput): FavoriteInput => ({
   name,
   url,
   notify,
+  landing,
 });
+
+/** The address a new session of a favorite starts at: its landing page when it has one, else its address. */
+export function favoriteStartUrl(favorite: { url: string; landing?: string | null }): string {
+  return favorite.landing || favorite.url;
+}
+
+/**
+ * What a favorite's landing field means: `null` for blank (the favorite opens its address), the
+ * address for an http(s) address or a `/path` on the favorite's own origin that stays on the
+ * favorite's site, and `undefined` for anything else. Rust checks it again and is the authority;
+ * this only lets the editor say so before saving.
+ */
+export function resolveLanding(input: string, favoriteUrl: string): string | null | undefined {
+  const text = input.trim();
+  if (text === "") return null;
+  if (/\s/.test(text)) return undefined;
+  let landing: URL;
+  try {
+    landing =
+      text.startsWith("/") && !text.startsWith("//") ? new URL(text, favoriteUrl) : new URL(text);
+  } catch {
+    return undefined;
+  }
+  if (landing.protocol !== "https:" && landing.protocol !== "http:") return undefined;
+  const site = siteOf(favoriteUrl);
+  return site !== null && siteOf(landing.href) === site ? landing.href : undefined;
+}
 
 /** The name a new favorite gets: the site's host, or the site it belongs to, short enough for the library to accept. */
 function favoriteName(url: string): string {

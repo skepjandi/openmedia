@@ -26,13 +26,20 @@ The recipe bundle is delivered with the script (embedded as a JSON literal in th
 
 Instagram, YouTube, X and Facebook mostly navigate without page loads. The engine:
 
-- wraps `history.pushState` / `replaceState` and listens for `popstate` and `hashchange`;
-- re-evaluates `when.path` conditions and `redirect` rules on every virtual navigation;
+- wraps `history.pushState` / `replaceState` and listens for `popstate` and `hashchange` (today only the redirect runtime does; recipe CSS and scripts are chosen once per document);
+- re-evaluates `redirect` rules on every virtual navigation (see [Redirect rules](#redirect-rules); `when.path` conditions on other rule types are not implemented);
 - reports the new URL to Core so recipe resolution can switch bundles when the pattern set changes.
 
 ## Redirect rules
 
-Evaluated on load and on virtual navigation. Same-origin only. Uses `location.replace` so the blocked route does not stay in history. Guards against redirect loops (max 3 per second per rule, then the rule is suspended and flagged).
+Implemented in `src-tauri/src/route_redirect.js`, embedded in the page script (`compile.rs`) only when an applying recipe has a `redirect` rule. Rust compiles each rule's glob to a regular expression (`route.rs`) and the page tests the same string. The script:
+
+- checks every rule on load and after each `history.pushState`, `history.replaceState`, `popstate` and `hashchange`; a rule applies when its recipe's `match` patterns (or its `on` subset) cover the current location and `when.path` selects the path;
+- resolves `to` against the page's origin and refuses any result on another origin, then calls `location.replace`, so the blocked route does not stay in history;
+- runs in the top frame only;
+- allows 3 redirects per second per rule, keyed by recipe and rule id and counted in `sessionStorage` so a site that sends the page straight back cannot loop across reloads either; one more and the rule is suspended for the rest of that session (tab). There is no on-screen flag for a suspended rule yet.
+
+Only rules whose option (and `choice`) is on reach the script, so switching the option off removes the redirect the next time the page script is built, like every other rule. Tested in `src/shared/routeRedirect.test.ts` (load, no match, single-page navigation, loop guard, negation, cross-origin refusal, top frame) and in `recipes/mod.rs`.
 
 ## Element picker
 
