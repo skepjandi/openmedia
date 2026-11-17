@@ -4,6 +4,7 @@ use serde::{Deserialize, Serialize};
 use url::Url;
 
 use super::matcher::Matcher;
+use super::route::{RouteGlob, validate_target};
 use super::script_policy::{self, Finding, MAX_CODE_BYTES, MAX_SCRIPT_RULES, MAX_TOTAL_CODE_BYTES};
 use super::selector::{targets_page_root, validate_declarations, validate_selector};
 use super::share::is_plain_text;
@@ -222,6 +223,13 @@ pub struct Hub {
     pub tabs: Vec<HubTab>,
 }
 
+/// When a `redirect` rule fires: the page's path matches the glob (see `route::RouteGlob`).
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct RouteCondition {
+    pub path: String,
+}
+
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(tag = "type", rename_all = "camelCase", deny_unknown_fields)]
 pub enum Rule {
@@ -292,6 +300,22 @@ pub enum Rule {
         #[serde(default, skip_serializing_if = "Option::is_none")]
         close: Option<Target>,
     },
+    /// Sends a page whose path matches `when.path` to the path `to` of the same site, on load and
+    /// on every navigation the page makes without reloading. Nothing runs from the recipe; the
+    /// app's own runtime does the replacing.
+    Redirect {
+        id: String,
+        label: String,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        option: Option<String>,
+        /// For a rule on a choice option: the choices in which it applies.
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        choice: Option<Vec<String>>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        on: Option<Vec<String>>,
+        when: RouteCondition,
+        to: String,
+    },
 }
 
 impl Rule {
@@ -300,7 +324,8 @@ impl Rule {
             Self::Hide { id, .. }
             | Self::Css { id, .. }
             | Self::Script { id, .. }
-            | Self::VideoMenu { id, .. } => id,
+            | Self::VideoMenu { id, .. }
+            | Self::Redirect { id, .. } => id,
         }
     }
 
@@ -310,7 +335,8 @@ impl Rule {
             Self::Hide { option, .. }
             | Self::Css { option, .. }
             | Self::Script { option, .. }
-            | Self::VideoMenu { option, .. } => option.as_deref(),
+            | Self::VideoMenu { option, .. }
+            | Self::Redirect { option, .. } => option.as_deref(),
         }
     }
 
@@ -320,7 +346,8 @@ impl Rule {
             Self::Hide { choice, .. }
             | Self::Css { choice, .. }
             | Self::Script { choice, .. }
-            | Self::VideoMenu { choice, .. } => choice.as_deref(),
+            | Self::VideoMenu { choice, .. }
+            | Self::Redirect { choice, .. } => choice.as_deref(),
         }
     }
 
@@ -330,7 +357,8 @@ impl Rule {
             Self::Hide { on, .. }
             | Self::Css { on, .. }
             | Self::Script { on, .. }
-            | Self::VideoMenu { on, .. } => on.as_deref(),
+            | Self::VideoMenu { on, .. }
+            | Self::Redirect { on, .. } => on.as_deref(),
         }
     }
 }
@@ -501,6 +529,7 @@ impl Recipe {
                     }
                     validate_video_menu(id, title, open, items, selected, close.as_ref())?;
                 }
+                Rule::Redirect { id, when, to, .. } => validate_redirect(id, &when.path, to)?,
             }
         }
         Ok(())
@@ -747,6 +776,13 @@ fn hides_content(declarations: &BTreeMap<String, String>) -> bool {
         || value("pointer-events").as_deref() == Some("none")
         || matches!(value("height").as_deref(), Some("0" | "0px"))
         || matches!(value("max-height").as_deref(), Some("0" | "0px"))
+}
+
+/// A redirect is a path glob and a path of the same site; being declarative it is as safe in a
+/// shared recipe as a `hide` rule.
+fn validate_redirect(id: &str, glob: &str, to: &str) -> Result<()> {
+    let glob = RouteGlob::parse(glob).map_err(|e| Error::Recipe(format!("redirect {id}: {e}")))?;
+    validate_target(to, &glob).map_err(|e| Error::Recipe(format!("redirect {id}: {e}")))
 }
 
 /// A video menu is made of selectors and one way to read the entry in use; nothing in it can run.

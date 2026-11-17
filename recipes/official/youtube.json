@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "market.official.youtube",
   "name": "YouTube",
-  "version": "2.2.0",
+  "version": "2.3.0",
   "origin": "user",
   "tags": ["desktop", "mobile"],
   "match": ["https://www.youtube.com/*", "https://m.youtube.com/*", "https://youtube.com/*"],
@@ -38,7 +38,7 @@
     {
       "id": "shorts",
       "label": "Hide Shorts",
-      "description": "The Shorts tab, Shorts shelves and cards in Home, search and video pages, and the Shorts tab on channels. A Shorts address can still be opened directly.",
+      "description": "The Shorts tab, Shorts shelves and cards in Home, search and video pages, and the Shorts tab on channels. A Shorts address opens Home instead.",
       "group": "content",
       "default": false
     },
@@ -1070,6 +1070,16 @@
       "target": {
         "css": "ytd-miniplayer"
       }
+    },
+    {
+      "id": "shorts-route",
+      "label": "Open a Shorts address as Home",
+      "type": "redirect",
+      "option": "shorts",
+      "when": {
+        "path": "/shorts/**"
+      },
+      "to": "/"
     }
   ],
   "meta": {

@@ -4,6 +4,7 @@ use std::fmt::Write;
 use serde::Serialize;
 
 use super::matcher::Matcher;
+use super::route::RouteGlob;
 use super::schema::{OptionValue, Recipe, Rule, Selected, VideoMenuKind};
 use super::script_policy::wrap;
 use crate::error::{Error, Result};
@@ -19,6 +20,17 @@ struct PageRecipe {
     css: String,
     scripts: Vec<usize>,
     menus: Vec<PageMenu>,
+    redirects: Vec<PageRedirect>,
+}
+
+/// A `redirect` rule as the page's runtime reads it (`route_redirect.js`): the compiled path glob
+/// and the same-site path to go to.
+#[derive(Serialize)]
+struct PageRedirect {
+    id: String,
+    #[serde(flatten)]
+    glob: RouteGlob,
+    to: String,
 }
 
 /// A `videoMenu` rule as the page's runtime reads it (`video_menu.js`): selectors and one way to
@@ -35,6 +47,9 @@ struct PageMenu {
 
 /// The runtime of the `videoMenu` rules, embedded only in a page script that has some.
 const MENU_RUNTIME: &str = include_str!("../video_menu.js");
+
+/// The runtime of the `redirect` rules, embedded only in a page script that has some.
+const REDIRECT_RUNTIME: &str = include_str!("../route_redirect.js");
 
 /// CSS for the rules of one recipe that currently apply. Hiding is `display: none`, so the
 /// element stays in the DOM and the site's own scripts keep working.
@@ -54,7 +69,7 @@ fn css_of<'a>(rules: impl Iterator<Item = &'a Rule>) -> String {
     for rule in rules {
         let _ = match rule {
             Rule::Hide { target, .. } => writeln!(css, "{}{{display:none!important}}", target.css),
-            Rule::Script { .. } | Rule::VideoMenu { .. } => Ok(()),
+            Rule::Script { .. } | Rule::VideoMenu { .. } | Rule::Redirect { .. } => Ok(()),
             Rule::Css {
                 target,
                 declarations,
@@ -135,12 +150,25 @@ fn page_recipes(
                     _ => None,
                 })
                 .collect();
+            let redirects = scoped()
+                .filter_map(|rule| match rule {
+                    Rule::Redirect { id, when, to, .. } => {
+                        Some(RouteGlob::parse(&when.path).map(|glob| PageRedirect {
+                            id: id.clone(),
+                            glob,
+                            to: to.clone(),
+                        }))
+                    }
+                    _ => None,
+                })
+                .collect::<Result<Vec<_>>>()?;
             Ok(PageRecipe {
                 id: recipe.id.clone(),
                 matchers: matchers_of(scope.unwrap_or(&recipe.matches))?,
                 css: css_of(scoped()),
                 scripts: indices,
                 menus,
+                redirects,
             })
         })
         .collect()
@@ -165,6 +193,11 @@ pub fn page_script(recipes: &[Recipe], choices: &OptionChoices) -> Result<String
     } else {
         "null"
     };
+    let redirect_runtime = if page.iter().any(|recipe| !recipe.redirects.is_empty()) {
+        REDIRECT_RUNTIME.trim()
+    } else {
+        "null"
+    };
     let scripts = scripts.join(",\n");
     Ok(format!(
         r#"(() => {{
@@ -177,6 +210,12 @@ pub fn page_script(recipes: &[Recipe], choices: &OptionChoices) -> Result<String
       new RegExp(m.host).test(here.hostname) &&
       new RegExp(m.path).test(here.pathname)));
     const css = found.map((recipe) => recipe.css).join("\n");
+    const redirectRuntime = {redirect_runtime};
+    const redirects = recipes.reduce((all, recipe) => all.concat(recipe.redirects.map((rule) =>
+      Object.assign({{ key: recipe.id + "/" + rule.id, matchers: recipe.matchers }}, rule))), []);
+    if (redirectRuntime && redirects.length) {{
+      try {{ redirectRuntime(redirects); }} catch (_) {{}}
+    }}
     const menuRuntime = {menu_runtime};
     const menus = found.reduce((all, recipe) => all.concat(recipe.menus), []);
     if (menuRuntime && menus.length) {{

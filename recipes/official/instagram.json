@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "market.official.instagram",
   "name": "Instagram",
-  "version": "2.0.2",
+  "version": "2.1.0",
   "origin": "user",
   "tags": ["desktop", "mobile"],
   "match": ["https://*.instagram.com/*"],
@@ -17,7 +17,7 @@
     {
       "id": "reels",
       "label": "Hide Reels",
-      "description": "The Reels tab, Reels and other videos in your feed, and the Reels tab on profiles. The /reels/ page itself can still be opened by address.",
+      "description": "The Reels tab, Reels and other videos in your feed, and the Reels tab on profiles. The /reels/ page opens Home instead.",
       "group": "content",
       "default": false
     },
@@ -399,6 +399,16 @@
       "target": {
         "css": "div:has(> span > div > a[href^=\"/direct/\"])"
       }
+    },
+    {
+      "id": "reels-route",
+      "label": "Open the Reels page as Home",
+      "type": "redirect",
+      "option": "reels",
+      "when": {
+        "path": "/reels/**"
+      },
+      "to": "/"
     }
   ],
   "meta": {

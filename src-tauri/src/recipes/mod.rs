@@ -1,6 +1,7 @@
 pub mod bundled;
 mod compile;
 mod matcher;
+mod route;
 mod schema;
 pub mod script_policy;
 mod selector;
@@ -581,6 +582,144 @@ mod tests {
         assert!(script.contains("t\\\\.example"));
         assert!(script.contains("www\\\\.reddit"));
         assert_eq!(script.matches(".nag{display:none!important}").count(), 1);
+    }
+
+    /// The address a fixture page stands for, when it declares one: `<meta name="openmedia-fixture-url">`.
+    fn fixture_url(page: &Html) -> Option<Url> {
+        let meta = Selector::parse("meta[name=\"openmedia-fixture-url\"]").unwrap();
+        let content = page.select(&meta).next()?.value().attr("content")?;
+        Url::parse(content).ok()
+    }
+
+    #[test]
+    fn every_official_redirect_fires_on_the_address_of_one_of_its_fixtures() {
+        let mut idle = Vec::new();
+        for recipe in official_recipes() {
+            if !recipe
+                .rules
+                .iter()
+                .any(|rule| matches!(rule, Rule::Redirect { .. }))
+            {
+                continue;
+            }
+            let addresses: Vec<Url> = fixture_pages(&recipe)
+                .iter()
+                .filter_map(fixture_url)
+                .collect();
+            for rule in &recipe.rules {
+                let Rule::Redirect { when, .. } = rule else {
+                    continue;
+                };
+                let glob = route::RouteGlob::parse(&when.path).unwrap();
+                if !addresses
+                    .iter()
+                    .any(|url| recipe.covers(url) && glob.selects(url.path()))
+                {
+                    idle.push(format!("{}: {}", recipe.id, rule.id()));
+                }
+            }
+        }
+        assert!(
+            idle.is_empty(),
+            "redirect rules no fixture address triggers:\n{}",
+            idle.join("\n")
+        );
+    }
+
+    const REDIRECTING: &str = r#"{"schema":1,"id":"t.route","name":"T","version":"1.0.0","origin":"user","tags":["desktop"],"match":["https://t.example/*"],
+      "options":[{"id":"clips","label":"Clips","description":"d","group":"content","default":true}],
+      "rules":[{"id":"clips-route","label":"Clips go home","type":"redirect","option":"clips","when":{"path":"/clips/**"},"to":"/"}]}"#;
+
+    fn redirecting(rule_tail: &str) -> String {
+        REDIRECTING.replace("\"when\":{\"path\":\"/clips/**\"},\"to\":\"/\"", rule_tail)
+    }
+
+    #[test]
+    fn a_redirect_is_compiled_with_its_runtime_only_while_its_option_is_on() {
+        let recipes = vec![Recipe::parse(REDIRECTING).unwrap()];
+        let on = page_script(&recipes, &OptionChoices::new()).unwrap();
+        assert!(on.contains("here.replace(href)"));
+        assert!(on.contains("\"regex\":\"^/clips(?:/.*)?$\""));
+        assert!(!on.contains("const redirectRuntime = null;"));
+        let off = OptionChoices::from([(
+            "t.route".to_owned(),
+            [("clips".to_owned(), OptionValue::Toggle(false))].into(),
+        )]);
+        let off = page_script(&recipes, &off).unwrap();
+        assert!(off.contains("const redirectRuntime = null;"));
+        assert!(!off.contains("clips-route"));
+    }
+
+    #[test]
+    fn a_redirect_follows_the_choice_of_its_option() {
+        let json = REDIRECTING
+            .replace(
+                "\"default\":true",
+                "\"choices\":[{\"id\":\"show\",\"label\":\"Show\"},{\"id\":\"hide\",\"label\":\"Hide\"}],\"default\":\"show\"",
+            )
+            .replace("\"option\":\"clips\"", "\"option\":\"clips\",\"choice\":[\"hide\"]");
+        let recipes = vec![Recipe::parse(&json).unwrap()];
+        let choose = |id: &str| {
+            OptionChoices::from([(
+                "t.route".to_owned(),
+                [("clips".to_owned(), OptionValue::Choice(id.to_owned()))].into(),
+            )])
+        };
+        assert!(
+            page_script(&recipes, &choose("show"))
+                .unwrap()
+                .contains("const redirectRuntime = null;")
+        );
+        assert!(
+            !page_script(&recipes, &choose("hide"))
+                .unwrap()
+                .contains("const redirectRuntime = null;")
+        );
+    }
+
+    #[test]
+    fn a_scoped_redirect_carries_only_its_own_sites_patterns() {
+        let json = REDIRECTING
+            .replace(
+                "\"match\":[\"https://t.example/*\"]",
+                "\"match\":[\"https://t.example/*\",\"https://u.example/*\"]",
+            )
+            .replace(
+                "\"option\":\"clips\"",
+                "\"option\":\"clips\",\"on\":[\"https://u.example/*\"]",
+            );
+        let script = page_script(&[Recipe::parse(&json).unwrap()], &OptionChoices::new()).unwrap();
+        assert!(script.contains("u\\\\.example"));
+        assert!(!script.contains("t\\\\.example"));
+    }
+
+    #[test]
+    fn a_redirect_may_leave_nothing_but_the_same_site() {
+        assert!(Recipe::parse(REDIRECTING).is_ok());
+        for tail in [
+            r#""when":{"path":"/clips/**"},"to":"https://evil.example/""#,
+            r#""when":{"path":"/clips/**"},"to":"//evil.example/""#,
+            r#""when":{"path":"/clips/**"},"to":"javascript:alert(1)""#,
+            r#""when":{"path":"/clips/**"},"to":"/clips/again""#,
+            r#""when":{"path":"clips"},"to":"/""#,
+            r#""when":{"path":"/clips/**","viewport":"mobile"},"to":"/""#,
+            r#""when":{"path":"/a b"},"to":"/""#,
+        ] {
+            assert!(Recipe::parse(&redirecting(tail)).is_err(), "{tail}");
+        }
+    }
+
+    #[test]
+    fn a_redirect_is_declarative_so_a_shared_recipe_may_carry_one() {
+        let shared = REDIRECTING
+            .replace("\"id\":\"t.route\"", "\"id\":\"market.t.route\"")
+            .replace("\"origin\":\"user\"", "\"origin\":\"imported\"");
+        let recipe = parse_bundled_recipe(shared.as_bytes()).unwrap();
+        assert_eq!(recipe.origin, Origin::Imported);
+        let preview = preview_recipe(&recipe, None);
+        assert!(!preview.runs_code);
+        assert_eq!(preview.rules[0].kind, "redirect");
+        assert_eq!(preview.rules[0].selector, "/clips/** → /");
     }
 
     fn with_script_rules(origin: &str, codes: &[&str]) -> String {
