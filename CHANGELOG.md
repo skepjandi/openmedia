@@ -6,6 +6,14 @@ All notable changes to OpenMedia are documented here.
 >
 > **Wiki**: the [GitHub Wiki](https://github.com/skepjandi/openmedia/wiki) is the public-facing main wiki — architecture, recipe format, AI pipeline, security model, roadmap. Source-controlled editing surface is `docs/wiki/` in this repo; CI (`.github/workflows/sync-wiki.yml`) mirrors it to the GitHub Wiki on every merge to `main`. New single-PR changes belong here, not as new wiki pages.
 
+### fix(siteview): switching to another site or a new tab keeps playing the old page's audio
+
+**Area:** `fix(siteview)`, `fix(shell)`
+
+**Change:** iOS: leaving a page for another floated its playing video into picture-in-picture whatever the site's setting; it now floats only when the site has the picture-in-picture switch on, and is paused otherwise (the page's own small player is unaffected). All platforms: a new tab or an incognito switch only covered the page in front with the shell's blank page, so its video played on underneath; the shell now reports the cover (`set_covered`) and the page is held like one left for another. Android: the pause script reached only the main frame, so players in iframes kept playing on a tab switch or in the background; it now also pauses same-origin iframes and messages every frame (`FRAME_HOLD_SCRIPT`), and the view itself is paused after the frames have had the message.
+
+**Verified:** Android emulator, read from the page through remote debugging: a video in the `tryit` iframe is `paused` with `__openmediaHold` true after switching to another site and after Home, and playing again on return. iOS Simulator: Miruro (iframe player, PiP and keep-playing off) goes silent (audio buffers 6 per 3 s to 0) when a new tab is opened or another site is switched to. macOS: covered through the same `media_steps`, build and clippy only. **Not verified:** a real picture-in-picture window for the "PiP on" path; macOS new tab by hand.
+
 ### fix(siteview): media and picture-in-picture left playing after minimizing or closing, on iOS, Android and macOS
 
 **Area:** `fix(siteview)`

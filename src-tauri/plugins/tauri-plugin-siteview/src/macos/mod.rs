@@ -116,6 +116,8 @@ struct State<R: Runtime> {
     native_suspended: HashSet<String>,
     /// True while the window is minimized or the app is hidden: no page is in front then.
     window_hidden: bool,
+    /// True while the shell covers the page in front with a page of its own (a new tab).
+    covered: bool,
 }
 
 /// What a page's media needs when its visibility changes.
@@ -194,6 +196,7 @@ pub fn init<R: Runtime, C: DeserializeOwned>(
             media_paused: HashSet::new(),
             native_suspended: HashSet::new(),
             window_hidden: false,
+            covered: false,
         }),
         labels: AtomicU64::new(0),
         focused: Mutex::new(None),
@@ -568,7 +571,9 @@ impl<R: Runtime> Inner<R> {
     fn media_steps(state: &mut State<R>) -> Vec<(String, Webview<R>, MediaStep)> {
         let mut steps = Vec::new();
         for (id, session) in &state.sessions {
-            let shown = state.active.as_deref() == Some(id.as_str()) && !state.window_hidden;
+            let shown = state.active.as_deref() == Some(id.as_str())
+                && !state.window_hidden
+                && !state.covered;
             let blocked = state.blocked.contains(id);
             let scope = session
                 .scope
@@ -855,6 +860,12 @@ impl<R: Runtime> Siteview<R> {
     pub fn set_interactive_regions(&self, request: SetInteractiveRegionsRequest) -> Result<()> {
         shell::set_regions(request.regions.clone());
         self.inner.state().regions = request.regions;
+        self.inner.sync_views();
+        Ok(())
+    }
+
+    pub fn set_covered(&self, request: SetCoveredRequest) -> Result<()> {
+        self.inner.state().covered = request.covered;
         self.inner.sync_views();
         Ok(())
     }

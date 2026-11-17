@@ -364,6 +364,9 @@ export const siteView = {
     command("plugin:siteview|set_interactive_regions", { request: { regions } }),
   setColorScheme: (scheme: Theme) =>
     command("plugin:siteview|set_color_scheme", { request: { scheme } }),
+  /** A page of the shell's own (a new tab) covers the page in front: its media is held. */
+  setCovered: (covered: boolean) =>
+    command("plugin:siteview|set_covered", { request: { covered } }),
   goBack: () => command("plugin:siteview|go_back"),
   goForward: () => command("plugin:siteview|go_forward"),
   reload: () => command("plugin:siteview|reload"),

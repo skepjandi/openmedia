@@ -37,6 +37,10 @@ impl<R: Runtime> Siteview<R> {
         Err(Error::DesktopUnsupported("site views"))
     }
 
+    pub fn set_covered(&self, _request: SetCoveredRequest) -> Result<()> {
+        Err(Error::DesktopUnsupported("site views"))
+    }
+
     pub fn navigate(&self, _request: NavigateRequest) -> Result<()> {
         Err(Error::DesktopUnsupported("site views"))
     }

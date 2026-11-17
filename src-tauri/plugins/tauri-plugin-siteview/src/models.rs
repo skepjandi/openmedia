@@ -79,6 +79,13 @@ pub struct SetInteractiveRegionsRequest {
     pub regions: Vec<Rect>,
 }
 
+/// Whether the shell covers the page in front with a page of its own (a new tab), so that none of
+/// it is on screen: its media is then handled as that of a page left for another.
+#[derive(Debug, Clone, Deserialize)]
+pub struct SetCoveredRequest {
+    pub covered: bool,
+}
+
 #[derive(Debug, Clone, Deserialize)]
 pub struct NavigateRequest {
     pub url: String,

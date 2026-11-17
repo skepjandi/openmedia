@@ -50,6 +50,12 @@ export function WebLayer() {
 
   useSiteViewRect(slot);
 
+  // A blank page over the one in front leaves it alive underneath: tell the native side, so what it
+  // plays is handled as that of a page left for another.
+  useEffect(() => {
+    siteView.setCovered(showEmpty).catch(() => {});
+  }, [showEmpty]);
+
   useEffect(() => {
     const element = slot.current;
     if (!listening || !profileId || !action || !element) return;

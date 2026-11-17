@@ -5,6 +5,7 @@ permissions = [
   "allow-close",
   "allow-set-rect",
   "allow-set-interactive-regions",
+  "allow-set-covered",
   "allow-navigate",
   "allow-go-back",
   "allow-go-forward",

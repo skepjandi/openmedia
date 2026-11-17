@@ -278,6 +278,10 @@ class SetInteractiveRegionsArgs: Decodable {
   let regions: [RectArgs]
 }
 
+class SetCoveredArgs: Decodable {
+  let covered: Bool
+}
+
 class NavigateArgs: Decodable {
   let url: String
 }
@@ -574,6 +578,8 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
   /// True while a timer is waiting to ask whether the windows kept open in the background are
   /// still open.
   private var watchingWindows = false
+  /// True while the shell covers the page in front with a page of its own (a new tab).
+  private var covered = false
   /// Pages that were left for another while their video played: the page stays alive, hidden, so
   /// its picture-in-picture window keeps playing, until the window is closed or the page in front
   /// plays a video of its own.
@@ -728,6 +734,18 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
     DispatchQueue.main.async {
       self.interactiveRegions = args.regions.map(\.cgRect)
       self.router?.regions = self.interactiveRegions
+      invoke.resolve()
+    }
+  }
+
+  /// The shell put a page of its own (a new tab) over the page in front, or took it away. The page
+  /// underneath is then handled as one left for another: its media is suspended unless its site
+  /// plays on in the background.
+  @objc public func setCovered(_ invoke: Invoke) throws {
+    let args = try invoke.parseArgs(SetCoveredArgs.self)
+    DispatchQueue.main.async {
+      self.covered = args.covered
+      self.refreshMedia()
       invoke.resolve()
     }
   }
@@ -978,11 +996,19 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
       guard let self, let session else { return }
       if floated { self.swapForFloatingVideo(session, loading: request) } else { inPlace() }
     }
-    session.view.evaluateJavaScript(floatForNavigationScript) { result, _ in
+    session.view.evaluateJavaScript(floatScript(for: session)) { result, _ in
       finish((result as? Bool) == true)
     }
     // A page that never answers must not keep the navigation from happening.
     DispatchQueue.main.asyncAfter(deadline: .now() + floatAnswerWait) { finish(false) }
+  }
+
+  /// What leaving a page for another asks of it. A video floats in a picture-in-picture window
+  /// only when the reader switched that on for its site; without it the page's video stays in the
+  /// page and is paused with the page. The page's own small player is the app's, so it stays up
+  /// either way.
+  private func floatScript(for session: Session) -> String {
+    pictureInPictureSites.contains(session.scope) ? floatForNavigationScript : miniActiveScript
   }
 
   /// Puts a fresh view in the session, loading `request`, and keeps the old one alive, hidden, for
@@ -1044,7 +1070,7 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
         answered = true
         continuation.resume(returning: value)
       }
-      session.view.evaluateJavaScript(floatForNavigationScript) { result, _ in
+      session.view.evaluateJavaScript(self.floatScript(for: session)) { result, _ in
         answer((result as? Bool) == true)
       }
       // A page that never answers must not keep the next one from opening.
@@ -1149,7 +1175,7 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
   /// `applyBlocked`.
   private func refreshMedia() {
     for session in sessions.values where !session.blocked && !session.floatedForNavigation {
-      let shown = appForeground && session.id == activeId
+      let shown = appForeground && !covered && session.id == activeId
       if !appForeground && session.id == activeId {
         // A window the reader opened (the panel's button, or an automatic one) keeps playing while
         // the app is minimized, on any site. Without one the page is suspended as usual.
@@ -1801,7 +1827,7 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
       shown = true
       self?.showNow(session)
     }
-    previous.view.evaluateJavaScript(floatForNavigationScript) { [weak self, weak previous] result, _ in
+    previous.view.evaluateJavaScript(floatScript(for: previous)) { [weak self, weak previous] result, _ in
       if (result as? Bool) == true, let self, let previous {
         previous.floatedForNavigation = true
         self.floatingSessions.append(previous)

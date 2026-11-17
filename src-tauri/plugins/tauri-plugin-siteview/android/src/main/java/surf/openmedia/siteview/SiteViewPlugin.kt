@@ -170,6 +170,9 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
 
     /** False from the activity's pause to its resume. */
     private var appForeground = true
+
+    /** True while the shell covers the page in front with a page of its own (a new tab). */
+    private var covered = false
     private var events: Channel? = null
 
     /** Drop windows and redirects a page makes on its own that are no sign-in; set by every `open`. */
@@ -427,6 +430,18 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
     }
 
     /**
+     * The shell put a page of its own (a new tab) over the page in front, or took it away. The page
+     * underneath is then handled as one left for another.
+     */
+    @Command
+    fun setCovered(invoke: Invoke) {
+        val args = invoke.parseArgs(SetCoveredArgs::class.java)
+        covered = args.covered
+        refreshMedia()
+        invoke.resolve()
+    }
+
+    /**
      * The system back gesture starts at a screen edge, where the floating button rests. Regions
      * touching an edge are kept out of it, so dragging the button inward is not taken for "back".
      * The system honours about 200 dp per edge, so large regions (a full-screen sheet) stay out.
@@ -646,14 +661,24 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
     private fun refreshMedia() {
         for (session in sessions.values) {
             if (session.blocked) continue
-            val shown = appForeground && session.id == activeId
+            val shown = appForeground && !covered && session.id == activeId
             val pause = !shown && session.scope !in backgroundMediaSites
-            // The script reaches the main frame only, and a page can start playing again: with the
-            // app in the background the view itself is paused, which stops every frame's media.
-            setViewPaused(session, pause && !appForeground)
-            if (pause == session.mediaPaused) continue
+            // With the app in the background the view itself is paused as well, for what the
+            // script misses. It is paused after the script ran (a paused view may not run it), and
+            // resumed before the script that plays again.
+            val pauseView = pause && !appForeground
+            if (!pauseView) setViewPaused(session, false)
+            if (pause == session.mediaPaused) {
+                if (pauseView) setViewPaused(session, true)
+                continue
+            }
             session.mediaPaused = pause
-            session.view.evaluateJavascript(if (pause) PAUSE_MEDIA_SCRIPT else RESUME_MEDIA_SCRIPT, null)
+            session.view.evaluateJavascript(if (pause) PAUSE_MEDIA_SCRIPT else RESUME_MEDIA_SCRIPT) {
+                // The frames get the word as a message; the view is paused once they have had it.
+                session.view.postDelayed({
+                    if (pauseView && !appForeground) setViewPaused(session, true)
+                }, FRAME_HOLD_SETTLE_MS)
+            }
         }
         signInWindow?.let { if (appForeground) it.onResume() else it.onPause() }
     }
@@ -1684,15 +1709,43 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
     companion object {
         private const val BRIDGE_OBJECT = "openmedia"
 
-        /** Pauses what plays and remembers which elements it paused, so only those resume. */
+        /**
+         * Pauses what plays and remembers which elements it paused, so only those resume. A script
+         * reaches only its own document, so the frames are told to do the same ([FRAME_HOLD_SCRIPT]).
+         */
         private const val PAUSE_MEDIA_SCRIPT =
             "(function(){window.__openmediaHold=true;var held=window.__openmediaPaused=window.__openmediaPaused||[];" +
-                "document.querySelectorAll('video,audio').forEach(function(m){" +
-                "if(!m.paused&&!m.ended&&held.indexOf(m)<0){held.push(m);m.pause()}})})()"
+                "function pause(d){d.querySelectorAll('video,audio').forEach(function(m){" +
+                "if(!m.paused&&!m.ended&&held.indexOf(m)<0){held.push(m);m.pause()}});" +
+                "d.querySelectorAll('iframe').forEach(function(f){" +
+                "try{if(f.contentDocument)pause(f.contentDocument)}catch(e){}" +
+                "try{f.contentWindow.postMessage({openmediaHold:true},'*')}catch(e){}})}" +
+                "pause(document)})()"
         private const val RESUME_MEDIA_SCRIPT =
             "(function(){window.__openmediaHold=false;var held=window.__openmediaPaused||[];window.__openmediaPaused=[];" +
                 "held.forEach(function(m){if(!m.isConnected)return;try{var p=m.play();if(p&&p.catch)p.catch(function(){})}" +
-                "catch(e){}});document.dispatchEvent(new Event('openmedia-resume'))})()"
+                "catch(e){}});function tell(d){d.querySelectorAll('iframe').forEach(function(f){" +
+                "try{if(f.contentDocument)tell(f.contentDocument)}catch(e){}" +
+                "try{f.contentWindow.postMessage({openmediaHold:false},'*')}catch(e){}})}" +
+                "tell(document);document.dispatchEvent(new Event('openmedia-resume'))})()"
+
+        /**
+         * In every frame but the top: pauses the frame's media when its parent says so and plays again
+         * what it paused when told to resume, and passes the word on to the frames inside it. Only the
+         * parent window is listened to.
+         */
+        private const val FRAME_HOLD_SCRIPT =
+            "(function(){if(window.top===window||window.__openmediaFrameHold)return;window.__openmediaFrameHold=1;var held=[];" +
+                "function down(on){var f=document.querySelectorAll('iframe');for(var i=0;i<f.length;i++){" +
+                "try{f[i].contentWindow.postMessage({openmediaHold:on},'*')}catch(e){}}}" +
+                "window.addEventListener('message',function(e){var d=e.data;" +
+                "if(!d||typeof d.openmediaHold!=='boolean'||e.source!==window.parent)return;" +
+                "var on=d.openmediaHold;window.__openmediaHold=on;" +
+                "if(on){document.querySelectorAll('video,audio').forEach(function(m){" +
+                "if(!m.paused&&!m.ended&&held.indexOf(m)<0){held.push(m);m.pause()}})}" +
+                "else{var h=held;held=[];h.forEach(function(m){if(!m.isConnected)return;try{var p=m.play();" +
+                "if(p&&p.catch)p.catch(function(){})}catch(x){}})}" +
+                "down(on)})})()"
         private const val PAINT_OBJECT = "openmediaPaint"
         private const val SCROLL_OBJECT = "openmediaScroll"
         private const val OPENER_OBJECT = "openmediaOpener"
@@ -1707,6 +1760,8 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
         private const val MAX_EXCLUSION_DP = 200
         private const val REFRESH_COLOR = 0xFF06AFF8.toInt()
         private const val EVALUATE_TIMEOUT_MS = 5000L
+        /** How long frames get to receive the hold message before the view itself is paused. */
+        private const val FRAME_HOLD_SETTLE_MS = 300L
         private const val EVALUATE_MAX_BYTES = 200_000
 
         /**
@@ -1756,7 +1811,7 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
 })();
 """
 
-        private val PAGE_REPORTER_SCRIPT = FIRST_PAINT_SCRIPT + TOUCH_SCROLL_SCRIPT
+        private val PAGE_REPORTER_SCRIPT = FIRST_PAINT_SCRIPT + TOUCH_SCROLL_SCRIPT + "\n;" + FRAME_HOLD_SCRIPT
 
         /**
          * Android's WebView gives a window no `window.opener`, so a sign-in window cannot report

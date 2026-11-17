@@ -4,6 +4,7 @@ const COMMANDS: &[&str] = &[
     "close",
     "set_rect",
     "set_interactive_regions",
+    "set_covered",
     "navigate",
     "go_back",
     "go_forward",

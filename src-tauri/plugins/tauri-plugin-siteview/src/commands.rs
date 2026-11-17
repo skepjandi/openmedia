@@ -42,6 +42,14 @@ pub(crate) async fn set_interactive_regions<R: Runtime>(
 }
 
 #[command]
+pub(crate) async fn set_covered<R: Runtime>(
+    app: AppHandle<R>,
+    request: SetCoveredRequest,
+) -> Result<()> {
+    app.siteview().set_covered(request)
+}
+
+#[command]
 pub(crate) async fn navigate<R: Runtime>(
     app: AppHandle<R>,
     request: NavigateRequest,

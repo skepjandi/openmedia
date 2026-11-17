@@ -8,6 +8,7 @@ Shell-only control of the native site view. `open` is deliberately absent: the a
 - `allow-close`
 - `allow-set-rect`
 - `allow-set-interactive-regions`
+- `allow-set-covered`
 - `allow-navigate`
 - `allow-go-back`
 - `allow-go-forward`
@@ -332,6 +333,32 @@ Enables the set_content_rule_lists command without any pre-configured scope.
 <td>
 
 Denies the set_content_rule_lists command without any pre-configured scope.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+`siteview:allow-set-covered`
+
+</td>
+<td>
+
+Enables the set_covered command without any pre-configured scope.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+`siteview:deny-set-covered`
+
+</td>
+<td>
+
+Denies the set_covered command without any pre-configured scope.
 
 </td>
 </tr>

@@ -59,6 +59,11 @@ class SetInteractiveRegionsArgs {
 }
 
 @InvokeArg
+class SetCoveredArgs {
+    var covered: Boolean = false
+}
+
+@InvokeArg
 class NavigateArgs {
     var url: String = ""
 }

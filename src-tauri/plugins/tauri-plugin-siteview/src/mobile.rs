@@ -118,6 +118,13 @@ impl<R: Runtime> Siteview<R> {
         )
     }
 
+    pub fn set_covered(&self, request: SetCoveredRequest) -> Result<()> {
+        self.run(
+            "setCovered",
+            serde_json::json!({ "covered": request.covered }),
+        )
+    }
+
     pub fn navigate(&self, request: NavigateRequest) -> Result<()> {
         self.run("navigate", serde_json::json!({ "url": request.url }))
     }
