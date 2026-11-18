@@ -351,6 +351,9 @@ export const id: Messages = {
   "settings.videoFull": "Juga di video penuh",
   "settings.videoFullNote":
     "Gunakan kontrol ini juga di halaman tonton, menggantikan kontrol bawaan situs. Jika mati, pemutar bawaan situs tetap dipakai, yang punya lebih banyak fitur, seperti teks dan kualitas.",
+  "settings.videoDragMini": "Seret video ke bawah untuk mengecilkannya",
+  "settings.videoDragMiniNote":
+    "Di halaman tentang satu video, seret video ke bawah dari atas halaman agar tetap diputar di pemutar kecil di pojok.",
   "settings.videoHeight": "Tinggi kontrol",
   "settings.videoHeightNote":
     "Seberapa tinggi kontrol dari tepi bawah. Favorit dapat mengatur sendiri.",

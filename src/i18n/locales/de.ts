@@ -355,6 +355,9 @@ export const de: Messages = {
   "settings.videoFull": "Auch bei vollen Videos",
   "settings.videoFullNote":
     "Nutze die Steuerung auch auf Wiedergabeseiten, statt der eigenen der Website. Aus behält den Player der Website, der mehr bietet, etwa Untertitel und Qualität.",
+  "settings.videoDragMini": "Video nach unten ziehen, um es zu verkleinern",
+  "settings.videoDragMiniNote":
+    "Ziehe auf einer Seite zu einem Video das Video vom Seitenanfang nach unten, damit es in einem kleinen Player in der Ecke weiterläuft.",
   "settings.videoHeight": "Höhe der Steuerung",
   "settings.videoHeightNote":
     "Wie weit über dem unteren Rand die Steuerung sitzt. Ein Favorit kann eine eigene festlegen.",

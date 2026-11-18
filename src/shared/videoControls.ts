@@ -7,6 +7,7 @@ export const VIDEO_CONTROLS_DEFAULT: VideoControls = {
   height: 16,
   skip: 10,
   fullVideos: false,
+  dragToMini: true,
   remember: false,
   loopOff: false,
   autoAdvance: false,

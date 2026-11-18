@@ -6,6 +6,16 @@ All notable changes to OpenMedia are documented here.
 >
 > **Wiki**: the [GitHub Wiki](https://github.com/skepjandi/openmedia/wiki) is the public-facing main wiki — architecture, recipe format, AI pipeline, security model, roadmap. Source-controlled editing surface is `docs/wiki/` in this repo; CI (`.github/workflows/sync-wiki.yml`) mirrors it to the GitHub Wiki on every merge to `main`. New single-PR changes belong here, not as new wiki pages.
 
+### fix(video-controls): drag to shrink works with the panel off, and the iOS float shows its page at once
+
+**Area:** `fix(video-controls)`, `perf(siteview)`
+
+**Problem:** Dragging a video down into the small player only worked while the tap panel was on: the drag, the frame's drag and the pull-to-refresh hold were all gated on `panelOn()`. And on iOS the float took the reader to the page before the video in a brand-new web view loaded cold, which left an empty screen for a second or more.
+
+**Change:** The drag has its own switch, Drag a video down to shrink it (`dragToMini`, on by default, also per site; `dragOn()` in `video_controls.js`), in the playback settings, whatever the panel is. iOS keeps one *standby* page: it is built and starts loading, under the page in front with its media suspended, as soon as the small player comes up (the drag has engaged), and the float shows it instead of loading; a replacement page is shown at its first commit rather than its first paint; expanding the corner window keeps the page that took its place as the standby, so floating again is instant. It is dropped when the drag falls short, after 5 minutes, on a memory warning, in the background, when another page is shown or its own closes or is blocked, when its process dies, and when scripts, rule lists, site choices or site data change. Its redirects open nothing over the page in view.
+
+**Verified:** Vitest (839, 3 new drag cases: panel off, switched off app-wide and per site), Rust tests and clippy, the iOS plugin builds for the simulator. iOS 26.5 simulator (iPhone 17 Pro Max), driven with idb on m.youtube.com: a drag down on a watch page showed the home page's layout at the moment of release and the full page about 1 s later, with the video in the corner; after expanding, a second drag showed the home page fully drawn at once; with the panel switched off from the fan, the drag still floated the video. **Not verified:** a device; sites other than YouTube (invariant 9); memory use of the standby on a device; Android has no corner window, so only the drag fix applies there. A drag that starts on a site's own control is left to the site, and at the top of the page the app's pull to refresh can then take it (seen once on YouTube with its controls up; unchanged by this). The 27 new translations are machine-made.
+
 ### feat(desktop): folders are window layouts, and keys to change the layout
 
 **Area:** `feat(desktop)`

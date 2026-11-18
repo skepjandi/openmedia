@@ -34,6 +34,8 @@ export interface VideoControls {
   skip: number;
   /** The panel on watch pages too, in place of the site's own player controls. Off by default. */
   fullVideos: boolean;
+  /** Dragging the video down on a watch page shrinks it into the small player. On by default; works with the panel off. */
+  dragToMini: boolean;
   /** The speed and sound last chosen, applied to the next video. */
   remember: boolean;
   /** Stops a video from restarting by itself when it ends. */
@@ -49,6 +51,7 @@ export interface SiteVideo {
   height?: number;
   skip?: number;
   fullVideos?: boolean;
+  dragToMini?: boolean;
   /** The speed and sound last chosen, applied to the next video. */
   remember?: boolean;
   /** Stops a video from restarting by itself when it ends. */

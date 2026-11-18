@@ -1796,6 +1796,7 @@ mod tests {
             height: Some(48),
             skip: Some(30),
             full_videos: Some(true),
+            drag_to_mini: Some(false),
             remember: Some(true),
             loop_off: Some(true),
             auto_advance: Some(false),

@@ -358,6 +358,9 @@ export const tr: Messages = {
   "settings.videoFull": "Tam videolarda da",
   "settings.videoFullNote":
     "Kontrolleri izleme sayfalarında da sitenin kendi kontrollerinin yerine kullanın. Kapalıyken sitenin oynatıcısı kalır; altyazı ve kalite gibi daha fazlasına sahiptir.",
+  "settings.videoDragMini": "Küçültmek için videoyu aşağı sürükleyin",
+  "settings.videoDragMiniNote":
+    "Tek bir videonun sayfasında, videoyu sayfanın üstünden aşağı sürükleyerek köşedeki küçük oynatıcıda oynamaya devam etmesini sağlayın.",
   "settings.videoHeight": "Kontrol yüksekliği",
   "settings.videoHeightNote":
     "Kontrollerin alt kenarın ne kadar üstünde durduğu. Bir favori kendi yüksekliğini belirleyebilir.",

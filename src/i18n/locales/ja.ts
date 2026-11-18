@@ -352,6 +352,9 @@ export const ja: Messages = {
   "settings.videoFull": "通常の動画でも使う",
   "settings.videoFullNote":
     "視聴ページでも、サイト標準のものの代わりにこのコントロールを使います。オフにするとサイト標準のプレーヤーのままで、字幕や画質の設定など、より多くの機能が使えます。",
+  "settings.videoDragMini": "動画を下にドラッグして小さくする",
+  "settings.videoDragMiniNote":
+    "1本の動画のページで、ページの先頭から動画を下にドラッグすると、隅の小さなプレーヤーで再生を続けられます。",
   "settings.videoHeight": "コントロールの高さ",
   "settings.videoHeightNote":
     "コントロールを下端からどれだけ上に置くかを設定します。お気に入りごとに個別に設定できます。",

@@ -357,6 +357,9 @@ export const sv: Messages = {
   "settings.videoFull": "Även på hela videor",
   "settings.videoFullNote":
     "Använd kontrollerna även på visningssidor, i stället för webbplatsens egna. Av behåller webbplatsens spelare, som har fler funktioner, till exempel undertexter och kvalitet.",
+  "settings.videoDragMini": "Dra en video nedåt för att krympa den",
+  "settings.videoDragMiniNote":
+    "På en sida om en enda video drar du videon nedåt från sidans överkant så att den fortsätter spelas i en liten spelare i hörnet.",
   "settings.videoHeight": "Kontrollernas höjd",
   "settings.videoHeightNote":
     "Hur högt över nedre kanten kontrollerna sitter. En favorit kan ha en egen.",

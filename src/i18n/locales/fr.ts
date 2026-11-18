@@ -364,6 +364,9 @@ export const fr: Messages = {
   "settings.videoFull": "Aussi sur les vidéos complètes",
   "settings.videoFullNote":
     "Utilisez les commandes aussi sur les pages de lecture, à la place de celles du site. Désactivé garde le lecteur du site, qui offre plus, comme les sous-titres et la qualité.",
+  "settings.videoDragMini": "Faire glisser une vidéo vers le bas pour la réduire",
+  "settings.videoDragMiniNote":
+    "Sur une page consacrée à une seule vidéo, faites glisser la vidéo vers le bas depuis le haut de la page pour continuer à la lire dans un petit lecteur dans le coin.",
   "settings.videoHeight": "Hauteur des commandes",
   "settings.videoHeightNote":
     "À quelle distance du bord inférieur se trouvent les commandes. Un favori peut définir la sienne.",

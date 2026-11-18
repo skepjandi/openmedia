@@ -354,6 +354,9 @@ export const cs: Messages = {
   "settings.videoFull": "I u celých videí",
   "settings.videoFullNote":
     "Používejte ovládání i na stránkách přehrávání místo ovládání samotného webu. Vypnuto ponechá přehrávač webu, který nabízí více, například titulky a kvalitu.",
+  "settings.videoDragMini": "Přetažením videa dolů ho zmenšit",
+  "settings.videoDragMiniNote":
+    "Na stránce o jednom videu přetáhněte video z horní části stránky dolů, aby se přehrávalo dál v malém přehrávači v rohu.",
   "settings.videoHeight": "Výška ovládání",
   "settings.videoHeightNote":
     "Jak vysoko nad spodním okrajem ovládání leží. Oblíbená stránka může mít vlastní.",

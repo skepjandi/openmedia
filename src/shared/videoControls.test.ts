@@ -1470,11 +1470,19 @@ describe("video controls", () => {
     afterEach(() => {
       vi.restoreAllMocks();
     });
-    const watch = () => {
+    const watch = (
+      options: { controls?: Partial<VideoControls>; sites?: Record<string, SiteVideo> } = {},
+    ) => {
       const home = new FakeElement();
       const video = new PlacedVideo();
       home.appendChild(video as unknown as FakeElement);
-      const page = load({ videos: [video], current: video, pathname: "/watch", feed: false });
+      const page = load({
+        ...options,
+        videos: [video],
+        current: video,
+        pathname: "/watch",
+        feed: false,
+      });
       return { home, video, page };
     };
     const touch = (y: number, x = 200) => ({ touches: [{ clientX: x, clientY: y }] });
@@ -1569,6 +1577,42 @@ describe("video controls", () => {
       ).toBeFalsy();
     });
 
+    const held = (page: Page) =>
+      (page.document as Record<symbol, unknown>)[Symbol.for("openmedia.holdRefresh")];
+
+    it("still lifts the video into the small player when the panel is off", () => {
+      const { video, page } = watch({ controls: { panel: false } });
+      expect(held(page)).toBe(true);
+      page.win("touchstart", touch(100));
+      page.win("touchmove", touch(130));
+      const box = miniBox(page);
+      expect(box).toBeDefined();
+      page.win("touchmove", touch(300));
+      expect(page.win("touchend", touch(300))).toBe(true);
+      page.runTimers();
+      expect(page.posts).toContainEqual({ float: true });
+      expect(video.parentNode).toBe(box);
+    });
+
+    it.each([
+      ["app-wide", { controls: { dragToMini: false } }],
+      ["for the site", { sites: { "youtube.com": { dragToMini: false } } }],
+    ])(
+      "leaves the drag to the site and holds no pull to refresh when it is off %s",
+      (_, options) => {
+        const { page } = watch(options);
+        page.tick();
+        expect(held(page)).toBeFalsy();
+        page.win("touchstart", touch(100));
+        expect(page.win("touchmove", touch(130))).toBe(false);
+        expect(page.win("touchmove", touch(300))).toBe(false);
+        expect(page.win("touchend", touch(300))).toBe(false);
+        expect(miniBox(page)).toBeUndefined();
+        page.runTimers();
+        expect(page.posts).not.toContainEqual({ float: true });
+      },
+    );
+
     it("in a frame, asks the page and never the app, and drags once the page says yes", () => {
       const video = new PlacedVideo();
       const page = load({
@@ -1593,7 +1637,7 @@ describe("video controls", () => {
       expect(page.posts).toEqual([]);
     });
 
-    it("in a frame, gives the player its own controls back when the page passes on that the panel is off", () => {
+    it("in a frame, leaves the player to the site when the page passes on that dragging is off", () => {
       const video = new PlacedVideo();
       const page = load({
         frame: true,
@@ -1607,14 +1651,14 @@ describe("video controls", () => {
       };
       page.win("message", {
         source: {},
-        data: { om: "config", config: { ...VIDEO_CONTROLS_DEFAULT, panel: false, sites: {} } },
+        data: { om: "config", config: { ...VIDEO_CONTROLS_DEFAULT, dragToMini: false, sites: {} } },
       });
       page.win("touchstart", touch);
       expect(page.parentPosts).toEqual([{ om: "drag-start" }]);
       page.parentPosts.length = 0;
       page.win("message", {
         source: page.parent,
-        data: { om: "config", config: { ...VIDEO_CONTROLS_DEFAULT, panel: false, sites: {} } },
+        data: { om: "config", config: { ...VIDEO_CONTROLS_DEFAULT, dragToMini: false, sites: {} } },
       });
       page.win("touchstart", touch);
       expect(page.parentPosts).toEqual([]);

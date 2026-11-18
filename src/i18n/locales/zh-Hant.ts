@@ -325,6 +325,9 @@ export const zhHant: Messages = {
   "settings.videoFull": "完整影片也適用",
   "settings.videoFullNote":
     "在觀看頁面也使用這些控制，取代網站自己的控制。關閉後保留網站自己的播放器，功能更多，例如字幕和畫質。",
+  "settings.videoDragMini": "向下拖曳影片以縮小",
+  "settings.videoDragMiniNote":
+    "在只有一部影片的頁面上，從頁面頂端向下拖曳影片，即可在角落的小播放器中繼續播放。",
   "settings.videoHeight": "控制高度",
   "settings.videoHeightNote": "控制離底邊有多高。我的最愛可以設定自己的高度。",
   "settings.videoHeightLabel": "影片控制高度",

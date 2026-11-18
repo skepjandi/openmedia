@@ -361,6 +361,9 @@ export const it: Messages = {
   "settings.videoFull": "Anche nei video a schermo intero",
   "settings.videoFullNote":
     "Usa i controlli anche nelle pagine di visione, al posto di quelli del sito. Se disattivato, resta il lettore del sito, che offre di più, come sottotitoli e qualità.",
+  "settings.videoDragMini": "Trascina un video verso il basso per ridurlo",
+  "settings.videoDragMiniNote":
+    "In una pagina dedicata a un solo video, trascina il video verso il basso dalla parte superiore della pagina per continuare a guardarlo in un piccolo lettore nell'angolo.",
   "settings.videoHeight": "Altezza dei controlli",
   "settings.videoHeightNote":
     "A quale distanza dal bordo inferiore stanno i controlli. Un preferito può averne una propria.",

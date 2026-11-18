@@ -479,6 +479,12 @@
       return typeof site.panel === 'boolean' ? site.panel : !!config.panel;
     }
 
+    // Dragging the video down on a watch page into the small player: its own switch, whatever the panel is.
+    function dragOn() {
+      var site = siteChoice();
+      return typeof site.dragToMini === 'boolean' ? site.dragToMini : config.dragToMini !== false;
+    }
+
     // The panel on a watch page too, in place of the site's own player controls: only when asked.
     function fullVideosOn() {
       var site = siteChoice();
@@ -1072,7 +1078,7 @@
         if (!frame) return;
         if (data.om === 'drag-start') {
           var top = window.scrollY || (document.scrollingElement && document.scrollingElement.scrollTop) || 0;
-          var ok = !mini && panelOn() && !onFeedPage() && !document.hidden && !window.__openmediaHold &&
+          var ok = !mini && dragOn() && !onFeedPage() && !document.hidden && !window.__openmediaHold &&
             top <= 1 && frame === playerFrame();
           frameDrag = ok ? { frame: frame, rect: frame.getBoundingClientRect() } : null;
           tellFrame(frame, { om: 'drag-ok', ok: ok });
@@ -1287,7 +1293,7 @@
     function syncRefreshHold() {
       if (framed) return;
       var top = window.scrollY || (document.scrollingElement && document.scrollingElement.scrollTop) || 0;
-      var want = !mini && !document.hidden && panelOn() && !onFeedPage() && watchPage() && top <= 1 && !!(focus() || playerFrame());
+      var want = !mini && !document.hidden && dragOn() && !onFeedPage() && watchPage() && top <= 1 && !!(focus() || playerFrame());
       if (want === refreshHeld) return;
       refreshHeld = want;
       document[REFRESH_HOLD] = want;
@@ -1363,7 +1369,7 @@
       drag = null;
       if (mini || !event.touches || event.touches.length !== 1 || document.hidden || window.__openmediaHold) return;
       if (framed && (parentMini || !frameBig())) return;
-      if (!panelOn() || onFeedPage() || !watchPage() || inPanel(event.target)) return;
+      if (!dragOn() || onFeedPage() || !watchPage() || inPanel(event.target)) return;
       var top = window.scrollY || (document.scrollingElement && document.scrollingElement.scrollTop) || 0;
       if (top > 1) return;
       // The page's own video, or its frame: a touch on a frame goes to the frame's own copy of the

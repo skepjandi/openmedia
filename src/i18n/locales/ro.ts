@@ -358,6 +358,9 @@ export const ro: Messages = {
   "settings.videoFull": "Și la videoclipurile complete",
   "settings.videoFullNote":
     "Folosește comenzile și pe paginile de vizionare, în locul celor ale site-ului. Dezactivat, păstrează playerul site-ului, care are mai multe opțiuni, precum subtitrări și calitate.",
+  "settings.videoDragMini": "Trage un videoclip în jos pentru a-l micșora",
+  "settings.videoDragMiniNote":
+    "Pe o pagină despre un singur videoclip, trage videoclipul în jos din partea de sus a paginii ca să continue să ruleze într-un player mic în colț.",
   "settings.videoHeight": "Înălțimea comenzilor",
   "settings.videoHeightNote":
     "La ce distanță deasupra marginii de jos se află comenzile. Un favorit poate avea propria înălțime.",

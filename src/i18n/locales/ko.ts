@@ -349,6 +349,9 @@ export const ko: Messages = {
   "settings.videoFull": "전체 동영상에서도 사용",
   "settings.videoFullNote":
     "시청 페이지에서도 사이트 자체 컨트롤 대신 이 컨트롤을 사용합니다. 끄면 자막, 화질 등 더 많은 기능이 있는 사이트 자체 플레이어가 유지됩니다.",
+  "settings.videoDragMini": "동영상을 아래로 끌어 작게 만들기",
+  "settings.videoDragMiniNote":
+    "동영상 하나가 있는 페이지에서 페이지 맨 위의 동영상을 아래로 끌면 모서리의 작은 플레이어에서 계속 재생됩니다.",
   "settings.videoHeight": "컨트롤 높이",
   "settings.videoHeightNote":
     "컨트롤이 하단 가장자리에서 얼마나 위에 놓일지 정합니다. 즐겨찾기별로 따로 설정할 수 있습니다.",

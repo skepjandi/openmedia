@@ -128,6 +128,8 @@ private let floatAnswerWait: TimeInterval = 0.6
 private let cornerWindowRadius: CGFloat = 12
 /// How long a picture-in-picture window asked for on leaving the app gets to appear.
 private let floatSettleWait: TimeInterval = 0.8
+/// How long a page kept ready for the next float (`SiteViewPlugin.standby`) lives unused.
+private let standbyLifetime: TimeInterval = 300
 private let exitPictureInPictureScript = """
   (function () {
     var videos = document.querySelectorAll('video');
@@ -514,6 +516,9 @@ private final class Session {
   var windowOpen = false
   /// True when the page was replaced in its session: only its picture-in-picture window is left.
   var floatDetached = false
+  /// A page made to take the place of one whose video went to the corner: shown at its first
+  /// commit, not its first paint, so the screen is not left empty while the site boots.
+  var revealOnCommit = false
   /// The native shield over a closed page. It covers the page and takes every touch.
   var shield: UIView?
   var observations: [NSKeyValueObservation] = []
@@ -617,6 +622,16 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
   /// plays a video of its own.
   private var floatingSessions: [Session] = []
   private var watchingFloats = false
+  /// At most one page kept ready, out of sight with its media suspended, to take the place of the
+  /// page in front when its video goes to the corner, so the float does not wait for a cold load.
+  /// It is made when the small player comes up (the drag has begun) and dropped if it goes down
+  /// without a float, or kept from a float the reader expanded back. It is dropped after
+  /// `standbyLifetime`, on a memory warning, in the background, when another page is shown or its
+  /// own closes, and when scripts, rule lists, site choices or site data change under it.
+  private var standby: Session?
+  /// The address the standby was made for; nil for one kept from a float, which serves any.
+  private var standbyTarget: URL?
+  private var standbyGeneration = 0
 
   override func load(webview: WKWebView) {
     shell = webview
@@ -634,11 +649,15 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
     try? AVAudioSession.sharedInstance().setCategory(.playback, mode: .moviePlayback)
     NotificationCenter.default.addObserver(
       forName: UIApplication.didReceiveMemoryWarningNotification, object: nil, queue: .main
-    ) { [weak self] _ in self?.send(MemoryWarningEvent()) }
+    ) { [weak self] _ in
+      self?.dropStandby()
+      self?.send(MemoryWarningEvent())
+    }
     NotificationCenter.default.addObserver(
       forName: UIApplication.didEnterBackgroundNotification, object: nil, queue: .main
     ) { [weak self] _ in
       self?.appForeground = false
+      self?.dropStandby()
       self?.refreshMedia()
     }
     NotificationCenter.default.addObserver(
@@ -749,6 +768,7 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
     let args = try invoke.parseArgs(SessionArgs.self)
     DispatchQueue.main.async {
       if let session = self.sessions[args.session] { self.dispose(session) }
+      if self.standby?.id == args.session { self.dropStandby() }
       invoke.resolve()
     }
   }
@@ -908,6 +928,7 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
         return
       }
       self.ruleListGeneration += 1
+      self.dropStandby()
       let (ruleLists, failure) = await self.loadRuleLists(args.lists)
       for session in self.sessions.values {
         let controller = session.view.configuration.userContentController
@@ -941,6 +962,7 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
       "document.querySelectorAll('style[data-openmedia]').forEach(function(s){s.remove()});"
       + (args.script ?? "")
     DispatchQueue.main.async {
+      self.dropStandby()
       for session in self.sessions.values {
         let controller = session.view.configuration.userContentController
         session.recipeScript = args.script
@@ -973,6 +995,7 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
     let args = try invoke.parseArgs(SetPictureInPictureArgs.self)
     DispatchQueue.main.async {
       self.pictureInPictureSites = Set(args.sites)
+      self.dropStandby()
       for session in self.sessions.values {
         self.installUserScripts(
           on: session.view.configuration.userContentController,
@@ -1000,6 +1023,7 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
     let args = try invoke.parseArgs(SetDesktopSitesArgs.self)
     DispatchQueue.main.async {
       self.desktopSites = Set(args.sites)
+      self.dropStandby()
       for session in self.sessions.values
       where session.desktop != self.desktopSites.contains(session.scope) {
         if session.id == self.activeId && !session.blocked {
@@ -1048,6 +1072,7 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
         invoke.reject("no site view is open")
         return
       }
+      self.dropStandby()
       let store = session.view.configuration.websiteDataStore
       let types = WKWebsiteDataStore.allWebsiteDataTypes()
       store.fetchDataRecords(ofTypes: types) { records in
@@ -1121,13 +1146,40 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
 
   /// Puts a fresh view in the session, loading `request`, and keeps the old one alive, hidden, for
   /// its picture-in-picture window. The old view has no session any more, so it cannot navigate;
-  /// it goes when its window closes.
-  private func swapForFloatingVideo(_ old: Session, loading request: URLRequest) {
-    guard let profileId = old.profileId, sessions[old.id] === old else {
+  /// it goes when its window closes. `ready` is a page already made for this (the standby), shown
+  /// as it is, without a load.
+  private func swapForFloatingVideo(_ old: Session, loading request: URLRequest, ready: Session? = nil) {
+    if ready == nil, standby?.id == old.id { dropStandby() }
+    guard sessions[old.id] === old,
+      let session = ready ?? makeReplacement(for: old, url: request.url ?? old.initialURL)
+    else {
       old.view.load(request)
       return
     }
-    let url = request.url ?? old.initialURL
+
+    old.floatedForNavigation = true
+    old.floatDetached = true
+    old.autoPictureInPicture = true
+    old.observations.removeAll()
+    // A page with its small player up goes to the corner at once, never hidden on the way: a view
+    // hidden and shown again draws its video torn or black.
+    if old.miniUp { placeCorner(old) } else { old.view.isHidden = true }
+    floatingSessions.append(old)
+    watchFloats()
+    cornerIfMini(old)
+
+    sessions[session.id] = session
+    activeId = session.id
+    observe(session)
+    // A standby sits under the page it stood in for; it moves up to where pages are shown.
+    session.view.removeFromSuperview()
+    mount(session)
+    if ready == nil { session.view.load(request) }
+  }
+
+  /// A view for `old`'s session, with its profile, scripts and rule lists, not loaded yet.
+  private func makeReplacement(for old: Session, url: URL) -> Session? {
+    guard let profileId = old.profileId else { return nil }
     let view = makeSessionView(
       profileId: profileId,
       recipe: old.recipeScript,
@@ -1147,23 +1199,84 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
     session.profileId = profileId
     // The shell already showed this session: it must not put its splash back up.
     session.painted = true
+    session.revealOnCommit = true
+    return session
+  }
 
-    old.floatedForNavigation = true
-    old.floatDetached = true
-    old.autoPictureInPicture = true
-    old.observations.removeAll()
-    // A page with its small player up goes to the corner at once, never hidden on the way: a view
-    // hidden and shown again draws its video torn or black.
-    if old.miniUp { placeCorner(old) } else { old.view.isHidden = true }
-    floatingSessions.append(old)
-    watchFloats()
-    cornerIfMini(old)
+  /// Where the reader goes when the page in front sends its video to the corner: the page before
+  /// it, else the site's start page.
+  private func floatTarget(of session: Session) -> URL {
+    let here = session.view.url ?? session.initialURL
+    var start = URLComponents(url: here, resolvingAgainstBaseURL: false)
+    start?.path = "/"
+    start?.query = nil
+    start?.fragment = nil
+    return session.view.backForwardList.backItem?.url ?? start?.url ?? session.initialURL
+  }
 
-    sessions[session.id] = session
-    activeId = session.id
-    observe(session)
-    mount(session)
-    session.view.load(request)
+  /// The small player came up on the page in front (a drag down has begun, or its button was
+  /// pressed): the page it would make way for starts loading now, out of sight under it.
+  private func prepareStandby(for session: Session) {
+    guard session.id == activeId, appForeground, !session.blocked, !session.floatedForNavigation,
+      let host = session.view.superview
+    else { return }
+    let target = floatTarget(of: session)
+    if let standby, standby.id == session.id, standbyTarget == nil || standbyTarget == target { return }
+    dropStandby()
+    guard let page = makeReplacement(for: session, url: target) else { return }
+    page.view.frame = session.view.frame
+    host.insertSubview(page.view, belowSubview: session.view)
+    setMediaSuspended(true, in: page)
+    keepAsStandby(page, target: target)
+    page.view.load(URLRequest(url: target))
+  }
+
+  /// The page that took the place of a floated one, when the reader expands the float back: kept
+  /// out of sight as the standby, so floating again shows it as the reader left it, at once.
+  private func setAside(_ page: Session) {
+    guard !page.blocked, signInOwner != page.id else {
+      dispose(page)
+      return
+    }
+    dropStandby()
+    page.observations.removeAll()
+    sessions[page.id] = nil
+    page.view.isHidden = true
+    setMediaSuspended(true, in: page)
+    keepAsStandby(page, target: nil)
+  }
+
+  private func keepAsStandby(_ page: Session, target: URL?) {
+    standby = page
+    standbyTarget = target
+    standbyGeneration += 1
+    let generation = standbyGeneration
+    DispatchQueue.main.asyncAfter(deadline: .now() + standbyLifetime) { [weak self] in
+      guard let self, self.standbyGeneration == generation else { return }
+      self.dropStandby()
+    }
+  }
+
+  /// The standby, out of standby, when it was made for `session` and fits a float to `target`;
+  /// one that does not fit is dropped.
+  private func takeStandby(for session: Session, target: URL) -> Session? {
+    guard let page = standby, page.id == session.id, standbyTarget == nil || standbyTarget == target
+    else {
+      dropStandby()
+      return nil
+    }
+    standby = nil
+    standbyTarget = nil
+    standbyGeneration += 1
+    return page
+  }
+
+  private func dropStandby() {
+    guard let page = standby else { return }
+    standby = nil
+    standbyTarget = nil
+    standbyGeneration += 1
+    teardownView(page.view)
   }
 
   /// Floats the page's playing video, when it has one with sound, and keeps the page out of the
@@ -1387,24 +1500,21 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
   /// Nothing in the kept page navigates or restyles its player, so a site that disposes its player
   /// when it navigates inside the page (YouTube) cannot take the video away, and the reader can go
   /// anywhere in the fresh view. It is not the same page again: a second player of the same site
-  /// starting makes the site pause the first (YouTube does). The fresh view has no history.
+  /// starting makes the site pause the first (YouTube does). The fresh view has no history. It is
+  /// the standby when one is ready, so it shows at once instead of loading cold.
   func floatToCorner(_ view: WKWebView) {
     guard let session = session(of: view), session.id == activeId, session.miniUp, appForeground,
       !session.blocked, !session.floatedForNavigation, session.profileId != nil
     else { return }
     // One small player at a time: the one up already is closed.
     for other in floatingSessions where other.inCorner { endFloat(other) }
-    let here = view.url ?? session.initialURL
-    var start = URLComponents(url: here, resolvingAgainstBaseURL: false)
-    start?.path = "/"
-    start?.query = nil
-    start?.fragment = nil
-    let target = view.backForwardList.backItem?.url ?? start?.url ?? session.initialURL
-    swapForFloatingVideo(session, loading: URLRequest(url: target))
+    let target = floatTarget(of: session)
+    swapForFloatingVideo(
+      session, loading: URLRequest(url: target), ready: takeStandby(for: session, target: target))
   }
 
   /// The corner player's expand button: the page in the corner is the page in front again, as it
-  /// was, with its video back in it, and the page that took its place is closed.
+  /// was, with its video back in it, and the page that took its place is set aside as the standby.
   func expandFromCorner(_ view: WKWebView) {
     guard let old = floatingSessions.first(where: { $0.view === view }), old.inCorner,
       let shell, let host = shell.superview
@@ -1413,7 +1523,7 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
       view.evaluateJavaScript(miniCloseScript)
       return
     }
-    if let current = sessions[old.id], current !== old { dispose(current) }
+    if let current = sessions[old.id], current !== old { setAside(current) }
     floatingSessions.removeAll { $0 === old }
     old.floatedForNavigation = false
     old.floatDetached = false
@@ -1429,7 +1539,14 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
   }
 
   func setMiniUp(_ view: WKWebView, _ up: Bool) {
-    session(of: view)?.miniUp = up
+    guard let session = session(of: view) else { return }
+    session.miniUp = up
+    if up {
+      prepareStandby(for: session)
+    } else if standby?.id == session.id, standbyTarget != nil {
+      // The drag fell short: the page made for it is not kept.
+      dropStandby()
+    }
   }
 
   func playFeedVideo(_ view: WKWebView) {
@@ -1456,6 +1573,7 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
         return
       }
       self.applyBlocked(args.blocked, to: session)
+      if args.blocked, self.standby?.id == args.session { self.dropStandby() }
       invoke.resolve()
     }
   }
@@ -1639,7 +1757,7 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
     decisionHandler: @escaping (WKNavigationActionPolicy, WKWebpagePreferences) -> Void
   ) {
     if navigationAction.targetFrame?.isMainFrame ?? true,
-      let session = session(of: webView),
+      let session = pageSession(of: webView),
       let host = navigationAction.request.url?.host
     {
       let desktop = desktopSites.contains(DomainScope.registrableDomain(of: host))
@@ -1681,7 +1799,7 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
       decisionHandler(.allow)
       return
     }
-    guard let session = session(of: webView) else {
+    guard let session = pageSession(of: webView) else {
       decisionHandler(.cancel)
       return
     }
@@ -1710,11 +1828,13 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
       decisionHandler(.allow)
     case .cancel:
       decisionHandler(.cancel)
-      notePopupBlocked(url)
+      if session !== standby { notePopupBlocked(url) }
     case .popup:
       // A redirect the page made on its own (a sign-in that runs after the tap) has to stay in
-      // the app: the system browser shares no cookies with the page.
+      // the app: the system browser shares no cookies with the page. A page out of sight (the
+      // standby) opens nothing over the one the reader is looking at.
       decisionHandler(.cancel)
+      guard session !== standby else { return }
       if let url, !openRedirectWindow(url, for: session) { presentPopup(url) }
     }
   }
@@ -1722,9 +1842,10 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
   /// While the initial load or a user-initiated navigation is unsettled, redirects may change the
   /// scope; it then stays pinned to the destination domain.
   func webView(_ webView: WKWebView, didCommit navigation: WKNavigation!) {
-    session(of: webView)?.committed = true
-    scheduleReveal(webView)
-    guard let session = session(of: webView), !session.settled, let host = webView.url?.host else { return }
+    let page = pageSession(of: webView)
+    page?.committed = true
+    if page?.revealOnCommit == true { reveal(webView) } else { scheduleReveal(webView) }
+    guard let session = page, !session.settled, let host = webView.url?.host else { return }
     session.scope = DomainScope.registrableDomain(of: host)
   }
 
@@ -1741,12 +1862,12 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
       return
     }
     reveal(webView)
-    session(of: webView)?.settled = true
+    pageSession(of: webView)?.settled = true
     finishHandoff(of: webView)
   }
 
   func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
-    session(of: webView)?.settled = true
+    pageSession(of: webView)?.settled = true
     finishHandoff(of: webView)
     // A page that never committed never paints, so nothing else would take the launch logo down:
     // the error would sit over a dead logo screen. The blank page stays hidden (it would be white).
@@ -1755,7 +1876,7 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
   }
 
   func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
-    session(of: webView)?.settled = true
+    pageSession(of: webView)?.settled = true
     finishHandoff(of: webView)
     // A page that never committed never paints, so nothing else would take the launch logo down:
     // the error would sit over a dead logo screen. The blank page stays hidden (it would be white).
@@ -1798,6 +1919,10 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
   /// showing until it commits; a hidden one is dropped and the shell is told, so it reopens fresh
   /// when the user comes back to it.
   func webViewWebContentProcessDidTerminate(_ webView: WKWebView) {
+    if webView === standby?.view {
+      dropStandby()
+      return
+    }
     guard let session = session(of: webView) else { return }
     if session.id == activeId {
       if session.blocked {
@@ -1926,6 +2051,12 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
     sessions.values.first { $0.view === view }
   }
 
+  /// The session a view's page runs in, the standby included: what decides where it may go. The
+  /// standby is not one of the sessions the shell sees, so it reports nothing to it.
+  private func pageSession(of view: WKWebView) -> Session? {
+    session(of: view) ?? (standby?.view === view ? standby : nil)
+  }
+
   // MARK: Blocking
 
   /// Closes or opens one session. Closing is native: the page is covered by a shield, its load
@@ -2051,6 +2182,7 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
   private func showNow(_ session: Session) {
     // Coming back to a page whose video floats puts the video back in it.
     if session.floatedForNavigation { endFloat(session) }
+    if let standby, standby.id != session.id { dropStandby() }
     // A sign-in window belongs to the page that opened it; another page takes the screen.
     if let owner = signInOwner, owner != session.id { closeSignInWindow() }
     for other in sessions.values where other !== session && !(other.floatedForNavigation && other.miniUp) {

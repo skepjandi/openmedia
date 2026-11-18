@@ -359,6 +359,9 @@ export const pl: Messages = {
   "settings.videoFull": "Także w pełnych filmach",
   "settings.videoFullNote":
     "Używaj sterowania także na stronach oglądania, zamiast własnego sterowania witryny. Wyłączone zachowuje odtwarzacz witryny, który ma więcej opcji, takich jak napisy i jakość.",
+  "settings.videoDragMini": "Przeciągnij wideo w dół, aby je zmniejszyć",
+  "settings.videoDragMiniNote":
+    "Na stronie o jednym wideo przeciągnij wideo w dół od góry strony, aby odtwarzało się dalej w małym odtwarzaczu w rogu.",
   "settings.videoHeight": "Wysokość sterowania",
   "settings.videoHeightNote":
     "Jak wysoko nad dolną krawędzią znajduje się sterowanie. Ulubione może mieć własną.",

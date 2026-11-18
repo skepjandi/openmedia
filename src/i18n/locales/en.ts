@@ -354,6 +354,9 @@ export const en = {
   "settings.videoFull": "Also on full videos",
   "settings.videoFullNote":
     "Use the controls on watch pages too, in place of the site's own. Off keeps the site's player, which has more, such as captions and quality.",
+  "settings.videoDragMini": "Drag a video down to shrink it",
+  "settings.videoDragMiniNote":
+    "On a page about one video, drag the video down from the top of the page to keep it playing in a small player in the corner.",
   "settings.videoHeight": "Controls height",
   "settings.videoHeightNote":
     "How far above the bottom edge the controls sit. A favorite can set its own.",

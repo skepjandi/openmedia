@@ -360,6 +360,9 @@ export const es: Messages = {
   "settings.videoFull": "También en vídeos completos",
   "settings.videoFullNote":
     "Usa los controles también en las páginas de reproducción, en lugar de los del propio sitio. Desactivado mantiene el reproductor del sitio, que tiene más, como subtítulos y calidad.",
+  "settings.videoDragMini": "Arrastra un vídeo hacia abajo para reducirlo",
+  "settings.videoDragMiniNote":
+    "En una página sobre un solo vídeo, arrastra el vídeo hacia abajo desde la parte superior de la página para seguir viéndolo en un reproductor pequeño en la esquina.",
   "settings.videoHeight": "Altura de los controles",
   "settings.videoHeightNote":
     "A qué distancia del borde inferior están los controles. Un favorito puede fijar la suya.",

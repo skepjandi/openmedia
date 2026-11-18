@@ -349,6 +349,9 @@ export const vi: Messages = {
   "settings.videoFull": "Cả trên video đầy đủ",
   "settings.videoFullNote":
     "Dùng điều khiển cả ở trang xem, thay cho điều khiển của trang. Khi tắt, giữ trình phát của trang, có nhiều hơn, như phụ đề và chất lượng.",
+  "settings.videoDragMini": "Kéo video xuống để thu nhỏ",
+  "settings.videoDragMiniNote":
+    "Trên trang về một video, kéo video xuống từ đầu trang để tiếp tục phát trong trình phát nhỏ ở góc.",
   "settings.videoHeight": "Độ cao điều khiển",
   "settings.videoHeightNote":
     "Điều khiển nằm cao hơn mép dưới bao nhiêu. Một mục yêu thích có thể đặt độ cao riêng.",

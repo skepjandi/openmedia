@@ -354,6 +354,9 @@ export const ms: Messages = {
   "settings.videoFull": "Juga pada video penuh",
   "settings.videoFullNote":
     "Guna kawalan ini pada halaman tonton juga, menggantikan kawalan asal laman. Jika dimatikan, pemain asal laman kekal, yang mempunyai lebih banyak ciri, seperti sari kata dan kualiti.",
+  "settings.videoDragMini": "Seret video ke bawah untuk mengecilkannya",
+  "settings.videoDragMiniNote":
+    "Pada halaman tentang satu video, seret video ke bawah dari bahagian atas halaman untuk terus memainkannya dalam pemain kecil di sudut.",
   "settings.videoHeight": "Ketinggian kawalan",
   "settings.videoHeightNote":
     "Sejauh mana kawalan berada di atas tepi bawah. Kegemaran boleh menetapkan ketinggiannya sendiri.",

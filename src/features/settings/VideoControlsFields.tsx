@@ -73,6 +73,15 @@ export function VideoControlsFields({ value, change, overrides }: VideoControlsF
       />
       {follows(["skip"], "settings.videoSkip", "")}
     </div>,
+    <div key="drag">
+      <Switch
+        label={t("settings.videoDragMini")}
+        description={t("settings.videoDragMiniNote")}
+        checked={value.dragToMini}
+        onChange={(on) => change({ dragToMini: on })}
+      />
+      {follows(["dragToMini"], "settings.videoDragMini", "px-4 pb-3")}
+    </div>,
     <div key="remember">
       <Switch
         label={t("settings.videoRemember")}

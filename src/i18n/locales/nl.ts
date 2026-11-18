@@ -357,6 +357,9 @@ export const nl: Messages = {
   "settings.videoFull": "Ook bij volledige video’s",
   "settings.videoFullNote":
     "Gebruik de bediening ook op kijkpagina’s, in plaats van die van de site zelf. Uit houdt de eigen speler van de site, die meer biedt, zoals ondertiteling en kwaliteit.",
+  "settings.videoDragMini": "Sleep een video omlaag om hem te verkleinen",
+  "settings.videoDragMiniNote":
+    "Sleep op een pagina over één video de video vanaf de bovenkant van de pagina omlaag om hem te laten doorspelen in een kleine speler in de hoek.",
   "settings.videoHeight": "Hoogte van de bediening",
   "settings.videoHeightNote":
     "Hoe ver boven de onderrand de bediening staat. Een favoriet kan een eigen hoogte instellen.",

@@ -65,6 +65,9 @@ pub struct VideoControls {
     /// The panel on a watch page too, in place of the site's own player controls. Off: those
     /// have more than the panel does (captions, quality, chapters), so they are left alone.
     pub full_videos: bool,
+    /// Dragging the video down on a watch page shrinks it into the small player. Works with the
+    /// panel off; its own switch.
+    pub drag_to_mini: bool,
     /// The speed and sound the reader last chose, applied to the next video.
     pub remember: bool,
     /// Stops a video from restarting by itself when it ends.
@@ -80,6 +83,7 @@ impl Default for VideoControls {
             height: default_height(),
             skip: default_skip(),
             full_videos: false,
+            drag_to_mini: on(),
             remember: false,
             loop_off: false,
             auto_advance: false,
@@ -104,6 +108,8 @@ pub struct SiteVideo {
     pub skip: Option<u32>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub full_videos: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub drag_to_mini: Option<bool>,
     /// The speed and sound last chosen, applied to the next video.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub remember: Option<bool>,
@@ -121,6 +127,7 @@ impl SiteVideo {
             && self.height.is_none()
             && self.skip.is_none()
             && self.full_videos.is_none()
+            && self.drag_to_mini.is_none()
             && self.remember.is_none()
             && self.loop_off.is_none()
             && self.auto_advance.is_none()
@@ -170,6 +177,7 @@ mod tests {
                 "height": 16,
                 "skip": 10,
                 "fullVideos": false,
+                "dragToMini": true,
                 "remember": false,
                 "loopOff": false,
                 "autoAdvance": false
@@ -189,7 +197,7 @@ mod tests {
         );
         let script = VideoControls::default().page_script(&sites);
         assert!(script.ends_with(
-            r#"({"panel":true,"height":16,"skip":10,"fullVideos":false,"remember":false,"loopOff":false,"autoAdvance":false,"sites":{"youtube.com":{"panel":false}}});"#
+            r#"({"panel":true,"height":16,"skip":10,"fullVideos":false,"dragToMini":true,"remember":false,"loopOff":false,"autoAdvance":false,"sites":{"youtube.com":{"panel":false}}});"#
         ));
     }
 
@@ -239,6 +247,7 @@ mod tests {
             height: Some(20),
             skip: Some(15),
             full_videos: Some(false),
+            drag_to_mini: Some(false),
             remember: Some(true),
             loop_off: Some(true),
             auto_advance: Some(false),
@@ -250,6 +259,7 @@ mod tests {
                 "height": 20,
                 "skip": 15,
                 "fullVideos": false,
+                "dragToMini": false,
                 "remember": true,
                 "loopOff": true,
                 "autoAdvance": false

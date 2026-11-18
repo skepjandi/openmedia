@@ -323,6 +323,9 @@ export const zhHans: Messages = {
   "settings.videoFull": "完整视频也适用",
   "settings.videoFullNote":
     "在观看页面也使用这些控制，取代网站自己的控制。关闭后保留网站自己的播放器，功能更多，例如字幕和画质。",
+  "settings.videoDragMini": "向下拖动视频以缩小",
+  "settings.videoDragMiniNote":
+    "在只有一个视频的页面上，从页面顶部向下拖动视频，即可在角落的小播放器中继续播放。",
   "settings.videoHeight": "控制高度",
   "settings.videoHeightNote": "控制离底边有多高。收藏可以设置自己的高度。",
   "settings.videoHeightLabel": "视频控制高度",
