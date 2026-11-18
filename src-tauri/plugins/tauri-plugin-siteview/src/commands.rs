@@ -2,7 +2,7 @@ use tauri::{AppHandle, Runtime, command};
 
 use crate::models::*;
 use crate::validate::{
-    parse_profile_id, parse_session_id, parse_web_url, validate_notification_text,
+    parse_profile_id, parse_session_id, parse_web_url, validate_layout, validate_notification_text,
     validate_rule_lists,
 };
 use crate::{Result, SiteviewExt};
@@ -31,6 +31,15 @@ pub(crate) async fn close<R: Runtime>(app: AppHandle<R>, request: SessionRequest
 #[command]
 pub(crate) async fn set_rect<R: Runtime>(app: AppHandle<R>, request: SetRectRequest) -> Result<()> {
     app.siteview().set_rect(request)
+}
+
+#[command]
+pub(crate) async fn set_layout<R: Runtime>(
+    app: AppHandle<R>,
+    request: SetLayoutRequest,
+) -> Result<()> {
+    validate_layout(&request.panes)?;
+    app.siteview().set_layout(request)
 }
 
 #[command]

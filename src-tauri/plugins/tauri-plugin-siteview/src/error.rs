@@ -30,6 +30,11 @@ pub enum Error {
     InvalidShareTitle(usize),
     #[error("not a site to clear: use a domain such as example.com")]
     InvalidSite,
+    #[error("the layout holds too many windows, or a window twice, or one that cannot be placed")]
+    InvalidLayout,
+    #[cfg(mobile)]
+    #[error("windows are only available on desktop")]
+    DesktopOnly,
     #[cfg(mobile)]
     #[error(transparent)]
     PluginInvoke(#[from] tauri::plugin::mobile::PluginInvokeError),

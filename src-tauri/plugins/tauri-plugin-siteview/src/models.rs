@@ -72,6 +72,22 @@ pub struct SetRectRequest {
     pub rect: Rect,
 }
 
+/// One window of a layout: the session whose page it shows, and where, in the shell's CSS pixels
+/// (the coordinates `Rect` has everywhere else).
+#[derive(Debug, Clone, Deserialize)]
+pub struct Pane {
+    pub session: String,
+    pub rect: Rect,
+}
+
+/// Divides the page area into windows, each showing one open session at its own rectangle. An
+/// empty list is no layout: the session in front then fills the page area, as it always did.
+/// Desktop only; the shell sends it whenever the windows or the page area change.
+#[derive(Debug, Clone, Deserialize)]
+pub struct SetLayoutRequest {
+    pub panes: Vec<Pane>,
+}
+
 /// Rectangles, in shell CSS pixels, where touches belong to the shell. Everywhere else a touch
 /// goes to the site view underneath.
 #[derive(Debug, Clone, Deserialize)]

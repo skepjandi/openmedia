@@ -9,6 +9,8 @@ import { setVideoPanel } from "../settings/videoPanel";
 import { VIDEO_CONTROLS_DEFAULT } from "../../shared/videoControls";
 import { usePalette } from "./paletteStore";
 import { useKeybindings } from "./store";
+import { RESIZE_STEP } from "../tiling/layout";
+import { useWorkspaceDialog } from "../tiling/workspaceDialog";
 
 type Runner = (count: number) => void | Promise<void>;
 
@@ -157,6 +159,27 @@ const RUNNERS: Readonly<Record<string, Runner>> = {
   "view.close": () => {
     runBackHandler();
   },
+
+  "tile.addRight": () => usePalette.getState().pickPage("right"),
+  "tile.addLeft": () => usePalette.getState().pickPage("left"),
+  "tile.addBelow": () => usePalette.getState().pickPage("bottom"),
+  "tile.addAbove": () => usePalette.getState().pickPage("top"),
+  "tile.focusLeft": () => app().focusWindow("left"),
+  "tile.focusRight": () => app().focusWindow("right"),
+  "tile.focusUp": () => app().focusWindow("up"),
+  "tile.focusDown": () => app().focusWindow("down"),
+  "tile.focusNext": (count) => repeat(count, () => app().focusNextWindow(1)),
+  "tile.focusPrev": (count) => repeat(count, () => app().focusNextWindow(-1)),
+  "tile.moveLeft": () => app().swapWindow("left"),
+  "tile.moveRight": () => app().swapWindow("right"),
+  "tile.moveUp": () => app().swapWindow("up"),
+  "tile.moveDown": () => app().swapWindow("down"),
+  "tile.grow": (count) => repeat(count, () => app().resizeWindow(RESIZE_STEP)),
+  "tile.shrink": (count) => repeat(count, () => app().resizeWindow(-RESIZE_STEP)),
+  "tile.equalize": () => app().equalizeWindows(),
+  "tile.close": () => app().closeWindow(),
+  "tile.only": () => app().keepOnlyWindow(),
+  "tile.saveWorkspace": () => useWorkspaceDialog.getState().setOpen(true),
 
   "tool.colorPick": () => (app().state?.colorPicker ? app().startColorPick() : undefined),
   "tool.techDetect": () => (app().state?.techDetector ? app().startTechDetect() : undefined),

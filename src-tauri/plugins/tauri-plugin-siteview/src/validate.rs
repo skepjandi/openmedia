@@ -3,9 +3,11 @@ use std::path::Path;
 use url::Url;
 use uuid::Uuid;
 
-use crate::{ContentRuleList, Error, Result};
+use crate::{ContentRuleList, Error, Pane, Result};
 
 pub const MAX_BRIDGE_MESSAGE_BYTES: usize = 64 * 1024;
+/// The most windows one layout may hold; the shell's layout and the saved ones keep to the same.
+pub const MAX_PANES: usize = 8;
 pub const MAX_RULE_LISTS: usize = 8;
 pub const MAX_EVALUATE_SCRIPT_BYTES: usize = 128 * 1024;
 pub const MAX_EVALUATE_RESULT_BYTES: usize = 200_000;
@@ -146,9 +148,33 @@ pub fn validate_rule_lists(lists: &[ContentRuleList]) -> Result<()> {
     Ok(())
 }
 
+/// A layout comes from the shell, and each window's session is a key into the open sessions, so
+/// the shape is checked: a bounded number of windows, each of a known session, none twice, each
+/// with a finite rectangle.
+pub fn validate_layout(panes: &[Pane]) -> Result<()> {
+    if panes.len() > MAX_PANES {
+        return Err(Error::InvalidLayout);
+    }
+    for (index, pane) in panes.iter().enumerate() {
+        parse_session_id(&pane.session)?;
+        let rect = pane.rect;
+        let finite = [rect.x, rect.y, rect.width, rect.height]
+            .iter()
+            .all(|value| value.is_finite());
+        let repeated = panes[..index]
+            .iter()
+            .any(|earlier| earlier.session == pane.session);
+        if !finite || repeated {
+            return Err(Error::InvalidLayout);
+        }
+    }
+    Ok(())
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::Rect;
 
     #[test]
     fn notification_text_is_short_and_plain() {
@@ -159,6 +185,44 @@ mod tests {
         assert!(validate_notification_text("Messenger", &"a".repeat(121)).is_err());
         assert!(validate_notification_text("Mess\nenger", "New activity").is_err());
         assert!(validate_notification_text("ماسنجر", "نشاط جديد").is_ok());
+    }
+
+    fn pane(session: &str, width: f64) -> Pane {
+        Pane {
+            session: session.to_owned(),
+            rect: Rect {
+                x: 0.0,
+                y: 0.0,
+                width,
+                height: 100.0,
+            },
+        }
+    }
+
+    #[test]
+    fn a_layout_holds_a_few_windows_of_known_sessions() {
+        let a = "6f1e2d3c-1111-4222-8333-444455556666";
+        let b = "6f1e2d3c-1111-4222-8333-444455556667";
+        assert!(validate_layout(&[]).is_ok());
+        assert!(validate_layout(&[pane(a, 100.0), pane(b, 200.0)]).is_ok());
+    }
+
+    #[test]
+    fn a_layout_refuses_a_bad_session_a_repeat_or_a_rectangle_that_is_not_a_number() {
+        let a = "6f1e2d3c-1111-4222-8333-444455556666";
+        assert!(validate_layout(&[pane("not-a-session", 100.0)]).is_err());
+        assert!(validate_layout(&[pane(a, 100.0), pane(a, 100.0)]).is_err());
+        assert!(validate_layout(&[pane(a, f64::NAN)]).is_err());
+        assert!(validate_layout(&[pane(a, f64::INFINITY)]).is_err());
+    }
+
+    #[test]
+    fn a_layout_has_a_limit_on_windows() {
+        let many: Vec<Pane> = (0..=MAX_PANES)
+            .map(|n| pane(&format!("6f1e2d3c-1111-4222-8333-44445555666{n}"), 10.0))
+            .collect();
+        assert!(validate_layout(&many).is_err());
+        assert!(validate_layout(&many[..MAX_PANES]).is_ok());
     }
 
     #[test]

@@ -44,7 +44,7 @@ use uuid::Uuid;
 
 use platform::{PageSnapshot, Track};
 
-use crate::events::{NOTIFICATION_TAP_EVENT, POPUP_BLOCKED_EVENT, STATE_EVENT};
+use crate::events::{FOCUS_EVENT, NOTIFICATION_TAP_EVENT, POPUP_BLOCKED_EVENT, STATE_EVENT};
 use crate::models::*;
 use crate::site::site_of_host;
 use crate::validate::{
@@ -119,6 +119,8 @@ struct State<R: Runtime> {
     window_hidden: bool,
     /// True while the shell covers the page in front with a page of its own (a new tab).
     covered: bool,
+    /// The windows the page area is divided into; empty while one page fills it.
+    panes: Vec<Pane>,
 }
 
 /// What a page's media needs when its visibility changes.
@@ -166,12 +168,34 @@ struct NewView<'a> {
     bounds: Rect,
 }
 
+/// What `sync_views` does with one session: where its window is (none when no layout gives it
+/// one) and whether it shows.
+struct ViewPlan<R: Runtime> {
+    session: String,
+    webview: Webview<R>,
+    window: Option<Rect>,
+    shown: bool,
+}
+
+/// A rectangle in the shell's coordinates, placed in the window whose page area starts at
+/// `frame`.
+fn within(frame: Rect, rect: Rect) -> Rect {
+    Rect {
+        x: frame.x + rect.x,
+        y: frame.y + rect.y,
+        ..rect
+    }
+}
+
 struct Inner<R: Runtime> {
     app: AppHandle<R>,
     state: Mutex<State<R>>,
     labels: AtomicU64,
     /// The label of the web view that was last given the keyboard.
     focused: Mutex<Option<String>>,
+    /// Counts the times the keyboard was given to a window on purpose (by the shell, or by a
+    /// sync). A click read from the system is only believed if none happened since it was read.
+    keyboard_given: AtomicU64,
     /// Drop windows a page opens that are no sign-in; set by every `open`.
     block_popups: Arc<AtomicBool>,
 }
@@ -199,9 +223,11 @@ pub fn init<R: Runtime, C: DeserializeOwned>(
             native_suspended: HashSet::new(),
             window_hidden: false,
             covered: false,
+            panes: Vec::new(),
         }),
         labels: AtomicU64::new(0),
         focused: Mutex::new(None),
+        keyboard_given: AtomicU64::new(0),
         block_popups: Arc::new(AtomicBool::new(true)),
     });
     spawn_poller(Arc::downgrade(&inner))?;
@@ -377,14 +403,9 @@ impl<R: Runtime> Inner<R> {
     /// shell while the shell has not reported one.
     fn page_bounds(&self, rect: Option<Rect>) -> Result<Rect> {
         let frame = self.shell_frame()?;
-        Ok(match rect.and_then(layout::usable) {
-            Some(rect) => Rect {
-                x: frame.x + rect.x,
-                y: frame.y + rect.y,
-                ..rect
-            },
-            None => frame,
-        })
+        Ok(rect
+            .and_then(layout::usable)
+            .map_or(frame, |rect| within(frame, rect)))
     }
 
     fn next_label(&self, session: &str) -> String {
@@ -503,20 +524,37 @@ impl<R: Runtime> Inner<R> {
         Ok(webview)
     }
 
-    /// Puts every view where it belongs: the active one visible unless the shell covers it or the
-    /// session is closed for the day, the rest hidden.
+    /// Whether a session is among the windows showing: with a layout, those in it; without one,
+    /// the session in front.
+    fn in_front(panes: &[Pane], active: Option<&str>, id: &str) -> bool {
+        if panes.is_empty() {
+            active == Some(id)
+        } else {
+            panes.iter().any(|pane| pane.session == id)
+        }
+    }
+
+    /// Puts every view where it belongs: the windows of the layout (or the active session when
+    /// there is none) visible, each at its own rectangle, unless the shell covers them or the
+    /// session is closed for the day; the rest hidden.
     fn sync_views(&self) {
-        let (rect, regions, overlay, covered, views, media) = {
+        let (rect, regions, overlay, covered, views, media, active) = {
             let mut state = self.state();
             let rect = state.rect.and_then(layout::usable);
             let overlay = rect.is_some_and(|rect| layout::overlay_open(&rect, &state.regions));
-            let views: Vec<(Webview<R>, bool)> = state
+            let views: Vec<ViewPlan<R>> = state
                 .sessions
                 .iter()
-                .map(|(id, session)| {
-                    let shown =
-                        state.active.as_deref() == Some(id.as_str()) && !state.blocked.contains(id);
-                    (session.webview.clone(), shown)
+                .map(|(id, session)| ViewPlan {
+                    session: id.clone(),
+                    webview: session.webview.clone(),
+                    window: state
+                        .panes
+                        .iter()
+                        .find(|pane| pane.session == *id)
+                        .map(|pane| pane.rect),
+                    shown: Self::in_front(&state.panes, state.active.as_deref(), id)
+                        && !state.blocked.contains(id),
                 })
                 .collect();
             let media = Self::media_steps(&mut state);
@@ -527,35 +565,35 @@ impl<R: Runtime> Inner<R> {
                 state.covered,
                 views,
                 media,
+                state.active.clone(),
             )
         };
         self.apply_media(media);
         // Without click-through the page would hide whatever the shell draws over it: it steps
         // aside for an overlay or a page of the shell's own, and keeps clear of the small controls.
         let shell_in_front = !platform::CLICK_THROUGH && (overlay || covered);
-        let fitted = rect.map(|rect| {
-            if platform::CLICK_THROUGH {
-                rect
-            } else {
-                layout::fit_page(&rect, &regions)
-            }
-        });
         // Asked of the main thread, so never while the state lock is held.
-        let bounds = fitted.and_then(|rect| self.page_bounds(Some(rect)).ok());
+        let frame = rect.and_then(|_| self.shell_frame().ok());
         let shell = self.app.get_webview(MAIN_WINDOW);
         let mut front = None;
-        for (webview, shown) in &views {
-            if let (Some(rect), Some(shell)) = (bounds, &shell) {
-                let _ = platform::place(shell, webview, rect);
+        for view in &views {
+            let target = view.window.and_then(layout::usable).or(rect);
+            if let (Some(target), Some(frame), Some(shell)) = (target, frame, &shell) {
+                let fitted = if platform::CLICK_THROUGH {
+                    target
+                } else {
+                    layout::fit_page(&target, &regions)
+                };
+                let _ = platform::place(shell, &view.webview, within(frame, fitted));
             }
-            let shown = *shown && !shell_in_front;
+            let shown = view.shown && !shell_in_front;
             let _ = if shown {
-                webview.show()
+                view.webview.show()
             } else {
-                webview.hide()
+                view.webview.hide()
             };
-            if shown {
-                front = Some(webview.label().to_owned());
+            if shown && active.as_deref() == Some(view.session.as_str()) {
+                front = Some(view.webview.label().to_owned());
             }
         }
         let focus = match front {
@@ -599,7 +637,7 @@ impl<R: Runtime> Inner<R> {
     fn media_steps(state: &mut State<R>) -> Vec<(String, Webview<R>, MediaStep)> {
         let mut steps = Vec::new();
         for (id, session) in &state.sessions {
-            let shown = state.active.as_deref() == Some(id.as_str())
+            let shown = Self::in_front(&state.panes, state.active.as_deref(), id)
                 && !state.window_hidden
                 && !state.covered;
             let blocked = state.blocked.contains(id);
@@ -637,6 +675,7 @@ impl<R: Runtime> Inner<R> {
     /// Gives the keyboard to `label` whether or not it was last given it: a click in the page
     /// takes the keyboard without telling us.
     fn give_keyboard(&self, label: &str) {
+        self.keyboard_given.fetch_add(1, Ordering::SeqCst);
         let mut focused = self.focused.lock().unwrap_or_else(PoisonError::into_inner);
         if let Some(webview) = self.app.get_webview(label) {
             let _ = webview.set_focus();
@@ -731,8 +770,74 @@ impl<R: Runtime> Inner<R> {
         self.apply_media(media);
     }
 
+    /// Rebuilds the windows showing whose page was built under an older script; a page out of
+    /// sight waits for the moment it is shown, but a window on screen cannot.
+    fn rebuild_stale_windows(&self) -> Result<()> {
+        let stale: Vec<String> = {
+            let state = self.state();
+            state
+                .panes
+                .iter()
+                .filter(|pane| {
+                    state
+                        .sessions
+                        .get(&pane.session)
+                        .is_some_and(|session| session.stale)
+                })
+                .map(|pane| pane.session.clone())
+                .collect()
+        };
+        stale.iter().try_for_each(|session| self.rebuild(session))
+    }
+
+    /// With several windows showing, the one the person clicked in holds the keyboard, so it is
+    /// the one in front: keys, Back and Reload then act on it. A system whose web view cannot say
+    /// where the keyboard is leaves the choice to the shell (a click on a window's title).
+    fn follow_keyboard(&self) {
+        let given = self.keyboard_given.load(Ordering::SeqCst);
+        let candidates: Vec<(String, Webview<R>)> = {
+            let state = self.state();
+            if state.panes.len() < 2 || state.window_hidden || state.covered {
+                return;
+            }
+            state
+                .panes
+                .iter()
+                .filter(|pane| !state.blocked.contains(&pane.session))
+                .filter_map(|pane| {
+                    state
+                        .sessions
+                        .get(&pane.session)
+                        .map(|session| (pane.session.clone(), session.webview.clone()))
+                })
+                .collect()
+        };
+        let Some((id, webview)) = candidates
+            .into_iter()
+            .find(|(_, webview)| platform::has_keyboard(webview))
+        else {
+            return;
+        };
+        let changed = {
+            let mut state = self.state();
+            // The shell may have chosen a window while the system was being asked.
+            let changed = self.keyboard_given.load(Ordering::SeqCst) == given
+                && state.active.as_deref() != Some(id.as_str());
+            if changed {
+                state.active = Some(id.clone());
+            }
+            changed
+        };
+        if changed {
+            *self.focused.lock().unwrap_or_else(PoisonError::into_inner) =
+                Some(webview.label().to_owned());
+            let _ = self.app.emit(FOCUS_EVENT, id);
+        }
+    }
+
     fn poll(&self) {
         self.follow_window();
+        self.follow_keyboard();
         let targets: Vec<(String, Webview<R>, Arc<Track>)> = self
             .state()
             .sessions
@@ -876,6 +981,7 @@ impl<R: Runtime> Siteview<R> {
                 .ok_or(Error::UnknownSession)?
                 .stale;
             state.active = Some(request.session.clone());
+            inner.keyboard_given.fetch_add(1, Ordering::SeqCst);
             stale
         };
         if stale {
@@ -916,6 +1022,16 @@ impl<R: Runtime> Siteview<R> {
 
     pub fn set_covered(&self, request: SetCoveredRequest) -> Result<()> {
         self.inner.state().covered = request.covered;
+        self.inner.sync_views();
+        Ok(())
+    }
+
+    /// Divides the page area into windows. Each window's session is shown at its rectangle and
+    /// every other session is hidden; an empty list puts the session in front back over the
+    /// whole area.
+    pub fn set_layout(&self, request: SetLayoutRequest) -> Result<()> {
+        self.inner.state().panes = request.panes;
+        self.inner.rebuild_stale_windows()?;
         self.inner.sync_views();
         Ok(())
     }
@@ -1010,10 +1126,11 @@ impl<R: Runtime> Siteview<R> {
                 session.stale = true;
             }
         }
-        match active {
+        let rebuilt = match active {
             Some(session) if rebuild_active => self.inner.rebuild(&session),
             _ => Ok(()),
-        }
+        };
+        rebuilt.and(self.inner.rebuild_stale_windows())
     }
 
     /// Replaces the rule lists on every open view and reloads the visible one.

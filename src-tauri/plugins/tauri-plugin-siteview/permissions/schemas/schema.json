@@ -475,6 +475,18 @@
           "markdownDescription": "Denies the set_interactive_regions command without any pre-configured scope."
         },
         {
+          "description": "Enables the set_layout command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-set-layout",
+          "markdownDescription": "Enables the set_layout command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the set_layout command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-set-layout",
+          "markdownDescription": "Denies the set_layout command without any pre-configured scope."
+        },
+        {
           "description": "Enables the set_rect command without any pre-configured scope.",
           "type": "string",
           "const": "allow-set-rect",
@@ -499,10 +511,10 @@
           "markdownDescription": "Denies the set_visible command without any pre-configured scope."
         },
         {
-          "description": "Shell-only control of the native site view. `open` is deliberately absent: the app's own `open_site` command opens pages so it can attach the recipe script. `fetch-favicon` is also absent: only Rust calls it, so the shell cannot make arbitrary native fetches. Never grant to a site webview.\n#### This default permission set includes:\n\n- `allow-activate`\n- `allow-close`\n- `allow-set-rect`\n- `allow-set-interactive-regions`\n- `allow-set-covered`\n- `allow-navigate`\n- `allow-go-back`\n- `allow-go-forward`\n- `allow-reload`\n- `allow-set-color-scheme`\n- `allow-notify`",
+          "description": "Shell-only control of the native site view. `open` is deliberately absent: the app's own `open_site` command opens pages so it can attach the recipe script. `fetch-favicon` is also absent: only Rust calls it, so the shell cannot make arbitrary native fetches. Never grant to a site webview.\n#### This default permission set includes:\n\n- `allow-activate`\n- `allow-close`\n- `allow-set-rect`\n- `allow-set-layout`\n- `allow-set-interactive-regions`\n- `allow-set-covered`\n- `allow-navigate`\n- `allow-go-back`\n- `allow-go-forward`\n- `allow-reload`\n- `allow-set-color-scheme`\n- `allow-notify`",
           "type": "string",
           "const": "default",
-          "markdownDescription": "Shell-only control of the native site view. `open` is deliberately absent: the app's own `open_site` command opens pages so it can attach the recipe script. `fetch-favicon` is also absent: only Rust calls it, so the shell cannot make arbitrary native fetches. Never grant to a site webview.\n#### This default permission set includes:\n\n- `allow-activate`\n- `allow-close`\n- `allow-set-rect`\n- `allow-set-interactive-regions`\n- `allow-set-covered`\n- `allow-navigate`\n- `allow-go-back`\n- `allow-go-forward`\n- `allow-reload`\n- `allow-set-color-scheme`\n- `allow-notify`"
+          "markdownDescription": "Shell-only control of the native site view. `open` is deliberately absent: the app's own `open_site` command opens pages so it can attach the recipe script. `fetch-favicon` is also absent: only Rust calls it, so the shell cannot make arbitrary native fetches. Never grant to a site webview.\n#### This default permission set includes:\n\n- `allow-activate`\n- `allow-close`\n- `allow-set-rect`\n- `allow-set-layout`\n- `allow-set-interactive-regions`\n- `allow-set-covered`\n- `allow-navigate`\n- `allow-go-back`\n- `allow-go-forward`\n- `allow-reload`\n- `allow-set-color-scheme`\n- `allow-notify`"
         }
       ]
     }

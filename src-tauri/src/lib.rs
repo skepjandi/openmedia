@@ -32,6 +32,7 @@ mod usage_commands;
 mod usage_lock;
 mod vault;
 mod video_controls;
+mod workspaces;
 
 use tauri::{Emitter, Manager};
 
@@ -138,6 +139,7 @@ pub fn run() {
             commands::get_state,
             commands::set_favorites,
             commands::set_folders,
+            commands::set_workspaces,
             commands::set_site_favorite,
             commands::set_last_url,
             commands::add_history,

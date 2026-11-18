@@ -1,7 +1,11 @@
+import { useRef, type PointerEvent } from "react";
 import { useT } from "../../i18n/useT";
 import { FolderIcon, ProIcon } from "../../shared/icons";
 import type { Favorite } from "../../shared/ipc";
 import { useBackHandler } from "../back/useBackHandler";
+
+/** How far a press on a favorite moves before it is a drag out of the popup rather than a tap. */
+const CARRY_SLOP = 12;
 
 /** One favorite in a folder, with what the dial knows about it. */
 export interface FolderMember {
@@ -26,6 +30,7 @@ export function FolderPopup({
   members,
   onPick,
   onClose,
+  onCarry,
 }: {
   name: string;
   /** The emoji the user gave the folder, if any. */
@@ -33,7 +38,10 @@ export function FolderPopup({
   members: FolderMember[];
   onPick: (member: FolderMember) => void;
   onClose: () => void;
+  /** A favorite was dragged out of the popup (desktop): it goes with the pointer. */
+  onCarry?: (member: FolderMember, event: PointerEvent<HTMLButtonElement>) => void;
 }) {
+  const press = useRef<{ x: number; y: number } | null>(null);
   const t = useT();
   useBackHandler(true, onClose);
 
@@ -66,6 +74,17 @@ export function FolderPopup({
                   ? t("paywall.title")
                   : t("fab.openFavorite", { name: member.favorite.name })
               }
+              onPointerDown={(event) => {
+                press.current = { x: event.clientX, y: event.clientY };
+              }}
+              onPointerMove={(event) => {
+                const from = press.current;
+                if (!onCarry || !from || member.locked) return;
+                if (Math.hypot(event.clientX - from.x, event.clientY - from.y) <= CARRY_SLOP)
+                  return;
+                press.current = null;
+                onCarry(member, event);
+              }}
               onClick={() => onPick(member)}
               className="flex min-w-0 flex-col items-center gap-1.5 rounded-2xl px-1 py-2 active:bg-paper/[0.08]"
             >

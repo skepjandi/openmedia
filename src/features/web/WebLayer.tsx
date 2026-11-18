@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-import { library, siteView, type SiteViewState } from "../../shared/ipc";
-import { appError, selectPage, useApp } from "../../app/store";
+import { library, siteView, type Rect, type SiteViewState } from "../../shared/ipc";
+import { appError, selectPage, useApp, type SessionAction } from "../../app/store";
 import { pageShowing } from "../../app/splash";
 import { useT } from "../../i18n/useT";
 import { Spinner } from "../../shared/Spinner";
@@ -14,6 +14,8 @@ import { leftSearchForSite } from "../history/searchVisit";
 import { HubBar } from "../hubs/HubBar";
 import { PauseCover } from "../stats/PauseCover";
 import { LimitCover } from "../stats/UsageGuard";
+import { contains } from "../tiling/layout";
+import { TileLayer } from "../tiling/TileLayer";
 
 /** How often idle and surplus hidden sessions are swept. */
 const SWEEP_MS = 60_000;
@@ -21,6 +23,42 @@ const SWEEP_MS = 60_000;
 /** The least time between two warnings that a pop-up was dropped. */
 const POPUP_WARNING_GAP_MS = 30_000;
 
+/**
+ * Does what a session action asks of the native side. A saved layout opens its pages one by one
+ * and then puts the right one in front; the pages that did not open are forgotten again, the ones
+ * that did stay.
+ */
+async function perform(
+  action: SessionAction,
+  rect: Rect,
+  forget: (id: string) => void,
+): Promise<void> {
+  switch (action.type) {
+    case "activate":
+      return siteView.activate(action.id);
+    case "adopt":
+      return library.adoptBootSession(action.id, action.url, rect).catch((error: unknown) => {
+        forget(action.id);
+        throw error;
+      });
+    case "open":
+      return library.openSite(action.id, action.url, rect).catch((error: unknown) => {
+        forget(action.id);
+        throw error;
+      });
+    case "openAll": {
+      for (const [index, { id, url }] of action.opens.entries()) {
+        try {
+          await library.openSite(id, url, rect);
+        } catch (error) {
+          action.opens.slice(index).forEach((left) => forget(left.id));
+          throw error;
+        }
+      }
+      return siteView.activate(action.focus);
+    }
+  }
+}
 /**
  * The page itself. This component only reserves the rectangle the native site view fills and
  * mirrors page state into the store; the web content is drawn by native code underneath. Each
@@ -59,17 +97,16 @@ export function WebLayer() {
   useEffect(() => {
     const element = slot.current;
     if (!listening || !profileId || !action || !element) return;
-    const run =
-      action.type === "activate"
-        ? siteView.activate(action.id)
-        : action.type === "adopt"
-          ? library.adoptBootSession(action.id, action.url, readRect(element))
-          : library.openSite(action.id, action.url, readRect(element));
-    run.catch((error: unknown) => {
-      if (action.type !== "activate") sessionOpenFailed(action.id);
-      reportError(appError(error));
-    });
+    perform(action, readRect(element), sessionOpenFailed).catch((error: unknown) =>
+      reportError(appError(error)),
+    );
   }, [listening, profileId, action, sessionOpenFailed, reportError]);
+
+  // The person clicked in another window of the layout: it is the one in front now.
+  useEffect(() => {
+    const unlisten = siteView.onFocus(openSession);
+    return () => void unlisten.then((stop) => stop());
+  }, [openSession]);
 
   useEffect(() => {
     let lastPopupWarning = 0;
@@ -79,11 +116,12 @@ export function WebLayer() {
     /** The pages behind each session's page, seeded from the pages saved before a restart. */
     const trails = new Map<string, readonly string[]>();
     const raiseNotification = (page: SiteViewState) => {
-      const { activeId, sessions, state } = useApp.getState();
+      const { activeId, layout, sessions, state } = useApp.getState();
+      const onScreen = layout ? contains(layout, page.session) : activeId === page.session;
       const observation = observeTitle(
         watches.get(page.session),
         page.title,
-        activeId !== page.session,
+        !onScreen,
         Date.now(),
       );
       watches.set(page.session, observation.watch);
@@ -173,6 +211,7 @@ export function WebLayer() {
               <Spinner size={28} label={<span className="sr-only">{t("web.loading")}</span>} />
             </div>
           )}
+          <TileLayer slot={slot} />
           <LimitCover />
           <PauseCover />
         </div>

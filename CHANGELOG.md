@@ -16,6 +16,16 @@ All notable changes to OpenMedia are documented here.
 
 **Verified:** Vitest (`videoControls.test.ts`, 94 cases, 9 new or rewritten: remembered speed gating, in-page speed carry, the speed list, skip length per site, double-tap skip, keys only while shown, throttled and exact seek, live window, small-player refit), Rust tests for `skip` (default, snapping, per site, page config). The panel was looked at in a WebKit tab on a local page with a 90 s file at 400×800 and 1000×600: layout, the speed list, the double-tap total, the seek bubble while dragging, and Space and M from the keyboard. **Not verified:** a device, a real feed or watch page, a live stream (unit-tested only); the headless WebKit there did not complete seeks on that file, so the skips were seen only in the tests. New translations of the four Skip by strings are machine-made. The panel's buttons still have no accessible names: the page script has no way to get the app's strings.
 
+### feat(desktop): window manager, tile pages side by side
+
+**Area:** `feat(desktop)`
+
+**Change:** Drag a favorite (or an open page) from the floating button onto the page: the window under the pointer shows which side the new page takes (left, right, above, below, or in place), and the drop opens it there. On an empty tab the drop opens the page alone. Windows have a title strip (focus, drag to move, close) and resizable handles. Keys: *Windows* actions for adding (`Mod+\`, `Mod+Shift+\`, and with Alt for left and above), focusing, moving, resizing, closing; Vim `Ctrl+w` and Emacs `C-x` sets. The command palette adds windows too: the add actions open a second list of favorites, open pages and a typed address. *Save the windows as a favorite* keeps a layout, which the floating button lists and Settings can rename or delete; opening it brings back its pages side by side. Plugin: `set_layout` (desktop only), `siteview:focus`, macOS first-responder detection; app: `set_workspaces`. Layout logic is `src/features/tiling/layout.ts`; wiki: platform-support.md#windows-desktop-window-manager, security.md.
+
+**Verified:** the shell flows run in a browser against a mocked Tauri IPC (throwaway page, not kept): holding the floating button and sliding a favorite out of the dial, the highlight for the right half and for an empty page, the drop, the `set_layout` rectangles sent for two and three windows, resizing by the handle and evening out by double-click, `Mod+\`, the page picker, the focus key, saving a layout and reopening it from the dial with live pages reused, dragging a window by its title strip below another, and an empty-tab drop. Rust: `validate_layout` and `workspaces` tests; `cargo clippy` and `cargo test` pass on macOS.
+
+**Not verified:** in the running desktop app: native placement of the page views, the macOS first-responder detection (`has_keyboard`), and drag over the native views were never run; Windows and Linux were not compiled, and there a click inside a page does not bring its window to the front. `ts:check`, lint, format and `vitest` pass.
+
 ### fix(desktop): page scan, color picker and technology detector work on desktop
 
 **Area:** `fix(desktop)`

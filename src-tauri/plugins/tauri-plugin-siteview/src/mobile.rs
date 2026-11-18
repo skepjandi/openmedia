@@ -125,6 +125,11 @@ impl<R: Runtime> Siteview<R> {
         )
     }
 
+    /// Windows side by side are a desktop feature; the shell never asks for them on a phone.
+    pub fn set_layout(&self, _request: SetLayoutRequest) -> Result<()> {
+        Err(Error::DesktopOnly)
+    }
+
     pub fn navigate(&self, request: NavigateRequest) -> Result<()> {
         self.run("navigate", serde_json::json!({ "url": request.url }))
     }

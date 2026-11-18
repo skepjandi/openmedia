@@ -3,16 +3,25 @@ import { siteView, type Rect } from "../shared/ipc";
 
 const TOUCH_PADDING = 8;
 
+/** What `data-hit="tight"` asks for: the element's own box, with no padding round it. */
+const TIGHT = "tight";
+
 function measureRegions(): Rect[] {
-  return Array.from(document.querySelectorAll<HTMLElement>("[data-hit]"))
-    .map((element) => element.getBoundingClientRect())
-    .filter((box) => box.width > 0 && box.height > 0)
-    .map((box) => ({
-      x: box.x - TOUCH_PADDING,
-      y: box.y - TOUCH_PADDING,
-      width: box.width + 2 * TOUCH_PADDING,
-      height: box.height + 2 * TOUCH_PADDING,
-    }));
+  return Array.from(document.querySelectorAll<HTMLElement>("[data-hit]")).flatMap((element) => {
+    const box = element.getBoundingClientRect();
+    if (box.width <= 0 || box.height <= 0) return [];
+    // A window's title strip and the handle between windows sit against a page, which must keep
+    // every pixel of its own edge (its scroll bar included).
+    const padding = element.dataset.hit === TIGHT ? 0 : TOUCH_PADDING;
+    return [
+      {
+        x: box.x - padding,
+        y: box.y - padding,
+        width: box.width + 2 * padding,
+        height: box.height + 2 * padding,
+      },
+    ];
+  });
 }
 
 /**

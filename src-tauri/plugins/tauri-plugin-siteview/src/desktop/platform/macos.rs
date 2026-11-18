@@ -5,7 +5,11 @@
 use std::{path::Path, process::Command, ptr::NonNull, sync::mpsc, time::Duration};
 
 use block2::RcBlock;
-use objc2::{MainThreadMarker, MainThreadOnly, msg_send, rc::Retained, runtime::Bool};
+use objc2::{
+    MainThreadMarker, MainThreadOnly, class, msg_send,
+    rc::Retained,
+    runtime::{AnyObject, Bool},
+};
 use objc2_foundation::{NSArray, NSEdgeInsets, NSError, NSString};
 use objc2_local_authentication::{LAContext, LAPolicy};
 use objc2_web_kit::{
@@ -124,6 +128,33 @@ pub fn content_insets<R: Runtime>(webview: &Webview<R>) -> Result<(f64, f64, f64
         let insets: NSEdgeInsets = unsafe { msg_send![view, safeAreaInsets] };
         (insets.left, insets.top, insets.right, insets.bottom)
     })
+}
+
+/// Whether the page's web view is where the keyboard is: the window's first responder is the web
+/// view or something inside it. The shell's own web view is a sibling, so while it holds the
+/// keyboard (a sheet is open) no page does.
+pub fn has_keyboard<R: Runtime>(webview: &Webview<R>) -> bool {
+    with_view(webview, |view| {
+        // SAFETY: plain geometry and responder-chain reads on the main thread; every pointer is
+        // checked for null before it is used and none is kept.
+        unsafe {
+            let window: *mut AnyObject = msg_send![view, window];
+            if window.is_null() {
+                return false;
+            }
+            let responder: *mut AnyObject = msg_send![window, firstResponder];
+            if responder.is_null() {
+                return false;
+            }
+            if std::ptr::eq(responder, (view as *const WKWebView).cast::<AnyObject>()) {
+                return true;
+            }
+            let is_view: Bool = msg_send![responder, isKindOfClass: class!(NSView)];
+            let inside: Bool = msg_send![responder, isDescendantOf: view];
+            is_view.as_bool() && inside.as_bool()
+        }
+    })
+    .unwrap_or(false)
 }
 
 /// Prepares the shell's web view (see `shell.rs`); run it again after each page view is added.

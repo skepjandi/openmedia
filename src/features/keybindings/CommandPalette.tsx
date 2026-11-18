@@ -9,13 +9,20 @@ import { formatSequence } from "./chord";
 import { effectiveBindings } from "./keymap";
 import { usePalette } from "./paletteStore";
 import { runAction } from "./runActions";
+import { PagePicker } from "../tiling/PagePicker";
 import { useKeybindings } from "./store";
 
-/** Every action by name, searchable; the keys that run each are shown beside it. */
+/**
+ * Every action by name, searchable; the keys that run each are shown beside it. Adding a window
+ * continues in a second list of pages to put in it.
+ */
 export function CommandPalette() {
   const open = usePalette((s) => s.open);
+  const side = usePalette((s) => s.side);
+  const setOpen = usePalette((s) => s.setOpen);
   const desktop = useApp((s) => s.desktop);
-  return open && desktop ? <PaletteBody /> : null;
+  if (!open || !desktop) return null;
+  return side ? <PagePicker side={side} onClose={() => setOpen(false)} /> : <PaletteBody />;
 }
 
 function PaletteBody() {

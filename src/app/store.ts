@@ -45,6 +45,8 @@ import {
   type Favorite,
   type FavoriteInput,
   type Folder,
+  type Workspace,
+  type WorkspaceInput,
   type OptionValue,
   type SearchEngine,
   type SiteSettings,
@@ -52,6 +54,26 @@ import {
   type Theme,
 } from "../shared/ipc";
 import { hiddenTabIds, tabAfterClose } from "../features/tabs/tabs";
+import {
+  contains,
+  equalize,
+  fromTiles,
+  leaves,
+  neighborOf,
+  place,
+  resizePane,
+  setRatio,
+  swapPanes,
+  tileUrls,
+  toTiles,
+  withoutSessions,
+  asLayout,
+  type Drop,
+  type DropIntent,
+  type Heading,
+  type Layout,
+  type Path,
+} from "../features/tiling/layout";
 import { useEntitlementStore } from "../features/paywall/store";
 import { isProRequired } from "../features/paywall/ipc";
 import { detectLocale, resolveLocale, type Locale } from "../i18n/locales";
@@ -135,10 +157,25 @@ const showSheet = (current: SheetState, next: Sheet): SheetState => ({
 
 /** What the web layer must do natively next; `nonce` makes a repeat of the same action distinct. */
 export type SessionAction = { nonce: number } & (
-  | { type: "open"; id: string; url: string; previousId: string | null }
+  | {
+      type: "open";
+      id: string;
+      url: string;
+      previousId: string | null;
+      /** The windows before the page opened, which a failed open puts back. */
+      previousLayout: Layout | null;
+    }
   | { type: "adopt"; id: string; url: string; previousId: null }
   | { type: "activate"; id: string }
+  /** Several pages at once (a saved layout), then the one to put in front. */
+  | { type: "openAll"; opens: { id: string; url: string }[]; focus: string }
 );
+
+/** What a drop on the page carries: a favorite or an address to open, or a page that is already open. */
+export type DroppedPage =
+  | { kind: "favorite"; favorite: Pick<Favorite, "url" | "landing"> }
+  | { kind: "address"; url: string }
+  | { kind: "session"; id: string };
 
 /** The picker's progress: the layer waits for a tap, then the color it read is shown. */
 export type ColorPickState =
@@ -183,6 +220,13 @@ export interface AppStore {
   activeId: string | null;
   /** An empty page covers the open sessions until the user opens or picks one. */
   blankTab: boolean;
+  /**
+   * Desktop: the windows the page area is divided into. Null while one page fills it, so a layout
+   * always holds two or more. Every window is an open session and the one in front is among them.
+   */
+  layout: Layout | null;
+  /** Where the page being opened is to land; set only for the instant a drop opens it. */
+  tileIntent: DropIntent | null;
   action: SessionAction | null;
   /** Edge the floating button rests on; the back button takes the other one. */
   fabEdge: Edge;
@@ -242,6 +286,33 @@ export interface AppStore {
   resetSession: (id: string) => void;
   /** Ends every live session but the visible one. */
   closeOtherSessions: () => void;
+  /**
+   * A page dropped on a window: a favorite opens (or its live session comes) beside the target,
+   * or in its place for the middle; an open session moves there. A null target is a drop on an
+   * empty page, which starts over with that page alone.
+   */
+  dropPage: (page: DroppedPage, target: string | null, drop: Drop) => void;
+  /** Puts the window beside the one in front in front. */
+  focusWindow: (heading: Heading) => void;
+  /** Puts the next (or previous) window in front, wrapping round. */
+  focusNextWindow: (step: 1 | -1) => void;
+  /** Closes the window in front, and its session. */
+  closeWindow: () => void;
+  /** Leaves the window in front on the page alone; the other pages stay open as tabs. */
+  keepOnlyWindow: () => void;
+  /** The window in front trades places with its neighbour. */
+  swapWindow: (heading: Heading) => void;
+  /** Grows (or, negative, shrinks) the window in front. */
+  resizeWindow: (delta: number) => void;
+  /** A handle between two windows was dragged: the split takes this ratio. */
+  resizeSplit: (path: Path, ratio: number) => void;
+  equalizeWindows: () => void;
+  /** Opens a saved layout: a live page for each window where there is one, a new one where not. */
+  openWorkspace: (workspace: Workspace) => void;
+  /** Saves the windows as they are under a name; false when there is nothing to save. */
+  saveWorkspace: (name: string) => Promise<boolean>;
+  /** Replaces the saved layouts. True when they were saved. */
+  saveWorkspaces: (workspaces: WorkspaceInput[]) => Promise<boolean>;
   setSessionState: (state: SiteViewState) => void;
   /** A native `open` failed: forget the session and go back to the one that was showing. */
   sessionOpenFailed: (id: string) => void;
@@ -479,9 +550,21 @@ export const useApp = create<AppStore>((set, get) => {
       activeId: id,
       blankTab: false,
       sheet: "none",
+      // A page opened from an empty tab starts over; elsewhere it takes the window in front.
+      layout:
+        current.blankTab && current.tileIntent === null
+          ? null
+          : place(current.layout, previousId, id, current.tileIntent),
       action: adoptedId
         ? { nonce: ++nonce, type: "adopt", id, url, previousId: null }
-        : { nonce: ++nonce, type: "open", id, url, previousId },
+        : {
+            nonce: ++nonce,
+            type: "open",
+            id,
+            url,
+            previousId,
+            previousLayout: current.layout,
+          },
     }));
     get().trimSessions("routine");
   };
@@ -494,6 +577,7 @@ export const useApp = create<AppStore>((set, get) => {
       activeId: id,
       blankTab: false,
       sheet: "none",
+      layout: place(current.layout, previousId, id, current.tileIntent),
       action: { nonce: ++nonce, type: "activate", id },
     }));
     get().trimSessions("routine");
@@ -598,6 +682,8 @@ export const useApp = create<AppStore>((set, get) => {
     sessions: [],
     activeId: null,
     blankTab: false,
+    layout: null,
+    tileIntent: null,
     action: null,
     fabEdge: loadPosition().edge,
     sites: [],
@@ -750,13 +836,20 @@ export const useApp = create<AppStore>((set, get) => {
     },
 
     closeSession: (id) => {
-      const { sessions, activeId } = get();
+      const { sessions, activeId, layout } = get();
       if (!sessions.some((session) => session.id === id)) return;
-      const next = id === activeId ? tabAfterClose(sessions, id) : activeId;
+      const tiled = layout !== null && contains(layout, id);
+      const remaining = withoutSessions(layout, activeId, [id]);
+      const next = tiled
+        ? remaining.activeId
+        : id === activeId
+          ? tabAfterClose(sessions, id)
+          : activeId;
       void siteView.close(id).catch(() => {});
       set((current) => ({
         sessions: current.sessions.filter((session) => session.id !== id),
         activeId: next,
+        layout: remaining.layout,
         action:
           next !== null && next !== activeId
             ? { nonce: ++nonce, type: "activate", id: next }
@@ -767,7 +860,12 @@ export const useApp = create<AppStore>((set, get) => {
     resetSession: (id) => {
       const session = get().sessions.find((entry) => entry.id === id);
       if (!session) return;
+      const { layout } = get();
+      if (layout !== null && contains(layout, id)) {
+        set({ tileIntent: { target: id, drop: "center" } });
+      }
       startSession(session.openedUrl, session.source, undefined, session.hubId);
+      set({ tileIntent: null });
       get().closeSession(id);
     },
 
@@ -777,6 +875,112 @@ export const useApp = create<AppStore>((set, get) => {
       if (doomed.length === 0) return;
       doomed.forEach((id) => void siteView.close(id).catch(() => {}));
       get().forgetSessions(doomed);
+    },
+
+    dropPage: (page, target, drop) => {
+      set(target === null ? { layout: null, tileIntent: null } : { tileIntent: { target, drop } });
+      if (page.kind === "favorite") get().openFavorite(page.favorite);
+      else if (page.kind === "address") get().openAddress(page.url);
+      else get().openSession(page.id);
+      set({ tileIntent: null });
+    },
+
+    focusWindow: (heading) => {
+      const { layout, activeId } = get();
+      const next = layout && activeId ? neighborOf(layout, activeId, heading) : null;
+      if (next) switchTo(next);
+    },
+
+    focusNextWindow: (step) => {
+      const { layout, activeId } = get();
+      if (!layout) return;
+      const order = leaves(layout);
+      const at = Math.max(order.indexOf(activeId ?? ""), 0);
+      switchTo(order[(at + step + order.length) % order.length]);
+    },
+
+    closeWindow: () => {
+      const { layout, activeId } = get();
+      if (layout && activeId) get().closeSession(activeId);
+    },
+
+    keepOnlyWindow: () => set({ layout: null }),
+
+    swapWindow: (heading) => {
+      const { layout, activeId } = get();
+      const other = layout && activeId ? neighborOf(layout, activeId, heading) : null;
+      if (layout && activeId && other) set({ layout: swapPanes(layout, activeId, other) });
+    },
+
+    resizeWindow: (delta) => {
+      const { layout, activeId } = get();
+      if (layout && activeId) set({ layout: resizePane(layout, activeId, delta) });
+    },
+
+    resizeSplit: (path, ratio) =>
+      set((current) => ({ layout: current.layout && setRatio(current.layout, path, ratio) })),
+
+    equalizeWindows: () =>
+      set((current) => ({ layout: current.layout && equalize(current.layout) })),
+
+    openWorkspace: (workspace) => {
+      const now = Date.now();
+      const taken = new Set<string>();
+      const created: Session[] = [];
+      const opens: { id: string; url: string }[] = [];
+      const ids = tileUrls(workspace.layout).map((url) => {
+        const live = findFavoriteSession(
+          get().sessions.filter((session) => !taken.has(session.id)),
+          url,
+        );
+        const id = live?.id ?? crypto.randomUUID();
+        taken.add(id);
+        if (!live) {
+          created.push(newSession(id, "favorite", url, now));
+          opens.push({ id, url });
+        }
+        return id;
+      });
+      const layout = asLayout(fromTiles(workspace.layout, (_url, index) => ids[index]));
+      set((current) => ({
+        sessions: [...current.sessions, ...created],
+        layout,
+        activeId: ids[0],
+        blankTab: false,
+        sheet: "none",
+        tileIntent: null,
+        action:
+          opens.length > 0
+            ? { nonce: ++nonce, type: "openAll", opens, focus: ids[0] }
+            : { nonce: ++nonce, type: "activate", id: ids[0] },
+      }));
+      get().trimSessions("routine");
+    },
+
+    saveWorkspace: async (name) => {
+      const { layout, sessions, state, incognito } = get();
+      if (incognito.active || layout === null) return false;
+      const tiles = toTiles(
+        layout,
+        (id) => sessions.find((session) => session.id === id)?.openedUrl ?? null,
+      );
+      if (tiles === null) return false;
+      const saved = (state?.workspaces ?? []).map(({ id, name, layout }) => ({ id, name, layout }));
+      return get().saveWorkspaces([...saved, { name, layout: tiles }]);
+    },
+
+    saveWorkspaces: async (workspaces) => {
+      try {
+        const saved = await library.setWorkspaces(workspaces);
+        set((current) => ({
+          state: current.state && { ...current.state, workspaces: saved },
+          error: null,
+        }));
+        return true;
+      } catch (error) {
+        set({ error: appError(error) });
+        return false;
+      }
     },
 
     setSessionState: (page) =>
@@ -789,27 +993,43 @@ export const useApp = create<AppStore>((set, get) => {
     sessionOpenFailed: (id) =>
       set((current) => {
         const action = current.action;
-        const previousId = action?.type === "open" && action.id === id ? action.previousId : null;
+        const failed = action?.type === "open" && action.id === id ? action : null;
+        const previousId = failed ? failed.previousId : null;
         const sessions = current.sessions.filter((session) => session.id !== id);
-        return {
-          sessions,
-          activeId:
-            current.activeId === id
-              ? sessions.some((session) => session.id === previousId)
-                ? previousId
-                : (sessions[0]?.id ?? null)
-              : current.activeId,
-        };
+        const wasFront = current.activeId === id;
+        const front = wasFront
+          ? sessions.some((session) => session.id === previousId)
+            ? previousId
+            : (sessions[0]?.id ?? null)
+          : current.activeId;
+        // A page that failed to open gives its window back to the page it had replaced.
+        const base = failed && wasFront ? failed.previousLayout : current.layout;
+        const missing = base
+          ? leaves(base).filter((window) => !sessions.some((session) => session.id === window))
+          : [];
+        const remaining = withoutSessions(base, front, missing);
+        return { sessions, activeId: remaining.activeId, layout: remaining.layout };
       }),
 
     forgetSessions: (ids) =>
-      set((current) => ({
-        sessions: current.sessions.filter((session) => !ids.includes(session.id)),
-        activeId: ids.includes(current.activeId ?? "") ? null : current.activeId,
-      })),
+      set((current) => {
+        const frontGone = ids.includes(current.activeId ?? "");
+        const remaining = withoutSessions(current.layout, current.activeId, ids);
+        const activeId =
+          current.layout === null ? (frontGone ? null : current.activeId) : remaining.activeId;
+        return {
+          sessions: current.sessions.filter((session) => !ids.includes(session.id)),
+          activeId,
+          layout: remaining.layout,
+          action:
+            frontGone && activeId !== null
+              ? { nonce: ++nonce, type: "activate", id: activeId }
+              : current.action,
+        };
+      }),
 
     trimSessions: (pressure) => {
-      const { sessions, activeId } = get();
+      const { sessions, activeId, layout } = get();
       const doomed = sessionsToClose(
         sessions,
         activeId,
@@ -817,6 +1037,7 @@ export const useApp = create<AppStore>((set, get) => {
         pressure,
         selectUsableQuickFavorites(get()),
         get().sites,
+        layout ? leaves(layout) : [],
       );
       if (doomed.length === 0) return;
       doomed.forEach((id) => void siteView.close(id).catch(() => {}));

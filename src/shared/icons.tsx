@@ -122,6 +122,13 @@ export const TabsIcon = () => (
   </Icon>
 );
 
+export const TilesIcon = () => (
+  <Icon>
+    <rect x="3.5" y="4.5" width="17" height="15" rx="2.2" />
+    <path d="M12 4.5v15M12 12h8.5" />
+  </Icon>
+);
+
 export const FolderIcon = ({ size }: { size?: number }) => (
   <Icon size={size}>
     <path d="M3.5 7.5A2 2 0 0 1 5.5 5.5h3.6l2 2.2h7.4a2 2 0 0 1 2 2v7.8a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2z" />

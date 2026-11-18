@@ -35,6 +35,20 @@ const STANDARD: Bindings = {
   "tab.select8": ["Mod+8"],
   "tab.last": ["Mod+9"],
 
+  "tile.addRight": ["Mod+\\"],
+  "tile.addBelow": ["Mod+Shift+\\"],
+  "tile.addLeft": ["Mod+Alt+\\"],
+  "tile.addAbove": ["Mod+Alt+Shift+\\"],
+  "tile.focusLeft": ["Mod+Alt+Shift+ArrowLeft"],
+  "tile.focusRight": ["Mod+Alt+Shift+ArrowRight"],
+  "tile.focusUp": ["Mod+Alt+Shift+ArrowUp"],
+  "tile.focusDown": ["Mod+Alt+Shift+ArrowDown"],
+  "tile.grow": ["Mod+Alt+]"],
+  "tile.shrink": ["Mod+Alt+["],
+  "tile.equalize": ["Mod+Alt+="],
+  "tile.close": ["Mod+Alt+w"],
+  "tile.only": ["Mod+Alt+o"],
+
   "page.find": ["Mod+f"],
   "page.findNext": ["Mod+g"],
   "page.findPrev": ["Mod+Shift+g"],
@@ -83,6 +97,24 @@ const VIM: Bindings = {
   "tab.prev": withStandard("tab.prev", "J", "g T"),
   "tab.close": withStandard("tab.close", "x"),
 
+  "tile.focusLeft": withStandard("tile.focusLeft", "Ctrl+w h"),
+  "tile.focusDown": withStandard("tile.focusDown", "Ctrl+w j"),
+  "tile.focusUp": withStandard("tile.focusUp", "Ctrl+w k"),
+  "tile.focusRight": withStandard("tile.focusRight", "Ctrl+w l"),
+  "tile.focusNext": ["Ctrl+w w"],
+  "tile.focusPrev": ["Ctrl+w W"],
+  "tile.moveLeft": ["Ctrl+w H"],
+  "tile.moveDown": ["Ctrl+w J"],
+  "tile.moveUp": ["Ctrl+w K"],
+  "tile.moveRight": ["Ctrl+w L"],
+  "tile.addRight": withStandard("tile.addRight", "Ctrl+w v"),
+  "tile.addBelow": withStandard("tile.addBelow", "Ctrl+w s"),
+  "tile.grow": withStandard("tile.grow", "Ctrl+w +"),
+  "tile.shrink": withStandard("tile.shrink", "Ctrl+w -"),
+  "tile.equalize": withStandard("tile.equalize", "Ctrl+w ="),
+  "tile.close": withStandard("tile.close", "Ctrl+w q"),
+  "tile.only": withStandard("tile.only", "Ctrl+w o"),
+
   "page.find": withStandard("page.find", "/"),
   "page.findNext": withStandard("page.findNext", "n"),
   "page.findPrev": withStandard("page.findPrev", "N"),
@@ -110,6 +142,12 @@ const EMACS: Bindings = {
   "tab.close": withStandard("tab.close", "Ctrl+x k"),
 
   "page.find": withStandard("page.find", "Ctrl+s"),
+
+  "tile.focusNext": ["Ctrl+x o"],
+  "tile.addRight": withStandard("tile.addRight", "Ctrl+x 3"),
+  "tile.addBelow": withStandard("tile.addBelow", "Ctrl+x 2"),
+  "tile.close": withStandard("tile.close", "Ctrl+x 0"),
+  "tile.only": withStandard("tile.only", "Ctrl+x 1"),
 
   "app.palette": withStandard("app.palette", "Alt+x"),
 };

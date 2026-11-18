@@ -11,3 +11,6 @@ pub const CLOSED_EVENT: &str = "siteview:closed";
 pub const MEMORY_EVENT: &str = "siteview:memory";
 pub const POPUP_BLOCKED_EVENT: &str = "siteview:popup-blocked";
 pub const NOTIFICATION_TAP_EVENT: &str = "siteview:notification-tap";
+/// The window the person clicked in is the one in front now (desktop, several windows showing).
+#[cfg(desktop)]
+pub const FOCUS_EVENT: &str = "siteview:focus";

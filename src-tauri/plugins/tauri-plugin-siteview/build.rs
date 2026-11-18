@@ -3,6 +3,7 @@ const COMMANDS: &[&str] = &[
     "activate",
     "close",
     "set_rect",
+    "set_layout",
     "set_interactive_regions",
     "set_covered",
     "navigate",

@@ -37,6 +37,12 @@ pub fn content_insets<R: Runtime>(_webview: &Webview<R>) -> Result<(f64, f64, f6
     Ok((0.0, 0.0, 0.0, 0.0))
 }
 
+/// These system web views do not say where the keyboard is, so a click inside a page does not
+/// make it the window in front; the shell's own controls for the window do.
+pub fn has_keyboard<R: Runtime>(_webview: &Webview<R>) -> bool {
+    false
+}
+
 pub fn enable_gestures<R: Runtime>(_webview: &Webview<R>) -> Result<()> {
     Ok(())
 }

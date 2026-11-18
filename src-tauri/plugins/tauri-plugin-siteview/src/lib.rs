@@ -46,6 +46,7 @@ pub fn init<R: Runtime>() -> TauriPlugin<R> {
             commands::activate,
             commands::close,
             commands::set_rect,
+            commands::set_layout,
             commands::set_interactive_regions,
             commands::set_covered,
             commands::navigate,

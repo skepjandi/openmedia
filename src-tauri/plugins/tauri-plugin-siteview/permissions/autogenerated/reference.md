@@ -7,6 +7,7 @@ Shell-only control of the native site view. `open` is deliberately absent: the a
 - `allow-activate`
 - `allow-close`
 - `allow-set-rect`
+- `allow-set-layout`
 - `allow-set-interactive-regions`
 - `allow-set-covered`
 - `allow-navigate`
@@ -411,6 +412,32 @@ Enables the set_interactive_regions command without any pre-configured scope.
 <td>
 
 Denies the set_interactive_regions command without any pre-configured scope.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+`siteview:allow-set-layout`
+
+</td>
+<td>
+
+Enables the set_layout command without any pre-configured scope.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+`siteview:deny-set-layout`
+
+</td>
+<td>
+
+Denies the set_layout command without any pre-configured scope.
 
 </td>
 </tr>

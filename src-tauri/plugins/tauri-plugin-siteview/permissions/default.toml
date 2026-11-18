@@ -4,6 +4,7 @@ permissions = [
   "allow-activate",
   "allow-close",
   "allow-set-rect",
+  "allow-set-layout",
   "allow-set-interactive-regions",
   "allow-set-covered",
   "allow-navigate",

@@ -208,7 +208,8 @@ export function findTypedSession(sessions: Session[], url: string): Session | un
 export type Pressure = "routine" | "memory";
 
 /**
- * Which hidden sessions to close. The visible one is never listed.
+ * Which hidden sessions to close. The visible one is never listed, and neither is any window of
+ * the desktop layout (`windows`): those are on screen.
  *
  * - `memory`: the OS asked for memory back, so every hidden session goes.
  * - `routine`: keep the session each quick-access favorite would activate. Other hidden pages
@@ -222,11 +223,12 @@ export function sessionsToClose(
   pressure: Pressure,
   favorites: readonly { url: string }[],
   sites: readonly SiteSettings[] = [],
+  windows: readonly string[] = [],
 ): string[] {
   const hidden = sessions.filter((s) => s.id !== activeId);
-  if (pressure === "memory") return hidden.map((s) => s.id);
+  if (pressure === "memory") return hidden.filter((s) => !windows.includes(s.id)).map((s) => s.id);
 
-  const retained = new Set<string>();
+  const retained = new Set<string>(windows);
   for (const { url } of quickAccess(favorites)) {
     const session = sessionForFavorite(sessions, url, sites);
     if (session) retained.add(session.id);

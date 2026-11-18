@@ -7,7 +7,13 @@ import {
   type ReactNode,
   type WheelEvent,
 } from "react";
-import { selectPage, selectQuickFavorites, selectQuickFolders, useApp } from "../../app/store";
+import {
+  selectPage,
+  selectQuickFavorites,
+  selectQuickFolders,
+  useApp,
+  type DroppedPage,
+} from "../../app/store";
 import { unreadByFavorite } from "../web/unreadWatch";
 import { sessionForFavorite, type Session } from "../web/sessions";
 import { FolderPopup, type FolderMember } from "./FolderPopup";
@@ -30,6 +36,7 @@ import { VIDEO_CONTROLS_DEFAULT } from "../../shared/videoControls";
 import { useInsets, useViewport } from "../../shared/viewport";
 import {
   FAB_SIZE,
+  DIAL_RADIUS,
   FAVORITE_SIZE,
   HISTORY_SIZE,
   HOLD_SCALE,
@@ -89,6 +96,7 @@ import {
   SlidersIcon,
   StatsIcon,
   TabsIcon,
+  TilesIcon,
   VideoControlsIcon,
 } from "../../shared/icons";
 import { useBackHandler } from "../back/useBackHandler";
@@ -97,6 +105,10 @@ import { useEntitlementStore } from "../paywall/store";
 import { useDownloadsStore } from "../downloads/store";
 import { setVideoPanel } from "../settings/videoPanel";
 import { selectFabHidden, useKeybindings } from "../keybindings/store";
+import type { Workspace } from "../../shared/ipc";
+import { beginTileDrag } from "../tiling/dragStore";
+
+const NO_WORKSPACES: readonly Workspace[] = [];
 
 const idle: GestureState = { phase: "idle" };
 
@@ -180,14 +192,40 @@ interface Entry {
   charging?: boolean;
 }
 
+/** What dragging a button out of the dial carries to the page. */
+interface Carry {
+  page: DroppedPage;
+  label: string;
+  icon?: string;
+}
+
+/** How far a press on a button moves before it can be a drag out of the dial. */
+const CARRY_SLOP = 20;
+/** The most a movement may stray from straight out of the dial and still be a drag out. */
+const CARRY_COSINE = 0.5;
+
+/**
+ * Whether a finger that went down at `from` is now heading away from the dial's center, rather
+ * than round it (which turns the dial) or back in.
+ */
+function headsOutward(from: Point, to: Point, center: Point, origin: Point): boolean {
+  const moved = { x: to.x - from.x, y: to.y - from.y };
+  const away = { x: center.x - origin.x, y: center.y - origin.y };
+  const length = Math.hypot(moved.x, moved.y) * Math.hypot(away.x, away.y);
+  if (Math.hypot(moved.x, moved.y) <= CARRY_SLOP || length === 0) return false;
+  return (moved.x * away.x + moved.y * away.y) / length >= CARRY_COSINE;
+}
+
 const targetKey = (target: FanTarget) =>
   target.kind === "favorite"
     ? `favorite:${target.index}`
     : target.kind === "tab"
       ? `tab:${target.sessionId}`
-      : target.kind === "folder"
-        ? `folder:${folderKey(target.name) ?? target.name}`
-        : target.kind;
+      : target.kind === "workspace"
+        ? `workspace:${target.id}`
+        : target.kind === "folder"
+          ? `folder:${folderKey(target.name) ?? target.name}`
+          : target.kind;
 
 const sameTarget = (a: FanTarget | null, b: FanTarget) =>
   a !== null && targetKey(a) === targetKey(b);
@@ -216,6 +254,9 @@ interface DialButtonProps {
   onSpinEnd: () => boolean;
   onWheel: (event: WheelEvent) => void;
   onActivate: (target: FanTarget, hold: Hold | null) => void;
+  /** What a drag out of this button carries; null for a button that cannot be dragged. */
+  carry: Carry | null;
+  onCarry: (event: PointerEvent<HTMLElement>, carry: Carry) => void;
 }
 
 /** One button on the dial. It sits at its stop, follows a finger turning the dial, and fades out of the arc. */
@@ -235,8 +276,11 @@ function DialButton({
   onSpinEnd,
   onWheel,
   onActivate,
+  carry,
+  onCarry,
 }: DialButtonProps) {
   const hold = holdOf(entry.target.kind);
+  const press = useRef<Point | null>(null);
   const style: FanStyle = {
     "--x": `${slot.center.x}px`,
     "--y": `${slot.center.y}px`,
@@ -264,10 +308,23 @@ function DialButton({
       disabled={entry.busy}
       tabIndex={fanOpen && slot.opacity >= TOUCHABLE_OPACITY ? 0 : -1}
       onPointerDown={(event) => {
+        press.current = { x: event.clientX, y: event.clientY };
         onSpinStart(event, entry.lane);
         hold?.start();
       }}
-      onPointerMove={onSpinMove}
+      onPointerMove={(event) => {
+        const from = press.current;
+        if (
+          carry &&
+          from &&
+          headsOutward(from, { x: event.clientX, y: event.clientY }, slot.center, origin)
+        ) {
+          press.current = null;
+          onCarry(event, carry);
+          return;
+        }
+        onSpinMove(event);
+      }}
       onPointerUp={() => {
         hold?.stop();
         onSpinEnd();
@@ -437,6 +494,33 @@ function FloatingButton() {
   const fanOpen = gesture.phase === "fan";
   const hover = gesture.phase === "fan" ? gesture.hover : null;
 
+  const desktop = useApp((s) => s.desktop);
+  const workspaces = useApp((s) => s.state?.workspaces);
+  const openWorkspace = useApp((s) => s.openWorkspace);
+  const savedWorkspaces =
+    desktop && !incognito.active ? (workspaces ?? NO_WORKSPACES) : NO_WORKSPACES;
+  /** The favorite or open page a dial button stands for, which can be dragged onto the page. */
+  const carryOf = (target: FanTarget): Carry | null => {
+    if (!desktop) return null;
+    if (target.kind === "tab") {
+      const session = sessions.find((entry) => entry.id === target.sessionId);
+      if (!session) return null;
+      const url = session.url ?? session.openedUrl;
+      return {
+        page: { kind: "session", id: session.id },
+        label: session.title?.trim() || displayHost(url),
+        icon: iconForUrl(url, favorites),
+      };
+    }
+    if (target.kind !== "favorite") return null;
+    const { favorite, locked } = slotAt(target.index);
+    return favorite && !locked
+      ? { page: { kind: "favorite", favorite }, label: favorite.name, icon: favorite.icon }
+      : null;
+  };
+  /** The last favorite or tab the finger slid over, so sliding on out of the dial carries it. */
+  const lastHover = useRef<FanTarget | null>(null);
+
   /** A favorite's place in the quick-access menu, or past it: then it is only locked without Pro. */
   const slotAt = (index: number) =>
     list[index] ?? {
@@ -462,6 +546,9 @@ function FloatingButton() {
       } else void setDarkMode({ enabled: !darkOn });
     } else if (target.kind === "controls") {
       setVideoPanel(!controlsOn);
+    } else if (target.kind === "workspace") {
+      const workspace = savedWorkspaces.find((entry) => entry.id === target.id);
+      if (workspace) openWorkspace(workspace);
     } else {
       const slot = slotAt(target.index);
       if (slot.locked) openSheet("paywall");
@@ -691,8 +778,20 @@ function FloatingButton() {
         ]
       : []),
   ];
+  const workspaceEntry = (workspace: Workspace): Entry => ({
+    lane: "ring",
+    target: { kind: "workspace", id: workspace.id },
+    size: FAVORITE_SIZE,
+    section: QUICK,
+    label: t("tile.workspaceOpen", { name: workspace.name }),
+    caption: workspace.name,
+    site: true,
+    className: "text-white",
+    content: <TilesIcon />,
+  });
   const ringEntries: Entry[] = [
     ...quickItems.map((item) => itemEntry(item, QUICK)),
+    ...savedWorkspaces.map(workspaceEntry),
     ...openTabs.map(tabEntry),
     ...restItems.map((item) => itemEntry(item, REST)),
   ];
@@ -880,11 +979,37 @@ function FloatingButton() {
     holdTimer.current = window.setTimeout(() => dispatch({ type: "holdElapsed" }), HOLD_MS);
   };
 
+  /** A button of the dial is dragged out of it: the page it stands for goes with the pointer. */
+  const startCarry = (event: PointerEvent<HTMLElement>, carry: Carry) => {
+    spin.current = null;
+    setTurn(null);
+    beginTileDrag(event, carry.page, carry.label, carry.icon);
+    dispatch({ type: "dismiss" });
+  };
+
   const onPointerMove = (event: PointerEvent<HTMLButtonElement>) => {
     if (ignorePress.current) return;
     const point = pointOf(event);
     if (gestureRef.current.phase === "dragging") clearTimeout(holdTimer.current);
-    dispatch({ type: "move", point, hit: hitAt(point) });
+    if (gestureRef.current.phase !== "fan") lastHover.current = null;
+    const hit = hitAt(point);
+    if (hit) lastHover.current = hit;
+    // A finger that slid onto a favorite and on past the dial takes the favorite with it.
+    const held = lastHover.current;
+    if (
+      gestureRef.current.phase === "fan" &&
+      !hit &&
+      held &&
+      Math.hypot(point.x - resting.x, point.y - resting.y) > DIAL_RADIUS + FAVORITE_SIZE
+    ) {
+      const carry = carryOf(held);
+      if (carry) {
+        lastHover.current = null;
+        startCarry(event, carry);
+        return;
+      }
+    }
+    dispatch({ type: "move", point, hit });
   };
 
   const onPointerUp = (event: PointerEvent<HTMLButtonElement>) => {
@@ -1007,6 +1132,8 @@ function FloatingButton() {
           onSpinEnd={endSpin}
           onWheel={onWheel}
           onActivate={activate}
+          carry={carryOf(entry.target)}
+          onCarry={startCarry}
         />
       ))}
 
@@ -1016,6 +1143,19 @@ function FloatingButton() {
           icon={folderIcon(folders, folderName)}
           members={folderMembers}
           onClose={() => setFolderName(null)}
+          onCarry={
+            desktop
+              ? (member, event) => {
+                  setFolderName(null);
+                  beginTileDrag(
+                    event,
+                    { kind: "favorite", favorite: member.favorite },
+                    member.favorite.name,
+                    member.favorite.icon,
+                  );
+                }
+              : undefined
+          }
           onPick={(member) => {
             setFolderName(null);
             if (member.locked) openSheet("paywall");

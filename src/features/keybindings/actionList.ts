@@ -1,10 +1,11 @@
 /** What a shortcut can do. Every entry can be bound to any keys; `runActions.ts` carries each one out. */
 
-export type ActionGroup = "navigate" | "tabs" | "page" | "view" | "tools" | "app";
+export type ActionGroup = "navigate" | "tabs" | "windows" | "page" | "view" | "tools" | "app";
 
 export const GROUP_TITLES: Readonly<Record<ActionGroup, string>> = {
   navigate: "Navigate",
   tabs: "Tabs",
+  windows: "Windows",
   page: "Page",
   view: "Scroll and move",
   tools: "Tools",
@@ -14,6 +15,7 @@ export const GROUP_TITLES: Readonly<Record<ActionGroup, string>> = {
 export const GROUP_ORDER: readonly ActionGroup[] = [
   "navigate",
   "tabs",
+  "windows",
   "page",
   "view",
   "tools",
@@ -71,6 +73,27 @@ export const ACTIONS: readonly ActionInfo[] = [
   action("page", "page.focus", "Type in the page"),
   action("page", "page.focusShell", "Use shortcuts on the page"),
   action("page", "page.focusToggle", "Switch between the page and shortcuts"),
+
+  action("windows", "tile.addRight", "Add a window on the right"),
+  action("windows", "tile.addLeft", "Add a window on the left"),
+  action("windows", "tile.addBelow", "Add a window below"),
+  action("windows", "tile.addAbove", "Add a window above"),
+  action("windows", "tile.focusLeft", "Go to the window on the left"),
+  action("windows", "tile.focusRight", "Go to the window on the right"),
+  action("windows", "tile.focusUp", "Go to the window above"),
+  action("windows", "tile.focusDown", "Go to the window below"),
+  action("windows", "tile.focusNext", "Go to the next window", true),
+  action("windows", "tile.focusPrev", "Go to the previous window", true),
+  action("windows", "tile.moveLeft", "Move the window left"),
+  action("windows", "tile.moveRight", "Move the window right"),
+  action("windows", "tile.moveUp", "Move the window up"),
+  action("windows", "tile.moveDown", "Move the window down"),
+  action("windows", "tile.grow", "Make the window larger", true),
+  action("windows", "tile.shrink", "Make the window smaller", true),
+  action("windows", "tile.equalize", "Make the windows equal in size"),
+  action("windows", "tile.close", "Close the window"),
+  action("windows", "tile.only", "Keep only this window"),
+  action("windows", "tile.saveWorkspace", "Save the windows as a favorite"),
 
   action("view", "view.down", "Down: next item, or scroll the page", true),
   action("view", "view.up", "Up: previous item, or scroll the page", true),

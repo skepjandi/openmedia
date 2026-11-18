@@ -49,6 +49,7 @@ use crate::sites::{self, SiteSettings};
 use crate::tech_detect;
 use crate::usage::{Usage, UsageReport};
 use crate::video_controls::{SiteVideo, VideoControls};
+use crate::workspaces::{Workspace, WorkspaceInput};
 
 /// The secret store, behind a trait so tests can swap it.
 pub struct Secrets(pub Box<dyn SecretStore>);
@@ -89,6 +90,20 @@ pub fn set_favorites(
 #[tauri::command]
 pub fn set_folders(library: State<'_, Library>, folders: Vec<Folder>) -> Result<Vec<Folder>> {
     library.set_folders(Mode::Normal, folders)
+}
+
+/// Replaces the saved window layouts. Never while incognito: a layout holds the addresses of its
+/// pages, and incognito leaves none of them on the device.
+#[tauri::command]
+pub fn set_workspaces(
+    library: State<'_, Library>,
+    incognito: State<'_, Incognito>,
+    workspaces: Vec<WorkspaceInput>,
+) -> Result<Vec<Workspace>> {
+    if incognito.is_active() {
+        return Err(Error::WorkspaceInIncognito);
+    }
+    library.set_workspaces(workspaces)
 }
 
 /// Adds a recipe's site to the favorites, or removes it; returns the new list.

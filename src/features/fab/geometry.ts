@@ -106,6 +106,8 @@ export type FanTarget =
   | { kind: "tab"; sessionId: string }
   /** A folder of favorites; a tap opens it. */
   | { kind: "folder"; name: string }
+  /** A saved window layout; a tap opens its pages side by side. */
+  | { kind: "workspace"; id: string }
   | { kind: "incognito" }
   | { kind: "stats" }
   | { kind: "history" }
