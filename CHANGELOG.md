@@ -6,6 +6,14 @@ All notable changes to OpenMedia are documented here.
 >
 > **Wiki**: the [GitHub Wiki](https://github.com/skepjandi/openmedia/wiki) is the public-facing main wiki — architecture, recipe format, AI pipeline, security model, roadmap. Source-controlled editing surface is `docs/wiki/` in this repo; CI (`.github/workflows/sync-wiki.yml`) mirrors it to the GitHub Wiki on every merge to `main`. New single-PR changes belong here, not as new wiki pages.
 
+### fix(fab): the same room above and below the floating button on the tool line
+
+**Area:** `fix(fab)`
+
+**Change:** The first tool button below the floating button sat closer to it than the first one above (75 against 132). Both are now the same distance (104), clear of the button while it is open and of the ring.
+
+**Verified:** Vitest for equal room and for clearance from the ring. **Not verified:** a phone by eye.
+
 ### feat(fab): the tool line is one run that hops over the floating button
 
 **Area:** `feat(fab)`

@@ -274,10 +274,11 @@ export function dialTargetAt(point: Point, slots: readonly DialSlot[]): FanTarge
 
 /** Distance between neighbouring buttons on the line. */
 export const TOOL_STEP = 52;
-/** From the button's centre to the first button above it, clear of the ring. */
-const TOOL_START = 132;
-/** The nearest a button on the line sits to the open button. */
-const TOOL_START_NEAR = 75;
+/**
+ * From the button's centre to the first button on either side of it: the same above and below,
+ * clear of the open button (which grows while it is open) and of the ring.
+ */
+const TOOL_START = 104;
 /** A button this far past the end of the visible line has faded out completely. */
 const TOOL_FADE = TOOL_STEP * 0.6;
 const TOOL_REACH = TOOL_STEP / 2 + SCREEN_PADDING;
@@ -305,9 +306,8 @@ export function toolPlan(origin: Point, viewport: Size, insets: Insets): ToolPla
   const pageBelow = viewport.height - insets.bottom - origin.y >= origin.y - insets.top;
   return {
     pageBelow,
-    // Below, the page column's nearest button (usage) sits just clear of the button.
     topStart: TOOL_START,
-    bottomStart: pageBelow ? TOOL_START_NEAR : TOOL_START,
+    bottomStart: TOOL_START,
   };
 }
 

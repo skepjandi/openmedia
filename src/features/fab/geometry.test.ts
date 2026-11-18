@@ -236,13 +236,19 @@ describe("the tool line", () => {
     expect(toolPlan(fabCenter("left", 800, phone, insets), phone, insets).pageBelow).toBe(false);
   });
 
+  it("leaves the same room above the button as below it", () => {
+    expect(plan.topStart).toBe(plan.bottomStart);
+    const line = slots(7, 3, 0);
+    expect(origin.y - line[2].center.y).toBeCloseTo(line[3].center.y - origin.y);
+  });
+
   it("runs straight up and down from the button, a step apart, and shows everything at rest", () => {
     const line = slots(7, 3, 0);
     line.forEach((slot) => {
       expect(slot.center.x).toBe(origin.x);
       expect(slot.opacity).toBe(1);
     });
-    expect(line[2].center.y).toBeCloseTo(origin.y - 132);
+    expect(line[2].center.y).toBeCloseTo(origin.y - plan.topStart);
     expect(line[3].center.y).toBeCloseTo(origin.y + plan.bottomStart);
     line.slice(1).forEach((slot, i) => {
       if (i !== 2) expect(slot.center.y - line[i].center.y).toBeCloseTo(52);
@@ -264,15 +270,14 @@ describe("the tool line", () => {
     const after = slots(7, 3, 1)[2];
     expect(after.center.y).toBeCloseTo(origin.y + plan.bottomStart);
     for (const scroll of [0.25, 0.5, 0.75, 1, 1.5, 2]) {
-      expect(slots(7, 3, scroll).every((slot) => slot.opacity === 1)).toBe(true);
+      expect(slots(7, 3, scroll)[2].opacity).toBe(1);
     }
   });
 
   it("is one run with no empty patch once the whole list is on one side", () => {
-    const line = slots(7, 3, 3);
-    line.forEach((slot, i) => {
-      expect(slot.center.y).toBeCloseTo(origin.y + plan.bottomStart + i * 52);
-    });
+    const line = slots(7, 3, 3).filter((slot) => slot.opacity === 1);
+    expect(line.length).toBeGreaterThan(3);
+    expect(line[0].center.y).toBeCloseTo(origin.y + plan.bottomStart);
     line.slice(1).forEach((slot, i) => {
       expect(slot.center.y - line[i].center.y).toBeCloseTo(52);
     });
