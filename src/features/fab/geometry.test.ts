@@ -249,21 +249,33 @@ describe("the tool line", () => {
     });
   });
 
-  it("slides every button along the line, a step at a time", () => {
+  it("slides the list along the line, a step at a time", () => {
     const rest = slots(7, 3, 0);
     const slid = slots(7, 3, 1);
-    slid.forEach((slot, i) => expect(slot.center.y - rest[i].center.y).toBeCloseTo(52));
+    // Every button moves a step down, but the one that reached the open button's room.
+    slid.forEach((slot, i) => {
+      if (i !== 2) expect(slot.center.y - rest[i].center.y).toBeCloseTo(52);
+    });
   });
 
-  it("hides a button that comes near the open button, and shows it again past it", () => {
-    // One step down puts the nearest button above (at -132) at -80: clear. Two puts it at -28.
-    expect(slots(7, 3, 1)[2].opacity).toBe(1);
-    expect(slots(7, 3, 2)[2].opacity).toBe(0);
-    expect(slots(7, 3, 3)[2].opacity).toBe(0);
-    // Four steps carry it across to the other side, where it is visible again.
-    const across = slots(7, 3, 4)[2];
-    expect(across.center.y).toBeGreaterThan(origin.y);
-    expect(across.opacity).toBe(1);
+  it("jumps a button that slides up to the open button to its other side, never fading it", () => {
+    const before = slots(7, 3, 0.9)[2];
+    expect(before.center.y).toBeLessThan(origin.y);
+    const after = slots(7, 3, 1)[2];
+    expect(after.center.y).toBeCloseTo(origin.y + plan.bottomStart);
+    for (const scroll of [0.25, 0.5, 0.75, 1, 1.5, 2]) {
+      expect(slots(7, 3, scroll).every((slot) => slot.opacity === 1)).toBe(true);
+    }
+  });
+
+  it("is one run with no empty patch once the whole list is on one side", () => {
+    const line = slots(7, 3, 3);
+    line.forEach((slot, i) => {
+      expect(slot.center.y).toBeCloseTo(origin.y + plan.bottomStart + i * 52);
+    });
+    line.slice(1).forEach((slot, i) => {
+      expect(slot.center.y - line[i].center.y).toBeCloseTo(52);
+    });
   });
 
   it("fades buttons out near the top and bottom of the screen", () => {

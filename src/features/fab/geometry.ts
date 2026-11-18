@@ -276,9 +276,9 @@ export function dialTargetAt(point: Point, slots: readonly DialSlot[]): FanTarge
 export const TOOL_STEP = 52;
 /** From the button's centre to the first button above it, clear of the ring. */
 const TOOL_START = 132;
-/** The nearest a button on the line sits to the open button without fading. */
+/** The nearest a button on the line sits to the open button. */
 const TOOL_START_NEAR = 75;
-/** A button this far past a place where it hides has faded out completely. */
+/** A button this far past the end of the visible line has faded out completely. */
 const TOOL_FADE = TOOL_STEP * 0.6;
 const TOOL_REACH = TOOL_STEP / 2 + SCREEN_PADDING;
 
@@ -319,18 +319,19 @@ function toolLimits(origin: Point, viewport: Size, insets: Insets) {
   };
 }
 
-/** Each button's resting place on the line, top to bottom: `topCount` above the button, the rest below. */
-function toolRest(count: number, topCount: number, plan: ToolPlan): number[] {
-  return Array.from({ length: count }, (_, i) =>
-    i < topCount
-      ? -(plan.topStart + (topCount - 1 - i) * TOOL_STEP)
-      : plan.bottomStart + (i - topCount) * TOOL_STEP,
-  );
+/**
+ * Where a button at `q` sits on the line, in button steps along the list from the gap (negative:
+ * the list's part above the open button, from 0 on: the part below it). The list is one run
+ * with no empty patch in it; the open button's room is only a jump in this mapping, so a
+ * button that slides up to it comes out on the other side.
+ */
+function toolPosition(q: number, plan: ToolPlan): number {
+  return q < 0 ? q - (plan.topStart - TOOL_STEP) : q + plan.bottomStart;
 }
 
 /**
- * How far the line slides, in button steps (down is positive): from the last button reaching the
- * top of the screen to the first reaching the bottom. Always includes 0.
+ * How far the list slides, in button steps (down is positive): from the last button reaching
+ * the top of the screen to the first reaching the bottom. Always includes 0.
  */
 export function toolScrollRange(
   origin: Point,
@@ -340,12 +341,13 @@ export function toolScrollRange(
   topCount: number,
   plan: ToolPlan,
 ): { min: number; max: number } {
-  const rest = toolRest(count, topCount, plan);
-  if (rest.length === 0) return { min: 0, max: 0 };
+  if (count === 0) return { min: 0, max: 0 };
   const limits = toolLimits(origin, viewport, insets);
+  const lastAtTop = Math.ceil((limits.top + plan.topStart - TOOL_STEP) / TOOL_STEP);
+  const firstAtBottom = Math.floor((limits.bottom - plan.bottomStart) / TOOL_STEP);
   return {
-    min: Math.min(0, Math.ceil((limits.top - rest[rest.length - 1]) / TOOL_STEP)),
-    max: Math.max(0, Math.floor((limits.bottom - rest[0]) / TOOL_STEP)),
+    min: Math.min(0, lastAtTop - (count - 1 - topCount)),
+    max: Math.max(0, firstAtBottom + topCount),
   };
 }
 
@@ -356,9 +358,10 @@ export function snapToolScroll(scroll: number, range: { min: number; max: number
 
 /**
  * The tool buttons on their line, top to bottom: the first `topCount` start above the open
- * button, the rest below it. `scroll` slides all of them along the line, in button steps: 0 is
- * where they start. A button hides while it is near the open button, and as it nears the top or
- * bottom of the screen, so one slid past the open button comes out on its other side.
+ * button, the rest below it, with the room for the open button between. `scroll` slides the
+ * whole list along the line, in button steps: 0 is where it starts. The list stays one run: a
+ * button that slides up to the open button jumps to its other side. Buttons fade out as they
+ * near the top or bottom of the screen.
  */
 export function toolSlots(
   origin: Point,
@@ -370,10 +373,8 @@ export function toolSlots(
   scroll: number,
 ): DialSlot[] {
   const limits = toolLimits(origin, viewport, insets);
-  const rest = toolRest(items.length, topCount, plan);
   return items.map((item, i) => {
-    const u = rest[i] + scroll * TOOL_STEP;
-    const nearButton = clamp((Math.abs(u) - (TOOL_START_NEAR - TOOL_FADE)) / TOOL_FADE, 0, 1);
+    const u = toolPosition((i - topCount + scroll) * TOOL_STEP, plan);
     const pastEdge = u < limits.top ? limits.top - u : u > limits.bottom ? u - limits.bottom : 0;
     return {
       target: item.target,
@@ -382,7 +383,7 @@ export function toolSlots(
         x: origin.x,
         y: origin.y + clamp(u, limits.top - TOOL_FADE, limits.bottom + TOOL_FADE),
       },
-      opacity: Math.min(nearButton, clamp(1 - pastEdge / TOOL_FADE, 0, 1)),
+      opacity: clamp(1 - pastEdge / TOOL_FADE, 0, 1),
     };
   });
 }

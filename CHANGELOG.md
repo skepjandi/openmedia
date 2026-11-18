@@ -6,6 +6,14 @@ All notable changes to OpenMedia are documented here.
 >
 > **Wiki**: the [GitHub Wiki](https://github.com/skepjandi/openmedia/wiki) is the public-facing main wiki — architecture, recipe format, AI pipeline, security model, roadmap. Source-controlled editing surface is `docs/wiki/` in this repo; CI (`.github/workflows/sync-wiki.yml`) mirrors it to the GitHub Wiki on every merge to `main`. New single-PR changes belong here, not as new wiki pages.
 
+### feat(fab): the tool line is one run that hops over the floating button
+
+**Area:** `feat(fab)`
+
+**Change:** The tool buttons keep their usual places, with room left for the floating button, but sliding them no longer fades them out near it. The list is one run: a button that slides up to the floating button jumps to its other side, so once slid the whole list can sit on one side with no empty patch. They still fade out near the top and bottom of the screen.
+
+**Verified:** Vitest for the hop, the single run and the sliding range. **Not verified:** a phone or the desktop window by eye.
+
 ### feat(favorites): quick access is five, with two locked without Pro
 
 **Area:** `feat(favorites)`
