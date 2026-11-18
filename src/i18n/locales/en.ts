@@ -358,6 +358,11 @@ export const en = {
   "settings.videoHeightNote":
     "How far above the bottom edge the controls sit. A favorite can set its own.",
   "settings.videoHeightLabel": "Video controls height",
+  "settings.videoSkip": "Skip by",
+  "settings.videoSkipNote":
+    "How far the back and forward buttons, and a double tap on either side of the video, jump.",
+  "settings.videoSkipLabel": "Video skip length",
+  "settings.videoSkipSeconds": "{seconds} s",
   "settings.videoRemember": "Remember speed and sound",
   "settings.videoRememberNote": "The next video starts at the speed and volume you last chose.",
   "settings.videoLoopOff": "Stop videos from looping",

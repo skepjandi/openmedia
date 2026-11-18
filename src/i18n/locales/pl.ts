@@ -363,6 +363,11 @@ export const pl: Messages = {
   "settings.videoHeightNote":
     "Jak wysoko nad dolną krawędzią znajduje się sterowanie. Ulubione może mieć własną.",
   "settings.videoHeightLabel": "Wysokość sterowania wideo",
+  "settings.videoSkip": "Przewijaj o",
+  "settings.videoSkipNote":
+    "O ile skaczą przyciski wstecz i do przodu oraz podwójne stuknięcie po dowolnej stronie wideo.",
+  "settings.videoSkipLabel": "Długość przewijania wideo",
+  "settings.videoSkipSeconds": "{seconds} s",
   "settings.videoRemember": "Zapamiętaj prędkość i dźwięk",
   "settings.videoRememberNote":
     "Następne wideo zaczyna się z ostatnio wybraną prędkością i głośnością.",

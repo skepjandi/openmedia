@@ -345,6 +345,11 @@ export const ar: Messages = {
   "settings.videoHeightNote":
     "المسافة بين عناصر التحكم والحافة السفلية. يمكن للمفضلة تعيين ارتفاع خاص بها.",
   "settings.videoHeightLabel": "ارتفاع عناصر تحكم الفيديو",
+  "settings.videoSkip": "مدة التخطي",
+  "settings.videoSkipNote":
+    "المسافة التي تقفزها أزرار الرجوع والتقدم والنقر المزدوج على جانبي الفيديو.",
+  "settings.videoSkipLabel": "مدة تخطي الفيديو",
+  "settings.videoSkipSeconds": "{seconds} ث",
   "settings.videoRemember": "تذكّر السرعة والصوت",
   "settings.videoRememberNote": "يبدأ الفيديو التالي بآخر سرعة ومستوى صوت اخترتهما.",
   "settings.videoLoopOff": "إيقاف تكرار الفيديوهات",

@@ -26,10 +26,12 @@ export interface Accessibility {
 
 /** What the user chose for the video in view in a full-screen feed, for every site without a choice of its own. */
 export interface VideoControls {
-  /** OpenMedia's panel on a tap (pause, skip 6 s, mute, speed, seek bar) in place of the site's own tap. On until switched off. */
+  /** OpenMedia's panel on a tap (pause, skip back and forward, mute, speed, seek bar) in place of the site's own tap. On until switched off. */
   panel: boolean;
   /** Pixels between the panel and the bottom of the page. */
   height: number;
+  /** Seconds the back and forward buttons, and a double tap on either side of the video, jump: 5, 10, 15 or 30. */
+  skip: number;
   /** The panel on watch pages too, in place of the site's own player controls. Off by default. */
   fullVideos: boolean;
   /** The speed and sound last chosen, applied to the next video. */
@@ -45,6 +47,7 @@ export interface SiteVideo {
   /** `false` gives the site its own controls back. */
   panel?: boolean;
   height?: number;
+  skip?: number;
   fullVideos?: boolean;
   /** The speed and sound last chosen, applied to the next video. */
   remember?: boolean;

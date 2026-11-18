@@ -369,6 +369,11 @@ export const ta: Messages = {
   "settings.videoHeightNote":
     "கட்டுப்பாடுகள் கீழ் விளிம்புக்கு மேல் எவ்வளவு உயரத்தில் இருக்கும். பிடித்தது தனக்கென ஒன்றை அமைக்கலாம்.",
   "settings.videoHeightLabel": "வீடியோ கட்டுப்பாடுகளின் உயரம்",
+  "settings.videoSkip": "தவிர்க்கும் அளவு",
+  "settings.videoSkipNote":
+    "பின் மற்றும் முன் பொத்தான்களும், வீடியோவின் இருபுறமும் இருமுறை தட்டுவதும் எவ்வளவு தாவும்.",
+  "settings.videoSkipLabel": "வீடியோ தவிர்க்கும் நீளம்",
+  "settings.videoSkipSeconds": "{seconds} வி",
   "settings.videoRemember": "வேகத்தையும் ஒலியையும் நினைவில் கொள்",
   "settings.videoRememberNote":
     "அடுத்த வீடியோ நீங்கள் கடைசியாகத் தேர்ந்த வேகத்திலும் ஒலியளவிலும் தொடங்கும்.",

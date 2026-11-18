@@ -362,6 +362,11 @@ export const ro: Messages = {
   "settings.videoHeightNote":
     "La ce distanță deasupra marginii de jos se află comenzile. Un favorit poate avea propria înălțime.",
   "settings.videoHeightLabel": "Înălțimea comenzilor video",
+  "settings.videoSkip": "Sari peste",
+  "settings.videoSkipNote":
+    "Cât sar butoanele înapoi și înainte și o atingere dublă pe oricare parte a videoclipului.",
+  "settings.videoSkipLabel": "Durata săriturii videoclipului",
+  "settings.videoSkipSeconds": "{seconds} s",
   "settings.videoRemember": "Ține minte viteza și sunetul",
   "settings.videoRememberNote":
     "Următorul videoclip începe cu viteza și volumul alese ultima dată.",

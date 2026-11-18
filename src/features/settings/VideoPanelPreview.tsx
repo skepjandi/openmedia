@@ -28,12 +28,44 @@ export function VideoPanelPreview({ value }: { value: VideoControls }) {
       </div>
       {value.panel && (
         <div
-          className="absolute inset-x-3 flex items-center justify-between rounded-full bg-black/60 px-3 py-1.5 text-[10px] font-semibold text-white transition-[bottom] duration-200"
+          className="absolute inset-x-2 flex flex-col gap-2 rounded-2xl bg-black/65 p-2.5 text-[9px] font-semibold text-white transition-[bottom] duration-200"
           style={{ bottom: panelBottom }}
         >
-          <span>1×</span>
-          <span>HD</span>
-          <span>CC</span>
+          <div className="flex items-center justify-between">
+            <span className="size-3.5 rounded-sm border border-white/70" />
+            <span className="size-3.5 rounded-sm border-2 border-white/70" />
+          </div>
+          <div className="flex items-center justify-center gap-3">
+            <span className="grid size-6 place-items-center rounded-full bg-white/20">
+              {value.skip}
+            </span>
+            <span className="grid size-9 place-items-center rounded-full bg-white text-[10px] text-black">
+              ❚❚
+            </span>
+            <span className="grid size-6 place-items-center rounded-full bg-white/20">
+              {value.skip}
+            </span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <span>0:42</span>
+            <span className="relative h-1 flex-1 rounded-full bg-white/20">
+              <span className="absolute inset-y-0 start-0 w-2/3 rounded-full bg-white/40" />
+              <span className="absolute inset-y-0 start-0 w-1/3 rounded-full bg-white" />
+              <span className="absolute start-1/3 top-1/2 size-2 -translate-y-1/2 rounded-full bg-white" />
+            </span>
+            <span>-1:18</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="size-2.5 rounded-sm bg-white/70" />
+            <span className="h-1 w-8 rounded-full bg-white/25">
+              <span className="block h-full w-2/3 rounded-full bg-white" />
+            </span>
+            <span className="ms-auto flex items-center gap-1.5">
+              <span className="rounded-sm border border-white/60 px-0.5">CC</span>
+              <span className="rounded-sm border border-white/60 px-0.5">HD</span>
+            </span>
+            <span className="rounded-full bg-white/20 px-1.5 py-0.5">1×</span>
+          </div>
         </div>
       )}
     </div>

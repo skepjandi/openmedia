@@ -1734,6 +1734,7 @@ mod tests {
         let chosen = VideoControls {
             panel: false,
             height: 40,
+            skip: 15,
             auto_advance: true,
             ..VideoControls::default()
         };
@@ -1784,6 +1785,7 @@ mod tests {
         let own = SiteVideo {
             panel: Some(false),
             height: Some(48),
+            skip: Some(30),
             full_videos: Some(true),
             remember: Some(true),
             loop_off: Some(true),

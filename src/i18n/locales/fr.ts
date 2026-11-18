@@ -368,6 +368,11 @@ export const fr: Messages = {
   "settings.videoHeightNote":
     "À quelle distance du bord inférieur se trouvent les commandes. Un favori peut définir la sienne.",
   "settings.videoHeightLabel": "Hauteur des commandes vidéo",
+  "settings.videoSkip": "Saut de",
+  "settings.videoSkipNote":
+    "De combien sautent les boutons reculer et avancer, et un double appui de chaque côté de la vidéo.",
+  "settings.videoSkipLabel": "Durée du saut de la vidéo",
+  "settings.videoSkipSeconds": "{seconds} s",
   "settings.videoRemember": "Mémoriser vitesse et son",
   "settings.videoRememberNote":
     "La vidéo suivante démarre à la vitesse et au volume choisis en dernier.",

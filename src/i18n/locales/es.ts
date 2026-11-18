@@ -364,6 +364,11 @@ export const es: Messages = {
   "settings.videoHeightNote":
     "A qué distancia del borde inferior están los controles. Un favorito puede fijar la suya.",
   "settings.videoHeightLabel": "Altura de los controles de vídeo",
+  "settings.videoSkip": "Saltar de",
+  "settings.videoSkipNote":
+    "Cuánto saltan los botones de retroceder y avanzar, y un doble toque a cada lado del vídeo.",
+  "settings.videoSkipLabel": "Duración del salto del vídeo",
+  "settings.videoSkipSeconds": "{seconds} s",
   "settings.videoRemember": "Recordar velocidad y sonido",
   "settings.videoRememberNote":
     "El siguiente vídeo empieza con la velocidad y el volumen que elegiste por última vez.",

@@ -1,12 +1,12 @@
 //! Controls for the video in view in a full-screen feed. A tap on the video shows OpenMedia's own
-//! panel (pause, skip 6 seconds, mute, speed, a seek bar with the time left) in place of the
+//! panel (pause, skip back and forward, mute, speed, a seek bar with the time left) in place of the
 //! site's tap, and the user can switch it off, or move it up or down, for one site. Around it: the
 //! last speed and sound remembered between videos, looping off, and moving on when a video ends.
 //! This module turns the choices into one script that runs in the top frame after the feed player.
 
 use std::collections::BTreeMap;
 
-use serde::{Deserialize, Serialize};
+use serde::{Deserialize, Deserializer, Serialize};
 
 const PAGE_SCRIPT: &str = include_str!("video_controls.js");
 /// The detectors for players built with a common library, spliced into the page script.
@@ -18,12 +18,37 @@ pub const DEFAULT_HEIGHT: u32 = 16;
 /// The highest the panel can be put, and the same cap as the bottom margin.
 pub const MAX_HEIGHT: u32 = 200;
 
+/// The seconds the skip buttons and a double tap can jump by.
+pub const SKIP_CHOICES: [u32; 4] = [5, 10, 15, 30];
+pub const DEFAULT_SKIP: u32 = 10;
+
 fn on() -> bool {
     true
 }
 
 fn default_height() -> u32 {
     DEFAULT_HEIGHT
+}
+
+fn default_skip() -> u32 {
+    DEFAULT_SKIP
+}
+
+/// The allowed skip nearest to `seconds`; halfway between two, the shorter one.
+fn nearest_skip(seconds: u32) -> u32 {
+    SKIP_CHOICES
+        .into_iter()
+        .min_by_key(|choice| choice.abs_diff(seconds))
+        .unwrap_or(DEFAULT_SKIP)
+}
+
+/// Reads a skip and snaps it to an allowed value, so a stray number never reaches the page.
+fn read_skip<'de, D: Deserializer<'de>>(deserializer: D) -> Result<u32, D::Error> {
+    u32::deserialize(deserializer).map(nearest_skip)
+}
+
+fn read_site_skip<'de, D: Deserializer<'de>>(deserializer: D) -> Result<Option<u32>, D::Error> {
+    Option::<u32>::deserialize(deserializer).map(|skip| skip.map(nearest_skip))
 }
 
 /// What the user chose for every site that has no choice of its own.
@@ -34,6 +59,9 @@ pub struct VideoControls {
     pub panel: bool,
     /// Pixels between the panel and the bottom of the page.
     pub height: u32,
+    /// Seconds the back and forward buttons, and a double tap on either side, jump: 5, 10, 15 or 30.
+    #[serde(deserialize_with = "read_skip")]
+    pub skip: u32,
     /// The panel on a watch page too, in place of the site's own player controls. Off: those
     /// have more than the panel does (captions, quality, chapters), so they are left alone.
     pub full_videos: bool,
@@ -50,6 +78,7 @@ impl Default for VideoControls {
         Self {
             panel: on(),
             height: default_height(),
+            skip: default_skip(),
             full_videos: false,
             remember: false,
             loop_off: false,
@@ -68,6 +97,11 @@ pub struct SiteVideo {
     pub panel: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub height: Option<u32>,
+    #[serde(
+        skip_serializing_if = "Option::is_none",
+        deserialize_with = "read_site_skip"
+    )]
+    pub skip: Option<u32>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub full_videos: Option<bool>,
     /// The speed and sound last chosen, applied to the next video.
@@ -85,6 +119,7 @@ impl SiteVideo {
     pub fn is_empty(&self) -> bool {
         self.panel.is_none()
             && self.height.is_none()
+            && self.skip.is_none()
             && self.full_videos.is_none()
             && self.remember.is_none()
             && self.loop_off.is_none()
@@ -133,6 +168,7 @@ mod tests {
             serde_json::json!({
                 "panel": true,
                 "height": 16,
+                "skip": 10,
                 "fullVideos": false,
                 "remember": false,
                 "loopOff": false,
@@ -153,7 +189,7 @@ mod tests {
         );
         let script = VideoControls::default().page_script(&sites);
         assert!(script.ends_with(
-            r#"({"panel":true,"height":16,"fullVideos":false,"remember":false,"loopOff":false,"autoAdvance":false,"sites":{"youtube.com":{"panel":false}}});"#
+            r#"({"panel":true,"height":16,"skip":10,"fullVideos":false,"remember":false,"loopOff":false,"autoAdvance":false,"sites":{"youtube.com":{"panel":false}}});"#
         ));
     }
 
@@ -192,6 +228,7 @@ mod tests {
             r#"{"remember":false}"#,
             r#"{"loopOff":true}"#,
             r#"{"autoAdvance":false}"#,
+            r#"{"skip":30}"#,
         ] {
             let site: SiteVideo = serde_json::from_str(json).unwrap();
             assert!(!site.is_empty());
@@ -200,6 +237,7 @@ mod tests {
         let full = SiteVideo {
             panel: Some(true),
             height: Some(20),
+            skip: Some(15),
             full_videos: Some(false),
             remember: Some(true),
             loop_off: Some(true),
@@ -210,11 +248,65 @@ mod tests {
             serde_json::json!({
                 "panel": true,
                 "height": 20,
+                "skip": 15,
                 "fullVideos": false,
                 "remember": true,
                 "loopOff": true,
                 "autoAdvance": false
             })
         );
+    }
+
+    #[test]
+    fn the_skip_is_ten_seconds_until_chosen() {
+        assert_eq!(VideoControls::default().skip, 10);
+        let saved: VideoControls = serde_json::from_str(r#"{"remember":true}"#).unwrap();
+        assert_eq!(saved.skip, DEFAULT_SKIP);
+    }
+
+    #[test]
+    fn a_skip_outside_the_allowed_set_snaps_to_the_nearest_one() {
+        for (saved, snapped) in [
+            (0, 5),
+            (7, 5),
+            (8, 10),
+            (12, 10),
+            (13, 15),
+            (22, 15),
+            (23, 30),
+            (999, 30),
+            (15, 15),
+        ] {
+            let general: VideoControls =
+                serde_json::from_str(&format!(r#"{{"skip":{saved}}}"#)).unwrap();
+            assert_eq!(general.skip, snapped, "general {saved}");
+            let site: SiteVideo = serde_json::from_str(&format!(r#"{{"skip":{saved}}}"#)).unwrap();
+            assert_eq!(site.skip, Some(snapped), "site {saved}");
+        }
+    }
+
+    #[test]
+    fn a_site_with_only_a_skip_is_not_empty_and_serializes_it() {
+        let site = SiteVideo {
+            skip: Some(5),
+            ..SiteVideo::default()
+        };
+        assert!(!site.is_empty());
+        assert_eq!(serde_json::to_string(&site).unwrap(), r#"{"skip":5}"#);
+    }
+
+    #[test]
+    fn the_page_gets_the_skip_in_general_and_per_site() {
+        let mut sites = BTreeMap::new();
+        sites.insert(
+            "youtube.com".to_owned(),
+            SiteVideo {
+                skip: Some(30),
+                ..SiteVideo::default()
+            },
+        );
+        let script = VideoControls::default().page_script(&sites);
+        assert!(script.contains(r#""skip":10"#));
+        assert!(script.contains(r#""youtube.com":{"skip":30}"#));
     }
 }

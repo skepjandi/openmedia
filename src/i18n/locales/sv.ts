@@ -361,6 +361,11 @@ export const sv: Messages = {
   "settings.videoHeightNote":
     "Hur högt över nedre kanten kontrollerna sitter. En favorit kan ha en egen.",
   "settings.videoHeightLabel": "Videokontrollernas höjd",
+  "settings.videoSkip": "Hoppa",
+  "settings.videoSkipNote":
+    "Hur långt knapparna bakåt och framåt, och ett dubbeltryck på någon sida av videon, hoppar.",
+  "settings.videoSkipLabel": "Videons hopplängd",
+  "settings.videoSkipSeconds": "{seconds} s",
   "settings.videoRemember": "Kom ihåg hastighet och ljud",
   "settings.videoRememberNote": "Nästa video startar med den hastighet och volym du valde senast.",
   "settings.videoLoopOff": "Sluta loopa videor",

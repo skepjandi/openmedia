@@ -356,6 +356,11 @@ export const ur: Messages = {
   "settings.videoHeightNote":
     "کنٹرولز نیچے کے کنارے سے کتنے اوپر ہوں۔ پسندیدہ اپنی اونچائی طے کر سکتا ہے۔",
   "settings.videoHeightLabel": "ویڈیو کنٹرولز کی اونچائی",
+  "settings.videoSkip": "چھوڑنے کی مدت",
+  "settings.videoSkipNote":
+    "پیچھے اور آگے کے بٹن، اور ویڈیو کے کسی بھی طرف دو بار ٹیپ کتنا آگے پیچھے جاتے ہیں۔",
+  "settings.videoSkipLabel": "ویڈیو چھوڑنے کی مدت",
+  "settings.videoSkipSeconds": "{seconds} سیکنڈ",
   "settings.videoRemember": "رفتار اور آواز یاد رکھیں",
   "settings.videoRememberNote": "اگلی ویڈیو آپ کی آخری منتخب کردہ رفتار اور آواز پر شروع ہوتی ہے۔",
   "settings.videoLoopOff": "ویڈیوز کو دہرانے سے روکیں",

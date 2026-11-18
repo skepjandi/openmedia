@@ -2,7 +2,9 @@ import type { MessageKey } from "../../i18n/messages";
 import { useApp } from "../../app/store";
 import { useT } from "../../i18n/useT";
 import type { SiteVideo, VideoControls } from "../../shared/ipc";
+import { VIDEO_SKIP_CHOICES } from "../../shared/videoControls";
 import { MarginSlider } from "./MarginSlider";
+import { Segmented } from "./Segmented";
 import { FollowGeneral, type SiteOverrides } from "./SiteParts";
 import { Switch } from "./Switch";
 import { Group, GroupLabel } from "./ui";
@@ -55,6 +57,22 @@ export function VideoControlsFields({ value, change, overrides }: VideoControlsF
     : [];
 
   const playbackRows = [
+    <div key="skip" className="flex flex-col gap-2 px-4 py-3">
+      <div className="text-base desktop:text-[15px]">{t("settings.videoSkip")}</div>
+      <p className="text-sm leading-snug text-paper/55 desktop:text-[13px]">
+        {t("settings.videoSkipNote")}
+      </p>
+      <Segmented
+        label={t("settings.videoSkipLabel")}
+        value={String(value.skip)}
+        options={VIDEO_SKIP_CHOICES.map((seconds) => ({
+          value: String(seconds),
+          label: t("settings.videoSkipSeconds", { seconds }),
+        }))}
+        onChange={(seconds) => change({ skip: Number(seconds) })}
+      />
+      {follows(["skip"], "settings.videoSkip", "")}
+    </div>,
     <div key="remember">
       <Switch
         label={t("settings.videoRemember")}

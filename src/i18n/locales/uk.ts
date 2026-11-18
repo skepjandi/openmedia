@@ -361,6 +361,11 @@ export const uk: Messages = {
   "settings.videoHeightNote":
     "На якій відстані від нижнього краю розташоване керування. Улюблений сайт може мати власну.",
   "settings.videoHeightLabel": "Висота керування відео",
+  "settings.videoSkip": "Крок перемотування",
+  "settings.videoSkipNote":
+    "На скільки перемотують кнопки назад і вперед і подвійний дотик збоку відео.",
+  "settings.videoSkipLabel": "Крок перемотування відео",
+  "settings.videoSkipSeconds": "{seconds} с",
   "settings.videoRemember": "Запам’ятовувати швидкість і звук",
   "settings.videoRememberNote":
     "Наступне відео почнеться з останньої обраної швидкості та гучності.",

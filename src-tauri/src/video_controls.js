@@ -3,11 +3,14 @@
   // OpenMedia's controls for the video in view in a full-screen feed (YouTube Shorts, Reels,
   // TikTok, or any page the feed player is told about) and, when the reader asked for it, for the
   // video of a page that is about one video (a watch page), whose own controls are left alone
-  // otherwise. They stay hidden; a tap on the video shows a panel in place of the
-  // site's own tap: pause, back and forward 6 seconds, mute, speed, and a seek bar with the time
-  // left. The reader can switch the panel off, or move it, for the whole app or for one site; with
+  // otherwise. They stay hidden; a tap on the video shows a panel in place of the site's own tap:
+  // pause, back and forward by the chosen seconds (a double tap on either side of the video does
+  // the same), mute and volume, a list of speeds, the site's options, and a seek bar with the time
+  // played and left (on a live stream: how far behind live). While the panel is up, keys work it
+  // too. The reader can switch the panel off, or move it, for the whole app or for one site; with
   // it off nothing here touches the page's own controls. Around it: the last speed and sound
-  // remembered between videos, looping switched off, and, when asked for, moving on to the next
+  // remembered between videos (on this page, or across pages when asked), looping switched off,
+  // and, when asked for, moving on to the next
   // video when one ends. It runs in the top frame, after the feed player, whose idea of "a feed
   // page" and of "the video in view" it shares. It never clicks anything on the page: moving on
   // scrolls.
@@ -24,14 +27,21 @@
   var MINI_CLOSE = Symbol.for('openmedia.miniClose');
   var USER_PAUSE = Symbol.for('openmedia.userPause');
   var STORE = 'openmedia.video';
-  var RATES = [0.5, 1, 1.25, 1.5, 2];
+  var RATES = [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2, 3];
   var TICK_MS = 100;
   var TAP_MS = 900; // a volume change this soon after a tap or key is the reader's
   var ADVANCE_GAP_MS = 1500;
   var WRAPPER_MAX = 1.5; // screens, as in the feed player
   var NEXT_GAP = 20; // px below the video in view that counts as the next one
   var DEFAULT_HEIGHT = 16; // px between the panel and the bottom edge, on top of the safe area
-  var SKIP_SECONDS = 6;
+  var DEFAULT_SKIP = 10; // seconds, when neither the app nor the site chose
+  var DOUBLE_TAP_MS = 300; // a second tap this soon on the same side of the video is a skip
+  var RIPPLE_MS = 700; // how long the skip a double tap made stays written on the video
+  var SEEK_STEP_MS = 150; // a dragged seek bar asks the video for a new place at most this often
+  var LIVE_EDGE = 3; // seconds behind the end of a live stream that still count as live
+  var VOLUME_STEP = 0.1;
+  var BUTTON = 40; // px a finger can hit on the panel's small buttons; their icons are smaller
+  var BUTTON_PAD = 9;
   var WATCH_PATH = /^\/(?:watch|video|videos|embed|clip|clips|movie|movies)(?:\/|$)/i;
   var MIN_VIDEO_SHARE = 0.15; // of the viewport, for the video of a page that is not a feed
   var TAP_SLOP = 10; // px a finger may move and still be a tap
@@ -66,7 +76,7 @@
 
     // The choices of this site, else the shared ones. Auto-advance needs the video not to loop.
     var ownChoice;
-    var wantsSound;
+    var wantsRemember;
     var wantsAdvance;
     var wantsLoopOff;
     function chosen(key) {
@@ -74,7 +84,7 @@
     }
     function applyChoices() {
       ownChoice = siteChoice();
-      wantsSound = chosen('remember');
+      wantsRemember = chosen('remember');
       wantsAdvance = chosen('autoAdvance');
       wantsLoopOff = chosen('loopOff') || wantsAdvance;
     }
@@ -169,6 +179,8 @@
     var awaitTapClick = false;
     var mutedAtDown = null;
     var panelSound = null; // what the reader last chose with the panel's mute button, until the page closes
+    var panelRate = null; // the speed the reader last picked in the panel, until the page closes
+    var showTotal = false; // the time at the end of the seek bar: the length, not the time left
 
     // The volume bar: on Android the device's media volume (a site's player resets the volume of
     // its own video there, so the app answers for the device through a message port); elsewhere
@@ -313,16 +325,17 @@
     function prefer(video) {
       if (!panelPage()) return;
       var saved = read();
-      if (panelOn() && typeof saved.rate === 'number') {
+      // The panel's speed and mute change the video, not the site's own idea of them, so the next
+      // video would start at the site's again: the choice is carried over for as long as the page
+      // lives, and across pages when asked for.
+      var rate = wantsRemember ? saved.rate : panelRate;
+      if (panelOn() && typeof rate === 'number') {
         try {
-          video.defaultPlaybackRate = saved.rate;
-          video.playbackRate = saved.rate;
+          video.defaultPlaybackRate = rate;
+          video.playbackRate = rate;
         } catch (_) {}
       }
-      // The panel's mute button changes the video, not the site's own idea of sound, so the next
-      // video would start muted again: the choice is carried over for as long as the page lives,
-      // and across pages when asked for.
-      var sound = wantsSound ? saved : panelSound;
+      var sound = wantsRemember ? saved : panelSound;
       if (sound && typeof sound.muted === 'boolean') {
         try {
           video.muted = sound.muted;
@@ -384,9 +397,67 @@
 
     function clock(seconds) {
       var whole = Math.max(0, Math.round(seconds));
-      var minutes = Math.floor(whole / 60);
+      var hours = Math.floor(whole / 3600);
+      var minutes = Math.floor(whole / 60) % 60;
       var rest = whole % 60;
-      return minutes + ':' + (rest < 10 ? '0' : '') + rest;
+      var tail = (rest < 10 ? '0' : '') + rest;
+      return hours ? hours + ':' + (minutes < 10 ? '0' : '') + minutes + ':' + tail : minutes + ':' + tail;
+    }
+
+    // The stretch of time the seek bar spans: the whole video, or on a live stream (no length of
+    // its own) the part the browser can still seek in, whose end is live. Nothing while unknown.
+    function rangeOf(video) {
+      if (isFinite(video.duration) && video.duration > 0) return { start: 0, end: video.duration, live: false };
+      try {
+        var seekable = video.seekable;
+        if (seekable && seekable.length) {
+          var start = seekable.start(0);
+          var end = seekable.end(seekable.length - 1);
+          if (end > start) return { start: start, end: end, live: true };
+        }
+      } catch (_) {}
+      return null;
+    }
+
+    function ratioIn(range, time) {
+      return Math.min(1, Math.max(0, (time - range.start) / (range.end - range.start)));
+    }
+
+    // How far past the playing point the browser has loaded, as a point of the range.
+    function loadedRatio(video, range) {
+      try {
+        var buffered = video.buffered;
+        for (var i = 0; buffered && i < buffered.length; i++) {
+          if (buffered.start(i) <= video.currentTime + 0.5 && buffered.end(i) >= video.currentTime) {
+            return ratioIn(range, buffered.end(i));
+          }
+        }
+      } catch (_) {}
+      return 0;
+    }
+
+    // To a point of the range. A video stops just short of its end, which would fire `ended` and
+    // move a feed on; a live stream may go up to live. While a finger drags the bar, a quick seek
+    // to the nearest key frame where the browser has one, so the stream is not asked for every pixel.
+    function seekTo(video, range, ratio, quick) {
+      var time = range.start + ratio * (range.end - range.start);
+      if (!range.live) time = Math.min(time, Math.max(0, range.end - 0.25));
+      try {
+        if (quick && typeof video.fastSeek === 'function') video.fastSeek(time);
+        else video.currentTime = time;
+      } catch (_) {}
+    }
+
+    function skip(video, seconds) {
+      var range = rangeOf(video);
+      var start = range ? range.start : 0;
+      var end = range ? range.end : Infinity;
+      video.currentTime = Math.min(end, Math.max(start, video.currentTime + seconds));
+    }
+
+    // A second behind the live end: the very end has nothing loaded yet to play.
+    function goLive(video, range) {
+      try { video.currentTime = Math.max(range.start, range.end - 1); } catch (_) {}
     }
 
     // What the reader chose for this site, if anything: the entry for the longest registrable
@@ -420,6 +491,13 @@
       return typeof height === 'number' ? height : DEFAULT_HEIGHT;
     }
 
+    // Seconds the back and forward buttons, a double tap on a side and the arrow keys skip.
+    function skipSeconds() {
+      var site = siteChoice();
+      var seconds = typeof site.skip === 'number' ? site.skip : config.skip;
+      return typeof seconds === 'number' && seconds > 0 ? seconds : DEFAULT_SKIP;
+    }
+
     function make(tag, css) {
       var element = document.createElement(tag);
       element.style.cssText = css;
@@ -446,7 +524,7 @@
       label.setAttribute('x', '12');
       label.setAttribute('y', '15.2');
       label.setAttribute('text-anchor', 'middle');
-      label.setAttribute('font-size', '7');
+      label.setAttribute('font-size', text.length > 1 ? '6.4' : '7');
       label.setAttribute('font-weight', '700');
       label.textContent = text;
       return label;
@@ -465,15 +543,19 @@
       cc: ['M19 4H5c-1.11 0-2 .9-2 2v12c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm-8 7H9.5v-.5h-2v3h2V13H11v1c0 .55-.45 1-1 1H7c-.55 0-1-.45-1-1v-4c0-.55.45-1 1-1h3c.55 0 1 .45 1 1v1zm7 0h-1.5v-.5h-2v3h2V13H18v1c0 .55-.45 1-1 1h-3c-.55 0-1-.45-1-1v-4c0-.55.45-1 1-1h3c.55 0 1 .45 1 1v1z'],
       audio: ['M12 3a9 9 0 0 0-9 9v7a2 2 0 0 0 2 2h3v-8H5v-1a7 7 0 0 1 14 0v1h-3v8h3a2 2 0 0 0 2-2v-7a9 9 0 0 0-9-9z'],
       gear: ['M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 0 0 .12-.61l-1.92-3.32a.488.488 0 0 0-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.484.484 0 0 0-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58a.49.49 0 0 0-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z'],
-      muted: ['M3 9v6h4l5 5V4L7 9H3z', 'M14.5 9.4l1.4-1.4 2.1 2.1 2.1-2.1 1.4 1.4-2.1 2.1 2.1 2.1-1.4 1.4-2.1-2.1-2.1 2.1-1.4-1.4 2.1-2.1z']
+      muted: ['M3 9v6h4l5 5V4L7 9H3z', 'M14.5 9.4l1.4-1.4 2.1 2.1 2.1-2.1 1.4 1.4-2.1 2.1 2.1 2.1-1.4 1.4-2.1-2.1-2.1 2.1-1.4-1.4 2.1-2.1z'],
+      rewind: ['M11 18V6l-8.5 6 8.5 6zm.5-6l8.5 6V6l-8.5 6z'],
+      fastForward: ['M4 18l8.5-6L4 6v12zm9-12v12l8.5-6L13 6z']
     };
 
+    // The skip buttons carry the seconds they skip, which a site's own choice can change.
     function setIcon(button, name) {
-      if (button.__icon === name) return;
+      var label = name === 'back' || name === 'forward' ? String(skipSeconds()) : '';
+      if (button.__icon === name && button.__label === label) return;
       button.__icon = name;
+      button.__label = label;
       button.textContent = '';
-      var extra = name === 'back' || name === 'forward' ? digit(String(SKIP_SECONDS)) : null;
-      button.appendChild(icon(ICONS[name], extra));
+      button.appendChild(icon(ICONS[name], label ? digit(label) : null));
     }
 
     // The video full screen, or back. A phone's own player takes a video (iOS: webkitEnterFullscreen),
@@ -575,32 +657,68 @@
     }
 
     function closeMenu() {
-      if (ui && ui.menu) { ui.menu.style.display = 'none'; ui.menu.textContent = ''; }
-      ui && (ui.menu.__group = -1);
+      if (!ui || !ui.menu) return;
+      ui.menu.style.display = 'none';
+      ui.menu.textContent = '';
+      ui.menu.__group = -1;
     }
 
-    function openMenu(index) {
-      var group = optionGroups.groups[index];
-      if (!ui || !group) return;
-      if (ui.menu.style.display === 'block' && ui.menu.__group === index) { closeMenu(); return; }
+    // The list a button opens above the panel: a row per choice, the chosen one ticked. The same
+    // button again closes it.
+    function openList(key, items, pick) {
+      if (!ui) return;
+      if (ui.menu.style.display === 'block' && ui.menu.__group === key) { closeMenu(); return; }
       ui.menu.textContent = '';
-      ui.menu.__group = index;
-      group.items.forEach(function (item, at) {
-        var row = make('div', 'padding:10px 14px;white-space:nowrap;cursor:pointer;touch-action:manipulation;' +
-          (item.selected ? 'font-weight:600' : 'opacity:.85'));
+      ui.menu.__group = key;
+      items.forEach(function (item, at) {
+        var row = make('div', 'padding:11px 16px;white-space:nowrap;cursor:pointer;touch-action:manipulation;' +
+          (item.selected ? 'font-weight:700' : 'font-weight:500;opacity:.85'));
         row.textContent = (item.selected ? '\u2713 ' : '\u2003') + item.label;
         row.addEventListener('pointerdown', stop);
         row.addEventListener('pointerup', function (event) {
           stop(event);
           ghostUntil = Date.now() + GHOST_MS;
-          try { group.select(at); } catch (_) {}
+          try { pick(at); } catch (_) {}
           closeMenu();
-          optionGroups.at = 0;
           keepAlive();
+          paint(focus());
         });
         ui.menu.appendChild(row);
       });
       ui.menu.style.display = 'block';
+    }
+
+    function openMenu(index) {
+      var group = optionGroups.groups[index];
+      if (!group) return;
+      openList(index, group.items, function (at) {
+        optionGroups.at = 0;
+        group.select(at);
+      });
+    }
+
+    function rateLabel(rate) {
+      return (Math.round(rate * 100) / 100) + '\u00d7';
+    }
+
+    function openRates(video) {
+      var now = video.playbackRate || 1;
+      openList('rate', RATES.map(function (rate) {
+        return { label: rateLabel(rate), selected: Math.abs(rate - now) < 0.001 };
+      }), function (at) { setRate(RATES[at]); });
+    }
+
+    // The speed picked carries over to the next video on this page, and to other pages when the
+    // reader asked to remember it.
+    function setRate(rate) {
+      panelRate = rate;
+      if (wantsRemember) write({ rate: rate });
+      var target = focus();
+      if (!target) return;
+      try {
+        target.defaultPlaybackRate = rate;
+        target.playbackRate = rate;
+      } catch (_) {}
     }
 
     // Buttons for the groups, made again only when the groups change.
@@ -619,7 +737,12 @@
       closeMenu();
       groups.forEach(function (group, index) {
         var icon = group.kind === 'captions' ? 'cc' : group.kind === 'audio' ? 'audio' : 'gear';
-        var opener = button(32, icon, function () { openMenu(index); });
+        // Read again first: a list the player changed since would open stale, then close at once.
+        var opener = button(BUTTON, icon, function (target) {
+          optionGroups.at = 0;
+          syncOptions(target);
+          openMenu(index);
+        }, BUTTON_PAD);
         if (group.label) opener.title = group.label;
         ui.extras.appendChild(opener);
       });
@@ -634,11 +757,12 @@
       tracks.forEach(function (track, index) { track.enabled = index === next; });
     }
 
-    function button(size, name, action) {
+    // A round button: `size` is what a finger can hit, `pad` keeps the icon inside it smaller.
+    function button(size, name, action, pad) {
       var element = make('div',
-        'pointer-events:auto;display:flex;align-items:center;justify-content:center;' +
-        'width:' + size + 'px;height:' + size + 'px;color:#fff;border-radius:50%;' +
-        'touch-action:manipulation;cursor:pointer');
+        'pointer-events:auto;display:flex;align-items:center;justify-content:center;box-sizing:border-box;' +
+        'flex:none;width:' + size + 'px;height:' + size + 'px;padding:' + (pad || 0) + 'px;color:#fff;' +
+        'border-radius:50%;touch-action:manipulation;cursor:pointer');
       setIcon(element, name);
       element.addEventListener('pointerdown', stop);
       element.addEventListener('pointerup', function (event) {
@@ -653,43 +777,67 @@
       return element;
     }
 
-    // A thin bar the reader drags along; `onRatio` gets where on it the finger is, 0 to 1.
-    function slider(height, onRatio) {
+    // A thin bar the reader drags along: `onRatio(ratio, phase)` gets where on it the finger is, 0
+    // to 1, as the press goes 'down', 'move's and lets go ('up'). The bar thickens and the knob
+    // grows while it is held; given `describe`, a bubble over the knob says what the point means.
+    function slider(height, onRatio, describe) {
       var track = make('div',
-        'pointer-events:auto;height:' + height + 'px;display:flex;align-items:center;' +
+        'pointer-events:auto;position:relative;height:' + height + 'px;display:flex;align-items:center;' +
         'touch-action:none;cursor:pointer');
-      var line = make('div', 'position:relative;width:100%;height:4px;background:rgba(255,255,255,.35)');
-      var fill = make('div', 'position:absolute;left:0;top:0;bottom:0;width:0;background:#fff');
+      var line = make('div',
+        'position:relative;width:100%;height:4px;border-radius:2px;background:rgba(255,255,255,.28);' +
+        'transition:height .12s ease-out');
+      var fill = make('div',
+        'position:absolute;z-index:2;left:0;top:0;bottom:0;width:0;border-radius:2px;background:#fff');
       var knob = make('div',
-        'position:absolute;top:-4px;width:12px;height:12px;margin-left:-6px;border-radius:50%;' +
-        'background:#fff;left:0');
+        'position:absolute;z-index:3;top:50%;left:0;width:14px;height:14px;margin:-7px 0 0 -7px;' +
+        'border-radius:50%;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.45);transition:transform .12s ease-out');
+      var loaded = make('div',
+        'position:absolute;z-index:1;left:0;top:0;bottom:0;width:0;border-radius:2px;background:rgba(255,255,255,.4)');
+      var bubble = make('div',
+        'position:absolute;z-index:4;bottom:18px;left:0;display:none;transform:translateX(-50%);padding:5px 8px;' +
+        'border-radius:8px;background:rgba(0,0,0,.85);font-size:12px;white-space:nowrap;pointer-events:none');
       line.appendChild(fill);
       line.appendChild(knob);
+      line.appendChild(loaded);
+      line.appendChild(bubble);
       track.appendChild(line);
       var drag = false;
+      var last = 0;
       function show(ratio) {
         fill.style.width = ratio * 100 + '%';
         knob.style.left = ratio * 100 + '%';
       }
-      function at(event) {
+      function held(on) {
+        line.style.height = on ? '6px' : '4px';
+        knob.style.transform = on ? 'scale(1.3)' : '';
+        if (!on) bubble.style.display = 'none';
+      }
+      function at(event, phase) {
         var box = line.getBoundingClientRect();
-        var ratio = Math.min(1, Math.max(0, (event.clientX - box.left) / (box.width || 1)));
+        last = Math.min(1, Math.max(0, (event.clientX - box.left) / (box.width || 1)));
         // The knob follows the finger; `paint` leaves it alone while a drag is on.
-        show(ratio);
-        onRatio(ratio);
+        show(last);
+        if (describe) {
+          bubble.textContent = describe(last);
+          bubble.style.left = last * 100 + '%';
+          bubble.style.display = bubble.textContent ? 'block' : 'none';
+        }
+        onRatio(last, phase);
       }
       track.addEventListener('pointerdown', function (event) {
         stop(event);
         drag = true;
         dragging = true;
+        held(true);
         try { track.setPointerCapture(event.pointerId); } catch (_) {}
-        at(event);
+        at(event, 'down');
         keepAlive();
       });
       track.addEventListener('pointermove', function (event) {
         if (!drag) return;
         stop(event);
-        at(event);
+        at(event, 'move');
         keepAlive();
       });
       var release = function (event) {
@@ -697,14 +845,16 @@
         stop(event);
         drag = false;
         dragging = false;
+        held(false);
+        onRatio(last, 'up');
       };
       track.addEventListener('pointerup', release);
       track.addEventListener('pointercancel', release);
       track.addEventListener('lostpointercapture', release);
       return {
         track: track,
-        line: line,
-        set: show
+        set: show,
+        setLoaded: function (ratio) { loaded.style.width = ratio * 100 + '%'; }
       };
     }
 
@@ -825,14 +975,45 @@
       frame.setProperty('visibility', 'visible', 'important');
     }
 
+    function viewport() {
+      return {
+        width: window.innerWidth || document.documentElement.clientWidth || 400,
+        height: window.innerHeight || document.documentElement.clientHeight || 800
+      };
+    }
+
+    function miniSize(ratio, screen) {
+      var width = Math.round(Math.min(MINI_MAX, screen.width * MINI_SHARE));
+      return { width: width, height: Math.round(Math.min(screen.height * 0.32, Math.max(90, width / ratio))) };
+    }
+
+    // A turned phone or a resized window: the small player takes its size for the new screen and
+    // stays inside it, near where the reader left it. A drag or a settle under way paints it itself.
+    function fitMini() {
+      var state = mini;
+      if (!state || miniWindowed || state.root.style.transition || (drag && drag.engaged) || frameDrag) return;
+      var screen = viewport();
+      var size = miniSize(state.ratio, screen);
+      state.width = size.width;
+      state.height = size.height;
+      state.right = Math.max(0, Math.min(screen.width - size.width, state.right));
+      state.bottom = Math.max(0, Math.min(screen.height - size.height, state.bottom));
+      ['right', 'bottom', 'width', 'height'].forEach(function (name) {
+        state.root.style[name] = state[name] + 'px';
+      });
+      syncFrame(state);
+    }
+
     function miniOnFrame(frame, from) {
       if (mini || !frame.isConnected || !frame.parentNode) return;
-      var screenWidth = window.innerWidth || document.documentElement.clientWidth || 400;
-      var screenHeight = window.innerHeight || document.documentElement.clientHeight || 800;
+      var screen = viewport();
+      var screenWidth = screen.width;
+      var screenHeight = screen.height;
       var here = frame.getBoundingClientRect();
-      var width = Math.round(Math.min(MINI_MAX, screenWidth * MINI_SHARE));
       var ratio = here.width > 0 && here.height > 0 ? here.width / here.height : 16 / 9;
-      var height = Math.round(Math.min(screenHeight * 0.32, Math.max(90, width / ratio)));
+      var size = miniSize(ratio, screen);
+      var width = size.width;
+      var height = size.height;
       var start = {
         right: screenWidth - here.right, bottom: screenHeight - here.bottom,
         width: here.width, height: here.height
@@ -846,7 +1027,7 @@
         frame: frame, video: null, root: root,
         marker: document.createElement('div'),
         style: frame.getAttribute('style'),
-        right: MINI_EDGE, bottom: MINI_BOTTOM, width: width, height: height,
+        right: MINI_EDGE, bottom: MINI_BOTTOM, width: width, height: height, ratio: ratio,
         start: from ? start : null, stops: []
       };
       // Its place in the page stays as it was, so the page does not move under the reader.
@@ -945,14 +1126,14 @@
 
     function miniOn(video, from) {
       if (mini || !video.parentNode) return;
-      var screenWidth = window.innerWidth || document.documentElement.clientWidth || 400;
-      var screenHeight = window.innerHeight || document.documentElement.clientHeight || 800;
-      var width = Math.round(Math.min(MINI_MAX, screenWidth * MINI_SHARE));
+      var screen = viewport();
       var ratio = video.videoWidth > 0 && video.videoHeight > 0 ? video.videoWidth / video.videoHeight : 16 / 9;
-      var height = Math.round(Math.min(screenHeight * 0.32, Math.max(90, width / ratio)));
+      var size = miniSize(ratio, screen);
+      var width = size.width;
+      var height = size.height;
       // Started by a drag, it begins where the video was, full size, and the finger shrinks it.
       var start = from ? {
-        right: screenWidth - from.right, bottom: screenHeight - from.bottom,
+        right: screen.width - from.right, bottom: screen.height - from.bottom,
         width: from.right - from.left, height: from.bottom - from.top
       } : null;
       var root = make('div',
@@ -974,6 +1155,7 @@
         bottom: MINI_BOTTOM,
         width: width,
         height: height,
+        ratio: ratio,
         start: start,
         stops: []
       };
@@ -1036,8 +1218,9 @@
       root.addEventListener('pointermove', function (event) {
         if (!from) return;
         stop(event);
-        state.right = Math.max(0, Math.min(screenWidth - width, from.right - (event.clientX - from.x)));
-        state.bottom = Math.max(0, Math.min(screenHeight - height, from.bottom - (event.clientY - from.y)));
+        var screen = viewport();
+        state.right = Math.max(0, Math.min(screen.width - state.width, from.right - (event.clientX - from.x)));
+        state.bottom = Math.max(0, Math.min(screen.height - state.height, from.bottom - (event.clientY - from.y)));
         root.style.right = state.right + 'px';
         root.style.bottom = state.bottom + 'px';
       });
@@ -1313,9 +1496,10 @@
       }
     }
 
-    // The panel: three buttons above a row (mute, time left, speed) above the seek bar,
-    // fixed above the bottom edge. Everything is made here as plain elements and nothing is read
-    // back from the site.
+    // The panel: the small player and full screen in its top corners, back, play and forward in
+    // the middle, a row (mute and volume, the site's options, speed) and the seek bar between the
+    // time played and the time left, fixed above the bottom edge. Everything is made here as plain
+    // elements and nothing is read back from the site.
     // Where the panel lives: the page's body, or the element the page has made full screen (all
     // else is hidden under it). A site that swaps its body out takes the panel with it, so it is
     // put back rather than left showing nowhere.
@@ -1327,55 +1511,83 @@
       if (parent && ui.root.parentNode !== parent) parent.appendChild(ui.root);
     }
 
+    function togglePlay(target) {
+      var feed = document[USER_PAUSE];
+      if (target.paused) {
+        if (typeof feed === 'function') feed(target, false);
+        try { target.play().catch(function () {}); } catch (_) {}
+      } else {
+        if (typeof feed === 'function') feed(target, true);
+        target.pause();
+      }
+    }
+
+    function toggleMute(target) {
+      target.muted = !target.muted;
+      if (!target.muted && shownVolume(target) === 0) setVolume(target, 1);
+      panelSound = { muted: target.muted, volume: target.volume };
+    }
+
+    // Dragging the bar up, or a key, unmutes the video.
+    function changeVolume(target, ratio) {
+      setVolume(target, ratio);
+      if (ratio > 0 && target.muted) target.muted = false;
+      panelSound = { muted: target.muted, volume: target.volume };
+    }
+
+    function toggleFloat(target) {
+      if (framed) {
+        toPage({ om: parentMini ? 'unfloat' : 'float' });
+      } else if (mini) {
+        miniOff();
+      } else {
+        miniOn(target);
+        askAppToFloat();
+      }
+      hide();
+    }
+
+    // What a point of the seek bar is: a time of the video, or how far behind live.
+    function describeSeek(ratio) {
+      var target = focus();
+      var range = target && rangeOf(target);
+      if (!range) return '';
+      var span = range.end - range.start;
+      return range.live ? '-' + clock((1 - ratio) * span) : clock(ratio * span);
+    }
+
     function build(video) {
       if (ui) { mount(); return ui; }
       var parent = document.body || document.documentElement;
       if (!parent) return null;
       var root = make('div',
         'position:fixed;left:0;right:0;z-index:2147483646;display:none;pointer-events:none;' +
-        'font:600 13px/1 -apple-system,system-ui,sans-serif;color:#fff;' +
-        '-webkit-user-select:none;user-select:none');
+        'font:600 13px/1 -apple-system,system-ui,sans-serif;color:#fff;font-variant-numeric:tabular-nums;' +
+        '-webkit-user-select:none;user-select:none;transition:opacity .16s ease-out');
       root.setAttribute('data-openmedia-controls', '');
+      // At most a comfortable width, centred, on a tablet, a turned phone or a desktop window.
       var card = make('div',
-        'position:relative;pointer-events:auto;margin:0 12px;padding:10px 14px 2px;border-radius:18px;background:rgba(0,0,0,.62);' +
-        '-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)');
+        'position:relative;pointer-events:auto;box-sizing:border-box;width:calc(100% - 24px);max-width:560px;' +
+        'margin:0 auto;padding:8px 10px 2px;border-radius:20px;background:rgba(18,18,18,.66);' +
+        'border:1px solid rgba(255,255,255,.08);box-shadow:0 8px 28px rgba(0,0,0,.35);' +
+        '-webkit-backdrop-filter:blur(14px) saturate(1.4);backdrop-filter:blur(14px) saturate(1.4)');
       var transport = make('div',
-        'display:flex;align-items:center;justify-content:center;gap:30px;padding-bottom:6px');
-      var back = button(40, 'back', function (target) {
-        target.currentTime = Math.max(0, target.currentTime - SKIP_SECONDS);
-      });
-      var toggle = button(56, 'pause', function (target) {
-        var feed = document[USER_PAUSE];
-        if (target.paused) {
-          if (typeof feed === 'function') feed(target, false);
-          try { target.play().catch(function () {}); } catch (_) {}
-        } else {
-          if (typeof feed === 'function') feed(target, true);
-          target.pause();
-        }
-      });
+        'display:flex;align-items:center;justify-content:center;gap:28px;padding:2px 0 4px');
+      var back = button(48, 'back', function (target) { skip(target, -skipSeconds()); }, 10);
+      var toggle = button(60, 'pause', togglePlay, 15);
       toggle.style.background = 'rgba(255,255,255,.18)';
-      var forward = button(40, 'forward', function (target) {
-        var end = isFinite(target.duration) && target.duration > 0 ? target.duration : Infinity;
-        target.currentTime = Math.min(end, target.currentTime + SKIP_SECONDS);
-      });
+      var forward = button(48, 'forward', function (target) { skip(target, skipSeconds()); }, 10);
       transport.appendChild(back);
       transport.appendChild(toggle);
       transport.appendChild(forward);
-      var row = make('div', 'display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:2px 0');
-      var mute = button(32, 'sound', function (target) {
-        target.muted = !target.muted;
-        if (!target.muted && shownVolume(target) === 0) setVolume(target, 1);
-        panelSound = { muted: target.muted, volume: target.volume };
-      });
+      var row = make('div', 'display:flex;align-items:center;gap:2px;min-height:' + BUTTON + 'px');
+      var mute = button(BUTTON, 'sound', toggleMute, BUTTON_PAD);
       // The volume of the device on Android, where a site's player resets its own; the video's own
-      // volume elsewhere, and no bar where that cannot be set. Dragging it up unmutes the video.
-      var volume = slider(30, function (ratio) {
+      // volume elsewhere, and no bar where that cannot be set.
+      var volume = slider(BUTTON, function (ratio, phase) {
         var target = focus();
-        if (!target) return;
-        setVolume(target, ratio);
-        if (ratio > 0 && target.muted) target.muted = false;
-        panelSound = { muted: target.muted, volume: target.volume };
+        if (!target || phase === 'up') return;
+        changeVolume(target, ratio);
         paint(target);
         // A site that puts the volume back (or a platform that ignores it) only leaves the ends:
         // when a middle value does not hold, the bar is no use on this page and goes.
@@ -1388,81 +1600,103 @@
           }, 400);
         }
       });
-      volume.track.style.cssText += ';flex:1 1 70px;min-width:56px;max-width:120px';
-      var floatButton = button(32, 'pip', function (target) {
-        if (framed) {
-          toPage({ om: parentMini ? 'unfloat' : 'float' });
-        } else if (mini) {
-          miniOff();
-        } else {
-          miniOn(target);
-          askAppToFloat();
-        }
-        hide();
-      });
-      var fullButton = button(32, 'fullscreen', function (target) { toggleFullscreen(target); });
-      var left = make('span', 'margin-left:auto;min-width:48px;text-align:right');
+      volume.track.style.cssText += ';flex:0 1 96px;min-width:56px;margin-right:6px';
+      var floatButton = button(BUTTON, 'pip', toggleFloat, 10);
+      var fullButton = button(BUTTON, 'fullscreen', toggleFullscreen, 10);
+      var spacer = make('span', 'flex:1 1 0');
       var pill = make('span',
-        'pointer-events:auto;padding:7px 12px;border-radius:999px;background:rgba(255,255,255,.18);' +
-        'touch-action:manipulation;cursor:pointer');
+        'pointer-events:auto;flex:none;margin-left:4px;padding:8px 12px;border-radius:999px;' +
+        'background:rgba(255,255,255,.18);touch-action:manipulation;cursor:pointer');
       pill.addEventListener('pointerdown', stop);
       pill.addEventListener('pointerup', function (event) {
         stop(event);
+        ghostUntil = Date.now() + GHOST_MS;
         var target = focus();
-        var rate = target ? target.playbackRate : 1;
-        var next = RATES.filter(function (candidate) { return candidate > rate + 0.001; })[0] || RATES[0];
-        write({ rate: next });
-        if (target) {
-          target.defaultPlaybackRate = next;
-          target.playbackRate = next;
-        }
+        if (target) openRates(target);
         keepAlive();
-        paint(target);
       });
-      var extras = make('span', 'display:flex;align-items:center;gap:10px');
-      var cc = button(32, 'cc', function (target) { cycleCaptions(target); });
-      var audio = button(32, 'audio', function (target) { cycleAudio(target); });
+      var extras = make('span', 'display:flex;align-items:center;gap:2px');
+      var cc = button(BUTTON, 'cc', cycleCaptions, BUTTON_PAD);
+      var audio = button(BUTTON, 'audio', cycleAudio, BUTTON_PAD);
       var note = make('span',
         'font-size:12px;opacity:.85;max-width:96px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap');
       cc.style.display = 'none';
       audio.style.display = 'none';
       row.appendChild(mute);
       row.appendChild(volume.track);
+      row.appendChild(spacer);
       row.appendChild(cc);
       row.appendChild(audio);
       row.appendChild(note);
       row.appendChild(extras);
-      row.appendChild(left);
       row.appendChild(pill);
-      var seek = slider(30, function (ratio) {
+      // The seek bar between the time played and the time left. A finger on it seeks a few times a
+      // second as it moves, and to the exact point when it lets go.
+      var times = make('div', 'display:flex;align-items:center;gap:10px;font-size:12px');
+      var played = make('span', 'flex:none;min-width:34px;opacity:.9');
+      var left = make('span',
+        'pointer-events:auto;flex:none;min-width:34px;text-align:right;opacity:.9;padding:8px 0;' +
+        'touch-action:manipulation;cursor:pointer');
+      var seekAt = 0;
+      var seek = slider(30, function (ratio, phase) {
         var target = focus();
-        if (!target || !isFinite(target.duration) || !target.duration) return;
-        // Not quite the end: the end would fire `ended`, which moves a feed on.
-        target.currentTime = Math.min(ratio * target.duration, Math.max(0, target.duration - 0.25));
+        var range = target && rangeOf(target);
+        if (!range) return;
+        var now = Date.now();
+        if (phase === 'move' && now - seekAt < SEEK_STEP_MS) return;
+        seekAt = now;
+        seekTo(target, range, ratio, phase === 'move');
+        paint(target);
+      }, describeSeek);
+      seek.track.style.cssText += ';flex:1 1 auto';
+      // The time left, or the length; on a live stream, a tap goes back to live.
+      left.addEventListener('pointerdown', stop);
+      left.addEventListener('pointerup', function (event) {
+        stop(event);
+        ghostUntil = Date.now() + GHOST_MS;
+        var target = focus();
+        var range = target && rangeOf(target);
+        if (range && range.live) goLive(target, range);
+        else showTotal = !showTotal;
+        keepAlive();
         paint(target);
       });
-      // The small player's button in the top left corner, full screen in the top right.
-      floatButton.style.cssText += ';position:absolute;top:8px;left:10px';
-      fullButton.style.cssText += ';position:absolute;top:8px;right:10px';
+      times.appendChild(played);
+      times.appendChild(seek.track);
+      times.appendChild(left);
+      floatButton.style.cssText += ';position:absolute;top:6px;left:6px';
+      fullButton.style.cssText += ';position:absolute;top:6px;right:6px';
       card.appendChild(floatButton);
       card.appendChild(fullButton);
-      // The list a group's button opens, above the panel.
+      // The list a group's button or the speed opens, above the panel.
       var menu = make('div',
-        'display:none;position:absolute;right:0;bottom:calc(100% + 8px);max-height:40vh;overflow-y:auto;' +
-        'border-radius:14px;background:rgba(0,0,0,.85);color:#fff;pointer-events:auto;' +
-        '-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)');
+        'display:none;position:absolute;right:8px;bottom:calc(100% + 8px);max-height:40vh;overflow-y:auto;' +
+        'border-radius:14px;background:rgba(18,18,18,.9);color:#fff;pointer-events:auto;' +
+        'box-shadow:0 8px 28px rgba(0,0,0,.4);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)');
       menu.__group = -1;
       card.appendChild(menu);
       card.appendChild(transport);
       card.appendChild(row);
-      card.appendChild(seek.track);
+      card.appendChild(times);
       root.appendChild(card);
+      // What a double tap on a side of the video skipped, written over that side for a moment.
+      var ripple = make('div',
+        'position:fixed;display:none;flex-direction:column;align-items:center;justify-content:center;gap:2px;' +
+        'width:84px;height:84px;margin:-42px 0 0 -42px;border-radius:50%;background:rgba(0,0,0,.45);' +
+        'pointer-events:none;font-size:13px');
+      var rippleIcon = make('span', 'display:block;width:26px;height:26px');
+      var rippleText = make('span', '');
+      ripple.appendChild(rippleIcon);
+      ripple.appendChild(rippleText);
+      root.appendChild(ripple);
       ['click', 'touchstart', 'touchmove', 'touchend'].forEach(function (name) {
         root.addEventListener(name, function (event) { event.stopPropagation(); });
       });
       parent.appendChild(root);
       ui = {
-        root: root, toggle: toggle, mute: mute, volume: volume, cc: cc, audio: audio, note: note, extras: extras, menu: menu, left: left, pill: pill, seek: seek
+        root: root, back: back, toggle: toggle, forward: forward, mute: mute, volume: volume, cc: cc, audio: audio,
+        note: note, extras: extras, menu: menu, played: played, left: left, pill: pill, seek: seek,
+        ripple: ripple, rippleIcon: rippleIcon, rippleText: rippleText
       };
       return ui;
     }
@@ -1472,13 +1706,37 @@
       if (event.cancelable) event.preventDefault();
     }
 
+    // The times by the seek bar: played and left (or the length), or on a live stream a dot, red
+    // at live and with how far behind it otherwise.
+    function paintTimes(video, range) {
+      if (!range) {
+        ui.played.textContent = '';
+        ui.left.textContent = '';
+        return;
+      }
+      if (range.live) {
+        var behind = range.end - video.currentTime;
+        var atLive = behind <= LIVE_EDGE;
+        ui.played.textContent = '';
+        ui.left.textContent = atLive ? '\u25cf' : '\u25cf -' + clock(behind);
+        ui.left.style.color = atLive ? '#ff4e45' : '';
+        return;
+      }
+      ui.left.style.color = '';
+      ui.played.textContent = clock(video.currentTime);
+      ui.left.textContent = showTotal ? clock(range.end) : '-' + clock(range.end - video.currentTime);
+    }
+
     function paint(video) {
       if (!ui || !video) return;
-      var known = isFinite(video.duration) && video.duration > 0;
-      if (!dragging) ui.seek.set(known ? Math.min(1, video.currentTime / video.duration) : 0);
-      ui.left.textContent = known ? '-' + clock(video.duration - video.currentTime) : '';
-      var rate = video.playbackRate || 1;
-      ui.pill.textContent = (Math.round(rate * 100) / 100) + '\u00d7';
+      var range = rangeOf(video);
+      if (!dragging) ui.seek.set(range ? ratioIn(range, video.currentTime) : 0);
+      ui.seek.setLoaded(range ? loadedRatio(video, range) : 0);
+      ui.seek.track.style.opacity = range ? '1' : '.4';
+      paintTimes(video, range);
+      ui.pill.textContent = rateLabel(video.playbackRate || 1);
+      setIcon(ui.back, 'back');
+      setIcon(ui.forward, 'forward');
       setIcon(ui.toggle, video.paused ? 'play' : 'pause');
       setIcon(ui.mute, video.muted || shownVolume(video) === 0 ? 'muted' : 'sound');
       ui.volume.track.style.display = volumeControllable() ? 'flex' : 'none';
@@ -1494,6 +1752,26 @@
       var heard = audios.filter(function (track) { return track.enabled; })[0];
       ui.audio.style.display = audios.length && kinds.indexOf('audio') < 0 ? 'flex' : 'none';
       ui.note.textContent = (showing && showing.label) || (heard && heard.label) || '';
+    }
+
+    // The skip a double tap made, over the side it was made on; taps that follow add to it.
+    var rippleState = { side: 0, seconds: 0, timer: 0 };
+    function showRipple(video, side) {
+      if (!ui) return;
+      var box = boxOf(video);
+      var screen = viewport();
+      rippleState.seconds = (rippleState.side === side ? rippleState.seconds : 0) + skipSeconds();
+      rippleState.side = side;
+      ui.ripple.style.left = (box.left + (box.right - box.left) * (side < 0 ? 0.2 : 0.8)) + 'px';
+      ui.ripple.style.top = (Math.max(box.top, 0) + Math.min(box.bottom, screen.height)) / 2 + 'px';
+      setIcon(ui.rippleIcon, side < 0 ? 'rewind' : 'fastForward');
+      ui.rippleText.textContent = (side < 0 ? '\u2212' : '+') + rippleState.seconds;
+      ui.ripple.style.display = 'flex';
+      clearTimeout(rippleState.timer);
+      rippleState.timer = setTimeout(function () {
+        rippleState.side = 0;
+        if (ui) ui.ripple.style.display = 'none';
+      }, RIPPLE_MS);
     }
 
     function hide() {
@@ -1534,7 +1812,13 @@
       var parts = build(video);
       if (!parts) return;
       parts.root.style.bottom = 'calc(env(safe-area-inset-bottom,0px) + ' + panelHeight() + 'px)';
-      parts.root.style.display = 'block';
+      // Fades in: the opacity starts from nothing once the panel is laid out again.
+      if (parts.root.style.display !== 'block') {
+        parts.root.style.opacity = '0';
+        parts.root.style.display = 'block';
+        void parts.root.offsetWidth;
+        parts.root.style.opacity = '1';
+      }
       paint(video);
     }
 
@@ -1571,6 +1855,20 @@
       return video;
     }
 
+    // Which third of the video a point is in: -1 the left, 1 the right, 0 the middle.
+    function sideOf(video, x) {
+      var box = boxOf(video);
+      var third = (box.right - box.left) / 3;
+      if (x < box.left + third) return -1;
+      if (x > box.right - third) return 1;
+      return 0;
+    }
+
+    // A tap shows or hides the panel. A second tap soon after on the same side of the video (not
+    // the middle) skips back or forward instead, as a player's double tap does, and each one more
+    // skips again; the panel stays up to show where the video is.
+    var lastPanelTap = null;
+    var skippedAt = 0;
     function tapAt(x, y, hit, event) {
       var video = videoAt(x, y, hit);
       if (!video) return false;
@@ -1582,6 +1880,20 @@
       event.stopImmediatePropagation();
       if (event.cancelable) event.preventDefault();
       restoreMute();
+      var now = Date.now();
+      var side = sideOf(video, x);
+      var previous = lastPanelTap;
+      lastPanelTap = { at: now, side: side, video: video };
+      if (side && previous && previous.side === side && previous.video === video && now - previous.at < DOUBLE_TAP_MS) {
+        skippedAt = now;
+        skip(video, side * skipSeconds());
+        lastVideo = video;
+        shown = true;
+        keepAlive();
+        tick();
+        showRipple(video, side);
+        return true;
+      }
       if (shown) {
         hide();
         return true;
@@ -1591,6 +1903,41 @@
       keepAlive();
       tick();
       return true;
+    }
+
+    // While the panel is up, keys work it as they do a player's: space or K plays and pauses, the
+    // arrows (or J and L) skip and set the volume, M mutes, F goes full screen, Escape puts the
+    // panel away. With the panel down, or while typing in a field, every key is the site's.
+    var KEYS = {
+      ' ': 'play', k: 'play', arrowleft: 'back', j: 'back', arrowright: 'forward', l: 'forward',
+      arrowup: 'louder', arrowdown: 'quieter', m: 'mute', f: 'full', escape: 'hide'
+    };
+    var KEY_ACTIONS = {
+      play: togglePlay,
+      back: function (video) { skip(video, -skipSeconds()); },
+      forward: function (video) { skip(video, skipSeconds()); },
+      louder: function (video) { if (volumeControllable()) changeVolume(video, Math.min(1, shownVolume(video) + VOLUME_STEP)); },
+      quieter: function (video) { if (volumeControllable()) changeVolume(video, Math.max(0, shownVolume(video) - VOLUME_STEP)); },
+      mute: toggleMute,
+      full: toggleFullscreen
+    };
+    function onKey(event) {
+      if (!shown || !ui || event.metaKey || event.ctrlKey || event.altKey) return;
+      var target = event.target;
+      if (target && (target.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(target.tagName || ''))) return;
+      var action = KEYS[String(event.key || '').toLowerCase()];
+      var video = action && panelPage() && panelOn() ? focus() : null;
+      if (!video) return;
+      event.stopImmediatePropagation();
+      if (event.cancelable) event.preventDefault();
+      lastTap = Date.now();
+      if (action === 'hide') {
+        hide();
+        return;
+      }
+      KEY_ACTIONS[action](video);
+      keepAlive();
+      paint(video);
     }
 
     // A tap on the video is the panel's and never mutes or unmutes: players that do so on the
@@ -1852,6 +2199,14 @@
     on(window, 'touchend', trusted(onTouchEnd), { capture: true });
     on(window, 'click', trusted(onClick), { capture: true });
     on(document, 'keydown', tapped, { capture: true, passive: true });
+    on(document, 'keydown', trusted(onKey), { capture: true });
+    on(window, 'resize', fitMini, { passive: true });
+    // A double click that skipped is not also the site's (a desktop player goes full screen on it).
+    on(window, 'dblclick', trusted(function (event) {
+      if (Date.now() - skippedAt > TAP_MAX_MS) return;
+      event.stopImmediatePropagation();
+      if (event.cancelable) event.preventDefault();
+    }), { capture: true });
     // A new source is a new video: it gets the remembered speed and sound, once it has started.
     on(document, 'loadstart', function (event) {
       var video = event.target;
@@ -1871,7 +2226,7 @@
     on(document, 'playing', applyOnStart, true);
     on(document, 'volumechange', function (event) {
       var video = event.target;
-      if (!wantsSound || !(video instanceof HTMLVideoElement)) return;
+      if (!wantsRemember || !(video instanceof HTMLVideoElement)) return;
       if (!panelPage() || Date.now() - lastTap > TAP_MS) return;
       write({ muted: video.muted, volume: video.volume });
     }, true);
@@ -1901,6 +2256,7 @@
       value: function () {
         clearInterval(timer);
         clearTimeout(hideTimer);
+        clearTimeout(rippleState.timer);
         miniOff();
         delete document[MINI_WINDOW];
         delete document[MINI_CLOSE];

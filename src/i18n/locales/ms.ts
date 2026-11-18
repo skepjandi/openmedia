@@ -358,6 +358,11 @@ export const ms: Messages = {
   "settings.videoHeightNote":
     "Sejauh mana kawalan berada di atas tepi bawah. Kegemaran boleh menetapkan ketinggiannya sendiri.",
   "settings.videoHeightLabel": "Ketinggian kawalan video",
+  "settings.videoSkip": "Langkau sebanyak",
+  "settings.videoSkipNote":
+    "Sejauh mana butang undur dan maju, serta ketik dua kali di sebelah video, melompat.",
+  "settings.videoSkipLabel": "Panjang langkauan video",
+  "settings.videoSkipSeconds": "{seconds} s",
   "settings.videoRemember": "Ingat kelajuan dan bunyi",
   "settings.videoRememberNote":
     "Video seterusnya bermula pada kelajuan dan kelantangan yang anda pilih kali terakhir.",

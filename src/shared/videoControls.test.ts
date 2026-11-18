@@ -143,6 +143,8 @@ class FakeElement {
   private text = "";
   /** The icon the page last put on this element, as its script records it. */
   __icon?: string;
+  /** The seconds a skip button's icon carries. */
+  __label?: string;
   attributes: Record<string, string> = {};
   handlers = new Map<string, Listener[]>();
 
@@ -618,6 +620,18 @@ function sliders(page: Page) {
   return page.body.descendants().filter((element) => element.handlers.has("pointermove"));
 }
 
+/** The list a panel button opened: shown, with a row that takes a tap for each choice. */
+function openedList(page: Page) {
+  return page.body
+    .descendants()
+    .find(
+      (element) =>
+        element.style.display === "block" &&
+        element.children.length > 0 &&
+        element.children.every((row) => row.handlers.has("pointerup")),
+    );
+}
+
 describe("video controls", () => {
   it("keeps a video from looping when it gets a new source", () => {
     const video = new FakeVideo();
@@ -634,12 +648,41 @@ describe("video controls", () => {
     expect(video.loop).toBe(true);
   });
 
-  it("starts the next video at the speed the reader last chose", () => {
+  it("starts the next video at the speed the reader last chose, across pages only when asked", () => {
     const video = new FakeVideo();
-    const page = load({ videos: [video], current: video, saved: { rate: 1.5 } });
+    const page = load({
+      controls: { remember: true },
+      videos: [video],
+      current: video,
+      saved: { rate: 1.5 },
+    });
     page.fire("loadstart", { target: video });
     expect(video.playbackRate).toBe(1.5);
     expect(video.defaultPlaybackRate).toBe(1.5);
+
+    const fresh = new FakeVideo();
+    const forgetful = load({ videos: [fresh], current: fresh, saved: { rate: 1.5 } });
+    forgetful.fire("loadstart", { target: fresh });
+    expect(fresh.playbackRate).toBe(1);
+  });
+
+  it("carries a speed picked in the panel to the next video on the page without saving it", () => {
+    const first = new FakeVideo();
+    const next = new FakeVideo(800);
+    const page = load({ videos: [first, next], current: first });
+    openPanel(page);
+    page.body
+      .descendants()
+      .find((element) => element.textContent === "1\u00d7")
+      ?.fire("pointerup");
+    openedList(page)
+      ?.children.find((row) => row.textContent.endsWith("2\u00d7"))
+      ?.fire("pointerup");
+    expect(first.playbackRate).toBe(2);
+    page.setCurrent(next);
+    page.fire("loadstart", { target: next });
+    expect(next.playbackRate).toBe(2);
+    expect(page.storage.has("openmedia.video")).toBe(false);
   });
 
   it("leaves the speed and sound of a page it is not in charge of alone", () => {
@@ -868,9 +911,7 @@ describe("video controls", () => {
     openPanel(page);
     const gear = buttonWith(page, "gear");
     gear.fire("pointerup");
-    const menu = page.body
-      .descendants()
-      .find((element) => element.style.display === "block" && element.children.length === 3);
+    const menu = openedList(page);
     expect(menu?.children.map((row) => row.textContent)).toEqual([
       "\u2003Auto",
       "\u2713 720p",
@@ -901,9 +942,7 @@ describe("video controls", () => {
       const opener = page.body.descendants().find((element) => element.__icon === icon);
       if (!opener || opener.style.display === "none") return null;
       opener.fire("pointerup");
-      const menu = page.body
-        .descendants()
-        .find((element) => element.style.display === "block" && element.children.length > 1);
+      const menu = openedList(page);
       return { menu, rows: menu?.children.map((row) => row.textContent) };
     }
 
@@ -1225,9 +1264,7 @@ describe("video controls", () => {
     });
     openPanel(jwPage);
     buttonWith(jwPage, "gear").fire("pointerup");
-    const rows = jwPage.body
-      .descendants()
-      .find((element) => element.style.display === "block" && element.children.length === 2);
+    const rows = openedList(jwPage);
     expect(rows?.children.map((row) => row.textContent)).toEqual(["\u2003360p", "\u2713 720p"]);
     rows?.children[0]?.fire("pointerup");
     expect(picks).toEqual(["jw0"]);
@@ -1244,9 +1281,7 @@ describe("video controls", () => {
     const vsPage = load({ videos: [vsVideo], current: vsVideo });
     openPanel(vsPage);
     buttonWith(vsPage, "gear").fire("pointerup");
-    const vsRows = vsPage.body
-      .descendants()
-      .find((element) => element.style.display === "block" && element.children.length === 3);
+    const vsRows = openedList(vsPage);
     expect(vsRows?.children.map((row) => row.textContent)).toEqual([
       "\u2003Auto",
       "\u2713 720p",
@@ -1275,9 +1310,7 @@ describe("video controls", () => {
     expect(player).toBeInstanceOf(Hls);
     openPanel(page);
     buttonWith(page, "gear").fire("pointerup");
-    const rows = page.body
-      .descendants()
-      .find((element) => element.style.display === "block" && element.children.length === 3);
+    const rows = openedList(page);
     expect(rows?.children.map((row) => row.textContent)).toEqual([
       "\u2713 Auto",
       "\u2003360p",
@@ -1873,18 +1906,98 @@ describe("video controls", () => {
     ]);
   });
 
-  it("skips 6 seconds back and forward and stays inside the video", () => {
+  it("skips by the seconds chosen, for the app or for the site, and stays inside the video", () => {
     const video = new FakeVideo();
     video.currentTime = 3;
     const page = load({ videos: [video], current: video });
     openPanel(page);
+    expect(buttonWith(page, "forward").__label).toBe("10");
     buttonWith(page, "back").fire("pointerup");
     expect(video.currentTime).toBe(0);
     buttonWith(page, "forward").fire("pointerup");
-    expect(video.currentTime).toBe(6);
+    expect(video.currentTime).toBe(10);
     video.currentTime = 18;
     buttonWith(page, "forward").fire("pointerup");
     expect(video.currentTime).toBe(20);
+
+    const short = new FakeVideo();
+    const site = load({
+      controls: { skip: 30 },
+      sites: { "youtube.com": { skip: 5 } },
+      videos: [short],
+      current: short,
+    });
+    openPanel(site);
+    expect(buttonWith(site, "back").__label).toBe("5");
+    buttonWith(site, "forward").fire("pointerup");
+    expect(short.currentTime).toBe(5);
+  });
+
+  it("skips with a double tap on either side of the video, and adds up the taps that follow", () => {
+    vi.useFakeTimers({ toFake: ["Date"] });
+    const video = new FakeVideo();
+    video.duration = 100;
+    video.currentTime = 50;
+    const page = load({ videos: [video], current: video });
+    expect(page.click(350, 400).kept).toBe(true);
+    page.tick();
+    expect(shown(page)).toBe(true);
+    expect(page.click(350, 400).kept).toBe(true);
+    expect(video.currentTime).toBe(60);
+    page.tick();
+    expect(shown(page)).toBe(true);
+    page.click(350, 400);
+    expect(video.currentTime).toBe(70);
+    expect(page.body.descendants().some((element) => element.textContent === "+20")).toBe(true);
+
+    // The other side starts again: its first tap puts the panel away, the second skips back.
+    page.click(50, 400);
+    expect(video.currentTime).toBe(70);
+    page.click(50, 400);
+    expect(video.currentTime).toBe(60);
+    expect(page.body.descendants().some((element) => element.textContent === "\u221210")).toBe(
+      true,
+    );
+
+    // Taps far apart are each a tap.
+    vi.setSystemTime(Date.now() + 1000);
+    page.click(50, 400);
+    expect(video.currentTime).toBe(60);
+  });
+
+  it("works from the keyboard only while the panel is up, and leaves typing alone", () => {
+    const video = new FakeVideo();
+    video.currentTime = 5;
+    const page = load({ videos: [video], current: video });
+    const key = (name: string, target: Record<string, unknown> = {}) => {
+      let kept = false;
+      page.fire("keydown", {
+        key: name,
+        target,
+        cancelable: true,
+        preventDefault() {},
+        stopImmediatePropagation() {
+          kept = true;
+        },
+      });
+      return kept;
+    };
+    expect(key(" ")).toBe(false);
+    expect(video.paused).toBe(false);
+    openPanel(page);
+    expect(key(" ")).toBe(true);
+    expect(video.paused).toBe(true);
+    expect(key("ArrowRight")).toBe(true);
+    expect(video.currentTime).toBe(15);
+    expect(key("m", { tagName: "INPUT" })).toBe(false);
+    expect(video.muted).toBe(false);
+    expect(key("M")).toBe(true);
+    expect(video.muted).toBe(true);
+    expect(key("Escape")).toBe(true);
+    page.tick();
+    expect(shown(page)).toBe(false);
+    expect(key("ArrowLeft")).toBe(false);
+    expect(video.currentTime).toBe(15);
   });
 
   it("mutes and unmutes, and remembers the sound the reader chose", () => {
@@ -1974,31 +2087,82 @@ describe("video controls", () => {
     expect(small.click(50, 120).kept).toBe(false);
   });
 
-  it("steps through the speeds when the button is tapped and remembers the choice", () => {
+  it("lists the speeds from the speed button, ticks the one playing, and saves a pick when asked", () => {
     const video = new FakeVideo();
-    const page = load({ videos: [video], current: video });
+    video.playbackRate = 1.5;
+    const page = load({ controls: { remember: true }, videos: [video], current: video });
     openPanel(page);
-    const [pill] = page.body.descendants().filter((element) => element.textContent.endsWith("×"));
-    pill.fire("pointerup");
+    page.body
+      .descendants()
+      .find((element) => element.textContent === "1.5\u00d7")
+      ?.fire("pointerup");
+    const list = openedList(page);
+    expect(list?.children.map((row) => row.textContent)).toEqual([
+      "\u20030.5\u00d7",
+      "\u20030.75\u00d7",
+      "\u20031\u00d7",
+      "\u20031.25\u00d7",
+      "\u2713 1.5\u00d7",
+      "\u20031.75\u00d7",
+      "\u20032\u00d7",
+      "\u20033\u00d7",
+    ]);
+    list?.children[3]?.fire("pointerup");
     expect(video.playbackRate).toBe(1.25);
-    pill.fire("pointerup");
-    expect(video.playbackRate).toBe(1.5);
-    expect(JSON.parse(page.storage.get("openmedia.video") ?? "{}").rate).toBe(1.5);
+    expect(JSON.parse(page.storage.get("openmedia.video") ?? "{}").rate).toBe(1.25);
+    expect(list?.style.display).toBe("none");
   });
 
-  it("seeks to where the bar is touched and shows the time left", () => {
-    const video = new FakeVideo();
+  it("seeks where the bar is touched, a few times a second while dragged, exactly on release", () => {
+    vi.useFakeTimers({ toFake: ["Date"] });
+    const video = new FakeVideo() as FakeVideo & { fastSeek?: (time: number) => void };
+    const quick: number[] = [];
+    video.fastSeek = (time) => quick.push(time);
     const page = load({ videos: [video], current: video });
     openPanel(page);
     const track = sliders(page).at(-1);
     track?.fire("pointerdown", { clientX: 100 });
     expect(video.currentTime).toBe(5);
     track?.fire("pointermove", { clientX: 300 });
-    expect(video.currentTime).toBe(15);
+    expect(quick).toEqual([]);
+    vi.setSystemTime(Date.now() + 200);
+    track?.fire("pointermove", { clientX: 200 });
+    expect(quick).toEqual([10]);
     page.fire("click");
     track?.fire("pointerup");
+    expect(video.currentTime).toBe(10);
     page.tick();
-    expect(page.body.descendants().some((element) => element.textContent === "-0:05")).toBe(true);
+    const visible = (text: string) =>
+      page.body
+        .descendants()
+        .filter((element) => element.textContent === text && element.style.display !== "none");
+    expect(visible("0:10")).toHaveLength(1);
+    expect(visible("-0:10")).toHaveLength(1);
+  });
+
+  it("seeks inside a live stream's window, says how far behind live it is, and goes back to live", () => {
+    const video = new FakeVideo() as FakeVideo & {
+      seekable?: { length: number; start: () => number; end: () => number };
+    };
+    video.duration = Infinity;
+    video.currentTime = 130;
+    video.seekable = { length: 1, start: () => 100, end: () => 160 };
+    const page = load({ videos: [video], current: video });
+    openPanel(page);
+    const behind = page.body
+      .descendants()
+      .find((element) => element.textContent === "\u25cf -0:30");
+    expect(behind).toBeDefined();
+    const track = sliders(page).at(-1);
+    track?.fire("pointerdown", { clientX: 100 });
+    track?.fire("pointerup");
+    expect(video.currentTime).toBe(115);
+    behind?.fire("pointerup");
+    expect(video.currentTime).toBe(159);
+    page.tick();
+    expect(behind?.textContent).toBe("\u25cf");
+    buttonWith(page, "forward").fire("pointerup");
+    expect(video.currentTime).toBe(160);
   });
 
   it("moves the knob with the finger while the bar is dragged", () => {
@@ -2062,14 +2226,24 @@ describe("video controls", () => {
     expect(bar?.style.display).toBe("none");
   });
 
-  it("goes to the next speed up when the video runs at one the list does not have", () => {
-    const video = new FakeVideo();
-    video.playbackRate = 1.1;
+  it("fits the small player to a turned or resized screen, inside it", () => {
+    const home = new FakeElement();
+    const video = new PlacedVideo();
+    home.appendChild(video as unknown as FakeElement);
     const page = load({ videos: [video], current: video });
     openPanel(page);
-    const [pill] = page.body.descendants().filter((element) => element.textContent.endsWith("×"));
-    pill.fire("pointerup");
-    expect(video.playbackRate).toBe(1.25);
+    buttonWith(page, "pip").fire("pointerup");
+    const box = page.body.children.find((child) => "data-openmedia-mini" in child.attributes);
+    box?.fire("pointerdown", { clientX: 300, clientY: 600 });
+    box?.fire("pointermove", { clientX: 100, clientY: 100 });
+    box?.fire("pointerup");
+    page.window.innerWidth = 800;
+    page.window.innerHeight = 400;
+    page.win("resize");
+    expect(box?.style.width).toBe("240px");
+    expect(box?.style.height).toBe("128px");
+    expect(box?.style.right).toBe("208px");
+    expect(box?.style.bottom).toBe("272px");
   });
 
   it("sits above the bottom edge and the home indicator by the height chosen for the site", () => {

@@ -350,6 +350,11 @@ export const bn: Messages = {
   "settings.videoHeightNote":
     "নিচের প্রান্ত থেকে নিয়ন্ত্রণ কতটা ওপরে থাকবে। একটি পছন্দের সাইট নিজের উচ্চতা ঠিক করতে পারে।",
   "settings.videoHeightLabel": "ভিডিও নিয়ন্ত্রণের উচ্চতা",
+  "settings.videoSkip": "এতটা এড়িয়ে যান",
+  "settings.videoSkipNote":
+    "পিছনে ও সামনে বোতাম এবং ভিডিওর যেকোনো পাশে দুইবার ট্যাপ করলে কতটা লাফ দেবে।",
+  "settings.videoSkipLabel": "ভিডিও এড়ানোর দৈর্ঘ্য",
+  "settings.videoSkipSeconds": "{seconds} সে.",
   "settings.videoRemember": "গতি ও শব্দ মনে রাখুন",
   "settings.videoRememberNote": "পরের ভিডিও আপনার সর্বশেষ বেছে নেওয়া গতি ও ভলিউমে শুরু হয়।",
   "settings.videoLoopOff": "ভিডিও লুপ করা বন্ধ করুন",

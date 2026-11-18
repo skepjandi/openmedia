@@ -353,6 +353,11 @@ export const si: Messages = {
   "settings.videoHeightNote":
     "පාලන පහළ දාරයට ඉහළින් කොපමණ දුරින් තබන්නේද යන්න. ප්‍රියතමයකට තමන්ගේම එකක් සැකසිය හැක.",
   "settings.videoHeightLabel": "වීඩියෝ පාලන උස",
+  "settings.videoSkip": "මඟ හැරීම",
+  "settings.videoSkipNote":
+    "පසුපසට සහ ඉදිරියට බොත්තම් සහ වීඩියෝවේ දෙපසින් දෙවරක් තට්ටු කිරීම කොපමණ පැනීමද.",
+  "settings.videoSkipLabel": "වීඩියෝ මඟ හැරීමේ දිග",
+  "settings.videoSkipSeconds": "{seconds} තත්.",
   "settings.videoRemember": "වේගය සහ ශබ්දය මතක තබාගන්න",
   "settings.videoRememberNote":
     "ඊළඟ වීඩියෝව ඔබ අවසන් වරට තෝරාගත් වේගයෙන් සහ ශබ්ද මට්ටමෙන් ආරම්භ වේ.",

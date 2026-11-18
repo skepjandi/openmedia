@@ -358,6 +358,11 @@ export const cs: Messages = {
   "settings.videoHeightNote":
     "Jak vysoko nad spodním okrajem ovládání leží. Oblíbená stránka může mít vlastní.",
   "settings.videoHeightLabel": "Výška ovládání videa",
+  "settings.videoSkip": "Délka přeskoku",
+  "settings.videoSkipNote":
+    "O kolik skočí tlačítka zpět a vpřed a dvojité klepnutí na kteroukoli stranu videa.",
+  "settings.videoSkipLabel": "Délka přeskoku videa",
+  "settings.videoSkipSeconds": "{seconds} s",
   "settings.videoRemember": "Pamatovat si rychlost a zvuk",
   "settings.videoRememberNote":
     "Další video začne s rychlostí a hlasitostí, které jste naposledy zvolili.",

@@ -356,6 +356,10 @@ export const ja: Messages = {
   "settings.videoHeightNote":
     "コントロールを下端からどれだけ上に置くかを設定します。お気に入りごとに個別に設定できます。",
   "settings.videoHeightLabel": "動画コントロールの高さ",
+  "settings.videoSkip": "スキップ幅",
+  "settings.videoSkipNote": "戻る・進むボタンと、動画の左右のダブルタップで移動する長さです。",
+  "settings.videoSkipLabel": "動画のスキップ幅",
+  "settings.videoSkipSeconds": "{seconds}秒",
   "settings.videoRemember": "速度と音量を記憶",
   "settings.videoRememberNote": "次の動画は、最後に選んだ速度と音量で始まります。",
   "settings.videoLoopOff": "動画のループを止める",

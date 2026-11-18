@@ -367,6 +367,11 @@ export const el: Messages = {
   "settings.videoHeightNote":
     "Πόσο ψηλά από το κάτω άκρο βρίσκονται τα στοιχεία ελέγχου. Ένα αγαπημένο μπορεί να ορίσει δικό του.",
   "settings.videoHeightLabel": "Ύψος στοιχείων ελέγχου βίντεο",
+  "settings.videoSkip": "Μέγεθος παράλειψης",
+  "settings.videoSkipNote":
+    "Πόσο πηδούν τα κουμπιά πίσω και μπροστά και το διπλό πάτημα σε κάθε πλευρά του βίντεο.",
+  "settings.videoSkipLabel": "Διάρκεια παράλειψης βίντεο",
+  "settings.videoSkipSeconds": "{seconds} δ",
   "settings.videoRemember": "Απομνημόνευση ταχύτητας και ήχου",
   "settings.videoRememberNote":
     "Το επόμενο βίντεο ξεκινά με την ταχύτητα και την ένταση που επιλέξατε τελευταία.",

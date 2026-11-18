@@ -6,6 +6,16 @@ All notable changes to OpenMedia are documented here.
 >
 > **Wiki**: the [GitHub Wiki](https://github.com/skepjandi/openmedia/wiki) is the public-facing main wiki — architecture, recipe format, AI pipeline, security model, roadmap. Source-controlled editing surface is `docs/wiki/` in this repo; CI (`.github/workflows/sync-wiki.yml`) mirrors it to the GitHub Wiki on every merge to `main`. New single-PR changes belong here, not as new wiki pages.
 
+### feat(video-controls): a reworked panel with double-tap skip, a speed list, live streams, keys and a skip length
+
+**Area:** `feat(video-controls)`, `fix(video-controls)`
+
+**Change:** `video_controls.js`: the panel is laid out as a player's (small player and full screen in the corners, back/play/forward, a row with mute, volume, the site's options and speed, and the seek bar between the time played and the time left, which a tap turns into the length); buttons are 40 px to hit whatever their icon, the card is at most 560 px wide and fades in. A double tap on the left or right third of the video skips, adding up as taps follow, with the total shown over that side. The speed button opens a list (0.5× to 3×) instead of stepping. The seek bar shows what is loaded, grows while held with a bubble giving the time under the finger, seeks at most every 150 ms while dragged (`fastSeek` where there is one) and exactly on release. A live stream gets a seek bar over its `seekable` window and a dot that says how far behind live it is and goes back to live on a tap. While the panel is up, Space/K, arrows, J/L, M, F and Escape work it. Videos over an hour read `h:mm:ss`. A new setting, Skip by (`skip`: 5, 10, 15 or 30 s, 10 by default, per site too; Rust snaps any other value), replaces the fixed 6 s, and the settings preview draws the new panel.
+
+**Fixes:** a speed picked in the panel was saved and applied on every page even with Remember off; it now carries over within the page only, and is saved only with Remember (the review finding left open in the seek-knob fix). The small player kept its size and position from when it opened, so turning the phone could leave it off screen; it now refits on `resize`. Opening an option list whose items the player had changed since the last read showed it stale and then closed it at once; the opener reads the options again first.
+
+**Verified:** Vitest (`videoControls.test.ts`, 94 cases, 9 new or rewritten: remembered speed gating, in-page speed carry, the speed list, skip length per site, double-tap skip, keys only while shown, throttled and exact seek, live window, small-player refit), Rust tests for `skip` (default, snapping, per site, page config). The panel was looked at in a WebKit tab on a local page with a 90 s file at 400×800 and 1000×600: layout, the speed list, the double-tap total, the seek bubble while dragging, and Space and M from the keyboard. **Not verified:** a device, a real feed or watch page, a live stream (unit-tested only); the headless WebKit there did not complete seeks on that file, so the skips were seen only in the tests. New translations of the four Skip by strings are machine-made. The panel's buttons still have no accessible names: the page script has no way to get the app's strings.
+
 ### fix(desktop): page scan, color picker and technology detector work on desktop
 
 **Area:** `fix(desktop)`

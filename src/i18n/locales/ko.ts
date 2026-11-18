@@ -353,6 +353,11 @@ export const ko: Messages = {
   "settings.videoHeightNote":
     "컨트롤이 하단 가장자리에서 얼마나 위에 놓일지 정합니다. 즐겨찾기별로 따로 설정할 수 있습니다.",
   "settings.videoHeightLabel": "동영상 컨트롤 높이",
+  "settings.videoSkip": "건너뛰기 간격",
+  "settings.videoSkipNote":
+    "뒤로·앞으로 버튼과 동영상 양쪽 가장자리를 두 번 탭할 때 이동하는 길이입니다.",
+  "settings.videoSkipLabel": "동영상 건너뛰기 간격",
+  "settings.videoSkipSeconds": "{seconds}초",
   "settings.videoRemember": "속도와 소리 기억",
   "settings.videoRememberNote": "다음 동영상은 마지막으로 고른 속도와 음량으로 시작합니다.",
   "settings.videoLoopOff": "동영상 반복 재생 중지",

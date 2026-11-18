@@ -361,6 +361,11 @@ export const nl: Messages = {
   "settings.videoHeightNote":
     "Hoe ver boven de onderrand de bediening staat. Een favoriet kan een eigen hoogte instellen.",
   "settings.videoHeightLabel": "Hoogte videobediening",
+  "settings.videoSkip": "Spring met",
+  "settings.videoSkipNote":
+    "Hoever de knoppen terug en vooruit, en een dubbele tik aan weerszijden van de video, springen.",
+  "settings.videoSkipLabel": "Sprongduur van de video",
+  "settings.videoSkipSeconds": "{seconds} s",
   "settings.videoRemember": "Snelheid en geluid onthouden",
   "settings.videoRememberNote":
     "De volgende video start met de snelheid en het volume die je het laatst koos.",

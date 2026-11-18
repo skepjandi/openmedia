@@ -340,6 +340,11 @@ export const th: Messages = {
   "settings.videoHeight": "ความสูงของตัวควบคุม",
   "settings.videoHeightNote": "ตัวควบคุมอยู่เหนือขอบล่างเท่าไร รายการโปรดกำหนดค่าของตัวเองได้",
   "settings.videoHeightLabel": "ความสูงของตัวควบคุมวิดีโอ",
+  "settings.videoSkip": "ข้ามครั้งละ",
+  "settings.videoSkipNote":
+    "ปุ่มย้อนกลับและไปข้างหน้า และการแตะสองครั้งที่ด้านใดด้านหนึ่งของวิดีโอ จะข้ามไปไกลเท่าใด",
+  "settings.videoSkipLabel": "ความยาวการข้ามวิดีโอ",
+  "settings.videoSkipSeconds": "{seconds} วิ",
   "settings.videoRemember": "จำความเร็วและเสียง",
   "settings.videoRememberNote": "วิดีโอถัดไปจะเริ่มด้วยความเร็วและระดับเสียงที่คุณเลือกล่าสุด",
   "settings.videoLoopOff": "หยุดไม่ให้วิดีโอเล่นซ้ำ",

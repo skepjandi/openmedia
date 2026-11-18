@@ -362,6 +362,11 @@ export const tr: Messages = {
   "settings.videoHeightNote":
     "Kontrollerin alt kenarın ne kadar üstünde durduğu. Bir favori kendi yüksekliğini belirleyebilir.",
   "settings.videoHeightLabel": "Video kontrolleri yüksekliği",
+  "settings.videoSkip": "Atlama süresi",
+  "settings.videoSkipNote":
+    "Geri ve ileri düğmelerinin ve videonun iki yanındaki çift dokunuşun ne kadar atlayacağı.",
+  "settings.videoSkipLabel": "Video atlama süresi",
+  "settings.videoSkipSeconds": "{seconds} sn",
   "settings.videoRemember": "Hızı ve sesi hatırla",
   "settings.videoRememberNote": "Sonraki video, en son seçtiğiniz hız ve ses düzeyiyle başlar.",
   "settings.videoLoopOff": "Videoların tekrarlanmasını durdur",

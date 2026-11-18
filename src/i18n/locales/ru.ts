@@ -361,6 +361,11 @@ export const ru: Messages = {
   "settings.videoHeightNote":
     "Насколько высоко над нижним краем находится управление. В избранном можно задать свою.",
   "settings.videoHeightLabel": "Высота управления видео",
+  "settings.videoSkip": "Шаг перемотки",
+  "settings.videoSkipNote":
+    "На сколько перематывают кнопки назад и вперёд и двойное касание по краям видео.",
+  "settings.videoSkipLabel": "Шаг перемотки видео",
+  "settings.videoSkipSeconds": "{seconds} с",
   "settings.videoRemember": "Запоминать скорость и звук",
   "settings.videoRememberNote":
     "Следующее видео начнётся с последней выбранной скорости и громкости.",

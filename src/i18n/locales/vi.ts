@@ -353,6 +353,11 @@ export const vi: Messages = {
   "settings.videoHeightNote":
     "Điều khiển nằm cao hơn mép dưới bao nhiêu. Một mục yêu thích có thể đặt độ cao riêng.",
   "settings.videoHeightLabel": "Độ cao điều khiển video",
+  "settings.videoSkip": "Tua mỗi lần",
+  "settings.videoSkipNote":
+    "Các nút lùi và tiến, cùng thao tác chạm đúp ở hai bên video, nhảy bao xa.",
+  "settings.videoSkipLabel": "Độ dài tua video",
+  "settings.videoSkipSeconds": "{seconds} giây",
   "settings.videoRemember": "Nhớ tốc độ và âm thanh",
   "settings.videoRememberNote":
     "Video tiếp theo bắt đầu với tốc độ và âm lượng bạn chọn lần gần nhất.",

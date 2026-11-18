@@ -355,6 +355,11 @@ export const id: Messages = {
   "settings.videoHeightNote":
     "Seberapa tinggi kontrol dari tepi bawah. Favorit dapat mengatur sendiri.",
   "settings.videoHeightLabel": "Tinggi kontrol video",
+  "settings.videoSkip": "Lompat sejauh",
+  "settings.videoSkipNote":
+    "Seberapa jauh tombol mundur dan maju, serta ketukan ganda di kedua sisi video, melompat.",
+  "settings.videoSkipLabel": "Lama lompatan video",
+  "settings.videoSkipSeconds": "{seconds} dtk",
   "settings.videoRemember": "Ingat kecepatan dan suara",
   "settings.videoRememberNote":
     "Video berikutnya dimulai dengan kecepatan dan volume yang terakhir Anda pilih.",

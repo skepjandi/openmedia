@@ -356,6 +356,11 @@ export const hi: Messages = {
   "settings.videoHeightNote":
     "नियंत्रण निचले किनारे से कितना ऊपर रहें। पसंदीदा अपनी अलग ऊँचाई रख सकता है।",
   "settings.videoHeightLabel": "वीडियो नियंत्रण की ऊँचाई",
+  "settings.videoSkip": "इतना छोड़ें",
+  "settings.videoSkipNote":
+    "पीछे और आगे के बटन, और वीडियो के किसी भी ओर दो बार टैप करने पर कितना आगे-पीछे जाएगा।",
+  "settings.videoSkipLabel": "वीडियो छोड़ने की अवधि",
+  "settings.videoSkipSeconds": "{seconds} से.",
   "settings.videoRemember": "स्पीड और आवाज़ याद रखें",
   "settings.videoRememberNote": "अगला वीडियो आपकी पिछली चुनी हुई स्पीड और वॉल्यूम पर शुरू होता है।",
   "settings.videoLoopOff": "वीडियो को दोबारा चलने से रोकें",

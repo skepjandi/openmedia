@@ -359,6 +359,11 @@ export const de: Messages = {
   "settings.videoHeightNote":
     "Wie weit über dem unteren Rand die Steuerung sitzt. Ein Favorit kann eine eigene festlegen.",
   "settings.videoHeightLabel": "Höhe der Videosteuerung",
+  "settings.videoSkip": "Sprungweite",
+  "settings.videoSkipNote":
+    "Wie weit die Zurück- und Vor-Tasten und ein Doppeltippen auf eine Seite des Videos springen.",
+  "settings.videoSkipLabel": "Sprungweite im Video",
+  "settings.videoSkipSeconds": "{seconds} s",
   "settings.videoRemember": "Tempo und Ton merken",
   "settings.videoRememberNote":
     "Das nächste Video startet mit dem zuletzt gewählten Tempo und der Lautstärke.",
