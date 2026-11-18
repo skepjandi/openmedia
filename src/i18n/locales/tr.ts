@@ -64,6 +64,14 @@ export const tr: Messages = {
     "Eski tarayıcınızda yer imlerinizi (HTML), geçmişinizi ve parolalarınızı (CSV) dışa aktarın, sonra dosyaları buradan seçin. Her şey bu cihazda okunur ve hiçbir yere gönderilmez.",
   "import.choose": "Dosya seç",
   "import.chooseMore": "Daha fazla dosya ekle",
+  "import.direct": "Bu bilgisayardaki bir tarayıcıdan doğrudan içe aktar",
+  "import.readingFrom": "{browser} okunuyor…",
+  "import.accessNote":
+    "Bilgisayarınız kayıtlı parolalara erişim izni isterse İzin ver'i seçin. Her şey bu cihazda kalır.",
+  "import.orFiles":
+    "Ya da başka bir tarayıcıdan dışa aktardığınız dosyaları seçin: yer imleri (HTML), geçmiş ve parolalar (CSV).",
+  "import.locked":
+    "Tarayıcınız {count} kayıtlı parolayı kilitli tuttuğu için okunamadı. Aktarmak için tarayıcının parola ayarlarından dışa aktarın ve aşağıdan dosyayı seçin.",
   "import.reading": "Okunuyor…",
   "import.tooLarge": "{name} içe aktarılamayacak kadar büyük.",
   "import.nothing":

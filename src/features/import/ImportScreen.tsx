@@ -1,9 +1,14 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useApp } from "../../app/store";
 import { describeError } from "../../i18n/errors";
 import { useT } from "../../i18n/useT";
 import { Screen } from "../../shared/Screen";
-import { importer, type ImportPreview, type ImportResult } from "../../shared/ipc";
+import {
+  importer,
+  type DetectedBrowser,
+  type ImportPreview,
+  type ImportResult,
+} from "../../shared/ipc";
 import { SEARCH_ENGINES } from "../../shared/searchEngines";
 import { Switch } from "../settings/Switch";
 import { Group, GroupLabel, primaryBlockButton, quietBlockButton } from "../settings/ui";
@@ -51,6 +56,20 @@ export function ImportScreen() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<ImportResult | null>(null);
+  const [browsers, setBrowsers] = useState<DetectedBrowser[]>([]);
+  const [reading, setReading] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    let current = true;
+    importer
+      .browsers()
+      .then((found) => current && setBrowsers(found))
+      .catch(() => current && setBrowsers([]));
+    return () => {
+      current = false;
+    };
+  }, [open]);
 
   if (!open) return null;
 
@@ -61,6 +80,26 @@ export function ImportScreen() {
     setError(null);
     setResult(null);
     closeSheet();
+  };
+
+  const readBrowser = async (
+    browser: DetectedBrowser,
+    profile: DetectedBrowser["profiles"][number],
+  ) => {
+    setBusy(true);
+    setReading(browser.name);
+    setError(null);
+    setResult(null);
+    try {
+      const latest = await importer.readBrowser(browser.id, profile.id);
+      setPreview(latest);
+      setPicks((now) => now ?? defaultPicks(latest));
+    } catch (failure) {
+      setError(describeError(failure, t));
+    } finally {
+      setBusy(false);
+      setReading(null);
+    }
   };
 
   const readFiles = async (files: FileList) => {
@@ -119,7 +158,32 @@ export function ImportScreen() {
   return (
     <Screen title={t("import.title")} closeLabel={t("common.back")} onClose={close} back>
       <div className="flex flex-col gap-6">
-        <p className="text-sm leading-snug text-paper/65">{t("import.intro")}</p>
+        {browsers.length > 0 && (
+          <div className="flex flex-col gap-2">
+            <GroupLabel>{t("import.direct")}</GroupLabel>
+            {browsers.flatMap((browser) =>
+              browser.profiles.map((profile) => (
+                <button
+                  key={`${browser.id}/${profile.id}`}
+                  type="button"
+                  disabled={busy}
+                  className={quietBlockButton}
+                  onClick={() => void readBrowser(browser, profile)}
+                >
+                  {reading === browser.name
+                    ? t("import.readingFrom", { browser: browser.name })
+                    : browser.profiles.length > 1
+                      ? `${browser.name} · ${profile.name}`
+                      : browser.name}
+                </button>
+              )),
+            )}
+            <p className="px-1 text-xs text-paper/55">{t("import.accessNote")}</p>
+          </div>
+        )}
+        <p className="text-sm leading-snug text-paper/65">
+          {t(browsers.length > 0 ? "import.orFiles" : "import.intro")}
+        </p>
         <input
           ref={input}
           type="file"
@@ -139,6 +203,11 @@ export function ImportScreen() {
         {error && (
           <p role="alert" className="text-sm text-error">
             {error}
+          </p>
+        )}
+        {preview && preview.unreadablePasswords > 0 && (
+          <p className="text-sm text-paper/65">
+            {t("import.locked", { count: preview.unreadablePasswords })}
           </p>
         )}
         {nothingFound && <p className="text-sm text-paper/65">{t("import.nothing")}</p>}

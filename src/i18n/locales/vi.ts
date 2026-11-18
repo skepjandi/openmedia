@@ -61,6 +61,14 @@ export const vi: Messages = {
     "Trong trình duyệt cũ, hãy xuất dấu trang (HTML), lịch sử và mật khẩu (CSV), rồi chọn các tệp tại đây. Mọi thứ được đọc trên thiết bị này và không có gì được gửi đi đâu cả.",
   "import.choose": "Chọn tệp",
   "import.chooseMore": "Thêm tệp khác",
+  "import.direct": "Nhập trực tiếp từ trình duyệt trên máy tính này",
+  "import.readingFrom": "Đang đọc {browser}…",
+  "import.accessNote":
+    "Nếu máy tính hỏi quyền truy cập mật khẩu đã lưu, hãy chọn Cho phép. Mọi thứ vẫn ở trên thiết bị này.",
+  "import.orFiles":
+    "Hoặc chọn các tệp bạn đã xuất từ trình duyệt khác: dấu trang (HTML), lịch sử và mật khẩu (CSV).",
+  "import.locked":
+    "Trình duyệt của bạn khóa {count} mật khẩu đã lưu nên không đọc được. Để mang chúng sang, hãy xuất từ phần cài đặt mật khẩu của trình duyệt rồi chọn tệp bên dưới.",
   "import.reading": "Đang đọc…",
   "import.tooLarge": "{name} quá lớn để nhập.",
   "import.nothing":

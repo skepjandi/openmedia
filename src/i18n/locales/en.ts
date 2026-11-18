@@ -72,6 +72,14 @@ export const en = {
     "In your old browser, export your bookmarks (HTML), history and passwords (CSV), then choose the files here. Everything is read on this device and nothing is sent anywhere.",
   "import.choose": "Choose files",
   "import.chooseMore": "Add more files",
+  "import.direct": "Import straight from a browser on this computer",
+  "import.readingFrom": "Reading {browser}…",
+  "import.accessNote":
+    "If your computer asks to allow access to saved passwords, choose Allow. Everything stays on this device.",
+  "import.orFiles":
+    "Or choose files you exported from another browser: bookmarks (HTML), history and passwords (CSV).",
+  "import.locked":
+    "Your browser keeps {count} saved passwords locked, so they could not be read. To bring them over, export them from its password settings and choose the file below.",
   "import.reading": "Reading…",
   "import.tooLarge": "{name} is too large to import.",
   "import.nothing":

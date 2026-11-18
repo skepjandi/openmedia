@@ -1,8 +1,25 @@
 # Import and the password vault
 
-> **Status: Implemented; not run on a device.** Code: `src-tauri/src/import/` (`parse.rs`, `mod.rs`), `vault.rs`, `fill.rs` + `fill.js`, `import_commands.rs`; shell: `features/import/ImportScreen.tsx`, `features/passwords/PasswordsScreen.tsx`, the Fill button in `features/sheet/PageTools.tsx`.
+> **Status: Implemented; not run on a device.** Code: `src-tauri/src/import/` (`parse.rs`, `mod.rs`, `browsers/`), `vault.rs`, `fill.rs` + `fill.js`, `import_commands.rs`; shell: `features/import/ImportScreen.tsx`, `features/passwords/PasswordsScreen.tsx`, the Fill button in `features/sheet/PageTools.tsx`.
 
-A person leaving another browser brings what it holds by **choosing the files that browser exports**. That works the same on every platform, including sandboxed iOS and the Mac App Store build, which cannot read another app's folders. Settings > *Import from another browser*.
+A person leaving another browser brings what it holds in one of two ways. Settings > *Import from another browser*:
+
+1. **Straight from the browser** (Windows, Linux and the directly distributed macOS build): the screen lists the browsers installed on this computer and their profiles; one tap reads the profile. Code: `src-tauri/src/import/browsers/`.
+2. **By choosing the files that browser exports**: the same on every platform, including sandboxed iOS and the Mac App Store build, which cannot read another app's folders (there the first list is empty and only this path shows).
+
+Both feed the same pending state and the same preview, so everything under [The flow](#the-flow) applies to either.
+
+## Reading a browser directly
+
+`import_browsers` lists what `browsers::detect` finds from the user's folders: Chromium browsers (Chrome, Edge, Brave, Vivaldi, Arc, Chromium: `Default` and `Profile N`, named from `Local State`), Firefox profiles (those with a `places.sqlite`) and, on macOS, Safari. `import_from_browser(browser, profile)` accepts only ids that detection lists; nothing the shell sends is used as a path.
+
+| Browser | Bookmarks, history, search engine | Saved logins |
+|---|---|---|
+| Chromium family | `Bookmarks` and `Preferences` JSON (the exported-file parsers), `History` database | `Login Data` database, opened with the browser's OS key: macOS Keychain item `<Browser> Safe Storage` (the OS asks the person to allow it), Windows DPAPI key in `Local State` (AES-256-GCM), Linux Secret Service via `secret-tool` or the fixed `peanuts` key (AES-128-CBC) |
+| Firefox | `places.sqlite` | Counted (`logins.json`), not read: Firefox seals them with its own security library. The preview says how many and points at *about:logins* export |
+| Safari (macOS) | `Bookmarks.plist`, `History.db`; macOS needs Full Disk Access for the app, and the error says so | Not read (system Keychain); Safari's own export covers them |
+
+Databases are copied with their write-ahead log to a private temporary folder, read there and deleted (`sqlite.rs`), so a running browser's lock never matters and the original is never opened. The OS key is fetched only when a profile has logins, held in `Zeroizing` memory and dropped with the read. Blobs the app cannot open (Chrome's newer app-bound `v20` format) are counted as locked, never guessed. Choosing the same profile twice counts once (`ImportState::add` keeps the sources read). Nothing is sent anywhere (invariant 1).
 
 ## What is read
 
@@ -43,4 +60,4 @@ Limits: the page can read what was filled, as with any autofill; a Mac, Windows 
 
 ## Not done
 
-Open tabs, extensions, cookies and sessions from the other browser are not imported (a session cannot be moved between browsers). Reading the other browser's own database files directly (Chrome `Login Data`, Firefox `logins.json`, Safari's keychain) is not done: it needs folder access the stores deny and decryption keys held by the other app.
+Open tabs, extensions, cookies and sessions from the other browser are not imported (a session cannot be moved between browsers). Direct reading is not available where the system keeps other apps' folders out of reach (iOS, the stores' sandboxes); Firefox's and Safari's saved logins and Chrome's `v20` app-bound logins are not read directly and come through the browser's own password export.

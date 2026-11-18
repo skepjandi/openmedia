@@ -75,6 +75,56 @@ pub fn import_read(state: State<'_, ImportState>, text: String) -> Result<Previe
     state.preview(&official())
 }
 
+/// The browsers on this computer that can be imported from directly. Empty where the system keeps
+/// other apps' folders out of reach (iOS, the stores' sandboxes): those use the exported files.
+#[tauri::command]
+pub async fn import_browsers() -> Result<Vec<import::browsers::Detected>> {
+    #[cfg(desktop)]
+    {
+        tokio::task::spawn_blocking(|| {
+            import::browsers::Roots::from_env()
+                .map(|roots| import::browsers::detect(&roots))
+                .unwrap_or_default()
+        })
+        .await
+        .map_err(|_| Error::Import("could not look for browsers".into()))
+    }
+    #[cfg(not(desktop))]
+    {
+        Ok(Vec::new())
+    }
+}
+
+/// Reads one profile of a browser found by [`import_browsers`] and returns what is pending. The
+/// OS may ask the person to allow access to the browser's saved passwords while this runs.
+#[tauri::command]
+pub async fn import_from_browser(
+    state: State<'_, ImportState>,
+    browser: String,
+    profile: String,
+) -> Result<Preview> {
+    #[cfg(desktop)]
+    {
+        let source = format!("{browser}/{profile}");
+        let found = tokio::task::spawn_blocking(move || {
+            let roots = import::browsers::Roots::from_env()
+                .ok_or_else(|| Error::Import("could not find your home folder".into()))?;
+            import::browsers::read(&roots, &browser, &profile)
+        })
+        .await
+        .map_err(|_| Error::Import("could not read that browser".into()))??;
+        state.add(Some(&source), found)?;
+        state.preview(&official())
+    }
+    #[cfg(not(desktop))]
+    {
+        let _ = (state, browser, profile);
+        Err(Error::Import(
+            "importing straight from a browser is not available on this device".into(),
+        ))
+    }
+}
+
 /// Forgets every pending file.
 #[tauri::command]
 pub fn import_cancel(state: State<'_, ImportState>) {

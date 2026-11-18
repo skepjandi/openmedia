@@ -65,6 +65,14 @@ export const pt: Messages = {
     "No seu navegador antigo, exporte seus favoritos (HTML), histórico e senhas (CSV) e escolha os arquivos aqui. Tudo é lido neste dispositivo e nada é enviado a lugar nenhum.",
   "import.choose": "Escolher arquivos",
   "import.chooseMore": "Adicionar mais arquivos",
+  "import.direct": "Importar diretamente de um navegador neste computador",
+  "import.readingFrom": "A ler {browser}…",
+  "import.accessNote":
+    "Se o computador pedir permissão para aceder às palavras-passe guardadas, escolha Permitir. Tudo fica neste dispositivo.",
+  "import.orFiles":
+    "Ou escolha ficheiros exportados de outro navegador: marcadores (HTML), histórico e palavras-passe (CSV).",
+  "import.locked":
+    "O seu navegador mantém {count} palavras-passe guardadas bloqueadas, por isso não foi possível lê-las. Para as trazer, exporte-as nas definições de palavras-passe do navegador e escolha o ficheiro abaixo.",
   "import.reading": "Lendo…",
   "import.tooLarge": "{name} é grande demais para importar.",
   "import.nothing":

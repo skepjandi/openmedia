@@ -8,6 +8,8 @@
 //! history, sets the search engine and seals the logins in the vault (`vault.rs`). Nothing leaves
 //! the device, and the pending data is dropped when it is applied, cancelled or too old.
 
+#[cfg(desktop)]
+pub mod browsers;
 pub mod parse;
 
 use std::{
@@ -35,12 +37,26 @@ const BOOKMARK_WEIGHT: u64 = 3;
 /// How many suggestions of each kind the preview lists.
 const MAX_SUGGESTIONS: usize = 12;
 
+/// What one source (a file or a browser profile) held.
+#[derive(Default)]
+pub struct Found {
+    pub bookmarks: Vec<Link>,
+    pub history: Vec<Link>,
+    pub credentials: Vec<Credential>,
+    pub search_engine: Option<SearchEngine>,
+    /// Saved passwords the source has but this app cannot open.
+    pub unreadable_passwords: usize,
+}
+
 #[derive(Default)]
 struct Pending {
     bookmarks: Vec<Link>,
     history: Vec<Link>,
     credentials: Vec<Credential>,
     search_engine: Option<SearchEngine>,
+    unreadable_passwords: usize,
+    /// Browser profiles already read, so choosing one twice does not count it twice.
+    sources: Vec<String>,
     since: Option<Instant>,
 }
 
@@ -71,6 +87,7 @@ pub struct Preview {
     pub history: usize,
     pub passwords: usize,
     pub password_sites: usize,
+    pub unreadable_passwords: usize,
     pub search_engine: Option<SearchEngine>,
     pub recipes: Vec<RecipeSuggestion>,
     pub sites: Vec<SiteSuggestion>,
@@ -119,15 +136,38 @@ impl ImportState {
             credentials,
             search_engine,
         } = parse::parse(text);
-        let mut pending = self.pending()?;
-        pending.since.get_or_insert_with(Instant::now);
-        if is_history {
-            pending.history.extend(links);
+        let (bookmarks, history) = if is_history {
+            (Vec::new(), links)
         } else {
-            pending.bookmarks.extend(links);
+            (links, Vec::new())
+        };
+        self.add(
+            None,
+            Found {
+                bookmarks,
+                history,
+                credentials,
+                search_engine,
+                unreadable_passwords: 0,
+            },
+        )
+    }
+
+    /// Adds what one source held. A `source` already added is not added again.
+    pub fn add(&self, source: Option<&str>, found: Found) -> Result<()> {
+        let mut pending = self.pending()?;
+        if let Some(source) = source {
+            if pending.sources.iter().any(|known| known == source) {
+                return Ok(());
+            }
+            pending.sources.push(source.to_owned());
         }
-        pending.credentials.extend(credentials);
-        pending.search_engine = search_engine.or(pending.search_engine);
+        pending.since.get_or_insert_with(Instant::now);
+        pending.bookmarks.extend(found.bookmarks);
+        pending.history.extend(found.history);
+        pending.credentials.extend(found.credentials);
+        pending.unreadable_passwords += found.unreadable_passwords;
+        pending.search_engine = found.search_engine.or(pending.search_engine);
         Ok(())
     }
 
@@ -236,6 +276,7 @@ fn preview_of(pending: &Pending, recipes: &[Bundled]) -> Preview {
         history: pending.history.len(),
         passwords: pending.credentials.len(),
         password_sites: password_sites.len(),
+        unreadable_passwords: pending.unreadable_passwords,
         search_engine: pending.search_engine,
         recipes: matched
             .into_iter()
@@ -441,6 +482,26 @@ mod tests {
         let preview = state.preview(&official()).unwrap();
         assert_eq!((preview.passwords, preview.password_sites), (3, 2));
         assert!(!serde_json::to_string(&preview).unwrap().contains("secret"));
+    }
+
+    #[test]
+    fn a_browser_profile_chosen_twice_counts_once() {
+        let state = ImportState::default();
+        let found = || Found {
+            history: vec![Link {
+                url: "https://www.reddit.com/".into(),
+                title: String::new(),
+                visits: 4,
+            }],
+            unreadable_passwords: 2,
+            ..Found::default()
+        };
+        state.add(Some("chrome/Default"), found()).unwrap();
+        state.add(Some("chrome/Default"), found()).unwrap();
+        state.add(Some("brave/Default"), found()).unwrap();
+        let preview = state.preview(&official()).unwrap();
+        assert_eq!(preview.history, 2);
+        assert_eq!(preview.unreadable_passwords, 4);
     }
 
     #[test]

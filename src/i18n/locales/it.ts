@@ -65,6 +65,14 @@ export const it: Messages = {
     "Nel tuo vecchio browser esporta i segnalibri (HTML), la cronologia e le password (CSV), poi scegli qui i file. Tutto viene letto su questo dispositivo e nulla viene inviato altrove.",
   "import.choose": "Scegli i file",
   "import.chooseMore": "Aggiungi altri file",
+  "import.direct": "Importa direttamente da un browser su questo computer",
+  "import.readingFrom": "Lettura di {browser}…",
+  "import.accessNote":
+    "Se il computer chiede il permesso di accedere alle password salvate, scegli Consenti. Tutto resta su questo dispositivo.",
+  "import.orFiles":
+    "Oppure scegli i file esportati da un altro browser: segnalibri (HTML), cronologia e password (CSV).",
+  "import.locked":
+    "Il tuo browser tiene bloccate {count} password salvate, quindi non è stato possibile leggerle. Per importarle, esportale dalle impostazioni password del browser e scegli il file qui sotto.",
   "import.reading": "Lettura in corso…",
   "import.tooLarge": "{name} è troppo grande per essere importato.",
   "import.nothing":

@@ -64,6 +64,14 @@ export const nl: Messages = {
     "Exporteer in je oude browser je bladwijzers (HTML), geschiedenis en wachtwoorden (CSV) en kies hier de bestanden. Alles wordt op dit apparaat gelezen en er wordt niets naar buiten gestuurd.",
   "import.choose": "Bestanden kiezen",
   "import.chooseMore": "Meer bestanden toevoegen",
+  "import.direct": "Rechtstreeks importeren uit een browser op deze computer",
+  "import.readingFrom": "{browser} wordt gelezen…",
+  "import.accessNote":
+    "Als je computer toegang tot opgeslagen wachtwoorden vraagt, kies dan Toestaan. Alles blijft op dit apparaat.",
+  "import.orFiles":
+    "Of kies bestanden die je uit een andere browser hebt geëxporteerd: bladwijzers (HTML), geschiedenis en wachtwoorden (CSV).",
+  "import.locked":
+    "Je browser houdt {count} opgeslagen wachtwoorden vergrendeld, dus ze konden niet worden gelezen. Exporteer ze via de wachtwoordinstellingen van de browser en kies hieronder het bestand.",
   "import.reading": "Lezen…",
   "import.tooLarge": "{name} is te groot om te importeren.",
   "import.nothing":

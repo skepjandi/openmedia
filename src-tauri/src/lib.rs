@@ -208,6 +208,8 @@ pub fn run() {
             commands::find_in_page_clear,
             commands::share_page,
             commands::clear_site_data,
+            import_commands::import_browsers,
+            import_commands::import_from_browser,
             import_commands::import_read,
             import_commands::import_cancel,
             import_commands::import_apply,

@@ -184,7 +184,7 @@ Imported logins are sealed with AES-256-GCM in `passwords.vault`; the key lives 
 ## Privacy
 
 - The snapshot is the only page-derived data that leaves the device, only on explicit user action, only to the endpoint the user configured. See [AI Assistant](./ai-assistant.md#privacy-what-is-sent).
-- The app reads no site credentials from the pages. Logins reach it only from a passwords file the user chooses to import; they are kept encrypted in the vault and sent to a page only on the person's tap ([Import and the password vault](./import-and-passwords.md)).
+- The app reads no site credentials from the pages. Logins reach it only from a passwords file the user chooses to import or from a browser profile the user taps in the import list (read in Rust with that browser's own OS key, never shown to the shell); they are kept encrypted in the vault and sent to a page only on the person's tap ([Import and the password vault](./import-and-passwords.md)).
 - App logs are local, scrubbed, and never include page content, URLs with query strings, or keys.
 
 ## Legal and store-policy risks (not code, but they shape scope)

@@ -61,6 +61,14 @@ export const id: Messages = {
     "Di browser lama Anda, ekspor markah (HTML), riwayat, dan kata sandi (CSV), lalu pilih berkasnya di sini. Semuanya dibaca di perangkat ini dan tidak ada yang dikirim ke mana pun.",
   "import.choose": "Pilih berkas",
   "import.chooseMore": "Tambah berkas lain",
+  "import.direct": "Impor langsung dari browser di komputer ini",
+  "import.readingFrom": "Membaca {browser}…",
+  "import.accessNote":
+    "Jika komputer meminta izin mengakses kata sandi tersimpan, pilih Izinkan. Semuanya tetap di perangkat ini.",
+  "import.orFiles":
+    "Atau pilih berkas yang Anda ekspor dari browser lain: bookmark (HTML), riwayat, dan kata sandi (CSV).",
+  "import.locked":
+    "Browser Anda mengunci {count} kata sandi tersimpan sehingga tidak dapat dibaca. Untuk membawanya, ekspor dari pengaturan kata sandi browser lalu pilih berkasnya di bawah.",
   "import.reading": "Membaca…",
   "import.tooLarge": "{name} terlalu besar untuk diimpor.",
   "import.nothing":

@@ -422,6 +422,8 @@ export interface ImportPreview {
   history: number;
   passwords: number;
   passwordSites: number;
+  /** Saved passwords the browser itself locks; only its own export can bring them. */
+  unreadablePasswords: number;
   searchEngine: SearchEngine | null;
   recipes: { recipeId: string; name: string; site: string }[];
   sites: { site: string; name: string }[];
@@ -443,8 +445,20 @@ export interface ImportResult {
   passwords: number;
 }
 
-/** Bringing in what another browser exported. Passwords never come back from Rust in a preview. */
+/** A browser found on this computer, with the profiles that hold data. */
+export interface DetectedBrowser {
+  id: string;
+  name: string;
+  profiles: { id: string; name: string }[];
+}
+
+/** Bringing in what another browser held. Passwords never come back from Rust in a preview. */
 export const importer = {
+  /** Browsers this app can read directly; empty on iOS and in the stores' sandboxes. */
+  browsers: () => invoke<DetectedBrowser[]>("import_browsers"),
+  /** Reads one profile of a detected browser; the OS may ask to allow its saved passwords. */
+  readBrowser: (browser: string, profile: string) =>
+    invoke<ImportPreview>("import_from_browser", { browser, profile }),
   /** Sends one exported file's text; answers with everything read so far. */
   read: (text: string) => invoke<ImportPreview>("import_read", { text }),
   cancel: () => command("import_cancel"),

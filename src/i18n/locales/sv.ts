@@ -65,6 +65,14 @@ export const sv: Messages = {
     "Exportera bokmärken (HTML), historik och lösenord (CSV) i din gamla webbläsare och välj sedan filerna här. Allt läses på den här enheten och ingenting skickas någonstans.",
   "import.choose": "Välj filer",
   "import.chooseMore": "Lägg till fler filer",
+  "import.direct": "Importera direkt från en webbläsare på den här datorn",
+  "import.readingFrom": "Läser {browser}…",
+  "import.accessNote":
+    "Om datorn frågar om åtkomst till sparade lösenord, välj Tillåt. Allt stannar på den här enheten.",
+  "import.orFiles":
+    "Eller välj filer du exporterat från en annan webbläsare: bokmärken (HTML), historik och lösenord (CSV).",
+  "import.locked":
+    "Din webbläsare håller {count} sparade lösenord låsta, så de gick inte att läsa. Exportera dem från webbläsarens lösenordsinställningar och välj filen nedan.",
   "import.reading": "Läser…",
   "import.tooLarge": "{name} är för stor för att importeras.",
   "import.nothing":

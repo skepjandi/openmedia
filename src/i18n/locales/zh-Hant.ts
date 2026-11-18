@@ -63,6 +63,12 @@ export const zhHant: Messages = {
     "在舊瀏覽器中匯出書籤（HTML）、記錄和密碼（CSV），然後在此選擇這些檔案。所有內容都在本裝置上讀取，不會傳送到任何地方。",
   "import.choose": "選擇檔案",
   "import.chooseMore": "加入更多檔案",
+  "import.direct": "直接從這台電腦上的瀏覽器匯入",
+  "import.readingFrom": "正在讀取 {browser}…",
+  "import.accessNote": "如果電腦詢問是否允許存取已儲存的密碼，請選擇允許。所有內容都留在此裝置上。",
+  "import.orFiles": "或選擇你從其他瀏覽器匯出的檔案：書籤（HTML）、歷史記錄和密碼（CSV）。",
+  "import.locked":
+    "你的瀏覽器鎖定了 {count} 個已儲存的密碼，因此無法讀取。要匯入它們，請在瀏覽器的密碼設定中匯出，然後在下方選擇該檔案。",
   "import.reading": "正在讀取…",
   "import.tooLarge": "{name} 太大，無法匯入。",
   "import.nothing": "這些檔案中找不到書籤、記錄、密碼或搜尋引擎。",

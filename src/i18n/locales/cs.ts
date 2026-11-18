@@ -65,6 +65,14 @@ export const cs: Messages = {
     "Ve starém prohlížeči exportujte záložky (HTML), historii a hesla (CSV) a soubory zde vyberte. Vše se čte v tomto zařízení a nic se nikam neodesílá.",
   "import.choose": "Vybrat soubory",
   "import.chooseMore": "Přidat další soubory",
+  "import.direct": "Importovat přímo z prohlížeče v tomto počítači",
+  "import.readingFrom": "Čtu {browser}…",
+  "import.accessNote":
+    "Pokud se počítač zeptá na povolení přístupu k uloženým heslům, zvolte Povolit. Vše zůstává v tomto zařízení.",
+  "import.orFiles":
+    "Nebo vyberte soubory exportované z jiného prohlížeče: záložky (HTML), historii a hesla (CSV).",
+  "import.locked":
+    "Váš prohlížeč drží {count} uložených hesel zamčených, takže je nešlo přečíst. Chcete-li je přenést, exportujte je v nastavení hesel prohlížeče a níže vyberte soubor.",
   "import.reading": "Čtení…",
   "import.tooLarge": "Soubor {name} je pro import příliš velký.",
   "import.nothing":

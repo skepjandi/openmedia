@@ -64,6 +64,14 @@ export const ko: Messages = {
     "이전 브라우저에서 북마크(HTML), 기록, 비밀번호(CSV)를 내보낸 다음 여기에서 파일을 선택하세요. 모든 내용은 이 기기에서만 읽으며 어디로도 전송되지 않습니다.",
   "import.choose": "파일 선택",
   "import.chooseMore": "파일 더 추가",
+  "import.direct": "이 컴퓨터의 브라우저에서 바로 가져오기",
+  "import.readingFrom": "{browser} 읽는 중…",
+  "import.accessNote":
+    "컴퓨터에서 저장된 비밀번호 접근을 허용할지 물으면 허용을 선택하세요. 모든 것은 이 기기에만 남습니다.",
+  "import.orFiles":
+    "또는 다른 브라우저에서 내보낸 파일(북마크 HTML, 방문 기록, 비밀번호 CSV)을 선택하세요.",
+  "import.locked":
+    "브라우저가 저장된 비밀번호 {count}개를 잠가 두어 읽을 수 없었습니다. 가져오려면 브라우저의 비밀번호 설정에서 내보낸 뒤 아래에서 그 파일을 선택하세요.",
   "import.reading": "읽는 중…",
   "import.tooLarge": "{name}은(는) 너무 커서 가져올 수 없습니다.",
   "import.nothing":

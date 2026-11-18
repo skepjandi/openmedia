@@ -66,6 +66,14 @@ export const fr: Messages = {
     "Dans votre ancien navigateur, exportez vos marque-pages (HTML), l’historique et les mots de passe (CSV), puis choisissez les fichiers ici. Tout est lu sur cet appareil et rien n’est envoyé ailleurs.",
   "import.choose": "Choisir des fichiers",
   "import.chooseMore": "Ajouter d’autres fichiers",
+  "import.direct": "Importer directement depuis un navigateur de cet ordinateur",
+  "import.readingFrom": "Lecture de {browser}…",
+  "import.accessNote":
+    "Si votre ordinateur demande l'accès aux mots de passe enregistrés, choisissez Autoriser. Tout reste sur cet appareil.",
+  "import.orFiles":
+    "Ou choisissez des fichiers exportés depuis un autre navigateur : favoris (HTML), historique et mots de passe (CSV).",
+  "import.locked":
+    "Votre navigateur garde {count} mots de passe enregistrés verrouillés ; ils n'ont pas pu être lus. Pour les importer, exportez-les depuis les réglages de mots de passe du navigateur et choisissez le fichier ci-dessous.",
   "import.reading": "Lecture…",
   "import.tooLarge": "{name} est trop volumineux pour être importé.",
   "import.nothing":

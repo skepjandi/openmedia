@@ -62,6 +62,12 @@ export const zhHans: Messages = {
     "在旧浏览器中导出书签（HTML）、历史和密码（CSV），然后在此选择这些文件。所有内容都在本设备上读取，不会发送到任何地方。",
   "import.choose": "选择文件",
   "import.chooseMore": "添加更多文件",
+  "import.direct": "直接从这台电脑上的浏览器导入",
+  "import.readingFrom": "正在读取 {browser}…",
+  "import.accessNote": "如果电脑询问是否允许访问已保存的密码，请选择允许。所有内容都留在此设备上。",
+  "import.orFiles": "或选择你从其他浏览器导出的文件：书签（HTML）、历史记录和密码（CSV）。",
+  "import.locked":
+    "你的浏览器锁定了 {count} 个已保存的密码，因此无法读取。要导入它们，请在浏览器的密码设置中导出，然后在下方选择该文件。",
   "import.reading": "正在读取…",
   "import.tooLarge": "{name} 太大，无法导入。",
   "import.nothing": "这些文件中没有找到书签、历史、密码或搜索引擎。",

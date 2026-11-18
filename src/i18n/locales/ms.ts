@@ -61,6 +61,14 @@ export const ms: Messages = {
     "Dalam pelayar lama anda, eksport penanda halaman (HTML), sejarah dan kata laluan (CSV), kemudian pilih fail di sini. Semuanya dibaca pada peranti ini dan tiada apa-apa dihantar ke mana-mana.",
   "import.choose": "Pilih fail",
   "import.chooseMore": "Tambah lagi fail",
+  "import.direct": "Import terus daripada pelayar pada komputer ini",
+  "import.readingFrom": "Membaca {browser}…",
+  "import.accessNote":
+    "Jika komputer anda meminta kebenaran mengakses kata laluan tersimpan, pilih Benarkan. Semuanya kekal pada peranti ini.",
+  "import.orFiles":
+    "Atau pilih fail yang anda eksport daripada pelayar lain: penanda halaman (HTML), sejarah dan kata laluan (CSV).",
+  "import.locked":
+    "Pelayar anda mengunci {count} kata laluan tersimpan, jadi ia tidak dapat dibaca. Untuk membawanya, eksport daripada tetapan kata laluan pelayar dan pilih failnya di bawah.",
   "import.reading": "Membaca…",
   "import.tooLarge": "{name} terlalu besar untuk diimport.",
   "import.nothing":

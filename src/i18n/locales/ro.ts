@@ -64,6 +64,14 @@ export const ro: Messages = {
     "În vechiul tău browser, exportă marcajele (HTML), istoricul și parolele (CSV), apoi alege fișierele aici. Totul este citit pe acest dispozitiv și nimic nu este trimis nicăieri.",
   "import.choose": "Alege fișiere",
   "import.chooseMore": "Adaugă mai multe fișiere",
+  "import.direct": "Importă direct dintr-un browser de pe acest computer",
+  "import.readingFrom": "Se citește {browser}…",
+  "import.accessNote":
+    "Dacă computerul cere permisiunea de a accesa parolele salvate, alege Permite. Totul rămâne pe acest dispozitiv.",
+  "import.orFiles":
+    "Sau alege fișiere exportate din alt browser: marcaje (HTML), istoric și parole (CSV).",
+  "import.locked":
+    "Browserul tău ține blocate {count} parole salvate, așa că nu au putut fi citite. Ca să le aduci, exportă-le din setările de parole ale browserului și alege fișierul mai jos.",
   "import.reading": "Se citește…",
   "import.tooLarge": "{name} este prea mare pentru a fi importat.",
   "import.nothing":

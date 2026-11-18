@@ -64,6 +64,14 @@ export const ja: Messages = {
     "以前のブラウザで、ブックマーク（HTML）、履歴、パスワード（CSV）を書き出し、ここでファイルを選んでください。すべてこの端末上で読み取られ、どこにも送信されません。",
   "import.choose": "ファイルを選択",
   "import.chooseMore": "ファイルを追加",
+  "import.direct": "このコンピューターのブラウザから直接インポート",
+  "import.readingFrom": "{browser} を読み込み中…",
+  "import.accessNote":
+    "保存したパスワードへのアクセス許可を求められたら「許可」を選んでください。すべてこのデバイス内で処理されます。",
+  "import.orFiles":
+    "または、他のブラウザからエクスポートしたファイル（ブックマークのHTML、履歴、パスワードのCSV）を選択します。",
+  "import.locked":
+    "お使いのブラウザは保存済みパスワード {count} 件をロックしているため読み取れませんでした。取り込むには、ブラウザのパスワード設定からエクスポートし、下でそのファイルを選択してください。",
   "import.reading": "読み込み中…",
   "import.tooLarge": "{name} は大きすぎて読み込めません。",
   "import.nothing":

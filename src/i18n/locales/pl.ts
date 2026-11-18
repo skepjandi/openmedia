@@ -65,6 +65,14 @@ export const pl: Messages = {
     "W starej przeglądarce wyeksportuj zakładki (HTML), historię i hasła (CSV), a potem wybierz tutaj pliki. Wszystko jest odczytywane na tym urządzeniu i nic nie jest nigdzie wysyłane.",
   "import.choose": "Wybierz pliki",
   "import.chooseMore": "Dodaj więcej plików",
+  "import.direct": "Importuj bezpośrednio z przeglądarki na tym komputerze",
+  "import.readingFrom": "Odczytywanie: {browser}…",
+  "import.accessNote":
+    "Jeśli komputer poprosi o zgodę na dostęp do zapisanych haseł, wybierz Zezwól. Wszystko zostaje na tym urządzeniu.",
+  "import.orFiles":
+    "Albo wybierz pliki wyeksportowane z innej przeglądarki: zakładki (HTML), historię i hasła (CSV).",
+  "import.locked":
+    "Twoja przeglądarka trzyma zablokowane zapisane hasła ({count}), więc nie dało się ich odczytać. Aby je przenieść, wyeksportuj je w ustawieniach haseł przeglądarki i wybierz plik poniżej.",
   "import.reading": "Wczytywanie…",
   "import.tooLarge": "Plik {name} jest za duży, aby go zaimportować.",
   "import.nothing":

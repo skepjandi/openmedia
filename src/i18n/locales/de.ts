@@ -60,6 +60,14 @@ export const de: Messages = {
     "Exportiere in deinem alten Browser deine Lesezeichen (HTML), den Verlauf und die Passwörter (CSV) und wähle die Dateien dann hier aus. Alles wird auf diesem Gerät gelesen und nichts wird irgendwohin gesendet.",
   "import.choose": "Dateien auswählen",
   "import.chooseMore": "Weitere Dateien hinzufügen",
+  "import.direct": "Direkt aus einem Browser auf diesem Computer importieren",
+  "import.readingFrom": "{browser} wird gelesen …",
+  "import.accessNote":
+    "Wenn dein Computer um Zugriff auf gespeicherte Passwörter bittet, wähle „Erlauben“. Alles bleibt auf diesem Gerät.",
+  "import.orFiles":
+    "Oder wähle Dateien, die du aus einem anderen Browser exportiert hast: Lesezeichen (HTML), Verlauf und Passwörter (CSV).",
+  "import.locked":
+    "Dein Browser hält {count} gespeicherte Passwörter gesperrt, daher konnten sie nicht gelesen werden. Exportiere sie in den Passwort-Einstellungen des Browsers und wähle unten die Datei.",
   "import.reading": "Wird gelesen…",
   "import.tooLarge": "{name} ist zu groß für den Import.",
   "import.nothing":
