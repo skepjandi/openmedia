@@ -8,11 +8,11 @@ OpenMedia has no accounts. Its one server (the share Worker, see [Recipe Library
 
 | Free, always | Pro |
 |---|---|
-| Opening any link or site, web search from the command bar, up to four favorites (the first four quick-access slots), history, adding recipes (official and community) from the recipe library and their switches, importing recipes, sharing a recipe as a GitHub pull request, ad and tracker blocking, Settings, theme, language | All AI features (providers, keys, test, assistant, preview, accept) |
+| Opening any link or site, web search from the command bar, up to three favorites (the first three quick-access slots), history, adding recipes (official and community) from the recipe library and their switches, importing recipes, sharing a recipe as a GitHub pull request, ad and tracker blocking, Settings, theme, language | All AI features (providers, keys, test, assistant, preview, accept) |
 | Deleting AI providers and keys, leaving incognito, unblocking a site, recording usage | Incognito mode |
 | | Usage: Stats, daily policies and limits, blocking an exhausted site |
 | | Quick-access slots 5 and 6, and More favorites (a free user sees the two slots grayed out and More favorites locked) |
-| | Onboarding lets a free user choose 4 quick-access recipes, a Pro user 6 |
+| | Onboarding lets a free user choose 3 quick-access recipes, a Pro user 5 |
 
 **Where the new gates are enforced.** The onboarding slot count: in Rust only. Sharing a recipe stays free.
 
@@ -45,7 +45,7 @@ flowchart LR
 - **`tauri-plugin-billing`** (`src-tauri/plugins/tauri-plugin-billing`) wraps `purchases-ios` and `purchases-android`. RevenueCat has no Tauri SDK. Its methods (`configure`, `customerInfo`, `offerings`, `purchase`, `restore`) are Rust-only: no Tauri command, permission or capability exists for them, so neither the shell nor a site view can call the plugin. On macOS the same API is served by a Swift package linked into the app (`macos/`, see [Platform Support](./platform-support.md#the-macos-site-view)); Windows and Linux return `Unsupported`.
 - **`entitlement.rs`** owns the state (`loading`, `free`, `pro`), resolves it in the background at launch, and exposes the commands the shell uses. It is the only place Pro is decided.
 - **The gate is in Rust.** `require_pro` runs at the top of each gated command, so a UI bug cannot unlock a feature. Gated: `ai_save_provider`, `ai_set_key`, `ai_set_active`, `ai_test`, `set_ai_preview`, `ai_prepare`, `ai_send`, `ai_accept`, `unlock_incognito`, `enter_incognito`, `get_incognito_favorites`, `set_incognito_favorites`, `get_usage`, `get_usage_limits`, `set_usage_limit`, `set_usage_section_limit`, and `set_usage_blocked` when blocking. A rejected call returns the stable code `pro-required`, which the shell turns into the paywall. If Pro is lost while incognito is on, incognito is switched off.
-- **Favorites limit.** `set_favorites` and `set_site_favorite` call `require_pro` when a save would grow the list past `FREE_FAVORITE_LIMIT` (4, `library.rs`; mirrored by `FREE_QUICK_ACCESS_LIMIT` in the shell). A list already longer (Pro that lapsed) can still be edited, reordered and shortened, just not extended; its entries past the fourth show grayed out and do nothing but open the paywall.
+- **Favorites limit.** `set_favorites` and `set_site_favorite` call `require_pro` when a save would grow the list past `FREE_FAVORITE_LIMIT` (3, `library.rs`; mirrored by `FREE_QUICK_ACCESS_LIMIT` in the shell). A list already longer (Pro that lapsed) can still be edited, reordered and shortened, just not extended; its entries past the third show grayed out and do nothing but open the paywall.
 - **Shell.** `src/features/paywall/` holds typed IPC wrappers, the zustand store, `PaywallSheet` and lock affordances. While entitlement is `loading`, gated actions stay blocked and open the paywall rather than risk a free access window.
 
 ## No login: how recovery works

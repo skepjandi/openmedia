@@ -100,7 +100,7 @@ sequenceDiagram
 
 ### Onboarding (Design)
 
-First launch shows the guide, then a step "What do you need in quick access?" that lists the official recipes for the current platform (`onboarding_options`, from the bundled set), and a step explaining the recipe library. `onboarding_apply` adds the selection through the same path as `library_install` and **replaces the favorites** with exactly the installed picks' homepages when at least one install succeeds (4 free, 6 with Pro: 5 or 6 without Pro is `pro-required`, more than 6 or a repeat is an error; picks that are not official options for this platform or fail to install are returned in `failed`; names are cut to 20 characters), then the shell calls `complete_onboarding`. Failed picks are reported and skipping is always allowed. See [UI Design](./ui-design.md#onboarding) and [Recipe Library and Sharing](./recipe-library.md).
+First launch shows the guide, then a step "What do you need in quick access?" that lists the official recipes for the current platform (`onboarding_options`, from the bundled set), and a step explaining the recipe library. `onboarding_apply` adds the selection through the same path as `library_install` and **replaces the favorites** with exactly the installed picks' homepages when at least one install succeeds (3 free, 5 with Pro: 4 or 5 without Pro is `pro-required`, more than 5 or a repeat is an error; picks that are not official options for this platform or fail to install are returned in `failed`; names are cut to 20 characters), then the shell calls `complete_onboarding`. Failed picks are reported and skipping is always allowed. See [UI Design](./ui-design.md#onboarding) and [Recipe Library and Sharing](./recipe-library.md).
 
 ### Launch
 

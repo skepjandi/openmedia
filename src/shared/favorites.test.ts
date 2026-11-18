@@ -31,21 +31,20 @@ describe("quickAccess", () => {
 describe("quickSlots", () => {
   const names = ["a", "b", "c", "d", "e", "f", "g", "h"];
 
-  it("gives Pro one usable slot per favorite, up to six", () => {
+  it("gives Pro one usable slot per favorite, up to five", () => {
     expect(quickSlots(names, true)).toEqual(
-      names.slice(0, 6).map((favorite) => ({ favorite, locked: false })),
+      names.slice(0, 5).map((favorite) => ({ favorite, locked: false })),
     );
     expect(quickSlots(["a"], true)).toEqual([{ favorite: "a", locked: false }]);
   });
 
-  it("gives a free user four usable slots and two locked ones holding the next favorites", () => {
+  it("gives a free user three usable slots and two locked ones holding the next favorites", () => {
     expect(quickSlots(names, false)).toEqual([
       { favorite: "a", locked: false },
       { favorite: "b", locked: false },
       { favorite: "c", locked: false },
-      { favorite: "d", locked: false },
+      { favorite: "d", locked: true },
       { favorite: "e", locked: true },
-      { favorite: "f", locked: true },
     ]);
   });
 
@@ -59,8 +58,8 @@ describe("quickSlots", () => {
   });
 
   it("lists only what a free user can open", () => {
-    expect(usableQuickAccess(names, false)).toEqual(["a", "b", "c", "d"]);
-    expect(usableQuickAccess(names, true)).toEqual(names.slice(0, 6));
+    expect(usableQuickAccess(names, false)).toEqual(["a", "b", "c"]);
+    expect(usableQuickAccess(names, true)).toEqual(names.slice(0, 5));
   });
 });
 

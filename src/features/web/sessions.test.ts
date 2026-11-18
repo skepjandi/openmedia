@@ -154,8 +154,8 @@ describe("sessionsToClose", () => {
     ]);
   });
 
-  it("keeps all six quick-access pages past the idle limit alongside a typed page", () => {
-    const favorites = many(6, "favorite").map((page) => ({
+  it("keeps all five quick-access pages past the idle limit alongside a typed page", () => {
+    const favorites = many(5, "favorite").map((page) => ({
       ...page,
       lastUsed: NOW - IDLE_LIMIT_MS - 1,
     }));
@@ -164,8 +164,8 @@ describe("sessionsToClose", () => {
     expect(sessionsToClose(sessions, "visible", NOW, "routine", urls)).toEqual([]);
   });
 
-  it("bounds extra browsing without evicting the six quick-access pages", () => {
-    const favorites = many(6, "favorite");
+  it("bounds extra browsing without evicting the five quick-access pages", () => {
+    const favorites = many(5, "favorite");
     const sessions = [
       ...favorites,
       session("older", "typed", { lastUsed: NOW - 100 }),
@@ -224,14 +224,14 @@ describe("sessionsToClose", () => {
     ]);
   });
 
-  it("follows the current first six when favorites are reordered or removed", () => {
-    const favorites = many(7, "favorite").map((page) => ({
+  it("follows the current first five when favorites are reordered or removed", () => {
+    const favorites = many(6, "favorite").map((page) => ({
       ...page,
       lastUsed: NOW - IDLE_LIMIT_MS - 1,
     }));
     const sessions = [...favorites, session("visible", "typed")];
     const urls = favorites.map((page) => ({ url: page.openedUrl }));
-    expect(sessionsToClose(sessions, "visible", NOW, "routine", urls)).toEqual(["s6"]);
+    expect(sessionsToClose(sessions, "visible", NOW, "routine", urls)).toEqual(["s5"]);
     expect(sessionsToClose(sessions, "visible", NOW, "routine", urls.slice(1))).toEqual(["s0"]);
     expect(sessionsToClose(sessions, "visible", NOW, "routine", [])).toEqual(
       favorites.map((page) => page.id),

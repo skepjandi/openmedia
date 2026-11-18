@@ -18,7 +18,7 @@ Parsers are tolerant: unknown text is an empty result. A web address is `http`/`
 ## The flow
 
 1. The shell reads each chosen file's text **once** and sends it to `import_read`. Rust keeps what it found in memory for 10 minutes (`ImportState`) and returns a `Preview`: counts, the top sites, the official recipes that match them (by registrable domain of the recipe's hosts) and the other top sites. Passwords never come back: the preview has two numbers.
-2. The person ticks recipes, sites, history, search engine and passwords. `import_apply` does exactly that: installs the picked official recipes (and adds each as a favorite), adds the picked sites as favorites **without removing existing ones, up to 4 (6 with Pro)**, adds the 100 most visited addresses to History (most visited on top), sets the search engine, seals the logins. A recipe or site the files did not offer is refused. Pending data is dropped when applied, cancelled or expired.
+2. The person ticks recipes, sites, history, search engine and passwords. `import_apply` does exactly that: installs the picked official recipes (and adds each as a favorite), adds the picked sites as favorites **without removing existing ones, up to 3 (5 with Pro)**, adds the 100 most visited addresses to History (most visited on top), sets the search engine, seals the logins. A recipe or site the files did not offer is refused. Pending data is dropped when applied, cancelled or expired.
 3. Nothing is sent anywhere (invariant 1).
 
 ## The vault

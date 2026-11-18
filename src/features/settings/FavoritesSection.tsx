@@ -63,8 +63,8 @@ interface EditorListProps {
 
 /**
  * The quick-access group, the rest, and the add button, for whichever list it is given. Without
- * Pro only four slots are usable: the other two show grayed out, More favorites is locked, and
- * adding past four opens the paywall.
+ * Pro only three slots are usable: the other two show grayed out, More favorites is locked, and
+ * adding past three opens the paywall.
  */
 export function FavoritesEditor({
   favorites,

@@ -6,6 +6,14 @@ All notable changes to OpenMedia are documented here.
 >
 > **Wiki**: the [GitHub Wiki](https://github.com/skepjandi/openmedia/wiki) is the public-facing main wiki — architecture, recipe format, AI pipeline, security model, roadmap. Source-controlled editing surface is `docs/wiki/` in this repo; CI (`.github/workflows/sync-wiki.yml`) mirrors it to the GitHub Wiki on every merge to `main`. New single-PR changes belong here, not as new wiki pages.
 
+### feat(favorites): quick access is five, with two locked without Pro
+
+**Area:** `feat(favorites)`
+
+**Change:** Quick access is now five favorites for Pro; without Pro the first three are usable and two are shown locked (it was six, four and two). The favorites limit for free (`FREE_FAVORITE_LIMIT`) is three, Pro's onboarding and import picks stop at five, and the Tabs, Settings and ring lists lock from the fourth favorite. A free list already longer keeps its entries, shown grayed out; nothing is deleted. Favorites past the fifth stay unlimited and are reached from the ring and folders.
+
+**Verified:** Vitest (slots, usable limit, onboarding limit, session budget) and `cargo test --lib`.
+
 ### feat(desktop): keyboard shortcuts for every action, with Vim and Emacs key sets
 
 **Area:** `feat(shell)`, `feat(desktop)`

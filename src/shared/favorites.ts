@@ -2,13 +2,13 @@ import type { FavoriteInput } from "./ipc";
 import { siteOf } from "./site";
 
 /** How many favorites the floating button fans out for Pro. The rest stay in Settings. */
-export const QUICK_ACCESS_LIMIT = 6;
+export const QUICK_ACCESS_LIMIT = 5;
 
 /**
  * How many of those slots a free user can use. Mirrors `FREE_FAVORITE_LIMIT` in `library.rs`,
  * which also refuses to grow the favorites past it. The other slots show grayed out.
  */
-export const FREE_QUICK_ACCESS_LIMIT = 4;
+export const FREE_QUICK_ACCESS_LIMIT = 3;
 
 /** Mirrors `MAX_FAVORITE_NAME_CHARS` in `library.rs`, which is what enforces it. */
 export const MAX_FAVORITE_NAME_CHARS = 20;
@@ -30,8 +30,8 @@ export interface QuickSlot<T> {
 }
 
 /**
- * The positions of the quick-access menu. Pro has one per favorite, up to six. Without Pro the
- * first four are usable and the last two are always shown, locked, so the way up is visible.
+ * The positions of the quick-access menu. Pro has one per favorite, up to five. Without Pro the
+ * first three are usable and the last two are always shown, locked, so the way up is visible.
  */
 export function quickSlots<T>(favorites: readonly T[], pro: boolean): QuickSlot<T>[] {
   const usable = usableQuickAccess(favorites, pro).map((favorite) => ({ favorite, locked: false }));

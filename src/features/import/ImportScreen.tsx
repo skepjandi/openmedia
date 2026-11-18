@@ -11,7 +11,7 @@ import { Group, GroupLabel, primaryBlockButton, quietBlockButton } from "../sett
 /** The largest file the shell reads; Rust refuses more than this as well. */
 const MAX_FILE_BYTES = 20 * 1024 * 1024;
 /** Matches `FREE_FAVORITE_LIMIT` and `PRO_FAVORITE_LIMIT` in Rust; only for the note's wording. */
-const FAVORITE_SLOTS = 6;
+const FAVORITE_SLOTS = 5;
 
 interface Picks {
   recipes: Set<string>;

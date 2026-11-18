@@ -50,11 +50,11 @@ const DEFAULT_FAVORITES: [(&str, &str); 1] = [("Google", "https://www.google.com
 
 /// How many favorites a free user can have; more needs Pro. Mirrors `FREE_QUICK_ACCESS_LIMIT` in
 /// the shell, which shows the Pro slots grayed out.
-pub const FREE_FAVORITE_LIMIT: usize = 4;
+pub const FREE_FAVORITE_LIMIT: usize = 3;
 
 /// How many sites the onboarding guide puts in quick access for a Pro user. Mirrors
 /// `QUICK_ACCESS_LIMIT` in the shell.
-pub const PRO_FAVORITE_LIMIT: usize = 6;
+pub const PRO_FAVORITE_LIMIT: usize = 5;
 
 /// True when saving `new` favorites over `current` grows the list past what a free user may have.
 /// A list already longer than the limit (Pro lapsed) can still shrink, be
