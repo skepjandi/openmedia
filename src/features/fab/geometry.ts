@@ -44,6 +44,7 @@ export const CONTROLS_SIZE = 44;
 export const DARK_MODE_SIZE = 44;
 export const COLOR_PICKER_SIZE = 44;
 export const TECH_DETECTOR_SIZE = 44;
+export const DOWNLOADS_SIZE = 44;
 /** Centre-to-centre distance between neighbouring buttons in the settings column. */
 const COLUMN_OFFSET = 52;
 /** From the settings button up to the usage button at the top of the page column. */
@@ -133,12 +134,15 @@ export interface FanLayout {
   colorPicker: Point | null;
   /** The technology detector, after the color picker; null while it is turned off in Settings. */
   techDetector: Point | null;
+  /** The downloads button, after the technology detector; null while it is turned off in the downloads settings. */
+  downloads: Point | null;
 }
 
-/** The optional buttons the user can switch on in Settings. */
+/** The optional buttons the user can switch on or off in Settings. */
 export interface FanExtras {
   colorPicker: boolean;
   techDetector: boolean;
+  downloads: boolean;
 }
 
 export type FanTarget =
@@ -151,6 +155,7 @@ export type FanTarget =
   | { kind: "darkMode" }
   | { kind: "colorPicker" }
   | { kind: "techDetector" }
+  | { kind: "downloads" }
   | { kind: "settings" };
 
 interface FanItem {
@@ -221,7 +226,7 @@ export function fanLayout(
   const preferred = roomBelow >= roomAbove ? 1 : -1;
 
   /** The optional buttons continue the column after the dark mode switch, in this order. */
-  const slots = [extras.colorPicker, extras.techDetector];
+  const slots = [extras.colorPicker, extras.techDetector, extras.downloads];
   const extraCount = slots.filter(Boolean).length;
   const slotOf = (index: number) =>
     slots[index] ? slots.slice(0, index).filter(Boolean).length : -1;
@@ -267,6 +272,7 @@ export function fanLayout(
         : { x: settings.x, y: settings.y - 6 * COLUMN_OFFSET },
       colorPicker: extraPoint(0),
       techDetector: extraPoint(1),
+      downloads: extraPoint(2),
     };
   };
   const items = (layout: FanLayout): FanItem[] => [
@@ -280,6 +286,7 @@ export function fanLayout(
     { center: layout.darkMode, size: DARK_MODE_SIZE },
     ...(layout.colorPicker ? [{ center: layout.colorPicker, size: COLOR_PICKER_SIZE }] : []),
     ...(layout.techDetector ? [{ center: layout.techDetector, size: TECH_DETECTOR_SIZE }] : []),
+    ...(layout.downloads ? [{ center: layout.downloads, size: DOWNLOADS_SIZE }] : []),
   ];
 
   for (const scale of favoriteCount > 1 ? ARC_SCALES : [1]) {
@@ -308,6 +315,7 @@ export function fanTargetAt(point: Point, layout: FanLayout): FanTarget | null {
     Math.hypot(point.x - center.x, point.y - center.y) <= size / 2 + TOUCH_SLACK;
   const index = layout.favorites.findIndex((p) => near(p, FAVORITE_SIZE));
   if (index >= 0) return { kind: "favorite", index };
+  if (layout.downloads && near(layout.downloads, DOWNLOADS_SIZE)) return { kind: "downloads" };
   if (layout.techDetector && near(layout.techDetector, TECH_DETECTOR_SIZE))
     return { kind: "techDetector" };
   if (layout.colorPicker && near(layout.colorPicker, COLOR_PICKER_SIZE))

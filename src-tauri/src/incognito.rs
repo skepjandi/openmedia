@@ -115,6 +115,7 @@ pub async fn enter_incognito(
 /// Back to the normal set. No check: nothing private is shown by leaving.
 #[tauri::command]
 pub async fn exit_incognito(app: AppHandle) -> Result<()> {
+    app.state::<crate::downloads::Manager>().purge_private();
     switch_mode(&app, false)
 }
 

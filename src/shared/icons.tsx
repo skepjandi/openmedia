@@ -171,6 +171,15 @@ export const ColorPickerIcon = () => (
   </Icon>
 );
 
+/** Downloads: an arrow into a tray. */
+export const DownloadIcon = () => (
+  <Icon>
+    <path d="M12 4v11" />
+    <path d="M7.5 10.5L12 15l4.5-4.5" />
+    <path d="M5 19h14" />
+  </Icon>
+);
+
 /** Technology detector: code brackets over a magnifier-free page outline. */
 export const TechIcon = () => (
   <Icon>

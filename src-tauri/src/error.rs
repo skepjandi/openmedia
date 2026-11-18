@@ -66,6 +66,8 @@ pub enum Error {
     SelfUpdateUnavailable,
     #[error("ad blocking failed: {0}")]
     AdBlock(String),
+    #[error("{0}")]
+    Download(String),
     #[error("library lock poisoned")]
     Poisoned,
 }

@@ -7,6 +7,7 @@ import {
   COLOR_PICKER_SIZE,
   CONTROLS_SIZE,
   DARK_MODE_SIZE,
+  DOWNLOADS_SIZE,
   TECH_DETECTOR_SIZE,
   INCOGNITO_SIZE,
   SETTINGS_SIZE,
@@ -61,13 +62,13 @@ describe("separateVerticalPosition", () => {
   });
 });
 
-const ALL_EXTRAS: FanExtras = { colorPicker: true, techDetector: true };
-const EXTRA_CHOICES: FanExtras[] = [
-  { colorPicker: false, techDetector: false },
-  { colorPicker: true, techDetector: false },
-  { colorPicker: false, techDetector: true },
-  ALL_EXTRAS,
-];
+const ALL_EXTRAS: FanExtras = { colorPicker: true, techDetector: true, downloads: true };
+const EXTRA_CHOICES: FanExtras[] = [false, true].flatMap((downloads) => [
+  { colorPicker: false, techDetector: false, downloads },
+  { colorPicker: true, techDetector: false, downloads },
+  { colorPicker: false, techDetector: true, downloads },
+  { colorPicker: true, techDetector: true, downloads },
+]);
 
 const distance = (a: Point, b: Point) => Math.hypot(a.x - b.x, a.y - b.y);
 
@@ -85,6 +86,7 @@ describe("fanLayout", () => {
           const layout = fanLayout(origin, edge, phone, insets, count, extras);
           expect(layout.colorPicker === null).toBe(!extras.colorPicker);
           expect(layout.techDetector === null).toBe(!extras.techDetector);
+          expect(layout.downloads === null).toBe(!extras.downloads);
           const items = [
             ...layout.favorites.map((center) => ({ center, size: FAVORITE_SIZE })),
             { center: layout.settings, size: SETTINGS_SIZE },
@@ -100,6 +102,7 @@ describe("fanLayout", () => {
             ...(layout.techDetector
               ? [{ center: layout.techDetector, size: TECH_DETECTOR_SIZE }]
               : []),
+            ...(layout.downloads ? [{ center: layout.downloads, size: DOWNLOADS_SIZE }] : []),
           ];
           for (const { center, size } of items) {
             expect(center.x - size / 2).toBeGreaterThanOrEqual(0);
@@ -232,6 +235,8 @@ describe("fanLayout", () => {
         expect(Math.sign((layout.colorPicker?.y ?? 0) - origin.y)).toBe(-pageSide);
         expect(layout.techDetector?.x).toBe(origin.x);
         expect(Math.sign((layout.techDetector?.y ?? 0) - origin.y)).toBe(-pageSide);
+        expect(layout.downloads?.x).toBe(origin.x);
+        expect(Math.sign((layout.downloads?.y ?? 0) - origin.y)).toBe(-pageSide);
       }
     }
   });
@@ -282,6 +287,7 @@ describe("the dark mode button", () => {
             layout.controls,
             ...(layout.colorPicker ? [layout.colorPicker] : []),
             ...(layout.techDetector ? [layout.techDetector] : []),
+            ...(layout.downloads ? [layout.downloads] : []),
           ];
           for (const other of others) {
             expect(distance(layout.darkMode, other)).toBeGreaterThan(DARK_MODE_SIZE);
@@ -307,12 +313,14 @@ describe("fanTargetAt", () => {
     expect(fanTargetAt(layout.darkMode, layout)).toEqual({ kind: "darkMode" });
     expect(fanTargetAt(pickerOf(layout), layout)).toEqual({ kind: "colorPicker" });
     expect(fanTargetAt(techOf(layout), layout)).toEqual({ kind: "techDetector" });
+    expect(fanTargetAt(layout.downloads ?? origin, layout)).toEqual({ kind: "downloads" });
   });
 
   it("stacks the technology detector straight after the dark mode switch when the picker is off", () => {
     const only = fanLayout(origin, "left", phone, insets, 4, {
       colorPicker: false,
       techDetector: true,
+      downloads: false,
     });
     const both = layout;
     expect(distance(only.techDetector ?? origin, only.darkMode)).toBeCloseTo(
@@ -324,6 +332,7 @@ describe("fanTargetAt", () => {
     const without = fanLayout(origin, "left", phone, insets, 4, {
       colorPicker: false,
       techDetector: false,
+      downloads: false,
     });
     expect(without.colorPicker).toBeNull();
     expect(without.techDetector).toBeNull();

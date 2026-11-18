@@ -50,6 +50,9 @@ sha2 = "0.11"
 ring = "0.17"
 base64 = "0.23"
 flate2 = "1"
+percent-encoding = "2.3"
+# Downloads run as tasks on the runtime Tauri already provides; these are the parts of it they use.
+tokio = { version = "1", features = ["fs", "io-util", "macros", "net", "rt", "sync", "time"] }
 
 # Desktop builds that ship outside the stores replace themselves (`self_update.rs`); the store builds
 # (iOS, Android, Mac App Store) are updated by their store and never compile this in.

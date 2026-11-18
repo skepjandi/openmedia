@@ -19,6 +19,7 @@ import { RecipesLink } from "./RecipesScreen";
 import { Switch } from "./Switch";
 import { UpdatesSection } from "./UpdatesSection";
 import { Picker } from "./Picker";
+import { NavRow } from "./SiteParts";
 import { Group, Section, primaryButton, quietButton } from "./ui";
 
 export function SettingsScreen() {
@@ -40,6 +41,7 @@ export function SettingsScreen() {
         <DarkModeLink />
         <VideoControlsLink />
         <FanButtonSwitches />
+        <DownloadsLink />
         <FavoritesSection />
         <RecipesLink />
         <LibraryLinks />
@@ -79,6 +81,22 @@ function FanButtonSwitches() {
         description={t("settings.techDetectorNote")}
         checked={techDetector}
         onChange={(on) => void setTechDetector(on)}
+      />
+    </Group>
+  );
+}
+
+/** The row that opens the downloads page: the list, the page's media, the folder, the names and the rules. */
+function DownloadsLink() {
+  const openSheet = useApp((s) => s.openSheet);
+  const t = useT();
+
+  return (
+    <Group>
+      <NavRow
+        title={t("settings.downloads")}
+        note={t("settings.downloadsNote")}
+        onClick={() => openSheet("downloads")}
       />
     </Group>
   );

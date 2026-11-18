@@ -337,6 +337,118 @@ export const colorPick = {
   cancel: () => command("color_pick_cancel"),
 };
 
+export type DownloadKind = "image" | "video" | "audio" | "document" | "archive" | "other";
+export type DownloadStatus = "queued" | "downloading" | "paused" | "done" | "failed" | "cancelled";
+
+/** One file being fetched, or fetched. */
+export interface Download {
+  id: string;
+  url: string;
+  fileName: string;
+  /** Where the finished file is, or will be. */
+  path: string | null;
+  kind: DownloadKind;
+  status: DownloadStatus;
+  received: number;
+  total: number | null;
+  /** Bytes per second while downloading. */
+  speed: number;
+  /** Whether pausing keeps what has arrived. */
+  resumable: boolean;
+  error: string | null;
+  site: string;
+  addedAt: number;
+  finishedAt: number | null;
+  /** Started in incognito: never saved, gone when incognito ends. */
+  private: boolean;
+}
+
+/** A rule renames and routes the files it matches; the first enabled match wins. */
+export interface DownloadRule {
+  id: string;
+  name: string;
+  enabled: boolean;
+  /** The site or a parent domain of it. */
+  host: string | null;
+  /** Empty means any kind. */
+  kinds: DownloadKind[];
+  /** A regular expression the address must contain a match for. */
+  regex: string | null;
+  mask: string | null;
+  /** A subfolder of the download folder; naming tokens work here too. */
+  folder: string | null;
+}
+
+export interface DownloadSettings {
+  /** The downloads button on the floating button's fan. */
+  button: boolean;
+  mask: string;
+  /** Connections per large file, 1 to 8. */
+  segments: number;
+  /** Where files go; null is the device's downloads folder. */
+  folder: string | null;
+  rules: DownloadRule[];
+}
+
+export interface DownloadsSnapshot {
+  settings: DownloadSettings;
+  downloads: Download[];
+  defaultFolder: string;
+}
+
+/** One address to download. */
+export interface DownloadRequest {
+  url: string;
+  label?: string;
+  kind?: DownloadKind;
+  pageUrl?: string;
+  pageTitle?: string;
+}
+
+/** A link, image, video or audio found on the page in front. */
+export interface FoundMedia {
+  url: string;
+  kind: DownloadKind;
+  label: string;
+  width: number;
+  height: number;
+}
+
+export interface SniffedPage {
+  page: { url: string; title: string };
+  items: FoundMedia[];
+}
+
+export type DownloadPreview =
+  { kind: "image"; dataUri: string } | { kind: "text"; text: string } | { kind: "none" };
+
+/** The download manager. Everything runs in Rust; the shell asks and listens. */
+export const downloads = {
+  state: () => invoke<DownloadsSnapshot>("downloads_state"),
+  setSettings: (settings: DownloadSettings) =>
+    invoke<DownloadSettings>("downloads_set_settings", { settings }),
+  add: (requests: DownloadRequest[]) => invoke<Download[]>("downloads_add", { requests }),
+  /** One address per line; `[001-020]` in an address stands for the whole range. */
+  addText: (text: string, page?: { url: string; title: string }) =>
+    invoke<Download[]>("downloads_add_text", {
+      text,
+      pageUrl: page?.url ?? null,
+      pageTitle: page?.title ?? null,
+    }),
+  pause: (id: string) => command("downloads_pause", { id }),
+  resume: (id: string) => command("downloads_resume", { id }),
+  cancel: (id: string) => command("downloads_cancel", { id }),
+  remove: (id: string) => command("downloads_remove", { id }),
+  clearFinished: () => command("downloads_clear_finished"),
+  open: (id: string) => command("downloads_open", { id }),
+  reveal: (id: string) => command("downloads_reveal", { id }),
+  preview: (id: string) => invoke<DownloadPreview>("downloads_preview", { id }),
+  /** Lists what the page in front offers to download. */
+  sniff: () => invoke<SniffedPage>("downloads_sniff"),
+  onChanged: (handler: (download: Download) => void): Promise<UnlistenFn> =>
+    listen<Download>("downloads:changed", (event) => handler(event.payload)),
+};
+
 async function command(name: string, args?: Record<string, unknown>): Promise<void> {
   await invoke(name, args);
 }
