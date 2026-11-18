@@ -13,6 +13,7 @@ import {
   HISTORY_SIZE,
   HOLD_SCALE,
   COLOR_PICKER_SIZE,
+  DOWNLOADS_SIZE,
   CONTROLS_SIZE,
   DARK_MODE_SIZE,
   INCOGNITO_SIZE,
@@ -44,6 +45,7 @@ import {
   ChevronLeftIcon,
   ChevronRightIcon,
   ColorPickerIcon,
+  DownloadIcon,
   TechIcon,
   HistoryIcon,
   IncognitoIcon,
@@ -57,6 +59,7 @@ import {
 import { useBackHandler } from "../back/useBackHandler";
 import logoMark from "../../assets/logo-mark.svg";
 import { useEntitlementStore } from "../paywall/store";
+import { useDownloadsStore } from "../downloads/store";
 
 const idle: GestureState = { phase: "idle" };
 
@@ -104,6 +107,8 @@ export function Fab() {
   // The page script runs through native code that desktop has no site view for.
   const colorPickerOn = useApp((s) => (s.state?.colorPicker ?? false) && !s.desktop);
   const techDetectorOn = useApp((s) => (s.state?.techDetector ?? false) && !s.desktop);
+  const downloadsOn = useDownloadsStore((s) => s.settings?.button ?? true);
+  const downloadsBadge = useDownloadsStore((s) => s.active + s.unseen);
   const startTechDetect = useApp((s) => s.startTechDetect);
   const startColorPick = useApp((s) => s.startColorPick);
   const openSheet = useApp((s) => s.openSheet);
@@ -150,10 +155,11 @@ export function Fab() {
       fanLayout(resting, position.edge, viewport, insets, list.length, {
         colorPicker: colorPickerOn,
         techDetector: techDetectorOn,
+        downloads: downloadsOn,
       }),
     // resting is derived from these inputs
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [position, viewport, insets, list.length, colorPickerOn, techDetectorOn],
+    [position, viewport, insets, list.length, colorPickerOn, techDetectorOn, downloadsOn],
   );
 
   const center: Point = gesture.phase === "dragging" ? gesture.position : resting;
@@ -169,6 +175,7 @@ export function Fab() {
       void (incognito.active ? exitIncognito() : enterIncognito());
     else if (target.kind === "colorPicker") void startColorPick();
     else if (target.kind === "techDetector") void startTechDetect();
+    else if (target.kind === "downloads") openSheet("downloads");
     else if (target.kind === "darkMode") {
       if (pageSite) {
         void setSiteDarkMode(pageSite, { ...darkSites?.[pageSite], mode: darkOn ? "off" : "on" });
@@ -274,7 +281,7 @@ export function Fab() {
     "--dx": `${center.x - target.x}px`,
     "--dy": `${center.y - target.y}px`,
     "--i": index,
-    "--n": list.length + 7 + Number(colorPickerOn) + Number(techDetectorOn),
+    "--n": list.length + 7 + Number(colorPickerOn) + Number(techDetectorOn) + Number(downloadsOn),
   });
 
   const hidden = sheet !== "none" || onboardingOpen;
@@ -612,6 +619,41 @@ export function Fab() {
           }`}
         >
           <TechIcon />
+        </button>
+      )}
+
+      {layout.downloads && (
+        <button
+          type="button"
+          data-open={fanOpen}
+          aria-label={t("fab.downloads")}
+          tabIndex={fanOpen ? 0 : -1}
+          onClick={() => {
+            select({ kind: "downloads" });
+            dispatch({ type: "dismiss" });
+          }}
+          style={{
+            ...fanStyle(
+              layout.downloads,
+              list.length + 7 + Number(colorPickerOn) + Number(techDetectorOn),
+            ),
+            width: DOWNLOADS_SIZE,
+            height: DOWNLOADS_SIZE,
+            margin: -DOWNLOADS_SIZE / 2,
+          }}
+          className={`fan-item fab-glass fixed z-20 grid place-items-center rounded-full ${
+            hover?.kind === "downloads" ? "border-accent! text-accent" : "text-white"
+          }`}
+        >
+          <DownloadIcon />
+          {downloadsBadge > 0 && (
+            <span
+              aria-hidden="true"
+              className="absolute -end-1 -top-1 grid min-w-4 place-items-center rounded-full bg-accent px-1 text-[10px] leading-4 font-semibold text-on-accent"
+            >
+              {downloadsBadge}
+            </span>
+          )}
         </button>
       )}
 

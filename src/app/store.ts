@@ -70,6 +70,7 @@ export type Sheet =
   | "favorites"
   | "stats"
   | "settings"
+  | "downloads"
   | "recipes"
   | "incognito-recipes"
   | "more-favorites"
@@ -89,6 +90,7 @@ const isSiteSheet = (sheet: Sheet): sheet is SiteSheet =>
 
 /** Pages that open on top of Settings. Closing one returns to Settings, which stays mounted beneath it. */
 const SETTINGS_CHILDREN: readonly Sheet[] = [
+  "downloads",
   "recipes",
   "incognito-recipes",
   "more-favorites",

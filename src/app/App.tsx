@@ -31,6 +31,8 @@ import { useT } from "../i18n/useT";
 import { PaywallSheet } from "../features/paywall/PaywallSheet";
 import { useEntitlementStore } from "../features/paywall/store";
 import { updates } from "../shared/ipc";
+import { DownloadToast } from "../features/downloads/DownloadToast";
+import { useDownloadEvents } from "../features/downloads/useDownloadEvents";
 
 /** Heavy screens load after the first page shows; most launches never open them. */
 const loadSettings = () => import("../features/settings/SettingsScreen");
@@ -43,8 +45,12 @@ const loadVideoControls = () => import("../features/settings/VideoControlsScreen
 const loadDarkMode = () => import("../features/settings/DarkModeScreen");
 const loadSiteVideoControls = () => import("../features/settings/SiteVideoControlsScreen");
 const loadSiteDarkMode = () => import("../features/settings/SiteDarkModeScreen");
+const loadDownloads = () => import("../features/downloads/DownloadsSheet");
 const loadIncognitoRecipes = () => import("../features/settings/IncognitoSections");
 const loadMoreFavorites = () => import("../features/settings/MoreFavoritesScreens");
+const DownloadsSheet = lazy(() =>
+  loadDownloads().then((module) => ({ default: module.DownloadsSheet })),
+);
 const MoreFavoritesScreen = lazy(() =>
   loadMoreFavorites().then((module) => ({ default: module.MoreFavoritesScreen })),
 );
@@ -135,6 +141,8 @@ export function App() {
 
   useEffect(() => startUsageTracking(), []);
 
+  useDownloadEvents();
+
   useEffect(() => {
     void load()
       .then(() => {
@@ -164,6 +172,7 @@ export function App() {
       <BackButton />
       <ColorPickBar />
       <TechPanel />
+      <DownloadToast />
       <CommandBar />
       <AssistantDock />
       <HistorySheet />
@@ -179,6 +188,7 @@ export function App() {
       <Suspense fallback={null}>
         {sheet === "incognito-more-favorites" && <IncognitoMoreFavoritesScreen />}
       </Suspense>
+      <Suspense fallback={null}>{sheet === "downloads" && <DownloadsSheet />}</Suspense>
       <Suspense fallback={null}>{sheet === "library" && <LibraryScreen />}</Suspense>
       <Suspense fallback={null}>{sheet === "share-recipe" && <ShareRecipeScreen />}</Suspense>
       <Suspense fallback={null}>{sheet === "video-controls" && <VideoControlsScreen />}</Suspense>
