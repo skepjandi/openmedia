@@ -127,6 +127,16 @@ The dark mode engine ([Dark Mode for Pages](./dark-mode.md)) is a page script li
 
 The plugin's `evaluate` and `sample_color` are Rust-only: no Tauri command, no permission, so no webview can call them. `evaluate` normally runs in an isolated JavaScript world on iOS (`WKContentWorld.defaultClient`) that the page cannot reach. The technology detector asks for the page's own world (`EvaluateRequest.page_world`) because it has to see what the page's scripts define. A page can then tamper with what that fixed, read-only script reads and returns, but the answer is only matched against Rust's own table of names, so the worst a page can do is make a name from that table appear. Nothing else uses the page world. `sample_color` reads one pixel of what the view draws and returns a validated `#rrggbb`. Commands that evaluate or sample are `async`: the iOS plugin answers from the main thread, so a synchronous command would deadlock the app.
 
+## Downloads
+
+The download manager ([Downloads](./downloads.md)) adds app commands for the shell (`downloads_*`) and no command, event or capability a site view can reach. It widens invariant 1 once: **a download requests the address of a file the user chose to save**, from the host that serves it, which the page in front named. Why that is acceptable and bounded:
+
+- **Only on the user's tap, only from Rust.** A selection in *This page* or an address typed in *Add* starts it; a page cannot start or see one. The request is a plain `GET` with no cookies, no credentials and no body, `http` and `https` only (everything else is refused before anything starts), and a `Referer` of the originating page's origin.
+- **The page is read, not driven.** `downloads_sniff` evaluates a fixed read-only script through the Rust-only `evaluate` (isolated world); the reply is validated in `downloads/sniff.rs` (schemes, length, kind set, entry cap, control characters removed). A page can at worst fill the picker with entries the user does not pick.
+- **Names and folders cannot escape.** File names from the server, the address, the link text or the page title are cleaned to single path components; a rule's folder is cleaned on save and again on use; the result is always under the download folder (`downloads/naming.rs`, tested with hostile input).
+- **Incognito.** Private downloads are never written to disk and are purged when incognito ends.
+- **Not covered.** A hostile server can serve any content under any file type; opening a file hands it to the system's app for that type, as a browser would. The app does not scan files.
+
 ## Sessions and the popup browser
 
 Each opened site is a session (a separate native web view) scoped to its current registrable domain, determined by the Public Suffix List (`bob.github.io` and `alice.github.io` are different sites). A user-activated top-level HTTP(S) link stays in that embedded view; the session follows redirects and adopts the destination domain once the load settles. Back/forward history also remains in the embedded view. Automatic cross-domain navigation is cancelled in the session's view and opened in an in-app window that shares the session's profile (a sign-in redirect needs the cookies it sets); a system popup browser is only the fallback. This adds no path from a site to native code:

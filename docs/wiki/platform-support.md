@@ -217,7 +217,7 @@ The page view takes key presses before the shell sees them, which is why the sho
 
 **Ad blocking.** The same WebKit rule lists as iOS, attached to the webview's `WKUserContentController`. Lists already in WebKit's store attach as soon as the lookup answers; missing ones are compiled in the background. The first request of a page opened right after the lists change may go out unblocked.
 
-**Downloads.** A download link saves to the Downloads folder (WebKit picks a free file name) and the file is selected in Finder when it is complete.
+**Downloads.** A download link saves to the Downloads folder (WebKit picks a free file name) and the file is selected in Finder when it is complete. These WebKit downloads are separate from the app's own manager ([Downloads](./downloads.md)), which lists, pauses and resumes the files the user picks from the page or adds by address.
 
 **Favicons.** Fetched from the site itself with `ureq` (the page's HTML for `<link rel="...icon">`, then `/apple-touch-icon.png` and `/favicon.ico`), staying inside the page's registrable domain, at most 400 kB each, decoded with the `image` crate (PNG, ICO, JPEG, GIF, WebP) and redrawn as a 96 px PNG `data:` URL. Nothing goes to an icon service.
 

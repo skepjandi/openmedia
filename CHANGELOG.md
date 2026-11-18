@@ -6,6 +6,14 @@ All notable changes to OpenMedia are documented here.
 >
 > **Wiki**: the [GitHub Wiki](https://github.com/skepjandi/openmedia/wiki) is the public-facing main wiki — architecture, recipe format, AI pipeline, security model, roadmap. Source-controlled editing surface is `docs/wiki/` in this repo; CI (`.github/workflows/sync-wiki.yml`) mirrors it to the GitHub Wiki on every merge to `main`. New single-PR changes belong here, not as new wiki pages.
 
+### feat(downloads): a download manager with pause, resume, segments, a page media sniffer, batch addresses, naming masks and rules
+
+**Area:** `feat(downloads)`, `feat(shell)`
+
+**Change:** Files are now fetched by an engine in Rust (`src-tauri/src/downloads/`) and listed on a new Downloads page (floating button fan, and Settings): progress, speed and time left; pause, resume, cancel, retry, open, show in folder; a banner and a count when one ends; image and text previews. Large files use up to 8 connections where the server honours `Range`, and a pause keeps the bytes. *This page* lists the links, images, video and audio of the page in front (read-only script through the Rust-only `evaluate`), filtered by kind and regular expression, to download in one tap. *Add* takes one address per line with batch descriptors (`photo[001-020].jpg`). Naming masks (`{site}/{date} {filename}`) and rules (by site, kind and address) name and route files. Private (incognito) downloads are never saved. Requests carry no cookies, so links that need a signed-in session fail with the server's refusal. Invariant 1 in `AGENTS.md` gains the address of a file the user chose to download; see `docs/wiki/downloads.md` and `security.md#downloads`.
+
+**Verified:** Rust tests against a loopback HTTP server (segmented download byte-for-byte, no-`Range` server, pause and resume, cancel, refusal and retry, server-chosen names, rules, name collisions, incognito), unit tests for masks, batch descriptors, rules, the sniffer parser and hostile names; Vitest for the list, formatting, the filters, the sniffer script against a stand-in document and the fan geometry with the new button. **Not verified:** a built desktop app, iOS, Android, real sites (the sniffer was not run on three unrelated pages, per invariant 9), the default download folder in the iOS and Android sandboxes, and the new strings' translations beyond English (machine-written, unreviewed).
+
 ### fix(video): no volume bar where a video's volume cannot be set (iOS)
 
 **Area:** `fix(video)`, `fix(siteview)`
