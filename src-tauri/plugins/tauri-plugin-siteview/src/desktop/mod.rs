@@ -1,25 +1,26 @@
-//! Site views on macOS: one Tauri child webview per session, stacked above the shell.
+//! Site views on macOS, Windows and Linux: one Tauri child webview per session, stacked above the
+//! shell.
 //!
-//! The shell is the window's own webview, kept above the page views and transparent, as on
-//! mobile: it reports the rectangle the page takes (`set_rect`) and the regions where it wants
-//! clicks (`set_interactive_regions`); everywhere else a click goes to the page below. See
-//! [`shell`] for how that is done.
+//! On macOS the shell is the window's own webview, kept above the page views and transparent, as
+//! on mobile: it reports the rectangle the page takes (`set_rect`) and the regions where it wants
+//! clicks (`set_interactive_regions`); everywhere else a click goes to the page below. On Windows
+//! and Linux a web view cannot be made click-through, so the page sits above the shell and is
+//! fitted around the regions (`layout::fit_page`); while an overlay such as a sheet is open it is
+//! hidden. What differs per system lives in [`platform`].
 //!
-//! Tauri's webview API has no navigation state, so a poll thread reads it from the `WKWebView`
-//! (see [`native`]) and reports changes as `siteview:state`, the same event mobile sends.
+//! Tauri's webview API has no navigation state, so a poll thread reads it (from the `WKWebView`
+//! on macOS, from Tauri's own address and the page callbacks elsewhere, see [`platform`]) and
+//! reports changes as `siteview:state`, the same event mobile sends.
 //!
 //! Calls that reach a web view hop to the main thread and wait, so they must never run on it.
 
 mod favicon;
 mod layout;
-mod native;
-mod notify;
-mod shell;
+mod platform;
 
 use std::{
     collections::{HashMap, HashSet},
-    path::{Path, PathBuf},
-    process::Command,
+    path::PathBuf,
     sync::{
         Arc, Mutex, MutexGuard, PoisonError, Weak,
         atomic::{AtomicBool, AtomicU64, Ordering},
@@ -34,13 +35,14 @@ use tauri::{
     WebviewWindow, WebviewWindowBuilder, Window,
     plugin::PluginApi,
     webview::{
-        DownloadEvent, NewWindowFeatures, NewWindowResponse, PermissionResponse, WebviewBuilder,
+        DownloadEvent, NewWindowFeatures, NewWindowResponse, PageLoadEvent, PermissionResponse,
+        WebviewBuilder,
     },
 };
 use url::Url;
 use uuid::Uuid;
 
-use native::PageSnapshot;
+use platform::{PageSnapshot, Track};
 
 use crate::events::{NOTIFICATION_TAP_EVENT, POPUP_BLOCKED_EVENT, STATE_EVENT};
 use crate::models::*;
@@ -55,16 +57,13 @@ use crate::{Error, Result};
 const MAX_REPORTED_TITLE_CHARS: usize = 256;
 const MAX_REPORTED_URL_BYTES: usize = 4096;
 
-const MAIN_WINDOW: &str = "main";
+pub(crate) const MAIN_WINDOW: &str = "main";
 /// How often each session's page state is read. Single-page sites change address without a page
 /// load, so the state has to be asked for.
 const POLL_INTERVAL: Duration = Duration::from_millis(400);
 /// A page that has not finished loading is still shown after this long.
 const PAINT_FALLBACK: Duration = Duration::from_millis(1500);
 const EVALUATE_TIMEOUT: Duration = Duration::from_secs(5);
-/// A `WKWebView` reports no `Safari` token, which Google reads as an embedded browser and refuses
-/// to sign in from. This is what Safari on macOS sends (it freezes the OS version in the string).
-const SAFARI_USER_AGENT: &str = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.6 Safari/605.1.15";
 /// How many closed sessions are remembered; the oldest are forgotten first.
 const MAX_REMEMBERED_BLOCKED: usize = 32;
 /// Pauses what is playing in a page that went out of sight and remembers which elements it
@@ -95,6 +94,8 @@ struct Session<R: Runtime> {
     /// The registrable domain of the page now showing. New-window requests read it from the
     /// webview's own callbacks, which run on the main thread and must not wait on the state lock.
     scope: Arc<Mutex<String>>,
+    /// What the page's callbacks reported, for systems whose web view cannot be asked.
+    track: Arc<Track>,
     /// The page was opened under an older script; it is rebuilt when next shown.
     stale: bool,
     reported: Option<Reported>,
@@ -161,6 +162,7 @@ struct NewView<'a> {
     profile: Uuid,
     script: &'a str,
     scope: &'a Arc<Mutex<String>>,
+    track: &'a Arc<Track>,
     bounds: Rect,
 }
 
@@ -204,7 +206,7 @@ pub fn init<R: Runtime, C: DeserializeOwned>(
     });
     spawn_poller(Arc::downgrade(&inner))?;
     let tapped = app.clone();
-    notify::install(move |session| {
+    platform::notify::install(move |session| {
         let _ = tapped.emit(NOTIFICATION_TAP_EVENT, session);
     });
     Ok(Siteview { inner })
@@ -288,16 +290,6 @@ fn looks_like_sign_in(url: &Url) -> bool {
     has("samlrequest") || (has("client_id") && (has("redirect_uri") || has("response_type")))
 }
 
-/// Selects a file in Finder.
-fn reveal_in_finder(file: &Path) {
-    let _ = Command::new("open").arg("-R").arg(file).spawn();
-}
-
-/// Hands a link to the user's browser. The URL is http or https and is passed as one argument.
-fn open_in_browser(url: &Url) {
-    let _ = Command::new("open").arg(url.as_str()).spawn();
-}
-
 /// WebKit does not tell the app when a page calls `window.close()`, which is how a sign-in popup
 /// ends. The script turns that call into a navigation to this address, which the popup refuses
 /// and closes itself on. A popup is built on its opener's web view configuration and so shares the
@@ -317,29 +309,30 @@ fn open_popup<R: Runtime>(
     let closing = app.clone();
     let closing_label = label.clone();
     let blank = Url::parse("about:blank").map_err(|e| Error::InvalidUrl(e.to_string()))?;
-    Ok(
-        WebviewWindowBuilder::new(app, &label, WebviewUrl::External(blank))
-            .window_features(features)
-            .user_agent(SAFARI_USER_AGENT)
-            .on_document_title_changed(|window, title| {
-                let _ = window.set_title(&title);
-            })
-            .on_navigation(move |url| {
-                if url.as_str() == POPUP_CLOSE_URL {
-                    // Closing from inside the navigation callback would re-enter the web view.
-                    let app = closing.clone();
-                    let label = closing_label.clone();
-                    let _ = closing.run_on_main_thread(move || {
-                        if let Some(window) = app.get_webview_window(&label) {
-                            let _ = window.destroy();
-                        }
-                    });
-                    return false;
-                }
-                allows_navigation(url)
-            })
-            .build()?,
-    )
+    let mut builder = WebviewWindowBuilder::new(app, &label, WebviewUrl::External(blank))
+        .window_features(features);
+    if let Some(agent) = platform::USER_AGENT {
+        builder = builder.user_agent(agent);
+    }
+    Ok(builder
+        .on_document_title_changed(|window, title| {
+            let _ = window.set_title(&title);
+        })
+        .on_navigation(move |url| {
+            if url.as_str() == POPUP_CLOSE_URL {
+                // Closing from inside the navigation callback would re-enter the web view.
+                let app = closing.clone();
+                let label = closing_label.clone();
+                let _ = closing.run_on_main_thread(move || {
+                    if let Some(window) = app.get_webview_window(&label) {
+                        let _ = window.destroy();
+                    }
+                });
+                return false;
+            }
+            allows_navigation(url)
+        })
+        .build()?)
 }
 
 fn scope_of(url: &str) -> Option<String> {
@@ -371,7 +364,7 @@ impl<R: Runtime> Inner<R> {
         let bounds = shell.bounds()?;
         let position = bounds.position.to_logical::<f64>(scale);
         let size = bounds.size.to_logical::<f64>(scale);
-        let (left, top, right, bottom) = native::content_insets(&shell)?;
+        let (left, top, right, bottom) = platform::content_insets(&shell)?;
         Ok(Rect {
             x: position.x + left,
             y: position.y + top,
@@ -411,6 +404,15 @@ impl<R: Runtime> Inner<R> {
             .ok_or(Error::UnknownSession)
     }
 
+    fn profiles_dir(&self) -> Result<PathBuf> {
+        Ok(self
+            .app
+            .path()
+            .app_data_dir()
+            .map_err(|error| Error::Native(error.to_string()))?
+            .join("profiles"))
+    }
+
     fn build_webview(&self, window: &Window<R>, view: NewView<'_>) -> Result<Webview<R>> {
         let NewView {
             label,
@@ -418,6 +420,7 @@ impl<R: Runtime> Inner<R> {
             profile,
             script,
             scope,
+            track,
             bounds,
         } = view;
         let app = self.app.clone();
@@ -425,12 +428,14 @@ impl<R: Runtime> Inner<R> {
         let scope = Arc::clone(scope);
         let own_label = label.to_owned();
         let downloading = Mutex::new(None::<PathBuf>);
+        let page_track = Arc::clone(track);
+        let title_track = Arc::clone(track);
         let mut builder = WebviewBuilder::new(label, WebviewUrl::External(url))
-            .user_agent(SAFARI_USER_AGENT)
-            // A data store per profile keeps cookies and storage apart (macOS 14 and later, which
-            // the bundle requires).
-            .data_store_identifier(profile.into_bytes())
             .on_navigation(allows_navigation)
+            .on_page_load(move |_, payload| {
+                page_track.set_loading(payload.event() == PageLoadEvent::Started);
+            })
+            .on_document_title_changed(move |_, title| title_track.set_title(&title))
             // A site never gets the camera, the microphone or the location: wry would otherwise
             // grant media capture when nothing handles the request.
             .on_permission_request(|_, _| PermissionResponse::Deny)
@@ -444,7 +449,7 @@ impl<R: Runtime> Inner<R> {
                     }
                     DownloadEvent::Finished { success: true, .. } => {
                         if let Some(file) = pending.take() {
-                            reveal_in_finder(&file);
+                            platform::reveal_file(&file);
                         }
                     }
                     _ => *pending = None,
@@ -476,11 +481,15 @@ impl<R: Runtime> Inner<R> {
                 match open_popup(&app, features) {
                     Ok(window) => NewWindowResponse::Create { window },
                     Err(_) => {
-                        open_in_browser(&url);
+                        platform::open_in_browser(&url);
                         NewWindowResponse::Deny
                     }
                 }
             });
+        builder = platform::configure_profile(builder, &self.profiles_dir()?, profile);
+        if let Some(agent) = platform::USER_AGENT {
+            builder = builder.user_agent(agent);
+        }
         builder = builder.initialization_script(POPUP_CLOSE_SCRIPT);
         if !script.is_empty() {
             builder = builder.initialization_script(script);
@@ -490,14 +499,14 @@ impl<R: Runtime> Inner<R> {
             LogicalPosition::new(bounds.x, bounds.y),
             LogicalSize::new(bounds.width, bounds.height),
         )?;
-        native::enable_gestures(&webview)?;
+        platform::enable_gestures(&webview)?;
         Ok(webview)
     }
 
     /// Puts every view where it belongs: the active one visible unless the shell covers it or the
     /// session is closed for the day, the rest hidden.
     fn sync_views(&self) {
-        let (rect, overlay, views, media) = {
+        let (rect, regions, overlay, covered, views, media) = {
             let mut state = self.state();
             let rect = state.rect.and_then(layout::usable);
             let overlay = rect.is_some_and(|rect| layout::overlay_open(&rect, &state.regions));
@@ -511,27 +520,46 @@ impl<R: Runtime> Inner<R> {
                 })
                 .collect();
             let media = Self::media_steps(&mut state);
-            (rect, overlay, views, media)
+            (
+                rect,
+                state.regions.clone(),
+                overlay,
+                state.covered,
+                views,
+                media,
+            )
         };
         self.apply_media(media);
-        // Asked of the main thread, so never while the state lock is held.
-        let bounds = rect.and_then(|rect| self.page_bounds(Some(rect)).ok());
-        for (webview, shown) in &views {
-            if let Some(rect) = bounds {
-                let _ = webview.set_bounds(tauri::Rect {
-                    position: LogicalPosition::new(rect.x, rect.y).into(),
-                    size: LogicalSize::new(rect.width, rect.height).into(),
-                });
+        // Without click-through the page would hide whatever the shell draws over it: it steps
+        // aside for an overlay or a page of the shell's own, and keeps clear of the small controls.
+        let shell_in_front = !platform::CLICK_THROUGH && (overlay || covered);
+        let fitted = rect.map(|rect| {
+            if platform::CLICK_THROUGH {
+                rect
+            } else {
+                layout::fit_page(&rect, &regions)
             }
-            let _ = if *shown {
+        });
+        // Asked of the main thread, so never while the state lock is held.
+        let bounds = fitted.and_then(|rect| self.page_bounds(Some(rect)).ok());
+        let shell = self.app.get_webview(MAIN_WINDOW);
+        let mut front = None;
+        for (webview, shown) in &views {
+            if let (Some(rect), Some(shell)) = (bounds, &shell) {
+                let _ = platform::place(shell, webview, rect);
+            }
+            let shown = *shown && !shell_in_front;
+            let _ = if shown {
                 webview.show()
             } else {
                 webview.hide()
             };
+            if shown {
+                front = Some(webview.label().to_owned());
+            }
         }
-        let page = views.iter().find(|(_, shown)| *shown);
-        let focus = match page {
-            Some((webview, _)) if !overlay => webview.label().to_owned(),
+        let focus = match front {
+            Some(label) if !overlay => label,
             _ => MAIN_WINDOW.to_owned(),
         };
         self.focus(&focus);
@@ -552,13 +580,13 @@ impl<R: Runtime> Inner<R> {
                     }
                     let suspend = self.state().native_suspended.insert(id);
                     if suspend {
-                        let _ = native::set_media_suspended(&webview, true);
+                        let _ = platform::set_media_suspended(&webview, true);
                     }
                 }
                 MediaStep::Resume => {
                     let resume = self.state().native_suspended.remove(&id);
                     if resume {
-                        let _ = native::set_media_suspended(&webview, false);
+                        let _ = platform::set_media_suspended(&webview, false);
                     }
                     let _ = webview.eval(RESUME_MEDIA_SCRIPT);
                 }
@@ -610,14 +638,14 @@ impl<R: Runtime> Inner<R> {
     /// Keeps the shell above the page views; a view added later would otherwise cover it.
     fn raise_shell(&self) {
         if let Some(shell) = self.app.get_webview(MAIN_WINDOW) {
-            let _ = native::prepare_shell(&shell);
+            let _ = platform::prepare_shell(&shell);
         }
     }
 
     fn attach_rule_lists(&self, webview: &Webview<R>) {
         let lists = self.state().rule_lists.clone();
         if !lists.is_empty() {
-            let _ = native::set_rule_lists(webview, lists);
+            let _ = platform::set_rule_lists(webview, lists);
         }
     }
 
@@ -625,11 +653,12 @@ impl<R: Runtime> Inner<R> {
     /// under the current script. The page's history is not carried over.
     fn rebuild(&self, session: &str) -> Result<()> {
         let window = self.window()?;
-        let (old, profile, scope, opened_url, script, rect) = {
+        let (old, old_track, profile, scope, opened_url, script, rect) = {
             let state = self.state();
             let entry = state.sessions.get(session).ok_or(Error::UnknownSession)?;
             (
                 entry.webview.clone(),
+                Arc::clone(&entry.track),
                 entry.profile,
                 Arc::clone(&entry.scope),
                 entry.opened_url.clone(),
@@ -637,7 +666,8 @@ impl<R: Runtime> Inner<R> {
                 state.rect,
             )
         };
-        let url = native::snapshot(&old)
+        let track = Arc::new(Track::default());
+        let url = platform::snapshot(&old, &old_track)
             .ok()
             .and_then(|page| page.url)
             .and_then(|url| parse_web_url(&url).ok())
@@ -650,6 +680,7 @@ impl<R: Runtime> Inner<R> {
             profile,
             script: &script,
             scope: &scope,
+            track: &track,
             bounds,
         };
         let webview = self.build_webview(&window, view)?;
@@ -660,6 +691,7 @@ impl<R: Runtime> Inner<R> {
             state.native_suspended.remove(session);
             if let Some(entry) = state.sessions.get_mut(session) {
                 entry.webview = webview.clone();
+                entry.track = track;
                 entry.stale = false;
                 entry.reported = None;
             }
@@ -692,14 +724,20 @@ impl<R: Runtime> Inner<R> {
 
     fn poll(&self) {
         self.follow_window();
-        let targets: Vec<(String, Webview<R>)> = self
+        let targets: Vec<(String, Webview<R>, Arc<Track>)> = self
             .state()
             .sessions
             .iter()
-            .map(|(id, session)| (id.clone(), session.webview.clone()))
+            .map(|(id, session)| {
+                (
+                    id.clone(),
+                    session.webview.clone(),
+                    Arc::clone(&session.track),
+                )
+            })
             .collect();
-        for (id, webview) in targets {
-            if let Ok(page) = native::snapshot(&webview) {
+        for (id, webview, track) in targets {
+            if let Ok(page) = platform::snapshot(&webview, &track) {
                 self.report(&id, webview.label(), page);
             }
         }
@@ -782,6 +820,7 @@ impl<R: Runtime> Siteview<R> {
         let scope = Arc::new(Mutex::new(
             url.host_str().map(site_of_host).unwrap_or_default(),
         ));
+        let track = Arc::new(Track::default());
         let label = inner.next_label(&request.session);
         let view = NewView {
             label: &label,
@@ -789,6 +828,7 @@ impl<R: Runtime> Siteview<R> {
             profile,
             script: &script,
             scope: &scope,
+            track: &track,
             bounds,
         };
         let webview = inner.build_webview(&window, view)?;
@@ -803,6 +843,7 @@ impl<R: Runtime> Siteview<R> {
                     opened_at: Instant::now(),
                     painted: false,
                     scope,
+                    track,
                     stale: false,
                     reported: None,
                 },
@@ -858,7 +899,7 @@ impl<R: Runtime> Siteview<R> {
     }
 
     pub fn set_interactive_regions(&self, request: SetInteractiveRegionsRequest) -> Result<()> {
-        shell::set_regions(request.regions.clone());
+        platform::set_regions(request.regions.clone());
         self.inner.state().regions = request.regions;
         self.inner.sync_views();
         Ok(())
@@ -876,16 +917,16 @@ impl<R: Runtime> Siteview<R> {
     }
 
     pub fn go_back(&self) -> Result<()> {
-        native::go_back(&self.inner.active_webview()?)
+        platform::go_back(&self.inner.active_webview()?)
     }
 
     pub fn go_forward(&self) -> Result<()> {
-        native::go_forward(&self.inner.active_webview()?)
+        platform::go_forward(&self.inner.active_webview()?)
     }
 
     /// Zooms the page now showing. Rust-only: raised by the app's View menu.
     pub fn zoom(&self, request: ZoomRequest) -> Result<()> {
-        native::zoom(&self.inner.active_webview()?, request.action)
+        platform::zoom(&self.inner.active_webview()?, request.action)
     }
 
     pub fn reload(&self) -> Result<()> {
@@ -894,7 +935,7 @@ impl<R: Runtime> Siteview<R> {
 
     /// A local notification for a hidden session; tapping it reports the session to the shell.
     pub fn notify(&self, request: NotifyRequest) -> Result<()> {
-        notify::notify(&request.session, &request.title, &request.body)
+        platform::notify::notify(&request.session, &request.title, &request.body)
     }
 }
 
@@ -937,7 +978,7 @@ impl<R: Runtime> Siteview<R> {
         let mut rebuild_active = false;
         for (id, webview) in views {
             let swapped =
-                native::replace_user_script(&webview, &previous, &script).unwrap_or(false);
+                platform::replace_user_script(&webview, &previous, &script).unwrap_or(false);
             if swapped {
                 let _ = webview.eval(&live);
                 continue;
@@ -972,9 +1013,9 @@ impl<R: Runtime> Siteview<R> {
             (views, active)
         };
         for webview in views {
-            native::set_rule_lists(&webview, request.lists.clone())?;
+            platform::set_rule_lists(&webview, request.lists.clone())?;
         }
-        if let Some(webview) = active {
+        if let (Some(webview), true) = (active, platform::APPLIES_RULE_LISTS) {
             webview.reload()?;
         }
         Ok(())
@@ -1018,13 +1059,14 @@ impl<R: Runtime> Siteview<R> {
         Ok(())
     }
 
-    /// Touch ID, Apple Watch or the account password, as the system offers. Rust-only: there is
-    /// no command for it, so no webview can raise or answer the prompt. Waits for the person.
+    /// The system's owner check (Touch ID or the account password on a Mac, Windows Hello on
+    /// Windows, the PolicyKit prompt on Linux). Rust-only: there is no command for it, so no
+    /// webview can raise or answer the prompt. Waits for the person.
     pub fn authenticate(&self, request: AuthenticateRequest) -> Result<bool> {
-        native::authenticate(check_auth_reason(&request.reason)?)
+        platform::authenticate(&self.inner.app, check_auth_reason(&request.reason)?)
     }
 
-    /// The Mac's biometric is Touch ID.
+    /// The generic fingerprint icon is shown on every desktop system.
     pub fn biometry_kind(&self) -> Result<BiometryKind> {
         Ok(BiometryKind::Fingerprint)
     }

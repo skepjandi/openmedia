@@ -1,19 +1,19 @@
 # Updates (OTA)
 
-> **Status: Implemented, with verification limits.** The web bundle path was run end to end on a macOS debug build (see [Verification](#verification)). Publishing to GitHub, the desktop self-update install, Windows and Linux, and every mobile device were not exercised.
+> **Status: Implemented, with verification limits.** The web bundle path was run end to end on a macOS debug build (see [Verification](#verification)). Publishing to GitHub, the desktop self-update install, Windows and Linux hardware, and every mobile device were not exercised.
 
 Two independent mechanisms, one CLI (`yarn ota`), and the same CLI inside GitHub Actions.
 
 | | Web bundle | Desktop self-update |
 |---|---|---|
 | Replaces | The React shell (`dist/`) | The whole app binary |
-| Platforms | iOS, Android, macOS, Windows, Linux | Builds distributed outside the stores (direct macOS, Windows, Linux) |
+| Platforms | iOS, Android, macOS, Windows, Linux | Windows and Linux builds from GitHub Releases (the only desktop downloads; macOS is store-only) |
 | Mechanism | In-repo: `src-tauri/src/ota/` | `tauri-plugin-updater`, behind the `self-update` Cargo feature (`src-tauri/src/self_update.rs`) |
 | Trust | Ed25519 over the bundle, key in `src-tauri/ota-public-key.txt` | Minisign, key in `src-tauri/tauri.ota.conf.json` |
 | Hosted at | Release `ota` (pre-release): `latest-<version>.json` + `bundle-<version>-<revision>.ota` | The repository's latest release: `latest.json` + installers |
 | Applies | Next launch, silently (checked 10 s after launch, and from Settings → Updates) | On the user's tap in Settings → Updates, then restarts |
 
-Store builds (iOS App Store, Play, Mac App Store) never contain the self-update code: the stores forbid an app replacing itself. They still get web bundles.
+Store builds (iOS App Store, Play, Mac App Store) are the only way to get iOS, Android and macOS: they have paid versions and are never published to GitHub Releases or the landing page (AGENTS.md, "Platforms and Pricing"). Windows and Linux are free and are the only platforms with desktop self-update. Store builds never contain the self-update code: the stores forbid an app replacing itself. They still get web bundles.
 
 ## The web bundle
 
@@ -36,14 +36,14 @@ A bundle is `signature (64 bytes) ‖ gzip(manifest JSON)`; the manifest carries
 ```bash
 yarn ota keygen            # once; see below
 yarn ota web               # build, sign, publish the web bundle
-yarn ota app               # build this Mac's installers, upload, refresh latest.json
+yarn ota app               # on Windows or Linux: build the installer, upload, refresh latest.json
 yarn ota all               # both
 yarn ota web --dry-run     # build and sign into release/ota/, publish nothing
 ```
 
 Needs the GitHub CLI logged in (`gh auth login`). The repository is `repository` in `src-tauri/Cargo.toml` (also what the app downloads from, at compile time) or `OTA_REPO`.
 
-`yarn ota app` builds for the machine it runs on (`--target <triple>` for another Rust target, e.g. `x86_64-apple-darwin` or `universal-apple-darwin`). Installers are named `OpenMedia_<version>_<platform>.<ext>`; `latest.json` is rebuilt from every signed installer on the release, so builds from several machines accumulate. `yarn ota manifest` rebuilds it on its own. The notes the updater shows come from `--notes "…"`.
+`yarn ota app` builds for the machine it runs on and refuses macOS and mobile targets (`--target <triple>` for another Windows or Linux Rust target). Installers are named `OpenMedia_<version>_<platform>.<ext>` (`windows-x86_64.exe`, `linux-x86_64.AppImage`); on Linux the `.deb` is uploaded beside the AppImage as `linux-x86_64.deb` and is not part of `latest.json`. `latest.json` is rebuilt from every signed installer on the release, so builds from several machines accumulate. `yarn ota manifest` rebuilds it on its own. The notes the updater shows come from `--notes "…"`.
 
 A desktop release needs the version bumped in `tauri.conf.json` first (the updater compares versions), then:
 
@@ -52,7 +52,7 @@ git tag v1.1.0 && git push origin v1.1.0   # creates the release's tag; or let `
 yarn ota app --notes "What changed"
 ```
 
-Without Apple signing and notarization variables the macOS build is ad-hoc signed: the updater works, but Gatekeeper warns on first install. Set the `APPLE_*` variables Tauri documents in the environment to sign and notarize.
+`yarn release github` does the tag step and lets CI build both platforms. The Windows installer is not code-signed, so SmartScreen may warn on first install; Windows and Linux packaging has not been verified on hardware.
 
 ## Keys
 
@@ -69,10 +69,10 @@ Without Apple signing and notarization variables the macOS build is ad-hoc signe
 | Trigger | Does |
 |---|---|
 | Push to `main` touching the web layer | `yarn ota web` on Ubuntu (cheap minutes) |
-| Push of a `v*` tag | web bundle, then `yarn ota app --no-manifest` on macOS, then `yarn ota manifest` |
+| Push of a `v*` tag | web bundle, then `yarn ota app --no-manifest` on Windows and Ubuntu, then `yarn ota manifest` and the release notes; the `v<version>` release is marked latest |
 | Manual run | web, app, or all |
 
-Secrets: `OPENMEDIA_OTA_KEY`, `TAURI_SIGNING_PRIVATE_KEY`, and `TAURI_SIGNING_PRIVATE_KEY_PASSWORD` if the key has one (all set by `yarn ota keygen --github`); `OPENMEDIA_MARKET_URL`, `OPENMEDIA_CATALOG_KEYS` and `OPENMEDIA_RC_KEY_MACOS` for the desktop build, as `build.rs` reads them. The macOS runner is the costly one and only runs on a tag. Windows and Linux are left out of the matrix until their site views exist (an installer would open an app that cannot show a page).
+Secrets: `OPENMEDIA_OTA_KEY`, `TAURI_SIGNING_PRIVATE_KEY`, and `TAURI_SIGNING_PRIVATE_KEY_PASSWORD` if the key has one (all set by `yarn ota keygen --github`); `OPENMEDIA_SHARE_URL` for the desktop build, as `build.rs` reads them. The desktop jobs only run on a tag. There is no macOS job: macOS ships through the Mac App Store only. CI's `desktop-build` job (`ci.yml`) compile-checks the crate on Windows and Linux for pull requests.
 
 ## Requirements on the repository
 
@@ -87,4 +87,4 @@ A check is a plain `GET` to github.com: no identifier, no cookie, nothing about 
 - `cargo test --lib ota`: signature, tamper, runtime, path, format and size checks; the launch lifecycle and rollback; a bundle written by the CLI.
 - `yarn vitest run scripts`: bundle round trip, `latest.json` assembly, platform names, and that the updater endpoint matches `Cargo.toml`'s repository.
 - Run by hand on a macOS debug build whose embedded shell predates `ota_confirm`: a bundle placed in the app's data folder became active and was confirmed, which only a page served from the bundle, with working IPC, could do. The same build with no bundle ran from the embedded shell. The window was not inspected visually.
-- Not verified: a real publish to GitHub; `yarn ota app` (a signed desktop build and the updater installing it); how an OTA-served page looks (the style nonce is covered by a unit test, not by eye); Android and iOS.
+- Not verified: a real publish to GitHub; `yarn ota app` on Windows or Linux (a signed desktop build and the updater installing it); how an OTA-served page looks (the style nonce is covered by a unit test, not by eye); Android and iOS.

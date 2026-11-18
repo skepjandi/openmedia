@@ -5,26 +5,22 @@ use tauri::{
 
 mod commands;
 mod error;
-#[cfg(any(mobile, target_os = "macos"))]
+#[cfg(any(mobile, desktop))]
 mod events;
 mod models;
 pub mod site;
 pub mod validate;
 
-#[cfg(all(desktop, not(target_os = "macos")))]
+#[cfg(desktop)]
 mod desktop;
-#[cfg(target_os = "macos")]
-mod macos;
 #[cfg(mobile)]
 mod mobile;
 
 pub use error::{Error, Result};
 pub use models::*;
 
-#[cfg(all(desktop, not(target_os = "macos")))]
+#[cfg(desktop)]
 pub use desktop::Siteview;
-#[cfg(target_os = "macos")]
-pub use macos::Siteview;
 #[cfg(mobile)]
 pub use mobile::Siteview;
 
@@ -65,10 +61,8 @@ pub fn init<R: Runtime>() -> TauriPlugin<R> {
         .setup(|app, api| {
             #[cfg(mobile)]
             let siteview = mobile::init(app, api)?;
-            #[cfg(all(desktop, not(target_os = "macos")))]
+            #[cfg(desktop)]
             let siteview = desktop::init(app, api)?;
-            #[cfg(target_os = "macos")]
-            let siteview = macos::init(app, api)?;
             app.manage(siteview);
             Ok(())
         })

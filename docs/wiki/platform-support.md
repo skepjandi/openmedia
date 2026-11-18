@@ -1,32 +1,31 @@
 # Platform Support
 
-> **Status: Partially implemented.** Native iOS (Swift) and Android (Kotlin) site-view plugins exist. iOS behavior has simulator evidence; Android debug startup and one onboarding tap were verified on one emulator, but broader Android behavior and a signed store build remain unverified. macOS site views exist (debug builds were run on one Mac, see [The macOS site view](#the-macos-site-view)); Windows and Linux site views are not implemented.
+> **Status: Partially implemented.** Native iOS (Swift) and Android (Kotlin) site-view plugins exist. iOS behavior has simulator evidence; Android debug startup and one onboarding tap were verified on one emulator, but broader Android behavior and a signed store build remain unverified. macOS site views exist (debug builds were run on one Mac, see [The macOS site view](#the-macos-site-view)). Windows and Linux site views exist and compile on their targets, but no Windows or Linux machine has run them yet (see [The Windows and Linux site view](#the-windows-and-linux-site-view)).
 
 ## The core constraint
 
 Tauri's multi-webview API (`Window::add_child`) is gated behind the `unstable` Cargo feature and **desktop-only**; upstream tracks mobile support in [#11794](https://github.com/tauri-apps/tauri/issues/11794) and [#11528](https://github.com/tauri-apps/tauri/issues/11528), both open. A mobile app has one Tauri webview, and navigating it to a site would destroy the shell. So:
 
 - **Mobile (iOS and Android):** each uses an in-repository native site-view plugin (`tauri-plugin-siteview`), positioned by the shell. The implementation exists on both platforms; iOS is the verified platform.
-- **macOS:** a Tauri child webview per session, beside the shell (`src-tauri/plugins/tauri-plugin-siteview/src/macos/`). See [The macOS site view](#the-macos-site-view).
-- **Windows and Linux — not implemented:** the plugin returns `DesktopUnsupported`.
+- **macOS, Windows and Linux:** a Tauri child webview per session (`src-tauri/plugins/tauri-plugin-siteview/src/desktop/`, one module for the three, with what differs per system in `desktop/platform/`). See [The macOS site view](#the-macos-site-view) and [The Windows and Linux site view](#the-windows-and-linux-site-view).
 
-The shell talks to the shared site-view API (`open`, `set_rect`, `navigate`, …); the native iOS and Android plugins implement it. Windows and Linux remain unimplemented ([Architecture](./architecture.md#components)).
+The shell talks to the shared site-view API (`open`, `set_rect`, `navigate`, …); the native iOS and Android plugins and the desktop module implement it ([Architecture](./architecture.md#components)).
 
 ## Matrix
 
 | Capability | macOS | Windows | Linux | iOS | Android |
 |------------|-------|---------|-------|-----|---------|
 | Webview engine | WKWebView | WebView2 | WebKitGTK | WKWebView | Android System WebView |
-| Site view mechanism | Tauri child webview | Not implemented | Not implemented | Native plugin | Native plugin |
-| Document-start injection | `initialization_script` | Not implemented | Not implemented | `WKUserScript` (recipe and main-frame blocker scripts) | `addDocumentStartJavaScript` if supported; blocker scriptlets are omitted without it, recipe scripts fall back to `onPageStarted` (late) |
-| Isolated profiles | `WKWebsiteDataStore(forIdentifier:)` (macOS 14+; not exercised) | Not implemented | Not implemented | `WKWebsiteDataStore(forIdentifier:)` (iOS 17+; simulator-verified) | Requires `MULTI_PROFILE`; implemented, device support unverified |
-| Page → Core channel | None yet (no page script uses the bridge) | Not implemented | Not implemented | Native message handler | AndroidX web message listener |
-| Secret store | Not implemented | Not implemented | Not implemented | Keychain | Keystore-backed plugin (device behavior unverified) |
-| Ad and tracker blocking | `WKContentRuleList` | Not built | Not built | `WKContentRuleList` + bundled main-frame filter scriptlets ([Ad Blocking](./ad-blocking.md)) | Request interception over the same rule JSON + document-start scriptlets when supported ([Ad Blocking](./ad-blocking.md)) |
-| Distribution / updates | Mac App Store package (validated, not uploaded) | Not built | Not built | App Store | Google Play |
+| Site view mechanism | Tauri child webview under a transparent shell | Tauri child webview above the shell | Tauri child webview moved into a `GtkOverlay` above the shell | Native plugin | Native plugin |
+| Document-start injection | `initialization_script` | `initialization_script` | `initialization_script` | `WKUserScript` (recipe and main-frame blocker scripts) | `addDocumentStartJavaScript` if supported; blocker scriptlets are omitted without it, recipe scripts fall back to `onPageStarted` (late) |
+| Isolated profiles | `WKWebsiteDataStore(forIdentifier:)` (macOS 14+; not exercised) | One WebView2 data folder per profile (`app data/profiles/<id>`; not exercised) | One WebKitGTK data folder per profile (not exercised) | `WKWebsiteDataStore(forIdentifier:)` (iOS 17+; simulator-verified) | Requires `MULTI_PROFILE`; implemented, device support unverified |
+| Page → Core channel | None yet (no page script uses the bridge) | None yet | None yet | Native message handler | AndroidX web message listener |
+| Secret store | Keychain (`keyring`) | Credential Manager (`keyring`) | Secret Service: GNOME Keyring or KWallet (`keyring`) | Keychain | Keystore-backed plugin (device behavior unverified) |
+| Ad and tracker blocking | `WKContentRuleList` | Cosmetic and scriptlet rules only; network request blocking is not wired | Cosmetic and scriptlet rules only; network request blocking is not wired | `WKContentRuleList` + bundled main-frame filter scriptlets ([Ad Blocking](./ad-blocking.md)) | Request interception over the same rule JSON + document-start scriptlets when supported ([Ad Blocking](./ad-blocking.md)) |
+| Distribution / updates | Mac App Store package (validated, not uploaded); never a GitHub download | NSIS installer on GitHub Releases, self-updating, free with every feature | AppImage and `.deb` on GitHub Releases, self-updating, free with every feature | App Store | Google Play |
 | Priority | 3 | 4 | 4 | **1** | **1** |
 
-iOS and Android first. macOS followed (same engine as iOS, fastest desktop path); Windows/Linux wait for the engine and format to settle; Linux WebKitGTK is the most likely to need per-site workarounds.
+iOS and Android first. macOS followed (same engine as iOS, fastest desktop path); Windows and Linux came with 1.0.4 as free builds; Linux WebKitGTK is the most likely to need per-site workarounds.
 
 ## Verified results
 
@@ -189,7 +188,7 @@ Fallback if the native-plugin approach fails: navigate the main webview to the s
 
 ## The macOS site view
 
-`src-tauri/plugins/tauri-plugin-siteview/src/macos/` implements the shared site-view API with Tauri child webviews (`Window::add_child`, which needs Tauri's `unstable` feature and is desktop-only).
+`src-tauri/plugins/tauri-plugin-siteview/src/desktop/` (with `platform/macos.rs` and `platform/macos/` for what is Mac-only) implements the shared site-view API with Tauri child webviews (`Window::add_child`, which needs Tauri's `unstable` feature and is desktop-only).
 
 **Layout.** The model is mobile's: the page views sit under a transparent shell, and the floating button, fan, command bar and sheets draw over the page. A web view added later goes on top of its siblings, and Tauri has no z-order call, so `shell.rs` does three things natively with the shell's own `WKWebView`: it stops painting a background (the private `drawsBackground` key, the same one Tauri's `macOSPrivateApi` sets), re-adds the view above the page views after each is created, and replaces `hitTest:` on its class so a click is offered to the shell only inside the interactive regions the shell reports (`set_interactive_regions`) and to the page view underneath everywhere else. It is the macOS counterpart of the iOS `TouchRouter`. The shell reports the page's rectangle in its own coordinates (`set_rect`); the plugin places the page relative to the shell's content area (its web view reaches under the title bar, so its `safeAreaInsets` are added). While an overlay is open (a region covering most of the page) the keyboard goes to the shell, otherwise to the page. The window opens at 1100 x 760 and cannot shrink below 560 x 480.
 
@@ -227,7 +226,7 @@ The page view takes key presses before the shell sees them, which is why the sho
 
 **Purchases.** RevenueCat over StoreKit 2, as on iOS, in a Swift package (`tauri-plugin-billing/macos`, linked by `build.rs` through `swift-rs`) because Tauri's Swift plugin API is iOS-only. Rust calls three C functions (`src/macos.rs`): a blocking request that answers with JSON, a free, and a listener for entitlement changes. The macOS app is the same App Store app as the iPhone one, so it uses `OPENMEDIA_RC_KEY_IOS` unless `OPENMEDIA_RC_KEY_MACOS` is set. The Pro gate is therefore live on the Mac: `Entitlement::from_build` no longer forces Pro on macOS. It still does on Windows and Linux, which have no store. In a debug build `OPENMEDIA_DEV_ENTITLEMENT=pro|free` forces the answer. Purchases need an app signed for the Mac App Store, and RevenueCat needs a Mac App Store app (or the shared Apple app) with the three products; neither exists in this repository's setup.
 
-**Navigation.** Only `http`, `https` and `about:` load; other schemes are refused. Tauri's navigation callback carries no frame information, so desktop cannot pin the main frame to its domain the way mobile does: a link in the page may leave the site, and the session's `scope` follows the page's registrable domain. This is deliberate for now: pinning would also send OAuth redirects (Google, Apple sign-in) out of the session. `target=_blank` and `window.open` are handled: a link inside the scope loads in place, one outside it opens in a popup window inside the app (`open_popup` in `macos/mod.rs`), built on the opener's web view configuration so it shares the data store and `window.opener`, which a sign-in popup reports back through. It falls back to the default browser if the window cannot be built. The popup shares the opener's `WKUserContentController`, and wry skips a popup's own initialization scripts for that reason, so the `window.close()` shim (WebKit does not report that call to the app: it navigates to a refused address the popup closes on) is injected with every site view's scripts instead.
+**Navigation.** Only `http`, `https` and `about:` load; other schemes are refused. Tauri's navigation callback carries no frame information, so desktop cannot pin the main frame to its domain the way mobile does: a link in the page may leave the site, and the session's `scope` follows the page's registrable domain. This is deliberate for now: pinning would also send OAuth redirects (Google, Apple sign-in) out of the session. `target=_blank` and `window.open` are handled: a link inside the scope loads in place, one outside it opens in a popup window inside the app (`open_popup` in `desktop/mod.rs`), built on the opener's web view configuration so it shares the data store and `window.opener`, which a sign-in popup reports back through. It falls back to the default browser if the window cannot be built. The popup shares the opener's `WKUserContentController`, and wry skips a popup's own initialization scripts for that reason, so the `window.close()` shim (WebKit does not report that call to the app: it navigates to a refused address the popup closes on) is injected with every site view's scripts instead.
 
 **User agent.** Safari's, without which Google refuses to sign in from an embedded view.
 
@@ -252,7 +251,32 @@ The page view takes key presses before the shell sees them, which is why the sho
 - Real trackpad gestures: the two-finger swipe and the pinch were never performed by a finger, only the settings that enable them were read back. The Settings swipe's wheel logic is unit-tested, not driven.
 - Notifications: `usernotificationsd` rejected the debug bundle ("Entitlement `com.apple.private.usernotifications.bundle-identifiers` required"), because it is ad-hoc signed. No banner was seen and no tap was tried; a Developer ID or App Store signed build is needed to check.
 - Touch ID: the prompt was never raised.
-- macOS 14 and 15, Intel, a release build, two profiles with separate cookies, Google sign-in, `target=_blank` routing, resize and multiple displays beyond a resize by hand, a page covered by an overlay and a docked panel at once, video and fullscreen, and Windows and Linux (the plugin there still returns `DesktopUnsupported`; `cargo clippy --target x86_64-pc-windows-msvc` passes for the plugin).
+- macOS 14 and 15, Intel, a release build, two profiles with separate cookies, Google sign-in, `target=_blank` routing, resize and multiple displays beyond a resize by hand, a page covered by an overlay and a docked panel at once, video and fullscreen, and Windows and Linux (see [The Windows and Linux site view](#the-windows-and-linux-site-view)).
+
+## The Windows and Linux site view
+
+> **Status: Implemented, compiled, never run.** `cargo check` passes for the plugin and the app crate on `x86_64-pc-windows-gnu` and for the plugin on Linux (aarch64, in a Debian container); the unit tests for the layout helper pass. No Windows or Linux machine has opened a page with it. Treat everything below as intent until someone does.
+
+The same module as the Mac (`desktop/mod.rs`): one Tauri child webview per session, the same `siteview:state` poller, popup, download and permission handling. `desktop/platform/` holds what differs.
+
+**Click-through is the difference.** macOS keeps the shell transparent above the page and filters its clicks natively. WebView2 and WebKitGTK have no per-pixel click-through, so here the page sits above the shell and the shell is kept clear of it:
+
+- `layout::fit_page` trims the page rectangle around the regions the shell reports (`data-hit`): each control that touches the page is cleared by cutting the one side that costs the least page. A control that would cost more than 60% of the page in either direction stays under the page.
+- While an overlay (a region spanning at least 60% of the page in both directions: Settings, the command bar, the fan's backdrop) is open, or the shell covers the page with a page of its own, the page view is hidden and the shell shows through.
+- Cost: the floating button takes a strip of the page beside it instead of floating over it.
+
+**Windows.** Page history (`CanGoBack`, `CanGoForward`, `GoBack`, `GoForward`) comes from `ICoreWebView2` through `webview2-com`; the address from Tauri, the title and loading flag from the page callbacks. A profile is a WebView2 data folder. The owner check is Windows Hello (`UserConsentVerifier`, through the interop interface with the main window).
+
+**Linux.** Tauri packs every web view of a window into one vertical box and ignores their positions, so `platform/linux.rs` moves the shell's `WebKitWebView` into a `GtkOverlay` with a `GtkFixed` layer on top (empty areas let clicks through) and moves each page view into that layer at the rectangle it is given. The owner check runs `pkexec true`, PolicyKit's own prompt (an administrator's password); a system without `pkexec` fails closed.
+
+**Gaps, all on Windows and Linux:**
+
+- Network request blocking (the Safari content rule lists) is not applied; cosmetic and scriptlet rules are.
+- A media pause stops the page's own document; media in iframes of other origins keeps playing while the page is hidden.
+- A changed document-start script rebuilds the page's view (the page reloads); the Mac swaps the script in place.
+- No notifications for hidden sessions; `notify` returns `DesktopUnsupported`.
+- Picture-in-picture and trackpad gestures are left to the web view.
+- The page's pixel color is not sampled; the page script's own color is used.
 
 ## Known platform constraints
 

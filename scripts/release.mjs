@@ -1,10 +1,17 @@
 // OpenMedia release CLI. Run `yarn release help` for the commands.
 //
-//   yarn release doctor [ios] [android] [macos]   check everything a release needs, with fixes
+//   yarn release doctor [platforms]               check everything a release needs, with fixes
 //   yarn release setup                            import certificates/profiles from the signing folder
-//   yarn release [build] [ios] [android] [macos]  build the store packages into release/<version>-<build>/
+//   yarn release [build] [platforms]              build into release/<version>-<build>/
 //   yarn release bump <patch|minor|major|x.y.z>   raise the version and build number (files only)
 //   yarn release ship <patch|minor|major|x.y.z>   doctor, bump through a PR, merge, then build
+//   yarn release github [version]                 tag v<version> on main and push it; CI publishes the
+//                                                 Windows and Linux installers to GitHub Releases
+//
+// Platforms: ios, android, macos (paid; store packages, never uploaded anywhere by this CLI and never
+// published to GitHub Releases or the landing page) and windows, linux (free; installers built on
+// that OS and published to GitHub Releases). A bare `yarn release` or `ship` is the three store
+// platforms; windows and linux are opt-in by name. See AGENTS.md, "Platforms and Pricing".
 //
 // Signing identities and profiles are discovered (scripts/lib/signing.mjs); any of them can still be
 // forced with IOS_SIGN_IDENTITY, IOS_PROFILE, MAS_APP_IDENTITY, MAS_INSTALLER_IDENTITY, MAS_PROFILE,
@@ -36,7 +43,9 @@ import {
 
 const root = path.resolve(import.meta.dirname, "..");
 const PLATFORMS = ["ios", "android", "macos"];
-const COMMANDS = ["help", "doctor", "setup", "build", "bump", "ship"];
+const DESKTOP_PLATFORMS = ["windows", "linux"];
+const HOST_OS = { windows: "win32", linux: "linux" };
+const COMMANDS = ["help", "doctor", "setup", "build", "bump", "ship", "github"];
 
 const args = process.argv.slice(2);
 const command = COMMANDS.includes(args[0]) ? args[0] : "build";
@@ -47,7 +56,8 @@ const valueOf = (name) => {
   return index >= 0 ? rest[index + 1] : null;
 };
 const explicitBuild = valueOf("--build") === null ? null : Number(valueOf("--build"));
-const wanted = rest.filter((a) => PLATFORMS.includes(a));
+const isPlatform = (a) => PLATFORMS.includes(a) || DESKTOP_PLATFORMS.includes(a);
+const wanted = rest.filter(isPlatform);
 const platforms = wanted.length ? wanted : PLATFORMS;
 
 const fail = (message) => {
@@ -270,13 +280,75 @@ function runChecks(targets, dir = root) {
     );
   }
 
-  add(
-    ascConfigured() ? "ok" : "warn",
-    "App Store Connect API key",
-    ascConfigured() ? env.ASC_KEY_ID : "not set",
-    "optional: ASC_KEY_ID, ASC_ISSUER_ID, ASC_KEY_PATH give automatic build numbers and --validate",
-  );
+  if (targets.some((t) => PLATFORMS.includes(t)))
+    add(
+      ascConfigured() ? "ok" : "warn",
+      "App Store Connect API key",
+      ascConfigured() ? env.ASC_KEY_ID : "not set",
+      "optional: ASC_KEY_ID, ASC_ISSUER_ID, ASC_KEY_PATH give automatic build numbers and --validate",
+    );
+
+  const desktop = targets.filter((t) => DESKTOP_PLATFORMS.includes(t));
+  if (desktop.length) addDesktopChecks(desktop, add, has);
   return checks;
+}
+
+/** Linux libraries Tauri links against; `pkg-config --exists` fails when one is missing. */
+const LINUX_LIBRARIES = ["webkit2gtk-4.1", "gtk+-3.0", "librsvg-2.0"];
+
+function addDesktopChecks(desktop, add, has) {
+  add(
+    has("node") && has("yarn") ? "ok" : "fail",
+    "Node and Yarn",
+    "",
+    "install Node 22 and Yarn (docs/wiki/development-guide.md)",
+  );
+  add(
+    has("rustc") && has("cargo") ? "ok" : "fail",
+    "Rust toolchain",
+    "",
+    "install it with rustup (https://rustup.rs)",
+  );
+  for (const system of desktop) {
+    add(
+      process.platform === HOST_OS[system] ? "ok" : "fail",
+      `${system} host`,
+      `this machine is ${process.platform}`,
+      `build ${system} on ${system === "windows" ? "Windows" : "Linux"}; Tauri cannot cross-build it. Or push a v* tag (yarn release github) and let CI build it`,
+    );
+  }
+  if (desktop.includes("linux")) {
+    const missing = LINUX_LIBRARIES.filter((lib) => !has("pkg-config", ["--exists", lib]));
+    add(
+      has("pkg-config", ["--version"]) && !missing.length ? "ok" : "fail",
+      "Linux libraries",
+      missing.length ? `missing ${missing.join(", ")}` : LINUX_LIBRARIES.join(", "),
+      "sudo apt install pkg-config libwebkit2gtk-4.1-dev libgtk-3-dev librsvg2-dev libayatana-appindicator3-dev libxdo-dev libssl-dev xdg-utils",
+    );
+    add(
+      has("patchelf") ? "ok" : "fail",
+      "patchelf",
+      "",
+      "sudo apt install patchelf (the AppImage bundler needs it)",
+    );
+  }
+  if (desktop.includes("windows"))
+    add(
+      "warn",
+      "NSIS and WebView2",
+      "not probed",
+      "Tauri downloads NSIS itself; the MSVC build tools and WebView2 runtime must be installed (https://v2.tauri.app/start/prerequisites/)",
+    );
+  const keyFile = path.join(
+    env.OPENMEDIA_OTA_KEY_DIR || path.join(os.homedir(), ".openmedia/ota"),
+    "updater.key",
+  );
+  add(
+    env.TAURI_SIGNING_PRIVATE_KEY || fs.existsSync(keyFile) ? "ok" : "fail",
+    "updater signing key",
+    env.TAURI_SIGNING_PRIVATE_KEY ? "TAURI_SIGNING_PRIVATE_KEY" : keyFile,
+    "run yarn ota keygen, or set TAURI_SIGNING_PRIVATE_KEY (and its password) in .env",
+  );
 }
 
 function printChecks(checks) {
@@ -346,7 +418,21 @@ function build(targets, { buildNumber }) {
   const produced = [];
   const need = (value, what, fix) => value || fail(`${what} not found. ${fix}`);
 
+  const desktop = (system) => () => {
+    run("node", ["scripts/ota.mjs", "app", "--dry-run"]);
+    const outputs = path.join(root, "release/ota");
+    const built = fs
+      .readdirSync(outputs)
+      .filter((name) => name.startsWith(`app-${version}-${system}-`));
+    if (!built.length) fail(`the ${system} build left nothing under release/ota/`);
+    for (const dir of built)
+      for (const file of fs.readdirSync(path.join(outputs, dir)))
+        produced.push(collect(path.join(outputs, dir, file), system));
+  };
+
   const builders = {
+    windows: desktop("windows"),
+    linux: desktop("linux"),
     android() {
       run("yarn", ["build", "android", "--production"]);
       const aab = path.join(
@@ -430,10 +516,21 @@ function build(targets, { buildNumber }) {
 
   if (flag("--validate")) validate(produced);
 
-  console.log(`\nrelease: done. Upload:`);
-  for (const file of produced) {
-    const where = file.endsWith(".aab") ? "Play Console" : "Transporter";
-    console.log(`  ${file}   (${where})`);
+  const storeFiles = produced.filter((f) => /\.(aab|ipa|pkg)$/.test(f));
+  const desktopFiles = produced.filter((f) => !storeFiles.includes(f));
+  if (storeFiles.length) {
+    console.log(`\nrelease: done. Upload to the stores only (never GitHub or the landing page):`);
+    for (const file of storeFiles) {
+      const where = file.endsWith(".aab") ? "Play Console" : "Transporter";
+      console.log(`  ${file}   (${where})`);
+    }
+  }
+  if (desktopFiles.length) {
+    console.log(`\nrelease: built the free desktop installers:`);
+    for (const file of desktopFiles) console.log(`  ${file}`);
+    console.log(
+      `Nothing was uploaded. Publish them with a v${version} tag (yarn release github, CI builds and\nuploads Windows and Linux), or on this machine: yarn ota app (builds, uploads, refreshes latest.json).`,
+    );
   }
 }
 
@@ -488,7 +585,7 @@ function bumpFiles(dir, spec, buildNumber) {
 }
 
 async function bump() {
-  const spec = rest.find((a) => !a.startsWith("--") && !PLATFORMS.includes(a));
+  const spec = rest.find((a) => !a.startsWith("--") && !isPlatform(a));
   if (!spec) fail("usage: yarn release bump <patch|minor|major|x.y.z>");
   const version = bumpFiles(root, spec, await nextBuild(root));
   console.log(
@@ -513,9 +610,8 @@ function waitForChecks(prUrl) {
 }
 
 async function ship() {
-  const spec = rest.find((a) => !a.startsWith("--") && !PLATFORMS.includes(a));
-  if (!spec)
-    fail("usage: yarn release ship <patch|minor|major|x.y.z> [ios] [android] [macos] [--no-wait]");
+  const spec = rest.find((a) => !a.startsWith("--") && !isPlatform(a));
+  if (!spec) fail("usage: yarn release ship <patch|minor|major|x.y.z> [platforms] [--no-wait]");
 
   // 1. Fail before touching GitHub if this machine cannot finish the release.
   ensureCertificates(platforms);
@@ -568,25 +664,61 @@ async function ship() {
   build(platforms, { buildNumber });
 }
 
+// ---- github release (Windows and Linux) ----
+/** Tags v<version> on an up-to-date, clean main and pushes it; CI builds and publishes the installers. */
+function publishToGithub() {
+  const confVersion = readVersions(root).conf;
+  const version = (rest.find((a) => !a.startsWith("--") && !isPlatform(a)) ?? confVersion).replace(
+    /^v/,
+    "",
+  );
+  const tag = `v${version}`;
+  if (version !== confVersion)
+    fail(`tauri.conf.json says ${confVersion}, not ${version}; the tag must match the app version`);
+  if (readVersions(root).pkg !== confVersion)
+    fail("package.json and tauri.conf.json versions differ; run yarn release bump");
+  if (git(["branch", "--show-current"]) !== "main") fail("run this from the main checkout");
+  if (git(["status", "--porcelain"])) fail("main has uncommitted changes");
+  git(["fetch", "origin", "main", "--tags"]);
+  const [behind, ahead] = git(["rev-list", "--left-right", "--count", "origin/main...HEAD"])
+    .split(/\s+/)
+    .map(Number);
+  if (behind) fail("main is behind origin/main; git pull --ff-only first");
+  if (ahead) fail("main has commits origin/main does not; push them (through a PR) first");
+  if (git(["tag", "--list", tag])) fail(`tag ${tag} already exists`);
+  git(["tag", "-a", tag, "-m", `OpenMedia ${version}`]);
+  git(["push", "origin", tag]);
+  console.log(
+    `release: pushed ${tag}. CI (.github/workflows/ota.yml) now builds and publishes the Windows and Linux installers and latest.json to the ${tag} GitHub release. No iOS, Android or macOS binary goes there.`,
+  );
+}
+
 // ---- main ----
 function help() {
   console.log(`yarn release <command>
 
-  doctor [ios] [android] [macos]   check signing, toolchains and versions; prints a fix per problem
+  doctor [platforms]               check signing, toolchains and versions; prints a fix per problem
   setup                            import .p12 certificates and install profiles from the signing
                                    folder (${signingDir(env)}), then run doctor
-  [build] [ios] [android] [macos]  build the store packages (all three by default)
+  [build] [platforms]              build into release/<version>-<build>/. Default: the store
+                                   packages ios, android, macos (paid; stores only, never GitHub).
+                                   Opt in by name: windows, linux (free; run on that OS; builds the
+                                   installers, uploads nothing; see github below)
                                    --no-bump   reuse the build number in tauri.conf.json
                                    --build N   use build number N
                                    --validate  run altool --validate-app on the .ipa and .pkg
   bump <patch|minor|major|x.y.z>   edit version, build number and CHANGELOG.md (no git)
   ship <patch|minor|major|x.y.z>   doctor, version PR, merge, then build from main
                                    --no-wait   merge without waiting for CI (admin merge)
+  github [version]                 tag v<version> on main and push it so CI publishes the Windows and
+                                   Linux installers to GitHub Releases. Needs a clean main equal to
+                                   origin/main and a tauri.conf.json version equal to the tag.
 
 Guide: docs/wiki/store-builds.md`);
 }
 
 if (command === "help") help();
+else if (command === "github") publishToGithub();
 else if (command === "doctor") process.exit(doctor(platforms) ? 0 : 1);
 else if (command === "setup") process.exit(setup() ? 0 : 1);
 else if (command === "bump") await bump();
@@ -595,7 +727,8 @@ else {
   ensureCertificates(platforms);
   if (!doctor(platforms))
     fail("fix the problems above (or run yarn release setup), then build again");
-  const buildNumber = await chooseBuild();
-  writeBuild(root, buildNumber);
+  const storeBuild = platforms.some((p) => PLATFORMS.includes(p));
+  const buildNumber = storeBuild ? await chooseBuild() : Math.max(...readBuilds(root));
+  if (storeBuild) writeBuild(root, buildNumber);
   build(platforms, { buildNumber });
 }

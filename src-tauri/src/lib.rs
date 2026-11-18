@@ -5,7 +5,7 @@ mod boot;
 mod color_pick;
 mod commands;
 mod dark_mode;
-#[cfg(target_os = "macos")]
+#[cfg(desktop)]
 mod desktop_menu;
 mod downloads;
 mod entitlement;
@@ -42,11 +42,11 @@ pub fn run() {
         .plugin(tauri_plugin_billing::init());
     #[cfg(all(desktop, feature = "self-update"))]
     let builder = builder.plugin(tauri_plugin_updater::Builder::new().build());
-    #[cfg(target_os = "macos")]
+    #[cfg(desktop)]
     let builder = builder.on_menu_event(desktop_menu::handle);
     builder
         .setup(|app| {
-            #[cfg(target_os = "macos")]
+            #[cfg(desktop)]
             desktop_menu::install(app.handle())?;
             let data_dir = app.path().app_data_dir()?;
             let library = library::Library::load(data_dir.join("library.json"))?;

@@ -32,27 +32,30 @@ pub enum Error {
     #[cfg(desktop)]
     #[error("{0} is not available on desktop yet")]
     DesktopUnsupported(&'static str),
-    #[cfg(target_os = "macos")]
+    #[cfg(desktop)]
     #[error("the main window is not open")]
     MainWindowMissing,
-    #[cfg(target_os = "macos")]
-    #[error("this Mac has no password or Touch ID to check with")]
+    #[cfg(desktop)]
+    #[error("this computer has no password, Touch ID, Windows Hello or PolicyKit to check with")]
     OwnerCheckUnavailable,
     #[cfg(target_os = "macos")]
     #[error("notifications need the app to run from its .app bundle")]
     NotBundled,
-    #[cfg(target_os = "macos")]
+    #[cfg(desktop)]
     #[error("no such site view")]
     UnknownSession,
-    #[cfg(target_os = "macos")]
+    #[cfg(desktop)]
     #[error("the page did not answer in time")]
     PageTimeout,
-    #[cfg(target_os = "macos")]
+    #[cfg(desktop)]
     #[error("the site view failed: {0}")]
     Webview(#[from] tauri::Error),
-    #[cfg(target_os = "macos")]
+    #[cfg(desktop)]
     #[error("could not start the page state poller: {0}")]
     Poller(#[from] std::io::Error),
+    #[cfg(desktop)]
+    #[error("the system web view failed: {0}")]
+    Native(String),
 }
 
 impl Serialize for Error {

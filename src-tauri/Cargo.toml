@@ -63,8 +63,15 @@ tauri-plugin-updater = { version = "2", optional = true }
 self-update = ["dep:tauri-plugin-updater"]
 
 # Android has no `keyring` backend; its secrets live in the Android Keystore (see `secrets.rs`).
-[target.'cfg(not(target_os = "android"))'.dependencies]
+# Every other target needs a real OS store, because `keyring` silently falls back to an in-memory
+# mock without one. Linux talks to the Secret Service (GNOME Keyring, KWallet) through zbus, which
+# is pure Rust: no libdbus to bundle in the AppImage. `async-io` keeps zbus off Tauri's tokio runtime.
+[target.'cfg(any(target_os = "macos", target_os = "ios"))'.dependencies]
 keyring = { version = "3", default-features = false, features = ["apple-native"] }
+[target.'cfg(target_os = "windows")'.dependencies]
+keyring = { version = "3", default-features = false, features = ["windows-native"] }
+[target.'cfg(target_os = "linux")'.dependencies]
+keyring = { version = "3", default-features = false, features = ["async-secret-service", "async-io", "crypto-rust"] }
 
 [dev-dependencies]
 scraper = "0.29.0"

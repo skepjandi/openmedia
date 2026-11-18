@@ -100,13 +100,31 @@ If uncertain about impact — **stop and ask**.
 - No `node_modules/`, `target/`, `.DS_Store`, `.env`, build artifacts, or signing material.
 - Branch per feature, rebase before merging.
 
+## Platforms and Pricing
+
+**iOS, Android and macOS have paid (Pro) versions and features and ship only through their stores** (App Store, Mac App Store, Google Play). **Windows and Linux are fully free: every feature is unlocked** (`Entitlement::from_build` in `src-tauri/src/entitlement.rs` forces Pro there).
+
+- **Never create, upload or publish an executable or installer for iOS, Android or macOS** (`.ipa`, `.aab`, `.apk`, `.pkg`, `.dmg`, `.app.tar.gz`) to GitHub Releases, the landing page, a workflow artifact meant for download, or anywhere outside the stores. Store packages go to Transporter / Play Console only.
+- **Always release the Windows and Linux executables** (NSIS `.exe`, `.AppImage`, `.deb`, with their updater signatures and `latest.json`) on GitHub Releases; they are the only platforms with downloads on GitHub and the landing page.
+- **Windows and Linux never get a paywall, Pro gate, upsell or purchase UI.** Pro is forced on in Rust there; do not add a code path that can show or require a purchase on those platforms.
+- New release tooling, workflows and download links must keep this split. `yarn ota app` refuses macOS and mobile on purpose.
+
 ## Releasing
 
-**Use `yarn release`; never hand-run store builds or export signing variables.** Full guide: `docs/wiki/store-builds.md#releasing-yarn-release`.
+**Use `yarn release`; never hand-run store builds or export signing variables.** Full guide: `docs/wiki/store-builds.md#releasing-yarn-release`. Two flows, one version:
+
+**Stores (iOS, Android, macOS).**
 
 - `yarn release doctor` first. It lists what is missing and the exact fix. Do not guess identity names, profile paths or passwords, and never search the disk for certificate passwords.
-- `yarn release ship <patch|minor|major|x.y.z>` is the whole release: version PR from a worktree, merge, build ios/android/macos from `main`. Run it from a clean `main` checkout (the Android keystore is gitignored and only exists there). `yarn release` alone builds from the current checkout.
+- `yarn release ship <patch|minor|major|x.y.z>` is the whole release: version PR from a worktree, merge, build ios/android/macos from `main`. Run it from a clean `main` checkout (the Android keystore is gitignored and only exists there). `yarn release` alone builds from the current checkout. Store packages are uploaded by hand to Transporter / Play Console, never to GitHub.
 - Signing material (`.p12`, profiles, `.p8`) lives in the signing folder outside the repo (`~/Documents/openmedia-signing`, or `SIGNING_DIR`), its passwords in the gitignored `.env`. Never print them, commit them, or paste them in a PR or chat.
+
+**GitHub (Windows and Linux).**
+
+- After the version PR is merged, `yarn release github` tags `v<version>` on a clean, up-to-date `main` and pushes it; `.github/workflows/ota.yml` builds the installers on Windows and Linux runners and publishes them with `latest.json` to the `v<version>` release. `yarn release doctor windows linux` / `yarn release windows|linux` / `yarn build windows|linux` build on a machine running that OS; `yarn ota app` builds and uploads from it.
+
+**Both.**
+
 - The version and build numbers are edited only by `yarn release bump` (`scripts/lib/version.mjs`), which keeps `package.json` and `src-tauri/tauri.conf.json` equal.
 - After a build, tell the user the artifact paths printed by the CLI and that nothing was uploaded or validated unless `--validate` ran.
 

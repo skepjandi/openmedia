@@ -3,8 +3,9 @@ use zeroize::Zeroizing;
 
 use crate::error::{Error, Result};
 
-/// The Keychain service the secrets live under. Android has no service: its store keeps the
-/// secret under its own name.
+/// The service the secrets live under: the Keychain service, the Credential Manager target
+/// prefix, the Secret Service attribute. Android has no service: its store keeps the secret
+/// under its own name.
 #[cfg(not(target_os = "android"))]
 const SERVICE: &str = "surf.openmedia";
 
@@ -20,7 +21,8 @@ pub trait SecretStore: Send + Sync {
     }
 }
 
-/// The OS secure store: the Keychain on iOS and macOS, the Android Keystore on Android.
+/// The OS secure store: the Keychain on iOS and macOS, Credential Manager on Windows, the Secret
+/// Service (GNOME Keyring, KWallet) on Linux, the Android Keystore on Android.
 #[cfg(not(target_os = "android"))]
 pub struct KeychainStore;
 
@@ -36,31 +38,44 @@ fn secret_id(id: Uuid) -> String {
 
 #[cfg(not(target_os = "android"))]
 impl KeychainStore {
+    /// Turns a store failure into the error the shell shows. On Linux the usual cause is that no
+    /// Secret Service is running, and the key must not fall back to a file.
+    fn fail(e: keyring::Error) -> Error {
+        #[cfg(target_os = "linux")]
+        if matches!(
+            e,
+            keyring::Error::PlatformFailure(_) | keyring::Error::NoStorageAccess(_)
+        ) {
+            return Error::Secret(format!(
+                "no secret service available: install and unlock GNOME Keyring or KWallet ({e})"
+            ));
+        }
+        Error::Secret(e.to_string())
+    }
+
     fn entry(id: Uuid) -> Result<keyring::Entry> {
-        keyring::Entry::new(SERVICE, &secret_id(id)).map_err(|e| Error::Secret(e.to_string()))
+        keyring::Entry::new(SERVICE, &secret_id(id)).map_err(Self::fail)
     }
 }
 
 #[cfg(not(target_os = "android"))]
 impl SecretStore for KeychainStore {
     fn set(&self, id: Uuid, secret: &str) -> Result<()> {
-        Self::entry(id)?
-            .set_password(secret)
-            .map_err(|e| Error::Secret(e.to_string()))
+        Self::entry(id)?.set_password(secret).map_err(Self::fail)
     }
 
     fn get(&self, id: Uuid) -> Result<Option<Zeroizing<String>>> {
         match Self::entry(id)?.get_password() {
             Ok(secret) => Ok(Some(Zeroizing::new(secret))),
             Err(keyring::Error::NoEntry) => Ok(None),
-            Err(e) => Err(Error::Secret(e.to_string())),
+            Err(e) => Err(Self::fail(e)),
         }
     }
 
     fn delete(&self, id: Uuid) -> Result<()> {
         match Self::entry(id)?.delete_credential() {
             Ok(()) | Err(keyring::Error::NoEntry) => Ok(()),
-            Err(e) => Err(Error::Secret(e.to_string())),
+            Err(e) => Err(Self::fail(e)),
         }
     }
 }

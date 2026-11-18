@@ -1,4 +1,5 @@
-//! The Mac menu bar: the shortcuts a Mac browser has. The page is a native view, so a key press
+//! The desktop menu bar: the shortcuts a desktop browser has (Cmd on a Mac, Ctrl on Windows and
+//! Linux). The page is a native view, so a key press
 //! in it never reaches the shell; menu items are handled by the app before either sees the key.
 
 use tauri::{
@@ -9,8 +10,9 @@ use tauri_plugin_siteview::{SiteviewExt, ZoomAction, ZoomRequest};
 
 /// The shell listens for this and opens the sheet named in the payload.
 const SHEET_EVENT: &str = "menu:sheet";
-/// Where the new menus go: before "Window" and "Help" in Tauri's default menu.
-const FIRST_CUSTOM_MENU: usize = 4;
+/// The new menus go before this one in Tauri's default menu. It is looked up by its text because
+/// the default layout differs per OS (Mac has an app menu first, Windows and Linux do not).
+const MENU_BEFORE: &str = "Window";
 
 const BACK: &str = "siteview.back";
 const FORWARD: &str = "siteview.forward";
@@ -52,7 +54,15 @@ pub fn install<R: Runtime>(app: &AppHandle<R>) -> tauri::Result<()> {
     let page_items: [&dyn IsMenuItem<R>; 3] = [&zoom_in, &zoom_out, &zoom_reset];
     let page = Submenu::with_items(app, "Page", true, &page_items)?;
 
-    let at = FIRST_CUSTOM_MENU.min(menu.items()?.len());
+    let items = menu.items()?;
+    let at = items
+        .iter()
+        .position(|menu_item| {
+            menu_item
+                .as_submenu()
+                .is_some_and(|submenu| submenu.text().is_ok_and(|text| text == MENU_BEFORE))
+        })
+        .unwrap_or(items.len());
     menu.insert(&navigate, at)?;
     menu.insert(&page, at + 1)?;
     app.set_menu(menu)?;

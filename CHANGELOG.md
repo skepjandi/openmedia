@@ -6,6 +6,14 @@ All notable changes to OpenMedia are documented here.
 >
 > **Wiki**: the [GitHub Wiki](https://github.com/skepjandi/openmedia/wiki) is the public-facing main wiki — architecture, recipe format, AI pipeline, security model, roadmap. Source-controlled editing surface is `docs/wiki/` in this repo; CI (`.github/workflows/sync-wiki.yml`) mirrors it to the GitHub Wiki on every merge to `main`. New single-PR changes belong here, not as new wiki pages.
 
+### feat(desktop): Windows and Linux builds, free with every feature unlocked
+
+**Area:** `feat(desktop)`, `feat(release)`
+
+**Change:** Windows and Linux get site views (one desktop module shared with the Mac; the page sits above the shell and is fitted around its controls, hidden while an overlay is open; on Linux the page views are moved into a `GtkOverlay`), real secret stores (`keyring` with Credential Manager and the Secret Service), Windows Hello and PolicyKit owner checks, and the Mac's menu shortcuts. Every feature is unlocked there: the shell starts as Pro and no purchase UI can appear. `yarn build windows|linux`, `yarn release windows|linux` and `yarn release github` build and tag them; a `v*` tag publishes the NSIS installer, AppImage and `.deb` with `latest.json` on GitHub. iOS, Android and macOS are never published as downloads (`AGENTS.md`, Platforms and Pricing); `yarn ota app` refuses them and the macOS job is gone from the release workflow.
+
+**Verified:** `cargo check` for the plugin and the app crate on `x86_64-pc-windows-gnu`, the plugin on Linux in a container, unit tests for the page-fitting helper, Vitest for the storeless-desktop entitlement. **Not verified:** a page opened, a profile kept apart, Windows Hello, PolicyKit, the installers or the self-update on any Windows or Linux machine; network request blocking and notifications are not wired there (`docs/wiki/platform-support.md`).
+
 ### fix(video): switching the controls off took a refresh to reach an embedded player
 
 **Area:** `fix(video)`

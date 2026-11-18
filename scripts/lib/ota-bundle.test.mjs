@@ -64,8 +64,9 @@ describe("injectStyleNonce", () => {
 
 describe("latest.json", () => {
   const signatures = new Map([
-    ["OpenMedia_1.0.0_darwin-universal.app.tar.gz.sig", "SIGA\n"],
+    ["OpenMedia_1.0.0_linux-x86_64.AppImage.sig", "SIGL\n"],
     ["OpenMedia_1.0.0_windows-x86_64.exe.sig", "SIGW\n"],
+    ["OpenMedia_1.0.0_darwin-universal.app.tar.gz.sig", "SIGA\n"],
   ]);
   const base = {
     version: "1.0.0",
@@ -75,39 +76,44 @@ describe("latest.json", () => {
     signatures,
   };
 
-  it("lists each signed installer under its platform and expands universal macOS builds", () => {
+  it("lists each signed Windows and Linux installer and ignores .deb packages", () => {
     const latest = buildLatestJson({
       ...base,
       assetNames: [
-        "OpenMedia_1.0.0_darwin-universal.app.tar.gz",
-        "OpenMedia_1.0.0_darwin-universal.app.tar.gz.sig",
-        "OpenMedia_1.0.0_darwin-universal.dmg",
+        "OpenMedia_1.0.0_linux-x86_64.AppImage",
+        "OpenMedia_1.0.0_linux-x86_64.AppImage.sig",
+        "OpenMedia_1.0.0_linux-x86_64.deb",
         "OpenMedia_1.0.0_windows-x86_64.exe",
       ],
     });
-    expect(Object.keys(latest.platforms).sort()).toEqual([
-      "darwin-aarch64",
-      "darwin-x86_64",
-      "windows-x86_64",
-    ]);
-    expect(latest.platforms["darwin-x86_64"]).toEqual({
-      signature: "SIGA",
-      url: "https://example.test/dl/OpenMedia_1.0.0_darwin-universal.app.tar.gz",
+    expect(Object.keys(latest.platforms).sort()).toEqual(["linux-x86_64", "windows-x86_64"]);
+    expect(latest.platforms["windows-x86_64"]).toEqual({
+      signature: "SIGW",
+      url: "https://example.test/dl/OpenMedia_1.0.0_windows-x86_64.exe",
     });
+  });
+
+  it("never lists a macOS build, even a signed one", () => {
+    const latest = buildLatestJson({
+      ...base,
+      assetNames: ["OpenMedia_1.0.0_darwin-universal.app.tar.gz"],
+    });
+    expect(latest.platforms).toEqual({});
   });
 
   it("skips an installer without a signature or built for another version", () => {
     const latest = buildLatestJson({
       ...base,
-      assetNames: ["OpenMedia_1.0.0_linux-x86_64.AppImage", "OpenMedia_0.9.0_windows-x86_64.exe"],
+      assetNames: ["OpenMedia_1.0.0_linux-aarch64.AppImage", "OpenMedia_0.9.0_windows-x86_64.exe"],
     });
     expect(latest.platforms).toEqual({});
   });
 
   it("names assets the way it parses them", () => {
-    expect(releaseAssetName("1.0.0", platformKey("aarch64-apple-darwin"), "dmg")).toBe(
-      "OpenMedia_1.0.0_darwin-aarch64.dmg",
+    expect(releaseAssetName("1.0.0", platformKey("x86_64-unknown-linux-gnu"), "deb")).toBe(
+      "OpenMedia_1.0.0_linux-x86_64.deb",
     );
+    expect(() => platformKey("aarch64-apple-darwin")).toThrow();
     expect(() => platformKey("riscv64-unknown-none")).toThrow();
   });
 });

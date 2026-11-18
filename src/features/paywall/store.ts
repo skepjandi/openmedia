@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { isStorelessDesktop } from "../../shared/platform";
 import { paywall, type EntitlementView, type Package, type PurchaseOutcome } from "./ipc";
 
 interface EntitlementState extends EntitlementView {
@@ -12,13 +13,18 @@ interface EntitlementState extends EntitlementView {
   restore: () => Promise<void>;
 }
 
-const initialView: EntitlementView = { status: "loading", configured: false, snapshot: null };
+/** Windows and Linux have no store and start Pro, so no lock or paywall shows before Rust answers. */
+const initialView = (): EntitlementView => ({
+  status: isStorelessDesktop() ? "pro" : "loading",
+  configured: false,
+  snapshot: null,
+});
 let initialized = false;
 let unsubscribe: (() => void) | null = null;
 let visibilityHandler: (() => void) | null = null;
 
 export const useEntitlementStore = create<EntitlementState>((set, get) => ({
-  ...initialView,
+  ...initialView(),
   packages: [],
   purchasing: null,
   restoring: false,
@@ -100,7 +106,7 @@ export function resetEntitlementStoreForTests(): void {
   visibilityHandler = null;
   initialized = false;
   useEntitlementStore.setState({
-    ...initialView,
+    ...initialView(),
     packages: [],
     purchasing: null,
     restoring: false,

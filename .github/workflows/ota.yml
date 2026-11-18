@@ -4,7 +4,11 @@ name: OTA
 # when Actions minutes are short (docs/wiki/updates.md).
 #
 #   push to main (web layer changed)  -> signed web bundle on the `ota` release, every platform
-#   push of a v* tag                  -> web bundle + desktop installers + latest.json
+#   push of a v* tag                  -> web bundle + Windows and Linux installers + latest.json,
+#                                        published on the GitHub release v<version> (marked latest)
+#
+# Windows and Linux are the free platforms and the only ones published here. iOS, Android and
+# macOS ship through their stores; never add them to this workflow (AGENTS.md).
 #   manual run                        -> either, chosen below
 
 on:
@@ -66,9 +70,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # Windows and Linux join once their site views exist (docs/wiki/platform-support.md):
-        # an installer for them today would open an app that cannot show a page.
-        os: [macos-latest]
+        os: [windows-latest, ubuntu-22.04]
     steps:
       - uses: actions/checkout@v7
         with:
@@ -77,6 +79,11 @@ jobs:
         with:
           node-version: 22
           cache: yarn
+      - name: Install Linux build dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libgtk-3-dev librsvg2-dev libayatana-appindicator3-dev libxdo-dev libssl-dev patchelf xdg-utils
       - uses: dtolnay/rust-toolchain@stable
       - uses: swatinem/rust-cache@v2
         with:
@@ -88,7 +95,6 @@ jobs:
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
           OPENMEDIA_SHARE_URL: ${{ secrets.OPENMEDIA_SHARE_URL }}
-          OPENMEDIA_RC_KEY_MACOS: ${{ secrets.OPENMEDIA_RC_KEY_MACOS }}
 
   manifest:
     needs: app
@@ -102,5 +108,12 @@ jobs:
         with:
           node-version: 22
       - run: node scripts/ota.mjs manifest
+        env:
+          GH_TOKEN: ${{ github.token }}
+      - name: Mark the release latest and publish its notes
+        run: |
+          notes="$(mktemp)"
+          node scripts/ota.mjs notes > "$notes"
+          gh release edit "v$(node -p 'require("./src-tauri/tauri.conf.json").version')" --latest --notes-file "$notes"
         env:
           GH_TOKEN: ${{ github.token }}

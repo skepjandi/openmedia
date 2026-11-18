@@ -46,6 +46,20 @@
       "minSdkVersion": 24,
       "versionCode": 1016
     },
+    "windows": {
+      "nsis": {
+        "installMode": "currentUser",
+        "languages": ["English"],
+        "displayLanguageSelector": false
+      },
+      "webviewInstallMode": { "type": "downloadBootstrapper" }
+    },
+    "linux": {
+      "deb": {
+        "depends": ["libwebkit2gtk-4.1-0", "libgtk-3-0", "libayatana-appindicator3-1"],
+        "section": "web"
+      }
+    },
     "category": "Utility",
     "publisher": "OpenMedia contributors",
     "copyright": "Copyright © OpenMedia contributors",

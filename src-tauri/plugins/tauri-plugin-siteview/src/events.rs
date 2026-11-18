@@ -9,7 +9,5 @@ pub const BRIDGE_EVENT: &str = "siteview:bridge";
 pub const CLOSED_EVENT: &str = "siteview:closed";
 #[cfg(mobile)]
 pub const MEMORY_EVENT: &str = "siteview:memory";
-#[cfg(any(mobile, target_os = "macos"))]
 pub const POPUP_BLOCKED_EVENT: &str = "siteview:popup-blocked";
-#[cfg(any(mobile, target_os = "macos"))]
 pub const NOTIFICATION_TAP_EVENT: &str = "siteview:notification-tap";

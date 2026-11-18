@@ -59,6 +59,23 @@ beforeEach(() => {
 
 afterEach(() => vi.clearAllMocks());
 
+describe("entitlement on a desktop without a store", () => {
+  it("recognises Windows and Linux but not Android or the test environment", async () => {
+    const { isStorelessDesktop } = await import("../../shared/platform");
+    expect(isStorelessDesktop("Mozilla/5.0 (Windows NT 10.0; Win64; x64) Edg/120")).toBe(true);
+    expect(isStorelessDesktop("Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/605.1.15")).toBe(true);
+    expect(isStorelessDesktop("Mozilla/5.0 (Linux; Android 14; Pixel 8) Chrome/120")).toBe(false);
+    expect(isStorelessDesktop("Mozilla/5.0 (Macintosh; Intel Mac OS X 14_0)")).toBe(false);
+  });
+
+  it("starts Pro on the first frame instead of loading", () => {
+    vi.spyOn(navigator, "userAgent", "get").mockReturnValue("Mozilla/5.0 (X11; Linux x86_64)");
+    resetEntitlementStoreForTests();
+    expect(useEntitlementStore.getState().status).toBe("pro");
+    vi.restoreAllMocks();
+  });
+});
+
 describe("entitlement state", () => {
   it("keeps startup locked, then mirrors a Pro store update", async () => {
     expect(useEntitlementStore.getState().status).toBe("loading");

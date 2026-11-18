@@ -2,14 +2,16 @@
 //
 //   keygen              make the two signing keys (once), print where they went
 //   web                 build the web layer, sign it, publish it to the `ota` release
-//   app                 build this machine's desktop installers with updater artifacts, upload
-//                       them to the release for the current version, then refresh latest.json
+//   app                 build this machine's Windows or Linux installer with updater artifacts,
+//                       upload it to the release for the current version, then refresh latest.json.
+//                       Refuses macOS and mobile: those ship only through their stores (AGENTS.md)
+//   notes               print this version's release notes (CI publishes them on the release)
 //   manifest            rebuild latest.json for the current version from the release's assets
 //   all                 web, then app
 //
 //   --dry-run           build and sign into release/ota/, publish nothing
 //   --no-build          web: reuse dist/ instead of running `yarn build:web`
-//   --target <triple>   app: a Rust target other than this machine's (e.g. x86_64-apple-darwin)
+//   --target <triple>   app: a Rust target other than this machine's (e.g. aarch64-pc-windows-msvc)
 //   --no-manifest       app: leave latest.json to a later `yarn ota manifest` (CI does this, since
 //                       several machines each add their own platform)
 //   --notes "text"      app, manifest: the release notes shown by the updater
@@ -32,6 +34,7 @@ import path from "node:path";
 import process from "node:process";
 import { loadEnv } from "./lib/env.mjs";
 import {
+  LINUX_PACKAGE,
   UPDATER_ARTIFACT,
   buildLatestJson,
   bundleName,
@@ -136,7 +139,7 @@ function ensureRelease(tag, { title, notes, prerelease }) {
   const target = tag.startsWith("v")
     ? ["--target", capture("git", ["rev-parse", "HEAD"]).trim()]
     : [];
-  gh(
+  const created = capture("gh", [
     "release",
     "create",
     tag,
@@ -146,7 +149,12 @@ function ensureRelease(tag, { title, notes, prerelease }) {
     notes,
     ...target,
     prerelease ? "--prerelease" : "--latest",
-  );
+    "--repo",
+    repository(),
+  ]);
+  // The Windows and Linux CI jobs race to create the same release; the loser just uses it.
+  if (created === null && ghOutput("release", "view", tag) === null)
+    fail(`could not create release ${tag}`);
 }
 
 const upload = (tag, files) => gh("release", "upload", tag, ...files, "--clobber");
@@ -298,11 +306,19 @@ function findFiles(dir, pattern) {
     .map((name) => path.join(dir, name));
 }
 
-const BUNDLES = { darwin: "app,dmg", windows: "nsis", linux: "appimage" };
+const BUNDLES = { windows: "nsis", linux: "appimage,deb" };
+
+const STORE_ONLY = `iOS, Android and macOS ship only through their stores and are never published as releases (AGENTS.md, "Platforms and Pricing"). \`yarn ota app\` builds Windows and Linux installers; run it on one of those systems.`;
 
 function buildApp() {
   const triple = option("--target") ?? hostTriple();
-  const key = platformKey(triple);
+  if (/apple|android/.test(triple)) fail(`target ${triple}: ${STORE_ONLY}`);
+  let key;
+  try {
+    key = platformKey(triple);
+  } catch (error) {
+    fail(`${error.message}. ${STORE_ONLY}`);
+  }
   const system = key.split("-")[0];
   run(
     "yarn",
@@ -335,12 +351,13 @@ function buildApp() {
   const out = path.join(root, "release/ota", `app-${version}-${key}`);
   fs.rmSync(out, { recursive: true, force: true });
   fs.mkdirSync(out, { recursive: true });
-  const extension = artifact.match(/(app\.tar\.gz|exe|AppImage)$/)[1];
+  const extension = artifact.match(/(exe|AppImage)$/)[1];
   const updaterName = releaseAssetName(version, key, extension);
   fs.copyFileSync(artifact, path.join(out, updaterName));
   fs.copyFileSync(`${artifact}.sig`, path.join(out, `${updaterName}.sig`));
-  for (const dmg of findFiles(bundleDir, /\.dmg$/))
-    fs.copyFileSync(dmg, path.join(out, releaseAssetName(version, key, "dmg")));
+  const deb = findFiles(bundleDir, LINUX_PACKAGE)[0];
+  if (system === "linux" && deb)
+    fs.copyFileSync(deb, path.join(out, releaseAssetName(version, key, "deb")));
   return fs.readdirSync(out).map((name) => path.join(out, name));
 }
 
@@ -397,6 +414,7 @@ const commands = {
   web: publishWeb,
   app: publishApp,
   manifest: publishManifest,
+  notes: () => console.log(changes().notes),
   all: () => {
     publishWeb();
     publishApp();
@@ -405,4 +423,6 @@ const commands = {
 
 if (command in commands) commands[command]();
 else
-  fail(`unknown command "${command ?? ""}". Usage: yarn ota keygen|web|app|manifest|all [options]`);
+  fail(
+    `unknown command "${command ?? ""}". Usage: yarn ota keygen|web|app|manifest|notes|all [options]`,
+  );

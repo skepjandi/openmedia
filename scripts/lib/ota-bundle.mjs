@@ -117,10 +117,9 @@ export const pointerFor = ({ runtimeVersion, revision, size }) => ({
 
 // ---- desktop updater ----
 
+// Windows and Linux only: iOS, Android and macOS builds ship through their stores and are never
+// published as releases (AGENTS.md, "Platforms and Pricing").
 const TRIPLES = {
-  "aarch64-apple-darwin": "darwin-aarch64",
-  "x86_64-apple-darwin": "darwin-x86_64",
-  "universal-apple-darwin": "darwin-universal",
   "x86_64-pc-windows-msvc": "windows-x86_64",
   "aarch64-pc-windows-msvc": "windows-aarch64",
   "x86_64-unknown-linux-gnu": "linux-x86_64",
@@ -136,21 +135,23 @@ export function platformKey(triple) {
 
 /** The file the updater downloads for each OS, as `tauri build` names it. */
 export const UPDATER_ARTIFACT = {
-  darwin: /\.app\.tar\.gz$/,
   windows: /-setup\.exe$/,
   linux: /\.AppImage$/,
 };
+
+/** The extra installer published beside the Linux updater artifact (not part of `latest.json`). */
+export const LINUX_PACKAGE = /\.deb$/;
 
 export const releaseAssetName = (version, key, extension) =>
   `${PRODUCT}_${version}_${key}.${extension}`;
 
 const ASSET = new RegExp(
-  `^${PRODUCT}_(.+?)_((?:darwin|windows|linux)-(?:aarch64|x86_64|universal))\\.(app\\.tar\\.gz|exe|AppImage)$`,
+  `^${PRODUCT}_(.+?)_((?:windows|linux)-(?:aarch64|x86_64))\\.(exe|AppImage)$`,
 );
 
 /**
  * Tauri's `latest.json`: one entry per platform that has both an installer and its signature among
- * the release's assets. `signatures` maps an asset name to the text of its `.sig` file.
+ * the release's assets (`.deb` packages and anything else are ignored). `signatures` maps an asset name to the text of its `.sig` file.
  */
 export function buildLatestJson({ version, notes, pubDate, downloadBase, assetNames, signatures }) {
   const platforms = {};
@@ -158,11 +159,7 @@ export function buildLatestJson({ version, notes, pubDate, downloadBase, assetNa
     const match = name.match(ASSET);
     const signature = signatures.get(`${name}.sig`);
     if (!match || match[1] !== version || signature === undefined) continue;
-    const keys = match[2].endsWith("universal")
-      ? [match[2].replace("universal", "aarch64"), match[2].replace("universal", "x86_64")]
-      : [match[2]];
-    for (const key of keys)
-      platforms[key] = { signature: signature.trim(), url: `${downloadBase}/${name}` };
+    platforms[match[2]] = { signature: signature.trim(), url: `${downloadBase}/${name}` };
   }
   return { version, notes, pub_date: pubDate, platforms };
 }

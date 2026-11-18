@@ -1,7 +1,8 @@
-//! The parts of a site view that Tauri's webview API does not expose, read from the `WKWebView`
-//! itself. Every call hops to the main thread and waits for the answer, so none may run on it.
+//! macOS: the parts of a site view that Tauri's webview API does not expose, read from the
+//! `WKWebView` itself. Every call hops to the main thread and waits for the answer, so none may
+//! run on it.
 
-use std::{sync::mpsc, time::Duration};
+use std::{path::Path, process::Command, sync::mpsc, time::Duration};
 
 use block2::RcBlock;
 use objc2::{MainThreadMarker, MainThreadOnly, msg_send, rc::Retained, runtime::Bool};
@@ -11,21 +12,63 @@ use objc2_web_kit::{
     WKContentRuleList, WKContentRuleListStore, WKUserContentController, WKUserScript,
     WKUserScriptInjectionTime, WKWebView,
 };
-use tauri::{Runtime, Webview};
+use tauri::{AppHandle, Runtime, Webview, webview::WebviewBuilder};
+use url::Url;
+use uuid::Uuid;
 
-use crate::{ContentRuleList, Error, Result, ZoomAction};
+use super::{PageSnapshot, Track, zoomed};
+use crate::{ContentRuleList, Error, Rect, Result, ZoomAction};
+
+pub mod notify;
+mod shell;
 
 /// How long to wait for the main thread. It only has to answer between two events.
 const MAIN_THREAD_WAIT: Duration = Duration::from_secs(3);
 
-/// What the web view knows about its page.
-#[derive(Debug, Clone, PartialEq)]
-pub struct PageSnapshot {
-    pub url: Option<String>,
-    pub title: Option<String>,
-    pub loading: bool,
-    pub can_go_back: bool,
-    pub can_go_forward: bool,
+/// A `WKWebView` reports no `Safari` token, which Google reads as an embedded browser and refuses
+/// to sign in from. This is what Safari on macOS sends (it freezes the OS version in the string).
+pub const USER_AGENT: Option<&str> = Some(
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.6 Safari/605.1.15",
+);
+
+/// The shell is transparent and answers clicks only where it drew something, so the page sits
+/// under it at full size (see `shell.rs`).
+pub const CLICK_THROUGH: bool = true;
+
+/// Safari content rule lists block requests inside the web view.
+pub const APPLIES_RULE_LISTS: bool = true;
+
+/// Where the shell wants clicks, in its own CSS pixels.
+pub fn set_regions(regions: Vec<Rect>) {
+    shell::set_regions(regions);
+}
+
+/// Puts the page view at `bounds` (window coordinates, logical pixels).
+pub fn place<R: Runtime>(_shell: &Webview<R>, page: &Webview<R>, bounds: Rect) -> Result<()> {
+    Ok(page.set_bounds(tauri::Rect {
+        position: tauri::LogicalPosition::new(bounds.x, bounds.y).into(),
+        size: tauri::LogicalSize::new(bounds.width, bounds.height).into(),
+    })?)
+}
+
+/// A data store per profile keeps cookies and storage apart (macOS 14 and later, which the bundle
+/// requires).
+pub fn configure_profile<R: Runtime>(
+    builder: WebviewBuilder<R>,
+    _profiles: &Path,
+    profile: Uuid,
+) -> WebviewBuilder<R> {
+    builder.data_store_identifier(profile.into_bytes())
+}
+
+/// Selects a file in Finder.
+pub fn reveal_file(file: &Path) {
+    let _ = Command::new("open").arg("-R").arg(file).spawn();
+}
+
+/// Hands a link to the user's browser. The URL is http or https and is passed as one argument.
+pub fn open_in_browser(url: &Url) {
+    let _ = Command::new("open").arg(url.as_str()).spawn();
 }
 
 /// Runs `work` on the main thread with the session's `WKWebView` and returns its result.
@@ -49,7 +92,7 @@ where
         .map_err(|_| Error::PageTimeout)
 }
 
-pub fn snapshot<R: Runtime>(webview: &Webview<R>) -> Result<PageSnapshot> {
+pub fn snapshot<R: Runtime>(webview: &Webview<R>, _track: &Track) -> Result<PageSnapshot> {
     with_view(webview, |view| {
         // SAFETY: plain property reads on the main thread.
         unsafe {
@@ -83,7 +126,7 @@ pub fn content_insets<R: Runtime>(webview: &Webview<R>) -> Result<(f64, f64, f64
 
 /// Prepares the shell's web view (see `shell.rs`); run it again after each page view is added.
 pub fn prepare_shell<R: Runtime>(shell: &Webview<R>) -> Result<()> {
-    with_view(shell, super::shell::prepare)
+    with_view(shell, shell::prepare)
 }
 
 /// Turns on the trackpad gestures a Mac browser has: a two-finger swipe goes back and forward
@@ -104,19 +147,6 @@ pub fn set_media_suspended<R: Runtime>(webview: &Webview<R>, suspended: bool) ->
     with_view(webview, move |view| unsafe {
         view.setAllMediaPlaybackSuspended_completionHandler(suspended, None);
     })
-}
-
-const ZOOM_STEP: f64 = 1.1;
-const MIN_ZOOM: f64 = 0.3;
-const MAX_ZOOM: f64 = 5.0;
-
-/// The page size after `action`, given the size now.
-pub fn zoomed(current: f64, action: ZoomAction) -> f64 {
-    match action {
-        ZoomAction::In => (current * ZOOM_STEP).min(MAX_ZOOM),
-        ZoomAction::Out => (current / ZOOM_STEP).max(MIN_ZOOM),
-        ZoomAction::Reset => 1.0,
-    }
 }
 
 /// Changes the page size, as Cmd + / Cmd - / Cmd 0 do in a browser. A reset also drops a pinch.
@@ -295,7 +325,7 @@ const AUTHENTICATION_WAIT: Duration = Duration::from_secs(180);
 /// password as the system's own fallback. `Ok(false)` means they cancelled or failed; a Mac with
 /// neither a password nor Touch ID set up is an error, so the check fails closed. Waits for the
 /// person, so it must not run on the main thread.
-pub fn authenticate(reason: &str) -> Result<bool> {
+pub fn authenticate<R: Runtime>(_app: &AppHandle<R>, reason: &str) -> Result<bool> {
     // SAFETY: plain calls into LocalAuthentication; the reply block owns its sender and runs once.
     unsafe {
         let context = LAContext::new();
@@ -314,23 +344,5 @@ pub fn authenticate(reason: &str) -> Result<bool> {
         receiver
             .recv_timeout(AUTHENTICATION_WAIT)
             .map_err(|_| Error::PageTimeout)
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn zooming_in_and_out_steps_and_stays_in_range() {
-        assert!((zoomed(1.0, ZoomAction::In) - 1.1).abs() < 1e-9);
-        assert!((zoomed(1.1, ZoomAction::Out) - 1.0).abs() < 1e-9);
-        assert_eq!(zoomed(MAX_ZOOM, ZoomAction::In), MAX_ZOOM);
-        assert_eq!(zoomed(MIN_ZOOM, ZoomAction::Out), MIN_ZOOM);
-    }
-
-    #[test]
-    fn reset_returns_to_actual_size() {
-        assert_eq!(zoomed(2.3, ZoomAction::Reset), 1.0);
     }
 }
