@@ -290,6 +290,8 @@ export interface AppStore {
   setSiteBackgroundMedia: (site: string, enabled: boolean) => Promise<void>;
   /** Whether a site's videos may open in a picture-in-picture window. */
   setSitePictureInPicture: (site: string, enabled: boolean) => Promise<void>;
+  /** Whether a site is asked for its desktop page; the page reloads when the choice changes. */
+  setSiteDesktop: (site: string, enabled: boolean) => Promise<void>;
   setBackButton: (enabled: boolean) => Promise<void>;
   setFabEdge: (edge: Edge) => void;
   /** Shows the exact payload before it is sent; on by default. */
@@ -1173,6 +1175,25 @@ export const useApp = create<AppStore>((set, get) => {
       } catch (error) {
         set((current) => ({
           state: current.state && { ...current.state, pictureInPictureSites: previous },
+          error: appError(error),
+        }));
+      }
+    },
+    setSiteDesktop: async (site, enabled) => {
+      const previous = get().state?.desktopSites;
+      if (!previous) return;
+      const without = previous.filter((entry) => entry !== site);
+      set((current) => ({
+        state: current.state && {
+          ...current.state,
+          desktopSites: enabled ? [...without, site] : without,
+        },
+      }));
+      try {
+        await library.setSiteDesktop(site, enabled);
+      } catch (error) {
+        set((current) => ({
+          state: current.state && { ...current.state, desktopSites: previous },
           error: appError(error),
         }));
       }

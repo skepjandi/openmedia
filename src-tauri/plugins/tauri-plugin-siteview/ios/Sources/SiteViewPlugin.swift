@@ -218,6 +218,12 @@ private let safariUserAgent: String = {
   let major = UIDevice.current.systemVersion.split(separator: ".").first.map(String.init) ?? "18"
   return "Mozilla/5.0 (iPhone; CPU iPhone OS 18_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/\(major).0 Mobile/15E148 Safari/604.1"
 }()
+/// What Safari on a Mac reports, for a site the reader asked for the desktop page of. Mobile
+/// Safari sends the same string when "Request Desktop Website" is on.
+private let desktopUserAgent: String = {
+  let major = UIDevice.current.systemVersion.split(separator: ".").first.map(String.init) ?? "18"
+  return "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/\(major).0 Safari/605.1.15"
+}()
 private let allowedSchemes: Set<String> = ["http", "https"]
 /// `evaluate` gives up after this long; a hung page must not hang the caller.
 private let evaluateTimeout: TimeInterval = 5
@@ -317,6 +323,19 @@ class SetBackgroundMediaArgs: Decodable {
 
 class SetPictureInPictureArgs: Decodable {
   let sites: [String]
+}
+
+class SetDesktopSitesArgs: Decodable {
+  let sites: [String]
+}
+
+class ShareArgs: Decodable {
+  let url: String
+  let title: String?
+}
+
+class ClearSiteDataArgs: Decodable {
+  let site: String
 }
 
 class AuthenticateArgs: Decodable {
@@ -469,6 +488,8 @@ private final class Session {
   var refreshControl: UIRefreshControl?
   /// A hidden session whose content rule lists changed reloads when it is shown again.
   var needsReload = false
+  /// True while the page was asked for as a desktop page; a change of the site's choice reloads.
+  var desktop = false
   /// True while the page has its small player up, as the page last said.
   var miniUp = false
   /// True while the page is shown as a small window in the corner.
@@ -582,6 +603,8 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
   private var backgroundMediaSites: Set<String> = []
   /// The sites (registrable domains) whose videos may open in picture-in-picture.
   private var pictureInPictureSites: Set<String> = []
+  /// The sites (registrable domains) whose pages are asked for as a desktop page.
+  private var desktopSites: Set<String> = []
   /// False from the app entering the background to it coming back.
   private var appForeground = true
   /// True while a timer is waiting to ask whether the windows kept open in the background are
@@ -968,6 +991,78 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
   private func pictureInPictureListScript() -> String {
     let list = (try? JSONEncoder().encode(pictureInPictureSites.sorted())) ?? Data("[]".utf8)
     return "window.__openmediaPip=\(String(decoding: list, as: UTF8.self))"
+  }
+
+  /// Names the sites whose pages are asked for as a desktop page. Rust-only: the plugin registers
+  /// no command for it, so neither the shell nor a site view can reach it. A page open on a site
+  /// whose choice changed reloads (a hidden one when it is shown again).
+  @objc public func setDesktopSites(_ invoke: Invoke) throws {
+    let args = try invoke.parseArgs(SetDesktopSitesArgs.self)
+    DispatchQueue.main.async {
+      self.desktopSites = Set(args.sites)
+      for session in self.sessions.values
+      where session.desktop != self.desktopSites.contains(session.scope) {
+        if session.id == self.activeId && !session.blocked {
+          session.view.reload()
+        } else {
+          session.needsReload = true
+        }
+      }
+      invoke.resolve()
+    }
+  }
+
+  /// Opens the system share sheet for an address. Rust-only: no webview can raise it.
+  @objc public func share(_ invoke: Invoke) throws {
+    let args = try invoke.parseArgs(ShareArgs.self)
+    DispatchQueue.main.async {
+      guard let url = self.webURL(args.url), self.presentShareSheet(for: url) else {
+        invoke.reject("the share sheet could not be opened")
+        return
+      }
+      invoke.resolve()
+    }
+  }
+
+  @MainActor
+  private func presentShareSheet(for url: URL) -> Bool {
+    var top = shell?.window?.rootViewController
+    while let presented = top?.presentedViewController { top = presented }
+    guard let top else { return false }
+    let controller = UIActivityViewController(activityItems: [url], applicationActivities: nil)
+    if let popover = controller.popoverPresentationController {
+      popover.sourceView = top.view
+      popover.sourceRect = CGRect(x: top.view.bounds.midX, y: top.view.bounds.midY, width: 0, height: 0)
+      popover.permittedArrowDirections = []
+    }
+    top.present(controller, animated: true)
+    return true
+  }
+
+  /// Erases one site's cookies, storage and caches from the active page's profile, then reloads
+  /// the page. Rust-only: no webview can call it. Other sites in the profile are untouched.
+  @objc public func clearSiteData(_ invoke: Invoke) throws {
+    let args = try invoke.parseArgs(ClearSiteDataArgs.self)
+    DispatchQueue.main.async {
+      guard let id = self.activeId, let session = self.sessions[id] else {
+        invoke.reject("no site view is open")
+        return
+      }
+      let store = session.view.configuration.websiteDataStore
+      let types = WKWebsiteDataStore.allWebsiteDataTypes()
+      store.fetchDataRecords(ofTypes: types) { records in
+        let matching = records.filter {
+          let name = $0.displayName.drop(while: { $0 == "." }).lowercased()
+          return DomainScope.contains(scope: args.site, host: name)
+        }
+        store.removeData(ofTypes: types, for: matching) {
+          DispatchQueue.main.async {
+            if !session.blocked { session.view.reload() }
+            invoke.resolve()
+          }
+        }
+      }
+    }
   }
 
   /// Leaving the app floats the playing video of the page in front, when its site is on the list,
@@ -1533,6 +1628,29 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
   }
 
   // MARK: WKNavigationDelegate / WKUIDelegate
+
+  /// Asks for the desktop page, or not, for each main-frame navigation by the site's choice, then
+  /// decides as `decidePolicyFor:decisionHandler:` does. A custom user agent stays what Mobile
+  /// Safari sends (Google refuses a sign-in without a Safari token), or what a Mac sends.
+  func webView(
+    _ webView: WKWebView,
+    decidePolicyFor navigationAction: WKNavigationAction,
+    preferences: WKWebpagePreferences,
+    decisionHandler: @escaping (WKNavigationActionPolicy, WKWebpagePreferences) -> Void
+  ) {
+    if navigationAction.targetFrame?.isMainFrame ?? true,
+      let session = session(of: webView),
+      let host = navigationAction.request.url?.host
+    {
+      let desktop = desktopSites.contains(DomainScope.registrableDomain(of: host))
+      session.desktop = desktop
+      preferences.preferredContentMode = desktop ? .desktop : .recommended
+      webView.customUserAgent = desktop ? desktopUserAgent : safariUserAgent
+    }
+    self.webView(webView, decidePolicyFor: navigationAction) { policy in
+      decisionHandler(policy, preferences)
+    }
+  }
 
   func webView(
     _ webView: WKWebView,

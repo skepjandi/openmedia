@@ -13,6 +13,7 @@ const MAX_RULE_LIST_ID_CHARS: usize = 64;
 pub const MAX_NOTIFICATION_TITLE_CHARS: usize = 40;
 pub const MAX_NOTIFICATION_BODY_CHARS: usize = 120;
 pub const MAX_AUTH_REASON_CHARS: usize = 120;
+pub const MAX_SHARE_TITLE_CHARS: usize = 200;
 
 pub fn parse_web_url(input: &str) -> Result<Url> {
     let url = Url::parse(input).map_err(|e| Error::InvalidUrl(e.to_string()))?;
@@ -91,6 +92,35 @@ pub fn check_auth_reason(reason: &str) -> Result<&str> {
         return Err(Error::InvalidAuthReason(MAX_AUTH_REASON_CHARS));
     }
     Ok(reason)
+}
+
+/// The title offered with a shared address: short and one line, or none.
+pub fn check_share_title(title: Option<&str>) -> Result<Option<&str>> {
+    let Some(title) = title.map(str::trim).filter(|title| !title.is_empty()) else {
+        return Ok(None);
+    };
+    if title.chars().count() > MAX_SHARE_TITLE_CHARS || title.chars().any(char::is_control) {
+        return Err(Error::InvalidShareTitle(MAX_SHARE_TITLE_CHARS));
+    }
+    Ok(Some(title))
+}
+
+/// A registrable domain in lowercase: dot separated labels of letters, digits and hyphens.
+pub fn check_site(site: &str) -> Result<&str> {
+    let labels_ok = site.split('.').all(|label| {
+        !label.is_empty()
+            && label.len() <= 63
+            && !label.starts_with('-')
+            && !label.ends_with('-')
+            && label
+                .bytes()
+                .all(|b| b.is_ascii_lowercase() || b.is_ascii_digit() || b == b'-')
+    });
+    if site.contains('.') && site.len() <= 253 && labels_ok {
+        Ok(site)
+    } else {
+        Err(Error::InvalidSite)
+    }
 }
 
 /// Rule lists come from Rust, never from a page, but the native side reads `path` and hands it to
@@ -303,5 +333,35 @@ mod tests {
         ));
         let edge = format!("\"{}\"", "x".repeat(MAX_EVALUATE_RESULT_BYTES - 2));
         assert!(check_evaluate_result(edge).is_ok());
+    }
+
+    #[test]
+    fn a_share_title_is_optional_short_and_one_line() {
+        assert_eq!(check_share_title(None).unwrap(), None);
+        assert_eq!(check_share_title(Some("  ")).unwrap(), None);
+        assert_eq!(check_share_title(Some(" Page ")).unwrap(), Some("Page"));
+        for bad in ["two\nlines", &"x".repeat(MAX_SHARE_TITLE_CHARS + 1)] {
+            assert!(matches!(
+                check_share_title(Some(bad)),
+                Err(Error::InvalidShareTitle(_))
+            ));
+        }
+    }
+
+    #[test]
+    fn a_site_to_clear_is_a_plain_lowercase_domain() {
+        assert_eq!(check_site("example.co.uk").unwrap(), "example.co.uk");
+        for bad in [
+            "",
+            "example",
+            "Example.com",
+            "a..com",
+            "-a.com",
+            "a.com/",
+            "a.com:80",
+            "é.com",
+        ] {
+            assert!(matches!(check_site(bad), Err(Error::InvalidSite)), "{bad}");
+        }
     }
 }

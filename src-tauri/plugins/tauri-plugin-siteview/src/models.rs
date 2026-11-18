@@ -206,6 +206,30 @@ pub struct SetPictureInPictureRequest {
     pub sites: Vec<String>,
 }
 
+/// The sites whose pages are asked for as a desktop page (a desktop user agent and layout), as
+/// registrable domains. Every other site gets the page made for the device. Rust-only: it is
+/// deliberately not a Tauri command and has no permission, so no webview can call it.
+#[derive(Debug, Clone, Default, Deserialize)]
+pub struct SetDesktopSitesRequest {
+    pub sites: Vec<String>,
+}
+
+/// An address to hand to the system's share sheet. Rust-only: it is deliberately not a Tauri
+/// command and has no permission, so no webview can open the sheet.
+#[derive(Debug, Clone, Deserialize)]
+pub struct ShareRequest {
+    pub url: String,
+    pub title: Option<String>,
+}
+
+/// A site whose cookies, storage and cache are erased from the active page's profile. Rust-only:
+/// it is deliberately not a Tauri command and has no permission, so no webview can erase data.
+#[derive(Debug, Clone, Deserialize)]
+pub struct ClearSiteDataRequest {
+    /// A registrable domain.
+    pub site: String,
+}
+
 /// A script for the active page. Rust-only: not a Tauri command, never reachable from a webview.
 #[derive(Debug, Clone, Deserialize)]
 pub struct EvaluateRequest {

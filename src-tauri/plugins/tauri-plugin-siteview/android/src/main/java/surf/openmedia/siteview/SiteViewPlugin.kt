@@ -26,6 +26,8 @@ import android.webkit.WebChromeClient
 import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
 import android.webkit.WebView
+import android.webkit.ValueCallback
+import android.webkit.WebSettings
 import android.webkit.WebViewClient
 import android.widget.FrameLayout
 import android.widget.TextView
@@ -38,6 +40,9 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.FragmentActivity
+import androidx.activity.ComponentActivity
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import androidx.webkit.ProfileStore
 import androidx.webkit.ScriptHandler
@@ -115,6 +120,8 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
         var scriptHandler: ScriptHandler? = null,
         var adBlockScriptHandler: ScriptHandler? = null,
         var paintHandler: ScriptHandler? = null,
+        /** True while the page is asked for as a desktop page: a desktop user agent and layout. */
+        var desktop: Boolean = false,
     )
 
     /** The layer under the shell that holds the page views and the backdrop behind them. */
@@ -169,6 +176,13 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
 
     /** The sites (registrable domains) whose media keeps playing while hidden or in the background. */
     private var backgroundMediaSites: Set<String> = emptySet()
+
+    /** The sites (registrable domains) whose pages are asked for as a desktop page. */
+    private var desktopSites: Set<String> = emptySet()
+
+    /** The file picker a page asked for with `<input type=file>`, until the person answers it. */
+    private var fileChooserCallback: ValueCallback<Array<Uri>>? = null
+    private var fileChooserLauncher: ActivityResultLauncher<Intent>? = null
 
     /** False from the activity's pause to its resume. */
     private var appForeground = true
@@ -391,6 +405,7 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
             // The site is closed for the day: the page never loads and the shield goes up.
             applyBlocked(true, session)
         } else {
+            applyDesktop(session, session.scope)
             view.loadUrl(url.toString())
         }
         invoke.resolve()
@@ -653,6 +668,143 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
     @Command
     fun setPictureInPicture(invoke: Invoke) {
         invoke.resolve()
+    }
+
+    /**
+     * Names the sites whose pages are asked for as a desktop page. Rust-only: the plugin registers
+     * no command for it, so neither the shell nor a site view can reach it. A page open on a site
+     * whose choice changed reloads (a hidden one when it is shown again).
+     */
+    @Command
+    fun setDesktopSites(invoke: Invoke) {
+        val args = invoke.parseArgs(SetDesktopSitesArgs::class.java)
+        activity.runOnUiThread {
+            desktopSites = args.sites.toSet()
+            for (session in sessions.values) {
+                if (session.desktop != (session.scope in desktopSites)) {
+                    applyDesktop(session, session.scope)
+                    reloadUnder(session)
+                }
+            }
+            invoke.resolve()
+        }
+    }
+
+    /**
+     * What a page is asked for: Chrome's user agent without the phone and WebView tokens, and a
+     * wide layout viewport. Turning it off puts the WebView's own user agent back.
+     */
+    private fun applyDesktop(session: Session, scope: String) {
+        val wanted = scope in desktopSites
+        if (wanted == session.desktop) return
+        session.desktop = wanted
+        val settings = session.view.settings
+        settings.userAgentString =
+            if (wanted) desktopUserAgent(WebSettings.getDefaultUserAgent(activity)) else null
+        settings.useWideViewPort = wanted
+        settings.loadWithOverviewMode = wanted
+    }
+
+    private fun desktopUserAgent(mobile: String): String =
+        mobile
+            .replace(Regex("\\(Linux; Android [^)]*\\)"), "(X11; Linux x86_64)")
+            .replace(" Version/4.0", "")
+            .replace(" Mobile", "")
+
+    /** Opens the system share sheet for an address. Rust-only: no webview can raise it. */
+    @Command
+    fun share(invoke: Invoke) {
+        val args = invoke.parseArgs(ShareArgs::class.java)
+        if (webUrl(args.url) == null) {
+            invoke.reject("only http and https addresses can be shared")
+            return
+        }
+        val send = Intent(Intent.ACTION_SEND).apply {
+            type = "text/plain"
+            putExtra(Intent.EXTRA_TEXT, args.url)
+            args.title?.let { putExtra(Intent.EXTRA_SUBJECT, it) }
+        }
+        activity.runOnUiThread {
+            try {
+                activity.startActivity(Intent.createChooser(send, null))
+                invoke.resolve()
+            } catch (error: Exception) {
+                invoke.reject("the share sheet could not be opened")
+            }
+        }
+    }
+
+    /**
+     * Erases one site's cookies, storage and cache from the active page's profile, then reloads the
+     * page. Rust-only: no webview can call it. Android lists no cookies, so the ones erased are
+     * those the site and its `www` host (and the page's own host) send, with the path `/`.
+     */
+    @Command
+    fun clearSiteData(invoke: Invoke) {
+        val args = invoke.parseArgs(ClearSiteDataArgs::class.java)
+        activity.runOnUiThread {
+            val session = activeSession()
+            val profile = session?.let {
+                runCatching { ProfileStore.getInstance().getProfile(it.profile) }.getOrNull()
+            }
+            if (session == null || profile == null) {
+                invoke.reject("no site view is open")
+                return@runOnUiThread
+            }
+            val pageHost = runCatching { Uri.parse(session.topUrl).host }.getOrNull()
+            val hosts = setOfNotNull(
+                args.site,
+                "www.${args.site}",
+                pageHost?.takeIf { DomainScope.contains(args.site, it) },
+            )
+            val cookies = profile.cookieManager
+            for (host in hosts) {
+                val origin = "https://$host"
+                cookies.getCookie(origin)?.split(";")?.forEach { pair ->
+                    val name = pair.substringBefore("=").trim()
+                    if (name.isEmpty()) return@forEach
+                    cookies.setCookie(origin, "$name=; Max-Age=0; Path=/")
+                    cookies.setCookie(origin, "$name=; Max-Age=0; Path=/; Domain=${args.site}")
+                }
+                profile.webStorage.deleteOrigin(origin)
+                profile.webStorage.deleteOrigin("http://$host")
+            }
+            cookies.flush()
+            session.view.clearCache(true)
+            if (!session.blocked) session.view.reload()
+            invoke.resolve()
+        }
+    }
+
+    /**
+     * Shows the system file picker for a page's `<input type=file>` and hands the answer back.
+     * A newer request cancels the one still waiting. Returns false when this activity cannot host
+     * the picker, which leaves the input doing nothing, as before.
+     */
+    private fun showFileChooser(
+        callback: ValueCallback<Array<Uri>>,
+        params: WebChromeClient.FileChooserParams,
+    ): Boolean {
+        val owner = activity as? ComponentActivity ?: return false
+        fileChooserCallback?.onReceiveValue(null)
+        fileChooserCallback = callback
+        val launcher = fileChooserLauncher ?: owner.activityResultRegistry.register(
+            FILE_CHOOSER_KEY,
+            ActivityResultContracts.StartActivityForResult(),
+        ) { result ->
+            val waiting = fileChooserCallback
+            fileChooserCallback = null
+            waiting?.onReceiveValue(
+                WebChromeClient.FileChooserParams.parseResult(result.resultCode, result.data),
+            )
+        }.also { fileChooserLauncher = it }
+        try {
+            launcher.launch(params.createIntent())
+        } catch (error: Exception) {
+            fileChooserCallback = null
+            callback.onReceiveValue(null)
+        }
+        return true
     }
 
     /**
@@ -1045,6 +1197,16 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
             override fun onHideCustomView() {
                 hideFullScreen()
             }
+
+            override fun onShowFileChooser(
+                webView: WebView,
+                callback: ValueCallback<Array<Uri>>,
+                params: FileChooserParams,
+            ): Boolean {
+                val session = sessionOf(webView) ?: return false
+                if (session.blocked) return false
+                return showFileChooser(callback, params)
+            }
         }
         view.webViewClient = object : WebViewClient() {
             override fun shouldOverrideUrlLoading(
@@ -1073,7 +1235,12 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
                         !blockPopups || DomainScope.looksLikeSignIn(url.host, url.path, url.query),
                     )
                 ) {
-                    DomainScope.Verdict.ALLOW -> false
+                    DomainScope.Verdict.ALLOW -> {
+                        url.host?.takeIf { request.isForMainFrame && it.isNotEmpty() }?.let {
+                            applyDesktop(session, DomainScope.registrableDomain(it))
+                        }
+                        false
+                    }
                     DomainScope.Verdict.CANCEL -> {
                         sendPopupBlocked(url)
                         true
@@ -1766,6 +1933,7 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
 
     companion object {
         private const val BRIDGE_OBJECT = "openmedia"
+        private const val FILE_CHOOSER_KEY = "surf.openmedia.siteview.fileChooser"
 
         /**
          * Pauses what plays and remembers which elements it paused, so only those resume. A script

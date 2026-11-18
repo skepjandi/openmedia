@@ -30,8 +30,8 @@ block2 = "0.6"
 objc2 = "0.6"
 objc2-user-notifications = { version = "0.3", default-features = false, features = ["std", "block2", "UNUserNotificationCenter", "UNNotificationContent", "UNNotificationRequest", "UNNotificationResponse", "UNNotification", "UNNotificationSound", "UNNotificationTrigger", "UNNotificationSettings"] }
 objc2-local-authentication = { version = "0.3", default-features = false, features = ["std", "block2", "LAContext", "LAPublicDefines", "LAError"] }
-objc2-foundation = { version = "0.3", default-features = false, features = ["std", "NSArray", "NSError", "NSBundle", "NSGeometry", "NSString", "NSURL", "NSValue"] }
-objc2-web-kit = { version = "0.3", default-features = false, features = ["std", "block2", "WKWebView", "WKWebViewConfiguration", "WKUserContentController", "WKUserScript", "WKContentRuleList", "WKContentRuleListStore", "objc2-core-foundation"] }
+objc2-foundation = { version = "0.3", default-features = false, features = ["std", "NSArray", "NSError", "NSBundle", "NSGeometry", "NSSet", "NSString", "NSURL", "NSValue", "NSDate"] }
+objc2-web-kit = { version = "0.3", default-features = false, features = ["std", "block2", "WKWebView", "WKWebViewConfiguration", "WKUserContentController", "WKUserScript", "WKContentRuleList", "WKContentRuleListStore", "WKWebsiteDataStore", "WKWebsiteDataRecord", "objc2-core-foundation"] }
 
 # Windows reads page history from WebView2 and asks Windows Hello for the owner check.
 [target.'cfg(windows)'.dependencies]

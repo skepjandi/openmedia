@@ -159,6 +159,8 @@ export interface AppState {
   backgroundMediaSites: string[];
   /** The sites (registrable domains) whose videos may open in a picture-in-picture window. */
   pictureInPictureSites: string[];
+  /** The sites (registrable domains) asked for their desktop page. Off for every other site. */
+  desktopSites: string[];
   backButton: boolean;
   /** The color picker on the floating button's fan. On unless the user turned it off. */
   colorPicker: boolean;
@@ -337,6 +339,25 @@ export const colorPick = {
   cancel: () => command("color_pick_cancel"),
 };
 
+/** Where a search of the page in front stands. `index` counts from 1 and is 0 with no match. */
+export interface FindResult {
+  count: number;
+  index: number;
+  /** The page has more matches than `count` shows. */
+  capped: boolean;
+}
+
+/** Find in page, and the other actions on the page in front that a browser's menu offers. */
+export const pageTools = {
+  find: (query: string) => invoke<FindResult>("find_in_page", { query }),
+  findStep: (forward: boolean) => invoke<FindResult>("find_in_page_step", { forward }),
+  findClear: () => command("find_in_page_clear"),
+  /** Opens the system share sheet (phones and tablets; desktop copies the address instead). */
+  share: (url: string, title: string | null) => command("share_page", { url, title }),
+  /** Erases one site's cookies, storage and cache from the page's profile, then reloads it. */
+  clearSiteData: (site: string) => command("clear_site_data", { site }),
+};
+
 export type DownloadKind = "image" | "video" | "audio" | "document" | "archive" | "other";
 export type DownloadStatus = "queued" | "downloading" | "paused" | "done" | "failed" | "cancelled";
 
@@ -504,6 +525,9 @@ export const library = {
   /** Lets a site's videos open in a picture-in-picture window; off for every site by default. */
   setSitePictureInPicture: (site: string, enabled: boolean) =>
     command("set_site_picture_in_picture", { site, enabled }),
+  /** Asks a site for its desktop page; off for every site by default. */
+  setSiteDesktop: (site: string, enabled: boolean) =>
+    command("set_site_desktop", { site, enabled }),
   /** Saves one site's video controls choice; an empty choice returns the site to the shared one. */
   setSiteVideoControls: (site: string, video: SiteVideo) =>
     command("set_site_video_controls", { site, video }),

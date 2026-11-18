@@ -164,6 +164,8 @@ pub struct AppState {
     pub background_media_sites: Vec<String>,
     /// The sites whose videos may open in a picture-in-picture window.
     pub picture_in_picture_sites: Vec<String>,
+    /// The sites whose pages are asked for as a desktop page.
+    pub desktop_sites: Vec<String>,
     pub back_button: bool,
     /// Whether the floating button fans out the color picker. Off by default.
     pub color_picker: bool,
@@ -229,6 +231,10 @@ struct LibraryData {
     /// other site.
     #[serde(default)]
     picture_in_picture_sites: BTreeSet<String>,
+    /// The sites (registrable domains) asked for as a desktop page: a desktop user agent and
+    /// layout. Off for every other site.
+    #[serde(default)]
+    desktop_sites: BTreeSet<String>,
     /// Off by default; the shell can show a floating back button over the page.
     #[serde(default)]
     back_button: bool,
@@ -334,6 +340,7 @@ impl Library {
             bottom_margin: data.bottom_margin,
             background_media_sites: data.background_media_sites.iter().cloned().collect(),
             picture_in_picture_sites: data.picture_in_picture_sites.iter().cloned().collect(),
+            desktop_sites: data.desktop_sites.iter().cloned().collect(),
             back_button: data.back_button,
             color_picker: data.color_picker,
             tech_detector: data.tech_detector,
@@ -588,6 +595,23 @@ impl Library {
         }
         self.save(&data)?;
         Ok(data.picture_in_picture_sites.iter().cloned().collect())
+    }
+
+    pub fn desktop_sites(&self) -> Result<Vec<String>> {
+        Ok(self.lock()?.desktop_sites.iter().cloned().collect())
+    }
+
+    /// Asks a site for its desktop page, or stops. Returns the whole list.
+    pub fn set_desktop_site(&self, site: &str, enabled: bool) -> Result<Vec<String>> {
+        let site = checked_site(site)?;
+        let mut data = self.lock()?;
+        if enabled {
+            data.desktop_sites.insert(site);
+        } else {
+            data.desktop_sites.remove(&site);
+        }
+        self.save(&data)?;
+        Ok(data.desktop_sites.iter().cloned().collect())
     }
 
     pub fn set_back_button(&self, enabled: bool) -> Result<()> {
@@ -999,6 +1023,7 @@ fn default_data() -> LibraryData {
         site_bottom_margins: BTreeMap::new(),
         background_media_sites: BTreeSet::new(),
         picture_in_picture_sites: BTreeSet::new(),
+        desktop_sites: BTreeSet::new(),
         back_button: false,
         color_picker: false,
         tech_detector: false,

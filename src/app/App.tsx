@@ -3,6 +3,7 @@ import { AssistantDock } from "../features/ai/AssistantDock";
 import { ChatsSheet } from "../features/ai/ChatsSheet";
 import { TechPanel } from "../features/techdetect/TechPanel";
 import { ColorPickBar } from "../features/colorpick/ColorPickBar";
+import { FindBar } from "../features/find/FindBar";
 import { BackButton } from "../features/back/BackButton";
 import { Fab } from "../features/fab/Fab";
 import { CommandBar } from "../features/sheet/CommandBar";
@@ -172,6 +173,7 @@ export function App() {
       <Fab />
       <BackButton />
       <ColorPickBar />
+      <FindBar />
       <TechPanel />
       <DownloadToast />
       <CommandBar />

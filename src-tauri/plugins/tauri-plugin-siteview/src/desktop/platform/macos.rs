@@ -2,7 +2,7 @@
 //! `WKWebView` itself. Every call hops to the main thread and waits for the answer, so none may
 //! run on it.
 
-use std::{path::Path, process::Command, sync::mpsc, time::Duration};
+use std::{path::Path, process::Command, ptr::NonNull, sync::mpsc, time::Duration};
 
 use block2::RcBlock;
 use objc2::{MainThreadMarker, MainThreadOnly, msg_send, rc::Retained, runtime::Bool};
@@ -10,7 +10,7 @@ use objc2_foundation::{NSArray, NSEdgeInsets, NSError, NSString};
 use objc2_local_authentication::{LAContext, LAPolicy};
 use objc2_web_kit::{
     WKContentRuleList, WKContentRuleListStore, WKUserContentController, WKUserScript,
-    WKUserScriptInjectionTime, WKWebView,
+    WKUserScriptInjectionTime, WKWebView, WKWebsiteDataRecord, WKWebsiteDataStore,
 };
 use tauri::{AppHandle, Runtime, Webview, webview::WebviewBuilder};
 use url::Url;
@@ -24,6 +24,8 @@ mod shell;
 
 /// How long to wait for the main thread. It only has to answer between two events.
 const MAIN_THREAD_WAIT: Duration = Duration::from_secs(3);
+/// How long to wait for the data store to finish erasing a site.
+const CLEAR_DATA_WAIT: Duration = Duration::from_secs(15);
 
 /// A `WKWebView` reports no `Safari` token, which Google reads as an embedded browser and refuses
 /// to sign in from. This is what Safari on macOS sends (it freezes the OS version in the string).
@@ -344,5 +346,68 @@ pub fn authenticate<R: Runtime>(_app: &AppHandle<R>, reason: &str) -> Result<boo
         receiver
             .recv_timeout(AUTHENTICATION_WAIT)
             .map_err(|_| Error::PageTimeout)
+    }
+}
+
+/// Whether a data record's name (a host, sometimes with a leading dot) belongs to `site`.
+fn record_belongs_to(name: &str, site: &str) -> bool {
+    let name = name.trim_start_matches('.').to_ascii_lowercase();
+    name == site || name.ends_with(&format!(".{site}"))
+}
+
+/// Erases `site`'s cookies, local storage, caches and every other kind of website data from the
+/// data store the session's web view uses, which is the session's profile only.
+pub fn clear_site_data<R: Runtime>(webview: &Webview<R>, site: &str) -> Result<()> {
+    let (done, finished) = mpsc::channel();
+    let site = site.to_owned();
+    with_view(webview, move |view| {
+        let Some(main) = MainThreadMarker::new() else {
+            let _ = done.send(());
+            return;
+        };
+        // SAFETY: WebKit calls on the main thread; the blocks run there too and own what they use.
+        unsafe {
+            let store = view.configuration().websiteDataStore();
+            let types = WKWebsiteDataStore::allWebsiteDataTypes(main);
+            let removing_store = store.clone();
+            let removing_types = types.clone();
+            let fetched = RcBlock::new(move |records: NonNull<NSArray<WKWebsiteDataRecord>>| {
+                let matching: Vec<Retained<WKWebsiteDataRecord>> = records
+                    .as_ref()
+                    .iter()
+                    .filter(|record| record_belongs_to(&record.displayName().to_string(), &site))
+                    .collect();
+                if matching.is_empty() {
+                    let _ = done.send(());
+                    return;
+                }
+                let finished = done.clone();
+                removing_store.removeDataOfTypes_forDataRecords_completionHandler(
+                    &removing_types,
+                    &NSArray::from_retained_slice(&matching),
+                    &RcBlock::new(move || {
+                        let _ = finished.send(());
+                    }),
+                );
+            });
+            store.fetchDataRecordsOfTypes_completionHandler(&types, &fetched);
+        }
+    })?;
+    finished
+        .recv_timeout(CLEAR_DATA_WAIT)
+        .map_err(|_| Error::PageTimeout)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn a_data_record_belongs_to_its_site_and_its_subdomains() {
+        assert!(record_belongs_to("example.com", "example.com"));
+        assert!(record_belongs_to(".example.com", "example.com"));
+        assert!(record_belongs_to("www.Example.com", "example.com"));
+        assert!(!record_belongs_to("badexample.com", "example.com"));
+        assert!(!record_belongs_to("example.com.evil.org", "example.com"));
     }
 }

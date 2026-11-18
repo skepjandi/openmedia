@@ -1,3 +1,4 @@
+import { PageTools } from "./PageTools";
 import { canStepBack } from "../web/sessions";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { selectPage, selectQuickFavorites, useApp } from "../../app/store";
@@ -392,6 +393,8 @@ export function CommandBar() {
             </p>
           </>
         )}
+
+        <PageTools onDone={closeSheet} />
 
         <div className="mt-2 flex items-center justify-between border-t border-hair pt-2">
           <div className="flex">

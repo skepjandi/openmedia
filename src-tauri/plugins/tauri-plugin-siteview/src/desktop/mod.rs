@@ -48,8 +48,8 @@ use crate::events::{NOTIFICATION_TAP_EVENT, POPUP_BLOCKED_EVENT, STATE_EVENT};
 use crate::models::*;
 use crate::site::site_of_host;
 use crate::validate::{
-    check_auth_reason, check_evaluate_result, parse_profile_id, parse_session_id, parse_web_url,
-    wrap_evaluate_script,
+    check_auth_reason, check_evaluate_result, check_site, parse_profile_id, parse_session_id,
+    parse_web_url, wrap_evaluate_script,
 };
 use crate::{Error, Result};
 
@@ -1057,6 +1057,27 @@ impl<R: Runtime> Siteview<R> {
     /// is accepted and not acted on.
     pub fn set_picture_in_picture(&self, _request: SetPictureInPictureRequest) -> Result<()> {
         Ok(())
+    }
+
+    /// Desktop system web views already send a desktop user agent and lay pages out at desktop
+    /// width, so the list is accepted and not acted on.
+    pub fn set_desktop_sites(&self, _request: SetDesktopSitesRequest) -> Result<()> {
+        Ok(())
+    }
+
+    /// No desktop system has a share sheet in this build: the shell copies the address instead.
+    pub fn share(&self, _request: ShareRequest) -> Result<()> {
+        Err(Error::DesktopUnsupported("sharing"))
+    }
+
+    /// Erases one site's cookies, storage and cache from the active page's data store, then
+    /// reloads the page. Rust-only: no webview can call it. Where the system web view cannot
+    /// erase one site (Windows and Linux), it is an error and nothing is erased.
+    pub fn clear_site_data(&self, request: ClearSiteDataRequest) -> Result<()> {
+        let site = check_site(&request.site)?;
+        let webview = self.inner.active_webview()?;
+        platform::clear_site_data(&webview, site)?;
+        Ok(webview.reload()?)
     }
 
     /// The system's owner check (Touch ID or the account password on a Mac, Windows Hello on

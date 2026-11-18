@@ -223,3 +223,33 @@ export const FingerprintIcon = ({ size }: { size?: number }) => (
     <path d="M21.8 16c.2-2 .131-5.354 0-6" />
   </Icon>
 );
+
+export const SearchIcon = () => (
+  <Icon>
+    <circle cx="11" cy="11" r="6" />
+    <path d="M20 20l-4.2-4.2" />
+  </Icon>
+);
+
+export const ShareIcon = () => (
+  <Icon>
+    <path d="M12 15V4" />
+    <path d="M8 8l4-4 4 4" />
+    <path d="M6 12H5a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-6a1 1 0 0 0-1-1h-1" />
+  </Icon>
+);
+
+export const DesktopIcon = ({ on = false }: { on?: boolean }) => (
+  <Icon>
+    <rect x="3" y="4" width="18" height="12" rx="2" fill={on ? "currentColor" : "none"} />
+    <path d="M9 20h6M12 16v4" />
+  </Icon>
+);
+
+export const TrashIcon = () => (
+  <Icon>
+    <path d="M4 7h16" />
+    <path d="M9 7V4h6v3" />
+    <path d="M6 7l1 13h10l1-13" />
+  </Icon>
+);

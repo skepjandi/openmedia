@@ -302,6 +302,10 @@ Tracked in [Roadmap](./roadmap.md#phase-0--feasibility-spikes). Each needs a rec
 | V6 | Secret-store options on iOS/Android meet the invariants | S6 |
 | V7 | Does Instagram web log in and function in each embedded webview (2FA, passkeys)? | S1, S3, S4 |
 
+## Page tools (share, desktop site, clear data, file upload)
+
+The plugin gained Rust-only methods `setDesktopSites`, `share` and `clearSiteData` (no Tauri command, no permission: a site webview cannot reach them; each argument is validated in `validate.rs` before it reaches native code). iOS: `decidePolicyFor:preferences:` now wraps the older policy method, so the desktop choice is made per main-frame navigation and the existing sign-in and popup rules run unchanged. Android: `onShowFileChooser` launches `params.createIntent()` through `ComponentActivity.activityResultRegistry` and hands `parseResult` back; a newer request cancels the waiting one; sign-in popup windows keep no picker. See [UI Design](./ui-design.md#page-tools).
+
 ## See Also
 
 [Architecture](./architecture.md) · [Site Runtime](./site-runtime.md) · [Security](./security.md) · [Roadmap](./roadmap.md)

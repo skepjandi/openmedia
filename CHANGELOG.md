@@ -14,6 +14,14 @@ All notable changes to OpenMedia are documented here.
 
 **Verified:** `cargo check` for the plugin and the app crate on `x86_64-pc-windows-gnu`, the plugin on Linux in a container, unit tests for the page-fitting helper, Vitest for the storeless-desktop entitlement. **Not verified:** a page opened, a profile kept apart, Windows Hello, PolicyKit, the installers or the self-update on any Windows or Linux machine; network request blocking and notifications are not wired there (`docs/wiki/platform-support.md`).
 
+### feat(shell): find in page, share, desktop site, clear site data, and file upload on Android
+
+**Area:** `feat(shell)`, `feat(siteview)`
+
+**Change:** A Page tools row in the address bar sheet. *Find* searches the page's visible text and steps through matches (`find_in_page.js` through the Rust-only `evaluate`; highlights through the CSS Custom Highlight API, no change to the page's markup). *Share* opens the system share sheet on iOS and Android (Rust-only plugin method `share`); the Mac copies the address. *Desktop site* asks a site for its desktop page, saved per site in `library.json` (`desktopSites`) and applied by the plugin on iOS (`preferredContentMode` and a Mac Safari user agent) and Android (user agent, wide viewport). *Clear data* erases one site's cookies, storage and cache from the page's profile and reloads (Rust-only plugin method `clearSiteData`; Android erases the cookies it can name, see `ui-design.md`). Android now answers `<input type=file>` with the system picker (`onShowFileChooser` through the activity result registry; new `androidx.activity` dependency). 14 new strings in all 29 languages (machine-written, unreviewed).
+
+**Verified:** Rust tests for the find script's query and answer handling, the new library list and the plugin's share and site checks; Vitest for the find store and the desktop-site store action; the find script itself run against a local page in WebKit (word split by markup matches, hidden, script and cross-cell text do not, stepping wraps, clearing removes highlights, selection and style); `ts:check`, lint, `format:check`, `clippy -D warnings`; the iOS plugin builds for the simulator and the Android plugin compiles (`compileDebugKotlin`). **Not verified:** any of it on a device or simulator: the share sheets, desktop pages on real sites (three unrelated sites per invariant 9 not run), clearing data on iOS, macOS and Android, and the Android file picker. Windows and Linux have no site view.
+
 ### fix(video): switching the controls off took a refresh to reach an embedded player
 
 **Area:** `fix(video)`

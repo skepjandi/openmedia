@@ -3,10 +3,11 @@ use std::collections::BTreeMap;
 use serde::{Deserialize, Serialize};
 use tauri::{AppHandle, Emitter, Manager, State, ipc::Channel};
 use tauri_plugin_siteview::{
-    ColorScheme, ContentRuleList, EvaluateRequest, FetchFaviconRequest, OpenRequest, Rect,
-    SampleColorRequest, SessionRequest, SetBackgroundMediaRequest, SetColorSchemeRequest,
-    SetContentRuleListsRequest, SetDocumentStartScriptRequest, SetPictureInPictureRequest,
-    SetRectRequest, SiteviewExt,
+    ClearSiteDataRequest, ColorScheme, ContentRuleList, EvaluateRequest, FetchFaviconRequest,
+    OpenRequest, Rect, SampleColorRequest, SessionRequest, SetBackgroundMediaRequest,
+    SetColorSchemeRequest, SetContentRuleListsRequest, SetDesktopSitesRequest,
+    SetDocumentStartScriptRequest, SetPictureInPictureRequest, SetRectRequest, ShareRequest,
+    SiteviewExt,
     validate::{parse_session_id, parse_web_url},
 };
 use url::Url;
@@ -34,6 +35,7 @@ use crate::color_pick;
 use crate::dark_mode::{DarkMode, SiteDark};
 use crate::entitlement::Entitlement;
 use crate::error::{Error, Result};
+use crate::find_in_page;
 use crate::incognito::Incognito;
 use crate::library::{
     Favorite, FavoriteInput, Library, Mode, SearchEngine, Theme, favorites_need_pro,
@@ -600,6 +602,79 @@ fn read_color_pick(app: &AppHandle, script: &str) -> Result<color_pick::Reading>
 #[tauri::command]
 pub async fn color_pick_cancel(app: AppHandle) -> Result<()> {
     LivePage(&app).evaluate(color_pick::CANCEL_SCRIPT.to_owned())?;
+    Ok(())
+}
+
+/// Searches the page in front for `query` and selects the first match. An empty query takes the
+/// search down. The script is fixed and the query travels as a JSON string. Async, like every
+/// command that evaluates in the page.
+#[tauri::command]
+pub async fn find_in_page(app: AppHandle, query: String) -> Result<find_in_page::FindResult> {
+    run_find(&app, find_in_page::Operation::Search, &query)
+}
+
+/// Moves to the next or previous match of the search in progress.
+#[tauri::command]
+pub async fn find_in_page_step(app: AppHandle, forward: bool) -> Result<find_in_page::FindResult> {
+    let operation = if forward {
+        find_in_page::Operation::Next
+    } else {
+        find_in_page::Operation::Previous
+    };
+    run_find(&app, operation, "")
+}
+
+/// Takes the highlights and the selection of the search down.
+#[tauri::command]
+pub async fn find_in_page_clear(app: AppHandle) -> Result<()> {
+    run_find(&app, find_in_page::Operation::Clear, "")?;
+    Ok(())
+}
+
+fn run_find(
+    app: &AppHandle,
+    operation: find_in_page::Operation,
+    query: &str,
+) -> Result<find_in_page::FindResult> {
+    let script = find_in_page::script(operation, query)?;
+    Ok(find_in_page::parse_result(&LivePage(app).evaluate(script)?))
+}
+
+/// Asks a site for its desktop page, or stops. `site` is a registrable domain. Pages already open
+/// on that site reload. Async for the reason given at `set_site_background_media`.
+#[tauri::command]
+pub async fn set_site_desktop(
+    app: AppHandle,
+    library: State<'_, Library>,
+    site: String,
+    enabled: bool,
+) -> Result<()> {
+    let sites = library.set_desktop_site(&site, enabled)?;
+    push_desktop_sites(&app, sites)
+}
+
+/// Tells the site views which sites are asked for a desktop page; the rest get the device's.
+pub(crate) fn push_desktop_sites(app: &AppHandle, sites: Vec<String>) -> Result<()> {
+    app.siteview()
+        .set_desktop_sites(SetDesktopSitesRequest { sites })?;
+    Ok(())
+}
+
+/// Opens the system's share sheet for the address of the page in front. Phones and tablets only:
+/// the Mac and desktop builds have no sheet, and the shell copies the address there.
+#[tauri::command]
+pub async fn share_page(app: AppHandle, url: String, title: Option<String>) -> Result<()> {
+    app.siteview().share(ShareRequest { url, title })?;
+    Ok(())
+}
+
+/// Erases one site's cookies, storage and cache from the profile of the page in front, then
+/// reloads it: the person is signed out of that site and nothing else. `site` is a registrable
+/// domain. Async for the reason given at `set_site_background_media`.
+#[tauri::command]
+pub async fn clear_site_data(app: AppHandle, site: String) -> Result<()> {
+    app.siteview()
+        .clear_site_data(ClearSiteDataRequest { site })?;
     Ok(())
 }
 

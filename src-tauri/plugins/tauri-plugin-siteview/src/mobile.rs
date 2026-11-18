@@ -11,8 +11,8 @@ use crate::events::{
 };
 use crate::models::*;
 use crate::validate::{
-    check_auth_reason, check_evaluate_result, is_color_hex, parse_bridge_body, parse_session_id,
-    wrap_evaluate_script,
+    check_auth_reason, check_evaluate_result, check_share_title, check_site, is_color_hex,
+    parse_bridge_body, parse_session_id, parse_web_url, wrap_evaluate_script,
 };
 use crate::{Error, Result};
 
@@ -207,6 +207,33 @@ impl<R: Runtime> Siteview<R> {
             "setPictureInPicture",
             serde_json::json!({ "sites": request.sites }),
         )
+    }
+
+    /// Names the sites whose pages are asked for as a desktop page. Rust-only: the plugin
+    /// registers no command for it, so neither the shell nor a site view can reach it. Pages
+    /// already open reload when their site's choice changed.
+    pub fn set_desktop_sites(&self, request: SetDesktopSitesRequest) -> Result<()> {
+        self.run(
+            "setDesktopSites",
+            serde_json::json!({ "sites": request.sites }),
+        )
+    }
+
+    /// Opens the system's share sheet for an address. Rust-only: no webview can raise it.
+    pub fn share(&self, request: ShareRequest) -> Result<()> {
+        parse_web_url(&request.url)?;
+        let title = check_share_title(request.title.as_deref())?;
+        self.run(
+            "share",
+            serde_json::json!({ "url": request.url, "title": title }),
+        )
+    }
+
+    /// Erases one site's cookies, storage and cache from the active page's profile, then reloads
+    /// the page. Rust-only: no webview can call it.
+    pub fn clear_site_data(&self, request: ClearSiteDataRequest) -> Result<()> {
+        let site = check_site(&request.site)?;
+        self.run("clearSiteData", serde_json::json!({ "site": site }))
     }
 
     /// Asks the device owner for Face ID, Touch ID or the device passcode and says whether they

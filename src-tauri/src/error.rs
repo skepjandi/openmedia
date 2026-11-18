@@ -14,6 +14,8 @@ pub enum Error {
     InvalidLanding,
     #[error("no such site to favorite")]
     UnknownSite,
+    #[error("search text must be at most {0} characters on one line")]
+    Find(usize),
     #[error("the bottom margin can be at most {0} pixels")]
     InvalidMargin(u32),
     #[error("invalid dark mode choice: {0}")]

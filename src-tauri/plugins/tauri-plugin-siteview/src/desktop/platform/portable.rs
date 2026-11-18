@@ -12,7 +12,12 @@ use url::Url;
 use uuid::Uuid;
 
 use super::{PageSnapshot, Track, history, zoomed};
-use crate::{ContentRuleList, Rect, Result, ZoomAction};
+use crate::{ContentRuleList, Error, Rect, Result, ZoomAction};
+
+/// The system web view can erase a whole profile, not one site, so nothing is erased here.
+pub fn clear_site_data<R: Runtime>(_webview: &Webview<R>, _site: &str) -> Result<()> {
+    Err(Error::DesktopUnsupported("clearing one site's data"))
+}
 
 /// The system web view's own user agent is one sites already accept for sign-in.
 pub const USER_AGENT: Option<&str> = None;

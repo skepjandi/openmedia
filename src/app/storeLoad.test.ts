@@ -23,6 +23,7 @@ const startup = {
   bottomMargin: 0,
   backgroundMediaSites: [],
   pictureInPictureSites: [],
+  desktopSites: [],
   backButton: true,
   colorPicker: true,
   techDetector: true,

@@ -10,6 +10,7 @@ mod desktop_menu;
 mod downloads;
 mod entitlement;
 pub mod error;
+mod find_in_page;
 mod incognito;
 mod library;
 mod link_clean;
@@ -53,6 +54,7 @@ pub fn run() {
             let ad_block_enabled = library.ad_block_enabled()?;
             let background_media = library.background_media_sites()?;
             let picture_in_picture = library.picture_in_picture_sites()?;
+            let desktop_sites = library.desktop_sites()?;
             app.manage(library);
             // Off the setup thread: on iOS the plugin answers from the main thread, which is the
             // thread running this closure, so asking from here would wait for itself.
@@ -62,6 +64,8 @@ pub fn run() {
                 let _ = commands::push_background_media(&handle, background_media);
                 // Likewise: a failure leaves picture-in-picture off everywhere.
                 let _ = commands::push_picture_in_picture(&handle, picture_in_picture);
+                // Likewise: a failure leaves every site with the device's own page.
+                let _ = commands::push_desktop_sites(&handle, desktop_sites);
             });
             app.manage(incognito::Incognito::default());
             let emitter = app.handle().clone();
@@ -182,6 +186,12 @@ pub fn run() {
             commands::bottom_margin_for,
             commands::set_site_background_media,
             commands::set_site_picture_in_picture,
+            commands::set_site_desktop,
+            commands::find_in_page,
+            commands::find_in_page_step,
+            commands::find_in_page_clear,
+            commands::share_page,
+            commands::clear_site_data,
             commands::set_back_button,
             commands::set_color_picker,
             commands::color_pick_start,

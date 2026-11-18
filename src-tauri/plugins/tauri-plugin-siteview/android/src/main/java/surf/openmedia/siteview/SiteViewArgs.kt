@@ -125,3 +125,19 @@ class SecretArgs {
     var id: String = ""
     var value: String? = null
 }
+
+@InvokeArg
+class SetDesktopSitesArgs {
+    var sites: List<String> = emptyList()
+}
+
+@InvokeArg
+class ShareArgs {
+    var url: String = ""
+    var title: String? = null
+}
+
+@InvokeArg
+class ClearSiteDataArgs {
+    var site: String = ""
+}
