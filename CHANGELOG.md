@@ -6,6 +6,14 @@ All notable changes to OpenMedia are documented here.
 >
 > **Wiki**: the [GitHub Wiki](https://github.com/skepjandi/openmedia/wiki) is the public-facing main wiki — architecture, recipe format, AI pipeline, security model, roadmap. Source-controlled editing surface is `docs/wiki/` in this repo; CI (`.github/workflows/sync-wiki.yml`) mirrors it to the GitHub Wiki on every merge to `main`. New single-PR changes belong here, not as new wiki pages.
 
+### fix(video): no volume bar where a video's volume cannot be set (iOS)
+
+**Area:** `fix(video)`, `fix(siteview)`
+
+**Change:** On iOS the bar moved the device volume through a hidden `MPVolumeView` and snapped back when that did not take. A page cannot set a video's volume on iOS (it reads as always 1), so the panel now shows only the mute button there. The bar shows only where it can work: Android (device media volume) and desktop (the video's own volume), found by setting a volume on a detached `<video>` and reading it back. The iOS `openmediaVolume` handler and `MPVolumeView` are removed.
+
+**Verified:** Vitest for the bar hidden where the volume is locked and shown otherwise. **Not verified:** a physical iPhone, and the iOS plugin build.
+
 ### feat(settings): specific dark mode and video controls are their own pages, as extensive as general
 
 **Area:** `feat(settings)`, `feat(dark-mode)`, `feat(video)`

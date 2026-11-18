@@ -298,6 +298,8 @@ function load(options: {
   feed?: boolean;
   /** The page's og:type, if it has one. */
   ogType?: string;
+  /** Videos that ignore a set volume, as on iOS. */
+  volumeLocked?: boolean;
   pathname?: string;
   /** True when the script runs inside a frame of the page, as another site's player does. */
   frame?: boolean;
@@ -328,7 +330,10 @@ function load(options: {
     body,
     documentElement: body,
     getElementById: () => null,
-    createElement: () => new FakeElement(),
+    createElement: (tag?: string) =>
+      tag === "video" && options.volumeLocked
+        ? Object.defineProperty({}, "volume", { get: () => 1, set: () => {} })
+        : new FakeElement(),
     createElementNS: () => new FakeElement(),
     createComment: () => new FakeElement(),
     querySelector: () =>
@@ -2005,35 +2010,15 @@ describe("video controls", () => {
     bar?.fire("pointerup");
   });
 
-  it("moves the device's volume, not the video's, where the app answers for it, and unmutes", async () => {
-    const asked: string[] = [];
+  it("shows no volume bar, only the mute button, where a video's volume cannot be set", () => {
     const video = new FakeVideo();
-    video.muted = true;
-    const page = load({
-      videos: [video],
-      current: video,
-      win: {
-        webkit: {
-          messageHandlers: {
-            openmediaMini: { postMessage: () => {} },
-            openmediaVolume: {
-              postMessage: (text: string) => {
-                asked.push(text);
-                return Promise.resolve("0.4");
-              },
-            },
-          },
-        },
-      },
-    });
-    openPanel(page);
-    const bar = sliders(page)[0];
-    bar?.fire("pointerdown", { clientX: 300 });
-    expect(asked).toContain("set:0.750");
-    expect(video.muted).toBe(false);
-    expect(video.volume).toBe(1);
-    bar?.fire("pointerup");
-    await Promise.resolve();
+    const locked = load({ videos: [video], current: video, volumeLocked: true });
+    openPanel(locked);
+    expect(sliders(locked)[0]?.style.display).toBe("none");
+
+    const free = load({ videos: [video], current: video });
+    openPanel(free);
+    expect(sliders(free)[0]?.style.display).toBe("flex");
   });
 
   it("goes to the next speed up when the video runs at one the list does not have", () => {

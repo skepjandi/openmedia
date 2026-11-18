@@ -162,18 +162,17 @@
     var mutedAtDown = null;
     var panelSound = null; // what the reader last chose with the panel's mute button, until the page closes
 
-    // The device's media volume, for phones: iOS gives a page no way to set a video's own volume
-    // (it is read-only there), and a site's player resets it where it can be set. The app answers
-    // for the device: a message handler on iOS, a message port on Android. Without either (a
-    // desktop), the video's own volume is used.
+    // The volume bar: on Android the device's media volume (a site's player resets the volume of
+    // its own video there, so the app answers for the device through a message port); elsewhere
+    // the video's own volume. Where a page cannot set a video's volume (iOS reads it as always 1)
+    // there is no bar, only the mute button.
     var volumeBridge = null;
     var deviceVolume = null; // 0 to 1 as last heard from the device
     var volumeAskedAt = 0;
     var volumeSetAt = 0;
+    var volumeSettable = null; // whether a video's own volume takes a value here, once probed
     try {
-      if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.openmediaVolume) {
-        volumeBridge = 'ios';
-      } else if (window.openmediaVolume && typeof window.openmediaVolume.postMessage === 'function') {
+      if (window.openmediaVolume && typeof window.openmediaVolume.postMessage === 'function') {
         volumeBridge = 'android';
         window.openmediaVolume.onmessage = function (event) { heardVolume(event.data); };
       }
@@ -186,13 +185,7 @@
     }
 
     function askDevice(text) {
-      try {
-        if (volumeBridge === 'ios') {
-          window.webkit.messageHandlers.openmediaVolume.postMessage(text).then(heardVolume, function () {});
-        } else {
-          window.openmediaVolume.postMessage(text);
-        }
-      } catch (_) {}
+      try { window.openmediaVolume.postMessage(text); } catch (_) {}
     }
 
     /** Asks the device for its volume, at most twice a second. */
@@ -201,6 +194,21 @@
       if (now - volumeAskedAt < 500) return;
       volumeAskedAt = now;
       askDevice('get');
+    }
+
+    /** Whether the bar can work: the device's volume on Android, else a video that takes a volume. */
+    function volumeControllable() {
+      if (volumeBridge) return true;
+      if (volumeSettable === null) {
+        try {
+          var probe = document.createElement('video');
+          probe.volume = 0.5;
+          volumeSettable = probe.volume === 0.5;
+        } catch (_) {
+          volumeSettable = false;
+        }
+      }
+      return volumeSettable;
     }
 
     /** What the volume control shows: the device's, or the video's (0 while it is muted). */
@@ -1323,8 +1331,8 @@
         if (!target.muted && shownVolume(target) === 0) setVolume(target, 1);
         panelSound = { muted: target.muted, volume: target.volume };
       });
-      // The volume of the device on a phone, where a page cannot set a video's own; the video's
-      // own volume elsewhere. Dragging it up unmutes the video.
+      // The volume of the device on Android, where a site's player resets its own; the video's own
+      // volume elsewhere, and no bar where that cannot be set. Dragging it up unmutes the video.
       var volume = slider(30, function (ratio) {
         var target = focus();
         if (!target) return;
@@ -1426,6 +1434,7 @@
       ui.pill.textContent = (Math.round(rate * 100) / 100) + '\u00d7';
       setIcon(ui.toggle, video.paused ? 'play' : 'pause');
       setIcon(ui.mute, video.muted || shownVolume(video) === 0 ? 'muted' : 'sound');
+      ui.volume.track.style.display = volumeControllable() ? 'flex' : 'none';
       if (!dragging) ui.volume.set(shownVolume(video));
       if (volumeBridge) readVolume();
       var texts = textTracksOf(video);

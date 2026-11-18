@@ -1,6 +1,5 @@
 import AVFoundation
 import LocalAuthentication
-import MediaPlayer
 import SafariServices
 import SwiftRs
 import Tauri
@@ -22,8 +21,6 @@ private let scrollHandlerName = "openmediaScroll"
 private let playHandlerName = "openmediaPlay"
 /// The page says whether its small player is up (true) or gone (false).
 private let miniHandlerName = "openmediaMini"
-/// The page's volume control, which asks for and sets the device's media volume.
-private let volumeHandlerName = "openmediaVolume"
 private let playFeedVideoScript =
   "(function(){var play=document[Symbol.for('openmedia.feedPlayNow')];if(typeof play==='function')play()})()"
 /// The same flag the Android and macOS pause scripts set, which the feed player reads.
@@ -437,25 +434,6 @@ private final class WeakMiniHandler: NSObject, WKScriptMessageHandler {
   }
 }
 
-private final class WeakVolumeHandler: NSObject, WKScriptMessageHandlerWithReply {
-  weak var target: SiteViewPlugin?
-
-  init(_ target: SiteViewPlugin) {
-    self.target = target
-  }
-
-  func userContentController(
-    _ controller: WKUserContentController, didReceive message: WKScriptMessage,
-    replyHandler: @escaping (Any?, String?) -> Void
-  ) {
-    guard let request = message.body as? String, let target else {
-      replyHandler(nil, "no volume")
-      return
-    }
-    replyHandler(target.handleVolume(request), nil)
-  }
-}
-
 private final class WeakPlayHandler: NSObject, WKScriptMessageHandler {
   weak var target: SiteViewPlugin?
 
@@ -611,8 +589,6 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
   private var watchingWindows = false
   /// True while the shell covers the page in front with a page of its own (a new tab).
   private var covered = false
-  /// The hidden system volume view that moves the device's volume.
-  private var volumeView: MPVolumeView?
   /// Pages that were left for another while their video played: the page stays alive, hidden, so
   /// its picture-in-picture window keeps playing, until the window is closed or the page in front
   /// plays a video of its own.
@@ -1359,50 +1335,6 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
 
   func setMiniUp(_ view: WKWebView, _ up: Bool) {
     session(of: view)?.miniUp = up
-  }
-
-  /// The page's volume control: `get` answers the device's media volume, `set:<0 to 1>` sets it and
-  /// answers what it set. A page cannot set a video's volume on iOS, so the control is the device's,
-  /// as the volume buttons are. The answer is a number as text.
-  func handleVolume(_ request: String) -> String {
-    if request.hasPrefix("set:"), let wanted = Float(request.dropFirst(4)) {
-      let level = min(1, max(0, wanted))
-      setDeviceVolume(level)
-      return String(level)
-    }
-    return String(AVAudioSession.sharedInstance().outputVolume)
-  }
-
-  /// The system's volume slider, which a hidden `MPVolumeView` carries, is the only way to move
-  /// the device's volume from an app.
-  private func setDeviceVolume(_ level: Float) {
-    if volumeView == nil, let host = shell?.superview {
-      let view = MPVolumeView(frame: CGRect(x: -100, y: -100, width: 1, height: 1))
-      view.alpha = 0.01
-      view.isUserInteractionEnabled = false
-      host.addSubview(view)
-      volumeView = view
-    }
-    guard let view = volumeView else { return }
-    view.layoutIfNeeded()
-    if let slider = volumeSlider(in: view) {
-      slider.value = level
-      return
-    }
-    // The view builds its slider a moment after it is added, and deeper than its own children on
-    // some systems: apply the level once it is there.
-    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self, weak view] in
-      guard let view, let slider = self?.volumeSlider(in: view) else { return }
-      slider.value = level
-    }
-  }
-
-  private func volumeSlider(in view: UIView) -> UISlider? {
-    if let slider = view as? UISlider { return slider }
-    for child in view.subviews {
-      if let slider = volumeSlider(in: child) { return slider }
-    }
-    return nil
   }
 
   func playFeedVideo(_ view: WKWebView) {
@@ -2312,8 +2244,6 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
     controller.add(WeakScrollHandler(self), name: scrollHandlerName)
     controller.add(WeakPlayHandler(self), name: playHandlerName)
     controller.add(WeakMiniHandler(self), name: miniHandlerName)
-    controller.addScriptMessageHandler(
-      WeakVolumeHandler(self), contentWorld: .page, name: volumeHandlerName)
     configuration.userContentController = controller
     return configuration
   }
@@ -2396,7 +2326,6 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
     view.configuration.userContentController.removeScriptMessageHandler(forName: scrollHandlerName)
     view.configuration.userContentController.removeScriptMessageHandler(forName: playHandlerName)
     view.configuration.userContentController.removeScriptMessageHandler(forName: miniHandlerName)
-    view.configuration.userContentController.removeScriptMessageHandler(forName: volumeHandlerName)
     view.navigationDelegate = nil
     view.uiDelegate = nil
     view.removeFromSuperview()
