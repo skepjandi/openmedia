@@ -6,6 +6,14 @@ All notable changes to OpenMedia are documented here.
 >
 > **Wiki**: the [GitHub Wiki](https://github.com/skepjandi/openmedia/wiki) is the public-facing main wiki — architecture, recipe format, AI pipeline, security model, roadmap. Source-controlled editing surface is `docs/wiki/` in this repo; CI (`.github/workflows/sync-wiki.yml`) mirrors it to the GitHub Wiki on every merge to `main`. New single-PR changes belong here, not as new wiki pages.
 
+### feat(fab): a rotary dial with folders of favorites
+
+**Area:** `feat(fab)`
+
+**Change:** Holding the floating button opens a half-circle dial that turns like a rotary phone: drag round the button (or use the wheel) to bring more buttons into view. It lists quick access first, then the sites that are open (favorites and other tabs), then the favorites that are not. A favorite can be filed in a folder (a new Folder field when editing a favorite, in the normal and the incognito list). A folder is one button on the dial, in the Tabs page and in the all-favorites page; tapping it shows every favorite inside it. The library stores the folder as an optional `folder` name on each favorite; files saved before keep working.
+
+**Verified:** Vitest for the dial geometry and the folder grouping; cargo test for saving, trimming and refusing folder names. **Not verified:** a phone or the desktop window by eye (drag-to-turn, the folder popup).
+
 ### feat(desktop): Windows and Linux builds, free with every feature unlocked
 
 **Area:** `feat(desktop)`, `feat(release)`

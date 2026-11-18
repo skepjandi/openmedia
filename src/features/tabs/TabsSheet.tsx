@@ -10,7 +10,8 @@ import { SiteTile } from "../../shared/SiteTile";
 import { describeAddress } from "../history/address";
 import { formatDuration, localDay } from "../stats/format";
 import { Group, GroupLabel, primaryBlockButton, quietButton } from "../settings/ui";
-import { findFavoriteSession, sessionForFavorite, type Session } from "../web/sessions";
+import { findFavoriteSession, type Session } from "../web/sessions";
+import { FavoriteRows } from "./FavoriteRows";
 import { formatMs, orderedTabs, secondsTodayFor } from "./tabs";
 
 const NO_HISTORY: string[] = [];
@@ -28,9 +29,7 @@ export function TabsSheet() {
   const openNewTab = useApp((s) => s.openNewTab);
   const favorites = useApp(selectQuickFavorites);
   const history = useApp((s) => s.state?.history) ?? NO_HISTORY;
-  const sites = useApp((s) => s.sites);
   const openSession = useApp((s) => s.openSession);
-  const openFavorite = useApp((s) => s.openFavorite);
   const openHistory = useApp((s) => s.openHistory);
   const closeSession = useApp((s) => s.closeSession);
   const resetSession = useApp((s) => s.resetSession);
@@ -105,16 +104,10 @@ export function TabsSheet() {
           {favorites.length === 0 ? (
             <Empty text={t("favorites.quickEmpty")} />
           ) : (
-            <Group>
-              {quickAccess(favorites).map((favorite) => (
-                <QuickRow
-                  key={favorite.id}
-                  favorite={favorite}
-                  live={sessionForFavorite(sessions, favorite.url, sites) !== undefined}
-                  onOpen={() => openFavorite(favorite)}
-                />
-              ))}
-            </Group>
+            <FavoriteRows
+              favorites={favorites}
+              shown={quickAccess(favorites).map((_, index) => index)}
+            />
           )}
           {favorites.length > QUICK_ACCESS_LIMIT && (
             <button
@@ -238,34 +231,6 @@ function OpenTab({
         <TabsCloseIcon />
       </button>
     </div>
-  );
-}
-
-export function QuickRow({
-  favorite,
-  live,
-  onOpen,
-}: {
-  favorite: Favorite;
-  live: boolean;
-  onOpen: () => void;
-}) {
-  const t = useT();
-  return (
-    <button
-      type="button"
-      onClick={onOpen}
-      className="flex w-full items-center gap-3 px-4 py-3 text-start active:bg-paper/[0.06]"
-    >
-      <SiteTile name={favorite.name} icon={favorite.icon} />
-      <span className="min-w-0 flex-1">
-        <span className="block truncate text-base font-medium">{favorite.name}</span>
-        <span className="block truncate text-sm text-paper/55">{displayHost(favorite.url)}</span>
-      </span>
-      <span className={`shrink-0 text-sm ${live ? "text-accent" : "text-paper/40"}`}>
-        {live ? t("tabs.isOpen") : t("tabs.notOpen")}
-      </span>
-    </button>
   );
 }
 

@@ -122,6 +122,10 @@ pub struct Favorite {
     /// before landing pages existed means.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub landing: Option<String>,
+    /// The folder this favorite is filed in; favorites that share a name share a folder. None
+    /// keeps it loose, which is also what a file saved before folders existed means.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub folder: Option<String>,
 }
 
 impl Favorite {
@@ -140,6 +144,9 @@ pub struct FavoriteInput {
     /// An address, or a path such as `/feed` on the favorite's own site; blank means none.
     #[serde(default)]
     pub landing: Option<String>,
+    /// A folder name; blank means none. At most `MAX_FAVORITE_NAME_CHARS` characters.
+    #[serde(default)]
+    pub folder: Option<String>,
 }
 
 /// Everything the shell needs at startup.
@@ -947,6 +954,7 @@ fn parse(text: &str) -> Result<(LibraryData, bool)> {
                     url: YOUTUBE_FAVORITE.1.to_owned(),
                     notify: true,
                     landing: None,
+                    folder: None,
                 })?);
             }
         }
@@ -1003,6 +1011,7 @@ fn default_favorites() -> Vec<Favorite> {
             icon: None,
             notify: true,
             landing: None,
+            folder: None,
         })
         .collect()
 }
@@ -1053,6 +1062,13 @@ fn favorite_from_input(input: FavoriteInput) -> Result<Favorite> {
         None | Some("") => None,
         Some(landing) => Some(landing_on_site(&url, landing).ok_or(Error::InvalidLanding)?),
     };
+    let folder = match input.folder.as_deref().map(str::trim) {
+        None | Some("") => None,
+        Some(folder) if folder.chars().count() > MAX_FAVORITE_NAME_CHARS => {
+            return Err(Error::InvalidFavoriteName);
+        }
+        Some(folder) => Some(folder.to_owned()),
+    };
     Ok(Favorite {
         id: Uuid::new_v4(),
         name: name.to_owned(),
@@ -1060,6 +1076,7 @@ fn favorite_from_input(input: FavoriteInput) -> Result<Favorite> {
         icon: None,
         notify: input.notify,
         landing,
+        folder,
     })
 }
 
@@ -1107,6 +1124,7 @@ mod tests {
             url: url.into(),
             notify: true,
             landing: None,
+            folder: None,
         }
     }
 
@@ -1130,6 +1148,7 @@ mod tests {
                 icon: None,
                 notify: true,
                 landing: None,
+                folder: None,
             })
             .collect()
     }
@@ -1334,6 +1353,40 @@ mod tests {
     fn favorites_may_be_emptied() {
         let (_dir, library) = library();
         assert!(library.set_favorites(vec![]).unwrap().is_empty());
+    }
+
+    #[test]
+    fn a_favorites_folder_is_trimmed_kept_across_a_reload_and_blank_means_loose() {
+        let (dir, library) = library();
+        let filed = |name: &str, url: &str, folder: &str| FavoriteInput {
+            folder: Some(folder.into()),
+            ..input(name, url)
+        };
+        library
+            .set_favorites(vec![
+                filed("Chat", "https://chat.example/", "  Social "),
+                filed("Mail", "https://mail.example/", "   "),
+                input("News", "https://news.example/"),
+            ])
+            .unwrap();
+        let folders: Vec<_> = reload(&dir)
+            .favorites()
+            .unwrap()
+            .into_iter()
+            .map(|favorite| favorite.folder)
+            .collect();
+        assert_eq!(folders, vec![Some("Social".to_owned()), None, None]);
+    }
+
+    #[test]
+    fn a_folder_name_longer_than_a_favorite_name_may_be_is_refused() {
+        let (_dir, library) = library();
+        let long = "x".repeat(MAX_FAVORITE_NAME_CHARS + 1);
+        let refused = library.set_favorites(vec![FavoriteInput {
+            folder: Some(long),
+            ..input("Chat", "https://chat.example/")
+        }]);
+        assert!(matches!(refused, Err(Error::InvalidFavoriteName)));
     }
 
     #[test]

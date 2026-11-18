@@ -93,12 +93,65 @@ export function toggleSiteFavorite(
 }
 
 /** What the library takes for a favorite: the id and icon are Rust's to keep. */
-export const asInput = ({ name, url, notify, landing }: FavoriteInput): FavoriteInput => ({
+export const asInput = ({ name, url, notify, landing, folder }: FavoriteInput): FavoriteInput => ({
   name,
   url,
   notify,
   landing,
+  folder,
 });
+
+/** Two names are the same folder when they differ only in case or surrounding space. */
+export const folderKey = (folder: string | null | undefined): string | null => {
+  const key = folder?.trim().toLowerCase();
+  return key ? key : null;
+};
+
+/** One line of a favorites list: a favorite on its own, or a folder standing for several. */
+export type FavoriteEntry<T> =
+  | { kind: "favorite"; favorite: T; index: number }
+  | { kind: "folder"; name: string; members: { favorite: T; index: number }[] };
+
+/**
+ * The favorites as a list shows them. `shown` are the indexes into `favorites` the list has room
+ * for, in order. A favorite with a folder is replaced by its folder, at the place of the first of
+ * its favorites that is shown, and the folder holds every favorite filed in it, shown or not, so
+ * opening it reaches them all. A folder none of whose favorites is shown is not listed.
+ */
+export function groupByFolder<T extends { folder?: string | null }>(
+  favorites: readonly T[],
+  shown: readonly number[] = favorites.map((_, index) => index),
+): FavoriteEntry<T>[] {
+  const entries: FavoriteEntry<T>[] = [];
+  const listed = new Set<string>();
+  for (const index of shown) {
+    const favorite = favorites[index];
+    const key = folderKey(favorite.folder);
+    if (key === null) {
+      entries.push({ kind: "favorite", favorite, index });
+    } else if (!listed.has(key)) {
+      listed.add(key);
+      entries.push({
+        kind: "folder",
+        name: favorite.folder?.trim() ?? "",
+        members: favorites.flatMap((member, at) =>
+          folderKey(member.folder) === key ? [{ favorite: member, index: at }] : [],
+        ),
+      });
+    }
+  }
+  return entries;
+}
+
+/** The folder names in use, each once, in list order. */
+export function folderNames(favorites: readonly { folder?: string | null }[]): string[] {
+  const names = new Map<string, string>();
+  for (const { folder } of favorites) {
+    const key = folderKey(folder);
+    if (key !== null && !names.has(key)) names.set(key, folder?.trim() ?? "");
+  }
+  return [...names.values()];
+}
 
 /** The address a new session of a favorite starts at: its landing page when it has one, else its address. */
 export function favoriteStartUrl(favorite: { url: string; landing?: string | null }): string {

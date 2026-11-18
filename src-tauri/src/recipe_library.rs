@@ -167,6 +167,7 @@ fn favorite_for(option: &OnboardingOption) -> FavoriteInput {
         url: option.homepage.clone(),
         notify: true,
         landing: None,
+        folder: None,
     }
 }
 

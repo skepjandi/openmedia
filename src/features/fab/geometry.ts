@@ -18,10 +18,6 @@ export type Edge = "left" | "right";
 export const FAB_SIZE = 64;
 /** The button grows by this factor while it charges and while the fan is open. */
 export const HOLD_SCALE = 1.3;
-/** How far the lock or incognito badge hangs past the button's edge before scaling. */
-const BADGE_OVERHANG = 4;
-/** Distance from the button's centre to the far edge of its badge while the fan is open. */
-const FAB_OPEN_REACH = (FAB_SIZE / 2 + BADGE_OVERHANG) * HOLD_SCALE;
 export const EDGE_MARGIN = 10;
 /**
  * How far from the screen edge the floating button rests: far enough that it grows by `HOLD_SCALE`
@@ -45,23 +41,8 @@ export const DARK_MODE_SIZE = 44;
 export const COLOR_PICKER_SIZE = 44;
 export const TECH_DETECTOR_SIZE = 44;
 export const DOWNLOADS_SIZE = 44;
-/** Centre-to-centre distance between neighbouring buttons in the settings column. */
-const COLUMN_OFFSET = 52;
-/** From the settings button up to the usage button at the top of the page column. */
-const COLUMN_REACH = 3 * COLUMN_OFFSET;
 
-const MIN_FAN_RADIUS = 108;
-const MAX_ARC_DEGREES = 120;
-const MAX_STEP_DEGREES = 30;
-const SETTINGS_DISTANCE = 132;
-const ITEM_GAP = 6;
-/** Centre-to-centre distance that keeps the column's top button clear of the open button. */
-const COLUMN_CLEARANCE = FAB_OPEN_REACH + STATS_SIZE / 2 + ITEM_GAP;
 const SCREEN_PADDING = 6;
-/** Absorbs rounding when an item is placed exactly at its minimum distance. */
-const FLOAT_SLACK = 1e-6;
-const ARC_SCALES = [1, 0.8, 0.65, 0.5, 0.35];
-const SHIFTS = [0, ...Array.from({ length: 16 }, (_, i) => [(i + 1) * 5, -(i + 1) * 5]).flat()];
 
 function clamp(value: number, min: number, max: number) {
   return Math.min(Math.max(value, min), max);
@@ -119,34 +100,12 @@ export function peekCenterY(y: number, viewport: Size, insets: Insets): number {
   );
 }
 
-export interface FanLayout {
-  favorites: Point[];
-  settings: Point;
-  history: Point;
-  tabs: Point;
-  stats: Point;
-  incognito: Point;
-  /** The video controls switch, on the opposite side of the button from the page buttons. */
-  controls: Point;
-  /** The dark mode switch, after the video controls switch. */
-  darkMode: Point;
-  /** The color picker, after the dark mode switch; null while it is turned off in Settings. */
-  colorPicker: Point | null;
-  /** The technology detector, after the color picker; null while it is turned off in Settings. */
-  techDetector: Point | null;
-  /** The downloads button, after the technology detector; null while it is turned off in the downloads settings. */
-  downloads: Point | null;
-}
-
-/** The optional buttons the user can switch on or off in Settings. */
-export interface FanExtras {
-  colorPicker: boolean;
-  techDetector: boolean;
-  downloads: boolean;
-}
-
 export type FanTarget =
   | { kind: "favorite"; index: number }
+  /** An open site that is not one of the favorites. */
+  | { kind: "tab"; sessionId: string }
+  /** A folder of favorites; a tap opens it. */
+  | { kind: "folder"; name: string }
   | { kind: "incognito" }
   | { kind: "stats" }
   | { kind: "history" }
@@ -158,9 +117,37 @@ export type FanTarget =
   | { kind: "downloads" }
   | { kind: "settings" };
 
-interface FanItem {
-  center: Point;
+/** Degrees between neighbouring items on the dial. */
+export const DIAL_STEP = 30;
+/** Distance from the button's centre to the centre of every dial item. */
+export const DIAL_RADIUS = 120;
+/** Empty arc between two sections, in item steps. */
+const SECTION_GAP = 0.5;
+/** How far past the visible arc an item keeps fading out, in degrees. */
+const DIAL_FADE = DIAL_STEP * 0.7;
+/** Items fainter than this cannot be touched. */
+export const TOUCHABLE_OPACITY = 0.5;
+const TOUCH_SLACK = 10;
+
+/** One stop on the dial. Items of the same `section` sit together; a gap separates sections. */
+export interface DialItem {
+  target: FanTarget;
   size: number;
+  section: number;
+}
+
+export interface DialSlot {
+  target: FanTarget;
+  size: number;
+  center: Point;
+  /** 1 on the visible arc, fading to 0 as the item turns out of it. */
+  opacity: number;
+}
+
+/** The arc of the half circle that fits on screen, in degrees from straight out of the edge. */
+export interface DialWindow {
+  lo: number;
+  hi: number;
 }
 
 function polar(origin: Point, radius: number, degrees: number): Point {
@@ -168,163 +155,118 @@ function polar(origin: Point, radius: number, degrees: number): Point {
   return { x: origin.x + radius * Math.cos(radians), y: origin.y + radius * Math.sin(radians) };
 }
 
-/** Big enough that neighbouring favorites on the arc never touch. */
-function radiusFor(stepDegrees: number) {
-  if (stepDegrees === 0) return MIN_FAN_RADIUS;
-  const chordNeeded = FAVORITE_SIZE + ITEM_GAP;
-  return Math.max(MIN_FAN_RADIUS, chordNeeded / (2 * Math.sin((stepDegrees * Math.PI) / 360)));
+/** Where on screen the point `a` degrees round the dial is; negative is above the button. */
+function dialPoint(origin: Point, edge: Edge, a: number): Point {
+  return polar(origin, DIAL_RADIUS, edge === "left" ? a : 180 - a);
 }
 
-function isValid(items: FanItem[], origin: Point, viewport: Size, insets: Insets) {
-  const onScreen = items.every(({ center, size }) => {
-    const reach = size / 2 + SCREEN_PADDING;
+/** The part of the half circle where an item fits on screen, widest first around straight out. */
+export function dialWindow(origin: Point, edge: Edge, viewport: Size, insets: Insets): DialWindow {
+  const reach = FAVORITE_SIZE / 2 + SCREEN_PADDING;
+  const fits = (a: number) => {
+    const p = dialPoint(origin, edge, a);
     return (
-      center.x >= reach &&
-      center.x <= viewport.width - reach &&
-      center.y >= insets.top + reach &&
-      center.y <= viewport.height - insets.bottom - reach
+      p.x >= reach &&
+      p.x <= viewport.width - reach &&
+      p.y >= insets.top + reach &&
+      p.y <= viewport.height - insets.bottom - reach
     );
+  };
+  let lo = 0;
+  while (lo > -90 && fits(lo - 1)) lo--;
+  let hi = 0;
+  while (hi < 90 && fits(hi + 1)) hi++;
+  return { lo, hi };
+}
+
+/** Each item's place along the dial, in item steps, with a gap where the section changes. */
+function dialPositions(items: readonly DialItem[]): number[] {
+  let gaps = 0;
+  return items.map((item, i) => {
+    if (i > 0 && item.section !== items[i - 1].section) gaps++;
+    return i + gaps * SECTION_GAP;
   });
-  const clearOfButton = items.every(
-    ({ center, size }) =>
-      Math.hypot(center.x - origin.x, center.y - origin.y) + FLOAT_SLACK >=
-      FAB_OPEN_REACH + size / 2 + ITEM_GAP,
+}
+
+/** The farthest the dial turns: the last item rests on the end of the visible arc. */
+export function dialMaxRotation(items: readonly DialItem[], window: DialWindow): number {
+  if (items.length === 0) return 0;
+  const positions = dialPositions(items);
+  return Math.max(0, positions[positions.length - 1] - (window.hi - window.lo) / DIAL_STEP);
+}
+
+export function clampRotation(
+  rotation: number,
+  items: readonly DialItem[],
+  window: DialWindow,
+): number {
+  return clamp(rotation, 0, dialMaxRotation(items, window));
+}
+
+/** The rest position nearest to `rotation`: an item on the first stop, or the dial's far end. */
+export function snapRotation(
+  rotation: number,
+  items: readonly DialItem[],
+  window: DialWindow,
+): number {
+  const max = dialMaxRotation(items, window);
+  const target = clamp(rotation, 0, max);
+  const stops = [0, max, ...dialPositions(items).filter((p) => p <= max)];
+  return stops.reduce((best, stop) =>
+    Math.abs(stop - target) < Math.abs(best - target) ? stop : best,
   );
-  const apart = items.every((a, i) =>
-    items.slice(i + 1).every((b) => {
-      const gap = Math.hypot(a.center.x - b.center.x, a.center.y - b.center.y);
-      return gap >= (a.size + b.size) / 2 + ITEM_GAP / 2;
-    }),
-  );
-  return onScreen && clearOfButton && apart;
 }
 
 /**
- * Favorites sit on an arc opening away from the edge, listed top to bottom. The page buttons
- * (settings, then history, tabs and usage above it) are tucked on the edge column above or below
- * the button, farther out than the arc, so they never read as favorites. Incognito, the video
- * controls and dark mode switches and the optional color picker and technology detector (when on) sit in the same column on the opposite side of the button, so a switch is never
- * mistaken for a page. Below the button the page column is pushed out far enough that its top
- * item clears the button. When the button is near the top or bottom the arc rotates, the column
- * may flip sides, the switches may move up against the button, and finally the arc compacts (smaller steps, larger radius) until everything
- * fits.
+ * How far the dial turns, in item steps, when a finger moves from `from` to `to` round the
+ * button: the items follow the finger.
  */
-export function fanLayout(
+export function dialTurn(origin: Point, edge: Edge, from: Point, to: Point): number {
+  const before = Math.atan2(from.y - origin.y, from.x - origin.x);
+  const after = Math.atan2(to.y - origin.y, to.x - origin.x);
+  let degrees = ((after - before) * 180) / Math.PI;
+  while (degrees > 180) degrees -= 360;
+  while (degrees <= -180) degrees += 360;
+  return (-degrees * (edge === "left" ? 1 : -1)) / DIAL_STEP;
+}
+
+/**
+ * Items on a half circle round the button, opening away from the edge. `rotation` (in item
+ * steps) is how far the dial has turned: 0 puts the first item at the top of the visible arc.
+ * Items turned out of the arc fade away.
+ */
+export function dialSlots(
   origin: Point,
   edge: Edge,
   viewport: Size,
   insets: Insets,
-  favoriteCount: number,
-  extras: FanExtras,
-): FanLayout {
-  const inward = edge === "left" ? 0 : 180;
-  const direction = edge === "left" ? 1 : -1;
-  const nominalStep =
-    favoriteCount > 1 ? Math.min(MAX_STEP_DEGREES, MAX_ARC_DEGREES / (favoriteCount - 1)) : 0;
-  const roomBelow = viewport.height - insets.bottom - origin.y;
-  const roomAbove = origin.y - insets.top;
-  const preferred = roomBelow >= roomAbove ? 1 : -1;
-
-  /** The optional buttons continue the column after the dark mode switch, in this order. */
-  const slots = [extras.colorPicker, extras.techDetector, extras.downloads];
-  const extraCount = slots.filter(Boolean).length;
-  const slotOf = (index: number) =>
-    slots[index] ? slots.slice(0, index).filter(Boolean).length : -1;
-  const place = (
-    scale: number,
-    shift: number,
-    side: number,
-    split: boolean,
-    tight: boolean,
-  ): FanLayout => {
-    const step = nominalStep * scale;
-    const radius = radiusFor(step);
-    const distance = Math.max(SETTINGS_DISTANCE, radius + 30);
-    const switchStart = tight ? COLUMN_CLEARANCE : distance;
-    const reach = split ? COLUMN_REACH : COLUMN_REACH + (3 + extraCount) * COLUMN_OFFSET;
-    const settings = {
-      x: origin.x,
-      y: origin.y + (side > 0 ? Math.max(switchStart, reach + COLUMN_CLEARANCE) : -switchStart),
-    };
-    const extraPoint = (index: number): Point | null => {
-      const slot = slotOf(index);
-      if (slot < 0) return null;
-      return split
-        ? { x: origin.x, y: origin.y - side * (switchStart + (3 + slot) * COLUMN_OFFSET) }
-        : { x: settings.x, y: settings.y - (7 + slot) * COLUMN_OFFSET };
-    };
+  items: readonly DialItem[],
+  rotation: number,
+): DialSlot[] {
+  const window = dialWindow(origin, edge, viewport, insets);
+  const positions = dialPositions(items);
+  return items.map((item, i) => {
+    const a = window.lo + (positions[i] - rotation) * DIAL_STEP;
+    const outside = a < window.lo ? window.lo - a : a > window.hi ? a - window.hi : 0;
     return {
-      favorites: Array.from({ length: favoriteCount }, (_, i) =>
-        polar(origin, radius, inward + direction * (shift + (i - (favoriteCount - 1) / 2) * step)),
+      target: item.target,
+      size: item.size,
+      center: dialPoint(
+        origin,
+        edge,
+        clamp(a, Math.max(-90, window.lo - DIAL_FADE), Math.min(90, window.hi + DIAL_FADE)),
       ),
-      settings,
-      history: { x: settings.x, y: settings.y - COLUMN_OFFSET },
-      tabs: { x: settings.x, y: settings.y - 2 * COLUMN_OFFSET },
-      stats: { x: settings.x, y: settings.y - 3 * COLUMN_OFFSET },
-      incognito: split
-        ? { x: origin.x, y: origin.y - side * switchStart }
-        : { x: settings.x, y: settings.y - 4 * COLUMN_OFFSET },
-      controls: split
-        ? { x: origin.x, y: origin.y - side * (switchStart + COLUMN_OFFSET) }
-        : { x: settings.x, y: settings.y - 5 * COLUMN_OFFSET },
-      darkMode: split
-        ? { x: origin.x, y: origin.y - side * (switchStart + 2 * COLUMN_OFFSET) }
-        : { x: settings.x, y: settings.y - 6 * COLUMN_OFFSET },
-      colorPicker: extraPoint(0),
-      techDetector: extraPoint(1),
-      downloads: extraPoint(2),
+      opacity: clamp(1 - outside / DIAL_FADE, 0, 1),
     };
-  };
-  const items = (layout: FanLayout): FanItem[] => [
-    ...layout.favorites.map((center) => ({ center, size: FAVORITE_SIZE })),
-    { center: layout.settings, size: SETTINGS_SIZE },
-    { center: layout.history, size: HISTORY_SIZE },
-    { center: layout.tabs, size: TABS_SIZE },
-    { center: layout.stats, size: STATS_SIZE },
-    { center: layout.incognito, size: INCOGNITO_SIZE },
-    { center: layout.controls, size: CONTROLS_SIZE },
-    { center: layout.darkMode, size: DARK_MODE_SIZE },
-    ...(layout.colorPicker ? [{ center: layout.colorPicker, size: COLOR_PICKER_SIZE }] : []),
-    ...(layout.techDetector ? [{ center: layout.techDetector, size: TECH_DETECTOR_SIZE }] : []),
-    ...(layout.downloads ? [{ center: layout.downloads, size: DOWNLOADS_SIZE }] : []),
-  ];
-
-  for (const scale of favoriteCount > 1 ? ARC_SCALES : [1]) {
-    for (const shift of SHIFTS) {
-      for (const side of [preferred, -preferred]) {
-        for (const [split, tight] of [
-          [true, false],
-          [false, false],
-          [true, true],
-          [false, true],
-        ]) {
-          const layout = place(scale, shift, side, split, tight);
-          if (isValid(items(layout), origin, viewport, insets)) return layout;
-        }
-      }
-    }
-  }
-  return place(1, 0, preferred, false, false);
+  });
 }
 
-const TOUCH_SLACK = 10;
-
-/** The fan item under a finger, with a little slack so a thumb can slide onto it. */
-export function fanTargetAt(point: Point, layout: FanLayout): FanTarget | null {
-  const near = (center: Point, size: number) =>
-    Math.hypot(point.x - center.x, point.y - center.y) <= size / 2 + TOUCH_SLACK;
-  const index = layout.favorites.findIndex((p) => near(p, FAVORITE_SIZE));
-  if (index >= 0) return { kind: "favorite", index };
-  if (layout.downloads && near(layout.downloads, DOWNLOADS_SIZE)) return { kind: "downloads" };
-  if (layout.techDetector && near(layout.techDetector, TECH_DETECTOR_SIZE))
-    return { kind: "techDetector" };
-  if (layout.colorPicker && near(layout.colorPicker, COLOR_PICKER_SIZE))
-    return { kind: "colorPicker" };
-  if (near(layout.darkMode, DARK_MODE_SIZE)) return { kind: "darkMode" };
-  if (near(layout.controls, CONTROLS_SIZE)) return { kind: "controls" };
-  if (near(layout.incognito, INCOGNITO_SIZE)) return { kind: "incognito" };
-  if (near(layout.stats, STATS_SIZE)) return { kind: "stats" };
-  if (near(layout.tabs, TABS_SIZE)) return { kind: "tabs" };
-  if (near(layout.history, HISTORY_SIZE)) return { kind: "history" };
-  return near(layout.settings, SETTINGS_SIZE) ? { kind: "settings" } : null;
+/** The dial item under a finger, with a little slack so a thumb can slide onto it. */
+export function dialTargetAt(point: Point, slots: readonly DialSlot[]): FanTarget | null {
+  const hit = slots.find(
+    ({ center, size, opacity }) =>
+      opacity >= TOUCHABLE_OPACITY &&
+      Math.hypot(point.x - center.x, point.y - center.y) <= size / 2 + TOUCH_SLACK,
+  );
+  return hit?.target ?? null;
 }

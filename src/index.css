@@ -230,7 +230,11 @@ input {
   backface-visibility: hidden;
 }
 
+/* Dial items sit at the origin and are moved with `--x/--y`, the centre of their stop. Closed,
+   they collapse onto the button at `--cx/--cy`. `--o` fades an item turned out of the visible arc. */
 .fan-item {
+  left: 0;
+  top: 0;
   transition:
     transform 420ms var(--ease-spring) calc(var(--i) * 35ms),
     opacity 160ms linear calc(var(--i) * 35ms),
@@ -238,7 +242,7 @@ input {
 }
 
 .fan-item[data-open="false"] {
-  transform: translate(var(--dx), var(--dy)) scale(0.3);
+  transform: translate(var(--cx), var(--cy)) scale(0.3);
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
@@ -249,8 +253,23 @@ input {
 }
 
 .fan-item[data-open="true"] {
-  transform: translate(0, 0) scale(1);
-  opacity: 1;
+  transform: translate(var(--x), var(--y)) scale(1);
+  opacity: var(--o, 1);
+}
+
+.fan-item[data-faded="true"] {
+  pointer-events: none;
+}
+
+/* The dial is being turned by a finger: items follow it with no easing, then settle on a stop. */
+.fan-item[data-open="true"][data-turn="drag"] {
+  transition: none;
+}
+
+.fan-item[data-open="true"][data-turn="snap"] {
+  transition:
+    transform 260ms var(--ease-spring),
+    opacity 160ms linear;
 }
 
 /* Incognito is on: its toggle turns solid, so it reads as pressed on any page behind it. */
@@ -364,6 +383,7 @@ svg {
 @media (prefers-reduced-motion: reduce) {
   .fan-item,
   .fan-item[data-open="false"],
+  .fan-item[data-open="true"][data-turn="snap"],
   .command-bar {
     transition-duration: 1ms;
     transition-delay: 0s;

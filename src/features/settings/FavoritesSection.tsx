@@ -5,6 +5,7 @@ import {
   FREE_QUICK_ACCESS_LIMIT,
   QUICK_ACCESS_LIMIT,
   asInput,
+  folderNames,
   recipeForFavorite,
   resolveLanding,
 } from "../../shared/favorites";
@@ -134,6 +135,8 @@ export function FavoritesEditor({
     void replaceAll(favorites.map(asInput).filter((_, at) => at !== index));
   };
 
+  const folders = folderNames(favorites);
+
   const renderRow = (favorite: Favorite, index: number) => {
     const recipe = recipes && recipeForFavorite(recipes, favorite.url);
     return (
@@ -143,6 +146,7 @@ export function FavoritesEditor({
         first={index === 0}
         last={index === favorites.length - 1}
         editing={editing === index}
+        folders={folders}
         showNotify={index < limit}
         onEdit={() => setEditing(editing === index ? null : index)}
         onMove={(by) => move(index, by)}
@@ -248,6 +252,7 @@ export function FavoritesEditor({
           <div className="mt-3 overflow-hidden rounded-2xl border border-hair bg-paper/[0.04]">
             <FavoriteEditor
               initial={{ name: "", url: "" }}
+              folders={folders}
               showNotify={favorites.length < limit}
               hint={favorites.length >= limit ? t("favorites.quickFull") : undefined}
               onCommit={(entry) => commit("new", entry)}
@@ -306,6 +311,8 @@ interface RowProps {
   first: boolean;
   last: boolean;
   editing: boolean;
+  /** The folders already in use, offered when filing a favorite. */
+  folders: string[];
   /** Only a quick-access favorite can notify, so only its editor offers the switch. */
   showNotify: boolean;
   onEdit: () => void;
@@ -325,6 +332,7 @@ function FavoriteRow({
   first,
   last,
   editing,
+  folders,
   showNotify,
   onEdit,
   onMove,
@@ -351,7 +359,9 @@ function FavoriteRow({
           <SiteTile name={favorite.name} icon={favorite.icon} />
           <span className="min-w-0 flex-1">
             <span className="block truncate text-base font-medium">{favorite.name}</span>
-            <span className="block truncate text-sm text-paper/55">{host}</span>
+            <span className="block truncate text-sm text-paper/55">
+              {favorite.folder ? `${host} · ${favorite.folder}` : host}
+            </span>
           </span>
         </button>
         <button
@@ -389,7 +399,9 @@ function FavoriteRow({
             url: favorite.url,
             notify: favorite.notify,
             landing: favorite.landing,
+            folder: favorite.folder,
           }}
+          folders={folders}
           showNotify={showNotify}
           onCommit={onCommit}
           onCancel={onEdit}
@@ -406,6 +418,7 @@ function FavoriteRow({
 
 interface EditorProps {
   initial: FavoriteInput;
+  folders: string[];
   showNotify: boolean;
   hint?: string;
   onCommit: (entry: FavoriteInput) => Promise<boolean>;
@@ -420,6 +433,7 @@ interface EditorProps {
 
 function FavoriteEditor({
   initial,
+  folders,
   showNotify,
   hint,
   onCommit,
@@ -434,6 +448,7 @@ function FavoriteEditor({
   const [url, setUrl] = useState(initial.url);
   const [landing, setLanding] = useState(initial.landing ?? "");
   const [notify, setNotify] = useState(initial.notify ?? true);
+  const [folder, setFolder] = useState(initial.folder ?? "");
   const [problem, setProblem] = useState<string | null>(null);
   const t = useT();
 
@@ -448,7 +463,13 @@ function FavoriteEditor({
       setProblem(t("favorites.landingInvalid"));
       return;
     }
-    await onCommit({ name: name.trim(), url: address, notify, landing: resolved });
+    await onCommit({
+      name: name.trim(),
+      url: address,
+      notify,
+      landing: resolved,
+      folder: folder.trim() || null,
+    });
   };
 
   return (
@@ -477,6 +498,23 @@ function FavoriteEditor({
           setUrl(event.target.value);
         }}
       />
+      <input
+        aria-label={t("favorites.folderLabel")}
+        className={field}
+        list="favorite-folders"
+        maxLength={MAX_FAVORITE_NAME}
+        placeholder={t("favorites.folderPlaceholder")}
+        value={folder}
+        onChange={(event) => {
+          setProblem(null);
+          setFolder(event.target.value);
+        }}
+      />
+      <datalist id="favorite-folders">
+        {folders.map((name) => (
+          <option key={name} value={name} />
+        ))}
+      </datalist>
       <div className="flex flex-col gap-1.5">
         <div className="text-sm font-medium">{t("favorites.landingLabel")}</div>
         <p className="text-sm leading-snug text-paper/55">{t("favorites.landingNote")}</p>

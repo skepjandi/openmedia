@@ -4,6 +4,8 @@ import {
   QUICK_ACCESS_LIMIT,
   asInput,
   displayHost,
+  folderNames,
+  groupByFolder,
   favoriteStartUrl,
   isFavoriteSite,
   quickAccess,
@@ -199,5 +201,55 @@ describe("landing pages", () => {
     expect(asInput(favorite)).toEqual(favorite);
     const kept = toggleSiteFavorite([favorite], "https://example.com/");
     expect(kept[0]?.landing).toBe("/feed");
+  });
+});
+
+describe("groupByFolder", () => {
+  const f = (name: string, folder?: string) => ({ name, folder });
+  const list = [
+    f("A"),
+    f("B", "Social"),
+    f("C"),
+    f("D", " social "),
+    f("E", "News"),
+    f("F", "Social"),
+  ];
+
+  it("keeps loose favorites and puts a folder where its first shown favorite is", () => {
+    const entries = groupByFolder(list, [0, 1, 2, 3, 4]);
+    expect(
+      entries.map((entry) => (entry.kind === "folder" ? entry.name : entry.favorite.name)),
+    ).toEqual(["A", "Social", "C", "News"]);
+  });
+
+  it("holds every favorite filed in the folder, shown or not, matching names loosely", () => {
+    const entry = groupByFolder(list, [0, 1])[1];
+    expect(entry.kind === "folder" && entry.members.map((member) => member.index)).toEqual([
+      1, 3, 5,
+    ]);
+  });
+
+  it("does not list a folder none of whose favorites is shown", () => {
+    expect(groupByFolder(list, [0, 2]).every((entry) => entry.kind === "favorite")).toBe(true);
+  });
+
+  it("lists every favorite and folder when nothing is said to be shown", () => {
+    expect(groupByFolder(list)).toHaveLength(4);
+  });
+});
+
+describe("folderNames", () => {
+  it("lists each folder once, in list order", () => {
+    expect(
+      folderNames([{ folder: "Social" }, {}, { folder: " social" }, { folder: "News" }]),
+    ).toEqual(["Social", "News"]);
+  });
+});
+
+describe("asInput", () => {
+  it("keeps the folder", () => {
+    expect(asInput({ name: "A", url: "https://a.example/", folder: "Social" }).folder).toBe(
+      "Social",
+    );
   });
 });

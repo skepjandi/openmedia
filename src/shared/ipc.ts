@@ -129,6 +129,8 @@ export interface Favorite {
   notify: boolean;
   /** Where a new session of this favorite starts instead of `url`; always on the favorite's own site. */
   landing?: string;
+  /** The folder it is filed in; favorites that share a name share a folder. Loose when absent. */
+  folder?: string;
 }
 
 export interface FavoriteInput {
@@ -138,6 +140,8 @@ export interface FavoriteInput {
   notify?: boolean;
   /** An address or a path on the favorite's site; left out or null, the favorite opens `url`. */
   landing?: string | null;
+  /** A folder name; left out, blank or null, the favorite is loose. */
+  folder?: string | null;
 }
 
 export interface AppState {

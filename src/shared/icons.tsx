@@ -122,6 +122,12 @@ export const TabsIcon = () => (
   </Icon>
 );
 
+export const FolderIcon = ({ size }: { size?: number }) => (
+  <Icon size={size}>
+    <path d="M3.5 7.5A2 2 0 0 1 5.5 5.5h3.6l2 2.2h7.4a2 2 0 0 1 2 2v7.8a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2z" />
+  </Icon>
+);
+
 export const StarIcon = ({ filled = false }: { filled?: boolean }) => (
   <Icon>
     <path

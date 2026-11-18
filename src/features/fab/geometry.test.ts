@@ -1,32 +1,26 @@
 import { describe, expect, it } from "vitest";
 import {
+  DIAL_RADIUS,
   FAB_SIZE,
   FAVORITE_SIZE,
-  HISTORY_SIZE,
   HOLD_SCALE,
-  COLOR_PICKER_SIZE,
-  CONTROLS_SIZE,
-  DARK_MODE_SIZE,
-  DOWNLOADS_SIZE,
-  TECH_DETECTOR_SIZE,
-  INCOGNITO_SIZE,
   SETTINGS_SIZE,
-  STATS_SIZE,
-  TABS_SIZE,
+  clampRotation,
+  dialMaxRotation,
+  dialSlots,
+  dialTargetAt,
+  dialTurn,
+  dialWindow,
   fabCenter,
-  fanLayout,
-  fanTargetAt,
   HIDE_REACH,
   PEEK_HEIGHT,
   peekCenterY,
   pushedOffEdge,
   separateVerticalPosition,
+  snapRotation,
   snapToEdge,
-  type Edge,
-  type FanExtras,
-  type FanLayout,
+  type DialItem,
   type Insets,
-  type Point,
 } from "./geometry";
 
 const phone = { width: 393, height: 852 };
@@ -62,235 +56,108 @@ describe("separateVerticalPosition", () => {
   });
 });
 
-const ALL_EXTRAS: FanExtras = { colorPicker: true, techDetector: true, downloads: true };
-const EXTRA_CHOICES: FanExtras[] = [false, true].flatMap((downloads) => [
-  { colorPicker: false, techDetector: false, downloads },
-  { colorPicker: true, techDetector: false, downloads },
-  { colorPicker: false, techDetector: true, downloads },
-  { colorPicker: true, techDetector: true, downloads },
-]);
+const tool = (kind: "settings" | "history" | "tabs"): DialItem => ({
+  target: { kind },
+  size: SETTINGS_SIZE,
+  section: 0,
+});
+const favorite = (index: number, section: number): DialItem => ({
+  target: { kind: "favorite", index },
+  size: FAVORITE_SIZE,
+  section,
+});
+const items: DialItem[] = [
+  tool("settings"),
+  tool("history"),
+  tool("tabs"),
+  favorite(0, 1),
+  favorite(1, 1),
+  favorite(2, 2),
+  favorite(3, 2),
+  favorite(4, 2),
+  favorite(5, 2),
+];
 
-const distance = (a: Point, b: Point) => Math.hypot(a.x - b.x, a.y - b.y);
-
-describe("fanLayout", () => {
-  const edges: Edge[] = ["left", "right"];
-  const heights = [insets.top, 200, 426, 700, phone.height - insets.bottom];
-
-  for (const edge of edges) {
-    for (const y of heights) {
-      for (const [count, extras] of [0, 1, 2, 4, 6].flatMap((n) =>
-        EXTRA_CHOICES.map((choice) => [n, choice] as const),
-      )) {
-        it(`keeps ${count} favorites on screen and apart (${edge} edge, y=${y}, ${JSON.stringify(extras)})`, () => {
-          const origin = fabCenter(edge, y, phone, insets);
-          const layout = fanLayout(origin, edge, phone, insets, count, extras);
-          expect(layout.colorPicker === null).toBe(!extras.colorPicker);
-          expect(layout.techDetector === null).toBe(!extras.techDetector);
-          expect(layout.downloads === null).toBe(!extras.downloads);
-          const items = [
-            ...layout.favorites.map((center) => ({ center, size: FAVORITE_SIZE })),
-            { center: layout.settings, size: SETTINGS_SIZE },
-            { center: layout.history, size: HISTORY_SIZE },
-            { center: layout.tabs, size: TABS_SIZE },
-            { center: layout.stats, size: STATS_SIZE },
-            { center: layout.incognito, size: INCOGNITO_SIZE },
-            { center: layout.controls, size: CONTROLS_SIZE },
-            { center: layout.darkMode, size: DARK_MODE_SIZE },
-            ...(layout.colorPicker
-              ? [{ center: layout.colorPicker, size: COLOR_PICKER_SIZE }]
-              : []),
-            ...(layout.techDetector
-              ? [{ center: layout.techDetector, size: TECH_DETECTOR_SIZE }]
-              : []),
-            ...(layout.downloads ? [{ center: layout.downloads, size: DOWNLOADS_SIZE }] : []),
-          ];
-          for (const { center, size } of items) {
-            expect(center.x - size / 2).toBeGreaterThanOrEqual(0);
-            expect(center.x + size / 2).toBeLessThanOrEqual(phone.width);
-            expect(center.y - size / 2).toBeGreaterThanOrEqual(insets.top);
-            expect(center.y + size / 2).toBeLessThanOrEqual(phone.height - insets.bottom);
-            expect(distance(center, origin)).toBeGreaterThanOrEqual(
-              (FAB_SIZE * HOLD_SCALE + size) / 2,
-            );
-          }
-          for (let i = 0; i < items.length; i++) {
-            for (let j = i + 1; j < items.length; j++) {
-              const gap = distance(items[i].center, items[j].center);
-              expect(gap).toBeGreaterThanOrEqual((items[i].size + items[j].size) / 2);
-            }
-          }
-        });
-      }
-    }
-  }
-
-  it("lists favorites top to bottom on both edges", () => {
-    for (const edge of edges) {
-      const layout = fanLayout(
-        fabCenter(edge, 426, phone, insets),
-        edge,
-        phone,
-        insets,
-        4,
-        ALL_EXTRAS,
-      );
-      const ys = layout.favorites.map((p) => p.y);
-      expect(ys).toEqual([...ys].sort((a, b) => a - b));
-    }
+describe("dialWindow", () => {
+  it("is the whole half circle in the middle of the screen", () => {
+    const origin = fabCenter("left", 426, phone, insets);
+    expect(dialWindow(origin, "left", phone, insets)).toEqual({ lo: -90, hi: 90 });
+    const right = fabCenter("right", 426, phone, insets);
+    expect(dialWindow(right, "right", phone, insets)).toEqual({ lo: -90, hi: 90 });
   });
 
-  it("keeps the arc compact when the middle of the screen has room for it", () => {
-    for (const edge of edges) {
-      const origin = fabCenter(edge, 426, phone, insets);
-      const layout = fanLayout(origin, edge, phone, insets, 5, ALL_EXTRAS);
-      for (const favorite of layout.favorites) {
-        expect(distance(favorite, origin)).toBeLessThan(130);
-      }
+  it("loses the part that would leave the screen near the top", () => {
+    const origin = fabCenter("left", 0, phone, insets);
+    const { lo, hi } = dialWindow(origin, "left", phone, insets);
+    expect(lo).toBeGreaterThan(-90);
+    expect(hi).toBe(90);
+  });
+});
+
+describe("dialSlots", () => {
+  const origin = fabCenter("left", 426, phone, insets);
+
+  it("lists the items top to bottom on both edges, the first at the top", () => {
+    for (const edge of ["left", "right"] as const) {
+      const at = fabCenter(edge, 426, phone, insets);
+      const slots = dialSlots(at, edge, phone, insets, items, 0);
+      const ys = slots.map((slot) => slot.center.y);
+      expect(ys).toEqual([...ys].sort((a, b) => a - b));
+      expect(slots[0].center.y).toBeLessThan(at.y);
     }
   });
 
   it("opens away from the edge the button rests on", () => {
-    const left = fanLayout(
-      fabCenter("left", 426, phone, insets),
-      "left",
-      phone,
-      insets,
-      4,
-      ALL_EXTRAS,
-    );
-    const right = fanLayout(
-      fabCenter("right", 426, phone, insets),
-      "right",
-      phone,
-      insets,
-      4,
-      ALL_EXTRAS,
-    );
-    expect(left.favorites.every((p) => p.x > FAB_SIZE)).toBe(true);
-    expect(right.favorites.every((p) => p.x < phone.width - FAB_SIZE)).toBe(true);
+    const left = dialSlots(origin, "left", phone, insets, items, 0);
+    expect(left.every((slot) => slot.center.x >= origin.x - 1e-6)).toBe(true);
+    const right = fabCenter("right", 426, phone, insets);
+    const mirrored = dialSlots(right, "right", phone, insets, items, 0);
+    expect(mirrored.every((slot) => slot.center.x <= right.x + 1e-6)).toBe(true);
   });
 
-  it("puts settings farther out than every favorite and clear of the arc", () => {
-    const origin = fabCenter("right", 426, phone, insets);
-    const layout = fanLayout(origin, "right", phone, insets, 4, ALL_EXTRAS);
-    const settings = distance(origin, layout.settings);
-    for (const favorite of layout.favorites) {
-      expect(settings).toBeGreaterThan(distance(origin, favorite));
-      expect(distance(layout.settings, favorite)).toBeGreaterThan(FAVORITE_SIZE);
+  it("keeps every item the same distance from the button and clear of its neighbours", () => {
+    const slots = dialSlots(origin, "left", phone, insets, items, 0);
+    for (const slot of slots) {
+      expect(Math.hypot(slot.center.x - origin.x, slot.center.y - origin.y)).toBeCloseTo(
+        DIAL_RADIUS,
+      );
     }
+    const visible = slots.filter((slot) => slot.opacity === 1);
+    visible.slice(1).forEach((slot, i) => {
+      const gap = Math.hypot(
+        slot.center.x - visible[i].center.x,
+        slot.center.y - visible[i].center.y,
+      );
+      expect(gap).toBeGreaterThanOrEqual((slot.size + visible[i].size) / 2);
+    });
   });
 
-  it("stacks history directly above settings in the same column", () => {
-    for (const edge of edges) {
-      for (const y of heights) {
-        const origin = fabCenter(edge, y, phone, insets);
-        const layout = fanLayout(origin, edge, phone, insets, 4, ALL_EXTRAS);
-        expect(layout.history.x).toBe(layout.settings.x);
-        expect(layout.history.y).toBeLessThan(layout.settings.y);
-      }
-    }
+  it("shows only the items on the visible arc and fades the rest out", () => {
+    const slots = dialSlots(origin, "left", phone, insets, items, 0);
+    expect(slots.slice(0, 6).every((slot) => slot.opacity === 1)).toBe(true);
+    expect(slots[items.length - 1].opacity).toBe(0);
   });
 
-  it("stacks tabs directly above history in the same column", () => {
-    for (const edge of edges) {
-      for (const y of heights) {
-        for (const count of [0, 6]) {
-          const origin = fabCenter(edge, y, phone, insets);
-          const layout = fanLayout(origin, edge, phone, insets, count, ALL_EXTRAS);
-          expect(layout.tabs.x).toBe(layout.history.x);
-          expect(layout.tabs.y).toBeLessThan(layout.history.y);
-        }
-      }
-    }
+  it("brings later items into view as the dial turns", () => {
+    const window = dialWindow(origin, "left", phone, insets);
+    const turned = dialMaxRotation(items, window);
+    const slots = dialSlots(origin, "left", phone, insets, items, turned);
+    expect(slots[items.length - 1].opacity).toBe(1);
+    expect(slots[0].opacity).toBe(0);
   });
 
-  it("stacks stats directly above tabs in the same column", () => {
-    for (const edge of edges) {
-      for (const y of heights) {
-        for (const count of [0, 6]) {
-          const origin = fabCenter(edge, y, phone, insets);
-          const layout = fanLayout(origin, edge, phone, insets, count, ALL_EXTRAS);
-          expect(layout.stats.x).toBe(layout.tabs.x);
-          expect(layout.stats.y).toBeLessThan(layout.tabs.y);
-        }
-      }
-    }
-  });
-
-  it("puts incognito and the controls switch across the button from the page column when there is room", () => {
-    for (const edge of edges) {
-      for (const count of [0, 1, 2, 4]) {
-        const origin = fabCenter(edge, 426, phone, insets);
-        const layout = fanLayout(origin, edge, phone, insets, count, ALL_EXTRAS);
-        const pageSide = Math.sign(layout.settings.y - origin.y);
-        expect(layout.incognito.x).toBe(origin.x);
-        expect(layout.controls.x).toBe(origin.x);
-        expect(layout.darkMode.x).toBe(origin.x);
-        for (const page of [layout.settings, layout.history, layout.tabs, layout.stats])
-          expect(Math.sign(page.y - origin.y)).toBe(pageSide);
-        expect(Math.sign(layout.incognito.y - origin.y)).toBe(-pageSide);
-        expect(Math.sign(layout.controls.y - origin.y)).toBe(-pageSide);
-        expect(Math.sign(layout.darkMode.y - origin.y)).toBe(-pageSide);
-        expect(layout.colorPicker?.x).toBe(origin.x);
-        expect(Math.sign((layout.colorPicker?.y ?? 0) - origin.y)).toBe(-pageSide);
-        expect(layout.techDetector?.x).toBe(origin.x);
-        expect(Math.sign((layout.techDetector?.y ?? 0) - origin.y)).toBe(-pageSide);
-        expect(layout.downloads?.x).toBe(origin.x);
-        expect(Math.sign((layout.downloads?.y ?? 0) - origin.y)).toBe(-pageSide);
-      }
-    }
-  });
-
-  it("continues the page column with incognito and the controls switch near the screen edge", () => {
-    for (const edge of edges) {
-      const origin = fabCenter(edge, insets.top, phone, insets);
-      const layout = fanLayout(origin, edge, phone, insets, 0, ALL_EXTRAS);
-      expect(layout.incognito.x).toBe(layout.stats.x);
-      expect(layout.incognito.y).toBeLessThan(layout.stats.y);
-      expect(layout.controls.x).toBe(layout.stats.x);
-      expect(layout.controls.y).toBeLessThan(layout.incognito.y);
-      expect(layout.darkMode.x).toBe(layout.stats.x);
-      expect(layout.darkMode.y).toBeLessThan(layout.controls.y);
-      expect(layout.colorPicker?.x).toBe(layout.stats.x);
-      expect(layout.colorPicker?.y).toBeLessThan(layout.darkMode.y);
-      expect(layout.techDetector?.x).toBe(layout.stats.x);
-      expect(layout.techDetector?.y).toBeLessThan(layout.colorPicker?.y ?? 0);
-    }
-  });
-});
-
-function techOf(layout: FanLayout): Point {
-  if (!layout.techDetector) throw new Error("the layout has no technology detector");
-  return layout.techDetector;
-}
-
-function pickerOf(layout: FanLayout): Point {
-  if (!layout.colorPicker) throw new Error("the layout has no color picker");
-  return layout.colorPicker;
-}
-
-describe("the dark mode button", () => {
-  it("sits right after the controls switch and never overlaps another item", () => {
+  it("keeps every visible item on screen near the top and bottom edges", () => {
     for (const edge of ["left", "right"] as const) {
-      for (const y of [insets.top, 200, 426, 700, phone.height - insets.bottom]) {
-        for (const extras of EXTRA_CHOICES) {
-          const origin = fabCenter(edge, y, phone, insets);
-          const layout = fanLayout(origin, edge, phone, insets, 4, extras);
-          expect(distance(layout.darkMode, layout.controls)).toBeCloseTo(52);
-          const others = [
-            ...layout.favorites,
-            layout.settings,
-            layout.history,
-            layout.tabs,
-            layout.stats,
-            layout.incognito,
-            layout.controls,
-            ...(layout.colorPicker ? [layout.colorPicker] : []),
-            ...(layout.techDetector ? [layout.techDetector] : []),
-            ...(layout.downloads ? [layout.downloads] : []),
-          ];
-          for (const other of others) {
-            expect(distance(layout.darkMode, other)).toBeGreaterThan(DARK_MODE_SIZE);
+      for (const y of [0, 100, 426, 750, 5000]) {
+        const at = fabCenter(edge, y, phone, insets);
+        for (const rotation of [0, 1, 2.5]) {
+          for (const slot of dialSlots(at, edge, phone, insets, items, rotation)) {
+            if (slot.opacity < 1) continue;
+            const half = slot.size / 2;
+            expect(slot.center.x - half).toBeGreaterThanOrEqual(0);
+            expect(slot.center.x + half).toBeLessThanOrEqual(phone.width);
+            expect(slot.center.y - half).toBeGreaterThanOrEqual(insets.top);
+            expect(slot.center.y + half).toBeLessThanOrEqual(phone.height - insets.bottom);
           }
         }
       }
@@ -298,50 +165,66 @@ describe("the dark mode button", () => {
   });
 });
 
-describe("fanTargetAt", () => {
+describe("dial rotation", () => {
   const origin = fabCenter("left", 426, phone, insets);
-  const layout = fanLayout(origin, "left", phone, insets, 4, ALL_EXTRAS);
+  const window = dialWindow(origin, "left", phone, insets);
 
-  it("finds the item under the finger", () => {
-    expect(fanTargetAt(layout.favorites[2], layout)).toEqual({ kind: "favorite", index: 2 });
-    expect(fanTargetAt(layout.settings, layout)).toEqual({ kind: "settings" });
-    expect(fanTargetAt(layout.history, layout)).toEqual({ kind: "history" });
-    expect(fanTargetAt(layout.tabs, layout)).toEqual({ kind: "tabs" });
-    expect(fanTargetAt(layout.stats, layout)).toEqual({ kind: "stats" });
-    expect(fanTargetAt(layout.incognito, layout)).toEqual({ kind: "incognito" });
-    expect(fanTargetAt(layout.controls, layout)).toEqual({ kind: "controls" });
-    expect(fanTargetAt(layout.darkMode, layout)).toEqual({ kind: "darkMode" });
-    expect(fanTargetAt(pickerOf(layout), layout)).toEqual({ kind: "colorPicker" });
-    expect(fanTargetAt(techOf(layout), layout)).toEqual({ kind: "techDetector" });
-    expect(fanTargetAt(layout.downloads ?? origin, layout)).toEqual({ kind: "downloads" });
+  it("never turns before the first item or past the last", () => {
+    const max = dialMaxRotation(items, window);
+    expect(max).toBeGreaterThan(0);
+    expect(clampRotation(-3, items, window)).toBe(0);
+    expect(clampRotation(max + 4, items, window)).toBe(max);
   });
 
-  it("stacks the technology detector straight after the dark mode switch when the picker is off", () => {
-    const only = fanLayout(origin, "left", phone, insets, 4, {
-      colorPicker: false,
-      techDetector: true,
-      downloads: false,
-    });
-    const both = layout;
-    expect(distance(only.techDetector ?? origin, only.darkMode)).toBeCloseTo(
-      distance(both.colorPicker ?? origin, both.darkMode),
+  it("does not turn when every item already fits", () => {
+    expect(dialMaxRotation(items.slice(0, 3), window)).toBe(0);
+    expect(dialMaxRotation([], window)).toBe(0);
+  });
+
+  it("settles with an item on the first stop", () => {
+    const settled = snapRotation(2.2, items, window);
+    const slots = dialSlots(origin, "left", phone, insets, items, settled);
+    const first = slots.find((slot) => slot.opacity === 1) ?? slots[0];
+    const radians = (window.lo * Math.PI) / 180;
+    const top = {
+      x: origin.x + DIAL_RADIUS * Math.cos(radians),
+      y: origin.y + DIAL_RADIUS * Math.sin(radians),
+    };
+    expect(Math.hypot(first.center.x - top.x, first.center.y - top.y)).toBeLessThan(1e-6);
+  });
+
+  it("follows a finger: dragging down the arc moves the items down it on either edge", () => {
+    for (const edge of ["left", "right"] as const) {
+      const at = fabCenter(edge, 426, phone, insets);
+      const side = edge === "left" ? 1 : -1;
+      const from = { x: at.x + side * DIAL_RADIUS, y: at.y };
+      const to = { x: at.x + side * DIAL_RADIUS * 0.87, y: at.y + DIAL_RADIUS * 0.5 };
+      const turn = dialTurn(at, edge, from, to);
+      // moving down the dial means going back to earlier items
+      expect(turn).toBeCloseTo(-1, 1);
+      expect(dialTurn(at, edge, to, from)).toBeCloseTo(1, 1);
+    }
+  });
+});
+
+describe("dialTargetAt", () => {
+  const origin = fabCenter("left", 426, phone, insets);
+  const slots = dialSlots(origin, "left", phone, insets, items, 0);
+
+  it("finds the item under the finger", () => {
+    expect(dialTargetAt(slots[1].center, slots)).toEqual({ kind: "history" });
+    const slack = { x: slots[3].center.x + FAVORITE_SIZE / 2 + 5, y: slots[3].center.y };
+    expect(dialTargetAt(slack, slots)).toEqual({ kind: "favorite", index: 0 });
+  });
+
+  it("cannot find an item that has turned out of view", () => {
+    expect(dialTargetAt(slots[items.length - 1].center, slots)).not.toEqual(
+      items[items.length - 1].target,
     );
   });
 
-  it("has no color picker to find when it is turned off", () => {
-    const without = fanLayout(origin, "left", phone, insets, 4, {
-      colorPicker: false,
-      techDetector: false,
-      downloads: false,
-    });
-    expect(without.colorPicker).toBeNull();
-    expect(without.techDetector).toBeNull();
-    expect(fanTargetAt(pickerOf(layout), without)?.kind).not.toBe("colorPicker");
-    expect(fanTargetAt(techOf(layout), without)?.kind).not.toBe("techDetector");
-  });
-
   it("returns null away from every item", () => {
-    expect(fanTargetAt({ x: 380, y: 10 }, layout)).toBeNull();
+    expect(dialTargetAt({ x: 380, y: 10 }, slots)).toBeNull();
   });
 });
 
