@@ -328,6 +328,7 @@ fn favorite(name: &str, url: &str) -> FavoriteInput {
         url: url.to_owned(),
         notify: true,
         landing: None,
+        folder: None,
     }
 }
 
@@ -354,6 +355,7 @@ fn add_favorites(targets: &Targets<'_>, additions: Vec<FavoriteInput>) -> Result
             url: existing.url,
             notify: existing.notify,
             landing: existing.landing,
+            folder: existing.folder,
         })
         .collect();
     let mut added = 0;
