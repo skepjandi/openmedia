@@ -118,6 +118,7 @@ pub fn run() {
             downloads::downloads_reveal,
             downloads::downloads_preview,
             downloads::downloads_sniff,
+            downloads::downloads_thumbnail,
             commands::get_state,
             commands::set_favorites,
             commands::set_site_favorite,

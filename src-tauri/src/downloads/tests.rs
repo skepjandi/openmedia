@@ -52,6 +52,14 @@ fn serve(stream: &mut TcpStream, ranged: &AtomicUsize) -> std::io::Result<()> {
             false,
             "Content-Disposition: attachment; filename=\"../pic.png\"\r\nContent-Type: image/png\r\n",
         ),
+        "/pic.png" => (body(300), false, false, "Content-Type: image/png\r\n"),
+        "/big.png" => (
+            body(super::thumbnail::MAX_BYTES + 1),
+            false,
+            false,
+            "Content-Type: image/png\r\n",
+        ),
+        "/page.png" => (body(300), false, false, "Content-Type: text/html\r\n"),
         _ => {
             stream.write_all(
                 b"HTTP/1.1 404 Not Found\r\nContent-Length: 0\r\nConnection: close\r\n\r\n",
@@ -292,4 +300,25 @@ fn the_same_name_twice_gets_a_number_and_incognito_downloads_are_not_saved() {
     assert_eq!(saved.matches("\"private\":true").count(), 0);
     manager.purge_private();
     assert_eq!(manager.list().len(), 1);
+}
+
+#[test]
+fn a_small_image_becomes_a_data_address_and_anything_else_has_no_thumbnail() {
+    let server = start_server();
+    let client = reqwest::Client::new();
+    let thumb = |path: &str| {
+        let url = request(&server, path).url;
+        tauri::async_runtime::block_on(super::thumbnail::fetch(&client, &url, None)).unwrap()
+    };
+    let small = thumb("/pic.png").unwrap();
+    assert!(small.starts_with("data:image/png;base64,"));
+    assert_eq!(thumb("/big.png"), None);
+    assert_eq!(thumb("/page.png"), None);
+    assert_eq!(thumb("/missing"), None);
+    let refused = tauri::async_runtime::block_on(super::thumbnail::fetch(
+        &client,
+        "file:///etc/passwd",
+        None,
+    ));
+    assert_eq!(refused.unwrap(), None);
 }

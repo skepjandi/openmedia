@@ -6,6 +6,14 @@ All notable changes to OpenMedia are documented here.
 >
 > **Wiki**: the [GitHub Wiki](https://github.com/skepjandi/openmedia/wiki) is the public-facing main wiki — architecture, recipe format, AI pipeline, security model, roadmap. Source-controlled editing surface is `docs/wiki/` in this repo; CI (`.github/workflows/sync-wiki.yml`) mirrors it to the GitHub Wiki on every merge to `main`. New single-PR changes belong here, not as new wiki pages.
 
+### feat(downloads): thumbnails and a larger preview for images in the page media picker
+
+**Area:** `feat(downloads)`
+
+**Change:** Each image row in *This page* shows a thumbnail, and *Preview* enlarges it. Rust fetches the picture (`downloads_thumbnail`: cookie-free, image types only, at most 2 MiB) because the shell's CSP allows no remote images; rows load as they scroll into view. Video and audio rows show their kind, as the shell cannot play remote media.
+
+**Verified:** Rust test against a loopback server (small image, oversized, wrong type, 404, `file:` address); Vitest suite, lint, clippy. **Not verified:** a built app or real sites.
+
 ### feat(ai): ask the assistant about a site, and a chats page with Recent, Favorites and History
 
 **Area:** `feat(ai)`, `feat(shell)`

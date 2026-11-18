@@ -443,6 +443,9 @@ export const downloads = {
   open: (id: string) => command("downloads_open", { id }),
   reveal: (id: string) => command("downloads_reveal", { id }),
   preview: (id: string) => invoke<DownloadPreview>("downloads_preview", { id }),
+  /** A small picture of an image address, or null when it is not a small image. */
+  thumbnail: (url: string, pageUrl?: string) =>
+    invoke<string | null>("downloads_thumbnail", { url, pageUrl: pageUrl ?? null }),
   /** Lists what the page in front offers to download. */
   sniff: () => invoke<SniffedPage>("downloads_sniff"),
   onChanged: (handler: (download: Download) => void): Promise<UnlistenFn> =>

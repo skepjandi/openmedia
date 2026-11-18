@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useApp } from "../../app/store";
 import { useT } from "../../i18n/useT";
-import { downloads, type SniffedPage } from "../../shared/ipc";
+import { downloads, type FoundMedia, type SniffedPage } from "../../shared/ipc";
+import { Thumb } from "./Thumb";
 import { field, primaryBlockButton, quietButton } from "../settings/ui";
 import {
   compilePattern,
@@ -143,26 +144,13 @@ export function PageTab({
       )}
       <ul className="divide-y divide-hair overflow-hidden rounded-2xl border border-hair bg-paper/[0.04]">
         {shown.map((item) => (
-          <li key={`${item.kind}:${item.url}`}>
-            <label className="flex items-center gap-3 px-4 py-2.5 active:bg-paper/[0.05]">
-              <input
-                type="checkbox"
-                checked={picked.has(item.url)}
-                onChange={() => toggle(item.url)}
-                className="size-5 shrink-0 accent-[var(--color-accent)]"
-              />
-              <span className="shrink-0 rounded-md border border-hair px-1.5 py-0.5 text-[10px] font-medium text-paper/60 uppercase">
-                {t(`downloads.kind.${item.kind}`)}
-              </span>
-              <span className="min-w-0 flex-1">
-                <span className="block truncate text-sm">{item.label || item.url}</span>
-                <span className="block truncate text-xs text-paper/45">
-                  {item.width > 0 && item.height > 0 ? `${item.width}×${item.height} · ` : ""}
-                  {item.url}
-                </span>
-              </span>
-            </label>
-          </li>
+          <MediaRow
+            key={`${item.kind}:${item.url}`}
+            item={item}
+            pageUrl={found?.page.url ?? ""}
+            checked={picked.has(item.url)}
+            onToggle={() => toggle(item.url)}
+          />
         ))}
       </ul>
       <button
@@ -174,5 +162,62 @@ export function PageTab({
         {t("downloads.downloadSelected", { count: chosen.length })}
       </button>
     </div>
+  );
+}
+
+function MediaRow({
+  item,
+  pageUrl,
+  checked,
+  onToggle,
+}: {
+  item: FoundMedia;
+  pageUrl: string;
+  checked: boolean;
+  onToggle: () => void;
+}) {
+  const t = useT();
+  const [picture, setPicture] = useState<string | null>(null);
+  const [enlarged, setEnlarged] = useState(false);
+
+  return (
+    <li>
+      <div className="flex items-center active:bg-paper/[0.05]">
+        <label className="flex min-w-0 flex-1 items-center gap-3 py-2.5 ps-4">
+          <input
+            type="checkbox"
+            checked={checked}
+            onChange={onToggle}
+            className="size-5 shrink-0 accent-[var(--color-accent)]"
+          />
+          {item.kind === "image" ? (
+            <Thumb url={item.url} pageUrl={pageUrl} onLoaded={setPicture} />
+          ) : (
+            <span className="grid size-12 shrink-0 place-items-center rounded-lg bg-paper/[0.06] text-[10px] font-medium text-paper/60 uppercase">
+              {t(`downloads.kind.${item.kind}`)}
+            </span>
+          )}
+          <span className="min-w-0 flex-1">
+            <span className="block truncate text-sm">{item.label || item.url}</span>
+            <span className="block truncate text-xs text-paper/45">
+              {item.width > 0 && item.height > 0 ? `${item.width}×${item.height} · ` : ""}
+              {item.url}
+            </span>
+          </span>
+        </label>
+        {picture && (
+          <button
+            type="button"
+            onClick={() => setEnlarged(!enlarged)}
+            className="shrink-0 px-4 py-2.5 text-sm font-medium text-accent"
+          >
+            {t(enlarged ? "downloads.hidePreview" : "downloads.preview")}
+          </button>
+        )}
+      </div>
+      {enlarged && picture && (
+        <img src={picture} alt="" className="max-h-72 w-full bg-paper/[0.04] object-contain p-2" />
+      )}
+    </li>
   );
 }

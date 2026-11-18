@@ -224,6 +224,17 @@ pub async fn downloads_sniff(app: AppHandle) -> Result<Sniffed> {
     Ok(sniff::parse(&json))
 }
 
+/// A small picture of an image the sniffer listed, as a data address, or `None` when the address
+/// is not an image the shell may show. The shell's CSP allows no remote images, so Rust fetches it.
+#[tauri::command]
+pub async fn downloads_thumbnail(
+    manager: State<'_, Manager>,
+    url: String,
+    page_url: Option<String>,
+) -> Result<Option<String>> {
+    super::thumbnail::fetch(manager.client(), &url, page_url.as_deref()).await
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

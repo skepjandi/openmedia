@@ -220,6 +220,10 @@ impl Manager {
         })
     }
 
+    pub(super) fn client(&self) -> &reqwest::Client {
+        &self.inner.client
+    }
+
     pub fn default_root(&self) -> &Path {
         &self.inner.default_root
     }

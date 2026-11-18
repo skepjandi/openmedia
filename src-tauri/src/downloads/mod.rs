@@ -12,6 +12,7 @@ mod naming;
 mod pattern;
 mod settings;
 mod sniff;
+mod thumbnail;
 mod transfer;
 
 pub use commands::*;
