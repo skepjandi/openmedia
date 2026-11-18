@@ -77,22 +77,22 @@ pub fn import_read(state: State<'_, ImportState>, text: String) -> Result<Previe
 
 /// The browsers on this computer that can be imported from directly. Empty where the system keeps
 /// other apps' folders out of reach (iOS, the stores' sandboxes): those use the exported files.
+#[cfg(desktop)]
 #[tauri::command]
 pub async fn import_browsers() -> Result<Vec<import::browsers::Detected>> {
-    #[cfg(desktop)]
-    {
-        tokio::task::spawn_blocking(|| {
-            import::browsers::Roots::from_env()
-                .map(|roots| import::browsers::detect(&roots))
-                .unwrap_or_default()
-        })
-        .await
-        .map_err(|_| Error::Import("could not look for browsers".into()))
-    }
-    #[cfg(not(desktop))]
-    {
-        Ok(Vec::new())
-    }
+    tokio::task::spawn_blocking(|| {
+        import::browsers::Roots::from_env()
+            .map(|roots| import::browsers::detect(&roots))
+            .unwrap_or_default()
+    })
+    .await
+    .map_err(|_| Error::Import("could not look for browsers".into()))
+}
+
+#[cfg(not(desktop))]
+#[tauri::command]
+pub async fn import_browsers() -> Result<Vec<serde_json::Value>> {
+    Ok(Vec::new())
 }
 
 /// Reads one profile of a browser found by [`import_browsers`] and returns what is pending. The
