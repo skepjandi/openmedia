@@ -44,6 +44,7 @@ import {
   type AppState,
   type Favorite,
   type FavoriteInput,
+  type Folder,
   type OptionValue,
   type SearchEngine,
   type SiteSettings,
@@ -82,6 +83,8 @@ export type Sheet =
   | "incognito-recipes"
   | "more-favorites"
   | "incognito-more-favorites"
+  | "folders"
+  | "incognito-folders"
   | "library"
   | "share-recipe"
   | "paywall"
@@ -105,6 +108,8 @@ const SETTINGS_CHILDREN: readonly Sheet[] = [
   "incognito-recipes",
   "more-favorites",
   "incognito-more-favorites",
+  "folders",
+  "incognito-folders",
   "library",
   "share-recipe",
   "paywall",
@@ -149,6 +154,8 @@ export interface IncognitoState {
    * unlocked, and dropped again when both end.
    */
   favorites: Favorite[];
+  /** The incognito folders; held and dropped together with `favorites`. */
+  folders: Folder[];
   /** A biometric check or a switch of mode is in flight. */
   busy: boolean;
 }
@@ -244,6 +251,11 @@ export interface AppStore {
   trimSessions: (pressure: Pressure) => void;
   reportError: (message: string | null) => void;
   saveFavorites: (favorites: FavoriteInput[]) => Promise<boolean>;
+  /**
+   * Saves the folders, after the favorites when a rename or delete changed those too, so a failed
+   * favorites save leaves the folders as they were. True when everything was saved.
+   */
+  saveFolders: (folders: Folder[], favorites?: FavoriteInput[]) => Promise<boolean>;
   /** Adds a recipe's site to the favorites, or removes every favorite that opens it. */
   setSiteFavorite: (recipeId: string, favorite: boolean) => Promise<void>;
   clearHistory: () => Promise<void>;
@@ -327,6 +339,7 @@ export interface AppStore {
   forgetIncognitoSites: () => void;
   loadIncognitoFavorites: () => Promise<void>;
   saveIncognitoFavorites: (favorites: FavoriteInput[]) => Promise<boolean>;
+  saveIncognitoFolders: (folders: Folder[], favorites?: FavoriteInput[]) => Promise<boolean>;
   loadIncognitoSites: () => Promise<void>;
   setIncognitoSiteOption: (recipeId: string, optionId: string, value: OptionValue) => Promise<void>;
 }
@@ -351,10 +364,15 @@ export const selectPage = (store: AppStore): Session | null =>
   store.blankTab ? null : (store.sessions.find((session) => session.id === store.activeId) ?? null);
 
 const NO_FAVORITES: readonly Favorite[] = [];
+const NO_FOLDERS: readonly Folder[] = [];
 
 /** The favorites the floating button fans out: the incognito set while incognito, else the normal one. */
 export const selectQuickFavorites = (store: AppStore): readonly Favorite[] =>
   store.incognito.active ? store.incognito.favorites : (store.state?.favorites ?? NO_FAVORITES);
+
+/** The folders of the set `selectQuickFavorites` reads. */
+export const selectQuickFolders = (store: AppStore): readonly Folder[] =>
+  store.incognito.active ? store.incognito.folders : (store.state?.folders ?? NO_FOLDERS);
 
 /** The quick-access favorites the user may open right now: without Pro, the first four of them. */
 export const selectUsableQuickFavorites = (store: AppStore): readonly Favorite[] =>
@@ -583,7 +601,7 @@ export const useApp = create<AppStore>((set, get) => {
     action: null,
     fabEdge: loadPosition().edge,
     sites: [],
-    incognito: { active: false, favorites: [], busy: false },
+    incognito: { active: false, favorites: [], folders: [], busy: false },
     incognitoSites: [],
     aiState: null,
     assistant: initialAssistant,
@@ -810,6 +828,21 @@ export const useApp = create<AppStore>((set, get) => {
     saveFavorites: async (favorites) => {
       try {
         adoptFavorites(await library.setFavorites(favorites));
+        return true;
+      } catch (error) {
+        set({ error: appError(error) });
+        return false;
+      }
+    },
+
+    saveFolders: async (folders, favorites) => {
+      try {
+        if (favorites) adoptFavorites(await library.setFavorites(favorites));
+        const saved = await library.setFolders(folders);
+        set((current) => ({
+          state: current.state && { ...current.state, folders: saved },
+          error: null,
+        }));
         return true;
       } catch (error) {
         set({ error: appError(error) });
@@ -1317,7 +1350,12 @@ export const useApp = create<AppStore>((set, get) => {
           setIncognitoBusy(false);
           return;
         }
-        set({ incognito: { active: true, favorites, busy: false }, error: null, blankTab: true });
+        const folders = await incognitoIpc.folders();
+        set({
+          incognito: { active: true, favorites, folders, busy: false },
+          error: null,
+          blankTab: true,
+        });
         resetChats();
         get().trimSessions("routine");
         applyIcons();
@@ -1334,7 +1372,7 @@ export const useApp = create<AppStore>((set, get) => {
       try {
         await incognitoIpc.exit();
         set({
-          incognito: { active: false, favorites: [], busy: false },
+          incognito: { active: false, favorites: [], folders: [], busy: false },
           incognitoSites: [],
           blankTab: true,
         });
@@ -1363,15 +1401,20 @@ export const useApp = create<AppStore>((set, get) => {
 
     forgetIncognitoFavorites: () =>
       set((current) =>
-        current.incognito.active ? current : { incognito: { ...current.incognito, favorites: [] } },
+        current.incognito.active
+          ? current
+          : { incognito: { ...current.incognito, favorites: [], folders: [] } },
       ),
 
     forgetIncognitoSites: () => set({ incognitoSites: [] }),
 
     loadIncognitoFavorites: async () => {
       try {
-        const favorites = await incognitoIpc.favorites();
-        set((current) => ({ incognito: { ...current.incognito, favorites } }));
+        const [favorites, folders] = await Promise.all([
+          incognitoIpc.favorites(),
+          incognitoIpc.folders(),
+        ]);
+        set((current) => ({ incognito: { ...current.incognito, favorites, folders } }));
         applyIcons();
         void fetchIcons(favorites.map((favorite) => favorite.url));
       } catch (error) {
@@ -1382,6 +1425,18 @@ export const useApp = create<AppStore>((set, get) => {
     saveIncognitoFavorites: async (favorites) => {
       try {
         adoptIncognitoFavorites(await incognitoIpc.setFavorites(favorites));
+        return true;
+      } catch (error) {
+        set({ error: appError(error) });
+        return false;
+      }
+    },
+
+    saveIncognitoFolders: async (folders, favorites) => {
+      try {
+        if (favorites) adoptIncognitoFavorites(await incognitoIpc.setFavorites(favorites));
+        const saved = await incognitoIpc.setFolders(folders);
+        set((current) => ({ incognito: { ...current.incognito, folders: saved }, error: null }));
         return true;
       } catch (error) {
         set({ error: appError(error) });

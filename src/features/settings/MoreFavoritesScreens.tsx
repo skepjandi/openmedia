@@ -9,6 +9,7 @@ export function MoreFavoritesScreen() {
   const open = useApp((s) => s.sheet === "more-favorites");
   const closeSheet = useApp((s) => s.closeSheet);
   const favorites = useApp((s) => s.state?.favorites) ?? [];
+  const folders = useApp((s) => s.state?.folders) ?? [];
   const save = useApp((s) => s.saveFavorites);
   const sites = useApp((s) => s.sites);
   const t = useT();
@@ -23,6 +24,7 @@ export function MoreFavoritesScreen() {
     >
       <FavoritesEditor
         favorites={favorites}
+        folders={folders}
         save={save}
         recipes={sites}
         recipeSheet="recipes"
@@ -36,6 +38,7 @@ export function MoreFavoritesScreen() {
 export function IncognitoMoreFavoritesScreen() {
   const closeSheet = useApp((s) => s.closeSheet);
   const favorites = useApp((s) => s.incognito.favorites);
+  const folders = useApp((s) => s.incognito.folders);
   const save = useApp((s) => s.saveIncognitoFavorites);
   const load = useApp((s) => s.loadIncognitoFavorites);
   const forget = useApp((s) => s.forgetIncognitoFavorites);
@@ -52,6 +55,7 @@ export function IncognitoMoreFavoritesScreen() {
     >
       <FavoritesEditor
         favorites={favorites}
+        folders={folders}
         save={save}
         recipeSheet="incognito-recipes"
         part="more"

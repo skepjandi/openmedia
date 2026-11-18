@@ -1,5 +1,5 @@
 import { invoke } from "@tauri-apps/api/core";
-import type { Favorite, FavoriteInput } from "../../shared/ipc";
+import type { Favorite, FavoriteInput, Folder } from "../../shared/ipc";
 
 /** Face ID where the device has it, otherwise a fingerprint; only used to pick an icon. */
 export type BiometryKind = "face" | "fingerprint";
@@ -22,4 +22,6 @@ export const incognito = {
   favorites: () => invoke<Favorite[]>("get_incognito_favorites"),
   setFavorites: (favorites: FavoriteInput[]) =>
     invoke<Favorite[]>("set_incognito_favorites", { favorites }),
+  folders: () => invoke<Folder[]>("get_incognito_folders"),
+  setFolders: (folders: Folder[]) => invoke<Folder[]>("set_incognito_folders", { folders }),
 };

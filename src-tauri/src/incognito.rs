@@ -21,7 +21,7 @@ use tauri_plugin_siteview::{
 use crate::commands::{current_script, script_for};
 use crate::entitlement::Entitlement;
 use crate::error::Result;
-use crate::library::{Favorite, FavoriteInput, Library, Mode};
+use crate::library::{Favorite, FavoriteInput, Folder, Library, Mode};
 use crate::recipes::Recipes;
 
 #[derive(Default)]
@@ -137,6 +137,27 @@ pub fn set_incognito_favorites(
 ) -> Result<Vec<Favorite>> {
     entitlement.require_pro()?;
     library.set_incognito_favorites(favorites)
+}
+
+/// The incognito folders, handed out only after a biometric check.
+#[tauri::command(async)]
+pub fn get_incognito_folders(
+    library: State<'_, Library>,
+    entitlement: State<'_, Entitlement>,
+) -> Result<Vec<Folder>> {
+    entitlement.require_pro()?;
+    library.folders(Mode::Incognito)
+}
+
+/// Replaces the incognito folders and returns them, validated.
+#[tauri::command(async)]
+pub fn set_incognito_folders(
+    library: State<'_, Library>,
+    entitlement: State<'_, Entitlement>,
+    folders: Vec<Folder>,
+) -> Result<Vec<Folder>> {
+    entitlement.require_pro()?;
+    library.set_folders(Mode::Incognito, folders)
 }
 
 #[cfg(test)]

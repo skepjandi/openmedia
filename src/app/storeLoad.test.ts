@@ -13,6 +13,7 @@ import { VIDEO_CONTROLS_DEFAULT } from "../shared/videoControls";
 const startup = {
   profileId: "default",
   favorites: [],
+  folders: [],
   history: [],
   lastUrl: "https://m.youtube.com/watch?v=example",
   lastBack: [],

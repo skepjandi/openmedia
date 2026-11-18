@@ -38,7 +38,7 @@ use crate::error::{Error, Result};
 use crate::find_in_page;
 use crate::incognito::Incognito;
 use crate::library::{
-    Favorite, FavoriteInput, Library, Mode, SearchEngine, Theme, favorites_need_pro,
+    Favorite, FavoriteInput, Folder, Library, Mode, SearchEngine, Theme, favorites_need_pro,
 };
 use crate::recipes::{
     OptionValue, Recipe, Recipes,
@@ -83,6 +83,12 @@ pub fn set_favorites(
 ) -> Result<Vec<Favorite>> {
     check_favorites_allowed(&library, &entitlement, favorites.len())?;
     library.set_favorites(favorites)
+}
+
+/// Replaces the folders, with their icons. Favorites keep naming the folder they are in.
+#[tauri::command]
+pub fn set_folders(library: State<'_, Library>, folders: Vec<Folder>) -> Result<Vec<Folder>> {
+    library.set_folders(Mode::Normal, folders)
 }
 
 /// Adds a recipe's site to the favorites, or removes it; returns the new list.

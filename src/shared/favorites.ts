@@ -1,4 +1,4 @@
-import type { FavoriteInput } from "./ipc";
+import type { FavoriteInput, Folder } from "./ipc";
 import { siteOf } from "./site";
 
 /** How many favorites the floating button fans out for Pro. The rest stay in Settings. */
@@ -151,6 +151,109 @@ export function folderNames(favorites: readonly { folder?: string | null }[]): s
     if (key !== null && !names.has(key)) names.set(key, folder?.trim() ?? "");
   }
   return [...names.values()];
+}
+
+/** The icons a folder can be given, an emoji each. A folder with none shows what is in it. */
+export const FOLDER_ICONS: readonly string[] = [
+  "📁",
+  "⭐",
+  "❤️",
+  "🏠",
+  "💼",
+  "🎬",
+  "🎵",
+  "🎮",
+  "📚",
+  "📰",
+  "🛒",
+  "✈️",
+  "🍔",
+  "💬",
+  "📷",
+  "🎓",
+  "💰",
+  "🔧",
+  "🧪",
+  "🌍",
+  "⚽",
+  "🧠",
+  "🔒",
+  "🎨",
+];
+
+/**
+ * Every folder to offer when filing a favorite: the managed ones, then any a favorite names that
+ * has no entry of its own (a file saved before folders were managed).
+ */
+export function folderChoices(
+  favorites: readonly { folder?: string | null }[],
+  folders: readonly Folder[],
+): Folder[] {
+  const known = new Map<string, Folder>();
+  for (const folder of folders) {
+    const key = folderKey(folder.name);
+    if (key !== null && !known.has(key)) known.set(key, folder);
+  }
+  for (const name of folderNames(favorites)) {
+    const key = folderKey(name);
+    if (key !== null && !known.has(key)) known.set(key, { name });
+  }
+  return [...known.values()];
+}
+
+/** The icon the user gave a folder, if any. */
+export function folderIcon(folders: readonly Folder[], name: string): string | undefined {
+  const key = folderKey(name);
+  return folders.find((folder) => folderKey(folder.name) === key)?.icon || undefined;
+}
+
+/**
+ * The folders and favorites after `from` is renamed `to` (and given `icon`), with the favorites
+ * filed in it following the new name. `from` is null for a folder being created. Null when `to`
+ * is blank or names another folder.
+ */
+export function saveFolder(
+  favorites: readonly FavoriteInput[],
+  folders: readonly Folder[],
+  from: string | null,
+  to: string,
+  icon: string | undefined,
+): { favorites: FavoriteInput[]; folders: Folder[] } | null {
+  const name = to.trim();
+  const fromKey = folderKey(from);
+  if (!name) return null;
+  const taken = folderChoices(favorites, folders).some(
+    (folder) => folderKey(folder.name) === folderKey(name) && folderKey(folder.name) !== fromKey,
+  );
+  if (taken) return null;
+  const next: Folder = icon ? { name, icon } : { name };
+  const kept = folderChoices(favorites, folders);
+  const at = kept.findIndex((folder) => folderKey(folder.name) === fromKey);
+  if (at >= 0) kept[at] = next;
+  else kept.push(next);
+  return {
+    favorites: favorites.map((favorite) =>
+      fromKey !== null && folderKey(favorite.folder) === fromKey
+        ? { ...favorite, folder: name }
+        : favorite,
+    ),
+    folders: kept,
+  };
+}
+
+/** The folders and favorites after a folder is deleted: the favorites in it are left loose. */
+export function deleteFolder(
+  favorites: readonly FavoriteInput[],
+  folders: readonly Folder[],
+  name: string,
+): { favorites: FavoriteInput[]; folders: Folder[] } {
+  const key = folderKey(name);
+  return {
+    favorites: favorites.map((favorite) =>
+      folderKey(favorite.folder) === key ? { ...favorite, folder: null } : favorite,
+    ),
+    folders: folders.filter((folder) => folderKey(folder.name) !== key),
+  };
 }
 
 /** The address a new session of a favorite starts at: its landing page when it has one, else its address. */

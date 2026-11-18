@@ -1,9 +1,12 @@
 import { describe, expect, it } from "vitest";
+import type { FavoriteInput } from "./ipc";
 import {
   MAX_FAVORITE_NAME_CHARS,
   QUICK_ACCESS_LIMIT,
   asInput,
+  deleteFolder,
   displayHost,
+  folderChoices,
   folderNames,
   groupByFolder,
   favoriteStartUrl,
@@ -12,6 +15,7 @@ import {
   quickSlots,
   recipeForFavorite,
   resolveLanding,
+  saveFolder,
   toggleSiteFavorite,
   usableQuickAccess,
 } from "./favorites";
@@ -250,5 +254,45 @@ describe("asInput", () => {
     expect(asInput({ name: "A", url: "https://a.example/", folder: "Social" }).folder).toBe(
       "Social",
     );
+  });
+});
+
+describe("folder management", () => {
+  const input = (name: string, folder?: string): FavoriteInput => ({
+    name,
+    url: `https://${name}.example/`,
+    folder,
+  });
+
+  it("renames a folder and moves its favorites with it", () => {
+    const result = saveFolder(
+      [input("a", "Work"), input("b")],
+      [{ name: "Work", icon: "💼" }],
+      "Work",
+      " Job ",
+      "💼",
+    );
+    expect(result?.folders).toEqual([{ name: "Job", icon: "💼" }]);
+    expect(result?.favorites.map((favorite) => favorite.folder)).toEqual(["Job", undefined]);
+  });
+
+  it("refuses a blank name or one another folder has, but allows a case change of its own", () => {
+    const folders = [{ name: "Work" }, { name: "Fun" }];
+    expect(saveFolder([], folders, "Work", "fun", undefined)).toBeNull();
+    expect(saveFolder([], folders, null, "  ", undefined)).toBeNull();
+    expect(saveFolder([], folders, "Work", "WORK", undefined)?.folders[0].name).toBe("WORK");
+  });
+
+  it("lists a folder that only a favorite names, and an empty one that only exists as a folder", () => {
+    expect(folderChoices([input("a", "Old")], [{ name: "Empty", icon: "⭐" }])).toEqual([
+      { name: "Empty", icon: "⭐" },
+      { name: "Old" },
+    ]);
+  });
+
+  it("leaves the favorites of a deleted folder loose", () => {
+    const result = deleteFolder([input("a", "Work")], [{ name: "Work" }], "work");
+    expect(result.folders).toEqual([]);
+    expect(result.favorites[0].folder).toBeNull();
   });
 });

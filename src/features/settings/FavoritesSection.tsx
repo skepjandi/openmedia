@@ -5,12 +5,21 @@ import {
   FREE_QUICK_ACCESS_LIMIT,
   QUICK_ACCESS_LIMIT,
   asInput,
-  folderNames,
+  folderChoices,
+  folderKey,
   recipeForFavorite,
   resolveLanding,
 } from "../../shared/favorites";
-import { DownIcon, ForwardIcon, ProIcon, PlusIcon, StarIcon, UpIcon } from "../../shared/icons";
-import type { Favorite, FavoriteInput, SiteSettings } from "../../shared/ipc";
+import {
+  DownIcon,
+  ForwardIcon,
+  FolderIcon,
+  ProIcon,
+  PlusIcon,
+  StarIcon,
+  UpIcon,
+} from "../../shared/icons";
+import type { Favorite, FavoriteInput, Folder, SiteSettings } from "../../shared/ipc";
 import { overrideCount } from "../../shared/overrides";
 import { SiteTile } from "../../shared/SiteTile";
 import { siteOf } from "../../shared/site";
@@ -31,6 +40,7 @@ import { Group, GroupLabel, Section, field, primaryButton, quietButton } from ".
  */
 export function FavoritesSection() {
   const favorites = useApp((s) => s.state?.favorites) ?? [];
+  const folders = useApp((s) => s.state?.folders) ?? [];
   const saveFavorites = useApp((s) => s.saveFavorites);
   const sites = useApp((s) => s.sites);
   const t = useT();
@@ -39,6 +49,7 @@ export function FavoritesSection() {
     <Section title={t("favorites.title")} note={t("favorites.note", { limit: QUICK_ACCESS_LIMIT })}>
       <FavoritesEditor
         favorites={favorites}
+        folders={folders}
         save={saveFavorites}
         recipes={sites}
         recipeSheet="recipes"
@@ -49,6 +60,8 @@ export function FavoritesSection() {
 
 interface EditorListProps {
   favorites: Favorite[];
+  /** The managed folders of the same set, offered when filing a favorite. */
+  folders: readonly Folder[];
   /** Replaces the whole list; resolves true when it was saved. */
   save: (favorites: FavoriteInput[]) => Promise<boolean>;
   /** Shown when quick access is empty; the default points at starring a recipe. */
@@ -68,6 +81,7 @@ interface EditorListProps {
  */
 export function FavoritesEditor({
   favorites,
+  folders: managedFolders,
   save,
   emptyText,
   recipes,
@@ -135,7 +149,7 @@ export function FavoritesEditor({
     void replaceAll(favorites.map(asInput).filter((_, at) => at !== index));
   };
 
-  const folders = folderNames(favorites);
+  const folders = folderChoices(favorites, managedFolders);
 
   const renderRow = (favorite: Favorite, index: number) => {
     const recipe = recipes && recipeForFavorite(recipes, favorite.url);
@@ -247,6 +261,13 @@ export function FavoritesEditor({
             </span>
             {t("favorites.addFromRecipes")}
           </button>
+          <button
+            type="button"
+            onClick={() => openSheet(recipeSheet === "recipes" ? "folders" : "incognito-folders")}
+            className="flex items-center gap-2 px-1 py-1 text-sm font-medium text-accent"
+          >
+            <FolderIcon /> {t("favorites.folderManage")}
+          </button>
         </div>
         {editing === "new" && (
           <div className="mt-3 overflow-hidden rounded-2xl border border-hair bg-paper/[0.04]">
@@ -311,8 +332,8 @@ interface RowProps {
   first: boolean;
   last: boolean;
   editing: boolean;
-  /** The folders already in use, offered when filing a favorite. */
-  folders: string[];
+  /** The folders a favorite can be filed in. */
+  folders: Folder[];
   /** Only a quick-access favorite can notify, so only its editor offers the switch. */
   showNotify: boolean;
   onEdit: () => void;
@@ -418,7 +439,7 @@ function FavoriteRow({
 
 interface EditorProps {
   initial: FavoriteInput;
-  folders: string[];
+  folders: Folder[];
   showNotify: boolean;
   hint?: string;
   onCommit: (entry: FavoriteInput) => Promise<boolean>;
@@ -498,23 +519,22 @@ function FavoriteEditor({
           setUrl(event.target.value);
         }}
       />
-      <input
+      <select
         aria-label={t("favorites.folderLabel")}
         className={field}
-        list="favorite-folders"
-        maxLength={MAX_FAVORITE_NAME}
-        placeholder={t("favorites.folderPlaceholder")}
-        value={folder}
+        value={folders.find((entry) => folderKey(entry.name) === folderKey(folder))?.name ?? ""}
         onChange={(event) => {
           setProblem(null);
           setFolder(event.target.value);
         }}
-      />
-      <datalist id="favorite-folders">
-        {folders.map((name) => (
-          <option key={name} value={name} />
+      >
+        <option value="">{t("favorites.folderNone")}</option>
+        {folders.map((entry) => (
+          <option key={entry.name} value={entry.name}>
+            {entry.icon ? `${entry.icon} ${entry.name}` : entry.name}
+          </option>
         ))}
-      </datalist>
+      </select>
       <div className="flex flex-col gap-1.5">
         <div className="text-sm font-medium">{t("favorites.landingLabel")}</div>
         <p className="text-sm leading-snug text-paper/55">{t("favorites.landingNote")}</p>

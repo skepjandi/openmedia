@@ -16,6 +16,7 @@ import { Group, LockedSection } from "./ui";
  */
 export function IncognitoFavoritesSection() {
   const favorites = useApp((s) => s.incognito.favorites);
+  const folders = useApp((s) => s.incognito.folders);
   const unlock = useApp((s) => s.unlockIncognito);
   const load = useApp((s) => s.loadIncognitoFavorites);
   const forget = useApp((s) => s.forgetIncognitoFavorites);
@@ -35,6 +36,7 @@ export function IncognitoFavoritesSection() {
     >
       <FavoritesEditor
         favorites={favorites}
+        folders={folders}
         save={save}
         emptyText={t("incognito.favoritesEmpty")}
         recipeSheet="incognito-recipes"

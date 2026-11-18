@@ -128,6 +128,19 @@ pub struct Favorite {
     pub folder: Option<String>,
 }
 
+/// How many characters a folder's icon may have: one emoji, with its joiners and selectors.
+pub const MAX_FOLDER_ICON_CHARS: usize = 8;
+
+/// A folder as the user manages it: a name and, when chosen, an icon. Favorites name the folder
+/// they are in; a folder with no favorites lives only here. Without an icon the folder shows the
+/// icons of what is in it.
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct Folder {
+    pub name: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub icon: Option<String>,
+}
+
 impl Favorite {
     /// The address a new session of this favorite opens.
     pub fn start_url(&self) -> &str {
@@ -155,6 +168,8 @@ pub struct FavoriteInput {
 pub struct AppState {
     pub profile_id: Uuid,
     pub favorites: Vec<Favorite>,
+    /// The folders the user manages, with their icons; includes empty ones.
+    pub folders: Vec<Folder>,
     pub history: Vec<String>,
     pub last_url: Option<String>,
     /// The pages behind `last_url`, oldest first, so Back still works after a restart.
@@ -199,6 +214,8 @@ struct LibraryData {
     version: u32,
     profile_id: Uuid,
     favorites: Vec<Favorite>,
+    #[serde(default)]
+    folders: Vec<Folder>,
     last_url: Option<String>,
     #[serde(default)]
     last_back: Vec<String>,
@@ -225,6 +242,9 @@ struct LibraryData {
     /// default favorites, with no recipe sites, and an emptied set stays empty.
     #[serde(default)]
     incognito_favorites: Option<Vec<Favorite>>,
+    /// The incognito set's folders, kept apart from `folders`.
+    #[serde(default)]
+    incognito_folders: Vec<Folder>,
     #[serde(default)]
     bottom_margin: u32,
     /// Per-site bottom margins by recipe id; a site without an entry uses `bottom_margin`.
@@ -337,6 +357,7 @@ impl Library {
         Ok(AppState {
             profile_id: data.profile_id,
             favorites: with_icons(&data, &data.favorites),
+            folders: data.folders.clone(),
             history: data.history.clone(),
             last_url: data.last_url.clone(),
             last_back: data.last_back.clone(),
@@ -384,6 +405,28 @@ impl Library {
         data.favorites = favorites;
         self.save(&data)?;
         Ok(with_icons(&data, &data.favorites))
+    }
+
+    /// The folders of the normal set or, for incognito, of the private one.
+    pub fn folders(&self, mode: Mode) -> Result<Vec<Folder>> {
+        let data = self.lock()?;
+        Ok(match mode {
+            Mode::Normal => data.folders.clone(),
+            Mode::Incognito => data.incognito_folders.clone(),
+        })
+    }
+
+    /// Replaces a set's folders. Names are trimmed and a repeat of one already listed (ignoring
+    /// case) is dropped.
+    pub fn set_folders(&self, mode: Mode, folders: Vec<Folder>) -> Result<Vec<Folder>> {
+        let folders = folders_from_input(folders)?;
+        let mut data = self.lock()?;
+        match mode {
+            Mode::Normal => data.folders = folders.clone(),
+            Mode::Incognito => data.incognito_folders = folders.clone(),
+        }
+        self.save(&data)?;
+        Ok(folders)
     }
 
     /// The incognito quick-access set, icons filled in. Handed out only after a biometric check.
@@ -1021,6 +1064,7 @@ fn default_data() -> LibraryData {
         version: FORMAT_VERSION,
         profile_id: Uuid::new_v4(),
         favorites: default_favorites(),
+        folders: Vec::new(),
         last_url: None,
         last_back: Vec::new(),
         onboarded: false,
@@ -1049,7 +1093,36 @@ fn default_data() -> LibraryData {
         dark_sites: BTreeMap::new(),
         incognito_site_options: OptionChoices::new(),
         incognito_favorites: None,
+        incognito_folders: Vec::new(),
     }
+}
+
+fn folders_from_input(inputs: Vec<Folder>) -> Result<Vec<Folder>> {
+    let mut folders: Vec<Folder> = Vec::with_capacity(inputs.len());
+    for input in inputs {
+        let name = input.name.trim();
+        if name.is_empty() || name.chars().count() > MAX_FAVORITE_NAME_CHARS {
+            return Err(Error::InvalidFolder);
+        }
+        let icon = match input.icon.as_deref().map(str::trim) {
+            None | Some("") => None,
+            Some(icon) if icon.chars().count() > MAX_FOLDER_ICON_CHARS => {
+                return Err(Error::InvalidFolder);
+            }
+            Some(icon) => Some(icon.to_owned()),
+        };
+        if folders
+            .iter()
+            .any(|known| known.name.to_lowercase() == name.to_lowercase())
+        {
+            continue;
+        }
+        folders.push(Folder {
+            name: name.to_owned(),
+            icon,
+        });
+    }
+    Ok(folders)
 }
 
 fn favorite_from_input(input: FavoriteInput) -> Result<Favorite> {
@@ -1346,6 +1419,38 @@ mod tests {
         assert_eq!(
             library.start_url().unwrap().as_deref(),
             Some("https://a.example/inbox")
+        );
+    }
+
+    #[test]
+    fn folders_are_validated_and_kept_per_set() {
+        let (_dir, library) = library();
+        let folder = |name: &str, icon: Option<&str>| Folder {
+            name: name.to_owned(),
+            icon: icon.map(str::to_owned),
+        };
+        let saved = library
+            .set_folders(
+                Mode::Normal,
+                vec![
+                    folder(" Work ", Some("💼")),
+                    folder("work", None),
+                    folder("Fun", Some(" ")),
+                ],
+            )
+            .unwrap();
+        assert_eq!(saved, vec![folder("Work", Some("💼")), folder("Fun", None)]);
+        assert_eq!(library.state().unwrap().folders, saved);
+        assert!(library.folders(Mode::Incognito).unwrap().is_empty());
+        assert!(
+            library
+                .set_folders(Mode::Normal, vec![folder("", None)])
+                .is_err()
+        );
+        assert!(
+            library
+                .set_folders(Mode::Normal, vec![folder("A", Some("123456789"))])
+                .is_err()
         );
     }
 

@@ -22,6 +22,14 @@ All notable changes to OpenMedia are documented here.
 
 **Not verified:** on a device or on a live site; depends on the site honouring untrusted cancel events.
 
+### feat(favorites): folders are chosen from a list, managed on their own page, and can have an icon
+
+**Area:** `feat(favorites)`
+
+**Change:** A favorite's folder is picked from a dropdown instead of typed. "Manage folders" opens a page to create, rename, delete and give a folder an emoji icon; without one the folder shows the icons of what is in it. Folders (and empty ones) are saved by Rust per set, normal and incognito apart.
+
+**Verified:** Vitest for rename, duplicate names, listing and delete; a Rust test for validation and per-set storage; clippy. **Not verified:** a phone or the desktop window by eye.
+
 ### fix(fab): the same room above and below the floating button on the tool line
 
 **Area:** `fix(fab)`

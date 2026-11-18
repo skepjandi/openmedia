@@ -144,9 +144,17 @@ export interface FavoriteInput {
   folder?: string | null;
 }
 
+/** A folder the user manages: a name and, when chosen, an emoji icon. Without one it shows what is in it. */
+export interface Folder {
+  name: string;
+  icon?: string;
+}
+
 export interface AppState {
   profileId: string;
   favorites: Favorite[];
+  /** The folders, including empty ones; favorites name the folder they are in. */
+  folders: Folder[];
   /** Addresses the user typed, newest first. */
   history: string[];
   lastUrl: string | null;
@@ -591,6 +599,7 @@ export const library = {
     return request;
   },
   setFavorites: (favorites: FavoriteInput[]) => invoke<Favorite[]>("set_favorites", { favorites }),
+  setFolders: (folders: Folder[]) => invoke<Folder[]>("set_folders", { folders }),
   /** Adds a recipe's site to the favorites, or removes the site's favorites. */
   setSiteFavorite: (recipeId: string, favorite: boolean) =>
     invoke<Favorite[]>("set_site_favorite", { recipeId, favorite }),

@@ -22,11 +22,14 @@ export interface FolderMember {
  */
 export function FolderPopup({
   name,
+  icon,
   members,
   onPick,
   onClose,
 }: {
   name: string;
+  /** The emoji the user gave the folder, if any. */
+  icon?: string;
   members: FolderMember[];
   onPick: (member: FolderMember) => void;
   onClose: () => void;
@@ -44,7 +47,13 @@ export function FolderPopup({
         className="glass assistant-dock fixed top-1/2 left-1/2 z-[61] max-h-[70vh] w-[min(88vw,22rem)] -translate-x-1/2 -translate-y-1/2 overflow-y-auto rounded-3xl p-4 text-paper"
       >
         <div className="mb-3 flex items-center gap-2 px-1 text-sm font-medium text-paper/70">
-          <FolderIcon size={18} />
+          {icon ? (
+            <span aria-hidden="true" className="text-lg leading-none">
+              {icon}
+            </span>
+          ) : (
+            <FolderIcon size={18} />
+          )}
           <span className="min-w-0 flex-1 truncate">{name}</span>
         </div>
         <div className="grid grid-cols-3 gap-x-2 gap-y-4">

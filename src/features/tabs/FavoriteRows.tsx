@@ -1,14 +1,16 @@
 import { useState } from "react";
-import { useApp } from "../../app/store";
+import { selectQuickFolders, useApp } from "../../app/store";
 import { useT } from "../../i18n/useT";
 import {
   FREE_QUICK_ACCESS_LIMIT,
   displayHost,
+  folderIcon,
   folderKey,
   groupByFolder,
 } from "../../shared/favorites";
-import { DownIcon, FolderIcon, ProIcon, UpIcon } from "../../shared/icons";
+import { DownIcon, ProIcon, UpIcon } from "../../shared/icons";
 import type { Favorite } from "../../shared/ipc";
+import { FolderTile } from "../../shared/FolderTile";
 import { SiteTile } from "../../shared/SiteTile";
 import { useEntitlementStore } from "../paywall/store";
 import { Group } from "../settings/ui";
@@ -28,6 +30,7 @@ export function FavoriteRows({
 }) {
   const sessions = useApp((s) => s.sessions);
   const sites = useApp((s) => s.sites);
+  const folders = useApp(selectQuickFolders);
   const openFavorite = useApp((s) => s.openFavorite);
   const openSheet = useApp((s) => s.openSheet);
   const isPro = useEntitlementStore((s) => s.status === "pro");
@@ -70,12 +73,10 @@ export function FavoriteRows({
               }
               className="flex w-full items-center gap-3 px-4 py-3 text-start active:bg-paper/[0.06]"
             >
-              <span
-                aria-hidden="true"
-                className="grid size-10 shrink-0 place-items-center rounded-[10px] bg-accent/15 text-accent"
-              >
-                <FolderIcon />
-              </span>
+              <FolderTile
+                icon={folderIcon(folders, entry.name)}
+                members={entry.members.map((member) => member.favorite)}
+              />
               <span className="min-w-0 flex-1">
                 <span className="block truncate text-base font-medium">{entry.name}</span>
                 <span className="block truncate text-sm text-paper/55">

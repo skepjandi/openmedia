@@ -64,6 +64,16 @@ const DownloadsSheet = lazy(() =>
 const MoreFavoritesScreen = lazy(() =>
   loadMoreFavorites().then((module) => ({ default: module.MoreFavoritesScreen })),
 );
+const FoldersScreen = lazy(() =>
+  import("../features/settings/FoldersScreen").then((module) => ({
+    default: module.FoldersScreen,
+  })),
+);
+const IncognitoFoldersScreen = lazy(() =>
+  import("../features/settings/FoldersScreen").then((module) => ({
+    default: module.IncognitoFoldersScreen,
+  })),
+);
 const IncognitoMoreFavoritesScreen = lazy(() =>
   loadMoreFavorites().then((module) => ({ default: module.IncognitoMoreFavoritesScreen })),
 );
@@ -203,6 +213,10 @@ export function App() {
       <Suspense fallback={null}>{sheet === "more-favorites" && <MoreFavoritesScreen />}</Suspense>
       <Suspense fallback={null}>
         {sheet === "incognito-more-favorites" && <IncognitoMoreFavoritesScreen />}
+      </Suspense>
+      <Suspense fallback={null}>{sheet === "folders" && <FoldersScreen />}</Suspense>
+      <Suspense fallback={null}>
+        {sheet === "incognito-folders" && <IncognitoFoldersScreen />}
       </Suspense>
       <Suspense fallback={null}>{sheet === "downloads" && <DownloadsSheet />}</Suspense>
       <Suspense fallback={null}>{sheet === "import" && <ImportScreen />}</Suspense>

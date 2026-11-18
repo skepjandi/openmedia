@@ -26,7 +26,10 @@ import { Group, Section, primaryButton, quietButton } from "./ui";
 export function SettingsScreen() {
   const open = useApp(selectSettingsOpen);
   const incognitoChildOpen = useApp(
-    (s) => s.sheet === "incognito-recipes" || s.sheet === "incognito-more-favorites",
+    (s) =>
+      s.sheet === "incognito-recipes" ||
+      s.sheet === "incognito-more-favorites" ||
+      s.sheet === "incognito-folders",
   );
   const closeSheet = useApp((s) => s.closeSheet);
   const t = useT();

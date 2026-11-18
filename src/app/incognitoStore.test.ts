@@ -27,7 +27,7 @@ beforeEach(() => {
     state: appState,
     sessions: [],
     activeId: null,
-    incognito: { active: false, favorites: [], busy: false },
+    incognito: { active: false, favorites: [], folders: [], busy: false },
     incognitoSites: [],
     error: null,
   });
@@ -41,7 +41,12 @@ describe("incognito mode", () => {
     invoke.mockResolvedValue(null);
     await useApp.getState().enterIncognito();
     expect(invoke).toHaveBeenCalledWith("enter_incognito", { reason: expect.any(String) });
-    expect(useApp.getState().incognito).toEqual({ active: false, favorites: [], busy: false });
+    expect(useApp.getState().incognito).toEqual({
+      active: false,
+      favorites: [],
+      folders: [],
+      busy: false,
+    });
     expect(names(selectQuickFavorites(useApp.getState()))).toEqual(["Reddit"]);
   });
 
@@ -53,7 +58,12 @@ describe("incognito mode", () => {
 
     await useApp.getState().exitIncognito();
     expect(calls("exit_incognito")).toHaveLength(1);
-    expect(useApp.getState().incognito).toEqual({ active: false, favorites: [], busy: false });
+    expect(useApp.getState().incognito).toEqual({
+      active: false,
+      favorites: [],
+      folders: [],
+      busy: false,
+    });
     expect(names(selectQuickFavorites(useApp.getState()))).toEqual(["Reddit"]);
   });
 
@@ -104,11 +114,11 @@ describe("incognito mode", () => {
   });
 
   it("keeps the incognito favorites while it is on, but forgets an unlocked section's copy otherwise", () => {
-    useApp.setState({ incognito: { active: false, favorites: secret, busy: false } });
+    useApp.setState({ incognito: { active: false, favorites: secret, folders: [], busy: false } });
     useApp.getState().forgetIncognitoFavorites();
     expect(useApp.getState().incognito.favorites).toEqual([]);
 
-    useApp.setState({ incognito: { active: true, favorites: secret, busy: false } });
+    useApp.setState({ incognito: { active: true, favorites: secret, folders: [], busy: false } });
     useApp.getState().forgetIncognitoFavorites();
     expect(useApp.getState().incognito.favorites).toEqual(secret);
   });

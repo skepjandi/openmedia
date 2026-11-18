@@ -7,7 +7,7 @@ import {
   type ReactNode,
   type WheelEvent,
 } from "react";
-import { selectPage, selectQuickFavorites, useApp } from "../../app/store";
+import { selectPage, selectQuickFavorites, selectQuickFolders, useApp } from "../../app/store";
 import { unreadByFavorite } from "../web/unreadWatch";
 import { sessionForFavorite, type Session } from "../web/sessions";
 import { FolderPopup, type FolderMember } from "./FolderPopup";
@@ -16,6 +16,7 @@ import { useT } from "../../i18n/useT";
 import {
   FREE_QUICK_ACCESS_LIMIT,
   displayHost,
+  folderIcon,
   folderKey,
   groupByFolder,
   quickSlots,
@@ -311,6 +312,7 @@ function DialButton({
  */
 export function Fab() {
   const favorites = useApp(selectQuickFavorites);
+  const folders = useApp(selectQuickFolders);
   const incognito = useApp((s) => s.incognito);
   const enterIncognito = useApp((s) => s.enterIncognito);
   const exitIncognito = useApp((s) => s.exitIncognito);
@@ -528,26 +530,32 @@ export function Fab() {
       className: "text-white",
       content: (
         <>
-          <span className="grid grid-cols-2 gap-0.5">
-            {item.members.slice(0, 4).map(({ favorite }) =>
-              favorite.icon ? (
-                <img
-                  key={favorite.id}
-                  src={favorite.icon}
-                  alt=""
-                  draggable={false}
-                  className="size-[18px] rounded-[5px]"
-                />
-              ) : (
-                <span
-                  key={favorite.id}
-                  className="grid size-[18px] place-items-center rounded-[5px] bg-white/25 text-[10px] leading-none font-semibold"
-                >
-                  {monogram(favorite.name)}
-                </span>
-              ),
-            )}
-          </span>
+          {folderIcon(folders, item.name) ? (
+            <span aria-hidden="true" className="text-[22px] leading-none">
+              {folderIcon(folders, item.name)}
+            </span>
+          ) : (
+            <span className="grid grid-cols-2 gap-0.5">
+              {item.members.slice(0, 4).map(({ favorite }) =>
+                favorite.icon ? (
+                  <img
+                    key={favorite.id}
+                    src={favorite.icon}
+                    alt=""
+                    draggable={false}
+                    className="size-[18px] rounded-[5px]"
+                  />
+                ) : (
+                  <span
+                    key={favorite.id}
+                    className="grid size-[18px] place-items-center rounded-[5px] bg-white/25 text-[10px] leading-none font-semibold"
+                  >
+                    {monogram(favorite.name)}
+                  </span>
+                ),
+              )}
+            </span>
+          )}
           {unreadCount > 0 && <UnreadBadge count={unreadCount} />}
           {item.live && <OpenDot />}
         </>
@@ -1013,6 +1021,7 @@ export function Fab() {
       {folderName !== null && folderMembers.length > 0 && !hidden && (
         <FolderPopup
           name={folderName}
+          icon={folderIcon(folders, folderName)}
           members={folderMembers}
           onClose={() => setFolderName(null)}
           onPick={(member) => {
