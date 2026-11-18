@@ -215,7 +215,17 @@ input {
   animation: ring-fill 230ms linear 120ms both;
 }
 
-.fan-item[data-carry="armed"],
+/* The dial places an item with its own `transform`; the individual `scale` property is applied
+   outside it and would scale the item's offset too, throwing it off the dial. So a lifted dial
+   item grows through `--lift`, inside the transform. */
+.fan-item[data-open="true"][data-carry="armed"] {
+  --lift: 1.18;
+  filter: drop-shadow(0 8px 14px rgb(0 0 0 / 0.5));
+  transition:
+    transform 180ms var(--ease-spring),
+    opacity 160ms linear;
+}
+
 .carry-tile[data-carry="armed"] {
   scale: 1.18;
   filter: drop-shadow(0 8px 14px rgb(0 0 0 / 0.5));
@@ -279,7 +289,7 @@ input {
 }
 
 .fan-item[data-open="true"] {
-  transform: translate(var(--x), var(--y)) scale(1);
+  transform: translate(var(--x), var(--y)) scale(var(--lift, 1));
   opacity: var(--o, 1);
 }
 
