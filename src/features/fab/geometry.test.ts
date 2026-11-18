@@ -2,7 +2,6 @@ import { describe, expect, it } from "vitest";
 import {
   DIAL_RADIUS,
   RING_HALF_SPAN,
-  TOOL_STEP,
   FAB_SIZE,
   FAVORITE_SIZE,
   HOLD_SCALE,
@@ -22,7 +21,7 @@ import {
   snapRotation,
   snapToEdge,
   snapToolScroll,
-  toolMaxScroll,
+  toolScrollRange,
   toolPlan,
   toolSlots,
   type ToolItem,
@@ -220,76 +219,85 @@ describe("dial rotation", () => {
   });
 });
 
-const toolItems: ToolItem[] = [
-  { target: { kind: "stats" }, size: 44 },
-  { target: { kind: "tabs" }, size: 44 },
-  { target: { kind: "history" }, size: 44 },
-  { target: { kind: "settings" }, size: 44 },
-];
+const tools = (count: number): ToolItem[] =>
+  Array.from({ length: count }, (_, i) => ({
+    target: { kind: i % 2 ? "tabs" : "stats" } as const,
+    size: 44,
+  }));
 
-describe("tool columns", () => {
+describe("the tool line", () => {
   const origin = fabCenter("left", 426, phone, insets);
+  const plan = toolPlan(origin, phone, insets);
+  const slots = (count: number, top: number, scroll: number, at = origin) =>
+    toolSlots(at, phone, insets, tools(count), top, toolPlan(at, phone, insets), scroll);
 
-  it("put the page column where there is more room and the switches across the button", () => {
-    const high = toolPlan(fabCenter("left", 100, phone, insets), phone, insets);
-    expect([high.pageSide, high.switchSide]).toEqual([1, -1]);
-    const low = toolPlan(fabCenter("left", 800, phone, insets), phone, insets);
-    expect([low.pageSide, low.switchSide]).toEqual([-1, 1]);
+  it("puts the page buttons where there is more room", () => {
+    expect(toolPlan(fabCenter("left", 100, phone, insets), phone, insets).pageBelow).toBe(true);
+    expect(toolPlan(fabCenter("left", 800, phone, insets), phone, insets).pageBelow).toBe(false);
   });
 
-  it("run straight down or up from the button, one step apart, the first at the start", () => {
-    const plan = toolPlan(origin, phone, insets);
-    const slots = toolSlots(origin, phone, insets, toolItems, plan.pageSide, plan.pageStart, 0);
-    slots.forEach((slot, k) => {
+  it("runs straight up and down from the button, a step apart, and shows everything at rest", () => {
+    const line = slots(7, 3, 0);
+    line.forEach((slot) => {
       expect(slot.center.x).toBe(origin.x);
-      expect(slot.center.y).toBeCloseTo(
-        origin.y + plan.pageSide * (plan.pageStart + k * TOOL_STEP),
-      );
       expect(slot.opacity).toBe(1);
+    });
+    expect(line[2].center.y).toBeCloseTo(origin.y - 132);
+    expect(line[3].center.y).toBeCloseTo(origin.y + plan.bottomStart);
+    line.slice(1).forEach((slot, i) => {
+      if (i !== 2) expect(slot.center.y - line[i].center.y).toBeCloseTo(52);
     });
   });
 
-  it("stay clear of the open button and of the ring", () => {
-    const plan = toolPlan(origin, phone, insets);
-    const column = toolSlots(
-      origin,
-      phone,
-      insets,
-      toolItems,
-      plan.switchSide,
-      plan.switchStart,
-      0,
-    );
+  it("slides every button along the line, a step at a time", () => {
+    const rest = slots(7, 3, 0);
+    const slid = slots(7, 3, 1);
+    slid.forEach((slot, i) => expect(slot.center.y - rest[i].center.y).toBeCloseTo(52));
+  });
+
+  it("hides a button that comes near the open button, and shows it again past it", () => {
+    // One step down puts the nearest button above (at -132) at -80: clear. Two puts it at -28.
+    expect(slots(7, 3, 1)[2].opacity).toBe(1);
+    expect(slots(7, 3, 2)[2].opacity).toBe(0);
+    expect(slots(7, 3, 3)[2].opacity).toBe(0);
+    // Four steps carry it across to the other side, where it is visible again.
+    const across = slots(7, 3, 4)[2];
+    expect(across.center.y).toBeGreaterThan(origin.y);
+    expect(across.opacity).toBe(1);
+  });
+
+  it("fades buttons out near the top and bottom of the screen", () => {
+    const range = toolScrollRange(origin, phone, insets, 7, 3, plan);
+    const line = slots(7, 3, range.max);
+    expect(line[0].center.y).toBeGreaterThan(origin.y);
+    expect(line.some((slot) => slot.opacity === 0)).toBe(true);
+    const bottom = slots(7, 3, 0, fabCenter("left", 700, phone, insets));
+    expect(
+      bottom.every((slot) => slot.center.y + slot.size / 2 <= phone.height - insets.bottom + 31),
+    ).toBe(true);
+    expect(bottom.some((slot) => slot.opacity < 1)).toBe(true);
+  });
+
+  it("slides as far as the last button reaching the top and the first the bottom", () => {
+    const range = toolScrollRange(origin, phone, insets, 7, 3, plan);
+    expect(range.min).toBeLessThan(0);
+    expect(range.max).toBeGreaterThan(0);
+    expect(toolScrollRange(origin, phone, insets, 0, 0, plan)).toEqual({ min: 0, max: 0 });
+    expect(snapToolScroll(2.4, range)).toBe(2);
+    expect(snapToolScroll(999, range)).toBe(range.max);
+    expect(snapToolScroll(-999, range)).toBe(range.min);
+  });
+
+  it("keeps clear of the ring", () => {
     const ring = dialSlots(origin, "left", phone, insets, items, 0).filter(
       (slot) => slot.opacity === 1,
     );
-    for (const a of column) {
+    for (const a of slots(7, 3, 0)) {
       for (const b of ring) {
         const gap = Math.hypot(a.center.x - b.center.x, a.center.y - b.center.y);
         expect(gap).toBeGreaterThanOrEqual((a.size + b.size) / 2);
       }
     }
-  });
-
-  it("slide along the line and fade out past the end of the screen", () => {
-    const high = origin;
-    const plan = toolPlan(high, phone, insets);
-    const max = toolMaxScroll(high, phone, insets, plan.pageSide, plan.pageStart, 8);
-    expect(max).toBeGreaterThan(0);
-    const many: ToolItem[] = Array.from({ length: 8 }, () => toolItems[0]);
-    const start = toolSlots(high, phone, insets, many, plan.pageSide, plan.pageStart, 0);
-    expect(start[7].opacity).toBe(0);
-    const end = toolSlots(high, phone, insets, many, plan.pageSide, plan.pageStart, max);
-    expect(end[7].opacity).toBe(1);
-    expect(end[0].opacity).toBe(0);
-  });
-
-  it("need no sliding when they fit, and settle on a whole button", () => {
-    const plan = toolPlan(origin, phone, insets);
-    expect(toolMaxScroll(origin, phone, insets, plan.pageSide, plan.pageStart, 4)).toBe(0);
-    expect(snapToolScroll(2.4, 5)).toBe(2);
-    expect(snapToolScroll(9, 5)).toBe(5);
-    expect(snapToolScroll(-1, 5)).toBe(0);
   });
 });
 

@@ -32,6 +32,14 @@ All notable changes to OpenMedia are documented here.
 
 **Verified:** Rust tests for each parser (Netscape HTML, Chromium JSON, history JSON/CSV, passwords CSV with quotes and line breaks, per-browser headers), the preview and apply (limits, refusals, nothing ticked changes nothing), the vault (round trip, no plain text in the file, tamper and wrong-key failure, update-not-duplicate, clear) and the fill policy (secure pages only, origin match, JSON-encoded values); the fill script run in WebKit (wrong origin refused, nearest field before the password field filled, hidden form untouched). **Not verified:** any of it in the app on a device: the file picker on iOS and Android, the owner check, filling on real login pages (three unrelated sites, per invariant 9), Linux without a Secret Service. Windows and Linux builds share the code. Other browsers' databases are not read directly and open tabs, extensions and sessions are not imported.
 
+### feat(fab): the tool buttons slide along one vertical line and hide near the button and the screen edges
+
+**Area:** `feat(fab)`
+
+**Change:** Usage, tabs, history and settings, and incognito, video controls, dark mode and the optional tools, now share one vertical line through the floating button, in the same places as before. Dragging along the line (or the wheel) slides all of them, one button at a time. A button hides as it comes near the floating button and shows again on the other side of it, and fades out as it nears the top or bottom of the screen.
+
+**Verified:** Vitest for the line's placement, sliding, hiding near the button and at the screen edges, and clearance from the ring. **Not verified:** a phone or the desktop window by eye.
+
 ### fix(fab): the ring holds only favorites; the other buttons keep their columns
 
 **Area:** `fix(fab)`

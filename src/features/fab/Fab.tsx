@@ -56,7 +56,7 @@ import {
   snapRotation,
   snapToolScroll,
   snapToEdge,
-  toolMaxScroll,
+  toolScrollRange,
   toolPlan,
   toolSlots,
   type DialItem,
@@ -111,8 +111,8 @@ const REST = 2;
 /** A finger this near the line of a column (sideways, in px) turns that column, not the ring. */
 const COLUMN_BAND = 30;
 
-/** What a finger turns: the ring of favorites, or one of the two columns of buttons. */
-type Lane = "ring" | "page" | "switches";
+/** What a finger turns: the ring of favorites, or the line of tool buttons. */
+type Lane = "ring" | "tools";
 
 function UnreadBadge({ count }: { count: number }) {
   return (
@@ -366,8 +366,7 @@ export function Fab() {
   const darkHeld = useRef(false);
   /** How far the dial is turned, in item steps, and whether a finger is turning it now. */
   const [rotation, setRotation] = useState(0);
-  const [pageScroll, setPageScroll] = useState(0);
-  const [switchScroll, setSwitchScroll] = useState(0);
+  const [toolScroll, setToolScroll] = useState(0);
   const [turn, setTurn] = useState<"drag" | "snap" | null>(null);
   const spin = useRef<{ lane: Lane; start: Point; value: number; moved: boolean } | null>(null);
   const spunClick = useRef(false);
@@ -588,18 +587,16 @@ export function Fab() {
   };
 
   const tool = (
-    lane: "page" | "switches",
     kind: "history" | "tabs" | "stats" | "settings" | "colorPicker" | "techDetector" | "downloads",
     size: number,
     label: string,
     content: ReactNode,
-  ): Entry => ({ lane, target: { kind }, size, section: QUICK, label, content });
+  ): Entry => ({ lane: "tools", target: { kind }, size, section: QUICK, label, content });
 
   // Top to bottom, as the page column reads; a column running upward from the button lists the
   // other way round.
   const pageTop: Entry[] = [
     tool(
-      "page",
       "stats",
       STATS_SIZE,
       t("fab.usage"),
@@ -612,13 +609,13 @@ export function Fab() {
         )}
       </>,
     ),
-    tool("page", "tabs", TABS_SIZE, t("fab.tabs"), <TabsIcon />),
-    tool("page", "history", HISTORY_SIZE, t("fab.history"), <HistoryIcon />),
-    tool("page", "settings", SETTINGS_SIZE, t("fab.settings"), <SlidersIcon />),
+    tool("tabs", TABS_SIZE, t("fab.tabs"), <TabsIcon />),
+    tool("history", HISTORY_SIZE, t("fab.history"), <HistoryIcon />),
+    tool("settings", SETTINGS_SIZE, t("fab.settings"), <SlidersIcon />),
   ];
   const switchTools: Entry[] = [
     {
-      lane: "switches",
+      lane: "tools",
       target: { kind: "incognito" },
       size: INCOGNITO_SIZE,
       section: QUICK,
@@ -646,7 +643,7 @@ export function Fab() {
       ),
     },
     {
-      lane: "switches",
+      lane: "tools",
       target: { kind: "controls" },
       size: CONTROLS_SIZE,
       section: QUICK,
@@ -657,7 +654,7 @@ export function Fab() {
       charging: controlsCharging,
     },
     {
-      lane: "switches",
+      lane: "tools",
       target: { kind: "darkMode" },
       size: DARK_MODE_SIZE,
       section: QUICK,
@@ -668,23 +665,14 @@ export function Fab() {
       charging: darkCharging,
     },
     ...(colorPickerOn
-      ? [
-          tool(
-            "switches",
-            "colorPicker",
-            COLOR_PICKER_SIZE,
-            t("fab.colorPicker"),
-            <ColorPickerIcon />,
-          ),
-        ]
+      ? [tool("colorPicker", COLOR_PICKER_SIZE, t("fab.colorPicker"), <ColorPickerIcon />)]
       : []),
     ...(techDetectorOn
-      ? [tool("switches", "techDetector", TECH_DETECTOR_SIZE, t("fab.techDetector"), <TechIcon />)]
+      ? [tool("techDetector", TECH_DETECTOR_SIZE, t("fab.techDetector"), <TechIcon />)]
       : []),
     ...(downloadsOn
       ? [
           tool(
-            "switches",
             "downloads",
             DOWNLOADS_SIZE,
             t("fab.downloads"),
@@ -717,39 +705,25 @@ export function Fab() {
   const arc = dialWindow(resting, position.edge, viewport, insets);
   const turned = clampRotation(rotation, dialItems, arc);
   const ringSlots = dialSlots(resting, position.edge, viewport, insets, dialItems, turned);
+  // One vertical line through the button. Top to bottom, the page buttons are below it and the
+  // switches above (or the other way round, where there is more room above), as before.
   const plan = toolPlan(resting, viewport, insets);
-  const pageItems = plan.pageSide > 0 ? pageTop : [...pageTop].reverse();
-  const pageMax = toolMaxScroll(
+  const above = plan.pageBelow ? [...switchTools].reverse() : pageTop;
+  const below = plan.pageBelow ? pageTop : switchTools;
+  const lineItems = [...above, ...below];
+  const scrollRange = toolScrollRange(
     resting,
     viewport,
     insets,
-    plan.pageSide,
-    plan.pageStart,
-    pageItems.length,
+    lineItems.length,
+    above.length,
+    plan,
   );
-  const switchMax = toolMaxScroll(
-    resting,
-    viewport,
-    insets,
-    plan.switchSide,
-    plan.switchStart,
-    switchTools.length,
-  );
-  const pageScrolled = Math.min(Math.max(pageScroll, 0), pageMax);
-  const switchScrolled = Math.min(Math.max(switchScroll, 0), switchMax);
-  const entries = [...ringEntries, ...pageItems, ...switchTools];
+  const scrolled = Math.min(Math.max(toolScroll, scrollRange.min), scrollRange.max);
+  const entries = [...ringEntries, ...lineItems];
   const slots = [
     ...ringSlots,
-    ...toolSlots(resting, viewport, insets, pageItems, plan.pageSide, plan.pageStart, pageScrolled),
-    ...toolSlots(
-      resting,
-      viewport,
-      insets,
-      switchTools,
-      plan.switchSide,
-      plan.switchStart,
-      switchScrolled,
-    ),
+    ...toolSlots(resting, viewport, insets, lineItems, above.length, plan, scrolled),
   ];
 
   const folderMembers: FolderMember[] =
@@ -793,8 +767,7 @@ export function Fab() {
         break;
       case "openFan":
         setRotation(0);
-        setPageScroll(0);
-        setSwitchScroll(0);
+        setToolScroll(0);
         setTurn(null);
         break;
       case "closeFan":
@@ -818,18 +791,12 @@ export function Fab() {
     gestureRef.current.phase === "fan" ? dialTargetAt(point, slots) : null;
 
   // Turning the dial: a finger dragging round the button moves the items with it.
-  /** What a finger at `point` turns: a column when it is on the column's line, else the ring. */
-  const laneAt = (point: Point): Lane => {
-    const dy = point.y - resting.y;
-    if (Math.abs(point.x - resting.x) > COLUMN_BAND || Math.abs(dy) < MIN_TURN_RADIUS)
-      return "ring";
-    return (dy > 0 ? 1 : -1) === plan.pageSide ? "page" : "switches";
-  };
-  const columnOf = (lane: "page" | "switches") =>
-    lane === "page"
-      ? { side: plan.pageSide, max: pageMax, value: pageScrolled, set: setPageScroll }
-      : { side: plan.switchSide, max: switchMax, value: switchScrolled, set: setSwitchScroll };
-  const valueOf = (lane: Lane) => (lane === "ring" ? turned : columnOf(lane).value);
+  /** What a finger at `point` turns: the line when it is on it, else the ring. */
+  const laneAt = (point: Point): Lane =>
+    Math.abs(point.x - resting.x) <= COLUMN_BAND && Math.abs(point.y - resting.y) >= MIN_TURN_RADIUS
+      ? "tools"
+      : "ring";
+  const valueOf = (lane: Lane) => (lane === "ring" ? turned : scrolled);
   const beginSpin = (event: PointerEvent<HTMLElement>, lane?: Lane) => {
     const start = pointOf(event);
     const chosen = lane ?? laneAt(start);
@@ -854,11 +821,10 @@ export function Fab() {
       stopDarkHold();
       setTurn("drag");
     }
-    if (current.lane !== "ring") {
+    if (current.lane === "tools") {
       // The buttons follow the finger along the line.
-      const column = columnOf(current.lane);
-      const slid = (-column.side * (point.y - current.start.y)) / TOOL_STEP;
-      column.set(Math.min(Math.max(current.value + slid, 0), column.max));
+      const slid = (point.y - current.start.y) / TOOL_STEP;
+      setToolScroll(Math.min(Math.max(current.value + slid, scrollRange.min), scrollRange.max));
       return;
     }
     if (Math.hypot(point.x - resting.x, point.y - resting.y) < MIN_TURN_RADIUS) return;
@@ -879,10 +845,7 @@ export function Fab() {
     window.setTimeout(() => (spunClick.current = false), 60);
     setTurn("snap");
     if (current.lane === "ring") setRotation(snapRotation(turned, dialItems, arc));
-    else {
-      const column = columnOf(current.lane);
-      column.set(snapToolScroll(column.value, column.max));
-    }
+    else setToolScroll(snapToolScroll(scrolled, scrollRange));
     return true;
   };
   const onWheel = (event: WheelEvent) => {
@@ -899,8 +862,7 @@ export function Fab() {
       setRotation(snapRotation(turned + Math.sign(event.deltaY), dialItems, arc));
       return;
     }
-    const column = columnOf(lane);
-    column.set(snapToolScroll(column.value + Math.sign(event.deltaY), column.max));
+    setToolScroll(snapToolScroll(scrolled + Math.sign(event.deltaY), scrollRange));
   };
 
   const onPointerDown = (event: PointerEvent<HTMLButtonElement>) => {

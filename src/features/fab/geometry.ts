@@ -272,99 +272,117 @@ export function dialTargetAt(point: Point, slots: readonly DialSlot[]): FanTarge
   return hit?.target ?? null;
 }
 
-/** Distance between neighbouring buttons in a column. */
+/** Distance between neighbouring buttons on the line. */
 export const TOOL_STEP = 52;
-/** From the button's centre to the first button of a column that keeps clear of the ring. */
+/** From the button's centre to the first button above it, clear of the ring. */
 const TOOL_START = 132;
-/** The nearest a column's first button gets to the open button. */
+/** The nearest a button on the line sits to the open button without fading. */
 const TOOL_START_NEAR = 75;
-/** A button this fraction of a step past the end of its column's visible run has faded out. */
+/** A button this far past a place where it hides has faded out completely. */
 const TOOL_FADE = TOOL_STEP * 0.6;
 const TOOL_REACH = TOOL_STEP / 2 + SCREEN_PADDING;
 
-/** A button in one of the two columns. */
+/** A button on the line. */
 export interface ToolItem {
   target: FanTarget;
   size: number;
 }
 
-/** Where the two columns run: each straight up or down from the button, on opposite sides. */
+/**
+ * Where the two groups of tool buttons start. They share one vertical line through the open
+ * button: the page buttons (usage, tabs, history, settings) go on the side with more room, the
+ * switches (incognito, video controls, dark mode, ...) on the other.
+ */
 export interface ToolPlan {
-  /** 1 runs down the screen, -1 up. The page column (usage, tabs, history, settings) is here. */
-  pageSide: 1 | -1;
-  pageStart: number;
-  /** The switches column (incognito, video controls, dark mode, ...) is on the other side. */
-  switchSide: 1 | -1;
-  switchStart: number;
+  /** True when the page buttons are below the button and the switches above it. */
+  pageBelow: boolean;
+  /** Distance from the centre to the nearest button above and the nearest below. */
+  topStart: number;
+  bottomStart: number;
 }
 
-/** The page column goes where there is more room; the switches go across the button from it. */
 export function toolPlan(origin: Point, viewport: Size, insets: Insets): ToolPlan {
-  const below = viewport.height - insets.bottom - origin.y;
-  const above = origin.y - insets.top;
-  const pageSide = below >= above ? 1 : -1;
+  const pageBelow = viewport.height - insets.bottom - origin.y >= origin.y - insets.top;
   return {
-    pageSide,
+    pageBelow,
     // Below, the page column's nearest button (usage) sits just clear of the button.
-    pageStart: pageSide > 0 ? TOOL_START_NEAR : TOOL_START,
-    switchSide: pageSide > 0 ? -1 : 1,
-    switchStart: TOOL_START,
+    topStart: TOOL_START,
+    bottomStart: pageBelow ? TOOL_START_NEAR : TOOL_START,
   };
 }
 
-function toolEnd(origin: Point, viewport: Size, insets: Insets, side: number): number {
-  return side > 0
-    ? viewport.height - insets.bottom - TOOL_REACH - origin.y
-    : origin.y - insets.top - TOOL_REACH;
+/** The line's limits relative to the button's centre: up is negative. */
+function toolLimits(origin: Point, viewport: Size, insets: Insets) {
+  return {
+    top: -(origin.y - insets.top - TOOL_REACH),
+    bottom: viewport.height - insets.bottom - TOOL_REACH - origin.y,
+  };
 }
 
-/** How far a column can slide: the last button comes to rest at the end of the visible run. */
-export function toolMaxScroll(
-  origin: Point,
-  viewport: Size,
-  insets: Insets,
-  side: number,
-  start: number,
-  count: number,
-): number {
-  const fit = Math.max(
-    1,
-    Math.floor((toolEnd(origin, viewport, insets, side) - start) / TOOL_STEP + 1e-6) + 1,
+/** Each button's resting place on the line, top to bottom: `topCount` above the button, the rest below. */
+function toolRest(count: number, topCount: number, plan: ToolPlan): number[] {
+  return Array.from({ length: count }, (_, i) =>
+    i < topCount
+      ? -(plan.topStart + (topCount - 1 - i) * TOOL_STEP)
+      : plan.bottomStart + (i - topCount) * TOOL_STEP,
   );
-  return Math.max(0, count - fit);
-}
-
-/** The column's rest position nearest to `scroll`: a whole number of buttons, within range. */
-export function snapToolScroll(scroll: number, max: number): number {
-  return Math.round(clamp(scroll, 0, max));
 }
 
 /**
- * A column of buttons running straight up (`side` -1) or down (1) from the button, the first at
- * `start`. `scroll` slides the buttons along the line, in button steps: 0 puts the first at
- * `start`. Buttons slid out of the visible run fade away.
+ * How far the line slides, in button steps (down is positive): from the last button reaching the
+ * top of the screen to the first reaching the bottom. Always includes 0.
+ */
+export function toolScrollRange(
+  origin: Point,
+  viewport: Size,
+  insets: Insets,
+  count: number,
+  topCount: number,
+  plan: ToolPlan,
+): { min: number; max: number } {
+  const rest = toolRest(count, topCount, plan);
+  if (rest.length === 0) return { min: 0, max: 0 };
+  const limits = toolLimits(origin, viewport, insets);
+  return {
+    min: Math.min(0, Math.ceil((limits.top - rest[rest.length - 1]) / TOOL_STEP)),
+    max: Math.max(0, Math.floor((limits.bottom - rest[0]) / TOOL_STEP)),
+  };
+}
+
+/** The rest position nearest to `scroll`: a whole number of buttons, within range. */
+export function snapToolScroll(scroll: number, range: { min: number; max: number }): number {
+  return Math.round(clamp(scroll, range.min, range.max));
+}
+
+/**
+ * The tool buttons on their line, top to bottom: the first `topCount` start above the open
+ * button, the rest below it. `scroll` slides all of them along the line, in button steps: 0 is
+ * where they start. A button hides while it is near the open button, and as it nears the top or
+ * bottom of the screen, so one slid past the open button comes out on its other side.
  */
 export function toolSlots(
   origin: Point,
   viewport: Size,
   insets: Insets,
   items: readonly ToolItem[],
-  side: number,
-  start: number,
+  topCount: number,
+  plan: ToolPlan,
   scroll: number,
 ): DialSlot[] {
-  const end = toolEnd(origin, viewport, insets, side);
-  return items.map((item, k) => {
-    const distance = start + (k - scroll) * TOOL_STEP;
-    const outside = distance < start ? start - distance : distance > end ? distance - end : 0;
+  const limits = toolLimits(origin, viewport, insets);
+  const rest = toolRest(items.length, topCount, plan);
+  return items.map((item, i) => {
+    const u = rest[i] + scroll * TOOL_STEP;
+    const nearButton = clamp((Math.abs(u) - (TOOL_START_NEAR - TOOL_FADE)) / TOOL_FADE, 0, 1);
+    const pastEdge = u < limits.top ? limits.top - u : u > limits.bottom ? u - limits.bottom : 0;
     return {
       target: item.target,
       size: item.size,
       center: {
         x: origin.x,
-        y: origin.y + side * clamp(distance, start - TOOL_FADE, Math.max(start, end) + TOOL_FADE),
+        y: origin.y + clamp(u, limits.top - TOOL_FADE, limits.bottom + TOOL_FADE),
       },
-      opacity: clamp(1 - outside / TOOL_FADE, 0, 1),
+      opacity: Math.min(nearButton, clamp(1 - pastEdge / TOOL_FADE, 0, 1)),
     };
   });
 }
