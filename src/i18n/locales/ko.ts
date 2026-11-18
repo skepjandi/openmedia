@@ -45,6 +45,7 @@ export const ko: Messages = {
   "pageTools.copyLink": "링크 복사",
   "pageTools.linkCopied": "링크 복사됨",
   "pageTools.desktopSite": "데스크톱 사이트",
+  "pageTools.mobileSite": "모바일 사이트",
   "pageTools.clearData": "데이터 지우기",
   "pageTools.clearDataConfirm":
     "{site}에서 로그아웃하고 쿠키, 저장소, 캐시를 지울까요? 다른 사이트의 데이터는 그대로 유지됩니다.",

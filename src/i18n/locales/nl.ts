@@ -45,6 +45,7 @@ export const nl: Messages = {
   "pageTools.copyLink": "Link kopiëren",
   "pageTools.linkCopied": "Link gekopieerd",
   "pageTools.desktopSite": "Desktopsite",
+  "pageTools.mobileSite": "Mobiele site",
   "pageTools.clearData": "Gegevens wissen",
   "pageTools.clearDataConfirm":
     "Uitloggen bij {site} en de cookies, opslag en cache wissen? Andere sites houden die van hen.",

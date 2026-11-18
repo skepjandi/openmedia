@@ -45,6 +45,7 @@ export const zhHans: Messages = {
   "pageTools.copyLink": "复制链接",
   "pageTools.linkCopied": "链接已复制",
   "pageTools.desktopSite": "桌面版网站",
+  "pageTools.mobileSite": "移动版网站",
   "pageTools.clearData": "清除数据",
   "pageTools.clearDataConfirm": "退出 {site} 并清除其 Cookie、存储和缓存？其他网站的数据不受影响。",
   "pageTools.clearDataAction": "清除",

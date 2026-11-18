@@ -46,6 +46,7 @@ export const sv: Messages = {
   "pageTools.copyLink": "Kopiera länk",
   "pageTools.linkCopied": "Länk kopierad",
   "pageTools.desktopSite": "Datorversion",
+  "pageTools.mobileSite": "Mobilversion",
   "pageTools.clearData": "Rensa data",
   "pageTools.clearDataConfirm":
     "Logga ut från {site} och radera dess cookies, lagring och cache? Andra webbplatser behåller sina.",

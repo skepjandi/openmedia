@@ -45,6 +45,7 @@ export const ur: Messages = {
   "pageTools.copyLink": "لنک کاپی کریں",
   "pageTools.linkCopied": "لنک کاپی ہو گیا",
   "pageTools.desktopSite": "ڈیسک ٹاپ سائٹ",
+  "pageTools.mobileSite": "موبائل سائٹ",
   "pageTools.clearData": "ڈیٹا صاف کریں",
   "pageTools.clearDataConfirm":
     "{site} سے سائن آؤٹ کریں اور اس کی کوکیز، اسٹوریج اور کیش مٹا دیں؟ دیگر سائٹس کا ڈیٹا برقرار رہے گا۔",

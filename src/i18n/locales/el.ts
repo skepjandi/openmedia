@@ -46,6 +46,7 @@ export const el: Messages = {
   "pageTools.copyLink": "Αντιγραφή συνδέσμου",
   "pageTools.linkCopied": "Ο σύνδεσμος αντιγράφηκε",
   "pageTools.desktopSite": "Έκδοση υπολογιστή",
+  "pageTools.mobileSite": "Έκδοση για κινητά",
   "pageTools.clearData": "Διαγραφή δεδομένων",
   "pageTools.clearDataConfirm":
     "Αποσύνδεση από το {site} και διαγραφή των cookies, της αποθήκευσης και της προσωρινής μνήμης του; Οι άλλοι ιστότοποι κρατούν τα δικά τους.",

@@ -46,6 +46,7 @@ export const ta: Messages = {
   "pageTools.copyLink": "இணைப்பை நகலெடு",
   "pageTools.linkCopied": "இணைப்பு நகலெடுக்கப்பட்டது",
   "pageTools.desktopSite": "டெஸ்க்டாப் தளம்",
+  "pageTools.mobileSite": "மொபைல் தளம்",
   "pageTools.clearData": "தரவை அழி",
   "pageTools.clearDataConfirm":
     "{site} தளத்திலிருந்து வெளியேறி அதன் குக்கீகள், சேமிப்பு, கேச் ஆகியவற்றை அழிக்கவா? பிற தளங்கள் தங்களுடையதை வைத்திருக்கும்.",

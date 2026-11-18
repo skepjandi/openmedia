@@ -42,6 +42,7 @@ export const bn: Messages = {
   "pageTools.copyLink": "লিংক কপি",
   "pageTools.linkCopied": "লিংক কপি হয়েছে",
   "pageTools.desktopSite": "ডেস্কটপ সাইট",
+  "pageTools.mobileSite": "মোবাইল সাইট",
   "pageTools.clearData": "ডেটা মুছুন",
   "pageTools.clearDataConfirm":
     "{site} থেকে সাইন আউট করে এর কুকি, স্টোরেজ ও ক্যাশ মুছবেন? অন্যান্য সাইটের ডেটা থেকে যাবে।",

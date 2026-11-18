@@ -252,10 +252,17 @@ export const ShareIcon = () => (
   </Icon>
 );
 
-export const DesktopIcon = ({ on = false }: { on?: boolean }) => (
+export const DesktopIcon = () => (
   <Icon>
-    <rect x="3" y="4" width="18" height="12" rx="2" fill={on ? "currentColor" : "none"} />
+    <rect x="3" y="4" width="18" height="12" rx="2" />
     <path d="M9 20h6M12 16v4" />
+  </Icon>
+);
+
+export const MobileIcon = () => (
+  <Icon>
+    <rect x="7" y="3" width="10" height="18" rx="2" />
+    <path d="M11 18h2" />
   </Icon>
 );
 

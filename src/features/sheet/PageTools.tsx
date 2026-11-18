@@ -2,7 +2,14 @@ import { useEffect, useState } from "react";
 import { selectPage, useApp } from "../../app/store";
 import { describeError } from "../../i18n/errors";
 import { useT } from "../../i18n/useT";
-import { DesktopIcon, KeyIcon, SearchIcon, ShareIcon, TrashIcon } from "../../shared/icons";
+import {
+  DesktopIcon,
+  KeyIcon,
+  MobileIcon,
+  SearchIcon,
+  ShareIcon,
+  TrashIcon,
+} from "../../shared/icons";
 import { pageTools, vault, type VaultLogin } from "../../shared/ipc";
 import { siteOf } from "../../shared/site";
 import { useFind } from "../find/findStore";
@@ -125,17 +132,18 @@ export function PageTools({ onDone }: { onDone: () => void }) {
         {!isDesktopApp && (
           <button
             type="button"
-            aria-pressed={desktopOn}
             disabled={!site}
-            className={`${tool} ${desktopOn ? "text-accent" : ""}`}
+            className={tool}
             onClick={() => {
               if (site) void setSiteDesktop(site, !desktopOn);
               setConfirming(false);
               onDone();
             }}
           >
-            <DesktopIcon on={desktopOn} />
-            <span className="max-w-full truncate">{t("pageTools.desktopSite")}</span>
+            {desktopOn ? <MobileIcon /> : <DesktopIcon />}
+            <span className="max-w-full truncate">
+              {t(desktopOn ? "pageTools.mobileSite" : "pageTools.desktopSite")}
+            </span>
           </button>
         )}
         <button

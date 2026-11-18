@@ -42,6 +42,7 @@ export const ms: Messages = {
   "pageTools.copyLink": "Salin pautan",
   "pageTools.linkCopied": "Pautan disalin",
   "pageTools.desktopSite": "Laman desktop",
+  "pageTools.mobileSite": "Laman mudah alih",
   "pageTools.clearData": "Padam data",
   "pageTools.clearDataConfirm":
     "Log keluar daripada {site} dan padam cookie, storan serta cache-nya? Laman lain kekal menyimpan miliknya.",

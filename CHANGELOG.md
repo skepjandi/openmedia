@@ -6,6 +6,16 @@ All notable changes to OpenMedia are documented here.
 >
 > **Wiki**: the [GitHub Wiki](https://github.com/skepjandi/openmedia/wiki) is the public-facing main wiki — architecture, recipe format, AI pipeline, security model, roadmap. Source-controlled editing surface is `docs/wiki/` in this repo; CI (`.github/workflows/sync-wiki.yml`) mirrors it to the GitHub Wiki on every merge to `main`. New single-PR changes belong here, not as new wiki pages.
 
+### fix(page-tools): the Desktop site button reads Mobile site while a site gets its desktop page
+
+**Area:** `fix(page-tools)`
+
+**Problem:** On iOS and Android the Page tools button kept the label *Desktop site* after it was turned on; only its colour changed, so going back to the mobile page looked impossible.
+
+**Change:** The button names what a tap does: *Desktop site* with a monitor icon, or *Mobile site* with a phone icon while the site is in `desktopSites` (new key `pageTools.mobileSite` in every locale, `MobileIcon`). The toggle and the plugin path are unchanged.
+
+**Verified:** Vitest catalog test (every locale has the new key), TypeScript, ESLint, Prettier. **Not verified:** on a device or simulator.
+
 ### feat(incognito): no Pro gate
 
 **Area:** `feat(incognito)`

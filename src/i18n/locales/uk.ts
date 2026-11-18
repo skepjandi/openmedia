@@ -45,6 +45,7 @@ export const uk: Messages = {
   "pageTools.copyLink": "Копіювати посилання",
   "pageTools.linkCopied": "Посилання скопійовано",
   "pageTools.desktopSite": "Версія для ПК",
+  "pageTools.mobileSite": "Мобільна версія",
   "pageTools.clearData": "Стерти дані",
   "pageTools.clearDataConfirm":
     "Вийти з сайту {site} і стерти його cookie, сховище та кеш? Інші сайти збережуть свої.",

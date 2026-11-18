@@ -45,6 +45,7 @@ export const ru: Messages = {
   "pageTools.copyLink": "Копировать ссылку",
   "pageTools.linkCopied": "Ссылка скопирована",
   "pageTools.desktopSite": "Версия для ПК",
+  "pageTools.mobileSite": "Мобильная версия",
   "pageTools.clearData": "Стереть данные",
   "pageTools.clearDataConfirm":
     "Выйти с сайта {site} и стереть его cookie, хранилище и кэш? Другие сайты сохранят свои.",

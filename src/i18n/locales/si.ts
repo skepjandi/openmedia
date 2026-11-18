@@ -45,6 +45,7 @@ export const si: Messages = {
   "pageTools.copyLink": "සබැඳිය පිටපත් කරන්න",
   "pageTools.linkCopied": "සබැඳිය පිටපත් විය",
   "pageTools.desktopSite": "ඩෙස්ක්ටොප් අඩවිය",
+  "pageTools.mobileSite": "ජංගම අඩවිය",
   "pageTools.clearData": "දත්ත මකන්න",
   "pageTools.clearDataConfirm":
     "{site} වෙතින් ඉවත් වී එහි කුකී, ගබඩාව සහ කැෂ් මකන්නද? වෙනත් අඩවිවල දත්ත ඒ ලෙසම තබයි.",

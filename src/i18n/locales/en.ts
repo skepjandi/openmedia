@@ -53,6 +53,7 @@ export const en = {
   "pageTools.copyLink": "Copy link",
   "pageTools.linkCopied": "Link copied",
   "pageTools.desktopSite": "Desktop site",
+  "pageTools.mobileSite": "Mobile site",
   "pageTools.clearData": "Clear data",
   "pageTools.clearDataConfirm":
     "Sign out of {site} and erase its cookies, storage and cache? Other sites keep theirs.",

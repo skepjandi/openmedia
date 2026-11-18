@@ -41,6 +41,7 @@ export const de: Messages = {
   "pageTools.copyLink": "Link kopieren",
   "pageTools.linkCopied": "Link kopiert",
   "pageTools.desktopSite": "Desktop-Version",
+  "pageTools.mobileSite": "Mobile Version",
   "pageTools.clearData": "Daten löschen",
   "pageTools.clearDataConfirm":
     "Von {site} abmelden und die Cookies, den Speicher und den Cache der Website löschen? Andere Websites behalten ihre.",

@@ -46,6 +46,7 @@ export const pl: Messages = {
   "pageTools.copyLink": "Kopiuj link",
   "pageTools.linkCopied": "Skopiowano link",
   "pageTools.desktopSite": "Wersja na komputer",
+  "pageTools.mobileSite": "Wersja mobilna",
   "pageTools.clearData": "Wyczyść dane",
   "pageTools.clearDataConfirm":
     "Wylogować się z witryny {site} i usunąć jej pliki cookie, dane oraz pamięć podręczną? Inne witryny zachowają swoje.",

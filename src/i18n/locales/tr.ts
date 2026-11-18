@@ -45,6 +45,7 @@ export const tr: Messages = {
   "pageTools.copyLink": "Bağlantıyı kopyala",
   "pageTools.linkCopied": "Bağlantı kopyalandı",
   "pageTools.desktopSite": "Masaüstü sitesi",
+  "pageTools.mobileSite": "Mobil site",
   "pageTools.clearData": "Verileri sil",
   "pageTools.clearDataConfirm":
     "{site} sitesinden çıkış yapıp çerezlerini, depolama alanını ve önbelleğini silmek istiyor musunuz? Diğer siteler kendi verilerini korur.",

@@ -42,6 +42,7 @@ export const th: Messages = {
   "pageTools.copyLink": "คัดลอกลิงก์",
   "pageTools.linkCopied": "คัดลอกลิงก์แล้ว",
   "pageTools.desktopSite": "เว็บไซต์เดสก์ท็อป",
+  "pageTools.mobileSite": "เว็บไซต์มือถือ",
   "pageTools.clearData": "ล้างข้อมูล",
   "pageTools.clearDataConfirm":
     "ออกจากระบบ {site} และลบคุกกี้ ที่เก็บข้อมูล และแคชของเว็บไซต์นี้หรือไม่ เว็บไซต์อื่นจะยังคงข้อมูลของตน",

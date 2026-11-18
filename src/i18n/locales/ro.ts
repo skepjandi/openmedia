@@ -45,6 +45,7 @@ export const ro: Messages = {
   "pageTools.copyLink": "Copiază linkul",
   "pageTools.linkCopied": "Link copiat",
   "pageTools.desktopSite": "Site desktop",
+  "pageTools.mobileSite": "Site mobil",
   "pageTools.clearData": "Șterge datele",
   "pageTools.clearDataConfirm":
     "Te deconectezi de la {site} și ștergi cookie-urile, stocarea și memoria cache ale acestuia? Celelalte site-uri le păstrează pe ale lor.",

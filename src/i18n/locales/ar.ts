@@ -45,6 +45,7 @@ export const ar: Messages = {
   "pageTools.copyLink": "نسخ الرابط",
   "pageTools.linkCopied": "تم نسخ الرابط",
   "pageTools.desktopSite": "موقع سطح المكتب",
+  "pageTools.mobileSite": "موقع الجوال",
   "pageTools.clearData": "مسح البيانات",
   "pageTools.clearDataConfirm":
     "هل تريد تسجيل الخروج من {site} ومسح ملفات تعريف الارتباط والتخزين والذاكرة المؤقتة الخاصة به؟ تحتفظ المواقع الأخرى بما لديها.",

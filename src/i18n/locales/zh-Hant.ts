@@ -45,6 +45,7 @@ export const zhHant: Messages = {
   "pageTools.copyLink": "拷貝連結",
   "pageTools.linkCopied": "連結已拷貝",
   "pageTools.desktopSite": "桌面版網站",
+  "pageTools.mobileSite": "行動版網站",
   "pageTools.clearData": "清除資料",
   "pageTools.clearDataConfirm":
     "登出 {site} 並清除其 Cookie、儲存空間和快取？其他網站的資料不受影響。",

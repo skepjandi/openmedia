@@ -42,6 +42,7 @@ export const id: Messages = {
   "pageTools.copyLink": "Salin tautan",
   "pageTools.linkCopied": "Tautan disalin",
   "pageTools.desktopSite": "Situs desktop",
+  "pageTools.mobileSite": "Situs seluler",
   "pageTools.clearData": "Hapus data",
   "pageTools.clearDataConfirm":
     "Keluar dari {site} dan hapus cookie, penyimpanan, serta cache-nya? Situs lain tetap menyimpan miliknya.",

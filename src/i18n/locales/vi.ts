@@ -42,6 +42,7 @@ export const vi: Messages = {
   "pageTools.copyLink": "Sao chép liên kết",
   "pageTools.linkCopied": "Đã sao chép liên kết",
   "pageTools.desktopSite": "Trang máy tính",
+  "pageTools.mobileSite": "Trang di động",
   "pageTools.clearData": "Xóa dữ liệu",
   "pageTools.clearDataConfirm":
     "Đăng xuất khỏi {site} và xóa cookie, bộ nhớ và bộ nhớ đệm của trang này? Các trang khác vẫn giữ dữ liệu của chúng.",

@@ -46,6 +46,7 @@ export const cs: Messages = {
   "pageTools.copyLink": "Kopírovat odkaz",
   "pageTools.linkCopied": "Odkaz zkopírován",
   "pageTools.desktopSite": "Verze pro počítač",
+  "pageTools.mobileSite": "Mobilní verze",
   "pageTools.clearData": "Smazat data",
   "pageTools.clearDataConfirm":
     "Odhlásit se z webu {site} a smazat jeho cookies, úložiště a mezipaměť? Ostatní weby si své ponechají.",

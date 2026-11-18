@@ -42,6 +42,7 @@ export const hi: Messages = {
   "pageTools.copyLink": "लिंक कॉपी करें",
   "pageTools.linkCopied": "लिंक कॉपी हुआ",
   "pageTools.desktopSite": "डेस्कटॉप साइट",
+  "pageTools.mobileSite": "मोबाइल साइट",
   "pageTools.clearData": "डेटा मिटाएँ",
   "pageTools.clearDataConfirm":
     "{site} से साइन आउट करें और उसकी कुकी, स्टोरेज और कैश मिटाएँ? दूसरी साइटों का डेटा बना रहेगा।",

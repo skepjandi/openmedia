@@ -46,6 +46,7 @@ export const pt: Messages = {
   "pageTools.copyLink": "Copiar link",
   "pageTools.linkCopied": "Link copiado",
   "pageTools.desktopSite": "Site para desktop",
+  "pageTools.mobileSite": "Site para celular",
   "pageTools.clearData": "Limpar dados",
   "pageTools.clearDataConfirm":
     "Sair de {site} e apagar os cookies, o armazenamento e o cache dele? Os outros sites mantêm os seus.",

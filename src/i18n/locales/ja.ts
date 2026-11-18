@@ -45,6 +45,7 @@ export const ja: Messages = {
   "pageTools.copyLink": "リンクをコピー",
   "pageTools.linkCopied": "リンクをコピーしました",
   "pageTools.desktopSite": "PC版サイト",
+  "pageTools.mobileSite": "モバイル版サイト",
   "pageTools.clearData": "データを消去",
   "pageTools.clearDataConfirm":
     "{site}からサインアウトし、Cookie、ストレージ、キャッシュを消去しますか？他のサイトのデータはそのまま残ります。",
