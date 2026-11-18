@@ -232,6 +232,7 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
         val margin = (16 * activity.resources.displayMetrics.density).toInt()
         val params = FrameLayout.LayoutParams(size, size, Gravity.TOP or Gravity.END)
         params.setMargins(0, margin, margin, 0)
+        close.elevation = 100f * activity.resources.displayMetrics.density
         close.setOnClickListener { hideFullScreen() }
         box.addView(close, params)
         decor.addView(
@@ -844,6 +845,9 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
 
     override fun onPause() {
         appForeground = false
+        // A page's full screen does not survive the activity going to the background: the video
+        // comes back zoomed over the shell with the app unresponsive. Leave it before pausing.
+        hideFullScreen()
         refreshMedia()
     }
 

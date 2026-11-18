@@ -6,6 +6,14 @@ All notable changes to OpenMedia are documented here.
 >
 > **Wiki**: the [GitHub Wiki](https://github.com/skepjandi/openmedia/wiki) is the public-facing main wiki — architecture, recipe format, AI pipeline, security model, roadmap. Source-controlled editing surface is `docs/wiki/` in this repo; CI (`.github/workflows/sync-wiki.yml`) mirrors it to the GitHub Wiki on every merge to `main`. New single-PR changes belong here, not as new wiki pages.
 
+### fix(siteview): leave a page's full screen when the Android app goes to the background
+
+**Area:** `fix(siteview)`
+
+**Change:** A page's full-screen video was left in place when the app was minimised, and came back zoomed over the shell with the floating button gone and the app unresponsive until restart. The activity's pause now leaves full screen first, and the box's close button is raised above the video surface.
+
+**Not verified:** on a device; Android only.
+
 ### fix(fab): the same room above and below the floating button on the tool line
 
 **Area:** `fix(fab)`
