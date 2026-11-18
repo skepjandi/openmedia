@@ -1560,6 +1560,33 @@ describe("video controls", () => {
       expect(page.posts).toEqual([]);
     });
 
+    it("in a frame, gives the player its own controls back when the page passes on that the panel is off", () => {
+      const video = new PlacedVideo();
+      const page = load({
+        frame: true,
+        feed: false,
+        videos: [video],
+        current: video,
+        pathname: "/embed/one",
+      });
+      const touch = {
+        touches: [{ clientX: 200, clientY: 100, screenX: 200, screenY: 100 }],
+      };
+      page.win("message", {
+        source: {},
+        data: { om: "config", config: { ...VIDEO_CONTROLS_DEFAULT, panel: false, sites: {} } },
+      });
+      page.win("touchstart", touch);
+      expect(page.parentPosts).toEqual([{ om: "drag-start" }]);
+      page.parentPosts.length = 0;
+      page.win("message", {
+        source: page.parent,
+        data: { om: "config", config: { ...VIDEO_CONTROLS_DEFAULT, panel: false, sites: {} } },
+      });
+      page.win("touchstart", touch);
+      expect(page.parentPosts).toEqual([]);
+    });
+
     it("in a frame, ignores what is not from its page and shows no panel once the page has made it the small player", () => {
       const video = new PlacedVideo();
       const page = load({

@@ -61,16 +61,24 @@
   var INTERACTIVE = 'a,button,input,textarea,select,summary,[role="button"],[role="link"],' +
     '[role="slider"],[role="menuitem"],[role="tab"],[role="switch"],[contenteditable="true"]';
   try {
-    if (typeof document[KEY] === 'function') document[KEY]();
+    var rerun = typeof document[KEY] === 'function';
+    if (rerun) document[KEY]();
 
     // The choices of this site, else the shared ones. Auto-advance needs the video not to loop.
-    var ownChoice = siteChoice();
+    var ownChoice;
+    var wantsSound;
+    var wantsAdvance;
+    var wantsLoopOff;
     function chosen(key) {
       return typeof ownChoice[key] === 'boolean' ? ownChoice[key] : !!config[key];
     }
-    var wantsSound = chosen('remember');
-    var wantsAdvance = chosen('autoAdvance');
-    var wantsLoopOff = chosen('loopOff') || wantsAdvance;
+    function applyChoices() {
+      ownChoice = siteChoice();
+      wantsSound = chosen('remember');
+      wantsAdvance = chosen('autoAdvance');
+      wantsLoopOff = chosen('loopOff') || wantsAdvance;
+    }
+    applyChoices();
 
     // Players built as web components keep their video in a shadow root, which a query on the
     // document does not reach. Roots are noted as the page makes them (the script runs before the
@@ -795,6 +803,11 @@
       try { frame.contentWindow.postMessage(message, '*'); } catch (_) {}
     }
 
+    /** Hands the choices to the frames of this page, which hand them on to theirs. */
+    function passConfig() {
+      allFrames().forEach(function (frame) { tellFrame(frame, { om: 'config', config: config }); });
+    }
+
     var FRAME_CSS_PROPS = ['position', 'right', 'bottom', 'left', 'top', 'width', 'height', 'z-index',
       'border-radius', 'margin', 'max-width', 'max-height', 'transform', 'background'];
 
@@ -920,6 +933,13 @@
         if (!video) return;
         if (video.paused) { try { video.play().catch(function () {}); } catch (_) {} } else video.pause();
         toPage({ om: 'paused', paused: video.paused });
+      } else if (data.om === 'config' && data.config && typeof data.config === 'object') {
+        // A frame is not reached by the page's new script until it loads again, so the page that
+        // took new choices passes them on: the panel in a frame then follows a switch at once.
+        config = data.config;
+        applyChoices();
+        passConfig();
+        tick();
       }
     }
 
@@ -1847,6 +1867,7 @@
 
     var timer = setInterval(tick, TICK_MS);
     tick();
+    if (rerun && !framed) passConfig();
 
     Object.defineProperty(document, MINI_CLOSE, {
       configurable: true,

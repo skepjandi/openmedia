@@ -6,6 +6,14 @@ All notable changes to OpenMedia are documented here.
 >
 > **Wiki**: the [GitHub Wiki](https://github.com/skepjandi/openmedia/wiki) is the public-facing main wiki — architecture, recipe format, AI pipeline, security model, roadmap. Source-controlled editing surface is `docs/wiki/` in this repo; CI (`.github/workflows/sync-wiki.yml`) mirrors it to the GitHub Wiki on every merge to `main`. New single-PR changes belong here, not as new wiki pages.
 
+### fix(video): switching the controls off took a refresh to reach an embedded player
+
+**Area:** `fix(video)`
+
+**Change:** A switch changed in the floating menu or Settings re-runs the controls script on the page in front, but not in the frames inside it, which only get the new script when they load again; an embedded player kept showing the panel until a refresh. The page's new script now hands its choices to its frames (which pass them on to theirs), and a frame takes them at once, so the panel goes away and the site's own controls are free.
+
+**Verified:** Vitest for a frame that takes the choices from its page and ignores them from anything else. **Not verified:** a phone, on a page with an embedded player.
+
 ### feat(downloads): thumbnails and a larger preview for images in the page media picker
 
 **Area:** `feat(downloads)`
