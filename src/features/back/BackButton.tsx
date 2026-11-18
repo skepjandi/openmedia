@@ -3,13 +3,17 @@ import { selectPage, useApp } from "../../app/store";
 import { canStepBack } from "../web/sessions";
 import { describeError } from "../../i18n/errors";
 import { useT } from "../../i18n/useT";
-import { BackIcon } from "../../shared/icons";
+import { BackIcon, ChevronLeftIcon, ChevronRightIcon } from "../../shared/icons";
 import { useInsets, useViewport } from "../../shared/viewport";
 import {
   EDGE_MARGIN,
   FAB_SIZE,
   HOLD_SCALE,
+  PEEK_HEIGHT,
+  PEEK_WIDTH,
   fabCenter,
+  peekCenterY,
+  pushedOffEdge,
   separateVerticalPosition,
   snapToEdge,
   type Point,
@@ -61,6 +65,9 @@ export function BackButton() {
   const restingY = Math.min(Math.max(position.yRatio * viewport.height, minY), maxY);
   const rawCenter = dragCenter ?? { x: restingX, y: restingY };
   const fab = fabCenter(fabPosition.edge, fabPosition.yRatio * viewport.height, viewport, insets);
+  const tucked = position.hidden;
+  const pushing = dragCenter !== null && pushedOffEdge(dragCenter, viewport) !== null;
+  const PeekIcon = position.edge === "left" ? ChevronRightIcon : ChevronLeftIcon;
   const center =
     !fabPosition.hidden && Math.abs(rawCenter.x - fab.x) < (FAB_SIZE + SIZE) / 2
       ? {
@@ -106,10 +113,23 @@ export function BackButton() {
           .catch((error: unknown) => reportError(describeError(error, t)));
       return;
     }
+    const pushed = pushedOffEdge({ x: event.clientX, y: event.clientY }, viewport);
+    if (pushed) {
+      const hiddenAt = {
+        edge: pushed,
+        yRatio: peekCenterY(event.clientY, viewport, insets) / viewport.height,
+        hidden: true,
+      };
+      setPosition(hiddenAt);
+      saveBackPosition(hiddenAt);
+      setDragCenter(null);
+      return;
+    }
     const snapped = snapToEdge({ x: event.clientX, y: event.clientY }, viewport, insets);
     const next = {
       edge: snapped.edge,
       yRatio: Math.min(Math.max(snapped.y / viewport.height, 0), 1),
+      hidden: false,
     };
     setPosition(next);
     saveBackPosition(next);
@@ -120,6 +140,32 @@ export function BackButton() {
     drag.current = null;
     setDragCenter(null);
   };
+
+  if (tucked && dragCenter === null) {
+    return (
+      <button
+        type="button"
+        data-hit=""
+        aria-label={t("fab.show")}
+        onClick={() => {
+          const shown = { ...position, hidden: false };
+          setPosition(shown);
+          saveBackPosition(shown);
+        }}
+        style={{
+          top: peekCenterY(position.yRatio * viewport.height, viewport, insets) - PEEK_HEIGHT / 2,
+          width: PEEK_WIDTH,
+          height: PEEK_HEIGHT,
+        }}
+        className={`fab-peek fab-glass fixed z-[80] grid place-items-center text-white ${
+          position.edge === "left" ? "left-0 rounded-r-full" : "right-0 rounded-l-full"
+        }`}
+        data-edge={position.edge}
+      >
+        <PeekIcon size={18} />
+      </button>
+    );
+  }
 
   return (
     <button
@@ -138,7 +184,7 @@ export function BackButton() {
         touchAction: "none",
       }}
       aria-disabled={!canAct}
-      className={`glass fixed z-[80] grid place-items-center rounded-full text-paper ${canAct ? "" : "opacity-45"}`}
+      className={`glass fixed z-[80] grid place-items-center rounded-full text-paper ${pushing ? "opacity-45" : canAct ? "" : "opacity-45"}`}
     >
       <BackIcon />
     </button>
