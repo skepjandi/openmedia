@@ -6,6 +6,7 @@ import { useFind } from "../find/findStore";
 import { hiddenTabIds } from "../tabs/tabs";
 import { activateFocused, focusEdge, moveFocus, scrollSheet } from "./dom";
 import { usePalette } from "./paletteStore";
+import { useKeybindings } from "./store";
 
 type Runner = (count: number) => void | Promise<void>;
 
@@ -166,6 +167,7 @@ const RUNNERS: Readonly<Record<string, Runner>> = {
   "tool.incognito": () => (app().incognito.active ? app().exitIncognito() : app().enterIncognito()),
 
   "app.palette": () => usePalette.getState().setOpen(true),
+  "app.fab": () => useKeybindings.getState().setShowFab(!useKeybindings.getState().showFab),
 };
 
 /** How long the menu and the shell may both report one key press. */

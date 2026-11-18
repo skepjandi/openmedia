@@ -50,6 +50,10 @@ export function useDesktopInput() {
   );
 
   useEffect(() => {
+    document.documentElement.toggleAttribute("data-desktop", desktop);
+  }, [desktop]);
+
+  useEffect(() => {
     if (!desktop) return;
     void keyboard.setMenuShortcuts(enabled ? menuShortcuts(bindings) : []).catch(() => undefined);
   }, [desktop, enabled, bindings]);

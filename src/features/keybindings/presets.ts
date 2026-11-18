@@ -47,6 +47,7 @@ const STANDARD: Bindings = {
   "view.close": ["Escape"],
 
   "app.palette": ["Mod+Shift+p"],
+  "app.fab": ["Mod+Shift+f"],
 };
 
 const withStandard = (id: string, ...extra: string[]): string[] => [

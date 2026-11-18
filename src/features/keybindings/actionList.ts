@@ -93,6 +93,7 @@ export const ACTIONS: readonly ActionInfo[] = [
   action("tools", "tool.incognito", "Turn incognito on or off"),
 
   action("app", "app.palette", "Command palette"),
+  action("app", "app.fab", "Show or hide the floating button"),
 ];
 
 export const ACTIONS_BY_ID: Readonly<Record<string, ActionInfo>> = Object.fromEntries(

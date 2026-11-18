@@ -25,8 +25,10 @@ export function Segmented<V extends string>({
           role="radio"
           aria-checked={value === option.value}
           onClick={() => onChange(option.value)}
-          className={`min-w-0 flex-1 rounded-xl px-2 py-2.5 text-sm font-medium ${
-            value === option.value ? "bg-accent text-on-accent" : "text-paper/75"
+          className={`min-w-0 flex-1 rounded-xl px-2 py-2.5 text-sm font-medium desktop:py-2 ${
+            value === option.value
+              ? "bg-accent text-on-accent"
+              : "text-paper/75 hover:bg-paper/[0.06]"
           }`}
         >
           {option.label}

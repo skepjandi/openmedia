@@ -15,7 +15,7 @@ export function NavRow({
     <button
       type="button"
       onClick={onClick}
-      className="flex w-full items-center gap-3 px-4 py-3.5 text-start active:bg-paper/[0.05]"
+      className="flex w-full items-center gap-3 px-4 py-3.5 text-start hover:bg-paper/[0.04] active:bg-paper/[0.05] desktop:py-3"
     >
       <span className="min-w-0 flex-1">
         <span className="block text-base font-medium">{title}</span>

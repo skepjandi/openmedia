@@ -31,8 +31,21 @@ interface SectionProps {
   children: ReactNode;
 }
 
-/** A titled block of settings. The title is small and quiet; the controls carry the weight. */
+/**
+ * A titled block of settings. On a phone the title is small, quiet and folds the block away; on
+ * desktop every block stays open, under a heading that says what it is, with its note above it.
+ */
 export function Section({ title, note, defaultOpen = true, children }: SectionProps) {
+  const desktop = useApp((s) => s.desktop);
+  if (desktop) {
+    return (
+      <section>
+        <h2 className="text-lg font-semibold tracking-tight">{title}</h2>
+        {note && <p className="mt-1 max-w-prose text-sm leading-snug text-paper/55">{note}</p>}
+        <div className="pt-4">{children}</div>
+      </section>
+    );
+  }
   return (
     <details className="group" open={defaultOpen}>
       <summary className="eyebrow flex cursor-pointer list-none items-center justify-between px-1 py-2">
@@ -55,7 +68,7 @@ export function Section({ title, note, defaultOpen = true, children }: SectionPr
 /** One rounded card whose rows are separated by hairlines. */
 export function Group({ children }: { children: ReactNode }) {
   return (
-    <div className="divide-y divide-hair overflow-hidden rounded-2xl border border-hair bg-paper/[0.04]">
+    <div className="divide-y divide-hair overflow-hidden rounded-2xl border border-hair bg-paper/[0.04] desktop:rounded-xl">
       {children}
     </div>
   );

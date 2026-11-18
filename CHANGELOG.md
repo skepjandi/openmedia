@@ -6,6 +6,14 @@ All notable changes to OpenMedia are documented here.
 >
 > **Wiki**: the [GitHub Wiki](https://github.com/skepjandi/openmedia/wiki) is the public-facing main wiki — architecture, recipe format, AI pipeline, security model, roadmap. Source-controlled editing surface is `docs/wiki/` in this repo; CI (`.github/workflows/sync-wiki.yml`) mirrors it to the GitHub Wiki on every merge to `main`. New single-PR changes belong here, not as new wiki pages.
 
+### feat(desktop): hide the floating button, and Settings laid out for a desktop window
+
+**Area:** `feat(desktop)`
+
+**Change:** A desktop switch, Settings > Controls > Floating button (and the shortcut `Mod+Shift+F`, also in the command palette), hides the floating button for keyboard-only use; it cannot be hidden while shortcuts are off or no key leads back to Settings. Full-screen pages now have a compact title bar and a centered column on desktop; Settings has a sidebar of parts (a row of chips on phones), theme choices show a preview, rows have hover and keyboard-focus states, and pickers are a centered dialog on desktop.
+
+**Not verified:** visually, in the running desktop and phone apps; `ts:check`, lint, format and tests pass.
+
 ### fix(siteview): leave a page's full screen when the Android app goes to the background
 
 **Area:** `fix(siteview)`

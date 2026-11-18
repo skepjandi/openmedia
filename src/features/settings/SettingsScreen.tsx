@@ -21,6 +21,8 @@ import { Switch } from "./Switch";
 import { UpdatesSection } from "./UpdatesSection";
 import { Picker } from "./Picker";
 import { NavRow } from "./SiteParts";
+import { FloatingButtonSection } from "./FloatingButtonSection";
+import { SettingsNav, type SettingsCategory } from "./SettingsNav";
 import { Group, Section, primaryButton, quietButton } from "./ui";
 
 export function SettingsScreen() {
@@ -32,33 +34,84 @@ export function SettingsScreen() {
       s.sheet === "incognito-folders",
   );
   const closeSheet = useApp((s) => s.closeSheet);
+  const [category, setCategory] = useState<SettingsCategory>("general");
   const t = useT();
   if (!open) return null;
 
   return (
-    <Screen title={t("settings.title")} closeLabel={t("settings.close")} onClose={closeSheet}>
-      <div className="flex flex-col gap-9">
-        <AppearanceSection />
-        <LanguageSection />
-        <BrowsingSection />
-        <AccessibilitySection />
-        <DarkModeLink />
-        <VideoControlsLink />
-        <FanButtonSwitches />
-        <KeybindingsLink />
-        <DownloadsLink />
-        <ImportLinks />
-        <FavoritesSection />
-        <RecipesLink />
-        <LibraryLinks />
-        <IncognitoFavoritesSection key={incognitoChildOpen ? "incognito-child" : "settings"} />
-        <IncognitoRecipesLink />
-        <AiSection />
-        <UpdatesSection />
-        <DataSection />
+    <Screen
+      title={t("settings.title")}
+      closeLabel={t("settings.close")}
+      onClose={closeSheet}
+      sidebar={<SettingsNav value={category} onChange={setCategory} />}
+    >
+      <div className="flex flex-col gap-9 desktop:gap-10">
+        <CategoryPanel category={category} incognitoChildOpen={incognitoChildOpen} />
       </div>
     </Screen>
   );
+}
+
+/** The blocks of one part of Settings. */
+function CategoryPanel({
+  category,
+  incognitoChildOpen,
+}: {
+  category: SettingsCategory;
+  incognitoChildOpen: boolean;
+}) {
+  switch (category) {
+    case "general":
+      return (
+        <>
+          <AppearanceSection />
+          <LanguageSection />
+        </>
+      );
+    case "browsing":
+      return (
+        <>
+          <BrowsingSection />
+          <DarkModeLink />
+          <VideoControlsLink />
+          <DownloadsLink />
+          <ImportLinks />
+        </>
+      );
+    case "controls":
+      return (
+        <>
+          <FloatingButtonSection />
+          <FanButtonSwitches />
+          <KeybindingsLink />
+          <AccessibilitySection />
+        </>
+      );
+    case "sites":
+      return (
+        <>
+          <FavoritesSection />
+          <RecipesLink />
+          <LibraryLinks />
+        </>
+      );
+    case "incognito":
+      return (
+        <>
+          <IncognitoFavoritesSection key={incognitoChildOpen ? "incognito-child" : "settings"} />
+          <IncognitoRecipesLink />
+        </>
+      );
+    case "assistant":
+      return <AiSection />;
+    case "data":
+      return (
+        <>
+          <UpdatesSection />
+          <DataSection />
+        </>
+      );
+  }
 }
 
 /**
@@ -135,6 +188,41 @@ const THEMES: { value: Theme; label: MessageKey }[] = [
   { value: "dark", label: "settings.themeDark" },
 ];
 
+const PREVIEW_COLORS = {
+  light: { page: "#f4f7fc", line: "rgb(11 18 32 / 0.18)" },
+  dark: { page: "#070b14", line: "rgb(238 243 250 / 0.22)" },
+} as const;
+
+/** A tiny page in one theme's colors; the "system" one is cut along the diagonal between the two. */
+function ThemePreview({ theme }: { theme: Theme }) {
+  const draw = (colors: (typeof PREVIEW_COLORS)[keyof typeof PREVIEW_COLORS]) => (
+    <span
+      className="absolute inset-0 flex flex-col gap-1.5 p-2.5"
+      style={{ background: colors.page }}
+    >
+      <span className="h-1.5 w-1/2 rounded-full" style={{ background: colors.line }} />
+      <span className="h-1.5 w-3/4 rounded-full" style={{ background: colors.line }} />
+      <span className="mt-auto size-3 self-end rounded-full bg-accent" />
+    </span>
+  );
+  return (
+    <span
+      aria-hidden="true"
+      className="relative block h-16 overflow-hidden rounded-lg border border-hair"
+    >
+      {draw(theme === "dark" ? PREVIEW_COLORS.dark : PREVIEW_COLORS.light)}
+      {theme === "system" && (
+        <span
+          className="absolute inset-0"
+          style={{ clipPath: "polygon(100% 0, 100% 100%, 0 100%)" }}
+        >
+          {draw(PREVIEW_COLORS.dark)}
+        </span>
+      )}
+    </span>
+  );
+}
+
 function AppearanceSection() {
   const theme = useApp((s) => s.state?.theme ?? "system");
   const setTheme = useApp((s) => s.setTheme);
@@ -145,22 +233,28 @@ function AppearanceSection() {
       <div
         role="radiogroup"
         aria-label={t("settings.themeLabel")}
-        className="grid grid-cols-3 gap-1 rounded-2xl border border-hair bg-paper/[0.04] p-1"
+        className="grid grid-cols-3 gap-3"
       >
-        {THEMES.map((option) => (
-          <button
-            key={option.value}
-            type="button"
-            role="radio"
-            aria-checked={theme === option.value}
-            onClick={() => void setTheme(option.value)}
-            className={`rounded-xl py-2.5 text-sm font-medium ${
-              theme === option.value ? "bg-accent text-on-accent" : "text-paper/75"
-            }`}
-          >
-            {t(option.label)}
-          </button>
-        ))}
+        {THEMES.map((option) => {
+          const chosen = theme === option.value;
+          return (
+            <button
+              key={option.value}
+              type="button"
+              role="radio"
+              aria-checked={chosen}
+              onClick={() => void setTheme(option.value)}
+              className={`flex flex-col gap-2 rounded-2xl border p-2 text-sm font-medium transition-colors desktop:rounded-xl ${
+                chosen
+                  ? "border-accent bg-accent/10 text-paper"
+                  : "border-hair bg-paper/[0.04] text-paper/75 hover:bg-paper/[0.07]"
+              }`}
+            >
+              <ThemePreview theme={option.value} />
+              <span className="px-1 pb-0.5 text-center">{t(option.label)}</span>
+            </button>
+          );
+        })}
       </div>
     </Section>
   );

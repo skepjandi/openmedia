@@ -120,7 +120,10 @@ export function Picker({ label, value, options, onChange }: PickerProps) {
         </span>
       </button>
       {open && (
-        <div data-hit="" className="fixed inset-0 z-[70] flex flex-col justify-end">
+        <div
+          data-hit=""
+          className="fixed inset-0 z-[70] flex flex-col justify-end desktop:items-center desktop:justify-center"
+        >
           <button
             type="button"
             aria-label={t("common.cancel")}
@@ -129,11 +132,11 @@ export function Picker({ label, value, options, onChange }: PickerProps) {
           />
           <div
             ref={sheet}
-            className="screen relative flex max-h-[70%] flex-col overflow-hidden rounded-t-3xl border-t border-hair bg-ink"
+            className="screen relative flex max-h-[70%] flex-col overflow-hidden rounded-t-3xl border-t border-hair bg-ink desktop:w-full desktop:max-w-sm desktop:rounded-2xl desktop:border desktop:shadow-2xl"
           >
             <div
               aria-hidden="true"
-              className="mx-auto mt-2 h-1 w-9 shrink-0 rounded-full bg-paper/25"
+              className="mx-auto mt-2 h-1 w-9 shrink-0 rounded-full bg-paper/25 desktop:hidden"
             />
             <div className="flex items-center justify-between gap-3 py-2 ps-5 pe-3">
               <div className="min-w-0 truncate text-sm font-semibold text-paper/60">{label}</div>
@@ -164,7 +167,7 @@ export function Picker({ label, value, options, onChange }: PickerProps) {
                       close();
                       if (!active) onChange(option.value);
                     }}
-                    className={`flex w-full items-center justify-between gap-3 px-5 py-3.5 text-start text-base active:bg-paper/[0.08] ${
+                    className={`flex w-full items-center justify-between gap-3 px-5 py-3.5 text-start text-base hover:bg-paper/[0.06] active:bg-paper/[0.08] desktop:py-2.5 desktop:text-[15px] ${
                       active ? "font-semibold text-accent" : "text-paper"
                     }`}
                   >

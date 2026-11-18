@@ -95,6 +95,7 @@ import { useBackHandler } from "../back/useBackHandler";
 import logoMark from "../../assets/logo-mark.svg";
 import { useEntitlementStore } from "../paywall/store";
 import { useDownloadsStore } from "../downloads/store";
+import { selectFabHidden, useKeybindings } from "../keybindings/store";
 
 const idle: GestureState = { phase: "idle" };
 
@@ -310,7 +311,7 @@ function DialButton({
  * (favorites and other tabs), then the favorites that are not. Slide onto one and lift, or lift
  * and tap. Turn the dial by dragging round the button, like a rotary phone, or with the wheel.
  */
-export function Fab() {
+function FloatingButton() {
   const favorites = useApp(selectQuickFavorites);
   const folders = useApp(selectQuickFolders);
   const incognito = useApp((s) => s.incognito);
@@ -1101,4 +1102,15 @@ export function Fab() {
       </button>
     </>
   );
+}
+
+/**
+ * The floating button, unless a desktop person who works by keys alone has hidden it. Hiding it
+ * unmounts it, so nothing of it stays on the page or takes a click.
+ */
+export function Fab() {
+  const desktop = useApp((s) => s.desktop);
+  const hidden = useKeybindings(selectFabHidden);
+  if (desktop && hidden) return null;
+  return <FloatingButton />;
 }

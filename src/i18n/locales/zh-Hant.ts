@@ -918,4 +918,12 @@ export const zhHant: Messages = {
   "keys.conflict": "Overlaps with {name}; these keys now run this action",
   "keys.palette": "Search actions",
   "keys.paletteEmpty": "No action matches",
+  "settings.navGeneral": "一般",
+  "settings.navControls": "控制",
+  "settings.navSites": "網站與配方",
+  "settings.floatingButton": "Floating button",
+  "settings.fabOnNote": "Switch off to work with the keyboard alone. Every key keeps working.",
+  "settings.fabHiddenNote": "Hidden. Switch it back on here, or press {keys}.",
+  "settings.fabLocked":
+    "To hide it, keep a way back: keyboard shortcuts on, and a key for Settings, the command palette or this switch.",
 };
