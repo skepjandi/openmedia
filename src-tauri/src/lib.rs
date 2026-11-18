@@ -7,6 +7,7 @@ mod commands;
 mod dark_mode;
 #[cfg(target_os = "macos")]
 mod desktop_menu;
+mod downloads;
 mod entitlement;
 pub mod error;
 mod incognito;
@@ -26,7 +27,7 @@ mod usage_commands;
 mod usage_lock;
 mod video_controls;
 
-use tauri::Manager;
+use tauri::{Emitter, Manager};
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 #[allow(clippy::expect_used, reason = "a failed startup is unrecoverable")]
@@ -63,6 +64,17 @@ pub fn run() {
                 let _ = commands::push_picture_in_picture(&handle, picture_in_picture);
             });
             app.manage(incognito::Incognito::default());
+            let emitter = app.handle().clone();
+            let downloads = downloads::Manager::load(
+                data_dir.join("downloads.json"),
+                app.path()
+                    .download_dir()
+                    .unwrap_or_else(|_| data_dir.join("downloads")),
+                Box::new(move |download| {
+                    let _ = emitter.emit("downloads:changed", download);
+                }),
+            )?;
+            app.manage(downloads);
             app.manage(recipes::Recipes::load(data_dir.join("recipes"))?);
             app.manage(share::Shares::from_build());
             let ad_block = ad_block::AdBlock::bundled(app.path().app_cache_dir()?.join("ad-block"));
@@ -93,6 +105,19 @@ pub fn run() {
             entitlement::get_offerings,
             entitlement::purchase_package,
             entitlement::restore_purchases,
+            downloads::downloads_state,
+            downloads::downloads_set_settings,
+            downloads::downloads_add,
+            downloads::downloads_add_text,
+            downloads::downloads_pause,
+            downloads::downloads_resume,
+            downloads::downloads_cancel,
+            downloads::downloads_remove,
+            downloads::downloads_clear_finished,
+            downloads::downloads_open,
+            downloads::downloads_reveal,
+            downloads::downloads_preview,
+            downloads::downloads_sniff,
             commands::get_state,
             commands::set_favorites,
             commands::set_site_favorite,
