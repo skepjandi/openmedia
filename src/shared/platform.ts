@@ -13,3 +13,7 @@ export const isIos = (): boolean =>
  */
 export const isStorelessDesktop = (userAgent: string = navigator.userAgent): boolean =>
   /Windows NT|Linux/.test(userAgent) && !/Android/i.test(userAgent);
+
+/** True on a Mac, where the command key is Cmd and Control is a separate modifier. */
+export const isMac = (userAgent: string = navigator.userAgent): boolean =>
+  /Macintosh/.test(userAgent) && !/iPhone|iPad|iPod/.test(userAgent);

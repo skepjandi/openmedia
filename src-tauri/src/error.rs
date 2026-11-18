@@ -76,6 +76,12 @@ pub enum Error {
     AdBlock(String),
     #[error("{0}")]
     Download(String),
+    #[error("keyboard shortcuts are for the desktop app")]
+    NotDesktop,
+    #[error("the menu bar could not be built: {0}")]
+    Menu(String),
+    #[error("invalid menu shortcuts: {0}")]
+    InvalidShortcuts(&'static str),
     #[error("library lock poisoned")]
     Poisoned,
 }

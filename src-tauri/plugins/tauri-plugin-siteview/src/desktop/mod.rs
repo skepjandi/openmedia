@@ -625,10 +625,19 @@ impl<R: Runtime> Inner<R> {
     /// Gives the keyboard to the page showing, or to the shell while an overlay is open: the page
     /// would otherwise keep every key press, and Escape would never reach the shell.
     fn focus(&self, label: &str) {
-        let mut focused = self.focused.lock().unwrap_or_else(PoisonError::into_inner);
-        if focused.as_deref() == Some(label) {
-            return;
+        let already = {
+            let focused = self.focused.lock().unwrap_or_else(PoisonError::into_inner);
+            focused.as_deref() == Some(label)
+        };
+        if !already {
+            self.give_keyboard(label);
         }
+    }
+
+    /// Gives the keyboard to `label` whether or not it was last given it: a click in the page
+    /// takes the keyboard without telling us.
+    fn give_keyboard(&self, label: &str) {
+        let mut focused = self.focused.lock().unwrap_or_else(PoisonError::into_inner);
         if let Some(webview) = self.app.get_webview(label) {
             let _ = webview.set_focus();
         }
@@ -927,6 +936,18 @@ impl<R: Runtime> Siteview<R> {
     /// Zooms the page now showing. Rust-only: raised by the app's View menu.
     pub fn zoom(&self, request: ZoomRequest) -> Result<()> {
         platform::zoom(&self.inner.active_webview()?, request.action)
+    }
+
+    /// Gives the keyboard to the shell, whose shortcuts then see every key, or back to the page
+    /// showing. Rust-only: raised by the shell's own shortcuts.
+    pub fn focus_keyboard(&self, to_shell: bool) -> Result<()> {
+        let label = if to_shell {
+            MAIN_WINDOW.to_owned()
+        } else {
+            self.inner.active_webview()?.label().to_owned()
+        };
+        self.inner.give_keyboard(&label);
+        Ok(())
     }
 
     pub fn reload(&self) -> Result<()> {

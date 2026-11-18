@@ -15,6 +15,7 @@ mod find_in_page;
 mod import;
 mod import_commands;
 mod incognito;
+mod keyboard;
 mod library;
 mod link_clean;
 mod ota;
@@ -130,6 +131,10 @@ pub fn run() {
             downloads::downloads_preview,
             downloads::downloads_sniff,
             downloads::downloads_thumbnail,
+            keyboard::page_scroll,
+            keyboard::page_zoom,
+            keyboard::focus_keyboard,
+            keyboard::set_menu_shortcuts,
             commands::get_state,
             commands::set_favorites,
             commands::set_site_favorite,

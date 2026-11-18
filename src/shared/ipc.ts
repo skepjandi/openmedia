@@ -362,6 +362,37 @@ export const pageTools = {
   clearSiteData: (site: string) => command("clear_site_data", { site }),
 };
 
+export type PageScroll =
+  | "down"
+  | "up"
+  | "left"
+  | "right"
+  | "halfDown"
+  | "halfUp"
+  | "pageDown"
+  | "pageUp"
+  | "top"
+  | "bottom";
+
+/** A menu item the shell asks the desktop menu bar to show, with the keys that run it. */
+export interface MenuShortcut {
+  id: string;
+  label: string;
+  group: string;
+  accelerator: string | null;
+}
+
+/** Desktop keyboard control: the page in front, the keyboard's owner and the menu bar's accelerators. */
+export const keyboard = {
+  scroll: (scroll: PageScroll) => command("page_scroll", { scroll }),
+  zoom: (zoom: "in" | "out" | "reset") => command("page_zoom", { zoom }),
+  /** Gives the keyboard to the page in front, or to the shell so its shortcuts see every key. */
+  focus: (target: "page" | "shell") => command("focus_keyboard", { target }),
+  setMenuShortcuts: (shortcuts: MenuShortcut[]) => command("set_menu_shortcuts", { shortcuts }),
+  onMenuAction: (handler: (id: string) => void): Promise<UnlistenFn> =>
+    listen<string>("menu:action", (event) => handler(event.payload)),
+};
+
 export interface ImportPreview {
   bookmarks: number;
   history: number;

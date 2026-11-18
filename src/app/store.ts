@@ -88,7 +88,8 @@ export type Sheet =
   | "video-controls"
   | "dark-mode"
   | "site-video"
-  | "site-dark-mode";
+  | "site-dark-mode"
+  | "keybindings";
 
 /** The pages about one favorite's site, which `openSiteSheet` fills in. */
 export type SiteSheet = "site-dark-mode" | "site-video";
@@ -111,6 +112,7 @@ const SETTINGS_CHILDREN: readonly Sheet[] = [
   "dark-mode",
   "site-video",
   "site-dark-mode",
+  "keybindings",
 ];
 const isSettingsChild = (sheet: Sheet): boolean => SETTINGS_CHILDREN.includes(sheet);
 

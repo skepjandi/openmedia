@@ -201,12 +201,17 @@ Fallback if the native-plugin approach fails: navigate the main webview to the s
 | Two-finger swipe, in a page | Back and forward through the page's history | `WKWebView.allowsBackForwardNavigationGestures`, set when a view is built |
 | Pinch, or two-finger double-tap, in a page | Zoom, as in Safari | `WKWebView.allowsMagnification` |
 | Two-finger swipe, on an app screen (Settings, History, Usage) | Closes it (Back) | `useTrackpadSwipeBack`: wheel events, because the shell has no swipe event; right-to-left locales swipe the other way |
-| Cmd `[`, Cmd `]`, Cmd R | Back, forward, reload the page | Navigate menu (`src/desktop_menu.rs`) |
-| Cmd L, Cmd Y, Cmd `,` | Open the address bar, History, Settings | Navigate menu, sent to the shell as `menu:sheet` |
-| Cmd `=`, Cmd `-`, Cmd 0 | Zoom in, out, actual size (a reset also drops a pinch) | Page menu, `WKWebView.pageZoom`, 0.3 to 5 |
-| Escape | Closes the sheet or the fan, as Back does on mobile | `useDesktopInput` |
+| Any bound key | Runs the action it is bound to (about 70 actions: navigation, tabs, page, scrolling, tools) | `useDesktopInput` and `src/features/keybindings/` |
+| Escape | Closes the sheet or the fan, as Back does on mobile (the default for *Close what is open*) | `view.close` |
 
-The page view takes key presses before the shell sees them, which is why the shortcuts are native menu items. The menu labels are English; they are not translated like the shell is.
+**Keyboard shortcuts.** Settings > *Keyboard shortcuts* (desktop only) lists every action and lets any of them be bound to any keys: one chord (`Mod+Shift+t`) or a sequence (`g g`, `Ctrl+x Ctrl+f`). `Mod` is Cmd on a Mac and Ctrl elsewhere. A key set is the base: *Standard* (browser keys), *Vim* (`j k h l`, `gg`, `G`, `d u`, `H L`, `/ n N`, `o t x`, `g t`, `:`, counts like `5j`) and *Emacs* (`C-n C-p`, `M-v`, `C-x C-f`, `C-x b`, `C-x k`, `C-s`, `M-x`); a person's own bindings replace an action's keys and win over the set. They live in `localStorage` (`om.keybindings`); the page has an off switch, after which only Escape still works. `Mod+Shift+P` (or `M-x`, `:`) opens a palette that lists every action by name.
+
+The page view takes key presses before the shell sees them, so a binding reaches the page in front two ways:
+
+- **Chords with the command key (or a function key)** become native menu items. The shell sends the list with `set_menu_shortcuts` whenever the bindings change; each item that is chosen comes back as `menu:action` and the shell runs the action. These work with the page focused. The shell also sees the same key press when it has the keyboard, so the same action from the menu and the keyboard within 120 ms runs once. Bare keys and Ctrl chords on a Mac are not menu items: they would break typing in the page's own fields.
+- **Everything else** (Vim keys, sequences, Emacs `Ctrl` chords on a Mac) works while the shell has the keyboard: with a sheet open, on the start screen, or after *Switch between the page and shortcuts* (`Mod+;`), which calls `focus_keyboard` (`Siteview::focus_keyboard`). *Type in the page* (`i` in Vim) hands the keyboard back. With the shell focused, scrolling runs `page_scroll`: a fixed script through the Rust-only `evaluate` (`src/page_scroll.js`) that scrolls the scroller under the middle of the page; no site gets a channel or an extra script.
+
+Reserved: Cmd/Ctrl with C, V, X, A, Z, Q, H, M, W belong to the system menu and text fields and cannot be bound as single chords. The menu labels and action names are English; only the page's chrome strings are translated.
 
 **State.** Tauri has no navigation-state API. A poll thread (400 ms) reads URL, title, loading, back and forward from each session's `WKWebView` (`native.rs`) and emits `siteview:state` when something changed, the same event and payload as mobile. `painted` is true once a load has finished or 1.5 s have passed. Single-page navigations are caught by the poll, not by a load event.
 

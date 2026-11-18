@@ -3,6 +3,7 @@ import { AssistantDock } from "../features/ai/AssistantDock";
 import { ChatsSheet } from "../features/ai/ChatsSheet";
 import { TechPanel } from "../features/techdetect/TechPanel";
 import { ColorPickBar } from "../features/colorpick/ColorPickBar";
+import { CommandPalette } from "../features/keybindings/CommandPalette";
 import { FindBar } from "../features/find/FindBar";
 import { BackButton } from "../features/back/BackButton";
 import { Fab } from "../features/fab/Fab";
@@ -51,6 +52,7 @@ const loadImport = () => import("../features/import/ImportScreen");
 const loadPasswords = () => import("../features/passwords/PasswordsScreen");
 const loadDownloads = () => import("../features/downloads/DownloadsSheet");
 const loadIncognitoRecipes = () => import("../features/settings/IncognitoSections");
+const loadKeybindings = () => import("../features/keybindings/KeybindingsScreen");
 const loadMoreFavorites = () => import("../features/settings/MoreFavoritesScreens");
 const ImportScreen = lazy(() => loadImport().then((module) => ({ default: module.ImportScreen })));
 const PasswordsScreen = lazy(() =>
@@ -82,6 +84,9 @@ const SiteVideoControlsScreen = lazy(() =>
 );
 const SiteDarkModeScreen = lazy(() =>
   loadSiteDarkMode().then((module) => ({ default: module.SiteDarkModeScreen })),
+);
+const KeybindingsScreen = lazy(() =>
+  loadKeybindings().then((module) => ({ default: module.KeybindingsScreen })),
 );
 const SettingsScreen = lazy(() =>
   loadSettings().then((module) => ({ default: module.SettingsScreen })),
@@ -183,6 +188,7 @@ export function App() {
       <TechPanel />
       <DownloadToast />
       <CommandBar />
+      <CommandPalette />
       <AssistantDock />
       <HistorySheet />
       <ChatsSheet />
@@ -207,6 +213,7 @@ export function App() {
       <Suspense fallback={null}>{sheet === "dark-mode" && <DarkModeScreen />}</Suspense>
       <Suspense fallback={null}>{sheet === "site-video" && <SiteVideoControlsScreen />}</Suspense>
       <Suspense fallback={null}>{sheet === "site-dark-mode" && <SiteDarkModeScreen />}</Suspense>
+      <Suspense fallback={null}>{sheet === "keybindings" && <KeybindingsScreen />}</Suspense>
       <Suspense fallback={null}>{(idle || sheet === "stats") && <StatsSheet />}</Suspense>
       <Suspense fallback={null}>{onboardingOpen && <Onboarding />}</Suspense>
       {sheet === "paywall" && <PaywallSheet />}

@@ -6,6 +6,14 @@ All notable changes to OpenMedia are documented here.
 >
 > **Wiki**: the [GitHub Wiki](https://github.com/skepjandi/openmedia/wiki) is the public-facing main wiki — architecture, recipe format, AI pipeline, security model, roadmap. Source-controlled editing surface is `docs/wiki/` in this repo; CI (`.github/workflows/sync-wiki.yml`) mirrors it to the GitHub Wiki on every merge to `main`. New single-PR changes belong here, not as new wiki pages.
 
+### feat(desktop): keyboard shortcuts for every action, with Vim and Emacs key sets
+
+**Area:** `feat(shell)`, `feat(desktop)`
+
+**Change:** Settings > *Keyboard shortcuts* (desktop only) lists every action (navigation, tabs, find, zoom, scrolling, color picker, ad blocking, theme, incognito and more) and binds any of them to any keys, as a chord or a sequence. Three key sets to start from: Standard, Vim (`j k h l`, `gg`/`G`, `H`/`L`, `/`, counts) and Emacs (`C-n`/`C-p`, `C-x` prefixes, `M-x`). A command palette (`Mod+Shift+P`) searches the actions by name. Chords with the command key are native menu items rebuilt from the bindings (`set_menu_shortcuts`, `menu:action`), so they work with the page focused; plain keys and sequences work while the shell has the keyboard, which `Mod+;` switches. An off switch leaves only Escape. The old `menu:sheet` event and fixed Navigate/Page menus are gone.
+
+**Verified:** Vitest for chord reading and writing, the matcher (sequences, counts, typing guard, ambiguity timeout), preset conflicts and overrides; clippy and cargo test for the menu list validation and the scroll script. **Not verified:** the app on a Mac, Windows or Linux: that a menu accelerator takes the key before the page and the shell see it twice at most, that `focus_keyboard` gives the shell the key events, the scroll script on real pages (three unrelated sites, per invariant 9), and menu accelerators for punctuation keys on each OS. Action names and the Vim/Emacs labels are English in every language.
+
 ### feat(import): import from another browser, with an encrypted password vault and one-tap fill
 
 **Area:** `feat(import)`, `feat(shell)`
