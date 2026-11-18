@@ -14,6 +14,14 @@ All notable changes to OpenMedia are documented here.
 
 **Not verified:** on a device; Android only.
 
+### fix(video-controls): clear the site's hold-for-2x badge after the small player is dismissed
+
+**Area:** `fix(video-controls)`
+
+**Change:** Dragging a full-size player down starts as a press-and-hold, which YouTube reads as "double speed"; the app keeps the rest of the drag from the page, so the page never saw the touch end and its 2x badge stayed on the video after the small player went back to normal. When an engaged drag ends, the element the touch began on gets `pointercancel` and `touchcancel`.
+
+**Not verified:** on a device or on a live site; depends on the site honouring untrusted cancel events.
+
 ### fix(fab): the same room above and below the floating button on the tool line
 
 **Area:** `fix(fab)`

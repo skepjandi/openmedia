@@ -1160,6 +1160,22 @@
       };
     }
 
+    // The same press never ends for the site either, so its hold-for-double-speed indicator (the
+    // "2x" badge) would stay on the video after the small player is dismissed. Tell the page the
+    // touch is over, as a cancel on the element it began on.
+    function cancelSiteTouch(target) {
+      if (!target || !target.isConnected) return;
+      var names = ['pointercancel', 'touchcancel'];
+      names.forEach(function (name) {
+        try {
+          var cancel = name === 'touchcancel' && typeof TouchEvent === 'function' ?
+            new TouchEvent(name, { bubbles: true, cancelable: false, touches: [], targetTouches: [], changedTouches: [] }) :
+            typeof PointerEvent === 'function' ? new PointerEvent(name, { bubbles: true, cancelable: false, pointerType: 'touch' }) : null;
+          if (cancel) target.dispatchEvent(cancel);
+        } catch (_) {}
+      });
+    }
+
     function dragStart(event) {
       drag = null;
       if (mini || !event.touches || event.touches.length !== 1 || document.hidden || window.__openmediaHold) return;
@@ -1178,7 +1194,7 @@
       if (video && onSiteButton(event.target, video)) return;
       drag = {
         video: video, frame: frame, rate: video ? video.playbackRate : 1, x: touchX(touch), y: touchY(touch), engaged: false,
-        box: { left: box.left, right: box.right, top: box.top, bottom: box.bottom },
+        box: { left: box.left, right: box.right, top: box.top, bottom: box.bottom }, target: event.target,
         last: { y: touchY(touch), at: Date.now() }, speed: 0, ok: false
       };
       // In a frame only the page knows whether it is at its top and this is its player.
@@ -1223,6 +1239,7 @@
       var held = drag;
       drag = null;
       if (held && held.release) held.release(HOLD_RATE_MS);
+      if (held && held.engaged && !framed) cancelSiteTouch(held.target);
       if (!held || !held.engaged || (!framed && !mini)) return;
       event.stopImmediatePropagation();
       if (event.cancelable) event.preventDefault();
