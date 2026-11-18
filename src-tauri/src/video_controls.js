@@ -1340,6 +1340,16 @@
         if (ratio > 0 && target.muted) target.muted = false;
         panelSound = { muted: target.muted, volume: target.volume };
         paint(target);
+        // A site that puts the volume back (or a platform that ignores it) only leaves the ends:
+        // when a middle value does not hold, the bar is no use on this page and goes.
+        if (!volumeBridge && ratio > 0.05 && ratio < 0.95) {
+          setTimeout(function () {
+            if (Math.abs(target.volume - ratio) > 0.05) {
+              volumeSettable = false;
+              paint(target);
+            }
+          }, 400);
+        }
       });
       volume.track.style.cssText += ';flex:1 1 70px;min-width:56px;max-width:120px';
       var floatButton = button(32, 'pip', function (target) {

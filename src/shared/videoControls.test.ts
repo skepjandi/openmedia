@@ -2021,6 +2021,20 @@ describe("video controls", () => {
     expect(sliders(free)[0]?.style.display).toBe("flex");
   });
 
+  it("takes the volume bar away on a page that puts a middle volume back", () => {
+    const video = new FakeVideo();
+    Object.defineProperty(video, "volume", { get: () => 1, set: () => {} });
+    const page = load({ videos: [video], current: video });
+    openPanel(page);
+    const bar = sliders(page)[0];
+    expect(bar?.style.display).toBe("flex");
+    bar?.fire("pointerdown", { clientX: 100 });
+    bar?.fire("pointerup");
+    page.runTimers();
+    page.tick();
+    expect(bar?.style.display).toBe("none");
+  });
+
   it("goes to the next speed up when the video runs at one the list does not have", () => {
     const video = new FakeVideo();
     video.playbackRate = 1.1;
