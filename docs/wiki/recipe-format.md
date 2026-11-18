@@ -102,7 +102,7 @@ A recipe may list `options`: the switches Settings shows for the site. Each rule
 | `group` | `annoyance` or `content`. Orders the switches. |
 | `default` | Whether the rules apply until the user chooses. **Policy for official recipes, enforced by a test: annoyances `true`, content `false`.** An annoyance is something that gets in the way (install prompts, pop-ups that block the page, scroll locks, ad slots); content is something the user may well want to see. |
 
-Validation: at most 30 options; every option has at least one rule; every `option` a rule names exists. Settings live in `library.json` (`siteOptions`: recipe id, then option id, then a boolean or a choice id); an option with no saved value follows the recipe's current default, so shipping a new option needs no migration. Adding `options`, `option`, `choices` and `choice` is additive, so `schema` stays 1.
+Validation: at most 32 options; every option has at least one rule; every `option` a rule names exists. Settings live in `library.json` (`siteOptions`: recipe id, then option id, then a boolean or a choice id); an option with no saved value follows the recipe's current default, so shipping a new option needs no migration. Adding `options`, `option`, `choices` and `choice` is additive, so `schema` stays 1.
 
 ### Choice options (more than on or off)
 
@@ -160,7 +160,24 @@ Resolution order: engine picks candidates by `css`, filters by the semantic fiel
 | `script` | Run JS in the page | `{ id, label, type: "script", option?, on?, code }`. `code` is a function body run once per page load after `DOMContentLoaded`, in strict mode. Origin decides what it may do, see [Trust levels](#trust-levels) and [Script Policy](./script-policy.md). Never run before the user has accepted the recipe |
 | `videoMenu` | An option list of the site's own player (quality, captions, audio) in the app's video controls | `{ id, label, type: "videoMenu", option?, on?, kind: "quality"\|"captions"\|"audio"\|"other", title, open?: [{css}], items: {css}, selected: {attr}\|{class}, close?: {css} }`. No code: the app clicks `open` in order to open the site's menu, reads the entries `items` matches (their text is the label, `selected` says which is in use: one of `aria-checked`, `aria-selected`, `aria-current`, `data-checked`, `data-selected`, `data-active`, `data-state`, or a class), and picks one by clicking it (`video_menu.js`). It clicks the site's own controls, so a recipe with one cannot be imported, shared or in the community library (invariant 7); only the maintainers' official recipes (`recipes/official/`) and the user's own recipes may have one; at most 4 per recipe. The assistant counts the first `open` selector (else `items`) like a style rule's, so a menu with no way in is reported as matching nothing. |
 | `prune` | Remove items from the JSON the page's own same-origin `fetch`/`XMLHttpRequest` calls receive | `{ id, label, type: "prune", option?, choice?, on?, urls: ["/api/feed"], remove: [{ path: "data.items[*]", when?: { key, equals } }] }`. Declarative; see [The prune rule](#the-prune-rule). Allowed in every origin, including shared recipes |
+| `sponsorBlock` | Skip the segments the SponsorBlock service lists for the video on the page | `{ id, label, type: "sponsorBlock", option?, choice?, on?, videoId, categories }`. Official recipes only. See [Crowd rules](#the-sponsorblock-and-dislikecount-rules). |
+| `dislikeCount` | Show the dislike count the Return YouTube Dislike service estimates | `{ id, label, type: "dislikeCount", option?, choice?, on?, videoId, target }`. Official recipes only. See [Crowd rules](#the-sponsorblock-and-dislikecount-rules). |
 | `dark` | Fixes for the built-in dark mode of pages | `{ id, label, type: "dark", option?, choice?, on?, mode?: "on"\|"off", method?: "dynamic"\|"filter"\|"filterplus"\|"static", invert?: [selector] }`. At least one of `mode`, `method`, `invert`; at most 20 `invert` selectors. Declarative, so it may be shared and bundled. See [Dark Mode for Pages](./dark-mode.md#recipes-and-the-assistant). |
+
+### The sponsorBlock and dislikeCount rules
+
+`{ id, label, type: "sponsorBlock", option?, choice?, on?, videoId: { query: "v" }, categories: ["sponsor", "selfpromo"] }`
+`{ id, label, type: "dislikeCount", option?, choice?, on?, videoId: { afterSegment: "shorts" }, target: { css: "dislike-button-view-model" } }`
+
+The first skips, once each, the segments the public [SponsorBlock](https://sponsor.ajay.app) database lists for the video on the page (it is what the SponsorBlock browser extension does). The second writes the dislike count that [Return YouTube Dislike](https://returnyoutubedislike.com) estimates into the site's dislike button, which the site no longer shows (what that extension does). They are the only rules that make the app, rather than the site, contact a server. Runtime: `src-tauri/src/crowd_data.js`; validation: `recipes/crowd.rs`.
+
+- **`videoId`**: where the page's own address holds the video id, exactly one of `query` (a parameter, `/watch?v=ID`) or `afterSegment` (the path segment after a fixed one, `/shorts/ID`). Names are 1 to 24 letters, digits, `-` or `_`. The runtime accepts only an id of 11 letters, digits, `-` or `_`; on any other page it sends nothing.
+- **`categories`** (`sponsorBlock`): one or more of `sponsor`, `selfpromo`, `interaction`, `intro`, `outro`, `preview`, `filler`, each once.
+- **`target`** (`dislikeCount`): a validated selector for the element that receives the count as a child `span`.
+- **What is sent:** one GET per video, no cookies, no referrer, no custom headers. `sponsorBlock` goes to `sponsor.ajay.app` with the first four hex digits of the SHA-256 of the id (the service's k-anonymity scheme); `dislikeCount` goes to `returnyoutubedislikeapi.com` with the id itself, because that service has no hashed form. Both hosts are fixed in the runtime; a recipe cannot name another. The services also see the device's IP address.
+- **Skipping:** only segments with action `skip`, once each per view of the video, so seeking back plays the segment. A video whose length differs from the one the segment was submitted for by more than 5 seconds (an ad in the same player) is left alone.
+- **Limits:** 2 of these rules per recipe. Unknown fields are refused.
+- **Trust:** **official recipes only.** An imported recipe (a bundled community recipe, a file import, a shared recipe) that carries one is refused, as with `videoMenu`. They ship off by default (`content`). See [Security](./security.md#crowd-rules).
 
 ### The prune rule
 

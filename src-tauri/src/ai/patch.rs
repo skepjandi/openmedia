@@ -822,6 +822,8 @@ pub fn option_css(recipe: &Recipe, option_id: &str, choice: Option<&str>) -> Str
             | Rule::VideoMenu { .. }
             | Rule::Prune { .. }
             | Rule::Redirect { .. }
+            | Rule::SponsorBlock { .. }
+            | Rule::DislikeCount { .. }
             | Rule::Dark { .. } => {}
         }
     }

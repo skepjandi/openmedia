@@ -492,6 +492,7 @@ export const ja: Messages = {
   "library.review.redirects": "転送するもの",
   "library.review.restyles": "見た目を変えるもの",
   "library.review.prunes": "取り除くもの",
+  "library.review.asksService": "動画について公開サービスに問い合わせるもの:",
   "library.review.runsCode": "コードを実行",
   "library.review.showCode": "コードを表示",
   "library.review.hideCode": "コードを非表示",

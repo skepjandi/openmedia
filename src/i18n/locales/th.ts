@@ -472,6 +472,7 @@ export const th: Messages = {
   "library.review.redirects": "เปลี่ยนเส้นทาง",
   "library.review.restyles": "ปรับรูปลักษณ์",
   "library.review.prunes": "นำออก",
+  "library.review.asksService": "สอบถามบริการสาธารณะเกี่ยวกับวิดีโอ:",
   "library.review.runsCode": "เรียกใช้โค้ด",
   "library.review.showCode": "แสดงโค้ด",
   "library.review.hideCode": "ซ่อนโค้ด",

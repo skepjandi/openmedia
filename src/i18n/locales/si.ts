@@ -493,6 +493,7 @@ export const si: Messages = {
   "library.review.redirects": "යළි යොමු කරයි",
   "library.review.restyles": "පෙනුම වෙනස් කරයි",
   "library.review.prunes": "ඉවත් කරයි",
+  "library.review.asksService": "වීඩියෝව ගැන පොදු සේවාවකින් අසයි:",
   "library.review.runsCode": "කේතය ධාවනය කරයි",
   "library.review.showCode": "කේතය පෙන්වන්න",
   "library.review.hideCode": "කේතය සඟවන්න",

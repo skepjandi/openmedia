@@ -8,6 +8,7 @@ use std::collections::BTreeMap;
 use serde::Serialize;
 use url::Url;
 
+use super::crowd::VideoId;
 use super::matcher::Matcher;
 use super::prune;
 use super::schema::{Origin, Recipe, Rule};
@@ -187,6 +188,8 @@ fn check_shared(recipe: &Recipe) -> Result<()> {
         | Rule::VideoMenu { label, .. }
         | Rule::Prune { label, .. }
         | Rule::Redirect { label, .. }
+        | Rule::SponsorBlock { label, .. }
+        | Rule::DislikeCount { label, .. }
         | Rule::Dark { label, .. } => label,
     });
     let tab_labels = recipe
@@ -317,6 +320,15 @@ fn tab_previews(recipe: &Recipe) -> Vec<TabPreview> {
         .collect()
 }
 
+/// Where a crowd rule finds the video's id, for the review.
+fn crowd_video_id(video_id: &VideoId) -> String {
+    match (&video_id.query, &video_id.after_segment) {
+        (Some(name), _) => format!("?{name}="),
+        (_, Some(name)) => format!("/{name}/"),
+        _ => String::new(),
+    }
+}
+
 fn rule_preview(rule: &Rule) -> RulePreview {
     match rule {
         Rule::Hide { label, target, .. } => RulePreview {
@@ -336,6 +348,37 @@ fn rule_preview(rule: &Rule) -> RulePreview {
             kind: "prune",
             selector: urls.join(", "),
             declarations: BTreeMap::from([("remove".to_owned(), prune::describe(remove))]),
+            code: None,
+        },
+        Rule::SponsorBlock {
+            label,
+            categories,
+            video_id,
+            ..
+        } => RulePreview {
+            label: label.clone(),
+            kind: "sponsorBlock",
+            selector: crowd_video_id(video_id),
+            declarations: BTreeMap::from([(
+                "skips".to_owned(),
+                categories
+                    .iter()
+                    .map(|category| format!("{category:?}").to_lowercase())
+                    .collect::<Vec<_>>()
+                    .join(", "),
+            )]),
+            code: None,
+        },
+        Rule::DislikeCount {
+            label,
+            video_id,
+            target,
+            ..
+        } => RulePreview {
+            label: label.clone(),
+            kind: "dislikeCount",
+            selector: format!("{} → {}", crowd_video_id(video_id), target.css),
+            declarations: BTreeMap::new(),
             code: None,
         },
         Rule::Dark {

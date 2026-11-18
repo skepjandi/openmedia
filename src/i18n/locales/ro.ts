@@ -505,6 +505,7 @@ export const ro: Messages = {
   "library.review.redirects": "Redirecționează",
   "library.review.restyles": "Schimbă aspectul",
   "library.review.prunes": "Elimină",
+  "library.review.asksService": "Întreabă un serviciu public despre videoclip:",
   "library.review.runsCode": "Rulează cod",
   "library.review.showCode": "Arată codul",
   "library.review.hideCode": "Ascunde codul",

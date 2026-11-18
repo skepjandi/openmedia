@@ -485,6 +485,7 @@ export const bn: Messages = {
   "library.review.redirects": "পুনঃনির্দেশ করে",
   "library.review.restyles": "দেখতে বদলায়",
   "library.review.prunes": "সরায়",
+  "library.review.asksService": "ভিডিও সম্পর্কে একটি পাবলিক সার্ভিসকে জিজ্ঞাসা করে:",
   "library.review.runsCode": "কোড চালায়",
   "library.review.showCode": "কোড দেখান",
   "library.review.hideCode": "কোড লুকান",

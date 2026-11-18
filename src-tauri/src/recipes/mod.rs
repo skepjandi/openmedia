@@ -1,5 +1,6 @@
 pub mod bundled;
 mod compile;
+mod crowd;
 mod matcher;
 mod prune;
 mod route;
@@ -622,6 +623,69 @@ mod tests {
         };
         assert!(Recipe::parse(&menu("user")).is_ok());
         assert!(Recipe::parse(&menu("imported")).is_err());
+    }
+
+    const SPONSOR_RULE: &str = r#"{"id":"sb","label":"Skip sponsors","type":"sponsorBlock","videoId":{"query":"v"},"categories":["sponsor","intro"]}"#;
+    const DISLIKE_RULE: &str = r#"{"id":"rd","label":"Dislike count","type":"dislikeCount","videoId":{"afterSegment":"shorts"},"target":{"css":"dislike-button-view-model"}}"#;
+
+    #[test]
+    fn sponsor_and_dislike_rules_ask_a_service_so_an_imported_recipe_cannot_have_one() {
+        for rule in [SPONSOR_RULE, DISLIKE_RULE] {
+            assert!(Recipe::parse(&prune_recipe("user", rule)).is_ok(), "{rule}");
+            assert!(
+                Recipe::parse(&prune_recipe("imported", rule)).is_err(),
+                "{rule}"
+            );
+        }
+    }
+
+    #[test]
+    fn sponsor_and_dislike_rules_refuse_a_host_a_missing_id_and_stray_fields() {
+        for bad in [
+            SPONSOR_RULE.replace("\"videoId\":{\"query\":\"v\"}", "\"videoId\":{}"),
+            SPONSOR_RULE.replace("\"query\":\"v\"", "\"query\":\"v\",\"afterSegment\":\"s\""),
+            SPONSOR_RULE.replace("[\"sponsor\",\"intro\"]", "[]"),
+            SPONSOR_RULE.replace("[\"sponsor\",\"intro\"]", "[\"sponsor\",\"sponsor\"]"),
+            SPONSOR_RULE.replace("[\"sponsor\",\"intro\"]", "[\"unknown\"]"),
+            SPONSOR_RULE.replace("\"type\"", "\"host\":\"evil.test\",\"type\""),
+            DISLIKE_RULE.replace("dislike-button-view-model", "a{"),
+        ] {
+            assert!(Recipe::parse(&prune_recipe("user", &bad)).is_err(), "{bad}");
+        }
+    }
+
+    #[test]
+    fn sponsor_and_dislike_rules_carry_their_runtime_only_when_a_recipe_has_one() {
+        let without =
+            page_script(&[Recipe::parse(TOGGLED).unwrap()], &OptionChoices::new()).unwrap();
+        assert!(without.contains("const crowdRuntime = null;"));
+        let both = format!("{SPONSOR_RULE},{DISLIKE_RULE}");
+        let recipe = Recipe::parse(&prune_recipe("user", &both)).unwrap();
+        let with = page_script(&[recipe], &OptionChoices::new()).unwrap();
+        assert!(with.contains("openmedia.crowd"));
+        assert!(with.contains("\"kind\":\"sponsorBlock\""));
+        assert!(with.contains("\"categories\":[\"sponsor\",\"intro\"]"));
+        assert!(with.contains("\"kind\":\"dislikeCount\""));
+        assert!(!with.contains("const crowdRuntime = null;"));
+    }
+
+    #[test]
+    fn the_official_youtube_recipe_has_its_sponsor_and_dislike_options_off_by_default() {
+        let youtube = official_recipes()
+            .into_iter()
+            .find(|recipe| recipe.id == "market.official.youtube")
+            .unwrap();
+        for option in ["sponsorblock", "dislike-count"] {
+            let found = youtube.option(option).unwrap();
+            assert_eq!(found.default_value, OptionValue::Toggle(false), "{option}");
+            assert!(
+                youtube
+                    .rules
+                    .iter()
+                    .any(|rule| rule.option() == Some(option)),
+                "{option}"
+            );
+        }
     }
 
     #[test]

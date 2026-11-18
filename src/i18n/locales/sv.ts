@@ -502,6 +502,7 @@ export const sv: Messages = {
   "library.review.redirects": "Omdirigerar",
   "library.review.restyles": "Ändrar utseendet",
   "library.review.prunes": "Tar bort",
+  "library.review.asksService": "Frågar en offentlig tjänst om videon:",
   "library.review.runsCode": "Kör kod",
   "library.review.showCode": "Visa koden",
   "library.review.hideCode": "Dölj koden",

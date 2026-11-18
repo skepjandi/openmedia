@@ -495,6 +495,7 @@ export const cs: Messages = {
   "library.review.redirects": "Přesměrovává",
   "library.review.restyles": "Mění vzhled",
   "library.review.prunes": "Odstraňuje",
+  "library.review.asksService": "Ptá se veřejné služby na video:",
   "library.review.runsCode": "Spouští kód",
   "library.review.showCode": "Zobrazit kód",
   "library.review.hideCode": "Skrýt kód",

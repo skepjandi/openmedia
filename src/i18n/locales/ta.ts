@@ -513,6 +513,7 @@ export const ta: Messages = {
   "library.review.redirects": "வேறு பக்கத்துக்கு திருப்புகிறது",
   "library.review.restyles": "தோற்றத்தை மாற்றுபவை",
   "library.review.prunes": "நீக்குகிறது",
+  "library.review.asksService": "வீடியோ பற்றி பொது சேவையிடம் கேட்கிறது:",
   "library.review.runsCode": "குறியீட்டை இயக்கும்",
   "library.review.showCode": "குறியீட்டைக் காட்டு",
   "library.review.hideCode": "குறியீட்டை மறை",

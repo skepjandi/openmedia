@@ -493,6 +493,7 @@ export const hi: Messages = {
   "library.review.redirects": "रीडायरेक्ट करती है",
   "library.review.restyles": "रूप बदलती है",
   "library.review.prunes": "हटाती है",
+  "library.review.asksService": "वीडियो के बारे में एक सार्वजनिक सेवा से पूछती है:",
   "library.review.runsCode": "कोड चलाती है",
   "library.review.showCode": "कोड दिखाएँ",
   "library.review.hideCode": "कोड छिपाएँ",

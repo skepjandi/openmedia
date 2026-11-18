@@ -76,6 +76,16 @@ Shared recipes are untrusted until validated on the device. **Bundled recipes** 
 
 **Updates.** `ota_status`, `ota_confirm`, `ota_check`, `app_update_check` and `app_update_install` are shell-only app commands like the rest; none takes a URL or a key. The web bundle is accepted only with a valid Ed25519 signature from the key compiled into the app, built for the app's own version, and is served in place of the embedded shell, so the signing key is as sensitive as the app's store signing: whoever holds it can change what the shell does. The desktop updater's Minisign key is the same kind of secret, and the plugin's own JS commands have no capability. Both fetch from GitHub releases over HTTPS and send nothing about the user ([Updates](./updates.md)).
 
+### Crowd rules
+
+`sponsorBlock` and `dislikeCount` ([Recipe Format](./recipe-format.md#the-sponsorblock-and-dislikecount-rules)) ask a public service about the video on the page, so they widen invariant 1: **two more network destinations exist, `sponsor.ajay.app` and `returnyoutubedislikeapi.com`, reached only while one of these rules applies (an option the user switched on, off by default) on a page whose address holds a video id.** Why that is acceptable:
+
+- **Only maintainers' recipes.** Rust refuses them in any `imported` recipe that is not one of `recipes/official/` (reviewed in a pull request), as with `videoMenu`. The assistant cannot write them. The script policy is unchanged: no script can call `fetch`.
+- **Fixed hosts, fixed requests.** The hosts are constants in `crowd_data.js`. A request is a GET with `credentials: 'omit'`, `referrerPolicy: 'no-referrer'` and no custom headers, so no cookie, token, profile or site identifier is sent. `sponsorBlock` sends a four-digit prefix of the id's hash; `dislikeCount` sends the id (that service has no hashed form). Both services see the device's IP address, as any site does. They are the user's choice, named in the option text.
+- **Invariant 3 (hostile site).** The request is made from the page's own JavaScript realm (it needs no bridge, no command and no capability), so the site can see it and can read the answers, which are public data about a public video. It receives nothing about the user. A page that blocks the request (a `connect-src` policy) simply gets no segments and no count.
+- **Invariant 7 (customize, never automate).** The rule changes what the reader sees (a count; a jump past a segment they opted to skip). It does not click, submit or change a request of the site, and a segment is skipped once so the reader can seek back.
+- **Off switch.** The option is off by default; switching it off clears the runtime's rules and removes the count in the live page.
+
 ### Prune rules
 
 A `prune` rule ([Recipe Format](./recipe-format.md#the-prune-rule)) may be in any recipe, including bundled and shared ones, though a `script` that wraps `fetch` may not ([Script Policy](./script-policy.md)). Why that is consistent with the invariants:

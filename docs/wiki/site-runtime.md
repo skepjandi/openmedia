@@ -83,6 +83,10 @@ The feed pages are the ones the feed player knows. A page it does not know is ad
 - **Circuit breaker.** An unexpected exception (not a parse failure, which is normal) counts as a fault; after 5 the rules are emptied and the page is left as the site made it until the next run of the page script.
 - Tested in `src/shared/pruneRuntime.test.ts` (stub `fetch`/XHR, no site) and `recipes/prune.rs` / `recipes/mod.rs` (validation and delivery).
 
+## Crowd rules
+
+`src-tauri/src/crowd_data.js` is a function expression embedded in the document-start script only when a rule that currently applies is a `sponsorBlock` or `dislikeCount` rule; the page script calls it with the rules, and when none applies it calls `window[Symbol.for('openmedia.crowd')].set([])` so a live page is cleaned after a switch. Top frame only. A 500 ms timer compares the page's address with each rule's `videoId`; when the id changes it loads data for the new video and, for `dislikeCount`, removes the old count. `sponsorBlock` listens for `timeupdate` on the document (capture) and sets `currentTime` of the video that fired it, once per segment. `dislikeCount` keeps one `span[data-openmedia-dislikes]` inside the target, putting it back when the site re-renders. What it sends is listed in [Security](./security.md#crowd-rules). Tested in `src/shared/crowdData.test.ts` (fake `fetch` and video, no network) and `recipes/crowd.rs`, `recipes/compile.rs`.
+
 ## Snapshot
 
 `__om.snapshot(opts)` returns a pruned tree used by the [AI Assistant](./ai-assistant.md).

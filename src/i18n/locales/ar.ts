@@ -477,6 +477,7 @@ export const ar: Messages = {
   "library.review.redirects": "تعيد التوجيه",
   "library.review.restyles": "تُغيّر المظهر",
   "library.review.prunes": "تُزيل",
+  "library.review.asksService": "يسأل خدمة عامة عن الفيديو:",
   "library.review.runsCode": "يشغّل شيفرة",
   "library.review.showCode": "إظهار الشيفرة",
   "library.review.hideCode": "إخفاء الشيفرة",

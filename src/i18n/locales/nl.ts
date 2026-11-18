@@ -500,6 +500,7 @@ export const nl: Messages = {
   "library.review.redirects": "Leidt om",
   "library.review.restyles": "Past de stijl aan van",
   "library.review.prunes": "Verwijdert",
+  "library.review.asksService": "Vraagt een openbare dienst naar de video:",
   "library.review.runsCode": "Voert code uit",
   "library.review.showCode": "Code tonen",
   "library.review.hideCode": "Code verbergen",

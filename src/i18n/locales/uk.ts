@@ -501,6 +501,7 @@ export const uk: Messages = {
   "library.review.redirects": "Перенаправляє",
   "library.review.restyles": "Змінює вигляд",
   "library.review.prunes": "Видаляє",
+  "library.review.asksService": "Запитує публічний сервіс про відео:",
   "library.review.runsCode": "Запускає код",
   "library.review.showCode": "Показати код",
   "library.review.hideCode": "Сховати код",

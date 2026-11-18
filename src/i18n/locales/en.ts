@@ -493,6 +493,7 @@ export const en = {
   "library.review.redirects": "Redirects",
   "library.review.restyles": "Restyles",
   "library.review.prunes": "Removes",
+  "library.review.asksService": "Asks a public service about the video:",
   "library.review.runsCode": "Runs code",
   "library.review.showCode": "Show the code",
   "library.review.hideCode": "Hide the code",

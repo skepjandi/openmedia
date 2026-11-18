@@ -3,6 +3,7 @@ use std::fmt::Write;
 
 use serde::Serialize;
 
+use super::crowd::{self, CROWD_RUNTIME, PageCrowd};
 use super::matcher::Matcher;
 use super::prune::{self, PRUNE_RUNTIME, PagePrune};
 use super::route::RouteGlob;
@@ -25,6 +26,7 @@ struct PageRecipe {
     menus: Vec<PageMenu>,
     prunes: Vec<PagePrune>,
     redirects: Vec<PageRedirect>,
+    crowds: Vec<PageCrowd>,
     darks: Vec<PageDark>,
 }
 
@@ -88,6 +90,8 @@ fn css_of<'a>(rules: impl Iterator<Item = &'a Rule>) -> String {
             | Rule::VideoMenu { .. }
             | Rule::Prune { .. }
             | Rule::Redirect { .. }
+            | Rule::SponsorBlock { .. }
+            | Rule::DislikeCount { .. }
             | Rule::Dark { .. } => Ok(()),
             Rule::Css {
                 target,
@@ -187,6 +191,23 @@ fn page_recipes(
                     _ => None,
                 })
                 .collect::<Result<Vec<_>>>()?;
+            let crowds = scoped()
+                .filter_map(|rule| match rule {
+                    Rule::SponsorBlock {
+                        id,
+                        video_id,
+                        categories,
+                        ..
+                    } => Some(crowd::sponsor_block_page(id, video_id, categories)),
+                    Rule::DislikeCount {
+                        id,
+                        video_id,
+                        target,
+                        ..
+                    } => Some(crowd::dislike_count_page(id, video_id, target)),
+                    _ => None,
+                })
+                .collect();
             let darks = scoped()
                 .filter_map(|rule| match rule {
                     Rule::Dark {
@@ -210,6 +231,7 @@ fn page_recipes(
                 menus,
                 prunes,
                 redirects,
+                crowds,
                 darks,
             })
         })
@@ -245,6 +267,11 @@ pub fn page_script(recipes: &[Recipe], choices: &OptionChoices) -> Result<String
     } else {
         "null"
     };
+    let crowd_runtime = if page.iter().any(|recipe| !recipe.crowds.is_empty()) {
+        CROWD_RUNTIME.trim()
+    } else {
+        "null"
+    };
     let scripts = scripts.join(",\n");
     Ok(format!(
         r#"(() => {{
@@ -275,6 +302,14 @@ pub fn page_script(recipes: &[Recipe], choices: &OptionChoices) -> Result<String
       try {{ pruneRuntime(prunes); }} catch (_) {{}}
     }} else if (pruneState) {{
       try {{ pruneState.rules = []; }} catch (_) {{}}
+    }}
+    const crowdRuntime = {crowd_runtime};
+    const crowds = found.reduce((all, recipe) => all.concat(recipe.crowds), []);
+    const crowdState = window[Symbol.for("openmedia.crowd")];
+    if (crowdRuntime && crowds.length) {{
+      try {{ crowdRuntime(crowds); }} catch (_) {{}}
+    }} else if (crowdState) {{
+      try {{ crowdState.set([]); }} catch (_) {{}}
     }}
     const darkFixes = found.reduce((all, recipe) => all.concat(recipe.darks), []);
     const darkKey = Symbol.for("openmedia.darkFixes");

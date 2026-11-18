@@ -496,6 +496,7 @@ export const id: Messages = {
   "library.review.redirects": "Mengalihkan",
   "library.review.restyles": "Mengubah tampilan",
   "library.review.prunes": "Menghapus",
+  "library.review.asksService": "Menanyakan layanan publik tentang video:",
   "library.review.runsCode": "Menjalankan kode",
   "library.review.showCode": "Tampilkan kode",
   "library.review.hideCode": "Sembunyikan kode",

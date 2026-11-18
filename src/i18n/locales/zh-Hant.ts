@@ -459,6 +459,7 @@ export const zhHant: Messages = {
   "library.review.redirects": "重新導向",
   "library.review.restyles": "調整樣式",
   "library.review.prunes": "移除",
+  "library.review.asksService": "向公共服務查詢該影片:",
   "library.review.runsCode": "執行程式碼",
   "library.review.showCode": "顯示程式碼",
   "library.review.hideCode": "隱藏程式碼",

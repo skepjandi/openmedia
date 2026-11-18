@@ -499,6 +499,7 @@ export const tr: Messages = {
   "library.review.redirects": "Yönlendirir",
   "library.review.restyles": "Yeniden biçimlendirir",
   "library.review.prunes": "Kaldırır",
+  "library.review.asksService": "Video hakkında herkese açık bir hizmete sorar:",
   "library.review.runsCode": "Kod çalıştırır",
   "library.review.showCode": "Kodu göster",
   "library.review.hideCode": "Kodu gizle",

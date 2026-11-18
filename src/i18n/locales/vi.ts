@@ -490,6 +490,7 @@ export const vi: Messages = {
   "library.review.redirects": "Chuyển hướng",
   "library.review.restyles": "Đổi kiểu dáng",
   "library.review.prunes": "Xóa",
+  "library.review.asksService": "Hỏi một dịch vụ công khai về video:",
   "library.review.runsCode": "Chạy mã",
   "library.review.showCode": "Xem mã",
   "library.review.hideCode": "Ẩn mã",

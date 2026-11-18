@@ -499,6 +499,7 @@ export const ms: Messages = {
   "library.review.redirects": "Mengalihkan",
   "library.review.restyles": "Mengubah gaya",
   "library.review.prunes": "Mengalih keluar",
+  "library.review.asksService": "Bertanya perkhidmatan awam tentang video:",
   "library.review.runsCode": "Menjalankan kod",
   "library.review.showCode": "Tunjukkan kod",
   "library.review.hideCode": "Sembunyikan kod",

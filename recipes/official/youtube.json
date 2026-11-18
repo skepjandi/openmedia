@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "market.official.youtube",
   "name": "YouTube",
-  "version": "2.4.0",
+  "version": "2.5.0",
   "origin": "user",
   "tags": ["desktop", "mobile"],
   "match": ["https://www.youtube.com/*", "https://m.youtube.com/*", "https://youtube.com/*"],
@@ -88,6 +88,20 @@
       "id": "end-cards",
       "label": "Hide end-screen suggestions",
       "description": "The video thumbnails that cover the player near the end and when paused.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "sponsorblock",
+      "label": "Skip sponsors with SponsorBlock",
+      "description": "Skips sponsor, self-promo, interaction, intro and outro segments. Asks sponsor.ajay.app about each video (a hash prefix only).",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "dislike-count",
+      "label": "Show dislike counts",
+      "description": "Shows an estimated dislike count from returnyoutubedislikeapi.com, which is sent the video's id.",
       "group": "content",
       "default": false
     },
@@ -1104,6 +1118,28 @@
           "path": "onResponseReceivedActions[*].appendContinuationItemsAction.continuationItems[*].richSectionRenderer.content.gridShelfViewModel.contents[*].shortsLockupViewModel"
         }
       ]
+    },
+    {
+      "id": "sponsorblock-skip",
+      "label": "Skip sponsor segments",
+      "type": "sponsorBlock",
+      "option": "sponsorblock",
+      "videoId": {
+        "query": "v"
+      },
+      "categories": ["sponsor", "selfpromo", "interaction", "intro", "outro"]
+    },
+    {
+      "id": "dislike-count-watch",
+      "label": "Dislike count on the dislike button",
+      "type": "dislikeCount",
+      "option": "dislike-count",
+      "videoId": {
+        "query": "v"
+      },
+      "target": {
+        "css": "dislike-button-view-model"
+      }
     }
   ],
   "meta": {
@@ -1111,6 +1147,6 @@
     "homepage": "https://www.youtube.com/",
     "lastVerified": "2026-11-13",
     "summary": "Hides Open App, promos, ad slots, Premium prompts, Shorts, Home feed, comments, up next; blurs or dims thumbnails, titles and feeds",
-    "notes": "## Checked 2026-11-13\nLogged out, real Chrome over CDP: iPhone UA 390x844 on `m.youtube.com` (home, watch, search, channel Videos) and Chrome desktop UA on `www.youtube.com` (watch, search). Counts are `querySelectorAll` on that live DOM; fixtures are sanitised excerpts. A fresh logged-out Home is the empty \"Try searching\" page, so Home rules rest on the earlier fixtures.\n\n## New options\n- **LIVE phone:** thumbnails (`ytm-thumbnail-cover` 12 watch/19 search, `yt-thumbnail-view-model` 8, `ytm-compact-thumbnail` on channels), titles (`h3` 12/19, `h4` 30), avatars (`ytw-channel-thumbnail-with-link-renderer` 12/19, comments teaser 1), views (`[aria-label$=\" views\"]` 12/19/30; watch views and likes 1), Subscribe (1 watch, 1 search), Share (1), hashtags (5).\n- **LIVE desktop:** `yt-thumbnail-view-model` 46/20, `ytd-thumbnail` 29, titles 40 and 18, avatars 38, 18 and 21 in comments, views 39 and 18, info text, `#owner-sub-count` and like number 1 each, Subscribe 1, Share, Save and Download 1 each, hashtags 3 under the title (12 with description), `.ytp-cards-teaser`, `.ytp-cards-button`, `.iv-branding` 1 each, `ytd-comments#comments` 1, `ytd-watch-next-secondary-results-renderer` 1, `ytd-search ytd-shelf-renderer` 2 (Music shelves).\n- **SOURCE:** hashtags (r/uBlockOrigin thread), player cards and watermark (houssemko Youtube-Declutter), search shelves (Onsotumenh list: Latest Posts From, People also watched), thumbnail blur (YouTube Thumbnail Blur extension).\n- **INFERRED:** `.ytp-watermark` (0 here), `ytd-compact-video-renderer h3`, shelves other than Music.\n- Mini player (`ytd-miniplayer`) `LIVE` 1 on the desktop watch page. The up-next grid at the end of a video (`.ytp-modern-videowall-still`) already carries `ytp-suggestion-set`, so `end-cards` covers it.\n- Some phone selectors use Polymer class names (`ytmBadgeAndBylineRendererItemByline`, `YtmCompactMediaItemStats`, `ytVideoSubtitleViewModelSubstring`); YouTube renames those, so re-check those rules first.\n- Choices: thumbnails Show/Blur/Hide, titles Show/Blur, comments, up next and Home feed style Show/Dim/Blur (dim = opacity 0.35). The Hide toggles for those areas still win.\n\n## Fixed\n`home-feed` on a phone also hid the channel Videos grid (`ytm-rich-grid-renderer` is shared). Now scoped with `ytm-browse:not(:has(yt-page-header-renderer))`; `channel-videos.html` marks that grid `data-keep`. Caveat: the scope needs `:not()` around `:has()`; Chromium and the Rust selector engine both accept it, but an engine that refuses it would drop that one rule and leave the Home feed visible.\n\n## Fixtures\nNew excerpts: `watch-details`, `search-cards`, `channel-videos`, `desktop-watch-details`, `desktop-search-cards`. The three player overlays sit in a hand-written player shell.\n\n## Not verified\nSigned in; Home feed; phone player overlays and search shelves; English-only labels (`\" views\"`, `\" likes\"`, Share, Save to playlist, Comments, Shorts); the \"Ask\" AI button never rendered in the logged-out captures (only its label string in the page's i18n table), so there is no rule for it; in-stream ads cannot be hidden by CSS.\n\n## Earlier notes\n- iPhone UA gets `ytm-*`, desktop `ytd-*`. Never hide `ytm-browse`, `ytm-search`, `ytm-watch`, a bare `ytm-item-section-renderer`, `lazy-list`, `ytm-pivot-bar-renderer`, `#movie_player`. `/shorts/ID` cannot be blocked.\n- LIVE phone: open-app-pill (watch only), shorts-*, home-chips, comments-entry, related-videos, companion-slot. SOURCE: shorts-chip. INFERRED: promo-banners, promoted-tiles.\n- Desktop (signed in, 2026-11-10) matched: promo, premium, ad, shorts-desktop, home, comments, related, mix, sidebar, info, create, voice, bell rules. INFERRED (`desktop-extras.html`): end-cards, live-chat, shopping, playlist-cards-desktop, shorts-search-items, shorts-related-items, shorts-grid-items."
+    "notes": "## Checked 2026-11-13\nLogged out, real Chrome over CDP: iPhone UA 390x844 on `m.youtube.com` (home, watch, search, channel Videos) and Chrome desktop UA on `www.youtube.com` (watch, search). Counts are `querySelectorAll` on that live DOM; fixtures are sanitised excerpts. A fresh logged-out Home is the empty \"Try searching\" page, so Home rules rest on the earlier fixtures.\n\n## New options\n- **LIVE phone:** thumbnails (`ytm-thumbnail-cover` 12 watch/19 search, `yt-thumbnail-view-model` 8, `ytm-compact-thumbnail` on channels), titles (`h3` 12/19, `h4` 30), avatars (`ytw-channel-thumbnail-with-link-renderer` 12/19, comments teaser 1), views (`[aria-label$=\" views\"]` 12/19/30; watch views and likes 1), Subscribe (1 watch, 1 search), Share (1), hashtags (5).\n- **LIVE desktop:** `yt-thumbnail-view-model` 46/20, `ytd-thumbnail` 29, titles 40 and 18, avatars 38, 18 and 21 in comments, views 39 and 18, info text, `#owner-sub-count` and like number 1 each, Subscribe 1, Share, Save and Download 1 each, hashtags 3 under the title (12 with description), `.ytp-cards-teaser`, `.ytp-cards-button`, `.iv-branding` 1 each, `ytd-comments#comments` 1, `ytd-watch-next-secondary-results-renderer` 1, `ytd-search ytd-shelf-renderer` 2 (Music shelves).\n- **SOURCE:** hashtags (r/uBlockOrigin thread), player cards and watermark (houssemko Youtube-Declutter), search shelves (Onsotumenh list: Latest Posts From, People also watched), thumbnail blur (YouTube Thumbnail Blur extension).\n- **INFERRED:** `.ytp-watermark` (0 here), `ytd-compact-video-renderer h3`, shelves other than Music.\n- Mini player (`ytd-miniplayer`) `LIVE` 1 on the desktop watch page. The up-next grid at the end of a video (`.ytp-modern-videowall-still`) already carries `ytp-suggestion-set`, so `end-cards` covers it.\n- Some phone selectors use Polymer class names (`ytmBadgeAndBylineRendererItemByline`, `YtmCompactMediaItemStats`, `ytVideoSubtitleViewModelSubstring`); YouTube renames those, so re-check those rules first.\n- Choices: thumbnails Show/Blur/Hide, titles Show/Blur, comments, up next and Home feed style Show/Dim/Blur (dim = opacity 0.35). The Hide toggles for those areas still win.\n\n## Fixed\n`home-feed` on a phone also hid the channel Videos grid (`ytm-rich-grid-renderer` is shared). Now scoped with `ytm-browse:not(:has(yt-page-header-renderer))`; `channel-videos.html` marks that grid `data-keep`. Caveat: the scope needs `:not()` around `:has()`; Chromium and the Rust selector engine both accept it, but an engine that refuses it would drop that one rule and leave the Home feed visible.\n\n## Fixtures\nNew excerpts: `watch-details`, `search-cards`, `channel-videos`, `desktop-watch-details`, `desktop-search-cards`. The three player overlays sit in a hand-written player shell.\n\n## Not verified\nSigned in; Home feed; phone player overlays and search shelves; English-only labels (`\" views\"`, `\" likes\"`, Share, Save to playlist, Comments, Shorts); the \"Ask\" AI button never rendered in the logged-out captures (only its label string in the page's i18n table), so there is no rule for it; in-stream ads cannot be hidden by CSS.\n\n## Earlier notes\n- iPhone UA gets `ytm-*`, desktop `ytd-*`. Never hide `ytm-browse`, `ytm-search`, `ytm-watch`, a bare `ytm-item-section-renderer`, `lazy-list`, `ytm-pivot-bar-renderer`, `#movie_player`. `/shorts/ID` cannot be blocked.\n- LIVE phone: open-app-pill (watch only), shorts-*, home-chips, comments-entry, related-videos, companion-slot. SOURCE: shorts-chip. INFERRED: promo-banners, promoted-tiles.\n- Desktop (signed in, 2026-11-10) matched: promo, premium, ad, shorts-desktop, home, comments, related, mix, sidebar, info, create, voice, bell rules. INFERRED (`desktop-extras.html`): end-cards, live-chat, shopping, playlist-cards-desktop, shorts-search-items, shorts-related-items, shorts-grid-items.\n\n## 2.5.0\n`sponsorblock`, `dislike-count`: not checked on the live site or a device; the count's place beside `dislike-button-view-model` is unconfirmed."
   }
 }

@@ -3,6 +3,7 @@ use std::collections::{BTreeMap, HashSet};
 use serde::{Deserialize, Serialize};
 use url::Url;
 
+use super::crowd::{self, SegmentCategory, VideoId};
 use super::matcher::Matcher;
 use super::prune::{self, PruneRemove};
 use super::route::{RouteGlob, validate_target};
@@ -13,7 +14,7 @@ use crate::error::{Error, Result};
 
 pub const SCHEMA_VERSION: u32 = 1;
 const MAX_RULES: usize = 200;
-const MAX_OPTIONS: usize = 30;
+const MAX_OPTIONS: usize = 32;
 const MAX_LABEL_CHARS: usize = 60;
 const MAX_DESCRIPTION_CHARS: usize = 160;
 pub const MIN_CHOICES: usize = 2;
@@ -373,6 +374,39 @@ pub enum Rule {
         #[serde(default, skip_serializing_if = "Vec::is_empty")]
         invert: Vec<String>,
     },
+    /// Skips the segments the crowd-sourced SponsorBlock service lists for the video whose id is in
+    /// the page's address, once each. Official recipes only: it asks a public service about the
+    /// video (see `crowd.rs`). Nothing runs from the recipe.
+    SponsorBlock {
+        id: String,
+        label: String,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        option: Option<String>,
+        /// For a rule on a choice option: the choices in which it applies.
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        choice: Option<Vec<String>>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        on: Option<Vec<String>>,
+        #[serde(rename = "videoId")]
+        video_id: VideoId,
+        categories: Vec<SegmentCategory>,
+    },
+    /// Writes the dislike count the Return YouTube Dislike service estimates for the video whose id
+    /// is in the page's address into `target`, the site's dislike button. Official recipes only.
+    DislikeCount {
+        id: String,
+        label: String,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        option: Option<String>,
+        /// For a rule on a choice option: the choices in which it applies.
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        choice: Option<Vec<String>>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        on: Option<Vec<String>>,
+        #[serde(rename = "videoId")]
+        video_id: VideoId,
+        target: Target,
+    },
 }
 
 impl Rule {
@@ -384,6 +418,8 @@ impl Rule {
             | Self::VideoMenu { id, .. }
             | Self::Prune { id, .. }
             | Self::Redirect { id, .. }
+            | Self::SponsorBlock { id, .. }
+            | Self::DislikeCount { id, .. }
             | Self::Dark { id, .. } => id,
         }
     }
@@ -397,6 +433,8 @@ impl Rule {
             | Self::VideoMenu { option, .. }
             | Self::Prune { option, .. }
             | Self::Redirect { option, .. }
+            | Self::SponsorBlock { option, .. }
+            | Self::DislikeCount { option, .. }
             | Self::Dark { option, .. } => option.as_deref(),
         }
     }
@@ -410,6 +448,8 @@ impl Rule {
             | Self::VideoMenu { choice, .. }
             | Self::Prune { choice, .. }
             | Self::Redirect { choice, .. }
+            | Self::SponsorBlock { choice, .. }
+            | Self::DislikeCount { choice, .. }
             | Self::Dark { choice, .. } => choice.as_deref(),
         }
     }
@@ -423,6 +463,8 @@ impl Rule {
             | Self::VideoMenu { on, .. }
             | Self::Prune { on, .. }
             | Self::Redirect { on, .. }
+            | Self::SponsorBlock { on, .. }
+            | Self::DislikeCount { on, .. }
             | Self::Dark { on, .. } => on.as_deref(),
         }
     }
@@ -532,6 +574,7 @@ impl Recipe {
         self.validate_script_totals()?;
         self.validate_video_menus()?;
         self.validate_prunes()?;
+        self.validate_crowd_rules()?;
         let mut seen = HashSet::new();
         for rule in &self.rules {
             if !seen.insert(rule.id()) {
@@ -599,6 +642,24 @@ impl Recipe {
                     id, urls, remove, ..
                 } => prune::validate(id, urls, remove)?,
                 Rule::Redirect { id, when, to, .. } => validate_redirect(id, &when.path, to)?,
+                Rule::SponsorBlock {
+                    id,
+                    video_id,
+                    categories,
+                    ..
+                } => {
+                    self.require_official(id, official)?;
+                    crowd::validate_sponsor_block(id, video_id, categories)?;
+                }
+                Rule::DislikeCount {
+                    id,
+                    video_id,
+                    target,
+                    ..
+                } => {
+                    self.require_official(id, official)?;
+                    crowd::validate_dislike_count(id, video_id, target)?;
+                }
                 Rule::Dark {
                     id,
                     mode,
@@ -643,6 +704,32 @@ impl Recipe {
             return Err(Error::Recipe(format!(
                 "recipe {} has too many video menus",
                 self.id
+            )));
+        }
+        Ok(())
+    }
+
+    fn validate_crowd_rules(&self) -> Result<()> {
+        let count = self
+            .rules
+            .iter()
+            .filter(|rule| matches!(rule, Rule::SponsorBlock { .. } | Rule::DislikeCount { .. }))
+            .count();
+        if count > crowd::MAX_CROWD_RULES {
+            return Err(Error::Recipe(format!(
+                "recipe {} has too many sponsor or dislike rules",
+                self.id
+            )));
+        }
+        Ok(())
+    }
+
+    /// The rules that ask a public service about the video leave the device, so only the
+    /// maintainers' reviewed recipes may carry them.
+    fn require_official(&self, id: &str, official: bool) -> Result<()> {
+        if self.origin == Origin::Imported && !official {
+            return Err(Error::Recipe(format!(
+                "rule {id} asks a public service about the video, which a shared recipe cannot"
             )));
         }
         Ok(())

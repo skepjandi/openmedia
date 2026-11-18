@@ -125,6 +125,8 @@ const REVIEW_VERBS = {
   css: "library.review.restyles",
   redirect: "library.review.redirects",
   prune: "library.review.prunes",
+  sponsorBlock: "library.review.asksService",
+  dislikeCount: "library.review.asksService",
   dark: "library.review.restyles",
 } as const;
 

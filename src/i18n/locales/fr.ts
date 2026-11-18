@@ -511,6 +511,7 @@ export const fr: Messages = {
   "library.review.redirects": "Redirige",
   "library.review.restyles": "Change l’apparence de",
   "library.review.prunes": "Supprime",
+  "library.review.asksService": "Interroge un service public sur la vidéo :",
   "library.review.runsCode": "Exécute du code",
   "library.review.showCode": "Afficher le code",
   "library.review.hideCode": "Masquer le code",

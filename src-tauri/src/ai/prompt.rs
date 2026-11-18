@@ -271,6 +271,8 @@ fn describe_options(out: &mut String, recipe: &Recipe, states: &BTreeMap<String,
                 | Rule::VideoMenu { label, .. }
                 | Rule::Prune { label, .. }
                 | Rule::Redirect { label, .. }
+                | Rule::SponsorBlock { label, .. }
+                | Rule::DislikeCount { label, .. }
                 | Rule::Dark { label, .. } => clean(label, 60),
             })
             .collect();

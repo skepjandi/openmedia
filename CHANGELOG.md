@@ -14,6 +14,14 @@ All notable changes to OpenMedia are documented here.
 
 **Verified:** frontend and Rust checks (940 web tests, 541 Rust tests), engine and video-controls tests for each overridable field. New translations are unreviewed (Sinhala, Tamil, Urdu and Bengali least certain).
 
+### feat(recipes): YouTube can skip sponsors (SponsorBlock) and show dislike counts (Return YouTube Dislike)
+
+**Area:** `feat(recipes)`, `feat(engine)`
+
+**Change:** Two new rule types, `sponsorBlock` and `dislikeCount`, and two YouTube 2.5.0 options that use them, `sponsorblock` ("Skip sponsors with SponsorBlock") and `dislike-count` ("Show dislike counts"), both off by default. `sponsorBlock` looks up the segments for the video in `/watch?v=` (sponsor, self-promo, interaction, intro, outro) by the first four hex digits of the id's SHA-256 and skips each once. `dislikeCount` asks `returnyoutubedislikeapi.com` for the video's estimate and writes it inside `dislike-button-view-model`. Only official recipes may carry them (Rust refuses them in any other imported recipe). The requests are cookie-free and referrer-free GETs; invariant 1 in `AGENTS.md`, `security.md#crowd-rules`, `recipe-format.md`, `site-runtime.md` and the roadmap decision log are updated. YouTube already shows a dislike button; what it hides is the count, so that is what comes back.
+
+**Verified:** `src/shared/crowdData.test.ts` runs the real `crowd_data.js` against a fake `fetch` and video (hash-prefix request without cookies or referrer, once-per-segment skipping, ad-length guard, navigation, off switch, malformed answers); Rust tests for validation and compilation. **Not verified:** on the live services, on YouTube's live pages (its CSP, where the count sits next to the button, layout on phone and desktop), on any device, and on three unrelated sites as AGENTS.md invariant 9 asks (the rules take the id from the address, so they act only on pages whose address names one, but that is untested).
+
 ### fix(siteview): picture-in-picture never started when leaving the app, and the volume bar could snap back (iOS)
 
 **Area:** `fix(siteview)`

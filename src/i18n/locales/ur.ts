@@ -496,6 +496,7 @@ export const ur: Messages = {
   "library.review.redirects": "ری ڈائریکٹ کرتی ہے",
   "library.review.restyles": "انداز بدلتی ہے",
   "library.review.prunes": "ہٹاتی ہے",
+  "library.review.asksService": "ویڈیو کے بارے میں ایک عوامی سروس سے پوچھتی ہے:",
   "library.review.runsCode": "کوڈ چلاتی ہے",
   "library.review.showCode": "کوڈ دکھائیں",
   "library.review.hideCode": "کوڈ چھپائیں",

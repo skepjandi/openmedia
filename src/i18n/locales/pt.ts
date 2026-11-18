@@ -505,6 +505,7 @@ export const pt: Messages = {
   "library.review.redirects": "Redireciona",
   "library.review.restyles": "Muda o visual",
   "library.review.prunes": "Remove",
+  "library.review.asksService": "Consulta um serviço público sobre o vídeo:",
   "library.review.runsCode": "Executa código",
   "library.review.showCode": "Mostrar o código",
   "library.review.hideCode": "Ocultar o código",

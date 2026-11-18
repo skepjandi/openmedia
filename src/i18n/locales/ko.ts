@@ -489,6 +489,7 @@ export const ko: Messages = {
   "library.review.redirects": "이동시키는 것",
   "library.review.restyles": "스타일을 바꾸는 것",
   "library.review.prunes": "제거하는 것",
+  "library.review.asksService": "동영상에 대해 공개 서비스에 묻는 것:",
   "library.review.runsCode": "코드 실행",
   "library.review.showCode": "코드 보기",
   "library.review.hideCode": "코드 숨기기",
