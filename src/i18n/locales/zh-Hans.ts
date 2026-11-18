@@ -853,7 +853,6 @@ export const zhHans: Messages = {
   "downloads.sniffScan": "扫描页面",
   "downloads.sniffRescan": "重新扫描",
   "downloads.sniffEmpty": "在此页面上未找到可下载的内容。",
-  "downloads.sniffDesktop": "扫描页面需要在应用内打开页面，而此设备不支持。",
   "downloads.filterAll": "全部",
   "downloads.filterText": "按正则表达式筛选",
   "downloads.badPattern": "这不是有效的正则表达式。",

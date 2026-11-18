@@ -940,8 +940,6 @@ export const nl: Messages = {
   "downloads.sniffScan": "Pagina scannen",
   "downloads.sniffRescan": "Opnieuw scannen",
   "downloads.sniffEmpty": "Er is niets om te downloaden gevonden op deze pagina.",
-  "downloads.sniffDesktop":
-    "Een pagina scannen vereist een pagina die in de app is geopend, en dat heeft dit apparaat niet.",
   "downloads.filterAll": "Alles",
   "downloads.filterText": "Filteren met reguliere expressie",
   "downloads.badPattern": "Dat is geen geldige reguliere expressie.",

@@ -951,8 +951,6 @@ export const de: Messages = {
   "downloads.sniffScan": "Seite scannen",
   "downloads.sniffRescan": "Erneut scannen",
   "downloads.sniffEmpty": "Auf dieser Seite wurde nichts zum Herunterladen gefunden.",
-  "downloads.sniffDesktop":
-    "Zum Scannen muss eine Seite in der App geöffnet sein, was dieses Gerät nicht kann.",
   "downloads.filterAll": "Alle",
   "downloads.filterText": "Nach regulärem Ausdruck filtern",
   "downloads.badPattern": "Das ist kein gültiger regulärer Ausdruck.",

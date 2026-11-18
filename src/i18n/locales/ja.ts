@@ -924,8 +924,6 @@ export const ja: Messages = {
   "downloads.sniffScan": "ページをスキャン",
   "downloads.sniffRescan": "再スキャン",
   "downloads.sniffEmpty": "このページにダウンロードできるものは見つかりませんでした。",
-  "downloads.sniffDesktop":
-    "ページのスキャンにはアプリ内で開いたページが必要ですが、この端末にはありません。",
   "downloads.filterAll": "すべて",
   "downloads.filterText": "正規表現で絞り込む",
   "downloads.badPattern": "有効な正規表現ではありません。",

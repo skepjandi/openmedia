@@ -923,8 +923,6 @@ export const si: Messages = {
   "downloads.sniffScan": "පිටුව ස්කෑන් කරන්න",
   "downloads.sniffRescan": "නැවත ස්කෑන් කරන්න",
   "downloads.sniffEmpty": "මෙම පිටුවෙන් බාගැනීමට කිසිවක් හමු නොවීය.",
-  "downloads.sniffDesktop":
-    "පිටුවක් ස්කෑන් කිරීමට යෙදුම තුළ විවෘත පිටුවක් අවශ්‍යයි, මෙම උපාංගයේ එය නැත.",
   "downloads.filterAll": "සියල්ල",
   "downloads.filterText": "නිත්‍ය ප්‍රකාශනයකින් පෙරන්න",
   "downloads.badPattern": "එය වලංගු නිත්‍ය ප්‍රකාශනයක් නොවේ.",

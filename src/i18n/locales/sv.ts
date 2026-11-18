@@ -934,8 +934,6 @@ export const sv: Messages = {
   "downloads.sniffScan": "Skanna sidan",
   "downloads.sniffRescan": "Skanna igen",
   "downloads.sniffEmpty": "Inget att ladda ner hittades på den här sidan.",
-  "downloads.sniffDesktop":
-    "Att skanna en sida kräver en sida som är öppen i appen, vilket den här enheten inte har.",
   "downloads.filterAll": "Alla",
   "downloads.filterText": "Filtrera med reguljärt uttryck",
   "downloads.badPattern": "Det är inte ett giltigt reguljärt uttryck.",

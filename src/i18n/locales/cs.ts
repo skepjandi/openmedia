@@ -926,8 +926,6 @@ export const cs: Messages = {
   "downloads.sniffScan": "Prohledat stránku",
   "downloads.sniffRescan": "Prohledat znovu",
   "downloads.sniffEmpty": "Na této stránce nebylo nalezeno nic ke stažení.",
-  "downloads.sniffDesktop":
-    "Prohledání stránky vyžaduje stránku otevřenou v aplikaci, což toto zařízení nemá.",
   "downloads.filterAll": "Vše",
   "downloads.filterText": "Filtrovat regulárním výrazem",
   "downloads.badPattern": "To není platný regulární výraz.",

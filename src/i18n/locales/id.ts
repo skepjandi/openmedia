@@ -931,8 +931,6 @@ export const id: Messages = {
   "downloads.sniffScan": "Pindai halaman",
   "downloads.sniffRescan": "Pindai ulang",
   "downloads.sniffEmpty": "Tidak ada yang bisa diunduh di halaman ini.",
-  "downloads.sniffDesktop":
-    "Memindai halaman memerlukan halaman yang terbuka di dalam aplikasi, yang tidak dimiliki perangkat ini.",
   "downloads.filterAll": "Semua",
   "downloads.filterText": "Saring dengan ekspresi reguler",
   "downloads.badPattern": "Itu bukan ekspresi reguler yang valid.",

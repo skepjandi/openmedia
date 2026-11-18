@@ -925,8 +925,6 @@ export const hi: Messages = {
   "downloads.sniffScan": "पेज स्कैन करें",
   "downloads.sniffRescan": "फिर स्कैन करें",
   "downloads.sniffEmpty": "इस पेज पर डाउनलोड करने लायक कुछ नहीं मिला।",
-  "downloads.sniffDesktop":
-    "पेज स्कैन करने के लिए ऐप के अंदर खुला पेज चाहिए, जो इस डिवाइस में नहीं है।",
   "downloads.filterAll": "सभी",
   "downloads.filterText": "रेगुलर एक्सप्रेशन से फ़िल्टर करें",
   "downloads.badPattern": "यह मान्य रेगुलर एक्सप्रेशन नहीं है।",

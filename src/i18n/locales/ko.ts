@@ -911,8 +911,6 @@ export const ko: Messages = {
   "downloads.sniffScan": "페이지 스캔",
   "downloads.sniffRescan": "다시 스캔",
   "downloads.sniffEmpty": "이 페이지에서 다운로드할 항목을 찾지 못했습니다.",
-  "downloads.sniffDesktop":
-    "페이지를 스캔하려면 앱 안에서 열린 페이지가 필요한데, 이 기기에는 없습니다.",
   "downloads.filterAll": "전체",
   "downloads.filterText": "정규식으로 필터링",
   "downloads.badPattern": "올바른 정규식이 아닙니다.",

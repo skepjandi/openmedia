@@ -925,8 +925,6 @@ export const ur: Messages = {
   "downloads.sniffScan": "صفحہ اسکین کریں",
   "downloads.sniffRescan": "دوبارہ اسکین کریں",
   "downloads.sniffEmpty": "اس صفحے پر ڈاؤن لوڈ کے لیے کچھ نہیں ملا۔",
-  "downloads.sniffDesktop":
-    "صفحہ اسکین کرنے کے لیے ایپ کے اندر کھلا صفحہ درکار ہے، جو اس آلے پر نہیں ہے۔",
   "downloads.filterAll": "سب",
   "downloads.filterText": "ریگولر ایکسپریشن سے فلٹر کریں",
   "downloads.badPattern": "یہ درست ریگولر ایکسپریشن نہیں ہے۔",

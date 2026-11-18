@@ -934,8 +934,6 @@ export const ms: Messages = {
   "downloads.sniffScan": "Imbas halaman",
   "downloads.sniffRescan": "Imbas semula",
   "downloads.sniffEmpty": "Tiada apa-apa untuk dimuat turun ditemui pada halaman ini.",
-  "downloads.sniffDesktop":
-    "Mengimbas halaman memerlukan halaman yang dibuka dalam apl, yang tiada pada peranti ini.",
   "downloads.filterAll": "Semua",
   "downloads.filterText": "Tapis dengan ungkapan nalar",
   "downloads.badPattern": "Itu bukan ungkapan nalar yang sah.",

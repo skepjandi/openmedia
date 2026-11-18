@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { useApp } from "../../app/store";
 import { useT } from "../../i18n/useT";
 import { downloads, type FoundMedia, type SniffedPage } from "../../shared/ipc";
 import { Thumb } from "./Thumb";
@@ -20,9 +19,8 @@ export function PageTab({
   onAdded: () => void;
   onError: (message: string) => void;
 }) {
-  const desktop = useApp((s) => s.desktop);
   const [found, setFound] = useState<SniffedPage | null>(null);
-  const [scanning, setScanning] = useState(!desktop);
+  const [scanning, setScanning] = useState(true);
   const [kind, setKind] = useState<KindFilter>("all");
   const [pattern, setPattern] = useState("");
   const [picked, setPicked] = useState<ReadonlySet<string>>(new Set());
@@ -44,8 +42,8 @@ export function PageTab({
   );
 
   useEffect(() => {
-    if (!desktop) void load();
-  }, [desktop, load]);
+    void load();
+  }, [load]);
 
   const scan = () => {
     setScanning(true);
@@ -57,8 +55,6 @@ export function PageTab({
   const counts = useMemo(() => countByKind(items), [items]);
   const invalid = compilePattern(pattern) === "invalid";
   const chosen = shown.filter((item) => picked.has(item.url));
-
-  if (desktop) return <p className="text-sm text-paper/60">{t("downloads.sniffDesktop")}</p>;
 
   const toggle = (url: string) =>
     setPicked((current) => {

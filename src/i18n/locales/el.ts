@@ -950,8 +950,6 @@ export const el: Messages = {
   "downloads.sniffScan": "Σάρωση της σελίδας",
   "downloads.sniffRescan": "Νέα σάρωση",
   "downloads.sniffEmpty": "Δεν βρέθηκε τίποτα για λήψη σε αυτή τη σελίδα.",
-  "downloads.sniffDesktop":
-    "Η σάρωση σελίδας απαιτεί μια σελίδα ανοιχτή μέσα στην εφαρμογή, που αυτή η συσκευή δεν έχει.",
   "downloads.filterAll": "Όλα",
   "downloads.filterText": "Φιλτράρισμα με κανονική έκφραση",
   "downloads.badPattern": "Αυτή δεν είναι έγκυρη κανονική έκφραση.",

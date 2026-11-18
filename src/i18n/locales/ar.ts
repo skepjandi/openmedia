@@ -891,7 +891,6 @@ export const ar: Messages = {
   "downloads.sniffScan": "فحص الصفحة",
   "downloads.sniffRescan": "فحص مرة أخرى",
   "downloads.sniffEmpty": "لم يُعثر على أي شيء للتنزيل في هذه الصفحة.",
-  "downloads.sniffDesktop": "يتطلب فحص الصفحة صفحة مفتوحة داخل التطبيق، وهذا الجهاز لا يدعم ذلك.",
   "downloads.filterAll": "الكل",
   "downloads.filterText": "تصفية بتعبير نمطي",
   "downloads.badPattern": "هذا ليس تعبيرًا نمطيًا صالحًا.",

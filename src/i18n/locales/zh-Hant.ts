@@ -857,7 +857,6 @@ export const zhHant: Messages = {
   "downloads.sniffScan": "掃描頁面",
   "downloads.sniffRescan": "重新掃描",
   "downloads.sniffEmpty": "在此頁面上找不到可下載的內容。",
-  "downloads.sniffDesktop": "掃描頁面需要在應用程式內開啟頁面，而此裝置不支援。",
   "downloads.filterAll": "全部",
   "downloads.filterText": "依正規表示式篩選",
   "downloads.badPattern": "這不是有效的正規表示式。",

@@ -329,9 +329,8 @@ function FloatingButton() {
   const setDarkMode = useApp((s) => s.setDarkMode);
   const setSiteDarkMode = useApp((s) => s.setSiteDarkMode);
   const openSiteSheet = useApp((s) => s.openSiteSheet);
-  // The page script runs through native code that desktop has no site view for.
-  const colorPickerOn = useApp((s) => (s.state?.colorPicker ?? false) && !s.desktop);
-  const techDetectorOn = useApp((s) => (s.state?.techDetector ?? false) && !s.desktop);
+  const colorPickerOn = useApp((s) => s.state?.colorPicker ?? false);
+  const techDetectorOn = useApp((s) => s.state?.techDetector ?? false);
   const downloadsOn = useDownloadsStore((s) => s.settings?.button ?? true);
   const downloadsBadge = useDownloadsStore((s) => s.active + s.unseen);
   const startTechDetect = useApp((s) => s.startTechDetect);

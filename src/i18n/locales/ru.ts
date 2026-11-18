@@ -936,8 +936,6 @@ export const ru: Messages = {
   "downloads.sniffScan": "Сканировать страницу",
   "downloads.sniffRescan": "Сканировать снова",
   "downloads.sniffEmpty": "На этой странице не найдено ничего для скачивания.",
-  "downloads.sniffDesktop":
-    "Для сканирования нужна страница, открытая внутри приложения, а на этом устройстве её нет.",
   "downloads.filterAll": "Все",
   "downloads.filterText": "Фильтр по регулярному выражению",
   "downloads.badPattern": "Это недопустимое регулярное выражение.",

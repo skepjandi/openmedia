@@ -945,8 +945,6 @@ export const ro: Messages = {
   "downloads.sniffScan": "Scanează pagina",
   "downloads.sniffRescan": "Scanează din nou",
   "downloads.sniffEmpty": "Nu s-a găsit nimic de descărcat în această pagină.",
-  "downloads.sniffDesktop":
-    "Scanarea unei pagini necesită o pagină deschisă în aplicație, iar acest dispozitiv nu are una.",
   "downloads.filterAll": "Toate",
   "downloads.filterText": "Filtrează după expresie regulată",
   "downloads.badPattern": "Aceasta nu este o expresie regulată validă.",

@@ -954,8 +954,6 @@ export const ta: Messages = {
   "downloads.sniffScan": "பக்கத்தை ஸ்கேன் செய்",
   "downloads.sniffRescan": "மீண்டும் ஸ்கேன் செய்",
   "downloads.sniffEmpty": "இந்தப் பக்கத்தில் பதிவிறக்க எதுவும் கிடைக்கவில்லை.",
-  "downloads.sniffDesktop":
-    "பக்கத்தை ஸ்கேன் செய்ய பயன்பாட்டினுள் திறந்த பக்கம் தேவை; இந்தச் சாதனத்தில் அது இல்லை.",
   "downloads.filterAll": "அனைத்தும்",
   "downloads.filterText": "ஒழுங்குமுறை வெளிப்பாட்டால் வடிகட்டு",
   "downloads.badPattern": "அது சரியான ஒழுங்குமுறை வெளிப்பாடு அல்ல.",

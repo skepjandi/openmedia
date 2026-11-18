@@ -915,8 +915,6 @@ export const bn: Messages = {
   "downloads.sniffScan": "পেজ স্ক্যান করুন",
   "downloads.sniffRescan": "আবার স্ক্যান করুন",
   "downloads.sniffEmpty": "এই পেজে ডাউনলোডের মতো কিছু পাওয়া যায়নি।",
-  "downloads.sniffDesktop":
-    "পেজ স্ক্যান করতে অ্যাপের ভেতরে একটি পেজ খোলা থাকতে হয়, যা এই ডিভাইসে নেই।",
   "downloads.filterAll": "সব",
   "downloads.filterText": "রেগুলার এক্সপ্রেশন দিয়ে ফিল্টার করুন",
   "downloads.badPattern": "এটি বৈধ রেগুলার এক্সপ্রেশন নয়।",

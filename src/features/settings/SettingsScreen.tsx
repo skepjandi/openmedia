@@ -116,17 +116,13 @@ function CategoryPanel({
 
 /**
  * Turns the optional buttons on the floating button's fan on or off. Both are off until chosen.
- * Desktop has no page to read, so no switches there.
  */
 function FanButtonSwitches() {
-  const desktop = useApp((s) => s.desktop);
   const colorPicker = useApp((s) => s.state?.colorPicker ?? false);
   const techDetector = useApp((s) => s.state?.techDetector ?? false);
   const setColorPicker = useApp((s) => s.setColorPicker);
   const setTechDetector = useApp((s) => s.setTechDetector);
   const t = useT();
-  if (desktop) return null;
-
   return (
     <Group>
       <Switch

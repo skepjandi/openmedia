@@ -887,7 +887,6 @@ export const th: Messages = {
   "downloads.sniffScan": "สแกนหน้า",
   "downloads.sniffRescan": "สแกนอีกครั้ง",
   "downloads.sniffEmpty": "ไม่พบสิ่งที่ดาวน์โหลดได้ในหน้านี้",
-  "downloads.sniffDesktop": "การสแกนหน้าต้องมีหน้าที่เปิดอยู่ในแอป ซึ่งอุปกรณ์นี้ไม่มี",
   "downloads.filterAll": "ทั้งหมด",
   "downloads.filterText": "กรองด้วยนิพจน์ปรกติ",
   "downloads.badPattern": "นี่ไม่ใช่นิพจน์ปรกติที่ถูกต้อง",

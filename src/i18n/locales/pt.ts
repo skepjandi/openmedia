@@ -937,8 +937,6 @@ export const pt: Messages = {
   "downloads.sniffScan": "Analisar a página",
   "downloads.sniffRescan": "Analisar de novo",
   "downloads.sniffEmpty": "Nada para baixar foi encontrado nesta página.",
-  "downloads.sniffDesktop":
-    "Analisar uma página exige uma página aberta dentro do app, o que este dispositivo não tem.",
   "downloads.filterAll": "Todos",
   "downloads.filterText": "Filtrar por expressão regular",
   "downloads.badPattern": "Essa não é uma expressão regular válida.",

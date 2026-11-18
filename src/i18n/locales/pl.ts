@@ -933,8 +933,6 @@ export const pl: Messages = {
   "downloads.sniffScan": "Skanuj stronę",
   "downloads.sniffRescan": "Skanuj ponownie",
   "downloads.sniffEmpty": "Na tej stronie nie znaleziono nic do pobrania.",
-  "downloads.sniffDesktop":
-    "Skanowanie strony wymaga strony otwartej w aplikacji, a to urządzenie jej nie ma.",
   "downloads.filterAll": "Wszystkie",
   "downloads.filterText": "Filtruj wyrażeniem regularnym",
   "downloads.badPattern": "To nie jest poprawne wyrażenie regularne.",

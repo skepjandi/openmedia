@@ -6,6 +6,16 @@ All notable changes to OpenMedia are documented here.
 >
 > **Wiki**: the [GitHub Wiki](https://github.com/skepjandi/openmedia/wiki) is the public-facing main wiki — architecture, recipe format, AI pipeline, security model, roadmap. Source-controlled editing surface is `docs/wiki/` in this repo; CI (`.github/workflows/sync-wiki.yml`) mirrors it to the GitHub Wiki on every merge to `main`. New single-PR changes belong here, not as new wiki pages.
 
+### fix(desktop): page scan, color picker and technology detector work on desktop
+
+**Area:** `fix(desktop)`
+
+**Problem:** On the Mac and other desktop builds, Downloads > Page said "Scanning a page needs a page open inside the app, which this device does not have", and the color picker and technology detector had no Settings switches or fan buttons. The shell hid them whenever `desktop` was set, but the desktop site view has implemented `evaluate` since the Windows and Linux builds.
+
+**Change:** The shell no longer gates these three features on `desktop`: the page scan runs on open, and the two fan-button switches and buttons show. The `downloads.sniffDesktop` string is removed from every locale. The keyboard actions `tool.colorPick` and `tool.techDetect` already reached them.
+
+**Not verified:** in the running desktop app; `ts:check`, lint, format and tests pass.
+
 ### feat(desktop): Spotlight-style command bar and palette, and a video controls page with a live preview
 
 **Area:** `feat(desktop)`

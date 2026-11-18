@@ -918,8 +918,6 @@ export const en = {
   "downloads.sniffScan": "Scan the page",
   "downloads.sniffRescan": "Scan again",
   "downloads.sniffEmpty": "Nothing to download was found on this page.",
-  "downloads.sniffDesktop":
-    "Scanning a page needs a page open inside the app, which this device does not have.",
   "downloads.filterAll": "All",
   "downloads.filterText": "Filter by regular expression",
   "downloads.badPattern": "That is not a valid regular expression.",

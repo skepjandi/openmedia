@@ -936,8 +936,6 @@ export const uk: Messages = {
   "downloads.sniffScan": "Сканувати сторінку",
   "downloads.sniffRescan": "Сканувати знову",
   "downloads.sniffEmpty": "На цій сторінці не знайдено нічого для завантаження.",
-  "downloads.sniffDesktop":
-    "Для сканування потрібна сторінка, відкрита в застосунку, а на цьому пристрої такої немає.",
   "downloads.filterAll": "Усі",
   "downloads.filterText": "Фільтр за регулярним виразом",
   "downloads.badPattern": "Це недійсний регулярний вираз.",

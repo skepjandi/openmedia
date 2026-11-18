@@ -921,8 +921,6 @@ export const vi: Messages = {
   "downloads.sniffScan": "Quét trang",
   "downloads.sniffRescan": "Quét lại",
   "downloads.sniffEmpty": "Không tìm thấy gì để tải trên trang này.",
-  "downloads.sniffDesktop":
-    "Quét trang cần một trang đang mở trong ứng dụng, mà thiết bị này không có.",
   "downloads.filterAll": "Tất cả",
   "downloads.filterText": "Lọc theo biểu thức chính quy",
   "downloads.badPattern": "Đó không phải là biểu thức chính quy hợp lệ.",

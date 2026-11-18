@@ -932,8 +932,6 @@ export const tr: Messages = {
   "downloads.sniffScan": "Sayfayı tara",
   "downloads.sniffRescan": "Yeniden tara",
   "downloads.sniffEmpty": "Bu sayfada indirilecek bir şey bulunamadı.",
-  "downloads.sniffDesktop":
-    "Sayfayı taramak için uygulama içinde açık bir sayfa gerekir; bu cihazda yok.",
   "downloads.filterAll": "Tümü",
   "downloads.filterText": "Düzenli ifadeyle filtrele",
   "downloads.badPattern": "Bu geçerli bir düzenli ifade değil.",
