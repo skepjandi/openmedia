@@ -7,6 +7,9 @@ import { pageTools, vault, type VaultLogin } from "../../shared/ipc";
 import { siteOf } from "../../shared/site";
 import { useFind } from "../find/findStore";
 
+/** One array for every render: a selector that returned a fresh `[]` would loop React forever. */
+const NO_SITES: readonly string[] = [];
+
 const tool =
   "flex min-w-0 flex-1 flex-col items-center gap-1 rounded-xl px-1 py-2 text-xs text-paper/80 active:bg-paper/[0.08] disabled:opacity-30";
 
@@ -15,7 +18,7 @@ export function PageTools({ onDone }: { onDone: () => void }) {
   const t = useT();
   const page = useApp(selectPage);
   const isDesktopApp = useApp((s) => s.desktop);
-  const desktopSites = useApp((s) => s.state?.desktopSites ?? []);
+  const desktopSites = useApp((s) => s.state?.desktopSites ?? NO_SITES);
   const setSiteDesktop = useApp((s) => s.setSiteDesktop);
   const openFind = useFind((s) => s.openBar);
   const [notice, setNotice] = useState<string | null>(null);
