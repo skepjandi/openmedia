@@ -50,6 +50,51 @@ export const fr: Messages = {
   "pageTools.clearDataConfirm":
     "Se déconnecter de {site} et effacer ses cookies, son stockage et son cache ? Les autres sites conservent les leurs.",
   "pageTools.clearDataAction": "Effacer",
+  "pageTools.fill": "Remplir",
+  "pageTools.fillReason": "Remplir un identifiant enregistré",
+  "pageTools.fillChoose": "Choisissez un identifiant",
+  "pageTools.fillNothing": "Aucun champ de connexion trouvé sur cette page",
+  "settings.import": "Importer depuis un autre navigateur",
+  "settings.importNote":
+    "Marque-pages, historique, mots de passe et recherche à partir des fichiers exportés par votre ancien navigateur.",
+  "settings.passwords": "Mots de passe",
+  "settings.passwordsNote":
+    "Les identifiants que vous avez importés, verrouillés derrière votre appareil.",
+  "import.title": "Importer depuis un autre navigateur",
+  "import.intro":
+    "Dans votre ancien navigateur, exportez vos marque-pages (HTML), l’historique et les mots de passe (CSV), puis choisissez les fichiers ici. Tout est lu sur cet appareil et rien n’est envoyé ailleurs.",
+  "import.choose": "Choisir des fichiers",
+  "import.chooseMore": "Ajouter d’autres fichiers",
+  "import.reading": "Lecture…",
+  "import.tooLarge": "{name} est trop volumineux pour être importé.",
+  "import.nothing":
+    "Rien dans ces fichiers ne ressemblait à des marque-pages, un historique, des mots de passe ou un moteur de recherche.",
+  "import.found":
+    "{bookmarks} marque-pages, {history} entrées d’historique et {passwords} mots de passe enregistrés trouvés.",
+  "import.recipes": "Activer les recettes pour les sites que vous utilisez",
+  "import.sites": "Ajouter aux favoris",
+  "import.limitNote":
+    "Les favoris peuvent contenir jusqu’à {limit} sites. Les recettes que vous choisissez sont activées dans tous les cas.",
+  "import.history": "Ajouter les {count} plus visités à l’historique",
+  "import.searchEngine": "Rechercher avec {engine}",
+  "import.passwords": "Enregistrer {count} mots de passe sur cet appareil",
+  "import.passwordsNote":
+    "Ils sont chiffrés avec une clé conservée dans le stockage sécurisé de cet appareil. Supprimez ensuite le fichier exporté : il les contient en clair.",
+  "import.apply": "Importer",
+  "import.done":
+    "{recipes} recettes, {favorites} favoris, {history} entrées d’historique et {passwords} mots de passe importés.",
+  "passwords.title": "Mots de passe",
+  "passwords.close": "Fermer les mots de passe",
+  "passwords.unlock": "Déverrouiller",
+  "passwords.unlockReason": "Afficher vos mots de passe enregistrés",
+  "passwords.empty":
+    "Aucun mot de passe enregistré. Importez-les depuis un autre navigateur dans les Réglages.",
+  "passwords.show": "Afficher",
+  "passwords.hide": "Masquer",
+  "passwords.delete": "Effacer",
+  "passwords.deleteAll": "Effacer tous les mots de passe",
+  "passwords.deleteAllConfirm":
+    "Effacer tous les mots de passe enregistrés de cet appareil ? Cette action est irréversible.",
   "commandBar.addFavorite": "Ajouter {site} aux favoris",
   "commandBar.removeFavorite": "Retirer {site} des favoris",
   "commandBar.openAiSettings": "Ouvrir les réglages > Assistant IA",

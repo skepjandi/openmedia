@@ -46,6 +46,48 @@ export const vi: Messages = {
   "pageTools.clearDataConfirm":
     "Đăng xuất khỏi {site} và xóa cookie, bộ nhớ và bộ nhớ đệm của trang này? Các trang khác vẫn giữ dữ liệu của chúng.",
   "pageTools.clearDataAction": "Xóa",
+  "pageTools.fill": "Điền đăng nhập",
+  "pageTools.fillReason": "Điền một thông tin đăng nhập đã lưu",
+  "pageTools.fillChoose": "Chọn một đăng nhập",
+  "pageTools.fillNothing": "Không tìm thấy ô đăng nhập nào trên trang này",
+  "settings.import": "Nhập từ trình duyệt khác",
+  "settings.importNote":
+    "Dấu trang, lịch sử, mật khẩu và công cụ tìm kiếm từ các tệp mà trình duyệt cũ của bạn xuất ra.",
+  "settings.passwords": "Mật khẩu",
+  "settings.passwordsNote": "Các thông tin đăng nhập bạn đã nhập, được khóa bằng thiết bị của bạn.",
+  "import.title": "Nhập từ trình duyệt khác",
+  "import.intro":
+    "Trong trình duyệt cũ, hãy xuất dấu trang (HTML), lịch sử và mật khẩu (CSV), rồi chọn các tệp tại đây. Mọi thứ được đọc trên thiết bị này và không có gì được gửi đi đâu cả.",
+  "import.choose": "Chọn tệp",
+  "import.chooseMore": "Thêm tệp khác",
+  "import.reading": "Đang đọc…",
+  "import.tooLarge": "{name} quá lớn để nhập.",
+  "import.nothing":
+    "Không có gì trong các tệp đó giống dấu trang, lịch sử, mật khẩu hay công cụ tìm kiếm.",
+  "import.found":
+    "Tìm thấy {bookmarks} dấu trang, {history} mục lịch sử và {passwords} mật khẩu đã lưu.",
+  "import.recipes": "Bật công thức cho các trang bạn dùng",
+  "import.sites": "Thêm vào yêu thích",
+  "import.limitNote":
+    "Yêu thích chứa tối đa {limit} trang. Các công thức bạn chọn vẫn được bật trong mọi trường hợp.",
+  "import.history": "Thêm {count} trang truy cập nhiều nhất vào Lịch sử",
+  "import.searchEngine": "Tìm kiếm bằng {engine}",
+  "import.passwords": "Lưu {count} mật khẩu trên thiết bị này",
+  "import.passwordsNote":
+    "Chúng được mã hóa bằng khóa lưu trong bộ nhớ bảo mật của thiết bị này. Hãy xóa tệp đã xuất sau đó: tệp chứa mật khẩu dạng văn bản thuần.",
+  "import.apply": "Nhập",
+  "import.done":
+    "Đã nhập {recipes} công thức, {favorites} mục yêu thích, {history} mục lịch sử và {passwords} mật khẩu.",
+  "passwords.title": "Mật khẩu",
+  "passwords.close": "Đóng mật khẩu",
+  "passwords.unlock": "Mở khóa",
+  "passwords.unlockReason": "Hiển thị các mật khẩu đã lưu của bạn",
+  "passwords.empty": "Chưa có mật khẩu nào được lưu. Hãy nhập từ trình duyệt khác trong Cài đặt.",
+  "passwords.show": "Hiện",
+  "passwords.hide": "Ẩn",
+  "passwords.delete": "Xóa",
+  "passwords.deleteAll": "Xóa tất cả mật khẩu",
+  "passwords.deleteAllConfirm": "Xóa mọi mật khẩu đã lưu khỏi thiết bị này? Không thể hoàn tác.",
   "commandBar.addFavorite": "Thêm {site} vào yêu thích",
   "commandBar.removeFavorite": "Gỡ {site} khỏi yêu thích",
   "commandBar.openAiSettings": "Mở Cài đặt > Trợ lý AI",

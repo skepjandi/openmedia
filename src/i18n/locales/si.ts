@@ -49,6 +49,49 @@ export const si: Messages = {
   "pageTools.clearDataConfirm":
     "{site} වෙතින් ඉවත් වී එහි කුකී, ගබඩාව සහ කැෂ් මකන්නද? වෙනත් අඩවිවල දත්ත ඒ ලෙසම තබයි.",
   "pageTools.clearDataAction": "මකන්න",
+  "pageTools.fill": "පිවිසුම පුරවන්න",
+  "pageTools.fillReason": "සුරකින ලද පිවිසුමක් පුරවන්න",
+  "pageTools.fillChoose": "පිවිසුමක් තෝරන්න",
+  "pageTools.fillNothing": "මෙම පිටුවේ පිවිසුම් ක්ෂේත්‍ර හමු නොවීය",
+  "settings.import": "වෙනත් බ්‍රවුසරයකින් ආයාත කරන්න",
+  "settings.importNote":
+    "ඔබේ පැරණි බ්‍රවුසරය නිර්යාත කරන ගොනු වලින් පිටු සලකුණු, ඉතිහාසය, මුරපද සහ සෙවුම.",
+  "settings.passwords": "මුරපද",
+  "settings.passwordsNote": "ඔබ ආයාත කළ පිවිසුම්, ඔබේ උපාංගයේ අගුල පිටුපස තබා ඇත.",
+  "import.title": "වෙනත් බ්‍රවුසරයකින් ආයාත කරන්න",
+  "import.intro":
+    "ඔබේ පැරණි බ්‍රවුසරයේ පිටු සලකුණු (HTML), ඉතිහාසය සහ මුරපද (CSV) නිර්යාත කර, ගොනු මෙහි තෝරන්න. සියල්ල මෙම උපාංගයේ කියවන අතර කිසිවක් කිසිතැනකට නොයැවේ.",
+  "import.choose": "ගොනු තෝරන්න",
+  "import.chooseMore": "තවත් ගොනු එක් කරන්න",
+  "import.reading": "කියවමින්…",
+  "import.tooLarge": "{name} ආයාත කිරීමට විශාල වැඩියි.",
+  "import.nothing":
+    "එම ගොනු වල පිටු සලකුණු, ඉතිහාසය, මුරපද හෝ සෙවුම් යන්ත්‍රයක් වැනි කිසිවක් නොපෙනුණි.",
+  "import.found":
+    "පිටු සලකුණු {bookmarks} ක්, ඉතිහාස ඇතුළත් කිරීම් {history} ක් සහ සුරකින ලද මුරපද {passwords} ක් හමු විය.",
+  "import.recipes": "ඔබ භාවිත කරන අඩවි සඳහා ක්‍රම ක්‍රියාත්මක කරන්න",
+  "import.sites": "ආදරණීය ලෙස එකතු කරන්න",
+  "import.limitNote":
+    "ආදරණීයවල අඩවි {limit} ක් දක්වා රැඳේ. ඔබ තෝරන ක්‍රම කෙසේ වුවත් ක්‍රියාත්මක වේ.",
+  "import.history": "වැඩිපුරම පිවිසි {count} ඉතිහාසයට එකතු කරන්න",
+  "import.searchEngine": "{engine} සමඟ සොයන්න",
+  "import.passwords": "මුරපද {count} ක් මෙම උපාංගයේ සුරකින්න",
+  "import.passwordsNote":
+    "ඒවා මෙම උපාංගයේ ආරක්ෂිත ගබඩාවේ තබා ඇති යතුරකින් සංකේතනය කෙරේ. පසුව නිර්යාත කළ ගොනුව මකන්න: එහි ඒවා සාමාන්‍ය පෙළ ලෙස ඇත.",
+  "import.apply": "ආයාත කරන්න",
+  "import.done":
+    "ක්‍රම {recipes} ක්, ආදරණීය {favorites} ක්, ඉතිහාස ඇතුළත් කිරීම් {history} ක් සහ මුරපද {passwords} ක් ආයාත කළා.",
+  "passwords.title": "මුරපද",
+  "passwords.close": "මුරපද වසන්න",
+  "passwords.unlock": "අගුළු හරින්න",
+  "passwords.unlockReason": "ඔබේ සුරකින ලද මුරපද පෙන්වන්න",
+  "passwords.empty": "සුරකින ලද මුරපද නැත. සැකසුම් තුළ වෙනත් බ්‍රවුසරයකින් ආයාත කරන්න.",
+  "passwords.show": "පෙන්වන්න",
+  "passwords.hide": "සඟවන්න",
+  "passwords.delete": "මකන්න",
+  "passwords.deleteAll": "සියලු මුරපද මකන්න",
+  "passwords.deleteAllConfirm":
+    "සුරකින ලද සියලු මුරපද මෙම උපාංගයෙන් මකන්නද? මෙය ආපසු හැරවිය නොහැක.",
   "commandBar.addFavorite": "{site} ආදරණීය අයිතිතයට එකතු කරන්න",
   "commandBar.removeFavorite": "{site} ආදරණීය අයිතිතයෙන් ඉවත් කරන්න",
   "commandBar.openAiSettings": "සැකසුම් > AI සහායක විවෘත කරන්න",

@@ -28,6 +28,7 @@ OpenMedia is a Tauri v2 app for browsing websites in native web views and custom
 | [Accessibility](./accessibility.md) | Epilepsy protection and the dyslexia aids (reading font, text spacing, page tint): what they change in the app and on pages, and what they cannot do |
 | [Dark Mode for Pages](./dark-mode.md) | Dark Reader style dark mode for sites: methods, colour settings, schedule, per-site choices, the engine, the `dark` recipe rule and the assistant |
 | [Downloads](./downloads.md) | The download manager: list, segments, pause and resume, page media sniffer, batch descriptors, naming masks and rules, what a site can and cannot reach |
+| [Import and the Password Vault](./import-and-passwords.md) | Bringing bookmarks, history, passwords and search from another browser's exported files; the encrypted vault, unlock window and one-tap fill |
 | [Ad Blocking](./ad-blocking.md) | Bundled filter lists as WebKit content rule lists, link cleaning: engine choice, caching, limits |
 | [Prior Art](./prior-art.md) | SocialLite and others: what they do, what we copy, where we differ |
 | [Roadmap](./roadmap.md) | Phased build plan with exit criteria, spikes, decision log, risks |

@@ -50,6 +50,49 @@ export const it: Messages = {
   "pageTools.clearDataConfirm":
     "Uscire da {site} e cancellarne cookie, archiviazione e cache? Gli altri siti mantengono i propri.",
   "pageTools.clearDataAction": "Cancella",
+  "pageTools.fill": "Compila",
+  "pageTools.fillReason": "Compila un accesso salvato",
+  "pageTools.fillChoose": "Scegli un accesso",
+  "pageTools.fillNothing": "Nessun campo di accesso trovato in questa pagina",
+  "settings.import": "Importa da un altro browser",
+  "settings.importNote":
+    "Segnalibri, cronologia, password e ricerca dai file che il tuo vecchio browser esporta.",
+  "settings.passwords": "Password",
+  "settings.passwordsNote": "Gli accessi che hai importato, bloccati dietro il tuo dispositivo.",
+  "import.title": "Importa da un altro browser",
+  "import.intro":
+    "Nel tuo vecchio browser esporta i segnalibri (HTML), la cronologia e le password (CSV), poi scegli qui i file. Tutto viene letto su questo dispositivo e nulla viene inviato altrove.",
+  "import.choose": "Scegli i file",
+  "import.chooseMore": "Aggiungi altri file",
+  "import.reading": "Lettura in corso…",
+  "import.tooLarge": "{name} è troppo grande per essere importato.",
+  "import.nothing":
+    "Nulla in quei file somigliava a segnalibri, cronologia, password o un motore di ricerca.",
+  "import.found":
+    "Trovati {bookmarks} segnalibri, {history} voci di cronologia e {passwords} password salvate.",
+  "import.recipes": "Attiva le ricette per i siti che usi",
+  "import.sites": "Aggiungi ai preferiti",
+  "import.limitNote":
+    "I preferiti contengono fino a {limit} siti. Le ricette che scegli vengono attivate comunque.",
+  "import.history": "Aggiungi i {count} più visitati alla Cronologia",
+  "import.searchEngine": "Cerca con {engine}",
+  "import.passwords": "Salva {count} password su questo dispositivo",
+  "import.passwordsNote":
+    "Vengono cifrate con una chiave conservata nell’archivio sicuro di questo dispositivo. Elimina poi il file esportato: le contiene in chiaro.",
+  "import.apply": "Importa",
+  "import.done":
+    "Importate {recipes} ricette, {favorites} preferiti, {history} voci di cronologia e {passwords} password.",
+  "passwords.title": "Password",
+  "passwords.close": "Chiudi password",
+  "passwords.unlock": "Sblocca",
+  "passwords.unlockReason": "Mostra le tue password salvate",
+  "passwords.empty": "Nessuna password salvata. Importale da un altro browser in Impostazioni.",
+  "passwords.show": "Mostra",
+  "passwords.hide": "Nascondi",
+  "passwords.delete": "Cancella",
+  "passwords.deleteAll": "Cancella tutte le password",
+  "passwords.deleteAllConfirm":
+    "Cancellare ogni password salvata da questo dispositivo? Non si può annullare.",
   "commandBar.addFavorite": "Aggiungi {site} ai preferiti",
   "commandBar.removeFavorite": "Rimuovi {site} dai preferiti",
   "commandBar.openAiSettings": "Apri Impostazioni > Assistente IA",

@@ -175,10 +175,14 @@ Incognito mode (a second favorites and recipe-choice set) is gated by a biometri
 
 Custom/history favicons are fetched with an ephemeral, cookie-free native URLSession. Icon links and redirects must remain on the page's registrable domain; responses are capped at 400 KB, images at 4096 px per dimension and output at 96 px PNG. Site icons for the official recipes are packaged assets, with no runtime icon-service requests.
 
+## Password vault
+
+Imported logins are sealed with AES-256-GCM in `passwords.vault`; the key lives only in the OS secure store and is read only in Rust, like an API key (invariant 2). Listing, showing, deleting and filling need an unlock window opened by the plugin's Rust-only owner check; no command, event or capability is reachable from a site webview (invariant 3). A fill is one tap by the person: Rust sends the password only to a secure page whose origin matches the login's, the script re-checks `location.origin`, fills two fields and submits nothing (invariant 7). The pending import files are held in memory for ten minutes and never leave the device. Full design and limits: [Import and the password vault](./import-and-passwords.md).
+
 ## Privacy
 
 - The snapshot is the only page-derived data that leaves the device, only on explicit user action, only to the endpoint the user configured. See [AI Assistant](./ai-assistant.md#privacy-what-is-sent).
-- The app never reads site credentials. Users log in to the real site inside the view.
+- The app reads no site credentials from the pages. Logins reach it only from a passwords file the user chooses to import; they are kept encrypted in the vault and sent to a page only on the person's tap ([Import and the password vault](./import-and-passwords.md)).
 - App logs are local, scrubbed, and never include page content, URLs with query strings, or keys.
 
 ## Legal and store-policy risks (not code, but they shape scope)

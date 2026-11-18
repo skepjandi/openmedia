@@ -49,6 +49,49 @@ export const ro: Messages = {
   "pageTools.clearDataConfirm":
     "Te deconectezi de la {site} și ștergi cookie-urile, stocarea și memoria cache ale acestuia? Celelalte site-uri le păstrează pe ale lor.",
   "pageTools.clearDataAction": "Șterge",
+  "pageTools.fill": "Completează",
+  "pageTools.fillReason": "Completează o autentificare salvată",
+  "pageTools.fillChoose": "Alege o autentificare",
+  "pageTools.fillNothing": "Nu s-au găsit câmpuri de autentificare pe această pagină",
+  "settings.import": "Importă din alt browser",
+  "settings.importNote":
+    "Marcaje, istoric, parole și căutare din fișierele exportate de vechiul tău browser.",
+  "settings.passwords": "Parole",
+  "settings.passwordsNote": "Autentificările importate, blocate în spatele dispozitivului tău.",
+  "import.title": "Importă din alt browser",
+  "import.intro":
+    "În vechiul tău browser, exportă marcajele (HTML), istoricul și parolele (CSV), apoi alege fișierele aici. Totul este citit pe acest dispozitiv și nimic nu este trimis nicăieri.",
+  "import.choose": "Alege fișiere",
+  "import.chooseMore": "Adaugă mai multe fișiere",
+  "import.reading": "Se citește…",
+  "import.tooLarge": "{name} este prea mare pentru a fi importat.",
+  "import.nothing":
+    "Nimic din acele fișiere nu semăna cu marcaje, istoric, parole sau un motor de căutare.",
+  "import.found":
+    "Am găsit {bookmarks} marcaje, {history} intrări de istoric și {passwords} parole salvate.",
+  "import.recipes": "Activează rețetele pentru site-urile pe care le folosești",
+  "import.sites": "Adaugă ca favorite",
+  "import.limitNote":
+    "Favoritele pot conține până la {limit} site-uri. Rețetele pe care le alegi sunt activate oricum.",
+  "import.history": "Adaugă în Istoric cele mai vizitate {count}",
+  "import.searchEngine": "Caută cu {engine}",
+  "import.passwords": "Salvează {count} parole pe acest dispozitiv",
+  "import.passwordsNote":
+    "Sunt criptate cu o cheie păstrată în stocarea securizată a acestui dispozitiv. Șterge apoi fișierul exportat: le conține în text simplu.",
+  "import.apply": "Importă",
+  "import.done":
+    "Au fost importate {recipes} rețete, {favorites} favorite, {history} intrări de istoric și {passwords} parole.",
+  "passwords.title": "Parole",
+  "passwords.close": "Închide parolele",
+  "passwords.unlock": "Deblochează",
+  "passwords.unlockReason": "Afișează parolele tale salvate",
+  "passwords.empty": "Nicio parolă salvată. Importă-le din alt browser, în Setări.",
+  "passwords.show": "Arată",
+  "passwords.hide": "Ascunde",
+  "passwords.delete": "Șterge",
+  "passwords.deleteAll": "Șterge toate parolele",
+  "passwords.deleteAllConfirm":
+    "Ștergi toate parolele salvate de pe acest dispozitiv? Acțiunea nu poate fi anulată.",
   "commandBar.addFavorite": "Adaugă {site} la favorite",
   "commandBar.removeFavorite": "Elimină {site} din favorite",
   "commandBar.openAiSettings": "Deschide Setări > Asistent AI",

@@ -46,6 +46,49 @@ export const ms: Messages = {
   "pageTools.clearDataConfirm":
     "Log keluar daripada {site} dan padam cookie, storan serta cache-nya? Laman lain kekal menyimpan miliknya.",
   "pageTools.clearDataAction": "Padam",
+  "pageTools.fill": "Isi log masuk",
+  "pageTools.fillReason": "Isi log masuk yang disimpan",
+  "pageTools.fillChoose": "Pilih log masuk",
+  "pageTools.fillNothing": "Tiada medan log masuk ditemui pada halaman ini",
+  "settings.import": "Import daripada pelayar lain",
+  "settings.importNote":
+    "Penanda halaman, sejarah, kata laluan dan carian daripada fail yang dieksport pelayar lama anda.",
+  "settings.passwords": "Kata laluan",
+  "settings.passwordsNote": "Log masuk yang anda import, dikunci di sebalik peranti anda.",
+  "import.title": "Import daripada pelayar lain",
+  "import.intro":
+    "Dalam pelayar lama anda, eksport penanda halaman (HTML), sejarah dan kata laluan (CSV), kemudian pilih fail di sini. Semuanya dibaca pada peranti ini dan tiada apa-apa dihantar ke mana-mana.",
+  "import.choose": "Pilih fail",
+  "import.chooseMore": "Tambah lagi fail",
+  "import.reading": "Membaca…",
+  "import.tooLarge": "{name} terlalu besar untuk diimport.",
+  "import.nothing":
+    "Tiada apa-apa dalam fail itu yang kelihatan seperti penanda halaman, sejarah, kata laluan atau enjin carian.",
+  "import.found":
+    "Ditemui {bookmarks} penanda halaman, {history} entri sejarah dan {passwords} kata laluan tersimpan.",
+  "import.recipes": "Hidupkan resipi untuk laman yang anda gunakan",
+  "import.sites": "Tambah sebagai kegemaran",
+  "import.limitNote":
+    "Kegemaran memuatkan sehingga {limit} laman. Resipi yang anda pilih dihidupkan dalam kedua-dua keadaan.",
+  "import.history": "Tambah {count} yang paling kerap dilawati ke Sejarah",
+  "import.searchEngine": "Cari dengan {engine}",
+  "import.passwords": "Simpan {count} kata laluan pada peranti ini",
+  "import.passwordsNote":
+    "Ia disulitkan dengan kunci yang disimpan dalam storan selamat peranti ini. Padam fail eksport selepas itu: ia menyimpannya dalam teks biasa.",
+  "import.apply": "Import",
+  "import.done":
+    "Diimport {recipes} resipi, {favorites} kegemaran, {history} entri sejarah dan {passwords} kata laluan.",
+  "passwords.title": "Kata laluan",
+  "passwords.close": "Tutup kata laluan",
+  "passwords.unlock": "Buka kunci",
+  "passwords.unlockReason": "Tunjukkan kata laluan tersimpan anda",
+  "passwords.empty": "Tiada kata laluan tersimpan. Import daripada pelayar lain dalam Tetapan.",
+  "passwords.show": "Tunjuk",
+  "passwords.hide": "Sembunyi",
+  "passwords.delete": "Padam",
+  "passwords.deleteAll": "Padam semua kata laluan",
+  "passwords.deleteAllConfirm":
+    "Padam setiap kata laluan tersimpan daripada peranti ini? Ini tidak boleh dibuat asal.",
   "commandBar.addFavorite": "Tambah {site} ke kegemaran",
   "commandBar.removeFavorite": "Buang {site} daripada kegemaran",
   "commandBar.openAiSettings": "Buka Tetapan > Pembantu AI",

@@ -50,6 +50,49 @@ export const es: Messages = {
   "pageTools.clearDataConfirm":
     "¿Cerrar sesión en {site} y borrar sus cookies, almacenamiento y caché? Los demás sitios conservan los suyos.",
   "pageTools.clearDataAction": "Borrar",
+  "pageTools.fill": "Rellenar",
+  "pageTools.fillReason": "Rellenar un inicio de sesión guardado",
+  "pageTools.fillChoose": "Elige un inicio de sesión",
+  "pageTools.fillNothing": "No se encontraron campos de inicio de sesión en esta página",
+  "settings.import": "Importar desde otro navegador",
+  "settings.importNote":
+    "Marcadores, historial, contraseñas y búsqueda a partir de los archivos que exporta tu navegador anterior.",
+  "settings.passwords": "Contraseñas",
+  "settings.passwordsNote": "Los inicios de sesión que importaste, bloqueados tras tu dispositivo.",
+  "import.title": "Importar desde otro navegador",
+  "import.intro":
+    "En tu navegador anterior, exporta tus marcadores (HTML), el historial y las contraseñas (CSV) y elige aquí los archivos. Todo se lee en este dispositivo y no se envía nada a ninguna parte.",
+  "import.choose": "Elegir archivos",
+  "import.chooseMore": "Añadir más archivos",
+  "import.reading": "Leyendo…",
+  "import.tooLarge": "{name} es demasiado grande para importarlo.",
+  "import.nothing":
+    "Nada de esos archivos parecía marcadores, historial, contraseñas o un motor de búsqueda.",
+  "import.found":
+    "Se encontraron {bookmarks} marcadores, {history} entradas del historial y {passwords} contraseñas guardadas.",
+  "import.recipes": "Activar recetas para los sitios que usas",
+  "import.sites": "Añadir a favoritos",
+  "import.limitNote":
+    "Los favoritos admiten hasta {limit} sitios. Las recetas que elijas se activan de todos modos.",
+  "import.history": "Añadir los {count} más visitados al historial",
+  "import.searchEngine": "Buscar con {engine}",
+  "import.passwords": "Guardar {count} contraseñas en este dispositivo",
+  "import.passwordsNote":
+    "Se cifran con una clave guardada en el almacenamiento seguro de este dispositivo. Borra después el archivo exportado: las contiene en texto sin cifrar.",
+  "import.apply": "Importar",
+  "import.done":
+    "Se importaron {recipes} recetas, {favorites} favoritos, {history} entradas del historial y {passwords} contraseñas.",
+  "passwords.title": "Contraseñas",
+  "passwords.close": "Cerrar contraseñas",
+  "passwords.unlock": "Desbloquear",
+  "passwords.unlockReason": "Mostrar tus contraseñas guardadas",
+  "passwords.empty": "No hay contraseñas guardadas. Impórtalas desde otro navegador en Ajustes.",
+  "passwords.show": "Mostrar",
+  "passwords.hide": "Ocultar",
+  "passwords.delete": "Borrar",
+  "passwords.deleteAll": "Borrar todas las contraseñas",
+  "passwords.deleteAllConfirm":
+    "¿Borrar todas las contraseñas guardadas de este dispositivo? No se puede deshacer.",
   "commandBar.addFavorite": "Añadir {site} a favoritos",
   "commandBar.removeFavorite": "Quitar {site} de favoritos",
   "commandBar.openAiSettings": "Abrir Ajustes > Asistente de IA",

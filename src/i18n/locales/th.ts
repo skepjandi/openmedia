@@ -46,6 +46,48 @@ export const th: Messages = {
   "pageTools.clearDataConfirm":
     "ออกจากระบบ {site} และลบคุกกี้ ที่เก็บข้อมูล และแคชของเว็บไซต์นี้หรือไม่ เว็บไซต์อื่นจะยังคงข้อมูลของตน",
   "pageTools.clearDataAction": "ลบ",
+  "pageTools.fill": "กรอกล็อกอิน",
+  "pageTools.fillReason": "กรอกข้อมูลเข้าสู่ระบบที่บันทึกไว้",
+  "pageTools.fillChoose": "เลือกข้อมูลเข้าสู่ระบบ",
+  "pageTools.fillNothing": "ไม่พบช่องเข้าสู่ระบบในหน้านี้",
+  "settings.import": "นำเข้าจากเบราว์เซอร์อื่น",
+  "settings.importNote":
+    "บุ๊กมาร์ก ประวัติ รหัสผ่าน และเครื่องมือค้นหาจากไฟล์ที่เบราว์เซอร์เดิมของคุณส่งออก",
+  "settings.passwords": "รหัสผ่าน",
+  "settings.passwordsNote": "ข้อมูลเข้าสู่ระบบที่คุณนำเข้า ล็อกไว้ด้วยอุปกรณ์ของคุณ",
+  "import.title": "นำเข้าจากเบราว์เซอร์อื่น",
+  "import.intro":
+    "ในเบราว์เซอร์เดิม ให้ส่งออกบุ๊กมาร์ก (HTML) ประวัติ และรหัสผ่าน (CSV) แล้วเลือกไฟล์ที่นี่ ทุกอย่างอ่านบนอุปกรณ์นี้และไม่มีการส่งไปที่ใดเลย",
+  "import.choose": "เลือกไฟล์",
+  "import.chooseMore": "เพิ่มไฟล์อีก",
+  "import.reading": "กำลังอ่าน…",
+  "import.tooLarge": "{name} ใหญ่เกินกว่าจะนำเข้า",
+  "import.nothing": "ไม่พบบุ๊กมาร์ก ประวัติ รหัสผ่าน หรือเครื่องมือค้นหาในไฟล์เหล่านั้น",
+  "import.found":
+    "พบบุ๊กมาร์ก {bookmarks} รายการ ประวัติ {history} รายการ และรหัสผ่านที่บันทึกไว้ {passwords} รายการ",
+  "import.recipes": "เปิดใช้สูตรสำหรับเว็บไซต์ที่คุณใช้",
+  "import.sites": "เพิ่มเป็นรายการโปรด",
+  "import.limitNote":
+    "รายการโปรดเก็บได้สูงสุด {limit} เว็บไซต์ สูตรที่คุณเลือกจะเปิดใช้ไม่ว่ากรณีใด",
+  "import.history": "เพิ่ม {count} รายการที่เข้าบ่อยที่สุดลงในประวัติ",
+  "import.searchEngine": "ค้นหาด้วย {engine}",
+  "import.passwords": "บันทึกรหัสผ่าน {count} รายการบนอุปกรณ์นี้",
+  "import.passwordsNote":
+    "รหัสผ่านถูกเข้ารหัสด้วยกุญแจที่เก็บในที่เก็บข้อมูลปลอดภัยของอุปกรณ์นี้ ลบไฟล์ที่ส่งออกหลังจากนั้น เพราะไฟล์เก็บรหัสผ่านเป็นข้อความธรรมดา",
+  "import.apply": "นำเข้า",
+  "import.done":
+    "นำเข้าสูตร {recipes} รายการ รายการโปรด {favorites} รายการ ประวัติ {history} รายการ และรหัสผ่าน {passwords} รายการแล้ว",
+  "passwords.title": "รหัสผ่าน",
+  "passwords.close": "ปิดรหัสผ่าน",
+  "passwords.unlock": "ปลดล็อก",
+  "passwords.unlockReason": "แสดงรหัสผ่านที่คุณบันทึกไว้",
+  "passwords.empty": "ไม่มีรหัสผ่านที่บันทึกไว้ นำเข้าจากเบราว์เซอร์อื่นได้ในการตั้งค่า",
+  "passwords.show": "แสดง",
+  "passwords.hide": "ซ่อน",
+  "passwords.delete": "ลบ",
+  "passwords.deleteAll": "ลบรหัสผ่านทั้งหมด",
+  "passwords.deleteAllConfirm":
+    "ลบรหัสผ่านที่บันทึกไว้ทั้งหมดจากอุปกรณ์นี้หรือไม่ การกระทำนี้ย้อนกลับไม่ได้",
   "commandBar.addFavorite": "เพิ่ม {site} ในรายการโปรด",
   "commandBar.removeFavorite": "นำ {site} ออกจากรายการโปรด",
   "commandBar.openAiSettings": "เปิดการตั้งค่า > ผู้ช่วย AI",

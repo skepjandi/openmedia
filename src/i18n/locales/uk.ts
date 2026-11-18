@@ -49,6 +49,48 @@ export const uk: Messages = {
   "pageTools.clearDataConfirm":
     "Вийти з сайту {site} і стерти його cookie, сховище та кеш? Інші сайти збережуть свої.",
   "pageTools.clearDataAction": "Стерти",
+  "pageTools.fill": "Заповнити вхід",
+  "pageTools.fillReason": "Заповнити збережений вхід",
+  "pageTools.fillChoose": "Виберіть вхід",
+  "pageTools.fillNothing": "На цій сторінці немає полів для входу",
+  "settings.import": "Імпорт з іншого браузера",
+  "settings.importNote":
+    "Закладки, історія, паролі та пошукова система з файлів, які експортує ваш старий браузер.",
+  "settings.passwords": "Паролі",
+  "settings.passwordsNote": "Імпортовані входи, захищені замком вашого пристрою.",
+  "import.title": "Імпорт з іншого браузера",
+  "import.intro":
+    "У старому браузері експортуйте закладки (HTML), історію та паролі (CSV), а потім виберіть файли тут. Усе читається на цьому пристрої й нікуди не надсилається.",
+  "import.choose": "Вибрати файли",
+  "import.chooseMore": "Додати ще файли",
+  "import.reading": "Читання…",
+  "import.tooLarge": "Файл {name} завеликий для імпорту.",
+  "import.nothing": "У цих файлах не знайдено закладок, історії, паролів чи пошукової системи.",
+  "import.found":
+    "Знайдено закладок: {bookmarks}, записів історії: {history} і збережених паролів: {passwords}.",
+  "import.recipes": "Увімкнути рецепти для сайтів, якими ви користуєтеся",
+  "import.sites": "Додати в обране",
+  "import.limitNote":
+    "В обраному може бути до {limit} сайтів. Вибрані вами рецепти вмикаються в будь-якому разі.",
+  "import.history": "Додати {count} найвідвідуваніших в історію",
+  "import.searchEngine": "Шукати через {engine}",
+  "import.passwords": "Зберегти паролі ({count}) на цьому пристрої",
+  "import.passwordsNote":
+    "Вони шифруються ключем, що зберігається в захищеному сховищі цього пристрою. Після цього видаліть експортований файл: у ньому паролі у відкритому вигляді.",
+  "import.apply": "Імпортувати",
+  "import.done":
+    "Імпортовано рецептів: {recipes}, обраного: {favorites}, записів історії: {history}, паролів: {passwords}.",
+  "passwords.title": "Паролі",
+  "passwords.close": "Закрити паролі",
+  "passwords.unlock": "Розблокувати",
+  "passwords.unlockReason": "Показати ваші збережені паролі",
+  "passwords.empty": "Збережених паролів немає. Імпортуйте їх з іншого браузера в налаштуваннях.",
+  "passwords.show": "Показати",
+  "passwords.hide": "Сховати",
+  "passwords.delete": "Видалити",
+  "passwords.deleteAll": "Видалити всі паролі",
+  "passwords.deleteAllConfirm":
+    "Стерти всі збережені паролі з цього пристрою? Цю дію не можна скасувати.",
   "commandBar.addFavorite": "Додати {site} до обраного",
   "commandBar.removeFavorite": "Прибрати {site} з обраного",
   "commandBar.openAiSettings": "Відкрити налаштування > ШІ-помічник",

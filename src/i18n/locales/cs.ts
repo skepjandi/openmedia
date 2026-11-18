@@ -50,6 +50,49 @@ export const cs: Messages = {
   "pageTools.clearDataConfirm":
     "Odhlásit se z webu {site} a smazat jeho cookies, úložiště a mezipaměť? Ostatní weby si své ponechají.",
   "pageTools.clearDataAction": "Smazat",
+  "pageTools.fill": "Vyplnit",
+  "pageTools.fillReason": "Vyplnit uložené přihlášení",
+  "pageTools.fillChoose": "Vyberte přihlášení",
+  "pageTools.fillNothing": "Na této stránce nebyla nalezena žádná pole pro přihlášení",
+  "settings.import": "Import z jiného prohlížeče",
+  "settings.importNote":
+    "Záložky, historie, hesla a vyhledávání ze souborů, které váš starý prohlížeč exportuje.",
+  "settings.passwords": "Hesla",
+  "settings.passwordsNote": "Přihlášení, která jste importovali, zamčená za vaším zařízením.",
+  "import.title": "Import z jiného prohlížeče",
+  "import.intro":
+    "Ve starém prohlížeči exportujte záložky (HTML), historii a hesla (CSV) a soubory zde vyberte. Vše se čte v tomto zařízení a nic se nikam neodesílá.",
+  "import.choose": "Vybrat soubory",
+  "import.chooseMore": "Přidat další soubory",
+  "import.reading": "Čtení…",
+  "import.tooLarge": "Soubor {name} je pro import příliš velký.",
+  "import.nothing":
+    "Nic v těchto souborech nevypadalo jako záložky, historie, hesla ani vyhledávač.",
+  "import.found":
+    "Nalezeno záložek: {bookmarks}, položek historie: {history} a uložených hesel: {passwords}.",
+  "import.recipes": "Zapnout recepty pro weby, které používáte",
+  "import.sites": "Přidat do oblíbených",
+  "import.limitNote":
+    "Oblíbené pojmou až {limit} webů. Vybrané recepty se zapnou v každém případě.",
+  "import.history": "Přidat {count} nejnavštěvovanějších do historie",
+  "import.searchEngine": "Vyhledávat pomocí {engine}",
+  "import.passwords": "Uložit hesla v tomto zařízení: {count}",
+  "import.passwordsNote":
+    "Jsou šifrována klíčem uloženým v zabezpečeném úložišti tohoto zařízení. Exportovaný soubor poté smažte: obsahuje je jako prostý text.",
+  "import.apply": "Importovat",
+  "import.done":
+    "Importováno receptů: {recipes}, oblíbených: {favorites}, položek historie: {history} a hesel: {passwords}.",
+  "passwords.title": "Hesla",
+  "passwords.close": "Zavřít hesla",
+  "passwords.unlock": "Odemknout",
+  "passwords.unlockReason": "Zobrazit uložená hesla",
+  "passwords.empty": "Žádná uložená hesla. Importujte je z jiného prohlížeče v Nastavení.",
+  "passwords.show": "Zobrazit",
+  "passwords.hide": "Skrýt",
+  "passwords.delete": "Smazat",
+  "passwords.deleteAll": "Smazat všechna hesla",
+  "passwords.deleteAllConfirm":
+    "Smazat z tohoto zařízení všechna uložená hesla? Nelze to vrátit zpět.",
   "commandBar.addFavorite": "Přidat {site} do oblíbených",
   "commandBar.removeFavorite": "Odebrat {site} z oblíbených",
   "commandBar.openAiSettings": "Otevřít Nastavení > Asistent AI",

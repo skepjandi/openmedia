@@ -49,6 +49,49 @@ export const tr: Messages = {
   "pageTools.clearDataConfirm":
     "{site} sitesinden çıkış yapıp çerezlerini, depolama alanını ve önbelleğini silmek istiyor musunuz? Diğer siteler kendi verilerini korur.",
   "pageTools.clearDataAction": "Sil",
+  "pageTools.fill": "Girişi doldur",
+  "pageTools.fillReason": "Kayıtlı bir girişi doldur",
+  "pageTools.fillChoose": "Bir giriş seçin",
+  "pageTools.fillNothing": "Bu sayfada giriş alanı bulunamadı",
+  "settings.import": "Başka bir tarayıcıdan içe aktar",
+  "settings.importNote":
+    "Eski tarayıcınızın dışa aktardığı dosyalardan yer imleri, geçmiş, parolalar ve arama motoru.",
+  "settings.passwords": "Parolalar",
+  "settings.passwordsNote": "İçe aktardığınız girişler, cihazınızın kilidi arkasında.",
+  "import.title": "Başka bir tarayıcıdan içe aktar",
+  "import.intro":
+    "Eski tarayıcınızda yer imlerinizi (HTML), geçmişinizi ve parolalarınızı (CSV) dışa aktarın, sonra dosyaları buradan seçin. Her şey bu cihazda okunur ve hiçbir yere gönderilmez.",
+  "import.choose": "Dosya seç",
+  "import.chooseMore": "Daha fazla dosya ekle",
+  "import.reading": "Okunuyor…",
+  "import.tooLarge": "{name} içe aktarılamayacak kadar büyük.",
+  "import.nothing":
+    "Bu dosyalarda yer imi, geçmiş, parola veya arama motoru gibi görünen bir şey yok.",
+  "import.found":
+    "{bookmarks} yer imi, {history} geçmiş kaydı ve {passwords} kayıtlı parola bulundu.",
+  "import.recipes": "Kullandığınız siteler için tarifleri aç",
+  "import.sites": "Favori olarak ekle",
+  "import.limitNote":
+    "Favoriler en fazla {limit} site tutar. Seçtiğiniz tarifler her durumda açılır.",
+  "import.history": "En çok ziyaret edilen {count} siteyi Geçmiş'e ekle",
+  "import.searchEngine": "{engine} ile ara",
+  "import.passwords": "{count} parolayı bu cihaza kaydet",
+  "import.passwordsNote":
+    "Bu cihazın güvenli depolamasında tutulan bir anahtarla şifrelenirler. Sonra dışa aktarılan dosyayı silin: parolaları düz metin olarak içerir.",
+  "import.apply": "İçe aktar",
+  "import.done":
+    "{recipes} tarif, {favorites} favori, {history} geçmiş kaydı ve {passwords} parola içe aktarıldı.",
+  "passwords.title": "Parolalar",
+  "passwords.close": "Parolaları kapat",
+  "passwords.unlock": "Kilidi aç",
+  "passwords.unlockReason": "Kayıtlı parolalarınızı gösterin",
+  "passwords.empty": "Kayıtlı parola yok. Ayarlar'dan başka bir tarayıcıdan içe aktarın.",
+  "passwords.show": "Göster",
+  "passwords.hide": "Gizle",
+  "passwords.delete": "Sil",
+  "passwords.deleteAll": "Tüm parolaları sil",
+  "passwords.deleteAllConfirm":
+    "Kayıtlı tüm parolalar bu cihazdan silinsin mi? Bu işlem geri alınamaz.",
   "commandBar.addFavorite": "{site} öğesini favorilere ekle",
   "commandBar.removeFavorite": "{site} öğesini favorilerden çıkar",
   "commandBar.openAiSettings": "Ayarlar > YZ asistanı bölümünü aç",

@@ -259,3 +259,10 @@ export const TrashIcon = () => (
     <path d="M6 7l1 13h10l1-13" />
   </Icon>
 );
+
+export const KeyIcon = () => (
+  <Icon>
+    <circle cx="8" cy="15" r="4" />
+    <path d="M11 12l8-8M16 7l3 3" />
+  </Icon>
+);

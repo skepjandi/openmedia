@@ -50,6 +50,49 @@ export const pt: Messages = {
   "pageTools.clearDataConfirm":
     "Sair de {site} e apagar os cookies, o armazenamento e o cache dele? Os outros sites mantêm os seus.",
   "pageTools.clearDataAction": "Apagar",
+  "pageTools.fill": "Preencher login",
+  "pageTools.fillReason": "Preencher um login salvo",
+  "pageTools.fillChoose": "Escolha um login",
+  "pageTools.fillNothing": "Nenhum campo de login encontrado nesta página",
+  "settings.import": "Importar de outro navegador",
+  "settings.importNote":
+    "Favoritos, histórico, senhas e pesquisa a partir dos arquivos que seu navegador antigo exporta.",
+  "settings.passwords": "Senhas",
+  "settings.passwordsNote": "Os logins que você importou, protegidos pelo bloqueio do dispositivo.",
+  "import.title": "Importar de outro navegador",
+  "import.intro":
+    "No seu navegador antigo, exporte seus favoritos (HTML), histórico e senhas (CSV) e escolha os arquivos aqui. Tudo é lido neste dispositivo e nada é enviado a lugar nenhum.",
+  "import.choose": "Escolher arquivos",
+  "import.chooseMore": "Adicionar mais arquivos",
+  "import.reading": "Lendo…",
+  "import.tooLarge": "{name} é grande demais para importar.",
+  "import.nothing":
+    "Nada nesses arquivos parecia ser favoritos, histórico, senhas ou um mecanismo de pesquisa.",
+  "import.found":
+    "Encontrados {bookmarks} favoritos, {history} itens de histórico e {passwords} senhas salvas.",
+  "import.recipes": "Ativar receitas para os sites que você usa",
+  "import.sites": "Adicionar como favoritos",
+  "import.limitNote":
+    "Os favoritos comportam até {limit} sites. As receitas que você escolher são ativadas de qualquer forma.",
+  "import.history": "Adicionar os {count} mais visitados ao Histórico",
+  "import.searchEngine": "Pesquisar com {engine}",
+  "import.passwords": "Salvar {count} senhas neste dispositivo",
+  "import.passwordsNote":
+    "Elas são criptografadas com uma chave guardada no armazenamento seguro deste dispositivo. Exclua depois o arquivo exportado: ele guarda as senhas em texto simples.",
+  "import.apply": "Importar",
+  "import.done":
+    "Importadas {recipes} receitas, {favorites} favoritos, {history} itens de histórico e {passwords} senhas.",
+  "passwords.title": "Senhas",
+  "passwords.close": "Fechar senhas",
+  "passwords.unlock": "Desbloquear",
+  "passwords.unlockReason": "Mostrar suas senhas salvas",
+  "passwords.empty": "Nenhuma senha salva. Importe-as de outro navegador em Configurações.",
+  "passwords.show": "Mostrar",
+  "passwords.hide": "Ocultar",
+  "passwords.delete": "Excluir",
+  "passwords.deleteAll": "Excluir todas as senhas",
+  "passwords.deleteAllConfirm":
+    "Apagar todas as senhas salvas deste dispositivo? Isso não pode ser desfeito.",
   "commandBar.addFavorite": "Adicionar {site} aos favoritos",
   "commandBar.removeFavorite": "Remover {site} dos favoritos",
   "commandBar.openAiSettings": "Abrir Configurações > Assistente de IA",

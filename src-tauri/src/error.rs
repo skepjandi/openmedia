@@ -16,6 +16,12 @@ pub enum Error {
     UnknownSite,
     #[error("search text must be at most {0} characters on one line")]
     Find(usize),
+    #[error("{0}")]
+    Import(String),
+    #[error("vault-locked")]
+    VaultLocked,
+    #[error("password vault: {0}")]
+    Vault(&'static str),
     #[error("the bottom margin can be at most {0} pixels")]
     InvalidMargin(u32),
     #[error("invalid dark mode choice: {0}")]

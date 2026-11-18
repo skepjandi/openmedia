@@ -50,6 +50,49 @@ export const pl: Messages = {
   "pageTools.clearDataConfirm":
     "Wylogować się z witryny {site} i usunąć jej pliki cookie, dane oraz pamięć podręczną? Inne witryny zachowają swoje.",
   "pageTools.clearDataAction": "Usuń",
+  "pageTools.fill": "Wpisz login",
+  "pageTools.fillReason": "Wpisz zapisany login",
+  "pageTools.fillChoose": "Wybierz login",
+  "pageTools.fillNothing": "Nie znaleziono pól logowania na tej stronie",
+  "settings.import": "Importuj z innej przeglądarki",
+  "settings.importNote":
+    "Zakładki, historia, hasła i wyszukiwarka z plików wyeksportowanych przez Twoją starą przeglądarkę.",
+  "settings.passwords": "Hasła",
+  "settings.passwordsNote": "Zaimportowane loginy, zablokowane za zabezpieczeniem urządzenia.",
+  "import.title": "Importuj z innej przeglądarki",
+  "import.intro":
+    "W starej przeglądarce wyeksportuj zakładki (HTML), historię i hasła (CSV), a potem wybierz tutaj pliki. Wszystko jest odczytywane na tym urządzeniu i nic nie jest nigdzie wysyłane.",
+  "import.choose": "Wybierz pliki",
+  "import.chooseMore": "Dodaj więcej plików",
+  "import.reading": "Wczytywanie…",
+  "import.tooLarge": "Plik {name} jest za duży, aby go zaimportować.",
+  "import.nothing":
+    "Nic w tych plikach nie przypominało zakładek, historii, haseł ani wyszukiwarki.",
+  "import.found":
+    "Znaleziono zakładki ({bookmarks}), wpisy historii ({history}) i zapisane hasła ({passwords}).",
+  "import.recipes": "Włącz przepisy dla używanych witryn",
+  "import.sites": "Dodaj do ulubionych",
+  "import.limitNote":
+    "Ulubione mieszczą do {limit} witryn. Wybrane przepisy zostaną włączone w obu przypadkach.",
+  "import.history": "Dodaj do Historii najczęściej odwiedzane ({count})",
+  "import.searchEngine": "Szukaj w {engine}",
+  "import.passwords": "Zapisz hasła ({count}) na tym urządzeniu",
+  "import.passwordsNote":
+    "Są szyfrowane kluczem przechowywanym w bezpiecznej pamięci tego urządzenia. Po imporcie usuń wyeksportowany plik: zawiera je zwykłym tekstem.",
+  "import.apply": "Importuj",
+  "import.done":
+    "Zaimportowano przepisy ({recipes}), ulubione ({favorites}), wpisy historii ({history}) i hasła ({passwords}).",
+  "passwords.title": "Hasła",
+  "passwords.close": "Zamknij hasła",
+  "passwords.unlock": "Odblokuj",
+  "passwords.unlockReason": "Pokaż zapisane hasła",
+  "passwords.empty": "Brak zapisanych haseł. Zaimportuj je z innej przeglądarki w Ustawieniach.",
+  "passwords.show": "Pokaż",
+  "passwords.hide": "Ukryj",
+  "passwords.delete": "Usuń",
+  "passwords.deleteAll": "Usuń wszystkie hasła",
+  "passwords.deleteAllConfirm":
+    "Usunąć z tego urządzenia wszystkie zapisane hasła? Tej operacji nie można cofnąć.",
   "commandBar.addFavorite": "Dodaj {site} do ulubionych",
   "commandBar.removeFavorite": "Usuń {site} z ulubionych",
   "commandBar.openAiSettings": "Otwórz Ustawienia > Asystent AI",

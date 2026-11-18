@@ -57,6 +57,49 @@ export const en = {
   "pageTools.clearDataConfirm":
     "Sign out of {site} and erase its cookies, storage and cache? Other sites keep theirs.",
   "pageTools.clearDataAction": "Erase",
+  "pageTools.fill": "Fill login",
+  "pageTools.fillReason": "Fill a saved login",
+  "pageTools.fillChoose": "Choose a login",
+  "pageTools.fillNothing": "No login fields found on this page",
+  "settings.import": "Import from another browser",
+  "settings.importNote":
+    "Bookmarks, history, passwords and search from the files your old browser exports.",
+  "settings.passwords": "Passwords",
+  "settings.passwordsNote": "The logins you imported, locked behind your device.",
+  "import.title": "Import from another browser",
+  "import.intro":
+    "In your old browser, export your bookmarks (HTML), history and passwords (CSV), then choose the files here. Everything is read on this device and nothing is sent anywhere.",
+  "import.choose": "Choose files",
+  "import.chooseMore": "Add more files",
+  "import.reading": "Reading…",
+  "import.tooLarge": "{name} is too large to import.",
+  "import.nothing":
+    "Nothing in those files looked like bookmarks, history, passwords or a search engine.",
+  "import.found":
+    "Found {bookmarks} bookmarks, {history} history entries and {passwords} saved passwords.",
+  "import.recipes": "Turn on recipes for sites you use",
+  "import.sites": "Add as favorites",
+  "import.limitNote":
+    "Favorites hold up to {limit} sites. Recipes you pick are turned on either way.",
+  "import.history": "Add {count} most visited to History",
+  "import.searchEngine": "Search with {engine}",
+  "import.passwords": "Save {count} passwords on this device",
+  "import.passwordsNote":
+    "They are encrypted with a key kept in this device's secure storage. Delete the exported file afterwards: it holds them in plain text.",
+  "import.apply": "Import",
+  "import.done":
+    "Imported {recipes} recipes, {favorites} favorites, {history} history entries and {passwords} passwords.",
+  "passwords.title": "Passwords",
+  "passwords.close": "Close passwords",
+  "passwords.unlock": "Unlock",
+  "passwords.unlockReason": "Show your saved passwords",
+  "passwords.empty": "No saved passwords. Import them from another browser in Settings.",
+  "passwords.show": "Show",
+  "passwords.hide": "Hide",
+  "passwords.delete": "Delete",
+  "passwords.deleteAll": "Delete all passwords",
+  "passwords.deleteAllConfirm":
+    "Erase every saved password from this device? This cannot be undone.",
   "commandBar.openAiSettings": "Open Settings > AI assistant",
 
   "fab.openFavorite": "Open {name}",

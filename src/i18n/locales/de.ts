@@ -45,6 +45,50 @@ export const de: Messages = {
   "pageTools.clearDataConfirm":
     "Von {site} abmelden und die Cookies, den Speicher und den Cache der Website löschen? Andere Websites behalten ihre.",
   "pageTools.clearDataAction": "Löschen",
+  "pageTools.fill": "Ausfüllen",
+  "pageTools.fillReason": "Gespeicherte Anmeldung ausfüllen",
+  "pageTools.fillChoose": "Anmeldung auswählen",
+  "pageTools.fillNothing": "Auf dieser Seite wurden keine Anmeldefelder gefunden",
+  "settings.import": "Aus anderem Browser importieren",
+  "settings.importNote":
+    "Lesezeichen, Verlauf, Passwörter und Suche aus den Dateien, die dein alter Browser exportiert.",
+  "settings.passwords": "Passwörter",
+  "settings.passwordsNote": "Die importierten Anmeldedaten, hinter deinem Gerät gesperrt.",
+  "import.title": "Aus anderem Browser importieren",
+  "import.intro":
+    "Exportiere in deinem alten Browser deine Lesezeichen (HTML), den Verlauf und die Passwörter (CSV) und wähle die Dateien dann hier aus. Alles wird auf diesem Gerät gelesen und nichts wird irgendwohin gesendet.",
+  "import.choose": "Dateien auswählen",
+  "import.chooseMore": "Weitere Dateien hinzufügen",
+  "import.reading": "Wird gelesen…",
+  "import.tooLarge": "{name} ist zu groß für den Import.",
+  "import.nothing":
+    "Nichts in diesen Dateien sah nach Lesezeichen, Verlauf, Passwörtern oder einer Suchmaschine aus.",
+  "import.found":
+    "{bookmarks} Lesezeichen, {history} Verlaufseinträge und {passwords} gespeicherte Passwörter gefunden.",
+  "import.recipes": "Rezepte für Websites aktivieren, die du nutzt",
+  "import.sites": "Als Favoriten hinzufügen",
+  "import.limitNote":
+    "Favoriten fassen bis zu {limit} Websites. Rezepte, die du auswählst, werden in jedem Fall aktiviert.",
+  "import.history": "Die {count} meistbesuchten zum Verlauf hinzufügen",
+  "import.searchEngine": "Mit {engine} suchen",
+  "import.passwords": "{count} Passwörter auf diesem Gerät speichern",
+  "import.passwordsNote":
+    "Sie werden mit einem Schlüssel verschlüsselt, der im sicheren Speicher dieses Geräts liegt. Lösche danach die exportierte Datei: Sie enthält sie im Klartext.",
+  "import.apply": "Importieren",
+  "import.done":
+    "{recipes} Rezepte, {favorites} Favoriten, {history} Verlaufseinträge und {passwords} Passwörter importiert.",
+  "passwords.title": "Passwörter",
+  "passwords.close": "Passwörter schließen",
+  "passwords.unlock": "Entsperren",
+  "passwords.unlockReason": "Deine gespeicherten Passwörter anzeigen",
+  "passwords.empty":
+    "Keine gespeicherten Passwörter. Importiere sie in den Einstellungen aus einem anderen Browser.",
+  "passwords.show": "Anzeigen",
+  "passwords.hide": "Verbergen",
+  "passwords.delete": "Löschen",
+  "passwords.deleteAll": "Alle Passwörter löschen",
+  "passwords.deleteAllConfirm":
+    "Alle gespeicherten Passwörter von diesem Gerät löschen? Das kann nicht rückgängig gemacht werden.",
   "commandBar.addFavorite": "{site} zu Favoriten hinzufügen",
   "commandBar.removeFavorite": "{site} aus Favoriten entfernen",
   "commandBar.openAiSettings": "Einstellungen > KI-Assistent öffnen",

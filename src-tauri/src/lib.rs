@@ -10,7 +10,10 @@ mod desktop_menu;
 mod downloads;
 mod entitlement;
 pub mod error;
+mod fill;
 mod find_in_page;
+mod import;
+mod import_commands;
 mod incognito;
 mod library;
 mod link_clean;
@@ -26,6 +29,7 @@ mod tech_detect;
 mod usage;
 mod usage_commands;
 mod usage_lock;
+mod vault;
 mod video_controls;
 
 use tauri::{Emitter, Manager};
@@ -68,6 +72,9 @@ pub fn run() {
                 let _ = commands::push_desktop_sites(&handle, desktop_sites);
             });
             app.manage(incognito::Incognito::default());
+            app.manage(import::ImportState::default());
+            app.manage(import_commands::Unlock::default());
+            app.manage(vault::Vault::new(data_dir.join("passwords.vault")));
             let emitter = app.handle().clone();
             let downloads = downloads::Manager::load(
                 data_dir.join("downloads.json"),
@@ -192,6 +199,18 @@ pub fn run() {
             commands::find_in_page_clear,
             commands::share_page,
             commands::clear_site_data,
+            import_commands::import_read,
+            import_commands::import_cancel,
+            import_commands::import_apply,
+            import_commands::vault_unlock,
+            import_commands::vault_lock,
+            import_commands::vault_list,
+            import_commands::vault_count_for_page,
+            import_commands::vault_matches,
+            import_commands::vault_reveal,
+            import_commands::vault_delete,
+            import_commands::vault_clear,
+            import_commands::vault_fill,
             commands::set_back_button,
             commands::set_color_picker,
             commands::color_pick_start,

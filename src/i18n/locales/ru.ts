@@ -49,6 +49,49 @@ export const ru: Messages = {
   "pageTools.clearDataConfirm":
     "Выйти с сайта {site} и стереть его cookie, хранилище и кэш? Другие сайты сохранят свои.",
   "pageTools.clearDataAction": "Стереть",
+  "pageTools.fill": "Ввести логин",
+  "pageTools.fillReason": "Ввести сохранённый логин",
+  "pageTools.fillChoose": "Выберите логин",
+  "pageTools.fillNothing": "На этой странице нет полей для входа",
+  "settings.import": "Импорт из другого браузера",
+  "settings.importNote":
+    "Закладки, история, пароли и поиск из файлов, которые экспортирует ваш прежний браузер.",
+  "settings.passwords": "Пароли",
+  "settings.passwordsNote": "Импортированные логины, защищённые блокировкой устройства.",
+  "import.title": "Импорт из другого браузера",
+  "import.intro":
+    "В прежнем браузере экспортируйте закладки (HTML), историю и пароли (CSV), затем выберите файлы здесь. Всё читается на этом устройстве и никуда не отправляется.",
+  "import.choose": "Выбрать файлы",
+  "import.chooseMore": "Добавить ещё файлы",
+  "import.reading": "Чтение…",
+  "import.tooLarge": "Файл {name} слишком большой для импорта.",
+  "import.nothing":
+    "В этих файлах не нашлось ничего похожего на закладки, историю, пароли или поисковую систему.",
+  "import.found":
+    "Найдено: закладок — {bookmarks}, записей истории — {history}, сохранённых паролей — {passwords}.",
+  "import.recipes": "Включить рецепты для ваших сайтов",
+  "import.sites": "Добавить в избранное",
+  "import.limitNote":
+    "В избранном помещается до {limit} сайтов. Выбранные рецепты будут включены в любом случае.",
+  "import.history": "Добавить в историю самые посещаемые: {count}",
+  "import.searchEngine": "Искать в {engine}",
+  "import.passwords": "Сохранить пароли на этом устройстве: {count}",
+  "import.passwordsNote":
+    "Они шифруются ключом, который хранится в защищённом хранилище этого устройства. После импорта удалите экспортированный файл: в нём они лежат открытым текстом.",
+  "import.apply": "Импортировать",
+  "import.done":
+    "Импортировано: рецептов — {recipes}, избранного — {favorites}, записей истории — {history}, паролей — {passwords}.",
+  "passwords.title": "Пароли",
+  "passwords.close": "Закрыть пароли",
+  "passwords.unlock": "Открыть",
+  "passwords.unlockReason": "Показать сохранённые пароли",
+  "passwords.empty": "Нет сохранённых паролей. Импортируйте их из другого браузера в настройках.",
+  "passwords.show": "Показать",
+  "passwords.hide": "Скрыть",
+  "passwords.delete": "Удалить",
+  "passwords.deleteAll": "Удалить все пароли",
+  "passwords.deleteAllConfirm":
+    "Стереть все сохранённые пароли с этого устройства? Это нельзя отменить.",
   "commandBar.addFavorite": "Добавить {site} в избранное",
   "commandBar.removeFavorite": "Убрать {site} из избранного",
   "commandBar.openAiSettings": "Открыть настройки > ИИ-помощник",

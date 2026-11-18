@@ -46,6 +46,49 @@ export const bn: Messages = {
   "pageTools.clearDataConfirm":
     "{site} থেকে সাইন আউট করে এর কুকি, স্টোরেজ ও ক্যাশ মুছবেন? অন্যান্য সাইটের ডেটা থেকে যাবে।",
   "pageTools.clearDataAction": "মুছুন",
+  "pageTools.fill": "লগইন পূরণ",
+  "pageTools.fillReason": "সংরক্ষিত লগইন পূরণ করুন",
+  "pageTools.fillChoose": "একটি লগইন বেছে নিন",
+  "pageTools.fillNothing": "এই পেজে কোনো লগইন ফিল্ড পাওয়া যায়নি",
+  "settings.import": "অন্য ব্রাউজার থেকে ইমপোর্ট",
+  "settings.importNote":
+    "আপনার পুরনো ব্রাউজারের এক্সপোর্ট করা ফাইল থেকে বুকমার্ক, ইতিহাস, পাসওয়ার্ড ও সার্চ।",
+  "settings.passwords": "পাসওয়ার্ড",
+  "settings.passwordsNote": "আপনার ইমপোর্ট করা লগইন, ডিভাইসের লকের পেছনে সুরক্ষিত।",
+  "import.title": "অন্য ব্রাউজার থেকে ইমপোর্ট",
+  "import.intro":
+    "পুরনো ব্রাউজার থেকে বুকমার্ক (HTML), ইতিহাস ও পাসওয়ার্ড (CSV) এক্সপোর্ট করুন, তারপর ফাইলগুলো এখানে বেছে নিন। সবকিছু এই ডিভাইসেই পড়া হয় এবং কোথাও পাঠানো হয় না।",
+  "import.choose": "ফাইল বেছে নিন",
+  "import.chooseMore": "আরও ফাইল যোগ করুন",
+  "import.reading": "পড়া হচ্ছে…",
+  "import.tooLarge": "{name} ইমপোর্ট করার জন্য খুব বড়।",
+  "import.nothing":
+    "ওই ফাইলগুলোর কোনোটিই বুকমার্ক, ইতিহাস, পাসওয়ার্ড বা সার্চ ইঞ্জিনের মতো মনে হয়নি।",
+  "import.found":
+    "{bookmarks}টি বুকমার্ক, {history}টি ইতিহাস এন্ট্রি এবং {passwords}টি সংরক্ষিত পাসওয়ার্ড পাওয়া গেছে।",
+  "import.recipes": "আপনার ব্যবহৃত সাইটের জন্য রেসিপি চালু করুন",
+  "import.sites": "পছন্দের তালিকায় যোগ করুন",
+  "import.limitNote":
+    "পছন্দের তালিকায় সর্বোচ্চ {limit}টি সাইট থাকে। আপনার বাছাই করা রেসিপি যেকোনোভাবে চালু হবে।",
+  "import.history": "সবচেয়ে বেশি দেখা {count}টি ইতিহাসে যোগ করুন",
+  "import.searchEngine": "{engine} দিয়ে সার্চ করুন",
+  "import.passwords": "এই ডিভাইসে {count}টি পাসওয়ার্ড সংরক্ষণ করুন",
+  "import.passwordsNote":
+    "ডিভাইসের নিরাপদ স্টোরেজে রাখা একটি কী দিয়ে এগুলো এনক্রিপ্ট করা হয়। পরে এক্সপোর্ট করা ফাইলটি মুছে ফেলুন: তাতে এগুলো সাধারণ টেক্সটে থাকে।",
+  "import.apply": "ইমপোর্ট করুন",
+  "import.done":
+    "{recipes}টি রেসিপি, {favorites}টি পছন্দের, {history}টি ইতিহাস এন্ট্রি ও {passwords}টি পাসওয়ার্ড ইমপোর্ট হয়েছে।",
+  "passwords.title": "পাসওয়ার্ড",
+  "passwords.close": "পাসওয়ার্ড বন্ধ করুন",
+  "passwords.unlock": "আনলক",
+  "passwords.unlockReason": "আপনার সংরক্ষিত পাসওয়ার্ড দেখান",
+  "passwords.empty": "কোনো পাসওয়ার্ড সংরক্ষিত নেই। সেটিংসে অন্য ব্রাউজার থেকে ইমপোর্ট করুন।",
+  "passwords.show": "দেখান",
+  "passwords.hide": "লুকান",
+  "passwords.delete": "মুছুন",
+  "passwords.deleteAll": "সব পাসওয়ার্ড মুছুন",
+  "passwords.deleteAllConfirm":
+    "এই ডিভাইস থেকে সব সংরক্ষিত পাসওয়ার্ড মুছে ফেলবেন? এটি আর ফেরানো যাবে না।",
   "commandBar.addFavorite": "{site} পছন্দের তালিকায় যোগ করুন",
   "commandBar.removeFavorite": "{site} পছন্দের তালিকা থেকে সরান",
   "commandBar.openAiSettings": "সেটিংস > AI সহকারী খুলুন",

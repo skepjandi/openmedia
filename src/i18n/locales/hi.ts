@@ -46,6 +46,49 @@ export const hi: Messages = {
   "pageTools.clearDataConfirm":
     "{site} से साइन आउट करें और उसकी कुकी, स्टोरेज और कैश मिटाएँ? दूसरी साइटों का डेटा बना रहेगा।",
   "pageTools.clearDataAction": "मिटाएँ",
+  "pageTools.fill": "लॉगिन भरें",
+  "pageTools.fillReason": "सहेजा हुआ लॉगिन भरें",
+  "pageTools.fillChoose": "कोई लॉगिन चुनें",
+  "pageTools.fillNothing": "इस पेज पर कोई लॉगिन फ़ील्ड नहीं मिला",
+  "settings.import": "दूसरे ब्राउज़र से इंपोर्ट करें",
+  "settings.importNote":
+    "आपके पुराने ब्राउज़र की एक्सपोर्ट की गई फ़ाइलों से बुकमार्क, इतिहास, पासवर्ड और खोज।",
+  "settings.passwords": "पासवर्ड",
+  "settings.passwordsNote": "आपके इंपोर्ट किए गए लॉगिन, आपके डिवाइस के लॉक के पीछे सुरक्षित।",
+  "import.title": "दूसरे ब्राउज़र से इंपोर्ट करें",
+  "import.intro":
+    "अपने पुराने ब्राउज़र में बुकमार्क (HTML), इतिहास और पासवर्ड (CSV) एक्सपोर्ट करें, फिर फ़ाइलें यहाँ चुनें। सब कुछ इसी डिवाइस पर पढ़ा जाता है और कहीं नहीं भेजा जाता।",
+  "import.choose": "फ़ाइलें चुनें",
+  "import.chooseMore": "और फ़ाइलें जोड़ें",
+  "import.reading": "पढ़ा जा रहा है…",
+  "import.tooLarge": "{name} इंपोर्ट करने के लिए बहुत बड़ी है।",
+  "import.nothing": "उन फ़ाइलों में कुछ भी बुकमार्क, इतिहास, पासवर्ड या खोज इंजन जैसा नहीं मिला।",
+  "import.found":
+    "{bookmarks} बुकमार्क, {history} इतिहास प्रविष्टियाँ और {passwords} सहेजे गए पासवर्ड मिले।",
+  "import.recipes": "आप जो साइटें इस्तेमाल करते हैं, उनकी रेसिपी चालू करें",
+  "import.sites": "पसंदीदा में जोड़ें",
+  "import.limitNote":
+    "पसंदीदा में अधिकतम {limit} साइटें रह सकती हैं। आपकी चुनी रेसिपी हर हाल में चालू हो जाती हैं।",
+  "import.history": "सबसे ज़्यादा देखी गई {count} को इतिहास में जोड़ें",
+  "import.searchEngine": "{engine} से खोजें",
+  "import.passwords": "इस डिवाइस पर {count} पासवर्ड सहेजें",
+  "import.passwordsNote":
+    "इन्हें इस डिवाइस के सुरक्षित स्टोरेज में रखी कुंजी से एन्क्रिप्ट किया जाता है। बाद में एक्सपोर्ट की गई फ़ाइल मिटा दें: उसमें ये सादे टेक्स्ट में होते हैं।",
+  "import.apply": "इंपोर्ट करें",
+  "import.done":
+    "{recipes} रेसिपी, {favorites} पसंदीदा, {history} इतिहास प्रविष्टियाँ और {passwords} पासवर्ड इंपोर्ट हुए।",
+  "passwords.title": "पासवर्ड",
+  "passwords.close": "पासवर्ड बंद करें",
+  "passwords.unlock": "अनलॉक",
+  "passwords.unlockReason": "अपने सहेजे गए पासवर्ड दिखाएँ",
+  "passwords.empty":
+    "कोई पासवर्ड सहेजा नहीं गया है। सेटिंग्स में उन्हें दूसरे ब्राउज़र से इंपोर्ट करें।",
+  "passwords.show": "दिखाएँ",
+  "passwords.hide": "छिपाएँ",
+  "passwords.delete": "मिटाएँ",
+  "passwords.deleteAll": "सभी पासवर्ड मिटाएँ",
+  "passwords.deleteAllConfirm":
+    "इस डिवाइस से हर सहेजा गया पासवर्ड मिटाएँ? इसे वापस नहीं किया जा सकता।",
   "commandBar.addFavorite": "{site} को पसंदीदा में जोड़ें",
   "commandBar.removeFavorite": "{site} को पसंदीदा से हटाएँ",
   "commandBar.openAiSettings": "सेटिंग्स > AI सहायक खोलें",

@@ -122,7 +122,7 @@ fn bundled_recipe(id: &str) -> Result<&'static Bundled> {
     bundled::find(id).ok_or_else(|| Error::Library("not in the recipe library".into()))
 }
 
-fn install(recipes: &Recipes, id: &str) -> Result<()> {
+pub(crate) fn install(recipes: &Recipes, id: &str) -> Result<()> {
     recipes.save_bundled(bundled_recipe(id)?.recipe.clone())?;
     Ok(())
 }

@@ -6,6 +6,14 @@ All notable changes to OpenMedia are documented here.
 >
 > **Wiki**: the [GitHub Wiki](https://github.com/skepjandi/openmedia/wiki) is the public-facing main wiki — architecture, recipe format, AI pipeline, security model, roadmap. Source-controlled editing surface is `docs/wiki/` in this repo; CI (`.github/workflows/sync-wiki.yml`) mirrors it to the GitHub Wiki on every merge to `main`. New single-PR changes belong here, not as new wiki pages.
 
+### feat(import): import from another browser, with an encrypted password vault and one-tap fill
+
+**Area:** `feat(import)`, `feat(shell)`
+
+**Change:** Settings > *Import from another browser* reads the files an old browser exports: bookmarks (HTML or Chromium JSON), history (JSON or CSV), passwords (CSV from Chrome, Edge, Brave, Firefox, Safari, Bitwarden) and a Chromium `Preferences` (search engine). Rust ranks the sites, matches them to official recipes and shows a checklist: recipes, favorites (within the 4/6 limit, existing ones kept), the 100 most visited into History, the search engine, the passwords. Passwords go into a vault (`passwords.vault`, AES-256-GCM, key only in the OS secure store) opened by the device owner check for 120 seconds; the Passwords page lists logins and shows one password for 15 seconds on request. *Fill login* in the page tools puts a login into a secure page of the same origin (re-checked in the page), fills two fields and submits nothing. No file or login leaves the device. See `docs/wiki/import-and-passwords.md`. 35 new strings in 29 languages (machine-written, unreviewed).
+
+**Verified:** Rust tests for each parser (Netscape HTML, Chromium JSON, history JSON/CSV, passwords CSV with quotes and line breaks, per-browser headers), the preview and apply (limits, refusals, nothing ticked changes nothing), the vault (round trip, no plain text in the file, tamper and wrong-key failure, update-not-duplicate, clear) and the fill policy (secure pages only, origin match, JSON-encoded values); the fill script run in WebKit (wrong origin refused, nearest field before the password field filled, hidden form untouched). **Not verified:** any of it in the app on a device: the file picker on iOS and Android, the owner check, filling on real login pages (three unrelated sites, per invariant 9), Linux without a Secret Service. Windows and Linux builds share the code. Other browsers' databases are not read directly and open tabs, extensions and sessions are not imported.
+
 ### feat(fab): a rotary dial with folders of favorites
 
 **Area:** `feat(fab)`

@@ -47,9 +47,15 @@ const loadVideoControls = () => import("../features/settings/VideoControlsScreen
 const loadDarkMode = () => import("../features/settings/DarkModeScreen");
 const loadSiteVideoControls = () => import("../features/settings/SiteVideoControlsScreen");
 const loadSiteDarkMode = () => import("../features/settings/SiteDarkModeScreen");
+const loadImport = () => import("../features/import/ImportScreen");
+const loadPasswords = () => import("../features/passwords/PasswordsScreen");
 const loadDownloads = () => import("../features/downloads/DownloadsSheet");
 const loadIncognitoRecipes = () => import("../features/settings/IncognitoSections");
 const loadMoreFavorites = () => import("../features/settings/MoreFavoritesScreens");
+const ImportScreen = lazy(() => loadImport().then((module) => ({ default: module.ImportScreen })));
+const PasswordsScreen = lazy(() =>
+  loadPasswords().then((module) => ({ default: module.PasswordsScreen })),
+);
 const DownloadsSheet = lazy(() =>
   loadDownloads().then((module) => ({ default: module.DownloadsSheet })),
 );
@@ -193,6 +199,8 @@ export function App() {
         {sheet === "incognito-more-favorites" && <IncognitoMoreFavoritesScreen />}
       </Suspense>
       <Suspense fallback={null}>{sheet === "downloads" && <DownloadsSheet />}</Suspense>
+      <Suspense fallback={null}>{sheet === "import" && <ImportScreen />}</Suspense>
+      <Suspense fallback={null}>{sheet === "passwords" && <PasswordsScreen />}</Suspense>
       <Suspense fallback={null}>{sheet === "library" && <LibraryScreen />}</Suspense>
       <Suspense fallback={null}>{sheet === "share-recipe" && <ShareRecipeScreen />}</Suspense>
       <Suspense fallback={null}>{sheet === "video-controls" && <VideoControlsScreen />}</Suspense>

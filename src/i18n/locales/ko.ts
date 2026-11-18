@@ -49,6 +49,48 @@ export const ko: Messages = {
   "pageTools.clearDataConfirm":
     "{site}에서 로그아웃하고 쿠키, 저장소, 캐시를 지울까요? 다른 사이트의 데이터는 그대로 유지됩니다.",
   "pageTools.clearDataAction": "지우기",
+  "pageTools.fill": "로그인 입력",
+  "pageTools.fillReason": "저장된 로그인 정보 입력",
+  "pageTools.fillChoose": "로그인 정보 선택",
+  "pageTools.fillNothing": "이 페이지에서 로그인 입력란을 찾지 못했습니다",
+  "settings.import": "다른 브라우저에서 가져오기",
+  "settings.importNote":
+    "이전 브라우저가 내보낸 파일에서 북마크, 기록, 비밀번호, 검색 설정을 가져옵니다.",
+  "settings.passwords": "비밀번호",
+  "settings.passwordsNote": "가져온 로그인 정보이며, 기기 잠금으로 보호됩니다.",
+  "import.title": "다른 브라우저에서 가져오기",
+  "import.intro":
+    "이전 브라우저에서 북마크(HTML), 기록, 비밀번호(CSV)를 내보낸 다음 여기에서 파일을 선택하세요. 모든 내용은 이 기기에서만 읽으며 어디로도 전송되지 않습니다.",
+  "import.choose": "파일 선택",
+  "import.chooseMore": "파일 더 추가",
+  "import.reading": "읽는 중…",
+  "import.tooLarge": "{name}은(는) 너무 커서 가져올 수 없습니다.",
+  "import.nothing":
+    "이 파일에서 북마크, 기록, 비밀번호, 검색 엔진으로 보이는 내용을 찾지 못했습니다.",
+  "import.found":
+    "북마크 {bookmarks}개, 기록 {history}개, 저장된 비밀번호 {passwords}개를 찾았습니다.",
+  "import.recipes": "사용하는 사이트의 레시피 켜기",
+  "import.sites": "즐겨찾기에 추가",
+  "import.limitNote":
+    "즐겨찾기는 최대 {limit}개 사이트까지 담을 수 있습니다. 선택한 레시피는 어느 쪽이든 켜집니다.",
+  "import.history": "가장 많이 방문한 {count}개를 기록에 추가",
+  "import.searchEngine": "{engine}(으)로 검색",
+  "import.passwords": "비밀번호 {count}개를 이 기기에 저장",
+  "import.passwordsNote":
+    "이 기기의 보안 저장소에 보관된 키로 암호화됩니다. 내보낸 파일에는 평문으로 들어 있으니 나중에 삭제하세요.",
+  "import.apply": "가져오기",
+  "import.done":
+    "레시피 {recipes}개, 즐겨찾기 {favorites}개, 기록 {history}개, 비밀번호 {passwords}개를 가져왔습니다.",
+  "passwords.title": "비밀번호",
+  "passwords.close": "비밀번호 닫기",
+  "passwords.unlock": "잠금 해제",
+  "passwords.unlockReason": "저장된 비밀번호를 표시합니다",
+  "passwords.empty": "저장된 비밀번호가 없습니다. 설정에서 다른 브라우저의 비밀번호를 가져오세요.",
+  "passwords.show": "표시",
+  "passwords.hide": "숨기기",
+  "passwords.delete": "삭제",
+  "passwords.deleteAll": "모든 비밀번호 삭제",
+  "passwords.deleteAllConfirm": "저장된 모든 비밀번호를 이 기기에서 지울까요? 되돌릴 수 없습니다.",
   "commandBar.addFavorite": "{site} 즐겨찾기에 추가",
   "commandBar.removeFavorite": "{site} 즐겨찾기에서 제거",
   "commandBar.openAiSettings": "설정 > AI 어시스턴트 열기",

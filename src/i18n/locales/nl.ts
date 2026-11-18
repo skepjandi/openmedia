@@ -49,6 +49,50 @@ export const nl: Messages = {
   "pageTools.clearDataConfirm":
     "Uitloggen bij {site} en de cookies, opslag en cache wissen? Andere sites houden die van hen.",
   "pageTools.clearDataAction": "Wissen",
+  "pageTools.fill": "Inlog invullen",
+  "pageTools.fillReason": "Een opgeslagen login invullen",
+  "pageTools.fillChoose": "Kies een login",
+  "pageTools.fillNothing": "Geen inlogvelden gevonden op deze pagina",
+  "settings.import": "Importeren uit een andere browser",
+  "settings.importNote":
+    "Bladwijzers, geschiedenis, wachtwoorden en zoekmachine uit de bestanden die je oude browser exporteert.",
+  "settings.passwords": "Wachtwoorden",
+  "settings.passwordsNote": "De logins die je hebt geïmporteerd, vergrendeld achter je apparaat.",
+  "import.title": "Importeren uit een andere browser",
+  "import.intro":
+    "Exporteer in je oude browser je bladwijzers (HTML), geschiedenis en wachtwoorden (CSV) en kies hier de bestanden. Alles wordt op dit apparaat gelezen en er wordt niets naar buiten gestuurd.",
+  "import.choose": "Bestanden kiezen",
+  "import.chooseMore": "Meer bestanden toevoegen",
+  "import.reading": "Lezen…",
+  "import.tooLarge": "{name} is te groot om te importeren.",
+  "import.nothing":
+    "Niets in die bestanden leek op bladwijzers, geschiedenis, wachtwoorden of een zoekmachine.",
+  "import.found":
+    "{bookmarks} bladwijzers, {history} geschiedenisitems en {passwords} opgeslagen wachtwoorden gevonden.",
+  "import.recipes": "Recepten aanzetten voor sites die je gebruikt",
+  "import.sites": "Toevoegen als favorieten",
+  "import.limitNote":
+    "Favorieten bevatten maximaal {limit} sites. Recepten die je kiest worden in beide gevallen aangezet.",
+  "import.history": "De {count} meest bezochte toevoegen aan Geschiedenis",
+  "import.searchEngine": "Zoeken met {engine}",
+  "import.passwords": "{count} wachtwoorden op dit apparaat opslaan",
+  "import.passwordsNote":
+    "Ze worden versleuteld met een sleutel in de beveiligde opslag van dit apparaat. Verwijder daarna het geëxporteerde bestand: daarin staan ze als platte tekst.",
+  "import.apply": "Importeren",
+  "import.done":
+    "{recipes} recepten, {favorites} favorieten, {history} geschiedenisitems en {passwords} wachtwoorden geïmporteerd.",
+  "passwords.title": "Wachtwoorden",
+  "passwords.close": "Wachtwoorden sluiten",
+  "passwords.unlock": "Ontgrendelen",
+  "passwords.unlockReason": "Je opgeslagen wachtwoorden tonen",
+  "passwords.empty":
+    "Geen opgeslagen wachtwoorden. Importeer ze in Instellingen uit een andere browser.",
+  "passwords.show": "Tonen",
+  "passwords.hide": "Verbergen",
+  "passwords.delete": "Wissen",
+  "passwords.deleteAll": "Alle wachtwoorden wissen",
+  "passwords.deleteAllConfirm":
+    "Elk opgeslagen wachtwoord van dit apparaat wissen? Dit kan niet ongedaan worden gemaakt.",
   "commandBar.addFavorite": "{site} toevoegen aan favorieten",
   "commandBar.removeFavorite": "{site} verwijderen uit favorieten",
   "commandBar.openAiSettings": "Open Instellingen > AI-assistent",

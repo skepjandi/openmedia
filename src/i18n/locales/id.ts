@@ -46,6 +46,49 @@ export const id: Messages = {
   "pageTools.clearDataConfirm":
     "Keluar dari {site} dan hapus cookie, penyimpanan, serta cache-nya? Situs lain tetap menyimpan miliknya.",
   "pageTools.clearDataAction": "Hapus",
+  "pageTools.fill": "Isi login",
+  "pageTools.fillReason": "Isi login yang tersimpan",
+  "pageTools.fillChoose": "Pilih login",
+  "pageTools.fillNothing": "Tidak ada kolom login di halaman ini",
+  "settings.import": "Impor dari browser lain",
+  "settings.importNote":
+    "Markah, riwayat, kata sandi, dan pencarian dari berkas yang diekspor browser lama Anda.",
+  "settings.passwords": "Kata sandi",
+  "settings.passwordsNote": "Login yang Anda impor, terkunci di balik perangkat Anda.",
+  "import.title": "Impor dari browser lain",
+  "import.intro":
+    "Di browser lama Anda, ekspor markah (HTML), riwayat, dan kata sandi (CSV), lalu pilih berkasnya di sini. Semuanya dibaca di perangkat ini dan tidak ada yang dikirim ke mana pun.",
+  "import.choose": "Pilih berkas",
+  "import.chooseMore": "Tambah berkas lain",
+  "import.reading": "Membaca…",
+  "import.tooLarge": "{name} terlalu besar untuk diimpor.",
+  "import.nothing":
+    "Tidak ada isi berkas tersebut yang tampak seperti markah, riwayat, kata sandi, atau mesin telusur.",
+  "import.found":
+    "Ditemukan {bookmarks} markah, {history} entri riwayat, dan {passwords} kata sandi tersimpan.",
+  "import.recipes": "Aktifkan resep untuk situs yang Anda gunakan",
+  "import.sites": "Tambahkan sebagai favorit",
+  "import.limitNote":
+    "Favorit menampung hingga {limit} situs. Resep yang Anda pilih tetap diaktifkan.",
+  "import.history": "Tambahkan {count} yang paling sering dikunjungi ke Riwayat",
+  "import.searchEngine": "Telusuri dengan {engine}",
+  "import.passwords": "Simpan {count} kata sandi di perangkat ini",
+  "import.passwordsNote":
+    "Kata sandi dienkripsi dengan kunci yang disimpan di penyimpanan aman perangkat ini. Hapus berkas ekspor setelahnya: berkas itu menyimpannya sebagai teks biasa.",
+  "import.apply": "Impor",
+  "import.done":
+    "Berhasil mengimpor {recipes} resep, {favorites} favorit, {history} entri riwayat, dan {passwords} kata sandi.",
+  "passwords.title": "Kata sandi",
+  "passwords.close": "Tutup kata sandi",
+  "passwords.unlock": "Buka kunci",
+  "passwords.unlockReason": "Tampilkan kata sandi tersimpan Anda",
+  "passwords.empty": "Belum ada kata sandi tersimpan. Impor dari browser lain di Pengaturan.",
+  "passwords.show": "Tampilkan",
+  "passwords.hide": "Sembunyikan",
+  "passwords.delete": "Hapus",
+  "passwords.deleteAll": "Hapus semua kata sandi",
+  "passwords.deleteAllConfirm":
+    "Hapus semua kata sandi tersimpan dari perangkat ini? Tindakan ini tidak dapat dibatalkan.",
   "commandBar.addFavorite": "Tambahkan {site} ke favorit",
   "commandBar.removeFavorite": "Hapus {site} dari favorit",
   "commandBar.openAiSettings": "Buka Pengaturan > Asisten AI",

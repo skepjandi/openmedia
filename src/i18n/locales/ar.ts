@@ -49,6 +49,48 @@ export const ar: Messages = {
   "pageTools.clearDataConfirm":
     "هل تريد تسجيل الخروج من {site} ومسح ملفات تعريف الارتباط والتخزين والذاكرة المؤقتة الخاصة به؟ تحتفظ المواقع الأخرى بما لديها.",
   "pageTools.clearDataAction": "مسح",
+  "pageTools.fill": "تعبئة الدخول",
+  "pageTools.fillReason": "تعبئة تسجيل دخول محفوظ",
+  "pageTools.fillChoose": "اختر تسجيل دخول",
+  "pageTools.fillNothing": "لم يتم العثور على حقول تسجيل الدخول في هذه الصفحة",
+  "settings.import": "الاستيراد من متصفح آخر",
+  "settings.importNote":
+    "الإشارات المرجعية والسجل وكلمات المرور والبحث من الملفات التي يصدّرها متصفحك القديم.",
+  "settings.passwords": "كلمات المرور",
+  "settings.passwordsNote": "تسجيلات الدخول التي استوردتها، مقفلة خلف جهازك.",
+  "import.title": "الاستيراد من متصفح آخر",
+  "import.intro":
+    "في متصفحك القديم، صدّر الإشارات المرجعية (HTML) والسجل وكلمات المرور (CSV)، ثم اختر الملفات هنا. تتم قراءة كل شيء على هذا الجهاز ولا يُرسل أي شيء إلى أي مكان.",
+  "import.choose": "اختيار الملفات",
+  "import.chooseMore": "إضافة ملفات أخرى",
+  "import.reading": "جارٍ القراءة…",
+  "import.tooLarge": "{name} كبير جدًا للاستيراد.",
+  "import.nothing": "لا شيء في تلك الملفات يبدو كإشارات مرجعية أو سجل أو كلمات مرور أو محرك بحث.",
+  "import.found":
+    "تم العثور على {bookmarks} إشارة مرجعية و{history} عنصرًا في السجل و{passwords} كلمة مرور محفوظة.",
+  "import.recipes": "تفعيل الوصفات للمواقع التي تستخدمها",
+  "import.sites": "إضافة إلى المفضلة",
+  "import.limitNote":
+    "تتسع المفضلة لما يصل إلى {limit} موقعًا. الوصفات التي تختارها تُفعَّل في كل الأحوال.",
+  "import.history": "إضافة {count} من الأكثر زيارة إلى السجل",
+  "import.searchEngine": "البحث باستخدام {engine}",
+  "import.passwords": "حفظ {count} من كلمات المرور على هذا الجهاز",
+  "import.passwordsNote":
+    "تُشفَّر بمفتاح محفوظ في التخزين الآمن لهذا الجهاز. احذف الملف المصدَّر بعد ذلك: فهو يحتويها كنص عادي.",
+  "import.apply": "استيراد",
+  "import.done":
+    "تم استيراد {recipes} وصفة و{favorites} من المفضلة و{history} عنصرًا من السجل و{passwords} كلمة مرور.",
+  "passwords.title": "كلمات المرور",
+  "passwords.close": "إغلاق كلمات المرور",
+  "passwords.unlock": "فتح القفل",
+  "passwords.unlockReason": "إظهار كلمات المرور المحفوظة",
+  "passwords.empty": "لا توجد كلمات مرور محفوظة. استوردها من متصفح آخر في الإعدادات.",
+  "passwords.show": "إظهار",
+  "passwords.hide": "إخفاء",
+  "passwords.delete": "حذف",
+  "passwords.deleteAll": "حذف كل كلمات المرور",
+  "passwords.deleteAllConfirm":
+    "هل تريد مسح كل كلمة مرور محفوظة من هذا الجهاز؟ لا يمكن التراجع عن ذلك.",
   "commandBar.addFavorite": "إضافة {site} إلى المفضلة",
   "commandBar.removeFavorite": "إزالة {site} من المفضلة",
   "commandBar.openAiSettings": "فتح الإعدادات > المساعد الذكي",

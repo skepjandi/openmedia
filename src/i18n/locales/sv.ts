@@ -50,6 +50,50 @@ export const sv: Messages = {
   "pageTools.clearDataConfirm":
     "Logga ut från {site} och radera dess cookies, lagring och cache? Andra webbplatser behåller sina.",
   "pageTools.clearDataAction": "Radera",
+  "pageTools.fill": "Fyll i inloggning",
+  "pageTools.fillReason": "Fyll i en sparad inloggning",
+  "pageTools.fillChoose": "Välj en inloggning",
+  "pageTools.fillNothing": "Inga inloggningsfält hittades på den här sidan",
+  "settings.import": "Importera från en annan webbläsare",
+  "settings.importNote":
+    "Bokmärken, historik, lösenord och sökning från filerna som din gamla webbläsare exporterar.",
+  "settings.passwords": "Lösenord",
+  "settings.passwordsNote": "Inloggningarna du importerade, låsta bakom din enhet.",
+  "import.title": "Importera från en annan webbläsare",
+  "import.intro":
+    "Exportera bokmärken (HTML), historik och lösenord (CSV) i din gamla webbläsare och välj sedan filerna här. Allt läses på den här enheten och ingenting skickas någonstans.",
+  "import.choose": "Välj filer",
+  "import.chooseMore": "Lägg till fler filer",
+  "import.reading": "Läser…",
+  "import.tooLarge": "{name} är för stor för att importeras.",
+  "import.nothing":
+    "Inget i de filerna såg ut som bokmärken, historik, lösenord eller en sökmotor.",
+  "import.found":
+    "Hittade {bookmarks} bokmärken, {history} historikposter och {passwords} sparade lösenord.",
+  "import.recipes": "Slå på recept för webbplatser du använder",
+  "import.sites": "Lägg till som favoriter",
+  "import.limitNote":
+    "Favoriter rymmer upp till {limit} webbplatser. Recepten du väljer slås på i båda fallen.",
+  "import.history": "Lägg till de {count} mest besökta i Historik",
+  "import.searchEngine": "Sök med {engine}",
+  "import.passwords": "Spara {count} lösenord på den här enheten",
+  "import.passwordsNote":
+    "De krypteras med en nyckel som förvaras i den här enhetens säkra lagring. Radera den exporterade filen efteråt: den innehåller dem som vanlig text.",
+  "import.apply": "Importera",
+  "import.done":
+    "Importerade {recipes} recept, {favorites} favoriter, {history} historikposter och {passwords} lösenord.",
+  "passwords.title": "Lösenord",
+  "passwords.close": "Stäng lösenord",
+  "passwords.unlock": "Lås upp",
+  "passwords.unlockReason": "Visa dina sparade lösenord",
+  "passwords.empty":
+    "Inga sparade lösenord. Importera dem från en annan webbläsare i Inställningar.",
+  "passwords.show": "Visa",
+  "passwords.hide": "Dölj",
+  "passwords.delete": "Radera",
+  "passwords.deleteAll": "Radera alla lösenord",
+  "passwords.deleteAllConfirm":
+    "Radera alla sparade lösenord från den här enheten? Det går inte att ångra.",
   "commandBar.addFavorite": "Lägg till {site} i favoriter",
   "commandBar.removeFavorite": "Ta bort {site} från favoriter",
   "commandBar.openAiSettings": "Öppna Inställningar > AI-assistent",

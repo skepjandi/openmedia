@@ -362,6 +362,70 @@ export const pageTools = {
   clearSiteData: (site: string) => command("clear_site_data", { site }),
 };
 
+export interface ImportPreview {
+  bookmarks: number;
+  history: number;
+  passwords: number;
+  passwordSites: number;
+  searchEngine: SearchEngine | null;
+  recipes: { recipeId: string; name: string; site: string }[];
+  sites: { site: string; name: string }[];
+}
+
+export interface ImportChoices {
+  recipes: string[];
+  sites: string[];
+  history: boolean;
+  searchEngine: boolean;
+  passwords: boolean;
+}
+
+export interface ImportResult {
+  recipes: number;
+  favorites: number;
+  history: number;
+  searchEngine: boolean;
+  passwords: number;
+}
+
+/** Bringing in what another browser exported. Passwords never come back from Rust in a preview. */
+export const importer = {
+  /** Sends one exported file's text; answers with everything read so far. */
+  read: (text: string) => invoke<ImportPreview>("import_read", { text }),
+  cancel: () => command("import_cancel"),
+  apply: (choices: ImportChoices) => invoke<ImportResult>("import_apply", { choices }),
+};
+
+/** A saved login without its password. */
+export interface VaultLogin {
+  id: string;
+  site: string;
+  origin: string;
+  name: string;
+  username: string;
+}
+
+export interface VaultFilled {
+  username: boolean;
+  password: boolean;
+}
+
+/** The vault of imported logins. Everything but `countForPage` needs an unlock by the device owner. */
+export const vault = {
+  /** Asks for Face ID, a fingerprint or the device passcode; `false` when they declined. */
+  unlock: (reason: string) => invoke<boolean>("vault_unlock", { reason }),
+  lock: () => command("vault_lock"),
+  list: () => invoke<VaultLogin[]>("vault_list"),
+  /** How many logins are saved for the page's site; a number only, no unlock. */
+  countForPage: (url: string) => invoke<number>("vault_count_for_page", { url }),
+  matches: (url: string) => invoke<VaultLogin[]>("vault_matches", { url }),
+  reveal: (id: string) => invoke<string>("vault_reveal", { id }),
+  remove: (id: string) => command("vault_delete", { id }),
+  clear: () => command("vault_clear"),
+  /** Puts the login in the page's username and password fields; submits nothing. */
+  fill: (id: string, url: string) => invoke<VaultFilled>("vault_fill", { id, url }),
+};
+
 export type DownloadKind = "image" | "video" | "audio" | "document" | "archive" | "other";
 export type DownloadStatus = "queued" | "downloading" | "paused" | "done" | "failed" | "cancelled";
 

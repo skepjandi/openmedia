@@ -49,6 +49,49 @@ export const ja: Messages = {
   "pageTools.clearDataConfirm":
     "{site}からサインアウトし、Cookie、ストレージ、キャッシュを消去しますか？他のサイトのデータはそのまま残ります。",
   "pageTools.clearDataAction": "消去",
+  "pageTools.fill": "ログイン入力",
+  "pageTools.fillReason": "保存したログイン情報を入力",
+  "pageTools.fillChoose": "ログイン情報を選択",
+  "pageTools.fillNothing": "このページにログイン欄が見つかりません",
+  "settings.import": "他のブラウザから読み込む",
+  "settings.importNote":
+    "以前のブラウザが書き出したファイルから、ブックマーク、履歴、パスワード、検索を読み込みます。",
+  "settings.passwords": "パスワード",
+  "settings.passwordsNote": "読み込んだログイン情報です。端末のロックで保護されます。",
+  "import.title": "他のブラウザから読み込む",
+  "import.intro":
+    "以前のブラウザで、ブックマーク（HTML）、履歴、パスワード（CSV）を書き出し、ここでファイルを選んでください。すべてこの端末上で読み取られ、どこにも送信されません。",
+  "import.choose": "ファイルを選択",
+  "import.chooseMore": "ファイルを追加",
+  "import.reading": "読み込み中…",
+  "import.tooLarge": "{name} は大きすぎて読み込めません。",
+  "import.nothing":
+    "これらのファイルには、ブックマーク、履歴、パスワード、検索エンジンらしきものが見つかりませんでした。",
+  "import.found":
+    "ブックマーク {bookmarks} 件、履歴 {history} 件、保存済みパスワード {passwords} 件が見つかりました。",
+  "import.recipes": "使っているサイトのレシピをオンにする",
+  "import.sites": "お気に入りに追加",
+  "import.limitNote":
+    "お気に入りは最大 {limit} サイトまでです。選んだレシピはどちらの場合もオンになります。",
+  "import.history": "よく見るサイト {count} 件を履歴に追加",
+  "import.searchEngine": "{engine} で検索",
+  "import.passwords": "パスワード {count} 件をこの端末に保存",
+  "import.passwordsNote":
+    "この端末のセキュアストレージに保管された鍵で暗号化されます。書き出したファイルには平文で入っているため、あとで削除してください。",
+  "import.apply": "読み込む",
+  "import.done":
+    "レシピ {recipes} 件、お気に入り {favorites} 件、履歴 {history} 件、パスワード {passwords} 件を読み込みました。",
+  "passwords.title": "パスワード",
+  "passwords.close": "パスワードを閉じる",
+  "passwords.unlock": "解除",
+  "passwords.unlockReason": "保存したパスワードを表示します",
+  "passwords.empty": "保存したパスワードはありません。設定で他のブラウザから読み込めます。",
+  "passwords.show": "表示",
+  "passwords.hide": "非表示",
+  "passwords.delete": "削除",
+  "passwords.deleteAll": "すべてのパスワードを削除",
+  "passwords.deleteAllConfirm":
+    "保存したパスワードをすべてこの端末から消去しますか？この操作は取り消せません。",
   "commandBar.addFavorite": "{site}をお気に入りに追加",
   "commandBar.removeFavorite": "{site}をお気に入りから外す",
   "commandBar.openAiSettings": "設定 > AI アシスタントを開く",

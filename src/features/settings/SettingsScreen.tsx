@@ -42,6 +42,7 @@ export function SettingsScreen() {
         <VideoControlsLink />
         <FanButtonSwitches />
         <DownloadsLink />
+        <ImportLinks />
         <FavoritesSection />
         <RecipesLink />
         <LibraryLinks />
@@ -81,6 +82,27 @@ function FanButtonSwitches() {
         description={t("settings.techDetectorNote")}
         checked={techDetector}
         onChange={(on) => void setTechDetector(on)}
+      />
+    </Group>
+  );
+}
+
+/** The rows that open the import page and the saved passwords. */
+function ImportLinks() {
+  const openSheet = useApp((s) => s.openSheet);
+  const t = useT();
+
+  return (
+    <Group>
+      <NavRow
+        title={t("settings.import")}
+        note={t("settings.importNote")}
+        onClick={() => openSheet("import")}
+      />
+      <NavRow
+        title={t("settings.passwords")}
+        note={t("settings.passwordsNote")}
+        onClick={() => openSheet("passwords")}
       />
     </Group>
   );
