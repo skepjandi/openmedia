@@ -36,15 +36,15 @@
     ],
     "iOS": {
       "minimumSystemVersion": "17.0",
-      "bundleVersion": "1016"
+      "bundleVersion": "1017"
     },
     "macOS": {
       "minimumSystemVersion": "14.0",
-      "bundleVersion": "1016"
+      "bundleVersion": "1017"
     },
     "android": {
       "minSdkVersion": 24,
-      "versionCode": 1016
+      "versionCode": 1017
     },
     "windows": {
       "nsis": {
