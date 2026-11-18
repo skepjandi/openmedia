@@ -66,16 +66,32 @@ pub struct Filled {
     pub password: bool,
 }
 
-/// Reads the page's answer. Anything unexpected is "nothing filled".
-pub fn parse_result(json: &str) -> Filled {
+/// How many times a fill is tried, a moment apart, for fields a page builds late or shows only
+/// after its first step.
+pub const ATTEMPTS: u32 = 4;
+/// The wait between two tries.
+pub const RETRY_AFTER_MS: u64 = 500;
+
+/// Reads the page's answer: which fields it took, and whether it was still on the checked origin.
+/// Anything unexpected is "nothing filled, page moved".
+pub fn parse_answer(json: &str) -> (Filled, bool) {
     let Ok(Value::Object(map)) = serde_json::from_str::<Value>(json) else {
-        return Filled::default();
+        return (Filled::default(), false);
     };
     let flag = |key: &str| map.get(key).and_then(Value::as_bool).unwrap_or(false);
-    Filled {
-        username: flag("user"),
-        password: flag("password"),
-    }
+    (
+        Filled {
+            username: flag("user"),
+            password: flag("password"),
+        },
+        flag("origin"),
+    )
+}
+
+/// Whether another try is worth making: the page is still where it was and has no password field
+/// filled yet.
+pub fn should_retry(filled: Filled, on_origin: bool) -> bool {
+    on_origin && !filled.password
 }
 
 #[cfg(test)]
@@ -117,16 +133,41 @@ mod tests {
     }
 
     #[test]
-    fn the_answer_is_two_flags_and_nothing_else() {
+    fn the_answer_is_flags_and_nothing_else() {
         assert_eq!(
-            parse_result(r#"{"user":true,"password":true,"origin":true}"#),
-            Filled {
-                username: true,
-                password: true
-            }
+            parse_answer(r#"{"user":true,"password":true,"origin":true}"#),
+            (
+                Filled {
+                    username: true,
+                    password: true
+                },
+                true
+            )
         );
-        for json in ["null", "[]", "{", r#"{"user":"yes","password":1}"#] {
-            assert_eq!(parse_result(json), Filled::default(), "{json}");
+        for json in [
+            "null",
+            "[]",
+            "{",
+            r#"{"user":"yes","password":1,"origin":"x"}"#,
+        ] {
+            assert_eq!(parse_answer(json), (Filled::default(), false), "{json}");
         }
+    }
+
+    #[test]
+    fn a_fill_is_retried_only_on_the_same_page_until_the_password_is_in() {
+        let none = Filled::default();
+        let user_only = Filled {
+            username: true,
+            password: false,
+        };
+        let both = Filled {
+            username: true,
+            password: true,
+        };
+        assert!(should_retry(none, true));
+        assert!(should_retry(user_only, true));
+        assert!(!should_retry(both, true));
+        assert!(!should_retry(none, false));
     }
 }

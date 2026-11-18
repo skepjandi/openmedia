@@ -243,9 +243,20 @@ pub async fn vault_fill(
     }
     let password = Zeroizing::new(entry.password.clone());
     let script = fill::script(&page, &entry.username, &password)?;
-    let json = app.siteview().evaluate(EvaluateRequest {
-        script: script.to_string(),
-        page_world: false,
-    })?;
-    Ok(fill::parse_result(&json))
+    let mut filled = fill::Filled::default();
+    for attempt in 0..fill::ATTEMPTS {
+        if attempt > 0 {
+            tokio::time::sleep(Duration::from_millis(fill::RETRY_AFTER_MS)).await;
+        }
+        let json = app.siteview().evaluate(EvaluateRequest {
+            script: script.to_string(),
+            page_world: false,
+        })?;
+        let (answer, on_origin) = fill::parse_answer(&json);
+        filled = answer;
+        if !fill::should_retry(filled, on_origin) {
+            break;
+        }
+    }
+    Ok(filled)
 }

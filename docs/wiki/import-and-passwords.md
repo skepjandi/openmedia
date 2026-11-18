@@ -37,7 +37,9 @@ Nothing here is reachable from a site webview: the commands are shell commands, 
 
 Tapping *Fill login* in the page tools unlocks, then `vault_fill` puts the login in the page in front. Before any password is sent, `fill::allowed` requires a **secure (`https`) page** whose origin is the login's origin, or whose registrable domain equals the login's and whose login origin is also `https`; `http` pages and other sites get nothing. The script (`fill.js`) then checks `location.origin` equals the origin Rust used, so a page that navigated between the tap and the fill gets nothing. It sets one username field (the nearest visible text, email or phone field before the password field) and one visible password field, fires `input` and `change`, and **submits nothing** (invariant 7: the person taps the site's own button). It returns two booleans and never a value. Values reach the script as JSON strings. A fill is one tap by the person; no feature fills unasked.
 
-Limits: the page can read what was filled, as with any autofill; only the main frame is filled (not iframes); a page that builds its fields after the fill finds them empty; a Mac, Windows or Linux build needs a working device owner check and, on Linux, a running Secret Service.
+Late fields: `vault_fill` tries up to 4 times, 500 ms apart, until the password field is filled or the page has left the checked origin, so a page that builds its login fields late, or shows the password field only after the username step, still gets its login. Frames: `fill.js` also fills frames of the **same origin** as the page (read through `contentDocument`, checked with the frame window's `origin`); frames of other origins are out of reach and left alone.
+
+Limits: the page can read what was filled, as with any autofill; a Mac, Windows or Linux build needs a working device owner check and, on Linux, a running Secret Service.
 
 ## Not done
 
