@@ -43,6 +43,7 @@ import {
   STATS_SIZE,
   TABS_SIZE,
   TECH_DETECTOR_SIZE,
+  TOOL_STEP,
   TOUCHABLE_OPACITY,
   clampRotation,
   dialSlots,
@@ -53,7 +54,11 @@ import {
   peekCenterY,
   pushedOffEdge,
   snapRotation,
+  snapToolScroll,
   snapToEdge,
+  toolMaxScroll,
+  toolPlan,
+  toolSlots,
   type DialItem,
   type DialSlot,
   type Edge,
@@ -99,10 +104,15 @@ const MIN_TURN_RADIUS = 40;
 /** Minimum time between wheel notches, so a trackpad flick turns the dial a stop or two. */
 const WHEEL_GAP_MS = 120;
 
-/** The dial's sections, in the order they appear going round it. */
-const TOOLS = 0;
+/** The ring's sections, in the order they appear going round it. */
+const QUICK = 0;
 const OPEN = 1;
-const CLOSED = 2;
+const REST = 2;
+/** A finger this near the line of a column (sideways, in px) turns that column, not the ring. */
+const COLUMN_BAND = 30;
+
+/** What a finger turns: the ring of favorites, or one of the two columns of buttons. */
+type Lane = "ring" | "page" | "switches";
 
 function UnreadBadge({ count }: { count: number }) {
   return (
@@ -147,6 +157,8 @@ type FavoriteItem =
 
 /** A button that is shown on the dial, whatever it does. */
 interface Entry {
+  /** Where it sits: on the ring of favorites, or in one of the two columns. */
+  lane: Lane;
   target: FanTarget;
   size: number;
   section: number;
@@ -196,7 +208,7 @@ interface DialButtonProps {
   hovered: boolean;
   turn: "drag" | "snap" | null;
   holdOf: (kind: FanTarget["kind"]) => Hold | null;
-  onSpinStart: (event: PointerEvent<HTMLElement>) => void;
+  onSpinStart: (event: PointerEvent<HTMLElement>, lane: Lane) => void;
   onSpinMove: (event: PointerEvent<HTMLElement>) => void;
   onSpinEnd: () => boolean;
   onWheel: (event: WheelEvent) => void;
@@ -249,7 +261,7 @@ function DialButton({
       disabled={entry.busy}
       tabIndex={fanOpen && slot.opacity >= TOUCHABLE_OPACITY ? 0 : -1}
       onPointerDown={(event) => {
-        onSpinStart(event);
+        onSpinStart(event, entry.lane);
         hold?.start();
       }}
       onPointerMove={onSpinMove}
@@ -354,8 +366,10 @@ export function Fab() {
   const darkHeld = useRef(false);
   /** How far the dial is turned, in item steps, and whether a finger is turning it now. */
   const [rotation, setRotation] = useState(0);
+  const [pageScroll, setPageScroll] = useState(0);
+  const [switchScroll, setSwitchScroll] = useState(0);
   const [turn, setTurn] = useState<"drag" | "snap" | null>(null);
-  const spin = useRef<{ start: Point; rotation: number; moved: boolean } | null>(null);
+  const spin = useRef<{ lane: Lane; start: Point; value: number; moved: boolean } | null>(null);
   const spunClick = useRef(false);
   const lastWheel = useRef(0);
   /** The folder whose favorites are showing in a popup. */
@@ -372,19 +386,19 @@ export function Fab() {
   const anyUnread = unread.some((count) => count > 0);
   const resting = fabCenter(position.edge, position.yRatio * viewport.height, viewport, insets);
 
-  // Favorites (loose ones, and folders as one item each) whose site is open come first, then the
-  // other open sites; the rest of the favorites are closed. A folder is listed when one of its
-  // favorites is in quick access, and holds every favorite filed in it.
+  // The ring lists quick access first (loose favorites, and folders as one item each, then the
+  // locked slots Pro would open), then the open sites that are not quick access, then every other
+  // favorite. A folder is listed once, where its first favorite is, and holds every favorite filed
+  // in it.
   const usable = usableQuickAccess(favorites, isPro).length;
-  const { favoriteItems, otherTabs } = useMemo(() => {
+  const { quickItems, openTabs, restItems } = useMemo(() => {
     const taken = new Set<string>();
     const sessionOf = (favorite: Favorite) => {
       const session = sessionForFavorite(sessions, favorite.url, sites);
       if (session) taken.add(session.id);
       return session !== undefined;
     };
-    const shown = Array.from({ length: usable }, (_, index) => index);
-    const items: FavoriteItem[] = groupByFolder(favorites, shown).map((entry) =>
+    const itemOf = (entry: ReturnType<typeof groupByFolder<Favorite>>[number]): FavoriteItem =>
       entry.kind === "favorite"
         ? { kind: "slot", index: entry.index, live: sessionOf(entry.favorite) }
         : {
@@ -392,20 +406,42 @@ export function Fab() {
             name: entry.name,
             members: entry.members,
             live: entry.members.map((member) => sessionOf(member.favorite)).some(Boolean),
-          },
-    );
+          };
+    const range = (from: number, to: number) =>
+      Array.from({ length: Math.max(0, to - from) }, (_, k) => from + k);
+    const quick = groupByFolder(favorites, range(0, usable)).map(itemOf);
     // The locked slots Pro would open come last.
     for (let index = usable; index < list.length; index++)
-      items.push({ kind: "slot", index, live: false });
-    return {
-      favoriteItems: items,
-      otherTabs: orderedTabs(sessions, activeId).filter((session) => !taken.has(session.id)),
-    };
+      quick.push({ kind: "slot", index, live: false });
+    const listed = new Set(
+      quick.flatMap((item) => (item.kind === "folder" ? [folderKey(item.name)] : [])),
+    );
+    const open = orderedTabs(sessions, activeId).filter((session) => !taken.has(session.id));
+    // A favorite past quick access that is open is already among the open sites.
+    const openIds = new Set(open.map((session) => session.id));
+    const rest = groupByFolder(favorites, range(list.length, favorites.length))
+      .filter((entry) =>
+        entry.kind === "folder"
+          ? !listed.has(folderKey(entry.name))
+          : !(() => {
+              const session = sessionForFavorite(sessions, entry.favorite.url, sites);
+              return session !== undefined && openIds.has(session.id);
+            })(),
+      )
+      .map(itemOf);
+    return { quickItems: quick, openTabs: open, restItems: rest };
   }, [favorites, list, usable, sessions, sites, activeId]);
 
   const center: Point = gesture.phase === "dragging" ? gesture.position : resting;
   const fanOpen = gesture.phase === "fan";
   const hover = gesture.phase === "fan" ? gesture.hover : null;
+
+  /** A favorite's place in the quick-access menu, or past it: then it is only locked without Pro. */
+  const slotAt = (index: number) =>
+    list[index] ?? {
+      favorite: favorites[index] ?? null,
+      locked: !isPro && index >= FREE_QUICK_ACCESS_LIMIT,
+    };
 
   const select = (target: FanTarget) => {
     if (target.kind === "settings") openSheet("settings");
@@ -434,16 +470,17 @@ export function Fab() {
         }
       }
     } else {
-      const slot = list[target.index];
-      if (slot?.locked) openSheet("paywall");
-      else if (slot?.favorite) openFavorite(slot.favorite);
+      const slot = slotAt(target.index);
+      if (slot.locked) openSheet("paywall");
+      else if (slot.favorite) openFavorite(slot.favorite);
     }
   };
 
   const favoriteEntry = (index: number, section: number, open: boolean): Entry => {
-    const { favorite, locked } = list[index];
+    const { favorite, locked } = slotAt(index);
     const name = favorite?.name ?? "";
     return {
+      lane: "ring",
       target: { kind: "favorite", index },
       size: FAVORITE_SIZE,
       section,
@@ -469,7 +506,7 @@ export function Fab() {
               <ProIcon size={12} />
             </span>
           )}
-          {unread[index] > 0 && <UnreadBadge count={unread[index]} />}
+          {(unread[index] ?? 0) > 0 && <UnreadBadge count={unread[index]} />}
           {open && <OpenDot />}
         </>
       ),
@@ -479,6 +516,7 @@ export function Fab() {
   const folderEntry = (item: Extract<FavoriteItem, { kind: "folder" }>, section: number): Entry => {
     const unreadCount = item.members.reduce((sum, member) => sum + (unread[member.index] ?? 0), 0);
     return {
+      lane: "ring",
       target: { kind: "folder", name: item.name },
       size: FAVORITE_SIZE,
       section,
@@ -528,6 +566,7 @@ export function Fab() {
     const name = session.title?.trim() || displayHost(url);
     const icon = iconForUrl(url, favorites);
     return {
+      lane: "ring",
       target: { kind: "tab", sessionId: session.id },
       size: FAVORITE_SIZE,
       section: OPEN,
@@ -549,16 +588,18 @@ export function Fab() {
   };
 
   const tool = (
+    lane: "page" | "switches",
     kind: "history" | "tabs" | "stats" | "settings" | "colorPicker" | "techDetector" | "downloads",
     size: number,
     label: string,
     content: ReactNode,
-  ): Entry => ({ target: { kind }, size, section: TOOLS, label, content });
+  ): Entry => ({ lane, target: { kind }, size, section: QUICK, label, content });
 
-  const entries: Entry[] = [
-    tool("history", HISTORY_SIZE, t("fab.history"), <HistoryIcon />),
-    tool("tabs", TABS_SIZE, t("fab.tabs"), <TabsIcon />),
+  // Top to bottom, as the page column reads; a column running upward from the button lists the
+  // other way round.
+  const pageTop: Entry[] = [
     tool(
+      "page",
       "stats",
       STATS_SIZE,
       t("fab.usage"),
@@ -571,10 +612,16 @@ export function Fab() {
         )}
       </>,
     ),
+    tool("page", "tabs", TABS_SIZE, t("fab.tabs"), <TabsIcon />),
+    tool("page", "history", HISTORY_SIZE, t("fab.history"), <HistoryIcon />),
+    tool("page", "settings", SETTINGS_SIZE, t("fab.settings"), <SlidersIcon />),
+  ];
+  const switchTools: Entry[] = [
     {
+      lane: "switches",
       target: { kind: "incognito" },
       size: INCOGNITO_SIZE,
-      section: TOOLS,
+      section: QUICK,
       label: t(incognito.active ? "fab.leaveIncognito" : "fab.incognito"),
       active: incognito.active,
       pressed: incognito.active,
@@ -599,9 +646,10 @@ export function Fab() {
       ),
     },
     {
+      lane: "switches",
       target: { kind: "controls" },
       size: CONTROLS_SIZE,
-      section: TOOLS,
+      section: QUICK,
       label: t("fab.videoControls"),
       active: controlsOn,
       pressed: controlsOn,
@@ -609,9 +657,10 @@ export function Fab() {
       charging: controlsCharging,
     },
     {
+      lane: "switches",
       target: { kind: "darkMode" },
       size: DARK_MODE_SIZE,
-      section: TOOLS,
+      section: QUICK,
       label: t(pageSite ? "fab.darkModeSite" : "fab.darkMode"),
       active: darkOn,
       pressed: darkOn,
@@ -619,14 +668,23 @@ export function Fab() {
       charging: darkCharging,
     },
     ...(colorPickerOn
-      ? [tool("colorPicker", COLOR_PICKER_SIZE, t("fab.colorPicker"), <ColorPickerIcon />)]
+      ? [
+          tool(
+            "switches",
+            "colorPicker",
+            COLOR_PICKER_SIZE,
+            t("fab.colorPicker"),
+            <ColorPickerIcon />,
+          ),
+        ]
       : []),
     ...(techDetectorOn
-      ? [tool("techDetector", TECH_DETECTOR_SIZE, t("fab.techDetector"), <TechIcon />)]
+      ? [tool("switches", "techDetector", TECH_DETECTOR_SIZE, t("fab.techDetector"), <TechIcon />)]
       : []),
     ...(downloadsOn
       ? [
           tool(
+            "switches",
             "downloads",
             DOWNLOADS_SIZE,
             t("fab.downloads"),
@@ -644,20 +702,55 @@ export function Fab() {
           ),
         ]
       : []),
-    tool("settings", SETTINGS_SIZE, t("fab.settings"), <SlidersIcon />),
-    ...favoriteItems.filter((item) => item.live).map((item) => itemEntry(item, OPEN)),
-    ...otherTabs.map(tabEntry),
-    ...favoriteItems.filter((item) => !item.live).map((item) => itemEntry(item, CLOSED)),
+  ];
+  const ringEntries: Entry[] = [
+    ...quickItems.map((item) => itemEntry(item, QUICK)),
+    ...openTabs.map(tabEntry),
+    ...restItems.map((item) => itemEntry(item, REST)),
   ];
 
-  const dialItems: DialItem[] = entries.map(({ target, size, section }) => ({
+  const dialItems: DialItem[] = ringEntries.map(({ target, size, section }) => ({
     target,
     size,
     section,
   }));
   const arc = dialWindow(resting, position.edge, viewport, insets);
   const turned = clampRotation(rotation, dialItems, arc);
-  const slots = dialSlots(resting, position.edge, viewport, insets, dialItems, turned);
+  const ringSlots = dialSlots(resting, position.edge, viewport, insets, dialItems, turned);
+  const plan = toolPlan(resting, viewport, insets);
+  const pageItems = plan.pageSide > 0 ? pageTop : [...pageTop].reverse();
+  const pageMax = toolMaxScroll(
+    resting,
+    viewport,
+    insets,
+    plan.pageSide,
+    plan.pageStart,
+    pageItems.length,
+  );
+  const switchMax = toolMaxScroll(
+    resting,
+    viewport,
+    insets,
+    plan.switchSide,
+    plan.switchStart,
+    switchTools.length,
+  );
+  const pageScrolled = Math.min(Math.max(pageScroll, 0), pageMax);
+  const switchScrolled = Math.min(Math.max(switchScroll, 0), switchMax);
+  const entries = [...ringEntries, ...pageItems, ...switchTools];
+  const slots = [
+    ...ringSlots,
+    ...toolSlots(resting, viewport, insets, pageItems, plan.pageSide, plan.pageStart, pageScrolled),
+    ...toolSlots(
+      resting,
+      viewport,
+      insets,
+      switchTools,
+      plan.switchSide,
+      plan.switchStart,
+      switchScrolled,
+    ),
+  ];
 
   const folderMembers: FolderMember[] =
     folderName === null
@@ -700,6 +793,8 @@ export function Fab() {
         break;
       case "openFan":
         setRotation(0);
+        setPageScroll(0);
+        setSwitchScroll(0);
         setTurn(null);
         break;
       case "closeFan":
@@ -723,12 +818,25 @@ export function Fab() {
     gestureRef.current.phase === "fan" ? dialTargetAt(point, slots) : null;
 
   // Turning the dial: a finger dragging round the button moves the items with it.
-  const beginSpin = (event: PointerEvent<HTMLElement>) => {
+  /** What a finger at `point` turns: a column when it is on the column's line, else the ring. */
+  const laneAt = (point: Point): Lane => {
+    const dy = point.y - resting.y;
+    if (Math.abs(point.x - resting.x) > COLUMN_BAND || Math.abs(dy) < MIN_TURN_RADIUS)
+      return "ring";
+    return (dy > 0 ? 1 : -1) === plan.pageSide ? "page" : "switches";
+  };
+  const columnOf = (lane: "page" | "switches") =>
+    lane === "page"
+      ? { side: plan.pageSide, max: pageMax, value: pageScrolled, set: setPageScroll }
+      : { side: plan.switchSide, max: switchMax, value: switchScrolled, set: setSwitchScroll };
+  const valueOf = (lane: Lane) => (lane === "ring" ? turned : columnOf(lane).value);
+  const beginSpin = (event: PointerEvent<HTMLElement>, lane?: Lane) => {
     const start = pointOf(event);
+    const chosen = lane ?? laneAt(start);
     spin.current =
       Math.hypot(start.x - resting.x, start.y - resting.y) < MIN_TURN_RADIUS
         ? null
-        : { start, rotation: turned, moved: false };
+        : { lane: chosen, start, value: valueOf(chosen), moved: false };
     try {
       event.currentTarget.setPointerCapture(event.pointerId);
     } catch {
@@ -746,16 +854,23 @@ export function Fab() {
       stopDarkHold();
       setTurn("drag");
     }
+    if (current.lane !== "ring") {
+      // The buttons follow the finger along the line.
+      const column = columnOf(current.lane);
+      const slid = (-column.side * (point.y - current.start.y)) / TOOL_STEP;
+      column.set(Math.min(Math.max(current.value + slid, 0), column.max));
+      return;
+    }
     if (Math.hypot(point.x - resting.x, point.y - resting.y) < MIN_TURN_RADIUS) return;
     setRotation(
       clampRotation(
-        current.rotation + dialTurn(resting, position.edge, current.start, point),
+        current.value + dialTurn(resting, position.edge, current.start, point),
         dialItems,
         arc,
       ),
     );
   };
-  /** Lets go of the dial. True when it was turned, so the lift is not also a tap. */
+  /** Lets go of the dial or a column. True when it was moved, so the lift is not also a tap. */
   const endSpin = () => {
     const current = spin.current;
     spin.current = null;
@@ -763,7 +878,11 @@ export function Fab() {
     spunClick.current = true;
     window.setTimeout(() => (spunClick.current = false), 60);
     setTurn("snap");
-    setRotation(snapRotation(turned, dialItems, arc));
+    if (current.lane === "ring") setRotation(snapRotation(turned, dialItems, arc));
+    else {
+      const column = columnOf(current.lane);
+      column.set(snapToolScroll(column.value, column.max));
+    }
     return true;
   };
   const onWheel = (event: WheelEvent) => {
@@ -775,7 +894,13 @@ export function Fab() {
       return;
     lastWheel.current = event.timeStamp;
     setTurn("snap");
-    setRotation(snapRotation(turned + Math.sign(event.deltaY), dialItems, arc));
+    const lane = laneAt(pointOf(event));
+    if (lane === "ring") {
+      setRotation(snapRotation(turned + Math.sign(event.deltaY), dialItems, arc));
+      return;
+    }
+    const column = columnOf(lane);
+    column.set(snapToolScroll(column.value + Math.sign(event.deltaY), column.max));
   };
 
   const onPointerDown = (event: PointerEvent<HTMLButtonElement>) => {
@@ -889,7 +1014,7 @@ export function Fab() {
     <>
       <div
         data-hit={fanOpen ? "" : undefined}
-        onPointerDown={beginSpin}
+        onPointerDown={(event) => beginSpin(event)}
         onPointerMove={moveSpin}
         onPointerUp={() => {
           if (!endSpin()) dispatch({ type: "dismiss" });

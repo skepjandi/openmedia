@@ -117,6 +117,11 @@ export type FanTarget =
   | { kind: "downloads" }
   | { kind: "settings" };
 
+/**
+ * How far above and below straight out of the edge the favorites ring reaches. The rest of the
+ * half circle is left to the two columns of buttons that run straight up and down from the button.
+ */
+export const RING_HALF_SPAN = 60;
 /** Degrees between neighbouring items on the dial. */
 export const DIAL_STEP = 30;
 /** Distance from the button's centre to the centre of every dial item. */
@@ -124,7 +129,7 @@ export const DIAL_RADIUS = 120;
 /** Empty arc between two sections, in item steps. */
 const SECTION_GAP = 0.5;
 /** How far past the visible arc an item keeps fading out, in degrees. */
-const DIAL_FADE = DIAL_STEP * 0.7;
+const DIAL_FADE = DIAL_STEP * 0.5;
 /** Items fainter than this cannot be touched. */
 export const TOUCHABLE_OPACITY = 0.5;
 const TOUCH_SLACK = 10;
@@ -160,7 +165,7 @@ function dialPoint(origin: Point, edge: Edge, a: number): Point {
   return polar(origin, DIAL_RADIUS, edge === "left" ? a : 180 - a);
 }
 
-/** The part of the half circle where an item fits on screen, widest first around straight out. */
+/** The part of the ring where an item fits on screen, widest first around straight out. */
 export function dialWindow(origin: Point, edge: Edge, viewport: Size, insets: Insets): DialWindow {
   const reach = FAVORITE_SIZE / 2 + SCREEN_PADDING;
   const fits = (a: number) => {
@@ -173,9 +178,9 @@ export function dialWindow(origin: Point, edge: Edge, viewport: Size, insets: In
     );
   };
   let lo = 0;
-  while (lo > -90 && fits(lo - 1)) lo--;
+  while (lo > -RING_HALF_SPAN && fits(lo - 1)) lo--;
   let hi = 0;
-  while (hi < 90 && fits(hi + 1)) hi++;
+  while (hi < RING_HALF_SPAN && fits(hi + 1)) hi++;
   return { lo, hi };
 }
 
@@ -251,11 +256,7 @@ export function dialSlots(
     return {
       target: item.target,
       size: item.size,
-      center: dialPoint(
-        origin,
-        edge,
-        clamp(a, Math.max(-90, window.lo - DIAL_FADE), Math.min(90, window.hi + DIAL_FADE)),
-      ),
+      center: dialPoint(origin, edge, clamp(a, window.lo - DIAL_FADE, window.hi + DIAL_FADE)),
       opacity: clamp(1 - outside / DIAL_FADE, 0, 1),
     };
   });
@@ -269,4 +270,101 @@ export function dialTargetAt(point: Point, slots: readonly DialSlot[]): FanTarge
       Math.hypot(point.x - center.x, point.y - center.y) <= size / 2 + TOUCH_SLACK,
   );
   return hit?.target ?? null;
+}
+
+/** Distance between neighbouring buttons in a column. */
+export const TOOL_STEP = 52;
+/** From the button's centre to the first button of a column that keeps clear of the ring. */
+const TOOL_START = 132;
+/** The nearest a column's first button gets to the open button. */
+const TOOL_START_NEAR = 75;
+/** A button this fraction of a step past the end of its column's visible run has faded out. */
+const TOOL_FADE = TOOL_STEP * 0.6;
+const TOOL_REACH = TOOL_STEP / 2 + SCREEN_PADDING;
+
+/** A button in one of the two columns. */
+export interface ToolItem {
+  target: FanTarget;
+  size: number;
+}
+
+/** Where the two columns run: each straight up or down from the button, on opposite sides. */
+export interface ToolPlan {
+  /** 1 runs down the screen, -1 up. The page column (usage, tabs, history, settings) is here. */
+  pageSide: 1 | -1;
+  pageStart: number;
+  /** The switches column (incognito, video controls, dark mode, ...) is on the other side. */
+  switchSide: 1 | -1;
+  switchStart: number;
+}
+
+/** The page column goes where there is more room; the switches go across the button from it. */
+export function toolPlan(origin: Point, viewport: Size, insets: Insets): ToolPlan {
+  const below = viewport.height - insets.bottom - origin.y;
+  const above = origin.y - insets.top;
+  const pageSide = below >= above ? 1 : -1;
+  return {
+    pageSide,
+    // Below, the page column's nearest button (usage) sits just clear of the button.
+    pageStart: pageSide > 0 ? TOOL_START_NEAR : TOOL_START,
+    switchSide: pageSide > 0 ? -1 : 1,
+    switchStart: TOOL_START,
+  };
+}
+
+function toolEnd(origin: Point, viewport: Size, insets: Insets, side: number): number {
+  return side > 0
+    ? viewport.height - insets.bottom - TOOL_REACH - origin.y
+    : origin.y - insets.top - TOOL_REACH;
+}
+
+/** How far a column can slide: the last button comes to rest at the end of the visible run. */
+export function toolMaxScroll(
+  origin: Point,
+  viewport: Size,
+  insets: Insets,
+  side: number,
+  start: number,
+  count: number,
+): number {
+  const fit = Math.max(
+    1,
+    Math.floor((toolEnd(origin, viewport, insets, side) - start) / TOOL_STEP + 1e-6) + 1,
+  );
+  return Math.max(0, count - fit);
+}
+
+/** The column's rest position nearest to `scroll`: a whole number of buttons, within range. */
+export function snapToolScroll(scroll: number, max: number): number {
+  return Math.round(clamp(scroll, 0, max));
+}
+
+/**
+ * A column of buttons running straight up (`side` -1) or down (1) from the button, the first at
+ * `start`. `scroll` slides the buttons along the line, in button steps: 0 puts the first at
+ * `start`. Buttons slid out of the visible run fade away.
+ */
+export function toolSlots(
+  origin: Point,
+  viewport: Size,
+  insets: Insets,
+  items: readonly ToolItem[],
+  side: number,
+  start: number,
+  scroll: number,
+): DialSlot[] {
+  const end = toolEnd(origin, viewport, insets, side);
+  return items.map((item, k) => {
+    const distance = start + (k - scroll) * TOOL_STEP;
+    const outside = distance < start ? start - distance : distance > end ? distance - end : 0;
+    return {
+      target: item.target,
+      size: item.size,
+      center: {
+        x: origin.x,
+        y: origin.y + side * clamp(distance, start - TOOL_FADE, Math.max(start, end) + TOOL_FADE),
+      },
+      opacity: clamp(1 - outside / TOOL_FADE, 0, 1),
+    };
+  });
 }

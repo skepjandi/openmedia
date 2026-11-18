@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 import {
   DIAL_RADIUS,
+  RING_HALF_SPAN,
+  TOOL_STEP,
   FAB_SIZE,
   FAVORITE_SIZE,
   HOLD_SCALE,
@@ -19,6 +21,11 @@ import {
   separateVerticalPosition,
   snapRotation,
   snapToEdge,
+  snapToolScroll,
+  toolMaxScroll,
+  toolPlan,
+  toolSlots,
+  type ToolItem,
   type DialItem,
   type Insets,
 } from "./geometry";
@@ -79,18 +86,24 @@ const items: DialItem[] = [
 ];
 
 describe("dialWindow", () => {
-  it("is the whole half circle in the middle of the screen", () => {
+  it("is the whole ring in the middle of the screen", () => {
     const origin = fabCenter("left", 426, phone, insets);
-    expect(dialWindow(origin, "left", phone, insets)).toEqual({ lo: -90, hi: 90 });
+    expect(dialWindow(origin, "left", phone, insets)).toEqual({
+      lo: -RING_HALF_SPAN,
+      hi: RING_HALF_SPAN,
+    });
     const right = fabCenter("right", 426, phone, insets);
-    expect(dialWindow(right, "right", phone, insets)).toEqual({ lo: -90, hi: 90 });
+    expect(dialWindow(right, "right", phone, insets)).toEqual({
+      lo: -RING_HALF_SPAN,
+      hi: RING_HALF_SPAN,
+    });
   });
 
   it("loses the part that would leave the screen near the top", () => {
     const origin = fabCenter("left", 0, phone, insets);
     const { lo, hi } = dialWindow(origin, "left", phone, insets);
     expect(lo).toBeGreaterThan(-90);
-    expect(hi).toBe(90);
+    expect(hi).toBe(RING_HALF_SPAN);
   });
 });
 
@@ -134,7 +147,7 @@ describe("dialSlots", () => {
 
   it("shows only the items on the visible arc and fades the rest out", () => {
     const slots = dialSlots(origin, "left", phone, insets, items, 0);
-    expect(slots.slice(0, 6).every((slot) => slot.opacity === 1)).toBe(true);
+    expect(slots.slice(0, 4).every((slot) => slot.opacity === 1)).toBe(true);
     expect(slots[items.length - 1].opacity).toBe(0);
   });
 
@@ -204,6 +217,79 @@ describe("dial rotation", () => {
       expect(turn).toBeCloseTo(-1, 1);
       expect(dialTurn(at, edge, to, from)).toBeCloseTo(1, 1);
     }
+  });
+});
+
+const toolItems: ToolItem[] = [
+  { target: { kind: "stats" }, size: 44 },
+  { target: { kind: "tabs" }, size: 44 },
+  { target: { kind: "history" }, size: 44 },
+  { target: { kind: "settings" }, size: 44 },
+];
+
+describe("tool columns", () => {
+  const origin = fabCenter("left", 426, phone, insets);
+
+  it("put the page column where there is more room and the switches across the button", () => {
+    const high = toolPlan(fabCenter("left", 100, phone, insets), phone, insets);
+    expect([high.pageSide, high.switchSide]).toEqual([1, -1]);
+    const low = toolPlan(fabCenter("left", 800, phone, insets), phone, insets);
+    expect([low.pageSide, low.switchSide]).toEqual([-1, 1]);
+  });
+
+  it("run straight down or up from the button, one step apart, the first at the start", () => {
+    const plan = toolPlan(origin, phone, insets);
+    const slots = toolSlots(origin, phone, insets, toolItems, plan.pageSide, plan.pageStart, 0);
+    slots.forEach((slot, k) => {
+      expect(slot.center.x).toBe(origin.x);
+      expect(slot.center.y).toBeCloseTo(
+        origin.y + plan.pageSide * (plan.pageStart + k * TOOL_STEP),
+      );
+      expect(slot.opacity).toBe(1);
+    });
+  });
+
+  it("stay clear of the open button and of the ring", () => {
+    const plan = toolPlan(origin, phone, insets);
+    const column = toolSlots(
+      origin,
+      phone,
+      insets,
+      toolItems,
+      plan.switchSide,
+      plan.switchStart,
+      0,
+    );
+    const ring = dialSlots(origin, "left", phone, insets, items, 0).filter(
+      (slot) => slot.opacity === 1,
+    );
+    for (const a of column) {
+      for (const b of ring) {
+        const gap = Math.hypot(a.center.x - b.center.x, a.center.y - b.center.y);
+        expect(gap).toBeGreaterThanOrEqual((a.size + b.size) / 2);
+      }
+    }
+  });
+
+  it("slide along the line and fade out past the end of the screen", () => {
+    const high = origin;
+    const plan = toolPlan(high, phone, insets);
+    const max = toolMaxScroll(high, phone, insets, plan.pageSide, plan.pageStart, 8);
+    expect(max).toBeGreaterThan(0);
+    const many: ToolItem[] = Array.from({ length: 8 }, () => toolItems[0]);
+    const start = toolSlots(high, phone, insets, many, plan.pageSide, plan.pageStart, 0);
+    expect(start[7].opacity).toBe(0);
+    const end = toolSlots(high, phone, insets, many, plan.pageSide, plan.pageStart, max);
+    expect(end[7].opacity).toBe(1);
+    expect(end[0].opacity).toBe(0);
+  });
+
+  it("need no sliding when they fit, and settle on a whole button", () => {
+    const plan = toolPlan(origin, phone, insets);
+    expect(toolMaxScroll(origin, phone, insets, plan.pageSide, plan.pageStart, 4)).toBe(0);
+    expect(snapToolScroll(2.4, 5)).toBe(2);
+    expect(snapToolScroll(9, 5)).toBe(5);
+    expect(snapToolScroll(-1, 5)).toBe(0);
   });
 });
 

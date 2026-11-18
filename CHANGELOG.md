@@ -16,6 +16,14 @@ All notable changes to OpenMedia are documented here.
 
 **Verified:** Rust tests for each parser (Netscape HTML, Chromium JSON, history JSON/CSV, passwords CSV with quotes and line breaks, per-browser headers), the preview and apply (limits, refusals, nothing ticked changes nothing), the vault (round trip, no plain text in the file, tamper and wrong-key failure, update-not-duplicate, clear) and the fill policy (secure pages only, origin match, JSON-encoded values); the fill script run in WebKit (wrong origin refused, nearest field before the password field filled, hidden form untouched). **Not verified:** any of it in the app on a device: the file picker on iOS and Android, the owner check, filling on real login pages (three unrelated sites, per invariant 9), Linux without a Secret Service. Windows and Linux builds share the code. Other browsers' databases are not read directly and open tabs, extensions and sessions are not imported.
 
+### fix(fab): the ring holds only favorites; the other buttons keep their columns
+
+**Area:** `fix(fab)`
+
+**Change:** The floating button's turning ring now holds only favorites: quick access first, then the open sites that are not quick access, then every other favorite (a folder is one item). Usage, tabs, history and settings are back in their column and incognito, video controls, dark mode and the optional tools in theirs, straight up and down from the button on opposite sides as before. Each column slides along its line when dragged (or with the wheel) and settles on a whole button; with nothing to slide they sit where they always did.
+
+**Verified:** Vitest for the ring window and the column geometry (placement, clearance from the ring, sliding, fading). **Not verified:** a phone or the desktop window by eye. When the button is near the top or bottom and a column does not fit, its far buttons are slid into view instead of the old fallback layouts.
+
 ### feat(fab): a rotary dial with folders of favorites
 
 **Area:** `feat(fab)`
