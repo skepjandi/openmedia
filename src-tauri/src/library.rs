@@ -19,8 +19,8 @@ use crate::ai::{AiSettings, MAX_PROVIDERS, ProviderConfig, ProviderInput};
 use crate::dark_mode::{DarkMode, SiteDark};
 use crate::error::{Error, Result};
 use crate::recipes::{OptionChoices, OptionValue};
+use crate::tiles::Tiles;
 use crate::video_controls::{MAX_HEIGHT as MAX_VIDEO_HEIGHT, SiteVideo, VideoControls};
-use crate::workspaces::{Workspace, WorkspaceInput};
 use tauri_plugin_siteview::site::site_of_host;
 
 const FORMAT_VERSION: u32 = 4;
@@ -140,6 +140,11 @@ pub struct Folder {
     pub name: String,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub icon: Option<String>,
+    /// How the desktop window manager arranges the folder's favorites when the folder is dropped
+    /// on the page; each window is a favorite of the folder, by its address. None opens a default
+    /// arrangement.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub layout: Option<Tiles>,
 }
 
 impl Favorite {
@@ -171,8 +176,6 @@ pub struct AppState {
     pub favorites: Vec<Favorite>,
     /// The folders the user manages, with their icons; includes empty ones.
     pub folders: Vec<Folder>,
-    /// The window layouts the user saved, which the floating button lists beside the favorites.
-    pub workspaces: Vec<Workspace>,
     pub history: Vec<String>,
     pub last_url: Option<String>,
     /// The pages behind `last_url`, oldest first, so Back still works after a restart.
@@ -219,8 +222,6 @@ struct LibraryData {
     favorites: Vec<Favorite>,
     #[serde(default)]
     folders: Vec<Folder>,
-    #[serde(default)]
-    workspaces: Vec<Workspace>,
     last_url: Option<String>,
     #[serde(default)]
     last_back: Vec<String>,
@@ -362,7 +363,6 @@ impl Library {
         Ok(AppState {
             profile_id: data.profile_id,
             favorites: with_icons(&data, &data.favorites),
-            workspaces: data.workspaces.clone(),
             folders: data.folders.clone(),
             history: data.history.clone(),
             last_url: data.last_url.clone(),
@@ -411,15 +411,6 @@ impl Library {
         data.favorites = favorites;
         self.save(&data)?;
         Ok(with_icons(&data, &data.favorites))
-    }
-
-    /// Replaces the saved window layouts. Each is checked, and none is kept when one is refused.
-    pub fn set_workspaces(&self, inputs: Vec<WorkspaceInput>) -> Result<Vec<Workspace>> {
-        let workspaces = crate::workspaces::from_inputs(inputs)?;
-        let mut data = self.lock()?;
-        data.workspaces = workspaces.clone();
-        self.save(&data)?;
-        Ok(workspaces)
     }
 
     /// The folders of the normal set or, for incognito, of the private one.
@@ -1080,7 +1071,6 @@ fn default_data() -> LibraryData {
         profile_id: Uuid::new_v4(),
         favorites: default_favorites(),
         folders: Vec::new(),
-        workspaces: Vec::new(),
         last_url: None,
         last_back: Vec::new(),
         onboarded: false,
@@ -1133,9 +1123,11 @@ fn folders_from_input(inputs: Vec<Folder>) -> Result<Vec<Folder>> {
         {
             continue;
         }
+        let layout = input.layout.map(crate::tiles::validated).transpose()?;
         folders.push(Folder {
             name: name.to_owned(),
             icon,
+            layout,
         });
     }
     Ok(folders)
@@ -1444,6 +1436,7 @@ mod tests {
         let folder = |name: &str, icon: Option<&str>| Folder {
             name: name.to_owned(),
             icon: icon.map(str::to_owned),
+            layout: None,
         };
         let saved = library
             .set_folders(

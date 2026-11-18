@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { favoriteStartUrl, usableQuickAccess } from "../shared/favorites";
+import { asInput, favoriteStartUrl, folderKey, usableQuickAccess } from "../shared/favorites";
 import {
   assistantReducer,
   initialAssistant,
@@ -45,8 +45,6 @@ import {
   type Favorite,
   type FavoriteInput,
   type Folder,
-  type Workspace,
-  type WorkspaceInput,
   type OptionValue,
   type SearchEngine,
   type SiteSettings,
@@ -55,8 +53,10 @@ import {
 } from "../shared/ipc";
 import { hiddenTabIds, tabAfterClose } from "../features/tabs/tabs";
 import {
+  arrange,
   contains,
   equalize,
+  flipPane,
   fromTiles,
   leaves,
   neighborOf,
@@ -65,15 +65,17 @@ import {
   setRatio,
   swapPanes,
   tileUrls,
-  toTiles,
+  tilesForFolder,
   withoutSessions,
   asLayout,
+  type Arrangement,
   type Drop,
   type DropIntent,
   type Heading,
   type Layout,
   type Path,
 } from "../features/tiling/layout";
+import { windowsToFolder } from "../features/tiling/folderSave";
 import { useEntitlementStore } from "../features/paywall/store";
 import { isProRequired } from "../features/paywall/ipc";
 import { detectLocale, resolveLocale, type Locale } from "../i18n/locales";
@@ -171,11 +173,12 @@ export type SessionAction = { nonce: number } & (
   | { type: "openAll"; opens: { id: string; url: string }[]; focus: string }
 );
 
-/** What a drop on the page carries: a favorite or an address to open, or a page that is already open. */
+/** What a drop on the page carries: a favorite or an address to open, a page that is already open, or a whole folder. */
 export type DroppedPage =
   | { kind: "favorite"; favorite: Pick<Favorite, "url" | "landing"> }
   | { kind: "address"; url: string }
-  | { kind: "session"; id: string };
+  | { kind: "session"; id: string }
+  | { kind: "folder"; name: string };
 
 /** The picker's progress: the layer waits for a tap, then the color it read is shown. */
 export type ColorPickState =
@@ -289,7 +292,8 @@ export interface AppStore {
   /**
    * A page dropped on a window: a favorite opens (or its live session comes) beside the target,
    * or in its place for the middle; an open session moves there. A null target is a drop on an
-   * empty page, which starts over with that page alone.
+   * empty page, which starts over with that page alone. A folder always starts over, opened in
+   * its layout.
    */
   dropPage: (page: DroppedPage, target: string | null, drop: Drop) => void;
   /** Puts the window beside the one in front in front. */
@@ -307,12 +311,17 @@ export interface AppStore {
   /** A handle between two windows was dragged: the split takes this ratio. */
   resizeSplit: (path: Path, ratio: number) => void;
   equalizeWindows: () => void;
-  /** Opens a saved layout: a live page for each window where there is one, a new one where not. */
-  openWorkspace: (workspace: Workspace) => void;
-  /** Saves the windows as they are under a name; false when there is nothing to save. */
-  saveWorkspace: (name: string) => Promise<boolean>;
-  /** Replaces the saved layouts. True when they were saved. */
-  saveWorkspaces: (workspaces: WorkspaceInput[]) => Promise<boolean>;
+  /** The split that holds the window in front turns: side by side becomes stacked, and back. */
+  flipWindow: () => void;
+  /** Lays every window out again, side by side, stacked or as a grid. */
+  arrangeWindows: (arrangement: Arrangement) => void;
+  /**
+   * Opens a folder's favorites in its layout (a default one when it has none): a live page for
+   * each window where there is one, a new one where not. One favorite just opens.
+   */
+  openFolder: (name: string) => void;
+  /** Saves the windows as a folder, which keeps their layout; false when there is nothing to save. */
+  saveWindowsToFolder: (name: string) => Promise<boolean>;
   setSessionState: (state: SiteViewState) => void;
   /** A native `open` failed: forget the session and go back to the one that was showing. */
   sessionOpenFailed: (id: string) => void;
@@ -878,9 +887,11 @@ export const useApp = create<AppStore>((set, get) => {
     },
 
     dropPage: (page, target, drop) => {
-      set(target === null ? { layout: null, tileIntent: null } : { tileIntent: { target, drop } });
+      const fresh = target === null || page.kind === "folder";
+      set(fresh ? { layout: null, tileIntent: null } : { tileIntent: { target, drop } });
       if (page.kind === "favorite") get().openFavorite(page.favorite);
       else if (page.kind === "address") get().openAddress(page.url);
+      else if (page.kind === "folder") get().openFolder(page.name);
       else get().openSession(page.id);
       set({ tileIntent: null });
     },
@@ -923,12 +934,33 @@ export const useApp = create<AppStore>((set, get) => {
     equalizeWindows: () =>
       set((current) => ({ layout: current.layout && equalize(current.layout) })),
 
-    openWorkspace: (workspace) => {
+    flipWindow: () => {
+      const { layout, activeId } = get();
+      if (layout && activeId) set({ layout: flipPane(layout, activeId) });
+    },
+
+    arrangeWindows: (arrangement) =>
+      set((current) => ({ layout: current.layout && arrange(current.layout, arrangement) })),
+
+    openFolder: (name) => {
+      const key = folderKey(name);
+      const members = selectQuickFavorites(get()).filter(
+        (favorite) => folderKey(favorite.folder) === key,
+      );
+      const saved = selectQuickFolders(get()).find((folder) => folderKey(folder.name) === key);
+      const tiles = tilesForFolder(
+        saved?.layout ?? null,
+        members.map((favorite) => ({ url: favorite.url, start: favoriteStartUrl(favorite) })),
+      );
+      if (tiles === null) {
+        if (members.length > 0) get().openFavorite(members[0]);
+        return;
+      }
       const now = Date.now();
       const taken = new Set<string>();
       const created: Session[] = [];
       const opens: { id: string; url: string }[] = [];
-      const ids = tileUrls(workspace.layout).map((url) => {
+      const ids = tileUrls(tiles).map((url) => {
         const live = findFavoriteSession(
           get().sessions.filter((session) => !taken.has(session.id)),
           url,
@@ -941,7 +973,7 @@ export const useApp = create<AppStore>((set, get) => {
         }
         return id;
       });
-      const layout = asLayout(fromTiles(workspace.layout, (_url, index) => ids[index]));
+      const layout = asLayout(fromTiles(tiles, (_url, index) => ids[index]));
       set((current) => ({
         sessions: [...current.sessions, ...created],
         layout,
@@ -957,30 +989,17 @@ export const useApp = create<AppStore>((set, get) => {
       get().trimSessions("routine");
     },
 
-    saveWorkspace: async (name) => {
+    saveWindowsToFolder: async (name) => {
       const { layout, sessions, state, incognito } = get();
-      if (incognito.active || layout === null) return false;
-      const tiles = toTiles(
+      if (incognito.active || layout === null || state === null) return false;
+      const next = windowsToFolder(
+        name,
         layout,
         (id) => sessions.find((session) => session.id === id)?.openedUrl ?? null,
+        state.favorites.map(asInput),
+        state.folders,
       );
-      if (tiles === null) return false;
-      const saved = (state?.workspaces ?? []).map(({ id, name, layout }) => ({ id, name, layout }));
-      return get().saveWorkspaces([...saved, { name, layout: tiles }]);
-    },
-
-    saveWorkspaces: async (workspaces) => {
-      try {
-        const saved = await library.setWorkspaces(workspaces);
-        set((current) => ({
-          state: current.state && { ...current.state, workspaces: saved },
-          error: null,
-        }));
-        return true;
-      } catch (error) {
-        set({ error: appError(error) });
-        return false;
-      }
+      return next !== null && get().saveFolders(next.folders, next.favorites);
     },
 
     setSessionState: (page) =>

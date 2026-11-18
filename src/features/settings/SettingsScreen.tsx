@@ -14,7 +14,6 @@ import { DarkModeLink } from "./DarkModeScreen";
 import { VideoControlsLink } from "./VideoControlsScreen";
 import { AiSection } from "./AiSection";
 import { FavoritesSection } from "./FavoritesSection";
-import { WorkspacesSection } from "../tiling/WorkspacesSection";
 import { IncognitoFavoritesSection, IncognitoRecipesLink } from "./IncognitoSections";
 import { LibraryLinks } from "../library/Links";
 import { RecipesLink } from "./RecipesScreen";
@@ -92,7 +91,6 @@ function CategoryPanel({
       return (
         <>
           <FavoritesSection />
-          <WorkspacesSection />
           <RecipesLink />
           <LibraryLinks />
         </>

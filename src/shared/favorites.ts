@@ -226,9 +226,11 @@ export function saveFolder(
     (folder) => folderKey(folder.name) === folderKey(name) && folderKey(folder.name) !== fromKey,
   );
   if (taken) return null;
-  const next: Folder = icon ? { name, icon } : { name };
   const kept = folderChoices(favorites, folders);
   const at = kept.findIndex((folder) => folderKey(folder.name) === fromKey);
+  // Editing the name and icon keeps the arrangement the folder opens as.
+  const layout = at >= 0 ? kept[at].layout : undefined;
+  const next: Folder = { name, ...(icon ? { icon } : {}), ...(layout ? { layout } : {}) };
   if (at >= 0) kept[at] = next;
   else kept.push(next);
   return {
@@ -284,7 +286,7 @@ export function resolveLanding(input: string, favoriteUrl: string): string | nul
 }
 
 /** The name a new favorite gets: the site's host, or the site it belongs to, short enough for the library to accept. */
-function favoriteName(url: string): string {
+export function favoriteName(url: string): string {
   const host = displayHost(url);
   if (host.length <= MAX_FAVORITE_NAME_CHARS) return host;
   const site = siteOf(url);

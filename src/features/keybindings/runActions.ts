@@ -10,7 +10,7 @@ import { VIDEO_CONTROLS_DEFAULT } from "../../shared/videoControls";
 import { usePalette } from "./paletteStore";
 import { useKeybindings } from "./store";
 import { RESIZE_STEP } from "../tiling/layout";
-import { useWorkspaceDialog } from "../tiling/workspaceDialog";
+import { useFolderDialog } from "../tiling/folderDialog";
 
 type Runner = (count: number) => void | Promise<void>;
 
@@ -177,9 +177,13 @@ const RUNNERS: Readonly<Record<string, Runner>> = {
   "tile.grow": (count) => repeat(count, () => app().resizeWindow(RESIZE_STEP)),
   "tile.shrink": (count) => repeat(count, () => app().resizeWindow(-RESIZE_STEP)),
   "tile.equalize": () => app().equalizeWindows(),
+  "tile.flip": () => app().flipWindow(),
+  "tile.arrangeRow": () => app().arrangeWindows("row"),
+  "tile.arrangeColumn": () => app().arrangeWindows("column"),
+  "tile.arrangeGrid": () => app().arrangeWindows("grid"),
   "tile.close": () => app().closeWindow(),
   "tile.only": () => app().keepOnlyWindow(),
-  "tile.saveWorkspace": () => useWorkspaceDialog.getState().setOpen(true),
+  "tile.saveFolder": () => useFolderDialog.getState().setOpen(true),
 
   "tool.colorPick": () => (app().state?.colorPicker ? app().startColorPick() : undefined),
   "tool.techDetect": () => (app().state?.techDetector ? app().startTechDetect() : undefined),

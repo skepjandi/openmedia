@@ -316,7 +316,7 @@ function DropOverlay({ bounds }: { bounds: Rect }) {
           className="pointer-events-none absolute z-40 grid place-items-center rounded-lg border-2 border-accent bg-accent/25"
         >
           <span className="rounded-full bg-ink/85 px-3 py-1 text-xs font-medium text-paper">
-            {t(DROP_LABELS[landing.drop])}
+            {t(drag.page.kind === "folder" ? "tile.dropFolder" : DROP_LABELS[landing.drop])}
           </span>
         </div>
       )}

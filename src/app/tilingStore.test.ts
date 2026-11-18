@@ -7,7 +7,7 @@ vi.mock("@tauri-apps/api/event", () => ({ listen: vi.fn() }));
 import { useApp } from "./store";
 import { newSession } from "../features/web/sessions";
 import { leaves, pane, type Layout } from "../features/tiling/layout";
-import type { Workspace } from "../shared/ipc";
+import type { Tiles } from "../shared/ipc";
 
 const S = (id: string, url = `https://${id}.example/`) => newSession(id, "typed", url, Date.now());
 const row = (first: Layout, second: Layout): Layout => ({
@@ -150,23 +150,27 @@ describe("windows in the store", () => {
   });
 });
 
-describe("saved layouts", () => {
-  const workspace: Workspace = {
-    id: "w",
-    name: "Desk",
-    layout: {
-      kind: "split",
-      direction: "row",
-      ratio: 0.5,
-      first: { kind: "pane", url: "https://a.example/" },
-      second: { kind: "pane", url: "https://new.example/" },
-    },
-  };
+describe("folders as layouts", () => {
+  const favorite = (name: string, folder = "Desk") => ({
+    id: name,
+    name,
+    url: `https://${name}.example/`,
+    notify: true,
+    folder,
+  });
+  const withFolder = (layout?: Tiles) =>
+    useApp.setState({
+      state: {
+        favorites: [favorite("a"), favorite("new"), favorite("other", "Else")],
+        folders: [{ name: "Desk", ...(layout ? { layout } : {}) }],
+      } as never,
+    });
 
   beforeEach(() => setup(["a"], null));
 
-  it("opens a live page where there is one and a new session where not, and brings the layout up", () => {
-    useApp.getState().openWorkspace(workspace);
+  it("opens a folder in its default layout, reusing live pages and opening the rest", () => {
+    withFolder();
+    useApp.getState().openFolder("desk");
     const { sessions, layout, activeId, action } = useApp.getState();
     expect(sessions).toHaveLength(2);
     expect(layout && leaves(layout)).toHaveLength(2);
@@ -177,47 +181,81 @@ describe("saved layouts", () => {
     ]);
   });
 
-  it("gives two windows on one address a session each", () => {
-    const twice: Workspace = {
-      ...workspace,
-      layout: {
-        ...(workspace.layout as Extract<Workspace["layout"], { kind: "split" }>),
-        second: { kind: "pane", url: "https://a.example/" },
-      },
-    };
-    useApp.getState().openWorkspace(twice);
-    const ids = layoutIds() ?? [];
-    expect(new Set(ids).size).toBe(2);
+  it("opens a folder in the layout it was saved in", () => {
+    withFolder({
+      kind: "split",
+      direction: "column",
+      ratio: 0.3,
+      first: { kind: "pane", url: "https://new.example/" },
+      second: { kind: "pane", url: "https://a.example/" },
+    });
+    useApp.getState().openFolder("Desk");
+    const { layout, sessions } = useApp.getState();
+    expect(layout).toMatchObject({ kind: "split", direction: "column", ratio: 0.3 });
+    const order = layout ? leaves(layout) : [];
+    expect(sessions.find((s) => s.id === order[1])?.openedUrl).toBe("https://a.example/");
   });
 
-  it("saves the windows with the address each was opened with", async () => {
+  it("dropping a folder on the page starts over with its windows", () => {
+    setup(["a", "b", "c"], row(pane("b"), pane("c")), "b");
+    withFolder();
+    useApp.getState().dropPage({ kind: "folder", name: "Desk" }, "b", "left");
+    const { layout, activeId } = useApp.getState();
+    expect(layout && leaves(layout)).toHaveLength(2);
+    expect(layout && leaves(layout)).toContain("a");
+    expect(activeId).toBe("a");
+  });
+
+  it("a folder of one favorite just opens it", () => {
+    useApp.setState({
+      state: { favorites: [favorite("solo", "One")], folders: [] } as never,
+    });
+    useApp.getState().openFolder("One");
+    expect(useApp.getState().layout).toBeNull();
+    expect(useApp.getState().sessions).toHaveLength(2);
+  });
+
+  it("saves the windows as a folder, keeping their layout", async () => {
     setup(["a", "b"], row(pane("a"), pane("b")), "a");
-    useApp.setState({ state: { workspaces: [] } as never });
-    invoke.mockImplementation((_command: string, args: { workspaces: unknown[] }) =>
-      Promise.resolve(args.workspaces.map((entry, i) => ({ id: `id${i}`, ...(entry as object) }))),
+    useApp.setState({ state: { favorites: [], folders: [] } as never });
+    invoke.mockImplementation((_command: string, args: Record<string, unknown>) =>
+      Promise.resolve(args.favorites ?? args.folders),
     );
-    await expect(useApp.getState().saveWorkspace("Pair")).resolves.toBe(true);
-    expect(invoke).toHaveBeenCalledWith("set_workspaces", {
-      workspaces: [
-        {
-          name: "Pair",
-          layout: {
-            kind: "split",
-            direction: "row",
-            ratio: 0.5,
-            first: { kind: "pane", url: "https://a.example/" },
-            second: { kind: "pane", url: "https://b.example/" },
-          },
-        },
-      ],
+    await expect(useApp.getState().saveWindowsToFolder("Pair")).resolves.toBe(true);
+    const saved = invoke.mock.calls.find(([command]) => command === "set_folders")?.[1] as {
+      folders: { name: string; layout: unknown }[];
+    };
+    expect(saved.folders[0]).toMatchObject({
+      name: "Pair",
+      layout: {
+        kind: "split",
+        direction: "row",
+        first: { kind: "pane", url: "https://a.example/" },
+        second: { kind: "pane", url: "https://b.example/" },
+      },
     });
   });
 
   it("saves nothing when there is no layout, or while incognito", async () => {
-    await expect(useApp.getState().saveWorkspace("Solo")).resolves.toBe(false);
+    await expect(useApp.getState().saveWindowsToFolder("Solo")).resolves.toBe(false);
     setup(["a", "b"], row(pane("a"), pane("b")), "a");
     useApp.setState({ incognito: { active: true, favorites: [], folders: [], busy: false } });
-    await expect(useApp.getState().saveWorkspace("Hidden")).resolves.toBe(false);
+    await expect(useApp.getState().saveWindowsToFolder("Hidden")).resolves.toBe(false);
     expect(invoke).not.toHaveBeenCalled();
+  });
+});
+
+describe("changing the arrangement", () => {
+  it("flips the split of the window in front and arranges all windows again", () => {
+    setup(["a", "b", "c"], row(pane("a"), row(pane("b"), pane("c"))), "c");
+    useApp.getState().flipWindow();
+    const flipped = useApp.getState().layout;
+    expect(
+      flipped?.kind === "split" && flipped.second.kind === "split" && flipped.second.direction,
+    ).toBe("column");
+    useApp.getState().arrangeWindows("column");
+    const column = useApp.getState().layout;
+    expect(column?.kind === "split" && column.direction).toBe("column");
+    expect(layoutIds()).toEqual(["a", "b", "c"]);
   });
 });

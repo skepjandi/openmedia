@@ -31,6 +31,7 @@ export function FolderPopup({
   onPick,
   onClose,
   onCarry,
+  onOpenAll,
 }: {
   name: string;
   /** The emoji the user gave the folder, if any. */
@@ -40,6 +41,8 @@ export function FolderPopup({
   onClose: () => void;
   /** A favorite was dragged out of the popup (desktop): it goes with the pointer. */
   onCarry?: (member: FolderMember, event: PointerEvent<HTMLButtonElement>) => void;
+  /** Opens every favorite in the folder side by side, in the folder's layout (desktop). */
+  onOpenAll?: () => void;
 }) {
   const press = useRef<{ x: number; y: number } | null>(null);
   const t = useT();
@@ -63,6 +66,15 @@ export function FolderPopup({
             <FolderIcon size={18} />
           )}
           <span className="min-w-0 flex-1 truncate">{name}</span>
+          {onOpenAll && members.length > 1 && (
+            <button
+              type="button"
+              onClick={onOpenAll}
+              className="shrink-0 rounded-full border border-hair px-3 py-1 text-xs font-medium text-paper/85"
+            >
+              {t("tile.openFolder")}
+            </button>
+          )}
         </div>
         <div className="grid grid-cols-3 gap-x-2 gap-y-4">
           {members.map((member) => (

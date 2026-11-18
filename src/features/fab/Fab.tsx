@@ -96,7 +96,6 @@ import {
   SlidersIcon,
   StatsIcon,
   TabsIcon,
-  TilesIcon,
   VideoControlsIcon,
 } from "../../shared/icons";
 import { useBackHandler } from "../back/useBackHandler";
@@ -105,10 +104,7 @@ import { useEntitlementStore } from "../paywall/store";
 import { useDownloadsStore } from "../downloads/store";
 import { setVideoPanel } from "../settings/videoPanel";
 import { selectFabHidden, useKeybindings } from "../keybindings/store";
-import type { Workspace } from "../../shared/ipc";
 import { beginTileDrag } from "../tiling/dragStore";
-
-const NO_WORKSPACES: readonly Workspace[] = [];
 
 const idle: GestureState = { phase: "idle" };
 
@@ -221,11 +217,9 @@ const targetKey = (target: FanTarget) =>
     ? `favorite:${target.index}`
     : target.kind === "tab"
       ? `tab:${target.sessionId}`
-      : target.kind === "workspace"
-        ? `workspace:${target.id}`
-        : target.kind === "folder"
-          ? `folder:${folderKey(target.name) ?? target.name}`
-          : target.kind;
+      : target.kind === "folder"
+        ? `folder:${folderKey(target.name) ?? target.name}`
+        : target.kind;
 
 const sameTarget = (a: FanTarget | null, b: FanTarget) =>
   a !== null && targetKey(a) === targetKey(b);
@@ -495,13 +489,12 @@ function FloatingButton() {
   const hover = gesture.phase === "fan" ? gesture.hover : null;
 
   const desktop = useApp((s) => s.desktop);
-  const workspaces = useApp((s) => s.state?.workspaces);
-  const openWorkspace = useApp((s) => s.openWorkspace);
-  const savedWorkspaces =
-    desktop && !incognito.active ? (workspaces ?? NO_WORKSPACES) : NO_WORKSPACES;
-  /** The favorite or open page a dial button stands for, which can be dragged onto the page. */
+  const openFolder = useApp((s) => s.openFolder);
+  /** The favorite, folder or open page a dial button stands for, which can be dragged onto the page. */
   const carryOf = (target: FanTarget): Carry | null => {
     if (!desktop) return null;
+    if (target.kind === "folder")
+      return { page: { kind: "folder", name: target.name }, label: target.name };
     if (target.kind === "tab") {
       const session = sessions.find((entry) => entry.id === target.sessionId);
       if (!session) return null;
@@ -546,9 +539,6 @@ function FloatingButton() {
       } else void setDarkMode({ enabled: !darkOn });
     } else if (target.kind === "controls") {
       setVideoPanel(!controlsOn);
-    } else if (target.kind === "workspace") {
-      const workspace = savedWorkspaces.find((entry) => entry.id === target.id);
-      if (workspace) openWorkspace(workspace);
     } else {
       const slot = slotAt(target.index);
       if (slot.locked) openSheet("paywall");
@@ -778,20 +768,8 @@ function FloatingButton() {
         ]
       : []),
   ];
-  const workspaceEntry = (workspace: Workspace): Entry => ({
-    lane: "ring",
-    target: { kind: "workspace", id: workspace.id },
-    size: FAVORITE_SIZE,
-    section: QUICK,
-    label: t("tile.workspaceOpen", { name: workspace.name }),
-    caption: workspace.name,
-    site: true,
-    className: "text-white",
-    content: <TilesIcon />,
-  });
   const ringEntries: Entry[] = [
     ...quickItems.map((item) => itemEntry(item, QUICK)),
-    ...savedWorkspaces.map(workspaceEntry),
     ...openTabs.map(tabEntry),
     ...restItems.map((item) => itemEntry(item, REST)),
   ];
@@ -1143,6 +1121,14 @@ function FloatingButton() {
           icon={folderIcon(folders, folderName)}
           members={folderMembers}
           onClose={() => setFolderName(null)}
+          onOpenAll={
+            desktop
+              ? () => {
+                  openFolder(folderName);
+                  setFolderName(null);
+                }
+              : undefined
+          }
           onCarry={
             desktop
               ? (member, event) => {

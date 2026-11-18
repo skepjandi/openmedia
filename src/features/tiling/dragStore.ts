@@ -75,8 +75,15 @@ export function registerDropMap(read: (() => DropMap | null) | null) {
   readMap = read;
 }
 
+/**
+ * Where a drop at `point` would land. A folder opens in a layout of its own, so it covers the
+ * whole page area whichever window the pointer is over.
+ */
 export const currentDropTarget = (point: Point): DropTarget | null => {
   const map = readMap?.() ?? null;
+  if (map && useTileDrag.getState().drag?.page.kind === "folder") {
+    return within(map.page, point) ? { target: null, drop: "center", area: map.page } : null;
+  }
   return map ? resolveDrop(map, point) : null;
 };
 

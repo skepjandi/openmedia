@@ -6,6 +6,14 @@ All notable changes to OpenMedia are documented here.
 >
 > **Wiki**: the [GitHub Wiki](https://github.com/skepjandi/openmedia/wiki) is the public-facing main wiki — architecture, recipe format, AI pipeline, security model, roadmap. Source-controlled editing surface is `docs/wiki/` in this repo; CI (`.github/workflows/sync-wiki.yml`) mirrors it to the GitHub Wiki on every merge to `main`. New single-PR changes belong here, not as new wiki pages.
 
+### feat(desktop): folders are window layouts, and keys to change the layout
+
+**Area:** `feat(desktop)`
+
+**Change:** The saved-layout list is gone: a folder is the saved layout. Dragging a folder from the floating button's dial onto the page (or *Open all in windows* in its popup) opens its favorites in the layout the folder was saved in, or a default one (two side by side, three a main window and a stack, four a grid) when it has none; opening the folder and dragging one favorite still works like any site. *Save the windows as a folder* files each window's page as a favorite in the named folder and keeps the arrangement. New actions: `tile.flip` (turn the window's split between side by side and stacked), `tile.arrangeRow` / `arrangeColumn` / `arrangeGrid`, with Standard `Mod+Alt+/` and `Mod+Alt+1/2/3` and Vim `Ctrl+w x`. `Folder.layout` in `library.rs`; `set_workspaces` and `Window layouts` in Settings are removed.
+
+**Verified:** vitest (layout arrangements, folder defaults and merging, folder saving, store flows), `cargo test` for `tiles` and folder persistence. **Not verified:** in the running desktop app.
+
 ### feat(video-controls): a reworked panel with double-tap skip, a speed list, live streams, keys and a skip length
 
 **Area:** `feat(video-controls)`, `fix(video-controls)`

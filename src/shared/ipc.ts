@@ -147,32 +147,20 @@ export interface FavoriteInput {
   folder?: string | null;
 }
 
-/** A folder the user manages: a name and, when chosen, an emoji icon. Without one it shows what is in it. */
-export interface Folder {
-  name: string;
-  icon?: string;
-}
-
 /** How a split divides its room: `row` puts the halves side by side, `column` stacks them. */
 export type TileDirection = "row" | "column";
 
-/** A saved window layout: a page by the address it opens, or two halves of a rectangle. */
+/** A window layout: a page by the address it opens, or two halves of a rectangle. */
 export type Tiles =
   | { kind: "pane"; url: string }
   | { kind: "split"; direction: TileDirection; ratio: number; first: Tiles; second: Tiles };
 
-/** A window layout the user saved. The floating button lists it beside the favorites. */
-export interface Workspace {
-  id: string;
+/** A folder the user manages: a name and, when chosen, an emoji icon. Without one it shows what is in it. */
+export interface Folder {
   name: string;
-  layout: Tiles;
-}
-
-export interface WorkspaceInput {
-  /** Kept when a layout is saved again; left out for a new one. */
-  id?: string;
-  name: string;
-  layout: Tiles;
+  icon?: string;
+  /** How the desktop window manager arranges its favorites when it is dropped on the page; each window is a favorite of the folder by its `url`. Absent opens a default arrangement. */
+  layout?: Tiles;
 }
 
 export interface AppState {
@@ -180,8 +168,6 @@ export interface AppState {
   favorites: Favorite[];
   /** The folders, including empty ones; favorites name the folder they are in. */
   folders: Folder[];
-  /** The saved window layouts. */
-  workspaces: Workspace[];
   /** Addresses the user typed, newest first. */
   history: string[];
   lastUrl: string | null;
@@ -626,8 +612,6 @@ export const library = {
     return request;
   },
   setFavorites: (favorites: FavoriteInput[]) => invoke<Favorite[]>("set_favorites", { favorites }),
-  setWorkspaces: (workspaces: WorkspaceInput[]) =>
-    invoke<Workspace[]>("set_workspaces", { workspaces }),
   setFolders: (folders: Folder[]) => invoke<Folder[]>("set_folders", { folders }),
   /** Adds a recipe's site to the favorites, or removes the site's favorites. */
   setSiteFavorite: (recipeId: string, favorite: boolean) =>

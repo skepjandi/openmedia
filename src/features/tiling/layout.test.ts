@@ -3,11 +3,13 @@ import type { Tiles } from "../../shared/ipc";
 import {
   GAP,
   MAX_PANES,
+  arrange,
   asLayout,
   dividers,
   dropArea,
   dropZone,
   equalize,
+  flipPane,
   fromTiles,
   insertPane,
   leaves,
@@ -23,6 +25,8 @@ import {
   setRatio,
   successorOf,
   swapPanes,
+  tilesForFolder,
+  tileUrls,
   withoutSessions,
   toTiles,
   type Layout,
@@ -337,5 +341,103 @@ describe("moving by how the layout is arranged", () => {
     expect(neighborOf(layout, "c", "left")).toBe("a");
     expect(neighborOf(layout, "c", "up")).toBe("b");
     expect(neighborOf(layout, "b", "up")).toBeNull();
+  });
+});
+
+describe("arranging windows again", () => {
+  const layout = row(pane("a"), column(pane("b"), pane("c")));
+
+  it("lays every window out side by side or stacked, keeping their order and giving each the same room", () => {
+    const sideBySide = arrange(layout, "row");
+    expect(leaves(sideBySide)).toEqual(["a", "b", "c"]);
+    const rects = paneRects(sideBySide, { x: 0, y: 0, width: 906, height: 100 }, 0);
+    expect([...rects.values()].map((rect) => Math.round(rect.width))).toEqual([302, 302, 302]);
+    const stacked = paneRects(
+      arrange(layout, "column"),
+      { x: 0, y: 0, width: 100, height: 900 },
+      0,
+    );
+    expect([...stacked.values()].map((rect) => Math.round(rect.height))).toEqual([300, 300, 300]);
+  });
+
+  it("makes a grid of four", () => {
+    const grid = paneRects(
+      arrange(row(pane("a"), row(pane("b"), row(pane("c"), pane("d")))), "grid"),
+      { x: 0, y: 0, width: 200, height: 200 },
+      0,
+    );
+    expect([...grid.values()].map((r) => [r.x, r.y, r.width, r.height])).toEqual([
+      [0, 0, 100, 100],
+      [0, 100, 100, 100],
+      [100, 0, 100, 100],
+      [100, 100, 100, 100],
+    ]);
+  });
+
+  it("turns the split that holds the window", () => {
+    expect(flipPane(row(pane("a"), pane("b")), "a")).toEqual(column(pane("a"), pane("b")));
+    const nested = row(pane("a"), column(pane("b"), pane("c")));
+    expect(flipPane(nested, "c")).toEqual(row(pane("a"), row(pane("b"), pane("c"))));
+    expect(flipPane(pane("a"), "a")).toEqual(pane("a"));
+  });
+});
+
+describe("what a folder opens as", () => {
+  const member = (name: string) => ({
+    url: `https://${name}.example/`,
+    start: `https://${name}.example/home`,
+  });
+  const urls = (tiles: Tiles | null) => (tiles ? tileUrls(tiles) : null);
+
+  it("is a default arrangement without a saved layout", () => {
+    expect(tilesForFolder(null, [member("a")])).toBeNull();
+    expect(urls(tilesForFolder(null, [member("a"), member("b")]))).toEqual([
+      "https://a.example/home",
+      "https://b.example/home",
+    ]);
+    const three = tilesForFolder(null, [member("a"), member("b"), member("c")]) as Tiles;
+    expect(three.kind === "split" && three.direction === "row" && three.second.kind).toBe("split");
+  });
+
+  it("keeps at most eight windows", () => {
+    const many = "abcdefghij".split("").map(member);
+    expect(urls(tilesForFolder(null, many))).toHaveLength(8);
+  });
+
+  it("keeps a saved layout, by each favorite's start address", () => {
+    const saved = toTiles(
+      column(pane("https://b.example/"), pane("https://a.example/")),
+      (id) => id,
+    ) as Tiles;
+    const tiles = tilesForFolder(saved, [member("a"), member("b")]) as Tiles;
+    expect(tiles.kind === "split" && tiles.direction).toBe("column");
+    expect(urls(tiles)).toEqual(["https://b.example/home", "https://a.example/home"]);
+  });
+
+  it("drops a window whose favorite left and adds one that joined", () => {
+    const saved = toTiles(
+      row(
+        pane("https://a.example/"),
+        row(pane("https://gone.example/"), pane("https://b.example/")),
+      ),
+      (id) => id,
+    ) as Tiles;
+    const tiles = tilesForFolder(saved, [member("a"), member("b"), member("new")]);
+    expect(urls(tiles)).toEqual([
+      "https://a.example/home",
+      "https://b.example/home",
+      "https://new.example/home",
+    ]);
+  });
+
+  it("falls back to the default when too little of the saved layout is left", () => {
+    const saved = toTiles(
+      row(pane("https://x.example/"), pane("https://y.example/")),
+      (id) => id,
+    ) as Tiles;
+    expect(urls(tilesForFolder(saved, [member("a"), member("b")]))).toEqual([
+      "https://a.example/home",
+      "https://b.example/home",
+    ]);
   });
 });

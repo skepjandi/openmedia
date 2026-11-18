@@ -10,12 +10,10 @@ pub type Result<T> = std::result::Result<T, Error>;
 pub enum Error {
     #[error("a favorite needs a name of 1-20 characters")]
     InvalidFavoriteName,
-    #[error("a folder needs a name of 1-20 characters and an icon of at most 8")]
+    #[error(
+        "a folder needs a name of 1-20 characters, an icon of at most 8, and a layout of 2 to 8 web addresses"
+    )]
     InvalidFolder,
-    #[error("a layout needs a name of 1-20 characters, and 2 to 8 pages that are web addresses")]
-    InvalidWorkspace,
-    #[error("window layouts cannot be saved while incognito")]
-    WorkspaceInIncognito,
     #[error("a landing page must be an address on the favorite's own site")]
     InvalidLanding,
     #[error("no such site to favorite")]

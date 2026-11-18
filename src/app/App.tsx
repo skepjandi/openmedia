@@ -10,7 +10,7 @@ import { Fab } from "../features/fab/Fab";
 import { CommandBar } from "../features/sheet/CommandBar";
 import { HistorySheet } from "../features/history/HistorySheet";
 import { FavoritesSheet } from "../features/tabs/FavoritesSheet";
-import { SaveWorkspaceDialog } from "../features/tiling/SaveWorkspaceDialog";
+import { SaveFolderDialog } from "../features/tiling/SaveFolderDialog";
 import { TabsSheet } from "../features/tabs/TabsSheet";
 import { startUsageTracking } from "../features/stats/tracker";
 import { UsageGuard } from "../features/stats/UsageGuard";
@@ -200,7 +200,7 @@ export function App() {
       <DownloadToast />
       <CommandBar />
       <CommandPalette />
-      <SaveWorkspaceDialog />
+      <SaveFolderDialog />
       <AssistantDock />
       <HistorySheet />
       <ChatsSheet />

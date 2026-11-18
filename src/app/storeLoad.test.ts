@@ -36,7 +36,6 @@ const startup = {
   videoSites: {},
   darkMode: DARK_MODE_DEFAULT,
   darkSites: {},
-  workspaces: [],
   bootSession: { id: "boot-session", url: "https://m.youtube.com/watch?v=example" },
   desktop: false,
 } satisfies Startup;

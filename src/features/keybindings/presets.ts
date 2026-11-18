@@ -46,6 +46,10 @@ const STANDARD: Bindings = {
   "tile.grow": ["Mod+Alt+]"],
   "tile.shrink": ["Mod+Alt+["],
   "tile.equalize": ["Mod+Alt+="],
+  "tile.flip": ["Mod+Alt+/"],
+  "tile.arrangeRow": ["Mod+Alt+1"],
+  "tile.arrangeColumn": ["Mod+Alt+2"],
+  "tile.arrangeGrid": ["Mod+Alt+3"],
   "tile.close": ["Mod+Alt+w"],
   "tile.only": ["Mod+Alt+o"],
 
@@ -112,6 +116,7 @@ const VIM: Bindings = {
   "tile.grow": withStandard("tile.grow", "Ctrl+w +"),
   "tile.shrink": withStandard("tile.shrink", "Ctrl+w -"),
   "tile.equalize": withStandard("tile.equalize", "Ctrl+w ="),
+  "tile.flip": withStandard("tile.flip", "Ctrl+w x"),
   "tile.close": withStandard("tile.close", "Ctrl+w q"),
   "tile.only": withStandard("tile.only", "Ctrl+w o"),
 

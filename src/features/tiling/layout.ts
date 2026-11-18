@@ -444,3 +444,79 @@ export const UNIT: Rect = { x: 0, y: 0, width: 1000, height: 1000 };
 export function neighborOf(layout: Layout, from: string, heading: Heading): string | null {
   return neighbor(paneRects(layout, UNIT, 0), from, heading);
 }
+
+/** A balanced tree over `ids` in reading order, alternating side by side and stacked; three make a main window and a stack of two. */
+function balanced(ids: readonly string[], depth = 0): Layout {
+  if (ids.length === 1) return pane(ids[0]);
+  const at = Math.floor(ids.length / 2);
+  return split(
+    depth % 2 === 0 ? "row" : "column",
+    balanced(ids.slice(0, at), depth + 1),
+    balanced(ids.slice(at), depth + 1),
+  );
+}
+
+/** Every window the same size, in one direction. */
+function chain(ids: readonly string[], direction: Direction): Layout {
+  if (ids.length === 1) return pane(ids[0]);
+  return split(direction, pane(ids[0]), chain(ids.slice(1), direction), 1 / ids.length);
+}
+
+/** The arrangements the layout can be changed to without changing which pages it holds. */
+export type Arrangement = "row" | "column" | "grid";
+
+/** The same windows, in the same order, laid out again. */
+export function arrange(layout: Layout, arrangement: Arrangement): Layout {
+  const ids = leaves(layout);
+  if (ids.length < 2) return layout;
+  return arrangement === "grid" ? balanced(ids) : chain(ids, arrangement);
+}
+
+/** The split that holds window `id` turns the other way: side by side becomes stacked and back. */
+export function flipPane(layout: Layout, id: string): Layout {
+  if (layout.kind === "pane") return layout;
+  const direct =
+    (layout.first.kind === "pane" && layout.first.id === id) ||
+    (layout.second.kind === "pane" && layout.second.id === id);
+  if (direct) return { ...layout, direction: layout.direction === "row" ? "column" : "row" };
+  return contains(layout.first, id)
+    ? { ...layout, first: flipPane(layout.first, id) }
+    : { ...layout, second: flipPane(layout.second, id) };
+}
+
+/** What a folder opens as when it has no layout of its own: up to `MAX_PANES` pages, one window each. */
+export function defaultTiles(urls: readonly string[]): Tiles | null {
+  const shown = urls.slice(0, MAX_PANES);
+  return shown.length < 2 ? null : toTiles(balanced(shown), (id) => id);
+}
+
+/** A folder's favorite: its address, which a saved layout names, and the address its window opens. */
+export interface Member {
+  url: string;
+  start: string;
+}
+
+/**
+ * The windows a folder opens as. The saved layout is kept as far as it still holds: a window
+ * whose favorite left the folder goes, and a favorite added since joins on the right. Without a
+ * usable layout (none saved, or fewer than two windows left) the default arrangement is used.
+ * Each window is by the address its favorite starts at. Null for fewer than two favorites.
+ */
+export function tilesForFolder(saved: Tiles | null, members: readonly Member[]): Tiles | null {
+  const first = new Map<string, Member>();
+  for (const member of members) if (!first.has(member.url)) first.set(member.url, member);
+  const known = [...first.values()].slice(0, MAX_PANES);
+  if (known.length < 2) return null;
+  const start = new Map(known.map((member) => [member.url, member.start]));
+
+  let layout: Layout | null = saved ? fromTiles(saved, (url) => url) : null;
+  for (const id of layout ? leaves(layout) : []) {
+    if (!start.has(id) && layout) layout = removePane(layout, id);
+  }
+  if (layout === null || leaves(layout).length < 2) return defaultTiles(known.map((m) => m.start));
+  for (const member of known) {
+    const last = leaves(layout).slice(-1)[0];
+    if (!contains(layout, member.url)) layout = insertPane(layout, last, "right", member.url);
+  }
+  return toTiles(layout, (id) => start.get(id) ?? null);
+}

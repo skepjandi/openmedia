@@ -3,21 +3,21 @@ import { useApp } from "../../app/store";
 import { useT } from "../../i18n/useT";
 import { MAX_FAVORITE_NAME_CHARS } from "../../shared/favorites";
 import { useBackHandler } from "../back/useBackHandler";
-import { useWorkspaceDialog } from "./workspaceDialog";
+import { useFolderDialog } from "./folderDialog";
 
-/** Names the windows as they are now and keeps them as a layout the floating button can open. */
-export function SaveWorkspaceDialog() {
-  const open = useWorkspaceDialog((s) => s.open);
+/** Names the folder the windows are saved as, which keeps their layout. */
+export function SaveFolderDialog() {
+  const open = useFolderDialog((s) => s.open);
   const desktop = useApp((s) => s.desktop);
   return open && desktop ? <DialogBody /> : null;
 }
 
 function DialogBody() {
   const t = useT();
-  const close = () => useWorkspaceDialog.getState().setOpen(false);
+  const close = () => useFolderDialog.getState().setOpen(false);
   const layout = useApp((s) => s.layout);
   const incognito = useApp((s) => s.incognito.active);
-  const saveWorkspace = useApp((s) => s.saveWorkspace);
+  const saveWindowsToFolder = useApp((s) => s.saveWindowsToFolder);
   const [name, setName] = useState("");
   const [busy, setBusy] = useState(false);
   const input = useRef<HTMLInputElement>(null);
@@ -34,7 +34,7 @@ function DialogBody() {
     event.preventDefault();
     if (blocked || busy || !name.trim()) return;
     setBusy(true);
-    const saved = await saveWorkspace(name.trim());
+    const saved = await saveWindowsToFolder(name.trim());
     setBusy(false);
     if (saved) close();
   };
@@ -52,18 +52,21 @@ function DialogBody() {
         {blocked ? (
           <p className="text-sm text-paper/65">{blocked}</p>
         ) : (
-          <input
-            ref={input}
-            value={name}
-            onChange={(event) => setName(event.target.value)}
-            maxLength={MAX_FAVORITE_NAME_CHARS}
-            placeholder={t("tile.saveName")}
-            aria-label={t("tile.saveName")}
-            autoCapitalize="off"
-            autoCorrect="off"
-            spellCheck={false}
-            className="rounded-xl border border-hair bg-transparent px-3 py-2.5 text-sm outline-none focus:border-accent"
-          />
+          <>
+            <input
+              ref={input}
+              value={name}
+              onChange={(event) => setName(event.target.value)}
+              maxLength={MAX_FAVORITE_NAME_CHARS}
+              placeholder={t("tile.saveName")}
+              aria-label={t("tile.saveName")}
+              autoCapitalize="off"
+              autoCorrect="off"
+              spellCheck={false}
+              className="rounded-xl border border-hair bg-transparent px-3 py-2.5 text-sm outline-none focus:border-accent"
+            />
+            <p className="text-xs leading-snug text-paper/55">{t("tile.saveHint")}</p>
+          </>
         )}
         <div className="flex justify-end gap-2">
           <button
