@@ -1009,4 +1009,6 @@ export const ru: Messages = {
   "settings.fabHiddenNote": "Hidden. Switch it back on here, or press {keys}.",
   "settings.fabLocked":
     "To hide it, keep a way back: keyboard shortcuts on, and a key for Settings, the command palette or this switch.",
+  "settings.videoGroupPanel": "Panel",
+  "settings.videoGroupPlayback": "Playback",
 };

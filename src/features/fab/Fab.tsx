@@ -95,6 +95,7 @@ import { useBackHandler } from "../back/useBackHandler";
 import logoMark from "../../assets/logo-mark.svg";
 import { useEntitlementStore } from "../paywall/store";
 import { useDownloadsStore } from "../downloads/store";
+import { setVideoPanel } from "../settings/videoPanel";
 import { selectFabHidden, useKeybindings } from "../keybindings/store";
 
 const idle: GestureState = { phase: "idle" };
@@ -319,7 +320,6 @@ function FloatingButton() {
   const exitIncognito = useApp((s) => s.exitIncognito);
   const sheet = useApp((s) => s.sheet);
   const controlsOn = useApp((s) => (s.state?.videoControls ?? VIDEO_CONTROLS_DEFAULT).panel);
-  const setVideoControls = useApp((s) => s.setVideoControls);
   const darkMode = useApp((s) => s.state?.darkMode ?? DARK_MODE_DEFAULT);
   const darkSites = useApp((s) => s.state?.darkSites);
   const savedFavorites = useApp((s) => s.state?.favorites);
@@ -462,15 +462,7 @@ function FloatingButton() {
         void setSiteDarkMode(pageSite, { ...darkSites?.[pageSite], mode: darkOn ? "off" : "on" });
       } else void setDarkMode({ enabled: !darkOn });
     } else if (target.kind === "controls") {
-      // The quick switch is for every site: a site's own "on" would keep the panel showing there.
-      const next = !controlsOn;
-      void setVideoControls({ panel: next });
-      if (!next) {
-        const { state, setSiteVideoControls } = useApp.getState();
-        for (const [site, own] of Object.entries(state?.videoSites ?? {})) {
-          if (own.panel === true) void setSiteVideoControls(site, { ...own, panel: undefined });
-        }
-      }
+      setVideoPanel(!controlsOn);
     } else {
       const slot = slotAt(target.index);
       if (slot.locked) openSheet("paywall");

@@ -5,6 +5,8 @@ import { runBackHandler } from "../back/backStack";
 import { useFind } from "../find/findStore";
 import { hiddenTabIds } from "../tabs/tabs";
 import { activateFocused, focusEdge, moveFocus, scrollSheet } from "./dom";
+import { setVideoPanel } from "../settings/videoPanel";
+import { VIDEO_CONTROLS_DEFAULT } from "../../shared/videoControls";
 import { usePalette } from "./paletteStore";
 import { useKeybindings } from "./store";
 
@@ -158,6 +160,8 @@ const RUNNERS: Readonly<Record<string, Runner>> = {
 
   "tool.colorPick": () => (app().state?.colorPicker ? app().startColorPick() : undefined),
   "tool.techDetect": () => (app().state?.techDetector ? app().startTechDetect() : undefined),
+  "tool.videoControls": () =>
+    setVideoPanel(!(app().state?.videoControls ?? VIDEO_CONTROLS_DEFAULT).panel),
   "tool.adBlock": () => app().setAdBlock(!app().state?.adBlock),
   "tool.blockPopups": () => app().setBlockPopups(!app().state?.blockPopups),
   "tool.theme": () => {

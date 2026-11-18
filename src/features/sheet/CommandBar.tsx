@@ -50,6 +50,7 @@ export function CommandBar() {
   const submitRequest = useApp((s) => s.submitRequest);
   const editRequest = useApp((s) => s.editRequest);
   const t = useT();
+  const desktop = useApp((s) => s.desktop);
   const [notice, setNotice] = useState<string | null>(null);
   const [blocked, setBlocked] = useState(false);
   // The mode the user picked; `null` means automatic: a site that already has a chat is a chat.
@@ -214,19 +215,20 @@ export function CommandBar() {
     site,
   });
 
-  const tool = "grid size-11 place-items-center rounded-full text-paper/80 disabled:opacity-25";
+  const tool =
+    "grid size-11 place-items-center rounded-full text-paper/80 hover:bg-paper/[0.08] disabled:opacity-25 desktop:size-9 desktop:rounded-lg";
 
   return (
     <div
       data-hit={open ? "" : undefined}
       onPointerDown={closeSheet}
-      className={`fixed inset-0 z-40 ${open ? "" : "pointer-events-none"}`}
+      className={`fixed inset-0 z-40 ${open ? "desktop:bg-black/35" : "pointer-events-none"}`}
     >
       <section
         ref={barRef}
         data-open={open}
         onPointerDown={(event) => event.stopPropagation()}
-        className="command-bar glass absolute inset-x-3 top-[calc(var(--safe-top)+8px)] rounded-3xl p-3"
+        className="command-bar glass absolute inset-x-3 top-[calc(var(--safe-top)+8px)] rounded-3xl p-3 desktop:top-[12vh] desktop:mx-auto desktop:max-w-2xl desktop:rounded-2xl desktop:p-2.5 desktop:shadow-2xl"
       >
         {chatVisible && (
           <div className="mb-3">
@@ -260,8 +262,13 @@ export function CommandBar() {
                   setNotice(null);
                   setBlocked(false);
                 }}
-                className="min-w-0 flex-1 bg-transparent px-2 py-2 text-base text-paper outline-none placeholder:text-paper/40"
+                className="min-w-0 flex-1 bg-transparent px-2 py-2 text-base text-paper outline-none placeholder:text-paper/40 desktop:py-2.5 desktop:text-lg"
               />
+              {desktop && (
+                <kbd className="keycap" aria-hidden="true">
+                  ↵
+                </kbd>
+              )}
               <button type="submit" disabled={hubBusy}>
                 <ArrowIcon />
               </button>
@@ -290,7 +297,9 @@ export function CommandBar() {
                       else setModeChoice(option);
                     }}
                     className={`flex flex-1 items-center justify-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-medium ${
-                      mode === option ? "bg-accent text-on-accent" : "text-paper/70 bg-paper/[0.06]"
+                      mode === option
+                        ? "bg-accent text-on-accent"
+                        : "text-paper/70 bg-paper/[0.06] hover:bg-paper/[0.1]"
                     } ${locked ? "opacity-45" : ""}`}
                   >
                     {t(`commandBar.mode.${option}`)}
@@ -442,9 +451,18 @@ export function CommandBar() {
             <button
               type="button"
               aria-label={t("commandBar.close")}
-              className={tool}
+              className={
+                desktop
+                  ? "flex h-9 items-center gap-2 rounded-lg px-3 text-paper/80 hover:bg-paper/[0.08]"
+                  : tool
+              }
               onClick={closeSheet}
             >
+              {desktop && (
+                <kbd className="keycap" aria-hidden="true">
+                  Esc
+                </kbd>
+              )}
               <CloseIcon />
             </button>
           </div>

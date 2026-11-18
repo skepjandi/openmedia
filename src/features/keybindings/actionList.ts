@@ -87,6 +87,7 @@ export const ACTIONS: readonly ActionInfo[] = [
 
   action("tools", "tool.colorPick", "Pick a color"),
   action("tools", "tool.techDetect", "Detect the page's technologies"),
+  action("tools", "tool.videoControls", "Turn video controls on or off"),
   action("tools", "tool.adBlock", "Turn ad blocking on or off"),
   action("tools", "tool.blockPopups", "Turn pop-up blocking on or off"),
   action("tools", "tool.theme", "Switch between system, light and dark"),

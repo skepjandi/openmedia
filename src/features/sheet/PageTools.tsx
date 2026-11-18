@@ -11,7 +11,7 @@ import { useFind } from "../find/findStore";
 const NO_SITES: readonly string[] = [];
 
 const tool =
-  "flex min-w-0 flex-1 flex-col items-center gap-1 rounded-xl px-1 py-2 text-xs text-paper/80 active:bg-paper/[0.08] disabled:opacity-30";
+  "flex min-w-0 flex-1 flex-col items-center gap-1 rounded-xl px-1 py-2 text-xs text-paper/80 hover:bg-paper/[0.06] active:bg-paper/[0.08] disabled:opacity-30";
 
 /** The page's own actions that a browser's menu has: find, share, desktop site, clear site data. */
 export function PageTools({ onDone }: { onDone: () => void }) {

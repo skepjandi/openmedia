@@ -3,7 +3,10 @@ import { useT } from "../../i18n/useT";
 import { Screen } from "../../shared/Screen";
 import { VIDEO_CONTROLS_DEFAULT } from "../../shared/videoControls";
 import { NavRow } from "./SiteParts";
+import { Switch } from "./Switch";
 import { VideoControlsFields } from "./VideoControlsFields";
+import { VideoPanelPreview } from "./VideoPanelPreview";
+import { setVideoPanel } from "./videoPanel";
 import { Group } from "./ui";
 
 /** The row in Settings that opens the video controls page. */
@@ -33,6 +36,7 @@ export function VideoControlsScreen() {
   const parent = useApp((s) => s.sheetParent);
   const controls = useApp((s) => s.state?.videoControls ?? VIDEO_CONTROLS_DEFAULT);
   const setVideoControls = useApp((s) => s.setVideoControls);
+  const desktop = useApp((s) => s.desktop);
   const t = useT();
   if (!open) return null;
 
@@ -43,8 +47,21 @@ export function VideoControlsScreen() {
       closeLabel={t(parent === "settings" ? "common.back" : "settings.close")}
       onClose={closeSheet}
       back={parent === "settings"}
+      sidebar={desktop ? <VideoPanelPreview value={controls} /> : undefined}
     >
-      <VideoControlsFields value={controls} change={(changes) => void setVideoControls(changes)} />
+      <div className="flex flex-col gap-8">
+        <Group>
+          <Switch
+            label={t("favorites.videoPanel")}
+            checked={controls.panel}
+            onChange={setVideoPanel}
+          />
+        </Group>
+        <VideoControlsFields
+          value={controls}
+          change={(changes) => void setVideoControls(changes)}
+        />
+      </div>
     </Screen>
   );
 }

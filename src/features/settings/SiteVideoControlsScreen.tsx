@@ -6,6 +6,7 @@ import { Screen } from "../../shared/Screen";
 import { VIDEO_CONTROLS_DEFAULT, effectiveVideo } from "../../shared/videoControls";
 import { Segmented } from "./Segmented";
 import { VideoControlsFields } from "./VideoControlsFields";
+import { VideoPanelPreview } from "./VideoPanelPreview";
 import { Group, quietButton } from "./ui";
 
 /**
@@ -21,6 +22,7 @@ export function SiteVideoControlsScreen() {
   const general = useApp((s) => s.state?.videoControls ?? VIDEO_CONTROLS_DEFAULT);
   const stored = useApp((s) => (site ? s.state?.videoSites[site] : undefined));
   const setSiteVideoControls = useApp((s) => s.setSiteVideoControls);
+  const desktop = useApp((s) => s.desktop);
   const t = useT();
   if (!open || !site || name === null) return null;
 
@@ -40,6 +42,7 @@ export function SiteVideoControlsScreen() {
       closeLabel={t(parent === "settings" ? "common.back" : "settings.close")}
       onClose={closeSheet}
       back={parent === "settings"}
+      sidebar={desktop ? <VideoPanelPreview value={effective} /> : undefined}
     >
       <div className="flex flex-col gap-9">
         <div className="flex flex-col gap-2">

@@ -6,6 +6,14 @@ All notable changes to OpenMedia are documented here.
 >
 > **Wiki**: the [GitHub Wiki](https://github.com/skepjandi/openmedia/wiki) is the public-facing main wiki — architecture, recipe format, AI pipeline, security model, roadmap. Source-controlled editing surface is `docs/wiki/` in this repo; CI (`.github/workflows/sync-wiki.yml`) mirrors it to the GitHub Wiki on every merge to `main`. New single-PR changes belong here, not as new wiki pages.
 
+### feat(desktop): Spotlight-style command bar and palette, and a video controls page with a live preview
+
+**Area:** `feat(desktop)`
+
+**Change:** On desktop the command bar and the command palette open as a centered panel over a dimmed page, with key hints (`Esc`, `Enter`, arrows), hover states, and each action's group in the palette. The video controls pages split into Panel and Playback, with a sketch of the feed that moves the panel as its height changes. The general page now has the controls panel switch itself, and the action `tool.videoControls` (palette, any key) turns it on or off, so it is reachable with the floating button hidden.
+
+**Not verified:** visually, in the running desktop app; `ts:check`, lint, format and tests pass.
+
 ### feat(desktop): hide the floating button, and Settings laid out for a desktop window
 
 **Area:** `feat(desktop)`
