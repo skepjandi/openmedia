@@ -97,16 +97,32 @@ export interface ActivityStep {
   total: number | null;
 }
 
+/** A page of the site an answer points to; `url` is on the page's own host. */
+export interface AnswerLink {
+  label: string;
+  url: string;
+}
+
+/** What the assistant said to a question about the site. Nothing was changed. */
+export interface Answer {
+  text: string;
+  links: AnswerLink[];
+}
+
+/** How a sent request ended: a change waiting for the user, or an answer to read. */
+export type Reply = { type: "proposal"; proposal: Proposal } | { type: "answer"; answer: Answer };
+
 /** How an earlier request of the chat ended, as the next request's prompt hears of it. */
 export interface EarlierTurn {
   request: string;
-  outcome: "applied" | "rejected" | "failed";
+  outcome: "applied" | "rejected" | "failed" | "answered";
 }
 
 export type TurnOutcome =
   | { status: "proposed"; proposal: Proposal }
   | { status: "accepted"; proposal: Proposal }
   | { status: "rejected"; proposal: Proposal }
+  | { status: "answered"; answer: Answer }
   | { status: "failed"; kind: string; text: string | null };
 
 export interface ChatTurn {
@@ -142,11 +158,14 @@ export const assistant = {
   /** Reads the open page, redacts it and builds the request. Nothing leaves the device yet. */
   prepare: (request: string, earlier: EarlierTurn[]) =>
     invoke<PreparedRequest>("ai_prepare", { chat: { request, earlier } }),
-  /** Sends a prepared request and previews the answer on the page; `onActivity` hears each step. */
+  /**
+   * Sends a prepared request. A change is previewed on the page; a question is answered in
+   * words. `onActivity` hears each step.
+   */
   send: (id: string, onActivity: (step: ActivityStep) => void) => {
     const channel = new Channel<ActivityStep>();
     channel.onmessage = onActivity;
-    return invoke<Proposal>("ai_send", { id, onActivity: channel });
+    return invoke<Reply>("ai_send", { id, onActivity: channel });
   },
   /** Searches the bundled recipe library and returns a validated, unsaved hub proposal. */
   buildHub: (request: string) => invoke<HubProposal>("ai_hub_build", { request }),

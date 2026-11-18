@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { useApp } from "../../app/store";
 import { useT } from "../../i18n/useT";
 import { ActivityList } from "./ActivityList";
+import { AnswerView } from "./AnswerView";
 import { AssistantBubble, RequestBubble } from "./ChatBubbles";
 import type { AssistantState } from "./flow";
 import { ProposalDetails } from "./ProposalDetails";
@@ -121,6 +122,17 @@ function LiveBody({ state, compact }: { state: Live; compact: boolean }) {
               }}
             >
               {t("assistant.openInSettings")}
+            </button>
+          </Actions>
+        </Body>
+      );
+    case "answered":
+      return (
+        <Body>
+          <AnswerView answer={state.answer} />
+          <Actions>
+            <button type="button" className={primary} onClick={() => cancel()}>
+              {t("common.done")}
             </button>
           </Actions>
         </Body>

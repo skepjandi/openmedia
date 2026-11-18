@@ -113,10 +113,29 @@ request in flight.
 - **The card.** A proposal shows the switch it would add or turn on, with the rules it hides and
   how many elements each rule found on the page, and the Accept / Reject / Ask again buttons. The
   page behind already shows the preview.
-- **Header.** *Chat history* opens the list of the site's chats (each with its recipe and date,
-  and a button to delete one); *New chat* starts a blank one for the site.
+- **Answers.** A question ([Questions about the site](./ai-assistant.md#questions-about-the-site))
+  is answered as a bubble, with the pages it points to as buttons that open them.
+- **Header.** *All chats* opens the chats page; *Chat history* opens the list of the site's chats
+  (each with its recipe and date, and a button to delete one); *New chat* starts a blank one for
+  the site.
 - **While it works.** The bar keeps the steps visible as they come in, so the wait shows what is
   happening. The dock over the page shows the same card while the bar is closed.
+
+## The chats page
+
+*All chats* in the header of the chat (`features/ai/ChatsSheet.tsx`, sheet `chats`) opens a
+full-screen page of every saved chat, in this order:
+
+- **Recent.** The five latest chats across all sites, each with its site, recipe and date.
+- **Favorites.** One dropdown per favorite. Closed it shows the site and how many chats it has;
+  open it lists those chats, or says there are none.
+- **History.** The same dropdown for every history address.
+
+A chat belongs to a site, so a dropdown lists the chats of that address's registrable domain
+(two addresses of one site list the same chats). Tapping a chat shows the live session on its site
+or opens the site (at the favorite's or history address, else the site's home page), then opens the
+chat bar on that chat in Chat mode (`openChat`). The button that opens the page sits in the chat
+bar, which is Pro; in incognito the page lists only the chats of that incognito session.
 
 ## Tabs
 

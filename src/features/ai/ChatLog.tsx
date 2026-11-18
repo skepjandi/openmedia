@@ -1,6 +1,7 @@
 import { useT } from "../../i18n/useT";
 import type { Translate } from "../../i18n/translate";
 import { ActivityList } from "./ActivityList";
+import { AnswerView } from "./AnswerView";
 import { AssistantBubble, RequestBubble } from "./ChatBubbles";
 import { restoreError } from "./errors";
 import type { ChatTurn, Proposal } from "./ipc";
@@ -62,6 +63,8 @@ function SavedTurn({ turn }: { turn: ChatTurn }) {
         <p role="alert" className="px-2 text-sm text-paper/80">
           {failure?.key ? t(failure.key) : failure?.text}
         </p>
+      ) : outcome.status === "answered" ? (
+        <AnswerView answer={outcome.answer} />
       ) : (
         <>
           <AssistantBubble>{outcome.proposal.summary}</AssistantBubble>

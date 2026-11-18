@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import { useApp } from "../../app/store";
 import { useT } from "../../i18n/useT";
-import { HistoryIcon, PlusIcon } from "../../shared/icons";
+import { ChatsIcon, HistoryIcon, PlusIcon } from "../../shared/icons";
 import { AssistantPanel } from "./AssistantPanel";
 import { savedFor } from "./chat";
 import { ChatHistory } from "./ChatHistory";
@@ -33,6 +33,7 @@ export function ChatPane({
   const active = useChat(selectActiveChat);
   const resume = useChat((s) => s.resume);
   const remove = useChat((s) => s.remove);
+  const openSheet = useApp((s) => s.openSheet);
   const t = useT();
   const scroller = useRef<HTMLDivElement>(null);
 
@@ -65,6 +66,14 @@ export function ChatPane({
         </div>
         {idle && (
           <div className="flex shrink-0">
+            <button
+              type="button"
+              aria-label={t("assistant.allChats")}
+              className={tool}
+              onClick={() => openSheet("chats")}
+            >
+              <ChatsIcon />
+            </button>
             <button
               type="button"
               aria-label={t("assistant.chatHistory")}

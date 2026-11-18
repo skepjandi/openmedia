@@ -19,7 +19,7 @@ use crate::ai::{
     ProviderConfig, ProviderInput,
     activity::Activity,
     agent::{
-        self, Accepted, Agent, Model, Page, PrepareInput, PreparedRequest, Proposal, RecipeContext,
+        self, Accepted, Agent, Model, Page, PrepareInput, PreparedRequest, RecipeContext, Reply,
     },
     chats::{ChatSession, Chats},
     connection::{list_models, models_request},
@@ -931,9 +931,10 @@ pub async fn ai_prepare(
     )
 }
 
-/// Sends the prepared request to the user's provider, previews the answer on the page and
-/// returns what it would change. Each step is reported on `on_activity` as it happens, so the
-/// shell can show the work while the model answers.
+/// Sends the prepared request to the user's provider. A change is previewed on the page and
+/// returned as what it would change; a question comes back as an answer and leaves nothing
+/// behind. Each step is reported on `on_activity` as it happens, so the shell can show the work
+/// while the model answers.
 #[tauri::command]
 pub async fn ai_send(
     app: AppHandle,
@@ -943,7 +944,7 @@ pub async fn ai_send(
     entitlement: State<'_, Entitlement>,
     id: Uuid,
     on_activity: Channel<Activity>,
-) -> Result<Proposal> {
+) -> Result<Reply> {
     entitlement.require_pro()?;
     // Send to the provider the preview named, not whichever one is active now.
     let reviewed = agent.get(id)?.provider;

@@ -1,5 +1,14 @@
 import { describe, expect, it } from "vitest";
-import { earlierOf, newSession, resolveFocus, savedFor, withTurn } from "./chat";
+import {
+  earlierOf,
+  newSession,
+  recentChats,
+  resolveFocus,
+  savedFor,
+  turnOf,
+  withTurn,
+} from "./chat";
+import type { AssistantState } from "./flow";
 import type { ChatSession, ChatTurn } from "./ipc";
 import { proposal } from "./fixtures";
 
@@ -97,5 +106,35 @@ describe("chat", () => {
     expect(earlierOf(full, "t2")).toEqual([{ request: "hide the promo", outcome: "applied" }]);
     expect(earlierOf(full, "t1")).toEqual([{ request: "hide the footer", outcome: "failed" }]);
     expect(earlierOf(undefined, "t1")).toEqual([]);
+  });
+
+  it("keeps an answered question without attaching the chat to a recipe", () => {
+    const answer = { text: "Under Saved.", links: [] };
+    const state: AssistantState = {
+      status: "answered",
+      turnId: "t1",
+      request: "where are my saved posts",
+      steps: [],
+      provider: "Claude",
+      answer,
+    };
+    const kept = turnOf(state, 5);
+    expect(kept?.outcome).toEqual({ status: "answered", answer });
+    const chat = withTurn(newSession("c1", "example.org", 0), kept as ChatTurn, 10);
+    expect(chat.recipeId).toBeNull();
+    expect(chat.title).toBe("where are my saved posts");
+    expect(earlierOf(chat, "other")).toEqual([
+      { request: "where are my saved posts", outcome: "answered" },
+    ]);
+  });
+
+  it("lists the latest chats of every site and skips empty ones", () => {
+    const chats = [
+      session("a", "example.org", 1),
+      session("b", "other.net", 4),
+      newSession("blank", "example.org", 9),
+      session("c", "third.io", 3),
+    ];
+    expect(recentChats(chats, 2).map((chat) => chat.id)).toEqual(["b", "c"]);
   });
 });

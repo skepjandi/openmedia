@@ -6,6 +6,14 @@ All notable changes to OpenMedia are documented here.
 >
 > **Wiki**: the [GitHub Wiki](https://github.com/skepjandi/openmedia/wiki) is the public-facing main wiki — architecture, recipe format, AI pipeline, security model, roadmap. Source-controlled editing surface is `docs/wiki/` in this repo; CI (`.github/workflows/sync-wiki.yml`) mirrors it to the GitHub Wiki on every merge to `main`. New single-PR changes belong here, not as new wiki pages.
 
+### feat(ai): ask the assistant about a site, and a chats page with Recent, Favorites and History
+
+**Area:** `feat(ai)`, `feat(shell)`
+
+**Change:** The assistant chat now answers questions as well as making changes ("where are my saved posts"). The model's patch has a third kind, `answer` (prompt version 7): text plus up to 5 links, each kept only if its path was an `href` in the redacted snapshot and turned into an `https://` address on the page's own host. `ai_send` returns a `Reply` (`proposal` or `answer`); an answer leaves no job and nothing on the page, and is saved in the chat as an `answered` turn. A new *All chats* button in the chat bar opens a Chats page: **Recent** (latest five across sites), then a dropdown for every favorite and every history address listing that site's chats; tapping one opens the site and the chat. Placeholder text and 9 new strings are translated into every language (unreviewed).
+
+**Verified:** Rust tests for answer parsing, link filtering, repair of an invalid answer and saving an answered turn; Vitest for the flow, chat helpers and store wiring; `ts:check`, `lint`, `format:check`, `clippy -D warnings`. **Not verified:** a real provider answering a question (the model's choice between a change and an answer is prompt-driven), and the new page on a device.
+
 ### fix(video): no volume bar where a video's volume cannot be set (iOS)
 
 **Area:** `fix(video)`, `fix(siteview)`

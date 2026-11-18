@@ -11,6 +11,8 @@ interface ChatStore {
   activeId: string | null;
   /** The site the user started a blank chat for; reopening the bar there keeps it blank. */
   blankDomain: string | null;
+  /** Counts the chats the user picked to continue, so the bar can leave a mode that hides them. */
+  resumed: number;
   load: () => Promise<void>;
   /** Picks the chat to continue for the site on screen. */
   focus: (domain: string | null) => void;
@@ -32,6 +34,7 @@ export const useChat = create<ChatStore>()((set, get) => ({
   loaded: false,
   activeId: null,
   blankDomain: null,
+  resumed: 0,
 
   load: async () => {
     try {
@@ -54,7 +57,8 @@ export const useChat = create<ChatStore>()((set, get) => ({
 
   startNew: (domain) => set({ activeId: null, blankDomain: domain }),
 
-  resume: (id) => set({ activeId: id, blankDomain: null }),
+  resume: (id) =>
+    set((current) => ({ activeId: id, blankDomain: null, resumed: current.resumed + 1 })),
 
   begin: (domain) => {
     const { chats, activeId } = get();

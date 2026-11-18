@@ -3,7 +3,7 @@
 //! goes through [`Page`] and [`Model`], so the flow is tested with fakes.
 
 use std::{
-    collections::{BTreeMap, HashMap},
+    collections::{BTreeMap, HashMap, HashSet},
     future::Future,
     sync::{Mutex, PoisonError},
     time::Instant,
@@ -220,6 +220,65 @@ pub struct Proposal {
 /// Saved chats from before script rules hold style-only proposals, which are always shareable.
 fn default_publishable() -> bool {
     true
+}
+
+/// A page of the site an answer points to, ready to open.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub struct AnswerLink {
+    pub label: String,
+    pub url: String,
+}
+
+/// What the assistant said to a question about the site. Nothing was changed or previewed, so
+/// there is no job to accept or reject.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub struct Answer {
+    pub text: String,
+    pub links: Vec<AnswerLink>,
+}
+
+/// How a sent request ended: a change waiting for the user, or an answer to read.
+#[derive(Debug, Clone, PartialEq, Serialize)]
+#[serde(tag = "type", rename_all = "camelCase")]
+pub enum Reply {
+    Proposal { proposal: Proposal },
+    Answer { answer: Answer },
+}
+
+fn collect_paths<'a>(node: &'a snapshot::Node, into: &mut HashSet<&'a str>) {
+    if let Some(href) = node.href.as_deref() {
+        into.insert(href);
+    }
+    for child in &node.children {
+        collect_paths(child, into);
+    }
+}
+
+/// The answer with only the links the page really had, as addresses on the page's own host: a
+/// path the model made up is dropped rather than opened.
+fn answer_for(snapshot: &Snapshot, found: patch::Answer) -> Answer {
+    let mut paths = HashSet::new();
+    collect_paths(&snapshot.root, &mut paths);
+    let mut seen = HashSet::new();
+    let links = found
+        .links
+        .into_iter()
+        .filter(|link| {
+            !snapshot.host.is_empty()
+                && paths.contains(link.path.as_str())
+                && seen.insert(link.path.clone())
+        })
+        .map(|link| AnswerLink {
+            label: link.label,
+            url: format!("https://{}{}", snapshot.host, link.path),
+        })
+        .collect();
+    Answer {
+        text: found.text,
+        links,
+    }
 }
 
 /// Everything about one request that has to outlive a command call.
@@ -539,17 +598,18 @@ async fn look_closer(page: &(impl Page + Sync), model: &impl Model, job: &Job) -
     (!found.is_empty()).then_some(found)
 }
 
-/// Sends the prepared request, previews the answer on the page, and repairs rules that matched
-/// nothing (at most [`MAX_REPAIRS`] more rounds). The preview stays on the page until the user
-/// accepts or rejects. `progress` hears every step as it starts and ends, so the shell can show
-/// what is happening while the model thinks.
+/// Sends the prepared request. A change is previewed on the page and rules that matched nothing
+/// are repaired (at most [`MAX_REPAIRS`] more rounds); the preview stays on the page until the
+/// user accepts or rejects. A question is answered in words and the job ends. `progress` hears
+/// every step as it starts and ends, so the shell can show what is happening while the model
+/// thinks.
 pub async fn send(
     agent: &Agent,
     page: &(impl Page + Sync),
     model: &impl Model,
     progress: &(impl Fn(Activity) + Sync),
     id: Uuid,
-) -> Result<Proposal> {
+) -> Result<Reply> {
     let job = agent.get(id)?;
     let schema = patch::patch_schema();
     let mut snapshot = job.snapshot.clone();
@@ -604,14 +664,14 @@ pub async fn send(
             return Err(Error::Connection(MSG_CANCELLED.to_owned()));
         }
 
-        let patch = match patch::parse_patch(&answer, job.base.as_ref()) {
-            Ok(patch) => {
+        let reply = match patch::parse_reply(&answer, job.base.as_ref()) {
+            Ok(reply) => {
                 progress(Activity::new(
                     StepKind::CheckAnswer,
                     StepStatus::Done,
                     round,
                 ));
-                patch
+                reply
             }
             Err(error) if round < MAX_REPAIRS => {
                 progress(Activity::new(
@@ -631,6 +691,18 @@ pub async fn send(
                     round,
                 ));
                 return Err(Error::Connection(MSG_BAD_ANSWER.to_owned()));
+            }
+        };
+        let patch = match reply {
+            patch::Reply::Change(patch) => patch,
+            patch::Reply::Answer(found) => {
+                if round > 0 {
+                    let _ = page.evaluate(snapshot::clear_preview_script());
+                }
+                agent.discard(id);
+                return Ok(Reply::Answer {
+                    answer: answer_for(&snapshot, found),
+                });
             }
         };
 
@@ -658,7 +730,7 @@ pub async fn send(
             let shown = shown_rules(&patch, rules, counts);
             let proposal = proposal_for(id, &job, &patch, shown);
             agent.set_patch(id, patch);
-            return Ok(proposal);
+            return Ok(Reply::Proposal { proposal });
         }
 
         ensure_same_page(page, &job.page_token)?;
@@ -733,6 +805,20 @@ mod tests {
     use crate::ai::ProviderKind;
     use crate::recipes::official_recipes;
 
+    /// `super::send` for the tests of a change, which expect the proposal.
+    async fn send(
+        agent: &Agent,
+        page: &(impl Page + Sync),
+        model: &impl Model,
+        progress: &(impl Fn(Activity) + Sync),
+        id: Uuid,
+    ) -> Result<Proposal> {
+        match super::send(agent, page, model, progress, id).await? {
+            Reply::Proposal { proposal } => Ok(proposal),
+            Reply::Answer { .. } => panic!("expected a proposal, got an answer"),
+        }
+    }
+
     const SNAPSHOT: &str = r#"{"v":1,"host":"www.example.org","path":"/","w":390,"vw":"phone","sl":false,"tr":false,"root":{"t":"body","k":[{"t":"div","x":"Suggested"}]}}"#;
 
     fn run<F: Future>(future: F) -> F::Output {
@@ -747,6 +833,8 @@ mod tests {
         moved: std::sync::atomic::AtomicBool,
         /// What `list_media` answers; a page without media says `null`.
         media: Option<&'static str>,
+        /// What the page's snapshot script answers.
+        snapshot: &'static str,
     }
 
     impl FakePage {
@@ -756,10 +844,15 @@ mod tests {
                 log: Mutex::new(Vec::new()),
                 moved: std::sync::atomic::AtomicBool::new(false),
                 media: None,
+                snapshot: SNAPSHOT,
             }
         }
         fn with_media(mut self, media: &'static str) -> Self {
             self.media = Some(media);
+            self
+        }
+        fn with_snapshot(mut self, snapshot: &'static str) -> Self {
+            self.snapshot = snapshot;
             self
         }
         fn log(&self) -> Vec<String> {
@@ -774,7 +867,7 @@ mod tests {
                 self.log.lock().unwrap().push(script.clone());
             }
             if script == snapshot::SNAPSHOT_SCRIPT {
-                Ok(SNAPSHOT.to_owned())
+                Ok(self.snapshot.to_owned())
             } else if script.starts_with(PAGE_CHECK_PREFIX) {
                 let moved = self.moved.load(std::sync::atomic::Ordering::SeqCst);
                 Ok((!moved).to_string())
@@ -1333,5 +1426,69 @@ mod tests {
             assert!(result.is_err());
             assert!(page.log().iter().all(|script| !script.contains("x();")));
         });
+    }
+
+    const LINKED: &str = r#"{"v":1,"host":"www.example.org","path":"/","w":390,"vw":"phone","sl":false,"tr":false,"root":{"t":"body","k":[{"t":"a","h":"/settings","x":"Settings"},{"t":"a","h":"/saved","x":"Saved"}]}}"#;
+
+    fn answer_of(links: &Value) -> String {
+        json!({"kind":"answer","summary":"Your saved posts are under Saved.","optionId":null,
+          "choice":null,"label":null,"description":null,"group":null,"rules":null,"links":links})
+        .to_string()
+    }
+
+    fn reply_to(page: &FakePage, model: &FakeModel) -> Result<Reply> {
+        run(async {
+            let agent = Agent::default();
+            let prepared = prepare(&agent, page, input(None)).unwrap();
+            let reply = super::send(&agent, page, model, &|_| {}, prepared.id).await;
+            if reply.is_ok() {
+                assert!(agent.get(prepared.id).is_err(), "a question leaves no job");
+            }
+            reply
+        })
+    }
+
+    #[test]
+    fn a_question_is_answered_in_words_with_only_links_the_page_had() {
+        let page = FakePage::new(vec![]).with_snapshot(LINKED);
+        let model = FakeModel::new(&[&answer_of(&json!([
+            {"label":"Saved posts","path":"/saved"},
+            {"label":"Made up","path":"/invented"},
+            {"label":"Saved again","path":"/saved"}
+        ]))]);
+        let Reply::Answer { answer } = reply_to(&page, &model).unwrap() else {
+            panic!("expected an answer");
+        };
+        assert_eq!(answer.text, "Your saved posts are under Saved.");
+        assert_eq!(
+            answer.links,
+            vec![AnswerLink {
+                label: "Saved posts".into(),
+                url: "https://www.example.org/saved".into()
+            }]
+        );
+        assert!(
+            page.log()
+                .iter()
+                .all(|script| !script.contains("s.textContent=")),
+            "an answer previews nothing on the page"
+        );
+    }
+
+    #[test]
+    fn an_answer_that_carries_a_change_or_a_host_is_repaired_then_refused() {
+        for bad in [
+            json!({"kind":"answer","summary":"s","optionId":null,"choice":null,"label":"Hide it",
+              "description":null,"group":null,"rules":null,"links":null}),
+            json!({"kind":"answer","summary":"s","optionId":null,"choice":null,"label":null,
+              "description":null,"group":null,"rules":null,
+              "links":[{"label":"Away","path":"//evil.example/x"}]}),
+        ] {
+            let page = FakePage::new(vec![]).with_snapshot(LINKED);
+            let text = bad.to_string();
+            let model = FakeModel::new(&[&text, &text, &text]);
+            assert!(reply_to(&page, &model).is_err());
+            assert_eq!(model.prompts().len(), 3, "first answer plus two repairs");
+        }
     }
 }

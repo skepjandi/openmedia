@@ -11,7 +11,7 @@ use super::snapshot::{Snapshot, clean};
 use crate::recipes::{OptionGroup, OptionValue, Recipe, Rule};
 
 /// Bump when the system prompt changes in a way that should be visible in logs or fixtures.
-pub const PROMPT_VERSION: u32 = 6;
+pub const PROMPT_VERSION: u32 = 7;
 
 const PLAYBOOKS: &str = include_str!("../../../docs/wiki/site-playbooks.md");
 const SELECTOR_RULES_HEADING: &str = "Rules for writing a selector";
@@ -56,6 +56,7 @@ pub enum EarlierOutcome {
     Applied,
     Rejected,
     Failed,
+    Answered,
 }
 
 impl EarlierOutcome {
@@ -64,6 +65,7 @@ impl EarlierOutcome {
             Self::Applied => "applied",
             Self::Rejected => "rejected by the user",
             Self::Failed => "failed",
+            Self::Answered => "answered with words, nothing changed",
         }
     }
 }
@@ -166,6 +168,11 @@ The user asks in plain language to hide, restyle or change something on the page
 with its hide, style or script rules, or points at a switch that already exists. Your whole answer is a single JSON object that follows the schema you were given. \
 Do not write anything else.";
 
+const ANSWERS: &str = "\
+Questions: the user may instead ask something about the site, or where to find something on it (\"where are my saved posts\", \"how do I get to my settings\"). Then answer with kind \"answer\": summary is your reply in plain words, at most 600 characters, in the language of the user's question, based only on what the snapshot shows. \
+If what they want is not on the page, say so and suggest where on the site it usually is. links lists up to 5 pages that help, each { label, path }, where path is an href path that appears in the snapshot exactly as written (it starts with \"/\"); never invent or guess a path, and use an empty list when the page shows none. \
+optionId, choice, label, description, group and rules are null for an answer. Use \"answer\" only when the user asked a question or to find something. A request to hide, restyle or change the page is never an answer, and links is null for every other kind.";
+
 const SEMANTICS: &str = "\
 How the answer is used:
 - kind \"existingOption\": the site already has a switch for this request (see \"Existing switches\" in the user message). Give its optionId; set label, description, group and rules to null. The app turns that switch on. For a switch marked CHOICE, also set choice to one of its choice ids other than the first (the first leaves the page alone); for an ON/OFF switch choice is null. Prefer this whenever an existing switch covers the request, even if it is currently on.
@@ -231,7 +238,7 @@ Hard prohibitions:
 /// The system prompt, with the site's playbook section when there is one.
 fn system(playbook: Option<&str>) -> String {
     let mut out = format!(
-        "{ROLE}\n\n{SEMANTICS}\n\n{LESSONS}\n\n{SCRIPTS}\n\n{VIDEO_FEEDS}\n\n{VIDEO_OPTIONS}\n\n{DARK_MODE}\n\n{PROHIBITIONS}\n\nPlaybook: rules for writing a selector\n{}\n",
+        "{ROLE}\n\n{ANSWERS}\n\n{SEMANTICS}\n\n{LESSONS}\n\n{SCRIPTS}\n\n{VIDEO_FEEDS}\n\n{VIDEO_OPTIONS}\n\n{DARK_MODE}\n\n{PROHIBITIONS}\n\nPlaybook: rules for writing a selector\n{}\n",
         selector_rules()
     );
     if let Some(site) = playbook.map(str::trim).filter(|site| !site.is_empty()) {

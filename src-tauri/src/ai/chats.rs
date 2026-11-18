@@ -16,7 +16,10 @@ use std::{
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-use super::{activity::Activity, agent::Proposal};
+use super::{
+    activity::Activity,
+    agent::{Answer, Proposal},
+};
 use crate::error::{Error, Result};
 use crate::library::write_atomically;
 use crate::recipes::script_policy;
@@ -33,6 +36,10 @@ const MAX_DOMAIN_CHARS: usize = 253;
 const MAX_SHORT_CHARS: usize = 200;
 const MAX_SELECTOR_CHARS: usize = 300;
 const MAX_POWERS: usize = 50;
+const MAX_ANSWER_CHARS: usize = 600;
+const MAX_ANSWER_LINKS: usize = 5;
+const MAX_LINK_LABEL_CHARS: usize = 60;
+const MAX_LINK_URL_CHARS: usize = 300;
 
 /// How one turn ended.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -48,6 +55,10 @@ pub enum Outcome {
     },
     Rejected {
         proposal: Proposal,
+    },
+    /// The assistant answered a question in words; nothing was proposed or changed.
+    Answered {
+        answer: Answer,
     },
     /// `kind` is the shell's error class, `text` the short line Rust sent when there is no fixed
     /// one for the class.
@@ -113,6 +124,18 @@ fn cut_proposal(proposal: &mut Proposal) {
     }
 }
 
+/// A link whose address was cut would open the wrong page, so one that is too long is dropped.
+fn cut_answer(answer: &mut Answer) {
+    cut(&mut answer.text, MAX_ANSWER_CHARS);
+    answer.links.retain(|link| {
+        link.url.starts_with("https://") && link.url.chars().count() <= MAX_LINK_URL_CHARS
+    });
+    answer.links.truncate(MAX_ANSWER_LINKS);
+    for link in &mut answer.links {
+        cut(&mut link.label, MAX_LINK_LABEL_CHARS);
+    }
+}
+
 impl ChatSession {
     /// Refuses what cannot be a chat and cuts what is too long, so the file stays small whatever
     /// the shell sends.
@@ -151,6 +174,7 @@ impl ChatSession {
                 Outcome::Proposed { proposal }
                 | Outcome::Accepted { proposal }
                 | Outcome::Rejected { proposal } => cut_proposal(proposal),
+                Outcome::Answered { answer } => cut_answer(answer),
                 Outcome::Failed { kind, text } => {
                     cut(kind, 24);
                     if let Some(line) = text.as_mut() {
@@ -511,5 +535,37 @@ mod tests {
         assert_eq!(rule.kind, ProposalRuleKind::Style);
         assert!(rule.code.is_none() && rule.powers.is_empty());
         assert!(!proposal.runs_code && proposal.publishable);
+    }
+
+    #[test]
+    fn an_answered_turn_is_kept_with_its_text_cut_and_unsafe_links_dropped() {
+        let (_dir, chats) = store();
+        let mut chat = session("example.org", 10);
+        chat.turns = vec![turn(
+            "where is my profile",
+            Outcome::Answered {
+                answer: Answer {
+                    text: "x".repeat(900),
+                    links: vec![
+                        crate::ai::agent::AnswerLink {
+                            label: "Profile".into(),
+                            url: "https://example.org/me".into(),
+                        },
+                        crate::ai::agent::AnswerLink {
+                            label: "Elsewhere".into(),
+                            url: "javascript:alert(1)".into(),
+                        },
+                    ],
+                },
+            },
+        )];
+        chats.save(chat).unwrap();
+        let listed = chats.list().unwrap();
+        let Outcome::Answered { answer } = &listed[0].turns[0].outcome else {
+            panic!("expected an answered turn");
+        };
+        assert_eq!(answer.text.chars().count(), MAX_ANSWER_CHARS);
+        assert_eq!(answer.links.len(), 1);
+        assert_eq!(answer.links[0].url, "https://example.org/me");
     }
 }

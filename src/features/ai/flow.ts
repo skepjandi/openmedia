@@ -1,4 +1,4 @@
-import type { ActivityStep, PreparedRequest, Proposal } from "./ipc";
+import type { ActivityStep, Answer, PreparedRequest, Proposal } from "./ipc";
 import { classifyError, nothingMatched, type AssistantError } from "./errors";
 
 /** What every request in flight carries: who it is, what was asked, and what has happened so far. */
@@ -21,6 +21,8 @@ export type AssistantState =
   | ({ status: "accepting"; proposal: Proposal } & Live)
   | ({ status: "accepted"; proposal: Proposal } & Live)
   | ({ status: "rejected"; proposal: Proposal } & Live)
+  /** A question answered in words: nothing is left in Rust to accept or reject. */
+  | ({ status: "answered"; answer: Answer } & Live)
   /** `jobId` is a prepared request Rust still holds; it must be dropped when leaving. */
   | ({ status: "error"; error: AssistantError; jobId: string | null } & Live);
 
@@ -34,6 +36,7 @@ export type AssistantEvent =
   /** Rust reported a step while the model works. */
   | { type: "activity"; step: ActivityStep }
   | { type: "proposed"; proposal: Proposal }
+  | { type: "answered"; answer: Answer }
   | { type: "accept" }
   | { type: "accepted" }
   | { type: "reject" }
@@ -97,7 +100,12 @@ export function assistantReducer(state: AssistantState, event: AssistantEvent): 
     case "submit": {
       const request = event.request.trim();
       if (request === "") return state;
-      if (state.status !== "idle" && state.status !== "error" && state.status !== "rejected") {
+      if (
+        state.status !== "idle" &&
+        state.status !== "error" &&
+        state.status !== "rejected" &&
+        state.status !== "answered"
+      ) {
         return state;
       }
       return {
@@ -149,6 +157,11 @@ export function assistantReducer(state: AssistantState, event: AssistantEvent): 
       }
       return { status: "proposal", turnId, request, steps, provider, proposal: event.proposal };
     }
+    case "answered": {
+      if (state.status !== "sending") return state;
+      const { turnId, request, steps, provider } = state;
+      return { status: "answered", turnId, request, steps, provider, answer: event.answer };
+    }
     case "accept":
       return state.status === "proposal" ? { ...state, status: "accepting" } : state;
     case "accepted":
@@ -156,7 +169,12 @@ export function assistantReducer(state: AssistantState, event: AssistantEvent): 
     case "reject":
       return state.status === "proposal" ? { ...state, status: "rejected" } : state;
     case "failed": {
-      if (state.status === "idle" || state.status === "accepted" || state.status === "rejected") {
+      if (
+        state.status === "idle" ||
+        state.status === "accepted" ||
+        state.status === "rejected" ||
+        state.status === "answered"
+      ) {
         return state;
       }
       const jobId =

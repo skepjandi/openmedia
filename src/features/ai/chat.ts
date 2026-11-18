@@ -13,6 +13,8 @@ const outcomeOf = (state: AssistantState): TurnOutcome | null => {
       return { status: "accepted", proposal: state.proposal };
     case "rejected":
       return { status: "rejected", proposal: state.proposal };
+    case "answered":
+      return { status: "answered", answer: state.answer };
     case "error":
       return { status: "failed", kind: state.error.kind, text: state.error.text };
     default:
@@ -59,7 +61,7 @@ export function withTurn(session: ChatSession, turn: ChatTurn, now: number): Cha
   const turns = existing
     ? session.turns.map((t) => (t.id === turn.id ? { ...turn, at: t.at } : t))
     : [...session.turns, turn].slice(-MAX_TURNS);
-  const proposal = turn.outcome.status === "failed" ? null : turn.outcome.proposal;
+  const proposal = "proposal" in turn.outcome ? turn.outcome.proposal : null;
   return {
     ...session,
     title: session.title || [...turns[0].request].slice(0, MAX_TITLE_CHARS).join(""),
@@ -75,6 +77,17 @@ export function savedFor(chats: readonly ChatSession[], domain: string): ChatSes
   return chats
     .filter((chat) => chat.domain === domain && chat.turns.length > 0)
     .sort((a, b) => b.updatedAt - a.updatedAt);
+}
+
+/** How many chats the "Recent" section of the chats page lists. */
+export const RECENT_CHATS = 5;
+
+/** The latest chats across every site, for the top of the chats page. */
+export function recentChats(chats: readonly ChatSession[], limit: number): ChatSession[] {
+  return chats
+    .filter((chat) => chat.turns.length > 0)
+    .sort((a, b) => b.updatedAt - a.updatedAt)
+    .slice(0, limit);
 }
 
 export interface ChatFocus {
@@ -99,17 +112,20 @@ export function resolveFocus(
   return { activeId: savedFor(chats, domain)[0]?.id ?? null, blankDomain: null };
 }
 
+const EARLIER_OUTCOME: Record<TurnOutcome["status"], EarlierTurn["outcome"]> = {
+  proposed: "rejected",
+  accepted: "applied",
+  rejected: "rejected",
+  answered: "answered",
+  failed: "failed",
+};
+
 /** What the next request's prompt is told about this chat: the user's words and how each ended. */
 export function earlierOf(session: ChatSession | undefined, exceptTurnId: string): EarlierTurn[] {
   return (session?.turns ?? [])
     .filter((turn) => turn.id !== exceptTurnId)
     .map((turn) => ({
       request: turn.request,
-      outcome:
-        turn.outcome.status === "accepted"
-          ? "applied"
-          : turn.outcome.status === "failed"
-            ? "failed"
-            : "rejected",
+      outcome: EARLIER_OUTCOME[turn.outcome.status],
     }));
 }

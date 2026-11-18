@@ -19,7 +19,8 @@ export function AssistantDock() {
     assistant.status === "proposal" ||
     assistant.status === "accepting" ||
     assistant.status === "accepted" ||
-    assistant.status === "rejected";
+    assistant.status === "rejected" ||
+    assistant.status === "answered";
   const running = assistant.steps[assistant.steps.length - 1];
   const busyText =
     running && running.status === "running"

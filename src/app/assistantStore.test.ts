@@ -35,7 +35,7 @@ function mockCommands(overrides: Record<string, (args?: unknown) => unknown> = {
       case "ai_prepare":
         return prepared;
       case "ai_send":
-        return proposal;
+        return { type: "proposal", proposal };
       case "get_sites":
         return [];
       default:
@@ -213,7 +213,7 @@ describe("assistant wiring", () => {
             { kind: "askModel", status: "running" },
           ],
         });
-        return proposal;
+        return { type: "proposal", proposal };
       },
     });
     useApp.setState({ state: appState(false) });
@@ -290,5 +290,37 @@ describe("assistant wiring", () => {
     const { turns } = useChat.getState().chats[0];
     expect(turns).toHaveLength(1);
     expect(turns[0].outcome.status).toBe("proposed");
+  });
+
+  it("keeps an answer in the chat and leaves the bar ready for the next question", async () => {
+    const answer = {
+      text: "Saved posts are under Saved.",
+      links: [{ label: "Saved", url: "https://www.youtube.com/saved" }],
+    };
+    mockCommands({ ai_send: () => ({ type: "answer", answer }) });
+    useApp.setState({ state: appState(false) });
+    await useApp.getState().submitRequest("where are my saved posts");
+    expect(useApp.getState().assistant.status).toBe("idle");
+    expect(useApp.getState().sheet).toBe("assistant");
+    const [chat] = useChat.getState().chats;
+    expect(chat.recipeId).toBeNull();
+    expect(chat.turns[0]).toMatchObject({
+      request: "where are my saved posts",
+      outcome: { status: "answered", answer },
+    });
+    expect(savedChat().turns[0].outcome.status).toBe("answered");
+  });
+
+  it("holds the answer for the dock when the bar was closed meanwhile", async () => {
+    mockCommands({
+      ai_send: () => ({ type: "answer", answer: { text: "Under Saved.", links: [] } }),
+    });
+    useApp.setState({ state: appState(false) });
+    const pending = useApp.getState().submitRequest("where are my saved posts");
+    useApp.setState({ sheet: "none" });
+    await pending;
+    expect(useApp.getState().assistant.status).toBe("answered");
+    useApp.getState().cancelAssistant();
+    expect(useApp.getState().assistant.status).toBe("idle");
   });
 });

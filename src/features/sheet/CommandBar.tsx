@@ -67,6 +67,7 @@ export function CommandBar() {
   const loadChats = useChat((s) => s.load);
   const focusChat = useChat((s) => s.focus);
   const startNewChat = useChat((s) => s.startNew);
+  const resumedChats = useChat((s) => s.resumed);
   const pageAddress = page?.url ?? null;
   const chatDomain = pageAddress && /^https?:\/\//i.test(pageAddress) ? siteOf(pageAddress) : null;
   // A site that already has a chat opens the bar as a chat, so the next words continue it.
@@ -82,6 +83,14 @@ export function CommandBar() {
   useEffect(() => {
     if (open && isPro) void loadChats();
   }, [open, isPro, loadChats]);
+
+  // A chat the user picked is shown whatever mode the bar was left in.
+  const [seenResumed, setSeenResumed] = useState(resumedChats);
+  if (seenResumed !== resumedChats) {
+    setSeenResumed(resumedChats);
+    setModeChoice(null);
+    setHistoryOpen(false);
+  }
 
   // Reopening the bar on a site continues that site's chat, unless a request is still running.
   useEffect(() => {

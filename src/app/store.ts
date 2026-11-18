@@ -9,7 +9,11 @@ import {
 } from "../features/ai/flow";
 import { earlierOf } from "../features/ai/chat";
 import { selectActiveChat, useChat } from "../features/ai/chatStore";
-import { assistant as assistantIpc, type PreparedRequest } from "../features/ai/ipc";
+import {
+  assistant as assistantIpc,
+  type ChatSession,
+  type PreparedRequest,
+} from "../features/ai/ipc";
 import { hubForFavorite } from "../shared/hubs";
 import { siteOf } from "../shared/site";
 import { incognito as incognitoIpc } from "../features/incognito/ipc";
@@ -65,6 +69,7 @@ import {
 export type Sheet =
   | "none"
   | "assistant"
+  | "chats"
   | "history"
   | "tabs"
   | "favorites"
@@ -207,6 +212,11 @@ export interface AppStore {
   openHubTab: (url: string, hubId: string) => void;
   /** A history entry: switches to the live session typed with it, otherwise opens a new one. */
   openHistory: (url: string) => void;
+  /**
+   * Continues a saved chat: shows the live session on its site, or opens the site (at `url`
+   * when the page that listed the chat knows one), then opens the assistant on that chat.
+   */
+  openChat: (chat: ChatSession, url?: string) => void;
   /** Shows a live session by id, for example the one a notification was tapped for. */
   openSession: (id: string) => void;
   /** Ends one live session. Favorites and history are untouched; the last open site stays. */
@@ -511,7 +521,7 @@ export const useApp = create<AppStore>((set, get) => {
 
   const runSend = async (prepared: PreparedRequest) => {
     try {
-      const proposal = await assistantIpc.send(prepared.id, (step) => {
+      const reply = await assistantIpc.send(prepared.id, (step) => {
         const live = get().assistant;
         if (live.status === "sending" && live.prepared.id === prepared.id) {
           dispatch({ type: "activity", step });
@@ -522,7 +532,13 @@ export const useApp = create<AppStore>((set, get) => {
         dropJob(prepared.id);
         return;
       }
-      dispatch({ type: "proposed", proposal });
+      if (reply.type === "answer") {
+        dispatch({ type: "answered", answer: reply.answer });
+        // The chat on screen already shows the turn; with the bar closed the dock keeps it.
+        if (get().sheet === "assistant") dispatch({ type: "reset" });
+        return;
+      }
+      dispatch({ type: "proposed", proposal: reply.proposal });
       // Let the user see the page with the preview applied.
       if (get().assistant.status === "proposal" && get().sheet === "assistant") {
         set({ sheet: "none" });
@@ -676,6 +692,16 @@ export const useApp = create<AppStore>((set, get) => {
       if (live) void fetchIcons([url]);
       if (live) switchTo(live.id);
       else get().openAddress(url);
+    },
+
+    openChat: (chat, url) => {
+      const live = get().sessions.find(
+        (session) => session.url !== null && siteOf(session.url) === chat.domain,
+      );
+      if (live) switchTo(live.id);
+      else startSession(url ?? `https://${chat.domain}/`, "typed");
+      useChat.getState().resume(chat.id);
+      get().openSheet("assistant");
     },
 
     openSession: (id) => {

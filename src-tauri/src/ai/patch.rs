@@ -102,6 +102,28 @@ impl Patch {
     }
 }
 
+/// A page of the site the assistant points the user to, with the words to show for it.
+#[derive(Debug, Clone, PartialEq)]
+pub struct AnswerLink {
+    pub label: String,
+    /// An href path that was in the snapshot (`/settings`); the caller checks that it was.
+    pub path: String,
+}
+
+/// A reply to a question about the site: words and pages to open, never a change.
+#[derive(Debug, Clone, PartialEq)]
+pub struct Answer {
+    pub text: String,
+    pub links: Vec<AnswerLink>,
+}
+
+/// What the model's answer turned out to be.
+#[derive(Debug, Clone, PartialEq)]
+pub enum Reply {
+    Change(Patch),
+    Answer(Answer),
+}
+
 /// The JSON Schema both providers are asked to follow. It is flat (one object, every property
 /// required, nullable where it does not apply) because that is the subset OpenAI's strict mode and
 /// Anthropic's tool input accept alike. Limits that strict mode cannot express are checked by
@@ -111,16 +133,16 @@ pub fn patch_schema() -> Value {
     json!({
         "type": "object",
         "additionalProperties": false,
-        "required": ["kind", "summary", "optionId", "choice", "label", "description", "group", "rules"],
+        "required": ["kind", "summary", "optionId", "choice", "label", "description", "group", "rules", "links"],
         "properties": {
             "kind": {
                 "type": "string",
-                "enum": ["existingOption", "newOption"],
-                "description": "existingOption when a switch that already exists covers the request; otherwise newOption."
+                "enum": ["existingOption", "newOption", "answer"],
+                "description": "existingOption when a switch that already exists covers the request; newOption for a change that needs a new switch; answer when the user asked a question or where to find something and wants no change."
             },
             "summary": {
                 "type": "string",
-                "description": "One sentence, at most 200 characters, saying what the switch changes and any limits."
+                "description": "One sentence, at most 200 characters, saying what the switch changes and any limits. For answer: the reply in plain words, at most 600 characters."
             },
             "optionId": {
                 "type": ["string", "null"],
@@ -195,6 +217,19 @@ pub fn patch_schema() -> Value {
                         }
                     }
                 }
+            },
+            "links": {
+                "type": ["array", "null"],
+                "description": "answer only: at most 5 pages of the site that help, each with a label of at most 60 characters and a path that appears as an href in the snapshot. null for every other kind.",
+                "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": ["label", "path"],
+                    "properties": {
+                        "label": { "type": "string" },
+                        "path": { "type": "string", "description": "An href path from the snapshot, starting with /." }
+                    }
+                }
             }
         }
     })
@@ -217,6 +252,15 @@ struct Raw {
     group: Option<String>,
     #[serde(default)]
     rules: Option<Vec<RawRule>>,
+    #[serde(default)]
+    links: Option<Vec<RawLink>>,
+}
+
+#[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
+struct RawLink {
+    label: String,
+    path: String,
 }
 
 #[derive(Deserialize)]
@@ -463,6 +507,56 @@ fn check_script_totals(rules: &[PatchRule], recipe: Option<&Recipe>) -> Result<(
     Ok(())
 }
 
+const MAX_ANSWER_CHARS: usize = 600;
+const MAX_LINKS: usize = 5;
+const MAX_PATH_CHARS: usize = 200;
+
+/// Validates the model's answer as either a change (see [`parse_patch`]) or, when the user asked
+/// a question, an [`Answer`]: its text and the pages it points to. A path must be an href path
+/// (one `/` start, no host, no whitespace or control characters); that it was on the page is for
+/// the caller to check, which has the snapshot.
+pub fn parse_reply(json: &str, recipe: Option<&Recipe>) -> Result<Reply> {
+    if json.len() > MAX_ANSWER_BYTES {
+        return Err(reject("it is too long"));
+    }
+    let Some(raw) = parse_raw(json).filter(|raw| raw.kind == "answer") else {
+        return parse_patch(json, recipe).map(Reply::Change);
+    };
+    let blank = |value: &Option<String>| value.as_deref().is_none_or(|v| v.trim().is_empty());
+    if !blank(&raw.option_id)
+        || !blank(&raw.choice)
+        || !blank(&raw.label)
+        || !blank(&raw.description)
+        || !blank(&raw.group)
+        || raw.rules.as_ref().is_some_and(|rules| !rules.is_empty())
+    {
+        return Err(reject(
+            "an answer changes nothing, so it has no option or rules",
+        ));
+    }
+    let text = plain(&raw.summary, "the answer", MAX_ANSWER_CHARS, false)?;
+    let raw_links = raw.links.unwrap_or_default();
+    if raw_links.len() > MAX_LINKS {
+        return Err(reject(format!("an answer has at most {MAX_LINKS} links")));
+    }
+    let mut links = Vec::with_capacity(raw_links.len());
+    for link in raw_links {
+        let path = link.path.trim();
+        let looks_like_path = path.starts_with('/')
+            && !path.starts_with("//")
+            && path.chars().count() <= MAX_PATH_CHARS
+            && !path.chars().any(|c| c.is_control() || c.is_whitespace());
+        if !looks_like_path {
+            return Err(reject("a link needs a path on the site that starts with /"));
+        }
+        links.push(AnswerLink {
+            label: plain(&link.label, "a link label", MAX_LABEL_CHARS, false)?,
+            path: path.to_owned(),
+        });
+    }
+    Ok(Reply::Answer(Answer { text, links }))
+}
+
 /// Validates the model's answer. `recipe` is the recipe the page already has, if any: an
 /// `existingOption` must name one of its options, and a new label must not repeat one.
 pub fn parse_patch(json: &str, recipe: Option<&Recipe>) -> Result<Patch> {
@@ -470,6 +564,9 @@ pub fn parse_patch(json: &str, recipe: Option<&Recipe>) -> Result<Patch> {
         return Err(reject("it is too long"));
     }
     let raw = parse_raw(json).ok_or_else(|| reject("it does not follow the schema"))?;
+    if raw.kind != "answer" && raw.links.as_ref().is_some_and(|links| !links.is_empty()) {
+        return Err(reject("only an answer has links"));
+    }
     let summary = plain(&raw.summary, "the summary", MAX_SUMMARY_CHARS, false)?;
     let blank = |value: &Option<String>| value.as_deref().is_none_or(|v| v.trim().is_empty());
     match raw.kind.as_str() {

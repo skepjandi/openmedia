@@ -1,5 +1,6 @@
 import { lazy, Suspense, useEffect, useState } from "react";
 import { AssistantDock } from "../features/ai/AssistantDock";
+import { ChatsSheet } from "../features/ai/ChatsSheet";
 import { TechPanel } from "../features/techdetect/TechPanel";
 import { ColorPickBar } from "../features/colorpick/ColorPickBar";
 import { BackButton } from "../features/back/BackButton";
@@ -167,6 +168,7 @@ export function App() {
       <CommandBar />
       <AssistantDock />
       <HistorySheet />
+      <ChatsSheet />
       <TabsSheet />
       <FavoritesSheet />
       {/* One boundary per screen: a page still loading must not hide Settings beneath it, or the site shows through. */}

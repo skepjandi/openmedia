@@ -185,4 +185,21 @@ describe("assistant flow", () => {
     });
     expect(after).toBe(cancelled);
   });
+
+  it("ends a question in an answer that leaves no job and lets the next request start", () => {
+    const answer = {
+      text: "Saved posts are under Saved.",
+      links: [{ label: "Saved", url: "https://example.org/saved" }],
+    };
+    const answered = run([
+      submit("where are my saved posts"),
+      { type: "prepared", prepared, preview: false },
+      { type: "answered", answer },
+    ]);
+    expect(answered).toMatchObject({ status: "answered", turnId: "turn-1", answer });
+    expect(pendingJobId(answered)).toBeNull();
+    expect(assistantReducer(answered, { type: "failed", error: new Error("late") })).toBe(answered);
+    expect(assistantReducer(answered, submit("and my settings")).status).toBe("preparing");
+    expect(run([{ type: "answered", answer }])).toBe(initialAssistant);
+  });
 });
