@@ -328,7 +328,7 @@ struct LibraryData {
     /// Epilepsy protection and the reading aids for dyslexia; all off until chosen.
     #[serde(default)]
     accessibility: Accessibility,
-    /// The controls for full-screen video feeds: the panel on a tap is on until switched off.
+    /// The controls for full-screen video feeds: the panel on a tap is off until switched on.
     #[serde(default)]
     video_controls: VideoControls,
     /// Per-site video controls choices by registrable domain; a site without an entry follows
@@ -1878,15 +1878,15 @@ mod tests {
     }
 
     #[test]
-    fn the_video_panel_is_on_by_default_and_the_choices_persist() {
+    fn the_video_panel_is_off_by_default_and_the_choices_persist() {
         let (dir, library) = library();
         assert_eq!(
             library.state().unwrap().video_controls,
             VideoControls::default()
         );
-        assert!(library.state().unwrap().video_controls.panel);
+        assert!(!library.state().unwrap().video_controls.panel);
         let chosen = VideoControls {
-            panel: false,
+            panel: true,
             height: 40,
             skip: 15,
             auto_advance: true,
@@ -1910,7 +1910,7 @@ mod tests {
         let (dir, library) = library();
         library
             .set_video_controls(VideoControls {
-                panel: false,
+                panel: true,
                 ..VideoControls::default()
             })
             .unwrap();

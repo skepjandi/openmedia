@@ -430,6 +430,7 @@ function load(options: {
   const context = vm.createContext(win);
   const config = JSON.stringify({
     ...VIDEO_CONTROLS_DEFAULT,
+    panel: true, // the app starts with it off; most of these tests are about the panel
     ...options.controls,
     sites: options.sites ?? {},
   });

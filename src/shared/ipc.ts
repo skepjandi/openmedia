@@ -26,7 +26,7 @@ export interface Accessibility {
 
 /** What the user chose for the video in view in a full-screen feed, for every site without a choice of its own. */
 export interface VideoControls {
-  /** OpenMedia's panel on a tap (pause, skip back and forward, mute, speed, seek bar) in place of the site's own tap. On until switched off. */
+  /** OpenMedia's panel on a tap (pause, skip back and forward, mute, speed, seek bar) in place of the site's own tap. Off until switched on. */
   panel: boolean;
   /** Pixels between the panel and the bottom of the page. */
   height: number;

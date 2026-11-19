@@ -55,7 +55,7 @@ fn read_site_skip<'de, D: Deserializer<'de>>(deserializer: D) -> Result<Option<u
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase", default)]
 pub struct VideoControls {
-    /// OpenMedia's panel on a tap, in place of the site's own tap. On until switched off.
+    /// OpenMedia's panel on a tap, in place of the site's own tap. Off until switched on.
     pub panel: bool,
     /// Pixels between the panel and the bottom of the page.
     pub height: u32,
@@ -79,7 +79,7 @@ pub struct VideoControls {
 impl Default for VideoControls {
     fn default() -> Self {
         Self {
-            panel: on(),
+            panel: false,
             height: default_height(),
             skip: default_skip(),
             full_videos: false,
@@ -169,11 +169,11 @@ mod tests {
     }
 
     #[test]
-    fn the_panel_is_on_until_switched_off_and_the_rest_is_off_until_chosen() {
+    fn the_panel_is_off_until_switched_on_and_only_the_drag_is_on_until_chosen() {
         assert_eq!(
             serde_json::to_value(VideoControls::default()).unwrap(),
             serde_json::json!({
-                "panel": true,
+                "panel": false,
                 "height": 16,
                 "skip": 10,
                 "fullVideos": false,
@@ -197,7 +197,7 @@ mod tests {
         );
         let script = VideoControls::default().page_script(&sites);
         assert!(script.ends_with(
-            r#"({"panel":true,"height":16,"skip":10,"fullVideos":false,"dragToMini":true,"remember":false,"loopOff":false,"autoAdvance":false,"sites":{"youtube.com":{"panel":false}}});"#
+            r#"({"panel":false,"height":16,"skip":10,"fullVideos":false,"dragToMini":true,"remember":false,"loopOff":false,"autoAdvance":false,"sites":{"youtube.com":{"panel":false}}});"#
         ));
     }
 
@@ -205,7 +205,7 @@ mod tests {
     fn a_saved_choice_missing_a_field_keeps_its_default() {
         let saved: VideoControls = serde_json::from_str(r#"{"remember":true}"#).unwrap();
         assert!(saved.remember);
-        assert!(saved.panel);
+        assert!(!saved.panel);
         assert_eq!(saved.height, DEFAULT_HEIGHT);
         assert!(!saved.auto_advance);
     }
@@ -214,7 +214,7 @@ mod tests {
     fn choices_saved_before_the_panel_existed_load_without_error() {
         let saved: VideoControls =
             serde_json::from_str(r#"{"seekBar":true,"speed":true,"autoAdvance":true}"#).unwrap();
-        assert!(saved.panel);
+        assert!(!saved.panel);
         assert!(saved.auto_advance);
     }
 

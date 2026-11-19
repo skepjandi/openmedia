@@ -6,6 +6,16 @@ All notable changes to OpenMedia are documented here.
 >
 > **Wiki**: the [GitHub Wiki](https://github.com/skepjandi/openmedia/wiki) is the public-facing main wiki — architecture, recipe format, AI pipeline, security model, roadmap. Source-controlled editing surface is `docs/wiki/` in this repo; CI (`.github/workflows/sync-wiki.yml`) mirrors it to the GitHub Wiki on every merge to `main`. New single-PR changes belong here, not as new wiki pages.
 
+### feat(video-controls): the controls panel starts off
+
+**Area:** `feat(video-controls)`
+
+**Problem:** The tap panel replaced the site's own tap on every feed from the first launch, before the reader had chosen it.
+
+**Change:** `panel` now defaults to off in `VIDEO_CONTROLS_DEFAULT` and `VideoControls::default()`. It is one tap on the floating button's video controls switch (or Settings > Video controls) to turn on, still per site as well. A library that never saved video controls, or saved them without `panel`, loads with it off; one that saved `panel: true` keeps it. Drag to shrink stays on.
+
+**Verified:** see the PR. **Not verified:** on a device.
+
 ### fix(siteview): Mobile site brings the mobile page back
 
 **Area:** `fix(siteview)`

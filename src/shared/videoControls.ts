@@ -1,9 +1,9 @@
 import type { SiteVideo, VideoControls } from "./ipc";
 import { withOverrides } from "./overrides";
 
-/** The panel on, the rest off: what the app starts with, and what Rust holds until the user chooses. */
+/** Everything off but the drag to shrink: what the app starts with, and what Rust holds until the user chooses. */
 export const VIDEO_CONTROLS_DEFAULT: VideoControls = {
-  panel: true,
+  panel: false,
   height: 16,
   skip: 10,
   fullVideos: false,
