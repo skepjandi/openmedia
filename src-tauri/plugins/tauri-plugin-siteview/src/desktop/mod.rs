@@ -191,6 +191,9 @@ struct Inner<R: Runtime> {
     app: AppHandle<R>,
     state: Mutex<State<R>>,
     labels: AtomicU64,
+    /// Held from deciding a media step to finishing it, so a pause and a resume decided in that
+    /// order also finish in that order; see `settle_media`.
+    media_gate: Mutex<()>,
     /// The label of the web view that was last given the keyboard.
     focused: Mutex<Option<String>>,
     /// Counts the times the keyboard was given to a window on purpose (by the shell, or by a
@@ -226,6 +229,7 @@ pub fn init<R: Runtime, C: DeserializeOwned>(
             panes: Vec::new(),
         }),
         labels: AtomicU64::new(0),
+        media_gate: Mutex::new(()),
         focused: Mutex::new(None),
         keyboard_given: AtomicU64::new(0),
         block_popups: Arc::new(AtomicBool::new(true)),
@@ -538,8 +542,8 @@ impl<R: Runtime> Inner<R> {
     /// there is none) visible, each at its own rectangle, unless the shell covers them or the
     /// session is closed for the day; the rest hidden.
     fn sync_views(&self) {
-        let (rect, regions, overlay, covered, views, media, active) = {
-            let mut state = self.state();
+        let (rect, regions, overlay, covered, views, active) = {
+            let state = self.state();
             let rect = state.rect.and_then(layout::usable);
             let overlay = rect.is_some_and(|rect| layout::overlay_open(&rect, &state.regions));
             let views: Vec<ViewPlan<R>> = state
@@ -557,18 +561,16 @@ impl<R: Runtime> Inner<R> {
                         && !state.blocked.contains(id),
                 })
                 .collect();
-            let media = Self::media_steps(&mut state);
             (
                 rect,
                 state.regions.clone(),
                 overlay,
                 state.covered,
                 views,
-                media,
                 state.active.clone(),
             )
         };
-        self.apply_media(media);
+        self.settle_media();
         // Without click-through the page would hide whatever the shell draws over it: it steps
         // aside for an overlay or a page of the shell's own, and keeps clear of the small controls.
         let shell_in_front = !platform::CLICK_THROUGH && (overlay || covered);
@@ -601,6 +603,19 @@ impl<R: Runtime> Inner<R> {
             _ => MAIN_WINDOW.to_owned(),
         };
         self.focus(&focus);
+    }
+
+    /// Decides what each session's media needs and does it. The decision and the work happen under
+    /// one gate: the pause waits up to a second for the page's answer, and a resume decided
+    /// meanwhile (the window came back) must not run before it, or it would find nothing to undo
+    /// and the late pause would leave the page's media suspended for good.
+    fn settle_media(&self) {
+        let _gate = self
+            .media_gate
+            .lock()
+            .unwrap_or_else(PoisonError::into_inner);
+        let media = Self::media_steps(&mut self.state());
+        self.apply_media(media);
     }
 
     /// Does what `media_steps` recorded. The page's script pauses what its own document plays and
@@ -759,15 +774,14 @@ impl<R: Runtime> Inner<R> {
             return;
         };
         let hidden = window.is_minimized().unwrap_or(false) || !window.is_visible().unwrap_or(true);
-        let media = {
+        {
             let mut state = self.state();
             if state.window_hidden == hidden {
                 return;
             }
             state.window_hidden = hidden;
-            Self::media_steps(&mut state)
-        };
-        self.apply_media(media);
+        }
+        self.settle_media();
     }
 
     /// Rebuilds the windows showing whose page was built under an older script; a page out of

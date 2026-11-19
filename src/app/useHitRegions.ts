@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { siteView, type Rect } from "../shared/ipc";
+import { createRegionReporter } from "./regionReporter";
 
 const TOUCH_PADDING = 8;
 
@@ -32,17 +33,19 @@ function measureRegions(): Rect[] {
 export function useHitRegions() {
   useEffect(() => {
     let frame = 0;
-    let last = "";
+    const reporter = createRegionReporter((regions) => siteView.setInteractiveRegions(regions));
 
     const sync = () => {
       cancelAnimationFrame(frame);
-      frame = requestAnimationFrame(() => {
-        const regions = measureRegions();
-        const key = JSON.stringify(regions);
-        if (key === last) return;
-        last = key;
-        void siteView.setInteractiveRegions(regions).catch(() => {});
-      });
+      frame = requestAnimationFrame(() => reporter.report(measureRegions()));
+    };
+
+    // The window may have been minimized or hidden while frames were not running: tell native
+    // code again what the shell wants, whatever it last heard.
+    const resync = () => {
+      if (document.visibilityState !== "visible") return;
+      reporter.forget();
+      sync();
     };
 
     const observer = new MutationObserver(sync);
@@ -50,9 +53,13 @@ export function useHitRegions() {
     for (const type of ["resize", "transitionend", "transitioncancel", "animationend"]) {
       window.addEventListener(type, sync, true);
     }
+    document.addEventListener("visibilitychange", resync);
+    window.addEventListener("focus", resync);
     sync();
     return () => {
       cancelAnimationFrame(frame);
+      document.removeEventListener("visibilitychange", resync);
+      window.removeEventListener("focus", resync);
       observer.disconnect();
       for (const type of ["resize", "transitionend", "transitioncancel", "animationend"]) {
         window.removeEventListener(type, sync, true);

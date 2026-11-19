@@ -16,6 +16,16 @@ All notable changes to OpenMedia are documented here.
 
 **Verified:** TypeScript, ESLint, Prettier, Vitest; the list, a part page, back and the Android back handler (off while a page sits over Settings) in a browser harness at 390 px, and the desktop layout at 1200 px. **Not verified:** on an iOS or Android device; the edge swipe off a part page.
 
+### fix(desktop): the app stays clickable after a cold start or a minimize with media playing
+
+**Area:** `fix(desktop)`
+
+**Problem:** Sometimes after launch, and most often after minimizing while media played, nothing in the app could be clicked. Two causes: the shell's click regions were remembered as sent even when the send failed (and not re-sent after the window came back), and native code answers every click outside the regions it holds with "not the shell"; and a pause decided as the window was minimized could finish after the resume decided as it came back, leaving the page's media suspended.
+
+**Change:** `regionReporter.ts` forgets a failed send and `useHitRegions` re-sends the regions when the window becomes visible or focused. In the desktop plugin, `settle_media` decides and applies each pause or resume under one gate, so they finish in the order they were decided.
+
+**Verified:** Vitest for the reporter, `cargo clippy -D warnings` on the plugin. **Not verified:** in the running desktop app; the freeze was not reproduced here.
+
 ### fix(desktop): the color picker reads the pixel the page shows on macOS
 
 **Area:** `fix(desktop)`
