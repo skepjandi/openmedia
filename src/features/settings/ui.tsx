@@ -1,7 +1,6 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { useApp } from "../../app/store";
 import { Chevron } from "../../shared/Chevron";
-import { DownIcon } from "../../shared/icons";
 import { BiometricIcon } from "../incognito/BiometricIcon";
 
 export const field =
@@ -26,16 +25,15 @@ interface SectionProps {
   title: string;
   /** Explains the group below it, in small print. */
   note?: ReactNode;
-  /** Sections start open; a long one can start collapsed. */
-  defaultOpen?: boolean;
   children: ReactNode;
 }
 
 /**
- * A titled block of settings. On a phone the title is small, quiet and folds the block away; on
- * desktop every block stays open, under a heading that says what it is, with its note above it.
+ * A titled block of settings. On a phone the title is a quiet label over the card and the note
+ * sits under it, as in the system's own Settings; on desktop the title is a heading with its note
+ * above the block. Phones get one part of Settings per page, so no block folds away.
  */
-export function Section({ title, note, defaultOpen = true, children }: SectionProps) {
+export function Section({ title, note, children }: SectionProps) {
   const desktop = useApp((s) => s.desktop);
   if (desktop) {
     return (
@@ -47,21 +45,11 @@ export function Section({ title, note, defaultOpen = true, children }: SectionPr
     );
   }
   return (
-    <details className="group" open={defaultOpen}>
-      <summary className="eyebrow flex cursor-pointer list-none items-center justify-between px-1 py-2">
-        <span>{title}</span>
-        <span
-          aria-hidden="true"
-          className="text-paper/45 transition-transform duration-200 group-open:rotate-180"
-        >
-          <DownIcon />
-        </span>
-      </summary>
-      <div className="pt-3">
-        {children}
-        {note && <p className="px-1 pt-2.5 text-[13px] leading-snug text-paper/50">{note}</p>}
-      </div>
-    </details>
+    <section>
+      <h2 className="eyebrow px-1 pb-2.5">{title}</h2>
+      {children}
+      {note && <p className="px-1 pt-2.5 text-[13px] leading-snug text-paper/50">{note}</p>}
+    </section>
   );
 }
 

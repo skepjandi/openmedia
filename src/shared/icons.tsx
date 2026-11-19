@@ -280,3 +280,31 @@ export const KeyIcon = () => (
     <path d="M11 12l8-8M16 7l3 3" />
   </Icon>
 );
+
+export const GlobeIcon = () => (
+  <Icon>
+    <circle cx="12" cy="12" r="8.5" />
+    <path d="M3.5 12h17M12 3.5c2.4 2.5 3.6 5.3 3.6 8.5s-1.2 6-3.6 8.5c-2.4-2.5-3.6-5.3-3.6-8.5S9.6 6 12 3.5z" />
+  </Icon>
+);
+
+export const ToggleIcon = () => (
+  <Icon>
+    <rect x="3" y="7.5" width="18" height="9" rx="4.5" />
+    <circle cx="16.5" cy="12" r="2.2" />
+  </Icon>
+);
+
+export const SparkIcon = () => (
+  <Icon>
+    <path d="M11 4l1.9 5.1L18 11l-5.1 1.9L11 18l-1.9-5.1L4 11l5.1-1.9z" />
+    <path d="M18.5 15.5l.7 1.8 1.8.7-1.8.7-.7 1.8-.7-1.8-1.8-.7 1.8-.7z" />
+  </Icon>
+);
+
+export const DatabaseIcon = () => (
+  <Icon>
+    <ellipse cx="12" cy="6.5" rx="7" ry="2.8" />
+    <path d="M5 6.5v11c0 1.5 3.1 2.8 7 2.8s7-1.3 7-2.8v-11M5 12c0 1.5 3.1 2.8 7 2.8s7-1.3 7-2.8" />
+  </Icon>
+);

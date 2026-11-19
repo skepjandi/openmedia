@@ -1,4 +1,4 @@
-import { useRef, type ReactNode } from "react";
+import { useEffect, useRef, type ReactNode } from "react";
 import { useApp } from "../app/store";
 import { useEdgeSwipeBack } from "../features/back/useEdgeSwipeBack";
 import { useTrackpadSwipeBack } from "../features/back/useTrackpadSwipeBack";
@@ -13,6 +13,8 @@ interface ScreenProps {
   back?: boolean;
   /** Desktop only: a column beside the page, such as a list of its parts. Phones show it above the body. */
   sidebar?: ReactNode;
+  /** A page that swaps its content in place: when this changes, the body scrolls back to the top. */
+  pageKey?: string;
   children: ReactNode;
 }
 
@@ -29,10 +31,14 @@ export function Screen({
   onClose,
   back = false,
   sidebar,
+  pageKey,
   children,
 }: ScreenProps) {
   const root = useRef<HTMLDivElement>(null);
   const desktop = useApp((s) => s.desktop);
+  useEffect(() => {
+    root.current?.scrollTo(0, 0);
+  }, [pageKey]);
   useEdgeSwipeBack(root, onClose);
   useTrackpadSwipeBack(root, onClose);
   const button = (

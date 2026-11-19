@@ -6,6 +6,7 @@ import { describeError } from "../../i18n/errors";
 import { useT } from "../../i18n/useT";
 import { useChat } from "../ai/chatStore";
 import { Screen } from "../../shared/Screen";
+import { useBackHandler } from "../back/useBackHandler";
 import type { SearchEngine, Theme } from "../../shared/ipc";
 import { DEFAULT_SEARCH_ENGINE, SEARCH_ENGINES } from "../../shared/searchEngines";
 import { AccessibilitySection } from "./AccessibilitySection";
@@ -22,11 +23,13 @@ import { UpdatesSection } from "./UpdatesSection";
 import { Picker } from "./Picker";
 import { NavRow } from "./SiteParts";
 import { FloatingButtonSection } from "./FloatingButtonSection";
-import { SettingsNav, type SettingsCategory } from "./SettingsNav";
+import { SettingsIndex, SettingsNav, categoryLabel, type SettingsCategory } from "./SettingsNav";
 import { Group, Section, primaryButton, quietButton } from "./ui";
 
 export function SettingsScreen() {
   const open = useApp(selectSettingsOpen);
+  const onSettingsPage = useApp((s) => s.sheet === "settings");
+  const desktop = useApp((s) => s.desktop);
   const incognitoChildOpen = useApp(
     (s) =>
       s.sheet === "incognito-recipes" ||
@@ -34,20 +37,50 @@ export function SettingsScreen() {
       s.sheet === "incognito-folders",
   );
   const closeSheet = useApp((s) => s.closeSheet);
-  const [category, setCategory] = useState<SettingsCategory>("general");
+  // Desktop always shows one part; a phone starts on the list of parts, which is `null`.
+  const [picked, setPicked] = useState<SettingsCategory | null>(null);
+  const [wasOpen, setWasOpen] = useState(open);
   const t = useT();
+  if (open !== wasOpen) {
+    setWasOpen(open);
+    if (!open && !desktop) setPicked(null);
+  }
+  const category = desktop ? (picked ?? "general") : picked;
+  const backToList = () => setPicked(null);
+  useBackHandler(open && onSettingsPage && !desktop && picked !== null, backToList);
   if (!open) return null;
+
+  if (category === null) {
+    return (
+      <Screen title={t("settings.title")} closeLabel={t("settings.close")} onClose={closeSheet}>
+        <SettingsIndex onOpen={setPicked} />
+      </Screen>
+    );
+  }
+
+  const panel = <CategoryPanel category={category} incognitoChildOpen={incognitoChildOpen} />;
+  if (desktop) {
+    return (
+      <Screen
+        title={t("settings.title")}
+        closeLabel={t("settings.close")}
+        onClose={closeSheet}
+        sidebar={<SettingsNav value={category} onChange={setPicked} />}
+      >
+        <div className="flex flex-col gap-10">{panel}</div>
+      </Screen>
+    );
+  }
 
   return (
     <Screen
-      title={t("settings.title")}
-      closeLabel={t("settings.close")}
-      onClose={closeSheet}
-      sidebar={<SettingsNav value={category} onChange={setCategory} />}
+      title={t(categoryLabel(category))}
+      closeLabel={t("common.back")}
+      onClose={backToList}
+      back
+      pageKey={category}
     >
-      <div className="flex flex-col gap-9 desktop:gap-10">
-        <CategoryPanel category={category} incognitoChildOpen={incognitoChildOpen} />
-      </div>
+      <div className="flex flex-col gap-6">{panel}</div>
     </Screen>
   );
 }

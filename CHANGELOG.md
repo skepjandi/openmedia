@@ -6,6 +6,16 @@ All notable changes to OpenMedia are documented here.
 >
 > **Wiki**: the [GitHub Wiki](https://github.com/skepjandi/openmedia/wiki) is the public-facing main wiki — architecture, recipe format, AI pipeline, security model, roadmap. Source-controlled editing surface is `docs/wiki/` in this repo; CI (`.github/workflows/sync-wiki.yml`) mirrors it to the GitHub Wiki on every merge to `main`. New single-PR changes belong here, not as new wiki pages.
 
+### feat(settings): phone Settings is a list of parts, each its own page
+
+**Area:** `feat(settings)`
+
+**Problem:** After the desktop Settings got a sidebar of parts, a phone still showed them as a row of chips above one long list of folding sections: seven names to scroll sideways, and a page that said nothing about what was in each part.
+
+**Change:** The first page of Settings on a phone is a list of the parts, each with an icon and the names of what it holds. A tap opens that part as a page with a back arrow; Back, the edge swipe and Android's back return to the list. Blocks no longer fold away on a phone: a quiet label over the card, the note under it. Reopening Settings starts on the list. Desktop is unchanged. No new strings.
+
+**Verified:** TypeScript, ESLint, Prettier, Vitest; the list, a part page, back and the Android back handler (off while a page sits over Settings) in a browser harness at 390 px, and the desktop layout at 1200 px. **Not verified:** on an iOS or Android device; the edge swipe off a part page.
+
 ### fix(desktop): the color picker reads the pixel the page shows on macOS
 
 **Area:** `fix(desktop)`
