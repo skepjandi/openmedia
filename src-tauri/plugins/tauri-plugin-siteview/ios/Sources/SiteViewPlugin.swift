@@ -1031,13 +1031,24 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
       for session in self.sessions.values
       where session.desktop != self.desktopSites.contains(session.scope) {
         if session.id == self.activeId && !session.blocked {
-          session.view.reload()
+          self.loadAgain(session)
         } else {
           session.needsReload = true
         }
       }
       invoke.resolve()
     }
+  }
+
+  /// Loads the page's address as a new navigation, past the cache, so the site's desktop or mobile
+  /// choice applies to it. A `reload()` keeps the content mode and user agent the page was first
+  /// loaded with, which left a site on its desktop page after "Mobile site".
+  private func loadAgain(_ session: Session) {
+    guard let url = session.view.url else {
+      session.view.reload()
+      return
+    }
+    session.view.load(URLRequest(url: url, cachePolicy: .reloadIgnoringLocalCacheData))
   }
 
   /// Opens the system share sheet for an address. Rust-only: no webview can raise it.
@@ -2227,6 +2238,8 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
       session.needsReload = false
       if session.view.url == nil {
         session.view.load(URLRequest(url: session.initialURL))
+      } else if session.desktop != desktopSites.contains(session.scope) {
+        loadAgain(session)
       } else {
         session.view.reload()
       }

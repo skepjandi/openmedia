@@ -6,6 +6,16 @@ All notable changes to OpenMedia are documented here.
 >
 > **Wiki**: the [GitHub Wiki](https://github.com/skepjandi/openmedia/wiki) is the public-facing main wiki — architecture, recipe format, AI pipeline, security model, roadmap. Source-controlled editing surface is `docs/wiki/` in this repo; CI (`.github/workflows/sync-wiki.yml`) mirrors it to the GitHub Wiki on every merge to `main`. New single-PR changes belong here, not as new wiki pages.
 
+### fix(siteview): Mobile site brings the mobile page back
+
+**Area:** `fix(siteview)`
+
+**Problem:** After *Desktop site*, tapping *Mobile site* left the page on its desktop layout.
+
+**Change:** When a site's desktop choice changes, the iOS and Android plugins load the page's address as a new navigation (iOS also past the cache) instead of `reload()`, which kept the content mode, user agent and zoom the page was first loaded with. A hidden iOS page does the same when it is shown again.
+
+**Verified:** nothing run. **Not verified:** on a device or simulator; the cause is inferred from the code, not reproduced.
+
 ### feat(settings): phone Settings is a list of parts, each its own page
 
 **Area:** `feat(settings)`

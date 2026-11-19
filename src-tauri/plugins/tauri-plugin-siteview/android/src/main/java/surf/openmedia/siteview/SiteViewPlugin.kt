@@ -684,7 +684,7 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
             for (session in sessions.values) {
                 if (session.desktop != (session.scope in desktopSites)) {
                     applyDesktop(session, session.scope)
-                    reloadUnder(session)
+                    loadAgain(session)
                 }
             }
             invoke.resolve()
@@ -1121,6 +1121,19 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
         }
         action(session)
         invoke.resolve()
+    }
+
+    /**
+     * Loads the page's address as a new navigation, so the site's desktop or mobile choice starts
+     * from a fresh layout: a reload keeps the zoom the other layout settled on.
+     */
+    private fun loadAgain(session: Session) {
+        val url = session.view.url
+        if (url == null || session.id != activeId || session.blocked) {
+            reloadUnder(session)
+        } else {
+            session.view.loadUrl(url)
+        }
     }
 
     private fun reloadUnder(session: Session) {
