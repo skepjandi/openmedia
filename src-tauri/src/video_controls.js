@@ -221,9 +221,11 @@
       if (volumeBridge) return true;
       if (volumeSettable === null) {
         try {
+          var ua = navigator.userAgent || '';
+          var onIos = /iPhone|iPad|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
           var probe = document.createElement('video');
           probe.volume = 0.5;
-          volumeSettable = probe.volume === 0.5;
+          volumeSettable = !onIos && probe.volume === 0.5;
         } catch (_) {
           volumeSettable = false;
         }
