@@ -803,6 +803,7 @@ export const zhHant: Messages = {
   "tabs.isOpen": "已開啟",
   "tabs.notOpen": "未開啟",
   "tabs.loading": "載入中",
+  "media.playing": "正在播放媒體",
   "tabs.statPaint": "首次繪製 {value}",
   "tabs.statLoad": "載入 {value}",
   "tabs.statToday": "今天 {value}",

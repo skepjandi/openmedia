@@ -872,6 +872,7 @@ export const id: Messages = {
   "tabs.isOpen": "Terbuka",
   "tabs.notOpen": "Tidak terbuka",
   "tabs.loading": "Memuat",
+  "media.playing": "Memutar media",
   "tabs.statPaint": "Render pertama {value}",
   "tabs.statLoad": "Muat {value}",
   "tabs.statToday": "{value} hari ini",

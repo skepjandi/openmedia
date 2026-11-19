@@ -863,6 +863,7 @@ export const en = {
   "tabs.isOpen": "Open",
   "tabs.notOpen": "Not open",
   "tabs.loading": "Loading",
+  "media.playing": "Playing media",
   "tabs.statPaint": "First paint {value}",
   "tabs.statLoad": "Load {value}",
   "tabs.statToday": "{value} today",

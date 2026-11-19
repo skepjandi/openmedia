@@ -5,6 +5,7 @@ import { displayHost, folderIcon, folderKey, groupByFolder } from "../../shared/
 import { DownIcon, UpIcon } from "../../shared/icons";
 import type { Favorite } from "../../shared/ipc";
 import { FolderTile } from "../../shared/FolderTile";
+import { PlayingBadge } from "../../shared/PlayingBadge";
 import { SiteTile } from "../../shared/SiteTile";
 import { Group } from "../settings/ui";
 import { sessionForFavorite } from "../web/sessions";
@@ -34,6 +35,7 @@ export function FavoriteRows({
       key={favorite.id}
       favorite={favorite}
       live={isLive(favorite)}
+      playing={sessionForFavorite([...sessions], favorite.url, sites)?.playing === true}
       onOpen={() => openFavorite(favorite)}
     />
   );
@@ -92,10 +94,12 @@ export function FavoriteRows({
 export function QuickRow({
   favorite,
   live,
+  playing,
   onOpen,
 }: {
   favorite: Favorite;
   live: boolean;
+  playing: boolean;
   onOpen: () => void;
 }) {
   const t = useT();
@@ -105,7 +109,10 @@ export function QuickRow({
       onClick={onOpen}
       className="flex w-full items-center gap-3 px-4 py-3 text-start active:bg-paper/[0.06]"
     >
-      <SiteTile name={favorite.name} icon={favorite.icon} />
+      <span className="relative shrink-0">
+        <SiteTile name={favorite.name} icon={favorite.icon} />
+        {playing && <PlayingBadge label={t("media.playing")} />}
+      </span>
       <span className="min-w-0 flex-1">
         <span className="block truncate text-base font-medium">{favorite.name}</span>
         <span className="block truncate text-sm text-paper/55">{displayHost(favorite.url)}</span>

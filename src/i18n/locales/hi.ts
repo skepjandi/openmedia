@@ -866,6 +866,7 @@ export const hi: Messages = {
   "tabs.isOpen": "खुली",
   "tabs.notOpen": "खुली नहीं",
   "tabs.loading": "लोड हो रही है",
+  "media.playing": "मीडिया चल रहा है",
   "tabs.statPaint": "पहला प्रदर्शन {value}",
   "tabs.statLoad": "लोड {value}",
   "tabs.statToday": "आज {value}",

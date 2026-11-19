@@ -837,6 +837,7 @@ export const ar: Messages = {
   "tabs.isOpen": "مفتوح",
   "tabs.notOpen": "غير مفتوح",
   "tabs.loading": "جارٍ التحميل",
+  "media.playing": "يشغّل وسائط",
   "tabs.statPaint": "أول عرض {value}",
   "tabs.statLoad": "التحميل {value}",
   "tabs.statToday": "{value} اليوم",

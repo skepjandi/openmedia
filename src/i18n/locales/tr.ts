@@ -872,6 +872,7 @@ export const tr: Messages = {
   "tabs.isOpen": "Açık",
   "tabs.notOpen": "Açık değil",
   "tabs.loading": "Yükleniyor",
+  "media.playing": "Medya oynatıyor",
   "tabs.statPaint": "İlk görüntüleme {value}",
   "tabs.statLoad": "Yükleme {value}",
   "tabs.statToday": "Bugün {value}",

@@ -878,6 +878,7 @@ export const pt: Messages = {
   "tabs.isOpen": "Aberto",
   "tabs.notOpen": "Não aberto",
   "tabs.loading": "Carregando",
+  "media.playing": "Reproduzindo mídia",
   "tabs.statPaint": "Primeira renderização {value}",
   "tabs.statLoad": "Carregamento {value}",
   "tabs.statToday": "{value} hoje",

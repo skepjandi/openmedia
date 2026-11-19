@@ -856,6 +856,7 @@ export const ko: Messages = {
   "tabs.isOpen": "열림",
   "tabs.notOpen": "열려 있지 않음",
   "tabs.loading": "로드 중",
+  "media.playing": "미디어 재생 중",
   "tabs.statPaint": "첫 렌더링 {value}",
   "tabs.statLoad": "로드 {value}",
   "tabs.statToday": "오늘 {value}",

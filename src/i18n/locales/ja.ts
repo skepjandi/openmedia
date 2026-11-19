@@ -864,6 +864,7 @@ export const ja: Messages = {
   "tabs.isOpen": "開いている",
   "tabs.notOpen": "開いていない",
   "tabs.loading": "読み込み中",
+  "media.playing": "メディアを再生中",
   "tabs.statPaint": "初回描画 {value}",
   "tabs.statLoad": "読み込み {value}",
   "tabs.statToday": "今日 {value}",

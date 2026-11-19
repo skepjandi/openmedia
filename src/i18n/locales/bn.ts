@@ -858,6 +858,7 @@ export const bn: Messages = {
   "tabs.isOpen": "খোলা",
   "tabs.notOpen": "খোলা নয়",
   "tabs.loading": "লোড হচ্ছে",
+  "media.playing": "মিডিয়া চলছে",
   "tabs.statPaint": "প্রথম প্রদর্শন {value}",
   "tabs.statLoad": "লোড {value}",
   "tabs.statToday": "আজ {value}",

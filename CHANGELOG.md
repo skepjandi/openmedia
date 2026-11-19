@@ -26,6 +26,14 @@ All notable changes to OpenMedia are documented here.
 
 **Verified:** Vitest for the reporter, `cargo clippy -D warnings` on the plugin. **Not verified:** in the running desktop app; the freeze was not reproduced here.
 
+### feat(tabs): a speaker badge on sites that are playing media
+
+**Area:** `feat(tabs)`
+
+**Change:** A site playing audible sound or video gets a small speaker badge on its icon's top corner in the Tabs screen, the floating button's fan and the folder popup. The site views report a new `playing` flag in `siteview:state`, found by asking the page every ~2 s (macOS, Windows, Linux, iOS, Android). Muted media and media inside iframes do not count.
+
+**Verified:** Vitest, TypeScript, ESLint, Prettier, `cargo test`/`clippy -D warnings` on the plugin (macOS). **Not verified:** on a running app, iOS, Android, Windows, Linux (Swift, Kotlin and the portable desktop path are not compiled here).
+
 ### fix(desktop): the color picker reads the pixel the page shows on macOS
 
 **Area:** `fix(desktop)`

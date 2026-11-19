@@ -863,6 +863,7 @@ export const vi: Messages = {
   "tabs.isOpen": "Đang mở",
   "tabs.notOpen": "Chưa mở",
   "tabs.loading": "Đang tải",
+  "media.playing": "Đang phát nội dung",
   "tabs.statPaint": "Hiển thị đầu tiên {value}",
   "tabs.statLoad": "Tải {value}",
   "tabs.statToday": "Hôm nay {value}",

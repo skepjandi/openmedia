@@ -875,6 +875,7 @@ export const sv: Messages = {
   "tabs.isOpen": "Öppen",
   "tabs.notOpen": "Inte öppen",
   "tabs.loading": "Laddar",
+  "media.playing": "Spelar upp media",
   "tabs.statPaint": "Första rendering {value}",
   "tabs.statLoad": "Laddning {value}",
   "tabs.statToday": "{value} idag",

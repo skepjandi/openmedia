@@ -869,6 +869,7 @@ export const cs: Messages = {
   "tabs.isOpen": "Otevřeno",
   "tabs.notOpen": "Neotevřeno",
   "tabs.loading": "Načítání",
+  "media.playing": "Přehrává média",
   "tabs.statPaint": "První vykreslení {value}",
   "tabs.statLoad": "Načtení {value}",
   "tabs.statToday": "Dnes {value}",

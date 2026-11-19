@@ -6,6 +6,7 @@ import { usage, type Favorite, type UsageReport } from "../../shared/ipc";
 import { PlusIcon, ReloadIcon } from "../../shared/icons";
 import { Screen } from "../../shared/Screen";
 import { useIconForUrl } from "../../shared/siteIcons";
+import { PlayingBadge } from "../../shared/PlayingBadge";
 import { SiteTile } from "../../shared/SiteTile";
 import { describeAddress } from "../history/address";
 import { formatDuration, localDay } from "../stats/format";
@@ -360,7 +361,10 @@ function OpenTab({
         >
           {number}
         </span>
-        <SiteTile name={host} icon={icon} />
+        <span className="relative shrink-0">
+          <SiteTile name={host} icon={icon} />
+          {session.playing && <PlayingBadge label={t("media.playing")} />}
+        </span>
         <span className="min-w-0 flex-1">
           <span className="block truncate text-base font-medium">{title}</span>
           <span className="block truncate text-sm text-paper/55">{host}</span>

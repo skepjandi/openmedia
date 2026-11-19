@@ -876,6 +876,7 @@ export const ru: Messages = {
   "tabs.isOpen": "Открыт",
   "tabs.notOpen": "Не открыт",
   "tabs.loading": "Загрузка",
+  "media.playing": "Воспроизводит медиа",
   "tabs.statPaint": "Первая отрисовка {value}",
   "tabs.statLoad": "Загрузка {value}",
   "tabs.statToday": "Сегодня {value}",

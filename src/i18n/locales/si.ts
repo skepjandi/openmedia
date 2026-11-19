@@ -866,6 +866,7 @@ export const si: Messages = {
   "tabs.isOpen": "විවෘතයි",
   "tabs.notOpen": "විවෘත නැත",
   "tabs.loading": "පූරණය වෙමින්",
+  "media.playing": "මාධ්‍ය වාදනය වේ",
   "tabs.statPaint": "පළමු සංදර්ශනය {value}",
   "tabs.statLoad": "පූරණය {value}",
   "tabs.statToday": "අද {value}",

@@ -100,6 +100,8 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
         // Redirect allowance must not weaken the cross-domain POST guard while unsettled.
         @Volatile var userNavigationPending: Boolean = false,
         var painted: Boolean = false,
+        /** True while the page plays sound or video the reader can hear, as the last check found. */
+        var playing: Boolean = false,
         /**
          * True while the touch in progress began inside a page container that is scrolled away from
          * its top, as in a feed of full-screen videos. The page itself is then still at its top, so
@@ -270,6 +272,7 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
         webView.isClickable = true
         webView.setOnTouchListener { _, event -> routeTouch(event) }
         trackSafeArea(webView)
+        watchPlaying()
 
         val host = webView.parent as? ViewGroup
         if (host != null) {
@@ -1841,6 +1844,7 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
         payload.put("loading", session.loading)
         payload.put("canGoBack", session.view.canGoBack())
         payload.put("canGoForward", session.view.canGoForward())
+        payload.put("playing", session.playing)
         payload.put("painted", session.painted)
         payload.put("scope", session.scope)
         events?.send(payload)
@@ -1857,6 +1861,22 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
         val payload = JSObject()
         payload.put("type", "memoryWarning")
         events?.send(payload)
+    }
+
+    private fun watchPlaying() {
+        shell?.postDelayed({
+            sessions.values.toList().forEach { probePlaying(it) }
+            watchPlaying()
+        }, PLAYING_CHECK_MS)
+    }
+
+    private fun probePlaying(session: Session) {
+        session.view.evaluateJavascript(PLAYING_SCRIPT) { value ->
+            val playing = value == "true"
+            if (playing == session.playing) return@evaluateJavascript
+            session.playing = playing
+            sendState(session)
+        }
     }
 
     private fun sendNotificationTapped(session: String) {
@@ -2020,6 +2040,12 @@ class SiteViewPlugin(private val activity: Activity) : Plugin(activity), Compone
         private const val EVALUATE_TIMEOUT_MS = 5000L
         /** How long frames get to receive the hold message before the view itself is paused. */
         private const val FRAME_HOLD_SETTLE_MS = 300L
+        private const val PLAYING_CHECK_MS = 2000L
+
+        /** True while a media element of the page's own document plays with sound the reader can hear. */
+        private const val PLAYING_SCRIPT =
+            "(function(){var m=document.querySelectorAll('video,audio');for(var i=0;i<m.length;i++){var e=m[i];" +
+                "if(!e.paused&&!e.ended&&!e.muted&&e.volume>0&&e.readyState>2)return true}return false})()"
         private const val EVALUATE_MAX_BYTES = 200_000
 
         /**

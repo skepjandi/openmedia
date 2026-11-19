@@ -334,6 +334,8 @@ export interface SiteViewState {
   loading: boolean;
   canGoBack: boolean;
   canGoForward: boolean;
+  /** The page is playing sound or video the reader can hear. */
+  playing: boolean;
   /** The page has drawn its first content and is showing. */
   painted: boolean;
   /** The registrable domain the session is pinned to. */

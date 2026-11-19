@@ -799,6 +799,7 @@ export const zhHans: Messages = {
   "tabs.isOpen": "已打开",
   "tabs.notOpen": "未打开",
   "tabs.loading": "加载中",
+  "media.playing": "正在播放媒体",
   "tabs.statPaint": "首次绘制 {value}",
   "tabs.statLoad": "加载 {value}",
   "tabs.statToday": "今天 {value}",

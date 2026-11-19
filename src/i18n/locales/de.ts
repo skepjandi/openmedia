@@ -891,6 +891,7 @@ export const de: Messages = {
   "tabs.isOpen": "Offen",
   "tabs.notOpen": "Nicht offen",
   "tabs.loading": "Lädt",
+  "media.playing": "Spielt Medien ab",
   "tabs.statPaint": "Erste Darstellung {value}",
   "tabs.statLoad": "Laden {value}",
   "tabs.statToday": "Heute {value}",

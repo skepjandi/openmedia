@@ -41,6 +41,8 @@ pub struct PageSnapshot {
     pub loading: bool,
     pub can_go_back: bool,
     pub can_go_forward: bool,
+    /// The page plays sound or video the reader can hear.
+    pub playing: bool,
 }
 
 /// What the page's own callbacks have said so far, for the systems whose web views cannot be asked
@@ -49,6 +51,7 @@ pub struct PageSnapshot {
 pub struct Track {
     title: Mutex<Option<String>>,
     loading: AtomicBool,
+    playing: AtomicBool,
 }
 
 impl Track {
@@ -59,6 +62,14 @@ impl Track {
 
     pub fn set_loading(&self, loading: bool) {
         self.loading.store(loading, Ordering::Relaxed);
+    }
+
+    pub fn set_playing(&self, playing: bool) {
+        self.playing.store(playing, Ordering::Relaxed);
+    }
+
+    fn playing(&self) -> bool {
+        self.playing.load(Ordering::Relaxed)
     }
 
     #[cfg(any(windows, target_os = "linux"))]

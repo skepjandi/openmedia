@@ -15,8 +15,9 @@ import {
   useApp,
   type DroppedPage,
 } from "../../app/store";
-import { unreadByFavorite } from "../web/unreadWatch";
+import { playingByFavorite, unreadByFavorite } from "../web/unreadWatch";
 import { sessionForFavorite, type Session } from "../web/sessions";
+import { PlayingBadge } from "../../shared/PlayingBadge";
 import { FolderPopup, type FolderMember } from "./FolderPopup";
 import { orderedTabs } from "../tabs/tabs";
 import { useT } from "../../i18n/useT";
@@ -479,6 +480,12 @@ function FloatingButton() {
     () => unreadByFavorite(sessions, quickAccess(favorites), activeId, sites),
     [sessions, favorites, activeId, sites],
   );
+  const playing = useMemo(
+    () => playingByFavorite(sessions, quickAccess(favorites), sites),
+    [sessions, favorites, sites],
+  );
+  const labelled = (label: string, isPlaying: boolean | undefined) =>
+    isPlaying ? `${label}. ${t("media.playing")}` : label;
   const anyUnread = unread.some((count) => count > 0);
   const resting = fabCenter(position.edge, position.yRatio * viewport.height, viewport, insets);
 
@@ -601,10 +608,12 @@ function FloatingButton() {
       target: { kind: "favorite", index },
       size: FAVORITE_SIZE,
       section,
-      label:
+      label: labelled(
         unread[index] > 0
           ? `${t("fab.openFavorite", { name })}. ${t("notify.newActivity")}`
           : t("fab.openFavorite", { name }),
+        playing[index],
+      ),
       caption: favorite?.name,
       site: true,
       className: "text-lg font-medium text-white",
@@ -616,6 +625,7 @@ function FloatingButton() {
             monogram(favorite.name)
           )}
           {(unread[index] ?? 0) > 0 && <UnreadBadge count={unread[index]} />}
+          {playing[index] && <PlayingBadge />}
           {open && <OpenDot />}
         </>
       ),
@@ -624,16 +634,19 @@ function FloatingButton() {
 
   const folderEntry = (item: Extract<FavoriteItem, { kind: "folder" }>, section: number): Entry => {
     const unreadCount = item.members.reduce((sum, member) => sum + (unread[member.index] ?? 0), 0);
+    const folderPlaying = item.members.some((member) => playing[member.index]);
     const icon = folderIcon(folders, item.name);
     return {
       lane: "ring",
       target: { kind: "folder", name: item.name },
       size: FAVORITE_SIZE,
       section,
-      label:
+      label: labelled(
         unreadCount > 0
           ? `${t("favorites.folderOpen", { name: item.name })}. ${t("notify.newActivity")}`
           : t("favorites.folderOpen", { name: item.name }),
+        folderPlaying,
+      ),
       caption: item.name,
       site: true,
       className: "text-white",
@@ -664,6 +677,7 @@ function FloatingButton() {
             </span>
           )}
           {unreadCount > 0 && <UnreadBadge count={unreadCount} />}
+          {folderPlaying && <PlayingBadge />}
           {item.live && <OpenDot />}
         </>
       ),
@@ -684,7 +698,7 @@ function FloatingButton() {
       target: { kind: "tab", sessionId: session.id },
       size: FAVORITE_SIZE,
       section: OPEN,
-      label: t("fab.openFavorite", { name }),
+      label: labelled(t("fab.openFavorite", { name }), session.playing),
       caption: name,
       site: true,
       className: "text-lg font-medium text-white",
@@ -695,6 +709,7 @@ function FloatingButton() {
           ) : (
             monogram(displayHost(url))
           )}
+          {session.playing && <PlayingBadge />}
           <OpenDot />
         </>
       ),
@@ -864,6 +879,7 @@ function FloatingButton() {
           favorite,
           index,
           live: sessionForFavorite(sessions, favorite.url, sites) !== undefined,
+          playing: playing[index] ?? false,
           unread: unread[index] ?? 0,
         }));
 

@@ -262,6 +262,7 @@ describe("applyState", () => {
       loading: false,
       canGoBack: true,
       canGoForward: false,
+      playing: false,
       painted: true,
       scope: "x.com",
     });
@@ -337,6 +338,7 @@ describe("applyState measurements", () => {
     loading: true,
     canGoBack: false,
     canGoForward: false,
+    playing: false,
     painted: false,
     scope: "a.example",
     ...overrides,

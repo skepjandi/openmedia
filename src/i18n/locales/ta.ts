@@ -893,6 +893,7 @@ export const ta: Messages = {
   "tabs.isOpen": "திறந்தது",
   "tabs.notOpen": "திறக்கப்படவில்லை",
   "tabs.loading": "ஏற்றுகிறது",
+  "media.playing": "மீடியா இயங்குகிறது",
   "tabs.statPaint": "முதல் காட்சி {value}",
   "tabs.statLoad": "ஏற்றம் {value}",
   "tabs.statToday": "இன்று {value}",

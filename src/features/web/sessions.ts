@@ -19,6 +19,8 @@ export interface Session {
   loading: boolean;
   canGoBack: boolean;
   canGoForward: boolean;
+  /** The page is playing sound or video the reader can hear. */
+  playing: boolean;
   /** Pages from before a restart, oldest first: Back opens them once the page has no history of its own. */
   restoredBack: string[];
   /** The page has drawn its first content and is showing. */
@@ -59,6 +61,7 @@ export function newSession(
     loading: true,
     canGoBack: false,
     canGoForward: false,
+    playing: false,
     restoredBack,
     painted: false,
     lastUsed: now,
@@ -90,6 +93,7 @@ export function applyState(session: Session, state: SiteViewState, now = Date.no
     loading: state.loading,
     canGoBack: state.canGoBack,
     canGoForward: state.canGoForward,
+    playing: state.playing,
     painted: state.painted,
   };
 }

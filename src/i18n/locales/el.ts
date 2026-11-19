@@ -889,6 +889,7 @@ export const el: Messages = {
   "tabs.isOpen": "Ανοιχτός",
   "tabs.notOpen": "Όχι ανοιχτός",
   "tabs.loading": "Φόρτωση",
+  "media.playing": "Αναπαραγωγή πολυμέσων",
   "tabs.statPaint": "Πρώτη εμφάνιση {value}",
   "tabs.statLoad": "Φόρτωση {value}",
   "tabs.statToday": "{value} σήμερα",

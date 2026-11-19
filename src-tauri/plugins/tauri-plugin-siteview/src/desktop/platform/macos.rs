@@ -98,8 +98,9 @@ where
         .map_err(|_| Error::PageTimeout)
 }
 
-pub fn snapshot<R: Runtime>(webview: &Webview<R>, _track: &Track) -> Result<PageSnapshot> {
-    with_view(webview, |view| {
+pub fn snapshot<R: Runtime>(webview: &Webview<R>, track: &Track) -> Result<PageSnapshot> {
+    let playing = track.playing();
+    with_view(webview, move |view| {
         // SAFETY: plain property reads on the main thread.
         unsafe {
             PageSnapshot {
@@ -114,6 +115,7 @@ pub fn snapshot<R: Runtime>(webview: &Webview<R>, _track: &Track) -> Result<Page
                 loading: view.isLoading(),
                 can_go_back: view.canGoBack(),
                 can_go_forward: view.canGoForward(),
+                playing,
             }
         }
     })

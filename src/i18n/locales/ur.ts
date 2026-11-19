@@ -865,6 +865,7 @@ export const ur: Messages = {
   "tabs.isOpen": "کھلی",
   "tabs.notOpen": "کھلی نہیں",
   "tabs.loading": "لوڈ ہو رہی ہے",
+  "media.playing": "میڈیا چل رہا ہے",
   "tabs.statPaint": "پہلی ڈسپلے {value}",
   "tabs.statLoad": "لوڈ {value}",
   "tabs.statToday": "آج {value}",

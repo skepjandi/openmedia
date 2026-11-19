@@ -64,6 +64,10 @@ const POLL_INTERVAL: Duration = Duration::from_millis(400);
 /// A page that has not finished loading is still shown after this long.
 const PAINT_FALLBACK: Duration = Duration::from_millis(1500);
 const EVALUATE_TIMEOUT: Duration = Duration::from_secs(5);
+/// Every this many polls each page is asked whether it is playing sound or video.
+const PLAYING_PROBE_EVERY: u64 = 5;
+/// True while a media element of the page's own document plays with sound the reader can hear.
+const PLAYING_SCRIPT: &str = "(function(){var m=document.querySelectorAll('video,audio');for(var i=0;i<m.length;i++){var e=m[i];if(!e.paused&&!e.ended&&!e.muted&&e.volume>0&&e.readyState>2)return true}return false})()";
 /// How many closed sessions are remembered; the oldest are forgotten first.
 const MAX_REMEMBERED_BLOCKED: usize = 32;
 /// Pauses what is playing in a page that went out of sight and remembers which elements it
@@ -246,9 +250,11 @@ fn spawn_poller<R: Runtime>(inner: Weak<Inner<R>>) -> Result<()> {
     std::thread::Builder::new()
         .name("siteview-poll".into())
         .spawn(move || {
+            let mut tick: u64 = 0;
             while let Some(inner) = inner.upgrade() {
-                inner.poll();
+                inner.poll(tick.is_multiple_of(PLAYING_PROBE_EVERY));
                 drop(inner);
+                tick = tick.wrapping_add(1);
                 std::thread::sleep(POLL_INTERVAL);
             }
         })?;
@@ -849,7 +855,7 @@ impl<R: Runtime> Inner<R> {
         }
     }
 
-    fn poll(&self) {
+    fn poll(&self, probe_playing: bool) {
         self.follow_window();
         self.follow_keyboard();
         let targets: Vec<(String, Webview<R>, Arc<Track>)> = self
@@ -865,6 +871,12 @@ impl<R: Runtime> Inner<R> {
             })
             .collect();
         for (id, webview, track) in targets {
+            if probe_playing {
+                let answer_track = Arc::clone(&track);
+                let _ = webview.eval_with_callback(PLAYING_SCRIPT, move |answer| {
+                    answer_track.set_playing(answer == "true");
+                });
+            }
             if let Ok(page) = platform::snapshot(&webview, &track) {
                 self.report(&id, webview.label(), page);
             }
@@ -908,6 +920,7 @@ impl<R: Runtime> Inner<R> {
                 loading: reported.page.loading,
                 can_go_back: reported.page.can_go_back,
                 can_go_forward: reported.page.can_go_forward,
+                playing: reported.page.playing,
                 painted: reported.painted,
                 scope: reported.scope.clone(),
             };

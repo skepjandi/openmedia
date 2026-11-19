@@ -876,6 +876,7 @@ export const ms: Messages = {
   "tabs.isOpen": "Terbuka",
   "tabs.notOpen": "Tidak terbuka",
   "tabs.loading": "Memuatkan",
+  "media.playing": "Memainkan media",
   "tabs.statPaint": "Paparan pertama {value}",
   "tabs.statLoad": "Muat {value}",
   "tabs.statToday": "{value} hari ini",

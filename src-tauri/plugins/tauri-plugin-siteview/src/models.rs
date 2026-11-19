@@ -123,6 +123,8 @@ pub enum SiteViewEvent {
         loading: bool,
         can_go_back: bool,
         can_go_forward: bool,
+        /// The page plays sound or video the reader can hear.
+        playing: bool,
         /// The page has drawn its first content and is showing; until then it is covered.
         painted: bool,
         /// The registrable domain this session is pinned to; see `DomainScope.swift`.

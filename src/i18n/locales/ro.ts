@@ -885,6 +885,7 @@ export const ro: Messages = {
   "tabs.isOpen": "Deschis",
   "tabs.notOpen": "Nedeschis",
   "tabs.loading": "Se încarcă",
+  "media.playing": "Redă conținut media",
   "tabs.statPaint": "Prima afișare {value}",
   "tabs.statLoad": "Încărcare {value}",
   "tabs.statToday": "{value} azi",

@@ -231,6 +231,11 @@ private let allowedSchemes: Set<String> = ["http", "https"]
 private let evaluateTimeout: TimeInterval = 5
 /// `evaluate` refuses a result larger than this many UTF-8 bytes.
 private let evaluateMaxBytes = 200_000
+/// How often each page is asked whether it is playing sound or video.
+private let playingCheckEvery: TimeInterval = 2
+/// True while a media element of the page's own document plays with sound the reader can hear.
+private let playingScript =
+  "(function(){var m=document.querySelectorAll('video,audio');for(var i=0;i<m.length;i++){var e=m[i];if(!e.paused&&!e.ended&&!e.muted&&e.volume>0&&e.readyState>2)return true}return false})()"
 /// What the native shield says when the app has closed a site for the day.
 private let shieldMessage = "This site is closed for today. It opens again tomorrow."
 /// How many closed sessions are remembered. A closed session stays closed, so it cannot be
@@ -366,6 +371,7 @@ struct StateEvent: Encodable {
   let loading: Bool
   let canGoBack: Bool
   let canGoForward: Bool
+  let playing: Bool
   let painted: Bool
   let scope: String
 }
@@ -489,6 +495,8 @@ private final class Session {
   var committed = false
   /// True once the page has been shown. Until then the shell's splash stays up.
   var painted = false
+  /// True while the page plays sound or video the reader can hear, as the last check found.
+  var playing = false
   /// The pull-to-refresh control, detached from the scroll view while a touch began inside a
   /// container that is scrolled away from its top.
   var refreshControl: UIRefreshControl?
@@ -651,6 +659,7 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
     // enough). Only the category is set here: WebKit activates the session when media plays, so
     // other apps' music is not interrupted until then.
     try? AVAudioSession.sharedInstance().setCategory(.playback, mode: .moviePlayback)
+    watchPlaying()
     NotificationCenter.default.addObserver(
       forName: UIApplication.didReceiveMemoryWarningNotification, object: nil, queue: .main
     ) { [weak self] _ in
@@ -2550,10 +2559,29 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
         loading: view.isLoading,
         canGoBack: view.canGoBack,
         canGoForward: view.canGoForward,
+        playing: session.playing,
         painted: session.painted,
         scope: session.scope
       )
     )
+  }
+
+  private func watchPlaying() {
+    DispatchQueue.main.asyncAfter(deadline: .now() + playingCheckEvery) { [weak self] in
+      guard let self else { return }
+      self.sessions.values.forEach { self.probePlaying($0) }
+      self.watchPlaying()
+    }
+  }
+
+  private func probePlaying(_ session: Session) {
+    session.view.evaluateJavaScript(playingScript) { [weak self, weak session] result, _ in
+      guard let self, let session else { return }
+      let playing = (result as? Bool) == true
+      guard playing != session.playing else { return }
+      session.playing = playing
+      self.sendState(session)
+    }
   }
 
   private func send<T: Encodable>(_ event: T) {

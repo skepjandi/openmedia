@@ -876,6 +876,7 @@ export const uk: Messages = {
   "tabs.isOpen": "Відкрито",
   "tabs.notOpen": "Не відкрито",
   "tabs.loading": "Завантаження",
+  "media.playing": "Відтворює медіа",
   "tabs.statPaint": "Перше відображення {value}",
   "tabs.statLoad": "Завантаження {value}",
   "tabs.statToday": "Сьогодні {value}",

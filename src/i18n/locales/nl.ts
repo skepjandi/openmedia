@@ -880,6 +880,7 @@ export const nl: Messages = {
   "tabs.isOpen": "Open",
   "tabs.notOpen": "Niet open",
   "tabs.loading": "Laden",
+  "media.playing": "Speelt media af",
   "tabs.statPaint": "Eerste weergave {value}",
   "tabs.statLoad": "Laden {value}",
   "tabs.statToday": "{value} vandaag",

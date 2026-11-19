@@ -70,3 +70,14 @@ export function unreadByFavorite(
     return session && session.id !== activeId ? unreadCount(session.title) : 0;
   });
 }
+
+/** Whether each quick-access favorite's live session is playing sound or video, in menu order. */
+export function playingByFavorite(
+  sessions: Session[],
+  favorites: readonly Favorite[],
+  sites: readonly SiteSettings[] = [],
+): boolean[] {
+  return quickAccess(favorites).map(
+    (favorite) => sessionForFavorite(sessions, favorite.url, sites)?.playing === true,
+  );
+}

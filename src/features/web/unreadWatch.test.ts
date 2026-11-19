@@ -4,6 +4,7 @@ import { newSession, applyState, type Session } from "./sessions";
 import {
   NOTIFY_MIN_GAP_MS,
   observeTitle,
+  playingByFavorite,
   quickFavoriteOf,
   unreadByFavorite,
   type Watch,
@@ -62,7 +63,7 @@ const favorite = (id: string, name: string, url: string): Favorite => ({
   notify: true,
 });
 
-function session(id: string, url: string, title: string | null): Session {
+function session(id: string, url: string, title: string | null, playing = false): Session {
   const opened = newSession(id, "favorite", url, 0);
   return applyState(opened, {
     session: id,
@@ -71,6 +72,7 @@ function session(id: string, url: string, title: string | null): Session {
     loading: false,
     canGoBack: false,
     canGoForward: false,
+    playing,
     painted: true,
     scope: new URL(url).hostname.replace(/^(www|m)\./, ""),
   });
@@ -104,5 +106,14 @@ describe("quick-access lookups", () => {
     expect(unreadByFavorite(sessions, favorites, "s2")).toEqual([4, 0]);
     expect(unreadByFavorite(sessions, favorites, null)).toEqual([4, 2]);
     expect(unreadByFavorite([], favorites, null)).toEqual([0, 0]);
+  });
+
+  it("marks the favorites whose session is playing media, the active one included", () => {
+    const playing = [
+      session("s1", "https://www.messenger.com/", "Messenger"),
+      session("s2", "https://www.reddit.com/", "Reddit", true),
+    ];
+    expect(playingByFavorite(playing, favorites)).toEqual([false, true]);
+    expect(playingByFavorite([], favorites)).toEqual([false, false]);
   });
 });

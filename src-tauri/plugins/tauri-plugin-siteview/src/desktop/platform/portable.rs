@@ -67,6 +67,7 @@ pub fn snapshot<R: Runtime>(webview: &Webview<R>, track: &Track) -> Result<PageS
         loading: track.loading(),
         can_go_back,
         can_go_forward,
+        playing: track.playing(),
     })
 }
 

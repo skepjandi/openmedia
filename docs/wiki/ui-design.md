@@ -26,6 +26,10 @@ The only default favorite is the default search engine, Google: onboarding sets 
 
 Two kinds of gate, two icons. A crown (`ProIcon`, in a navy badge) means the paywall: Usage, the assistant's Chat mode and show it without Pro. A biometric icon (`BiometricIcon`) means Face ID, Touch ID or the passcode: Face ID's face glyph on a device that has Face ID, a fingerprint on Touch ID devices, Android and the Mac (Rust's `biometry_kind` asks the plugin, which reads `LAContext.biometryType` on iOS; Android cannot tell a face from a finger). It appears on: the locked incognito section in Settings, the Incognito recipes row, and the Incognito button in the fan (it asks for the check before entering). Incognito is free: none of these shows a crown.
 
+### Playing-media indicator
+
+A site that is playing sound or video shows a small speaker badge on the top corner of its icon: on the Tabs screen (open tabs and quick-access rows), on the floating button's fan and folder popup. Each native site view asks its page every ~2 s (desktop: `eval_with_callback` from the poll loop; iOS `evaluateJavaScript`; Android `evaluateJavascript`) whether a `video`/`audio` element of the page's own document is playing, unmuted, with volume and enough data to play, and reports the answer as `playing` in the `siteview:state` event. Muted autoplay (feeds) does not count; media in iframes is not seen. The answer is a boolean from hostile page code: it can only decide whether a badge shows. Frontend: `playingByFavorite` (`src/features/web/unreadWatch.ts`), `PlayingBadge` (`src/shared/PlayingBadge.tsx`).
+
 ### Unread badges and notifications
 
 A page that has unread items usually says so in its title: `(3) Messenger`. For each quick-access favorite's live session the shell reads that leading `(N)` or `[N]` (`unreadCount`, `src/shared/unread.ts`; a generic title convention, not per-site code). The count appears as a badge on the fan item, and a dot on the floating button when any hidden favorite has one. The page on screen is never badged.

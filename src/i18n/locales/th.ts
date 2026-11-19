@@ -832,6 +832,7 @@ export const th: Messages = {
   "tabs.isOpen": "เปิดอยู่",
   "tabs.notOpen": "ไม่ได้เปิด",
   "tabs.loading": "กำลังโหลด",
+  "media.playing": "กำลังเล่นสื่อ",
   "tabs.statPaint": "แสดงผลครั้งแรก {value}",
   "tabs.statLoad": "โหลด {value}",
   "tabs.statToday": "วันนี้ {value}",

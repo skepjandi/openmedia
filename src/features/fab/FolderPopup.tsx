@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, type PointerEvent } from "react";
 import { useT } from "../../i18n/useT";
 import { Glyph, isGlyph } from "../../shared/glyphs";
 import { FolderIcon } from "../../shared/icons";
+import { PlayingBadge } from "../../shared/PlayingBadge";
 import type { Favorite } from "../../shared/ipc";
 import { useBackHandler } from "../back/useBackHandler";
 import { CARRY_HOLD_MS, carryHold, strayedFromPress, type CarryHold } from "./gesture";
@@ -18,6 +19,8 @@ export interface FolderMember {
   live: boolean;
   /** New activity in it, from its page title; 0 when none. */
   unread: number;
+  /** A site of it is playing sound or video. */
+  playing: boolean;
 }
 
 /**
@@ -152,6 +155,7 @@ function MemberButton({
         ) : (
           member.favorite.name.trim().charAt(0) || "·"
         )}
+        {member.playing && <PlayingBadge />}
         {member.unread > 0 && (
           <span
             aria-hidden="true"
