@@ -6,6 +6,20 @@ All notable changes to OpenMedia are documented here.
 >
 > **Wiki**: the [GitHub Wiki](https://github.com/skepjandi/openmedia/wiki) is the public-facing main wiki — architecture, recipe format, AI pipeline, security model, roadmap. Source-controlled editing surface is `docs/wiki/` in this repo; CI (`.github/workflows/sync-wiki.yml`) mirrors it to the GitHub Wiki on every merge to `main`. New single-PR changes belong here, not as new wiki pages.
 
+### fix(siteview): a page no longer stops short of the bottom of the screen (iOS)
+
+**Area:** `fix(siteview)`
+
+**Problem:** On iOS a page often ended about 96 pt above the bottom of the screen (the safe areas' height), leaving a strip of app background under it. It came with a fresh install's first launch and stayed until something resized the shell.
+
+**Cause:** The shell lays out more than once as it starts. `adopt_boot_session` (the shell taking over the page Rust opens at launch) was given the rectangle the shell read at its first layout, waited for the page's open to finish, and then applied that rectangle with `set_rect`, replacing the settled one the shell had sent in the meantime. Nothing sent another, because the shell's size had not changed since.
+
+**Change:** `adopt_boot_session` no longer applies a rectangle to the page it adopts. The shell's own `set_rect`, sent at every layout, is the only source; the rectangle the command takes is now used only when the page has to be opened afresh.
+
+**Verified:** `cargo clippy --workspace -D warnings`, `cargo fmt --check`, TypeScript, Prettier; in the iOS Simulator (iPhone 17 Pro Max), a fresh install and first launch left the page short in 3 of 4 runs before the change and in 0 of 8 after it (read from the pixels under the page, and from the rectangles the plugin received, where the stale one arrived last). **Not verified:** on a device, Android or desktop (the same command runs there, but the problem was only looked for on iOS).
+
+**PR:** n/a
+
 ### fix(siteview): Mobile site brings the mobile page back
 
 **Area:** `fix(siteview)`

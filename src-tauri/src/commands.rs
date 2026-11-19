@@ -6,8 +6,7 @@ use tauri_plugin_siteview::{
     ClearSiteDataRequest, ColorScheme, ContentRuleList, EvaluateRequest, FetchFaviconRequest,
     OpenRequest, Rect, SampleColorRequest, SessionRequest, SetBackgroundMediaRequest,
     SetColorSchemeRequest, SetContentRuleListsRequest, SetDesktopSitesRequest,
-    SetDocumentStartScriptRequest, SetPictureInPictureRequest, SetRectRequest, ShareRequest,
-    SiteviewExt,
+    SetDocumentStartScriptRequest, SetPictureInPictureRequest, ShareRequest, SiteviewExt,
     validate::{parse_session_id, parse_web_url},
 };
 use url::Url;
@@ -330,9 +329,14 @@ pub async fn open_site(app: AppHandle, session: String, url: String, rect: Rect)
     Ok(())
 }
 
-/// Takes over the page opened at launch (`boot.rs`): waits for its open to finish, gives it the
-/// shell's real rectangle and re-announces its state, which the shell was not yet listening for.
-/// If there is no such page, or opening it failed, opens `url` as `open_site` would.
+/// Takes over the page opened at launch (`boot.rs`): waits for its open to finish, shows it and
+/// re-announces its state, which the shell was not yet listening for. If there is no such page, or
+/// opening it failed, opens `url` as `open_site` would, in `rect`.
+///
+/// The adopted page is not given `rect`: it was read when the shell started, while the shell was
+/// still laying out, and the wait for the open can outlast later layouts. Applying it then put
+/// the page back at the first layout's size (on iOS, 96 pt short of the screen, the safe areas'
+/// height). The shell's own `set_rect`, sent at every layout, is the one source of the rectangle.
 #[tauri::command]
 pub async fn adopt_boot_session(
     app: AppHandle,
@@ -343,9 +347,7 @@ pub async fn adopt_boot_session(
 ) -> Result<()> {
     let warning = match boot.adopt(&session).await {
         Some(warning) => {
-            let plugin = app.siteview();
-            plugin.set_rect(SetRectRequest { rect })?;
-            plugin.activate(SessionRequest { session })?;
+            app.siteview().activate(SessionRequest { session })?;
             warning
         }
         None => open_session(&app, session, url, Some(rect)).await?,

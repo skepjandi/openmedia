@@ -705,8 +705,9 @@ export const library = {
   openSite: (session: string, url: string, rect: Rect) =>
     command("open_site", { session, url, rect }),
   /**
-   * Takes over the page Rust opened at launch: gives it the real rectangle and re-announces its
-   * state. If that page is gone, opens `url` instead; see `adopt_boot_session` in Rust.
+   * Takes over the page Rust opened at launch and re-announces its state; its rectangle is the one
+   * `setRect` keeps. If that page is gone, opens `url` in `rect` instead; see `adopt_boot_session`
+   * in Rust.
    */
   adoptBootSession: (session: string, url: string, rect: Rect) =>
     command("adopt_boot_session", { session, url, rect }),
