@@ -33,6 +33,9 @@ fetch() {
     rm -f "$tmp"
     return 1
   fi
+  # App Review (guideline 5): no links to sanctioned-territory sites in the binary.
+  grep -v -e 'zoomit\.ir/product' -e 'offerdaily\.ir' -e 'api2\.zoomit\.ir' "$tmp" >"$tmp.f" || true
+  mv "$tmp.f" "$tmp"
   chmod 644 "$tmp"
   mv "$tmp" "$name"
   grep -m1 -E '^! (Version|Last modified):' "$name" | sed "s/^/$name /" || true

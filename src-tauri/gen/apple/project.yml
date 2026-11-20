@@ -48,7 +48,6 @@ targets:
         ITSAppUsesNonExemptEncryption: false
         LSApplicationCategoryType: public.app-category.utilities
         NSFaceIDUsageDescription: OpenMedia asks for Face ID before it opens or shows your incognito favorites and recipes.
-        UIBackgroundModes: [audio]
         UILaunchStoryboardName: LaunchScreen
         UIRequiredDeviceCapabilities: [arm64, metal]
         UISupportedInterfaceOrientations:
