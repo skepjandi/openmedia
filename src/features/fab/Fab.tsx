@@ -33,7 +33,7 @@ import type { Favorite } from "../../shared/ipc";
 import { DARK_MODE_DEFAULT, darkActiveFor } from "../../shared/darkMode";
 import { siteOf } from "../../shared/site";
 import { iconForUrl, useIconCache } from "../../shared/siteIcons";
-import { VIDEO_CONTROLS_DEFAULT } from "../../shared/videoControls";
+import { VIDEO_CONTROLS_DEFAULT, effectiveVideo } from "../../shared/videoControls";
 import { useInsets, useViewport } from "../../shared/viewport";
 import {
   FAB_SIZE,
@@ -415,12 +415,16 @@ function FloatingButton() {
   const enterIncognito = useApp((s) => s.enterIncognito);
   const exitIncognito = useApp((s) => s.exitIncognito);
   const sheet = useApp((s) => s.sheet);
-  const controlsOn = useApp((s) => (s.state?.videoControls ?? VIDEO_CONTROLS_DEFAULT).panel);
+  const videoGeneral = useApp((s) => s.state?.videoControls ?? VIDEO_CONTROLS_DEFAULT);
+  const videoSites = useApp((s) => s.state?.videoSites);
+  const setSiteVideoControls = useApp((s) => s.setSiteVideoControls);
   const darkMode = useApp((s) => s.state?.darkMode ?? DARK_MODE_DEFAULT);
   const darkSites = useApp((s) => s.state?.darkSites);
   const savedFavorites = useApp((s) => s.state?.favorites);
   const pageUrl = useApp((s) => selectPage(s)?.url);
   const pageSite = pageUrl ? siteOf(pageUrl) : null;
+  const siteVideo = pageSite ? videoSites?.[pageSite] : undefined;
+  const controlsOn = effectiveVideo(videoGeneral, siteVideo).panel;
   const darkOn = darkActiveFor(darkMode, darkSites ?? {}, pageSite);
   const setDarkMode = useApp((s) => s.setDarkMode);
   const setSiteDarkMode = useApp((s) => s.setSiteDarkMode);
@@ -593,7 +597,8 @@ function FloatingButton() {
         void setSiteDarkMode(pageSite, { ...darkSites?.[pageSite], mode: darkOn ? "off" : "on" });
       } else void setDarkMode({ enabled: !darkOn });
     } else if (target.kind === "controls") {
-      setVideoPanel(!controlsOn);
+      if (pageSite) void setSiteVideoControls(pageSite, { ...siteVideo, panel: !controlsOn });
+      else setVideoPanel(!controlsOn);
     } else {
       const favorite = favorites[target.index];
       if (favorite) openFavorite(favorite);

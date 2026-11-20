@@ -6,6 +6,14 @@ All notable changes to OpenMedia are documented here.
 >
 > **Wiki**: the [GitHub Wiki](https://github.com/skepjandi/openmedia/wiki) is the public-facing main wiki — architecture, recipe format, AI pipeline, security model, roadmap. Source-controlled editing surface is `docs/wiki/` in this repo; CI (`.github/workflows/sync-wiki.yml`) mirrors it to the GitHub Wiki on every merge to `main`. New single-PR changes belong here, not as new wiki pages.
 
+### fix(video): the reader's mute carries to the next reel; the floating button's controls toggle is per site
+
+**Area:** `fix(video)`
+
+**Change:** `video_controls.js`: a sound change the reader makes with the site's own button (not only the panel's) is kept for the next video; the sound is also put on a video whose `loadstart` the page never saw (on its first `loadedmetadata`, `play` or `playing`); and for 2 s after a video starts, a site putting its own sound back is undone. The iOS volume check no longer reads a missing `navigator`. The floating button's video-controls toggle sets the open site's own setting (`videoSites[site].panel`) and only the general one when no site is open.
+
+**Verified:** Vitest for the controls. **Not verified:** a device; the intermittent unmute was not reproduced.
+
 ### feat(video-controls): the controls panel starts off
 
 **Area:** `feat(video-controls)`
@@ -1085,6 +1093,14 @@ A floating video now survives leaving its page. Before, Back and an address type
 **Verified:** `yarn ts:check`, focused lint/format checks, and browser review at phone width in dark and light themes. **Not verified:** native device rendering.
 
 **PR:** n/a
+
+## 2026-11-20
+
+### chore(release): version 1.0.5
+
+**Area:** `chore(release)`
+
+**Change:** The app version is `1.0.5` (build 1026) in `package.json` and `src-tauri/tauri.conf.json`.
 
 ## 2026-11-15
 

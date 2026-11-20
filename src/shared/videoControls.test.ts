@@ -686,6 +686,48 @@ describe("video controls", () => {
     expect(page.storage.has("openmedia.video")).toBe(false);
   });
 
+  it("carries the sound the reader set with the site's own button to the next video", () => {
+    const first = new FakeVideo();
+    const next = new FakeVideo(800);
+    first.muted = true;
+    next.muted = true;
+    const page = load({ videos: [first, next], current: first });
+    first.muted = false;
+    page.fire("touchend");
+    page.fire("volumechange", { target: first });
+    page.setCurrent(next);
+    page.fire("loadstart", { target: next });
+    expect(next.muted).toBe(false);
+  });
+
+  it("puts the sound on a video whose loadstart the page never saw, when it starts", () => {
+    const first = new FakeVideo();
+    const next = new FakeVideo(800);
+    const page = load({ videos: [first, next], current: first });
+    openPanel(page);
+    buttonWith(page, "sound").fire("pointerup");
+    expect(first.muted).toBe(true);
+    next.muted = false;
+    page.setCurrent(next);
+    page.fire("play", { target: next });
+    expect(next.muted).toBe(true);
+  });
+
+  it("puts the reader's sound back when a site changes it as a video starts, and not later", () => {
+    const first = new FakeVideo();
+    const next = new FakeVideo(800);
+    const page = load({ videos: [first, next], current: first });
+    first.muted = false;
+    page.fire("touchend");
+    page.fire("volumechange", { target: first });
+    page.setCurrent(next);
+    page.fire("loadstart", { target: next });
+    page.fire("playing", { target: next });
+    next.muted = true;
+    page.fire("volumechange", { target: next });
+    expect(next.muted).toBe(false);
+  });
+
   it("leaves the speed and sound of a page it is not in charge of alone", () => {
     const video = new FakeVideo();
     const page = load({
@@ -2255,6 +2297,17 @@ describe("video controls", () => {
     const free = load({ videos: [video], current: video });
     openPanel(free);
     expect(sliders(free)[0]?.style.display).toBe("flex");
+  });
+
+  it("shows no volume bar on iOS, where the page cannot set the volume", () => {
+    const video = new FakeVideo();
+    const iphone = load({
+      videos: [video],
+      current: video,
+      win: { navigator: { userAgent: "Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X)" } },
+    });
+    openPanel(iphone);
+    expect(sliders(iphone)[0]?.style.display).toBe("none");
   });
 
   it("takes the volume bar away on a page that puts a middle volume back", () => {

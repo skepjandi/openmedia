@@ -156,6 +156,10 @@
     }
 
     var fresh = new WeakSet();
+    var seen = new WeakSet(); // videos that have had the remembered sound and speed put on
+    var settleUntil = new WeakMap(); // video to the time until which the site changing its sound is undone
+    var restoringUntil = 0; // until then a sound change is the tap being undone, not the reader's
+    var SETTLE_MS = 2000;
     var watched = new WeakSet();
     var observers = [];
     var teardown = [];
@@ -221,8 +225,9 @@
       if (volumeBridge) return true;
       if (volumeSettable === null) {
         try {
-          var ua = navigator.userAgent || '';
-          var onIos = /iPhone|iPad|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+          var nav = window.navigator || {};
+          var ua = nav.userAgent || '';
+          var onIos = /iPhone|iPad|iPod/.test(ua) || (nav.platform === 'MacIntel' && nav.maxTouchPoints > 1);
           var probe = document.createElement('video');
           probe.volume = 0.5;
           volumeSettable = !onIos && probe.volume === 0.5;
@@ -337,7 +342,7 @@
           video.playbackRate = rate;
         } catch (_) {}
       }
-      var sound = wantsRemember ? saved : panelSound;
+      var sound = panelSound || (wantsRemember ? saved : null);
       if (sound && typeof sound.muted === 'boolean') {
         try {
           video.muted = sound.muted;
@@ -1530,17 +1535,23 @@
       }
     }
 
+    /** The reader's sound for the videos that follow: kept for the page, and across pages with Remember. */
+    function choose(sound) {
+      panelSound = sound;
+      if (wantsRemember) write(sound);
+    }
+
     function toggleMute(target) {
       target.muted = !target.muted;
       if (!target.muted && shownVolume(target) === 0) setVolume(target, 1);
-      panelSound = { muted: target.muted, volume: target.volume };
+      choose({ muted: target.muted, volume: target.volume });
     }
 
     // Dragging the bar up, or a key, unmutes the video.
     function changeVolume(target, ratio) {
       setVolume(target, ratio);
       if (ratio > 0 && target.muted) target.muted = false;
-      panelSound = { muted: target.muted, volume: target.volume };
+      choose({ muted: target.muted, volume: target.volume });
     }
 
     function toggleFloat(target) {
@@ -1960,6 +1971,7 @@
     function restoreMute() {
       var kept = mutedAtDown;
       if (!kept) return;
+      restoringUntil = Date.now() + 500;
       var undo = function () {
         try { if (kept.video.muted !== kept.muted) kept.video.muted = kept.muted; } catch (_) {}
       };
@@ -2220,23 +2232,44 @@
       var video = event.target;
       if (!(video instanceof HTMLVideoElement)) return;
       fresh.add(video);
+      seen.add(video);
+      settleUntil.set(video, Date.now() + SETTLE_MS);
       prefer(video);
       prepare(video);
     }, true);
+    // A player that made its video before this page script saw it (its loadstart fired on a video
+    // not yet in the page) is new at its first start all the same.
     var applyOnStart = function (event) {
       var video = event.target;
-      if (!(video instanceof HTMLVideoElement) || !fresh.has(video)) return;
+      if (!(video instanceof HTMLVideoElement)) return;
+      if (!fresh.has(video)) {
+        if (seen.has(video)) return;
+        seen.add(video);
+        fresh.add(video);
+      }
       prefer(video);
-      if (event.type === 'playing') fresh.delete(video);
+      if (event.type === 'playing') {
+        if (fresh.delete(video)) settleUntil.set(video, Date.now() + SETTLE_MS);
+      }
     };
     on(document, 'loadedmetadata', applyOnStart, true);
     on(document, 'play', applyOnStart, true);
     on(document, 'playing', applyOnStart, true);
     on(document, 'volumechange', function (event) {
       var video = event.target;
-      if (!wantsRemember || !(video instanceof HTMLVideoElement)) return;
-      if (!panelPage() || Date.now() - lastTap > TAP_MS) return;
-      write({ muted: video.muted, volume: video.volume });
+      if (!(video instanceof HTMLVideoElement) || !panelPage()) return;
+      var now = Date.now();
+      if ((settleUntil.get(video) || 0) > now) {
+        // A video just starting: a swipe's own touch is no choice, and a site that puts its own
+        // sound back as the video starts has the reader's choice put back in turn. The panel's
+        // mute and volume have set the choice before this is heard, so they are never undone.
+        var wanted = panelSound || (wantsRemember ? read() : null);
+        if (wanted && typeof wanted.muted === 'boolean' && video.muted !== wanted.muted) prefer(video);
+        return;
+      }
+      if (now - lastTap > TAP_MS || now < restoringUntil) return;
+      // The reader's, from the panel or the site's own button: the next video starts the same.
+      choose({ muted: video.muted, volume: video.volume });
     }, true);
     on(document, 'ended', function (event) {
       var video = event.target;
