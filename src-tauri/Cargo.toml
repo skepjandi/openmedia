@@ -36,7 +36,7 @@ serde_json = { version = "1", features = ["unbounded_depth"] }
 oxc_parser = "=0.158.0"
 oxc_allocator = "=0.158.0"
 oxc_span = "=0.158.0"
-oxc_semantic = "=0.158.0"
+oxc_semantic = "=0.159.0"
 oxc_ast = { version = "=0.158.0", features = ["serialize"] }
 thiserror = "2"
 uuid = { version = "1", features = ["v4", "serde"] }
