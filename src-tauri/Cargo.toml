@@ -63,7 +63,7 @@ tauri-plugin-updater = { version = "2", optional = true }
 # logins, Firefox places) and the AES Chromium browsers use for saved passwords.
 rusqlite = { version = "0.32", features = ["bundled"] }
 aes = "0.8"
-cbc = "0.1"
+cbc = "0.2"
 
 [features]
 self-update = ["dep:tauri-plugin-updater"]
