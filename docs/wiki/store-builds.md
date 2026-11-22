@@ -147,10 +147,6 @@ The sandboxed Mac app was only launched to the onboarding screen (an ad-hoc sign
 
 The Kotlin Android implementation and AAB build path exist, but Android runtime behavior and a signed release have not been verified. Store account setup, policy declarations, review, and rollout are manual Play Console work.
 
-## Store artwork
-
-Artwork files and sizes are listed in [`assets/store/README.md`](../../assets/store/README.md); the images are slices of one panorama per set. The Android images currently use iOS captures, frameless; **replace them with screenshots captured from the Android app before submitting to Google Play**. Usage and Limits screens show synthetic sample data.
-
 ## See also
 
 [Development Guide](./development-guide.md) · [Platform Support](./platform-support.md) · [Paywall](./paywall.md)

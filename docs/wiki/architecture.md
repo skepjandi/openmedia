@@ -199,7 +199,6 @@ recipes/
   fixtures/             DOM fixtures per site
 scripts/official-recipes.mjs  Prints the SQL that publishes recipes/official/ (operator)
 blocklists/              Bundled EasyList and EasyPrivacy files
-assets/store/            Store listing artwork and source captures
 docs/wiki/               Source-controlled wiki, synced to GitHub Wiki
 ```
 
