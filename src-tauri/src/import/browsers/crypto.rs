@@ -4,7 +4,7 @@
 use std::num::NonZeroU32;
 
 use aes::Aes128;
-use cbc::cipher::{BlockDecryptMut, KeyIvInit, block_padding::Pkcs7};
+use cbc::cipher::{BlockModeDecrypt, KeyIvInit, block_padding::Pkcs7};
 use ring::pbkdf2;
 use zeroize::Zeroizing;
 
@@ -48,7 +48,7 @@ impl Key {
 fn open_cbc(key: &[u8; 16], sealed: &[u8]) -> Option<Zeroizing<Vec<u8>>> {
     let mut buffer = Zeroizing::new(sealed.to_vec());
     let plain = cbc::Decryptor::<Aes128>::new(key.into(), &CBC_IV.into())
-        .decrypt_padded_mut::<Pkcs7>(&mut buffer)
+        .decrypt_padded::<Pkcs7>(&mut buffer)
         .ok()?;
     Some(Zeroizing::new(plain.to_vec()))
 }
@@ -75,7 +75,7 @@ fn open_gcm(key: &[u8], sealed: &[u8]) -> Option<Zeroizing<Vec<u8>>> {
 #[cfg(test)]
 pub(crate) mod tests {
     use super::*;
-    use cbc::cipher::BlockEncryptMut;
+    use cbc::cipher::BlockModeEncrypt;
     use ring::aead;
 
     pub fn seal_cbc(key: &Key, plain: &[u8]) -> Vec<u8> {
@@ -84,8 +84,8 @@ pub(crate) mod tests {
         };
         let mut buffer = vec![0u8; plain.len() + 16];
         buffer[..plain.len()].copy_from_slice(plain);
-        cbc::Encryptor::<Aes128>::new(key.as_ref().into(), &CBC_IV.into())
-            .encrypt_padded_mut::<Pkcs7>(&mut buffer, plain.len())
+        cbc::Encryptor::<Aes128>::new((&**key).into(), &CBC_IV.into())
+            .encrypt_padded::<Pkcs7>(&mut buffer, plain.len())
             .map(<[u8]>::to_vec)
             .unwrap_or_default()
     }
