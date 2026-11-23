@@ -27,6 +27,8 @@ const FORMAT_VERSION: u32 = 4;
 const MAX_HISTORY: usize = 100;
 const MAX_BACK: usize = 20;
 pub const MAX_FAVORITE_NAME_CHARS: usize = 20;
+/// A page title longer than this is cut; the fan shows only the start of it anyway.
+const MAX_BOOKMARK_TITLE_CHARS: usize = 80;
 const MAX_ICON_CHARS: usize = 200_000;
 /// The most site icons the app keeps. Each one is a small PNG, so this stays well under a
 /// megabyte.
@@ -210,6 +212,14 @@ impl Favorite {
     }
 }
 
+/// The one page the user saved in the fan's bookmark slot, free of charge. Unlike a favorite it
+/// is a page, not a site: it opens exactly where it was saved.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct Bookmark {
+    pub url: String,
+    pub title: String,
+}
+
 #[derive(Debug, Clone, Deserialize)]
 pub struct FavoriteInput {
     pub name: String,
@@ -271,6 +281,8 @@ pub struct AppState {
     pub dark_mode: DarkMode,
     /// What the user chose for one site's dark mode, by registrable domain.
     pub dark_sites: BTreeMap<String, SiteDark>,
+    /// The page in the fan's bookmark slot, if one is saved.
+    pub bookmark: Option<Bookmark>,
     /// What the app opens at launch.
     pub start_page: StartPage,
 }
@@ -376,6 +388,9 @@ struct LibraryData {
     /// `dark_mode`.
     #[serde(default)]
     dark_sites: BTreeMap<String, SiteDark>,
+    /// The page in the fan's bookmark slot. Normal set only: nothing is saved while incognito.
+    #[serde(default)]
+    bookmark: Option<Bookmark>,
     /// The last page until the user picks the search engine's home page.
     #[serde(default)]
     start_page: StartPage,
@@ -491,6 +506,10 @@ impl Library {
             video_sites: data.video_sites.clone(),
             dark_mode: data.dark_mode.clone(),
             dark_sites: data.dark_sites.clone(),
+            bookmark: data
+                .bookmark
+                .clone()
+                .filter(|bookmark| parse_web_url(&bookmark.url).is_ok()),
             start_page: data.start_page,
         })
     }
@@ -499,6 +518,30 @@ impl Library {
     pub fn set_locale(&self, locale: Option<String>) -> Result<()> {
         let mut data = self.lock()?;
         data.locale = locale;
+        self.save(&data)
+    }
+
+    pub fn bookmark(&self) -> Result<Option<Bookmark>> {
+        Ok(self.lock()?.bookmark.clone())
+    }
+
+    /// Saves `url` in the bookmark slot, replacing what was there. An empty title falls back to
+    /// the host, and a long one is cut.
+    pub fn set_bookmark(&self, url: &str, title: &str) -> Result<Bookmark> {
+        let parsed = parse_web_url(url)?;
+        let bookmark = Bookmark {
+            title: bookmark_title(title, parsed.host_str().unwrap_or_default()),
+            url: parsed.to_string(),
+        };
+        let mut data = self.lock()?;
+        data.bookmark = Some(bookmark.clone());
+        self.save(&data)?;
+        Ok(bookmark)
+    }
+
+    pub fn clear_bookmark(&self) -> Result<()> {
+        let mut data = self.lock()?;
+        data.bookmark = None;
         self.save(&data)
     }
 
@@ -1065,6 +1108,24 @@ fn icon_for_host(data: &LibraryData, host: &str) -> Option<String> {
         .cloned()
 }
 
+/// The title as the bookmark keeps it: trimmed, without control characters, cut to
+/// `MAX_BOOKMARK_TITLE_CHARS`, and the host (without `www.`) when nothing is left.
+fn bookmark_title(title: &str, host: &str) -> String {
+    let kept: String = title
+        .chars()
+        .filter(|c| !c.is_control())
+        .collect::<String>()
+        .trim()
+        .chars()
+        .take(MAX_BOOKMARK_TITLE_CHARS)
+        .collect();
+    if kept.is_empty() {
+        host.trim_start_matches("www.").to_owned()
+    } else {
+        kept.trim_end().to_owned()
+    }
+}
+
 /// Drops the icons of sites the user no longer has anywhere, and keeps the cache bounded: the
 /// oldest visited sites go first, a favorite's icon (normal or incognito) never does.
 fn prune_icons(data: &mut LibraryData) {
@@ -1072,7 +1133,9 @@ fn prune_icons(data: &mut LibraryData) {
         .favorites
         .iter()
         .chain(data.incognito_favorites.iter().flatten())
-        .filter_map(|favorite| host_of(&favorite.url))
+        .map(|favorite| favorite.url.as_str())
+        .chain(data.bookmark.iter().map(|bookmark| bookmark.url.as_str()))
+        .filter_map(host_of)
         .collect();
     let history: Vec<String> = data.history.iter().filter_map(|url| host_of(url)).collect();
     let mut wanted = favorites.clone();
@@ -1236,6 +1299,7 @@ fn default_data() -> LibraryData {
         video_sites: BTreeMap::new(),
         dark_mode: DarkMode::default(),
         dark_sites: BTreeMap::new(),
+        bookmark: None,
         start_page: StartPage::LastPage,
         incognito_site_options: OptionChoices::new(),
         incognito_favorites: None,
@@ -1923,6 +1987,88 @@ mod tests {
         assert_eq!(reload(&dir).state().unwrap().locale.as_deref(), Some("si"));
         library.set_locale(None).unwrap();
         assert_eq!(reload(&dir).state().unwrap().locale, None);
+    }
+
+    #[test]
+    fn the_bookmark_starts_empty_keeps_the_exact_page_and_survives_a_reload() {
+        let (dir, library) = library();
+        assert_eq!(library.state().unwrap().bookmark, None);
+        let saved = library
+            .set_bookmark("https://www.example.com/a/page?x=1", "  A page  ")
+            .unwrap();
+        assert_eq!(
+            saved,
+            Bookmark {
+                url: "https://www.example.com/a/page?x=1".into(),
+                title: "A page".into(),
+            }
+        );
+        assert_eq!(reload(&dir).state().unwrap().bookmark, Some(saved));
+        library.clear_bookmark().unwrap();
+        assert_eq!(reload(&dir).state().unwrap().bookmark, None);
+    }
+
+    #[test]
+    fn a_new_bookmark_replaces_the_old_one() {
+        let (_dir, library) = library();
+        library.set_bookmark("https://a.example/", "A").unwrap();
+        library.set_bookmark("https://b.example/", "B").unwrap();
+        assert_eq!(
+            library.bookmark().unwrap().map(|bookmark| bookmark.url),
+            Some("https://b.example/".into())
+        );
+    }
+
+    #[test]
+    fn a_bookmark_must_be_a_web_page() {
+        let (_dir, library) = library();
+        assert!(library.set_bookmark("javascript:alert(1)", "x").is_err());
+        assert!(library.set_bookmark("file:///etc/passwd", "x").is_err());
+        assert_eq!(library.bookmark().unwrap(), None);
+    }
+
+    #[test]
+    fn a_bookmark_title_is_cleaned_cut_and_never_empty() {
+        let (_dir, library) = library();
+        let untitled = library
+            .set_bookmark("https://www.example.com/", " \n\t ")
+            .unwrap();
+        assert_eq!(untitled.title, "example.com");
+        let long = library
+            .set_bookmark("https://a.example/", &"é".repeat(200))
+            .unwrap();
+        assert_eq!(long.title.chars().count(), MAX_BOOKMARK_TITLE_CHARS);
+        let controls = library
+            .set_bookmark("https://a.example/", "a\u{0}b\u{7}c")
+            .unwrap();
+        assert_eq!(controls.title, "abc");
+    }
+
+    #[test]
+    fn clearing_history_keeps_the_bookmark_and_its_icon() {
+        let (_dir, library) = library();
+        library
+            .set_bookmark("https://kept.example/page", "Kept")
+            .unwrap();
+        library
+            .set_icon("kept.example", "data:image/png;base64,AAAA")
+            .unwrap();
+        library.clear_history().unwrap();
+        assert!(library.bookmark().unwrap().is_some());
+        assert!(library.icons().unwrap().contains_key("kept.example"));
+    }
+
+    #[test]
+    fn a_damaged_bookmark_is_not_handed_to_the_shell() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("library.json");
+        let mut saved = default_data();
+        saved.bookmark = Some(Bookmark {
+            url: "javascript:alert(1)".into(),
+            title: "x".into(),
+        });
+        fs::write(&path, serde_json::to_vec(&saved).unwrap()).unwrap();
+        assert_eq!(Library::load(path).unwrap().state().unwrap().bookmark, None);
     }
 
     #[test]

@@ -186,6 +186,8 @@ pub fn run() {
             commands::set_theme,
             commands::set_locale,
             commands::set_search_engine,
+            commands::set_bookmark,
+            commands::clear_bookmark,
             commands::set_start_page,
             commands::refresh_icons,
             commands::get_icons,

@@ -103,6 +103,9 @@ export const id: Messages = {
   "commandBar.openAiSettings": "Buka Pengaturan > Asisten AI",
 
   "fab.openFavorite": "Buka {name}",
+  "fab.openBookmark": "Buka bookmark: {name}",
+  "fab.saveBookmark": "Simpan halaman ini di slot bookmark",
+  "fab.saveBookmarkHint": "Simpan halaman",
   "fab.history": "Riwayat",
   "fab.usage": "Penggunaan",
   "fab.settings": "Pengaturan",
@@ -428,6 +431,12 @@ export const id: Messages = {
   "settings.languageLabel": "Bahasa aplikasi",
   "settings.languageSystem": "Bahasa sistem",
   "settings.searchEngine": "Mesin telusur",
+  "bookmark.title": "Bookmark",
+  "bookmark.note":
+    "Satu halaman yang bisa Anda buka dari tombol, gratis. Tahan tombol lalu ketuk slot bookmark untuk menyimpan halaman yang sedang dibuka, lalu ketuk untuk kembali. Tidak disimpan saat mode penyamaran.",
+  "bookmark.empty": "Belum ada halaman yang disimpan.",
+  "bookmark.save": "Simpan halaman saat ini",
+  "bookmark.replace": "Ganti dengan halaman saat ini",
   "settings.startPage": "Halaman awal",
   "settings.startPageLast": "Halaman terakhir yang saya buka",
   "settings.startPageSearch": "Beranda {engine}",

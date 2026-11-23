@@ -106,6 +106,9 @@ export const ro: Messages = {
   "commandBar.openAiSettings": "Deschide Setări > Asistent AI",
 
   "fab.openFavorite": "Deschide {name}",
+  "fab.openBookmark": "Deschide marcajul: {name}",
+  "fab.saveBookmark": "Salvează această pagină în locul pentru marcaj",
+  "fab.saveBookmarkHint": "Salvează pagina",
   "fab.history": "Istoric",
   "fab.usage": "Utilizare",
   "fab.settings": "Setări",
@@ -436,6 +439,12 @@ export const ro: Messages = {
   "settings.languageLabel": "Limba aplicației",
   "settings.languageSystem": "Limba sistemului",
   "settings.searchEngine": "Motor de căutare",
+  "bookmark.title": "Marcaj",
+  "bookmark.note":
+    "O pagină pe care o deschizi din buton, gratuit. Ține apăsat butonul și atinge locul pentru marcaj ca să salvezi pagina pe care ești, apoi atinge-l ca să revii. Nu se salvează în modul incognito.",
+  "bookmark.empty": "Nicio pagină salvată încă.",
+  "bookmark.save": "Salvează pagina curentă",
+  "bookmark.replace": "Înlocuiește cu pagina curentă",
   "settings.startPage": "Pagina de start",
   "settings.startPageLast": "Ultima pagină pe care am fost",
   "settings.startPageSearch": "Pagina principală {engine}",

@@ -105,6 +105,9 @@ export const uk: Messages = {
   "commandBar.openAiSettings": "Відкрити налаштування > ШІ-помічник",
 
   "fab.openFavorite": "Відкрити {name}",
+  "fab.openBookmark": "Відкрити закладку: {name}",
+  "fab.saveBookmark": "Зберегти цю сторінку в комірку закладки",
+  "fab.saveBookmarkHint": "Зберегти сторінку",
   "fab.history": "Історія",
   "fab.usage": "Використання",
   "fab.settings": "Налаштування",
@@ -434,6 +437,12 @@ export const uk: Messages = {
   "settings.languageLabel": "Мова застосунку",
   "settings.languageSystem": "Системна мова",
   "settings.searchEngine": "Пошукова система",
+  "bookmark.title": "Закладка",
+  "bookmark.note":
+    "Одна сторінка, яку можна відкрити з кнопки, безплатно. Утримуйте кнопку й торкніться комірки закладки, щоб зберегти поточну сторінку, а потім торкніться її, щоб повернутися. В режимі інкогніто не зберігається.",
+  "bookmark.empty": "Сторінку ще не збережено.",
+  "bookmark.save": "Зберегти поточну сторінку",
+  "bookmark.replace": "Замінити поточною сторінкою",
   "settings.startPage": "Стартова сторінка",
   "settings.startPageLast": "Остання відкрита сторінка",
   "settings.startPageSearch": "Головна сторінка {engine}",

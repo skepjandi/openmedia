@@ -103,6 +103,9 @@ export const bn: Messages = {
   "commandBar.openAiSettings": "সেটিংস > AI সহকারী খুলুন",
 
   "fab.openFavorite": "{name} খুলুন",
+  "fab.openBookmark": "বুকমার্ক খুলুন: {name}",
+  "fab.saveBookmark": "এই পাতাটি বুকমার্ক স্লটে সংরক্ষণ করুন",
+  "fab.saveBookmarkHint": "পাতা সংরক্ষণ",
   "fab.history": "ইতিহাস",
   "fab.usage": "ব্যবহার",
   "fab.settings": "সেটিংস",
@@ -420,6 +423,12 @@ export const bn: Messages = {
   "settings.languageLabel": "অ্যাপের ভাষা",
   "settings.languageSystem": "সিস্টেমের ভাষা",
   "settings.searchEngine": "সার্চ ইঞ্জিন",
+  "bookmark.title": "বুকমার্ক",
+  "bookmark.note":
+    "বোতাম থেকে খোলা যায় এমন একটি পাতা, বিনামূল্যে। বোতামটি চেপে ধরে বুকমার্ক স্লটে ট্যাপ করলে আপনি যে পাতায় আছেন তা সংরক্ষিত হবে, পরে ট্যাপ করে ফিরে আসুন। ইনকগনিটোতে সংরক্ষিত হয় না।",
+  "bookmark.empty": "এখনও কোনো পাতা সংরক্ষিত হয়নি।",
+  "bookmark.save": "বর্তমান পাতা সংরক্ষণ করুন",
+  "bookmark.replace": "বর্তমান পাতা দিয়ে বদলান",
   "settings.startPage": "শুরুর পাতা",
   "settings.startPageLast": "শেষ যে পাতায় ছিলাম",
   "settings.startPageSearch": "{engine}-এর হোম পেজ",

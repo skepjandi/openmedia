@@ -18,6 +18,7 @@ import { KeybindingsLink } from "../keybindings/KeybindingsScreen";
 import { DarkModeLink } from "./DarkModeScreen";
 import { VideoControlsLink } from "./VideoControlsScreen";
 import { AiSection } from "./AiSection";
+import { BookmarkSection } from "./BookmarkSection";
 import { FavoritesSection } from "./FavoritesSection";
 import { IncognitoFavoritesSection, IncognitoRecipesLink } from "./IncognitoSections";
 import { LibraryLinks } from "../library/Links";
@@ -129,6 +130,7 @@ function CategoryPanel({
       return (
         <>
           <FavoritesSection />
+          <BookmarkSection />
           <RecipesLink />
           <LibraryLinks />
         </>

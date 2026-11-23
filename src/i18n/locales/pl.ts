@@ -107,6 +107,9 @@ export const pl: Messages = {
   "commandBar.openAiSettings": "Otwórz Ustawienia > Asystent AI",
 
   "fab.openFavorite": "Otwórz {name}",
+  "fab.openBookmark": "Otwórz zakładkę: {name}",
+  "fab.saveBookmark": "Zapisz tę stronę w miejscu na zakładkę",
+  "fab.saveBookmarkHint": "Zapisz stronę",
   "fab.history": "Historia",
   "fab.usage": "Użycie",
   "fab.settings": "Ustawienia",
@@ -435,6 +438,12 @@ export const pl: Messages = {
   "settings.languageLabel": "Język aplikacji",
   "settings.languageSystem": "Język systemu",
   "settings.searchEngine": "Wyszukiwarka",
+  "bookmark.title": "Zakładka",
+  "bookmark.note":
+    "Jedna strona, którą otworzysz z przycisku, za darmo. Przytrzymaj przycisk i stuknij miejsce na zakładkę, aby zapisać bieżącą stronę; stuknij je później, aby wrócić. W trybie incognito nic nie jest zapisywane.",
+  "bookmark.empty": "Nie zapisano jeszcze żadnej strony.",
+  "bookmark.save": "Zapisz bieżącą stronę",
+  "bookmark.replace": "Zastąp bieżącą stroną",
   "settings.startPage": "Strona startowa",
   "settings.startPageLast": "Ostatnio otwarta strona",
   "settings.startPageSearch": "Strona główna {engine}",

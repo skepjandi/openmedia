@@ -141,6 +141,12 @@ export interface Favorite {
   folder?: string;
 }
 
+/** The page in the fan's bookmark slot: one, free, and opened exactly where it was saved. */
+export interface Bookmark {
+  url: string;
+  title: string;
+}
+
 export interface FavoriteInput {
   name: string;
   url: string;
@@ -209,6 +215,7 @@ export interface AppState {
   darkMode: DarkMode;
   /** Per-site dark mode choices by registrable domain. */
   darkSites: Record<string, SiteDark>;
+  bookmark: Bookmark | null;
   startPage: StartPage;
 }
 
@@ -725,6 +732,10 @@ export const library = {
   removeHistory: (url: string) => invoke<string[]>("remove_history", { url }),
   /** Forgets the typed addresses and the remembered last page. */
   clearHistory: () => command("clear_history"),
+  /** Saves a page in the bookmark slot; returns what the slot holds (unchanged while incognito). */
+  setBookmark: (url: string, title: string) =>
+    invoke<Bookmark | null>("set_bookmark", { url, title }),
+  clearBookmark: () => command("clear_bookmark"),
   setBackButton: (enabled: boolean) => command("set_back_button", { enabled }),
   setColorPicker: (enabled: boolean) => command("set_color_picker", { enabled }),
   setTechDetector: (enabled: boolean) => command("set_tech_detector", { enabled }),

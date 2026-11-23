@@ -106,6 +106,9 @@ export const tr: Messages = {
   "commandBar.openAiSettings": "Ayarlar > YZ asistanı bölümünü aç",
 
   "fab.openFavorite": "{name} öğesini aç",
+  "fab.openBookmark": "Yer işaretini aç: {name}",
+  "fab.saveBookmark": "Bu sayfayı yer işareti yuvasına kaydet",
+  "fab.saveBookmarkHint": "Sayfayı kaydet",
   "fab.history": "Geçmiş",
   "fab.usage": "Kullanım",
   "fab.settings": "Ayarlar",
@@ -432,6 +435,12 @@ export const tr: Messages = {
   "settings.languageLabel": "Uygulama dili",
   "settings.languageSystem": "Sistem dili",
   "settings.searchEngine": "Arama motoru",
+  "bookmark.title": "Yer işareti",
+  "bookmark.note":
+    "Düğmeden açabileceğiniz tek bir sayfa, ücretsiz. Düğmeye basılı tutup yer işareti yuvasına dokunarak bulunduğunuz sayfayı kaydedin, sonra geri dönmek için ona dokunun. Gizli modda kaydedilmez.",
+  "bookmark.empty": "Henüz kaydedilmiş sayfa yok.",
+  "bookmark.save": "Geçerli sayfayı kaydet",
+  "bookmark.replace": "Geçerli sayfayla değiştir",
   "settings.startPage": "Başlangıç sayfası",
   "settings.startPageLast": "En son bulunduğum sayfa",
   "settings.startPageSearch": "{engine} ana sayfası",

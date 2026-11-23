@@ -99,6 +99,9 @@ export const zhHant: Messages = {
   "commandBar.openAiSettings": "開啟「設定 > AI 助理」",
 
   "fab.openFavorite": "開啟 {name}",
+  "fab.openBookmark": "開啟書籤：{name}",
+  "fab.saveBookmark": "將此頁面儲存到書籤位",
+  "fab.saveBookmarkHint": "儲存頁面",
   "fab.history": "記錄",
   "fab.usage": "用量",
   "fab.settings": "設定",
@@ -394,6 +397,12 @@ export const zhHant: Messages = {
   "settings.languageLabel": "App 語言",
   "settings.languageSystem": "系統語言",
   "settings.searchEngine": "搜尋引擎",
+  "bookmark.title": "書籤",
+  "bookmark.note":
+    "可從按鈕開啟的一個頁面，免費。按住按鈕並輕點書籤位即可儲存目前頁面，之後輕點它即可返回。無痕模式下不會儲存。",
+  "bookmark.empty": "尚未儲存頁面。",
+  "bookmark.save": "儲存目前頁面",
+  "bookmark.replace": "以目前頁面取代",
   "settings.startPage": "啟動頁面",
   "settings.startPageLast": "上次瀏覽的頁面",
   "settings.startPageSearch": "{engine} 首頁",

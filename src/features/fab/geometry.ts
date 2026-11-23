@@ -42,6 +42,7 @@ export const DARK_MODE_SIZE = 44;
 export const COLOR_PICKER_SIZE = 44;
 export const TECH_DETECTOR_SIZE = 44;
 export const DOWNLOADS_SIZE = 44;
+export const BOOKMARK_SIZE = 44;
 
 const SCREEN_PADDING = 6;
 
@@ -116,6 +117,7 @@ export type FanTarget =
   | { kind: "colorPicker" }
   | { kind: "techDetector" }
   | { kind: "downloads" }
+  | { kind: "bookmark" }
   | { kind: "profiles" }
   | { kind: "settings" };
 

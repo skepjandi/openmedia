@@ -108,6 +108,9 @@ export const el: Messages = {
   "commandBar.openAiSettings": "Άνοιγμα Ρυθμίσεων > Βοηθός AI",
 
   "fab.openFavorite": "Άνοιγμα {name}",
+  "fab.openBookmark": "Άνοιγμα σελιδοδείκτη: {name}",
+  "fab.saveBookmark": "Αποθήκευση αυτής της σελίδας στη θέση σελιδοδείκτη",
+  "fab.saveBookmarkHint": "Αποθήκευση σελίδας",
   "fab.history": "Ιστορικό",
   "fab.usage": "Χρήση",
   "fab.settings": "Ρυθμίσεις",
@@ -440,6 +443,12 @@ export const el: Messages = {
   "settings.languageLabel": "Γλώσσα εφαρμογής",
   "settings.languageSystem": "Γλώσσα συστήματος",
   "settings.searchEngine": "Μηχανή αναζήτησης",
+  "bookmark.title": "Σελιδοδείκτης",
+  "bookmark.note":
+    "Μία σελίδα που ανοίγετε από το κουμπί, δωρεάν. Κρατήστε πατημένο το κουμπί και πατήστε τη θέση σελιδοδείκτη για να αποθηκεύσετε τη σελίδα όπου βρίσκεστε· πατήστε την ξανά για να επιστρέψετε. Δεν αποθηκεύεται σε ανώνυμη περιήγηση.",
+  "bookmark.empty": "Δεν έχει αποθηκευτεί σελίδα ακόμα.",
+  "bookmark.save": "Αποθήκευση τρέχουσας σελίδας",
+  "bookmark.replace": "Αντικατάσταση με την τρέχουσα σελίδα",
   "settings.startPage": "Αρχική σελίδα",
   "settings.startPageLast": "Η τελευταία σελίδα που ήμουν",
   "settings.startPageSearch": "Αρχική σελίδα του {engine}",

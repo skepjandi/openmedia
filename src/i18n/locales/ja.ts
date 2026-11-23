@@ -106,6 +106,9 @@ export const ja: Messages = {
   "commandBar.openAiSettings": "設定 > AI アシスタントを開く",
 
   "fab.openFavorite": "{name}を開く",
+  "fab.openBookmark": "ブックマークを開く: {name}",
+  "fab.saveBookmark": "このページをブックマーク枠に保存",
+  "fab.saveBookmarkHint": "ページを保存",
   "fab.history": "履歴",
   "fab.usage": "使用時間",
   "fab.settings": "設定",
@@ -426,6 +429,12 @@ export const ja: Messages = {
   "settings.languageLabel": "アプリの言語",
   "settings.languageSystem": "システムの言語",
   "settings.searchEngine": "検索エンジン",
+  "bookmark.title": "ブックマーク",
+  "bookmark.note":
+    "ボタンから開ける 1 ページ（無料）。ボタンを長押ししてブックマーク枠をタップすると今のページを保存し、もう一度タップするとそのページに戻ります。シークレットモード中は保存されません。",
+  "bookmark.empty": "まだページが保存されていません。",
+  "bookmark.save": "今のページを保存",
+  "bookmark.replace": "今のページに置き換える",
   "settings.startPage": "起動時のページ",
   "settings.startPageLast": "最後に開いていたページ",
   "settings.startPageSearch": "{engine} のホームページ",

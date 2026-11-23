@@ -102,6 +102,9 @@ export const vi: Messages = {
   "commandBar.openAiSettings": "Mở Cài đặt > Trợ lý AI",
 
   "fab.openFavorite": "Mở {name}",
+  "fab.openBookmark": "Mở dấu trang: {name}",
+  "fab.saveBookmark": "Lưu trang này vào ô dấu trang",
+  "fab.saveBookmarkHint": "Lưu trang",
   "fab.history": "Lịch sử",
   "fab.usage": "Thời gian sử dụng",
   "fab.settings": "Cài đặt",
@@ -425,6 +428,12 @@ export const vi: Messages = {
   "settings.languageLabel": "Ngôn ngữ ứng dụng",
   "settings.languageSystem": "Ngôn ngữ hệ thống",
   "settings.searchEngine": "Công cụ tìm kiếm",
+  "bookmark.title": "Dấu trang",
+  "bookmark.note":
+    "Một trang bạn mở từ nút, miễn phí. Giữ nút rồi chạm vào ô dấu trang để lưu trang đang xem, sau đó chạm vào để quay lại. Không lưu khi ở chế độ ẩn danh.",
+  "bookmark.empty": "Chưa lưu trang nào.",
+  "bookmark.save": "Lưu trang hiện tại",
+  "bookmark.replace": "Thay bằng trang hiện tại",
   "settings.startPage": "Trang khởi động",
   "settings.startPageLast": "Trang tôi xem lần cuối",
   "settings.startPageSearch": "Trang chủ {engine}",

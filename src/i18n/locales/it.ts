@@ -107,6 +107,9 @@ export const it: Messages = {
   "commandBar.openAiSettings": "Apri Impostazioni > Assistente IA",
 
   "fab.openFavorite": "Apri {name}",
+  "fab.openBookmark": "Apri segnalibro: {name}",
+  "fab.saveBookmark": "Salva questa pagina nello spazio del segnalibro",
+  "fab.saveBookmarkHint": "Salva pagina",
   "fab.history": "Cronologia",
   "fab.usage": "Utilizzo",
   "fab.settings": "Impostazioni",
@@ -438,6 +441,12 @@ export const it: Messages = {
   "settings.languageLabel": "Lingua dell’app",
   "settings.languageSystem": "Lingua di sistema",
   "settings.searchEngine": "Motore di ricerca",
+  "bookmark.title": "Segnalibro",
+  "bookmark.note":
+    "Una pagina che apri dal pulsante, gratis. Tieni premuto il pulsante e tocca lo spazio del segnalibro per salvare la pagina in cui sei, poi toccalo per tornarci. Non viene salvato in incognito.",
+  "bookmark.empty": "Nessuna pagina salvata.",
+  "bookmark.save": "Salva la pagina attuale",
+  "bookmark.replace": "Sostituisci con la pagina attuale",
   "settings.startPage": "Pagina iniziale",
   "settings.startPageLast": "L'ultima pagina visitata",
   "settings.startPageSearch": "Home page di {engine}",

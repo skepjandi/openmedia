@@ -112,6 +112,9 @@ export const en = {
   "commandBar.openAiSettings": "Open Settings > AI assistant",
 
   "fab.openFavorite": "Open {name}",
+  "fab.openBookmark": "Open bookmark: {name}",
+  "fab.saveBookmark": "Save this page in the bookmark slot",
+  "fab.saveBookmarkHint": "Save page",
   "fab.history": "History",
   "fab.usage": "Usage",
   "fab.settings": "Settings",
@@ -429,6 +432,12 @@ export const en = {
   "settings.languageLabel": "App language",
   "settings.languageSystem": "System language",
   "settings.searchEngine": "Search engine",
+  "bookmark.title": "Bookmark",
+  "bookmark.note":
+    "One page you can open from the button, free. Hold the button and tap the bookmark slot to save the page you are on, then tap it to come back. Not saved while incognito.",
+  "bookmark.empty": "No page saved yet.",
+  "bookmark.save": "Save the current page",
+  "bookmark.replace": "Replace with the current page",
   "settings.startPage": "Start page",
   "settings.startPageLast": "The last page I was on",
   "settings.startPageSearch": "{engine} home page",

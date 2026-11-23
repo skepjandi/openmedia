@@ -104,6 +104,9 @@ export const ur: Messages = {
   "commandBar.openAiSettings": "ترتیبات > AI معاون کھولیں",
 
   "fab.openFavorite": "{name} کھولیں",
+  "fab.openBookmark": "بک مارک کھولیں: {name}",
+  "fab.saveBookmark": "یہ صفحہ بک مارک کی جگہ میں محفوظ کریں",
+  "fab.saveBookmarkHint": "صفحہ محفوظ کریں",
   "fab.history": "تاریخ",
   "fab.usage": "استعمال",
   "fab.settings": "ترتیبات",
@@ -429,6 +432,12 @@ export const ur: Messages = {
   "settings.languageLabel": "ایپ کی زبان",
   "settings.languageSystem": "سسٹم کی زبان",
   "settings.searchEngine": "سرچ انجن",
+  "bookmark.title": "بک مارک",
+  "bookmark.note":
+    "بٹن سے کھلنے والا ایک صفحہ، مفت۔ بٹن دبائے رکھیں اور بک مارک کی جگہ پر ٹیپ کریں تاکہ جس صفحے پر آپ ہیں وہ محفوظ ہو جائے، پھر واپس آنے کے لیے اسے ٹیپ کریں۔ انکوگنیٹو میں محفوظ نہیں ہوتا۔",
+  "bookmark.empty": "ابھی کوئی صفحہ محفوظ نہیں۔",
+  "bookmark.save": "موجودہ صفحہ محفوظ کریں",
+  "bookmark.replace": "موجودہ صفحے سے بدلیں",
   "settings.startPage": "شروع کا صفحہ",
   "settings.startPageLast": "آخری صفحہ جس پر میں تھا",
   "settings.startPageSearch": "{engine} کا ہوم پیج",

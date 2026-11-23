@@ -8,7 +8,7 @@ OpenMedia has no accounts. Its one server (the share Worker, see [Recipe Library
 
 | Free, always | Pro |
 |---|---|
-| Opening any link or site, web search from the command bar, favorites (all five quick-access slots and More favorites), history, adding recipes (official and community) from the recipe library and their switches, importing recipes, sharing a recipe as a GitHub pull request, ad and tracker blocking, Settings, theme, language | All AI features (providers, keys, test, assistant, preview, accept) |
+| Opening any link or site, web search from the command bar, favorites (all five quick-access slots and More favorites), the bookmark button in the fan (one saved page), history, adding recipes (official and community) from the recipe library and their switches, importing recipes, sharing a recipe as a GitHub pull request, ad and tracker blocking, Settings, theme, language | All AI features (providers, keys, test, assistant, preview, accept) |
 | Incognito mode, deleting AI providers and keys, unblocking a site, recording usage | Usage: Stats, daily policies and limits, blocking an exhausted site |
 
 **Where the new gates are enforced.** The onboarding slot count: in Rust only. Sharing a recipe stays free.

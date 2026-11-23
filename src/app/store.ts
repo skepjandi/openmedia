@@ -1,5 +1,11 @@
 import { create } from "zustand";
-import { asInput, favoriteStartUrl, folderKey, quickAccess } from "../shared/favorites";
+import {
+  asInput,
+  displayHost,
+  favoriteStartUrl,
+  folderKey,
+  quickAccess,
+} from "../shared/favorites";
 import {
   assistantReducer,
   initialAssistant,
@@ -367,6 +373,11 @@ export interface AppStore {
   clearHistory: () => Promise<void>;
   /** Forgets one history entry. */
   removeHistory: (url: string) => Promise<void>;
+  /** Saves the visible page in the bookmark slot, replacing what was there. Not while incognito. */
+  saveBookmark: () => Promise<void>;
+  /** Shows the bookmarked page: its live session if that page is open, otherwise a new one. */
+  openBookmark: () => void;
+  removeBookmark: () => Promise<void>;
   setTheme: (theme: Theme) => Promise<void>;
   /** Picks the language the app is in; null puts it back on the device's language. */
   setLocale: (locale: string | null) => Promise<void>;
@@ -1196,6 +1207,42 @@ export const useApp = create<AppStore>((set, get) => {
         }));
       } catch (error) {
         set({ error: appError(error) });
+      }
+    },
+
+    saveBookmark: async () => {
+      const page = selectPage(get());
+      if (!page || get().incognito.active) return;
+      const url = page.url ?? page.openedUrl;
+      try {
+        const bookmark = await library.setBookmark(url, page.title?.trim() || displayHost(url));
+        set((current) => ({ state: current.state && { ...current.state, bookmark } }));
+        void fetchIcons([url]);
+      } catch (error) {
+        set({ error: appError(error) });
+      }
+    },
+
+    openBookmark: () => {
+      const bookmark = get().state?.bookmark;
+      if (!bookmark) return;
+      const live = get().sessions.find(
+        (session) => session.hubId === null && (session.url ?? session.openedUrl) === bookmark.url,
+      );
+      if (live) switchTo(live.id);
+      else startSession(bookmark.url, "typed");
+    },
+
+    removeBookmark: async () => {
+      const previous = get().state?.bookmark ?? null;
+      set((current) => ({ state: current.state && { ...current.state, bookmark: null } }));
+      try {
+        await library.clearBookmark();
+      } catch (error) {
+        set((current) => ({
+          state: current.state && { ...current.state, bookmark: previous },
+          error: appError(error),
+        }));
       }
     },
 

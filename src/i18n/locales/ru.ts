@@ -106,6 +106,9 @@ export const ru: Messages = {
   "commandBar.openAiSettings": "Открыть настройки > ИИ-помощник",
 
   "fab.openFavorite": "Открыть {name}",
+  "fab.openBookmark": "Открыть закладку: {name}",
+  "fab.saveBookmark": "Сохранить эту страницу в ячейку закладки",
+  "fab.saveBookmarkHint": "Сохранить страницу",
   "fab.history": "История",
   "fab.usage": "Использование",
   "fab.settings": "Настройки",
@@ -433,6 +436,12 @@ export const ru: Messages = {
   "settings.languageLabel": "Язык приложения",
   "settings.languageSystem": "Системный язык",
   "settings.searchEngine": "Поисковая система",
+  "bookmark.title": "Закладка",
+  "bookmark.note":
+    "Одна страница, которую можно открыть с кнопки, бесплатно. Удерживайте кнопку и коснитесь ячейки закладки, чтобы сохранить текущую страницу, а потом коснитесь её, чтобы вернуться. В режиме инкогнито не сохраняется.",
+  "bookmark.empty": "Страница ещё не сохранена.",
+  "bookmark.save": "Сохранить текущую страницу",
+  "bookmark.replace": "Заменить текущей страницей",
   "settings.startPage": "Стартовая страница",
   "settings.startPageLast": "Последняя открытая страница",
   "settings.startPageSearch": "Главная страница {engine}",

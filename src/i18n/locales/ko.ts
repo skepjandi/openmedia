@@ -105,6 +105,9 @@ export const ko: Messages = {
   "commandBar.openAiSettings": "설정 > AI 어시스턴트 열기",
 
   "fab.openFavorite": "{name} 열기",
+  "fab.openBookmark": "북마크 열기: {name}",
+  "fab.saveBookmark": "이 페이지를 북마크 칸에 저장",
+  "fab.saveBookmarkHint": "페이지 저장",
   "fab.history": "기록",
   "fab.usage": "사용 시간",
   "fab.settings": "설정",
@@ -423,6 +426,12 @@ export const ko: Messages = {
   "settings.languageLabel": "앱 언어",
   "settings.languageSystem": "시스템 언어",
   "settings.searchEngine": "검색 엔진",
+  "bookmark.title": "북마크",
+  "bookmark.note":
+    "버튼에서 여는 페이지 하나, 무료입니다. 버튼을 길게 누른 뒤 북마크 칸을 탭하면 지금 보는 페이지가 저장되고, 다시 탭하면 그 페이지로 돌아갑니다. 시크릿 모드에서는 저장되지 않습니다.",
+  "bookmark.empty": "아직 저장된 페이지가 없습니다.",
+  "bookmark.save": "현재 페이지 저장",
+  "bookmark.replace": "현재 페이지로 바꾸기",
   "settings.startPage": "시작 페이지",
   "settings.startPageLast": "마지막으로 보던 페이지",
   "settings.startPageSearch": "{engine} 홈페이지",

@@ -107,6 +107,9 @@ export const cs: Messages = {
   "commandBar.openAiSettings": "Otevřít Nastavení > Asistent AI",
 
   "fab.openFavorite": "Otevřít {name}",
+  "fab.openBookmark": "Otevřít záložku: {name}",
+  "fab.saveBookmark": "Uložit tuto stránku do pozice záložky",
+  "fab.saveBookmarkHint": "Uložit stránku",
   "fab.history": "Historie",
   "fab.usage": "Využití",
   "fab.settings": "Nastavení",
@@ -429,6 +432,12 @@ export const cs: Messages = {
   "settings.languageLabel": "Jazyk aplikace",
   "settings.languageSystem": "Systémový jazyk",
   "settings.searchEngine": "Vyhledávač",
+  "bookmark.title": "Záložka",
+  "bookmark.note":
+    "Jedna stránka, kterou otevřete z tlačítka, zdarma. Podržte tlačítko a klepněte na pozici záložky, tím uložíte stránku, na které jste; dalším klepnutím se na ni vrátíte. V anonymním režimu se neukládá.",
+  "bookmark.empty": "Zatím není uložena žádná stránka.",
+  "bookmark.save": "Uložit aktuální stránku",
+  "bookmark.replace": "Nahradit aktuální stránkou",
   "settings.startPage": "Úvodní stránka",
   "settings.startPageLast": "Poslední stránka, na které jsem byl",
   "settings.startPageSearch": "Domovská stránka {engine}",

@@ -103,6 +103,9 @@ export const ms: Messages = {
   "commandBar.openAiSettings": "Buka Tetapan > Pembantu AI",
 
   "fab.openFavorite": "Buka {name}",
+  "fab.openBookmark": "Buka penanda buku: {name}",
+  "fab.saveBookmark": "Simpan halaman ini dalam slot penanda buku",
+  "fab.saveBookmarkHint": "Simpan halaman",
   "fab.history": "Sejarah",
   "fab.usage": "Penggunaan",
   "fab.settings": "Tetapan",
@@ -432,6 +435,12 @@ export const ms: Messages = {
   "settings.languageLabel": "Bahasa aplikasi",
   "settings.languageSystem": "Bahasa sistem",
   "settings.searchEngine": "Enjin carian",
+  "bookmark.title": "Penanda buku",
+  "bookmark.note":
+    "Satu halaman yang anda buka daripada butang, percuma. Tekan lama butang dan ketik slot penanda buku untuk menyimpan halaman semasa, kemudian ketik untuk kembali. Tidak disimpan semasa inkognito.",
+  "bookmark.empty": "Belum ada halaman disimpan.",
+  "bookmark.save": "Simpan halaman semasa",
+  "bookmark.replace": "Ganti dengan halaman semasa",
   "settings.startPage": "Halaman mula",
   "settings.startPageLast": "Halaman terakhir yang saya buka",
   "settings.startPageSearch": "Halaman utama {engine}",

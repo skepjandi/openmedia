@@ -74,6 +74,22 @@ export const ArrowIcon = () => (
   </Icon>
 );
 
+export const BookmarkIcon = ({ filled = false, size }: { filled?: boolean; size?: number }) => (
+  <Icon size={size}>
+    <path
+      d="M7 4.5h10a1 1 0 0 1 1 1V20l-6-4-6 4V5.5a1 1 0 0 1 1-1z"
+      fill={filled ? "currentColor" : "none"}
+    />
+  </Icon>
+);
+
+export const BookmarkPlusIcon = () => (
+  <Icon>
+    <path d="M14 4.5H7a1 1 0 0 0-1 1V20l6-4 6 4v-8" />
+    <path d="M18 3v6M15 6h6" />
+  </Icon>
+);
+
 export const PlusIcon = () => (
   <Icon>
     <path d="M12 5v14M5 12h14" />

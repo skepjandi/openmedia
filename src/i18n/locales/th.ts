@@ -102,6 +102,9 @@ export const th: Messages = {
   "commandBar.openAiSettings": "เปิดการตั้งค่า > ผู้ช่วย AI",
 
   "fab.openFavorite": "เปิด {name}",
+  "fab.openBookmark": "เปิดบุ๊กมาร์ก: {name}",
+  "fab.saveBookmark": "บันทึกหน้านี้ไว้ในช่องบุ๊กมาร์ก",
+  "fab.saveBookmarkHint": "บันทึกหน้า",
   "fab.history": "ประวัติ",
   "fab.usage": "เวลาใช้งาน",
   "fab.settings": "การตั้งค่า",
@@ -409,6 +412,12 @@ export const th: Messages = {
   "settings.languageLabel": "ภาษาของแอป",
   "settings.languageSystem": "ภาษาระบบ",
   "settings.searchEngine": "เครื่องมือค้นหา",
+  "bookmark.title": "บุ๊กมาร์ก",
+  "bookmark.note":
+    "หน้าเดียวที่เปิดได้จากปุ่ม ฟรี กดปุ่มค้างไว้แล้วแตะช่องบุ๊กมาร์กเพื่อบันทึกหน้าที่เปิดอยู่ จากนั้นแตะเพื่อกลับมา ไม่บันทึกระหว่างโหมดไม่ระบุตัวตน",
+  "bookmark.empty": "ยังไม่ได้บันทึกหน้าใด",
+  "bookmark.save": "บันทึกหน้าปัจจุบัน",
+  "bookmark.replace": "แทนที่ด้วยหน้าปัจจุบัน",
   "settings.startPage": "หน้าเริ่มต้น",
   "settings.startPageLast": "หน้าล่าสุดที่ฉันเปิดอยู่",
   "settings.startPageSearch": "หน้าแรกของ {engine}",

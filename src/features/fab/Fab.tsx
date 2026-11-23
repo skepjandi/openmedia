@@ -37,6 +37,7 @@ import { VIDEO_CONTROLS_DEFAULT, effectiveVideo } from "../../shared/videoContro
 import { useInsets, useViewport } from "../../shared/viewport";
 import {
   FAB_SIZE,
+  BOOKMARK_SIZE,
   DIAL_RADIUS,
   FAVORITE_SIZE,
   HISTORY_SIZE,
@@ -90,6 +91,8 @@ import {
 import { loadPosition, savePosition, type FabPosition } from "./position";
 import { BiometricIcon } from "../incognito/BiometricIcon";
 import {
+  BookmarkIcon,
+  BookmarkPlusIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
   ColorPickerIcon,
@@ -438,6 +441,10 @@ function FloatingButton() {
   const openSheet = useApp((s) => s.openSheet);
   const openFavorite = useApp((s) => s.openFavorite);
   const openSession = useApp((s) => s.openSession);
+  const bookmark = useApp((s) => s.state?.bookmark ?? null);
+  const hasPage = useApp((s) => s.activeId !== null);
+  const saveBookmark = useApp((s) => s.saveBookmark);
+  const openBookmark = useApp((s) => s.openBookmark);
   const onboardingOpen = useApp((s) => s.onboardingOpen);
   const setFabEdge = useApp((s) => s.setFabEdge);
   const isPro = useEntitlementStore((state) => state.status === "pro");
@@ -590,7 +597,10 @@ function FloatingButton() {
     else if (target.kind === "colorPicker") void startColorPick();
     else if (target.kind === "techDetector") void startTechDetect();
     else if (target.kind === "downloads") openSheet("downloads");
-    else if (target.kind === "tab") openSession(target.sessionId);
+    else if (target.kind === "bookmark") {
+      if (bookmark) openBookmark();
+      else void saveBookmark();
+    } else if (target.kind === "tab") openSession(target.sessionId);
     else if (target.kind === "folder") setFolderName(target.name);
     else if (target.kind === "darkMode") {
       if (pageSite) {
@@ -730,11 +740,36 @@ function FloatingButton() {
       | "settings"
       | "colorPicker"
       | "techDetector"
-      | "downloads",
+      | "downloads"
+      | "bookmark",
     size: number,
     label: string,
     content: ReactNode,
   ): Entry => ({ lane: "tools", target: { kind }, size, section: QUICK, label, content });
+
+  // One page anyone can keep, free; nothing is saved or shown while incognito.
+  const showBookmark = !incognito.active && (bookmark !== null || hasPage);
+  const bookmarkIcon = bookmark ? iconForUrl(bookmark.url, favorites) : undefined;
+  const bookmarkTool: Entry = {
+    ...tool(
+      "bookmark",
+      BOOKMARK_SIZE,
+      bookmark ? t("fab.openBookmark", { name: bookmark.title }) : t("fab.saveBookmark"),
+      bookmarkIcon ? (
+        <>
+          <img src={bookmarkIcon} alt="" draggable={false} className="size-6 rounded-md" />
+          <span className="absolute -end-1.5 -top-1.5 z-10 grid size-5 place-items-center rounded-full border border-white/70 bg-black/80 text-white">
+            <BookmarkIcon filled size={12} />
+          </span>
+        </>
+      ) : bookmark ? (
+        <BookmarkIcon filled />
+      ) : (
+        <BookmarkPlusIcon />
+      ),
+    ),
+    caption: bookmark ? undefined : t("fab.saveBookmarkHint"),
+  };
 
   // Top to bottom, as the page column reads; a column running upward from the button lists the
   // other way round.
@@ -753,6 +788,7 @@ function FloatingButton() {
       </>,
     ),
     tool("tabs", TABS_SIZE, t("fab.tabs"), <TabsIcon />),
+    ...(showBookmark ? [bookmarkTool] : []),
     tool("history", HISTORY_SIZE, t("fab.history"), <HistoryIcon />),
     tool(
       "profiles",

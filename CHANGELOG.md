@@ -6,6 +6,14 @@ All notable changes to OpenMedia are documented here.
 >
 > **Wiki**: the [GitHub Wiki](https://github.com/skepjandi/openmedia/wiki) is the public-facing main wiki — architecture, recipe format, AI pipeline, security model, roadmap. Source-controlled editing surface is `docs/wiki/` in this repo; CI (`.github/workflows/sync-wiki.yml`) mirrors it to the GitHub Wiki on every merge to `main`. New single-PR changes belong here, not as new wiki pages.
 
+### feat(fab): a free bookmark button in the hold menu
+
+**Area:** `feat(fab)`
+
+**Change:** Holding the button now shows a bookmark button in the page column, right after Tabs, free for everyone. Empty, a tap saves the page being shown; filled, it shows the site's icon and a tap opens that exact page (or switches to it if it is open). Settings > Sites > Bookmark shows it and can replace it with the current page or remove it. Stored in `library.json` as `bookmark` (`set_bookmark`, `clear_bookmark`, shell-only; `http(s)` only; the title is cleaned and cut to 80 characters; its site icon survives icon pruning). Hidden while incognito, and Rust saves nothing then. Eight new strings in all 29 locales, machine-drafted.
+
+**Verified:** see the PR. **Not verified:** the fan on a device or simulator; the Rust side was not compiled (see the PR); native-speaker review of the new strings.
+
 ### feat(tabs): reopen recently closed sites from the Tabs screen
 
 **Area:** `feat(tabs)`

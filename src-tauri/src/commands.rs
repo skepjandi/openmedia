@@ -37,7 +37,7 @@ use crate::error::{Error, Result};
 use crate::find_in_page;
 use crate::incognito::Incognito;
 use crate::library::{
-    Favorite, FavoriteInput, Folder, Library, Mode, SearchEngine, StartPage, Theme,
+    Bookmark, Favorite, FavoriteInput, Folder, Library, Mode, SearchEngine, StartPage, Theme,
 };
 use crate::recipes::{
     OptionValue, Recipe, Recipes,
@@ -126,6 +126,28 @@ pub fn add_history(
 #[tauri::command]
 pub fn remove_history(library: State<'_, Library>, url: String) -> Result<Vec<String>> {
     library.remove_history(&url)
+}
+
+/// Saves the page in the fan's bookmark slot and returns what the slot holds. Free: there is
+/// one slot for everyone. Nothing is saved while incognito, so an incognito page never shows in
+/// the normal set; the slot is then returned unchanged.
+#[tauri::command(async)]
+pub fn set_bookmark(
+    library: State<'_, Library>,
+    incognito: State<'_, Incognito>,
+    url: String,
+    title: String,
+) -> Result<Option<Bookmark>> {
+    if incognito.is_active() {
+        return library.bookmark();
+    }
+    library.set_bookmark(&url, &title).map(Some)
+}
+
+/// Empties the bookmark slot.
+#[tauri::command]
+pub fn clear_bookmark(library: State<'_, Library>) -> Result<()> {
+    library.clear_bookmark()
 }
 
 /// Forgets every searched address and the remembered last page.

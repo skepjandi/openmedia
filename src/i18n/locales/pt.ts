@@ -107,6 +107,9 @@ export const pt: Messages = {
   "commandBar.openAiSettings": "Abrir Configurações > Assistente de IA",
 
   "fab.openFavorite": "Abrir {name}",
+  "fab.openBookmark": "Abrir favorito salvo: {name}",
+  "fab.saveBookmark": "Salvar esta página no espaço do marcador",
+  "fab.saveBookmarkHint": "Salvar página",
   "fab.history": "Histórico",
   "fab.usage": "Uso",
   "fab.settings": "Configurações",
@@ -437,6 +440,12 @@ export const pt: Messages = {
   "settings.languageLabel": "Idioma do app",
   "settings.languageSystem": "Idioma do sistema",
   "settings.searchEngine": "Mecanismo de pesquisa",
+  "bookmark.title": "Marcador",
+  "bookmark.note":
+    "Uma página que você abre pelo botão, de graça. Segure o botão e toque no espaço do marcador para salvar a página em que está; toque nele depois para voltar. Não é salvo no modo anônimo.",
+  "bookmark.empty": "Nenhuma página salva ainda.",
+  "bookmark.save": "Salvar a página atual",
+  "bookmark.replace": "Substituir pela página atual",
   "settings.startPage": "Página inicial",
   "settings.startPageLast": "A última página em que estive",
   "settings.startPageSearch": "Página inicial do {engine}",

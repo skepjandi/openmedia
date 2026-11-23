@@ -98,6 +98,9 @@ export const zhHans: Messages = {
   "commandBar.openAiSettings": "打开“设置 > AI 助手”",
 
   "fab.openFavorite": "打开 {name}",
+  "fab.openBookmark": "打开书签：{name}",
+  "fab.saveBookmark": "将此页面保存到书签位",
+  "fab.saveBookmarkHint": "保存页面",
   "fab.history": "历史",
   "fab.usage": "用量",
   "fab.settings": "设置",
@@ -391,6 +394,12 @@ export const zhHans: Messages = {
   "settings.languageLabel": "应用语言",
   "settings.languageSystem": "跟随系统语言",
   "settings.searchEngine": "搜索引擎",
+  "bookmark.title": "书签",
+  "bookmark.note":
+    "可从按钮打开的一个页面，免费。按住按钮并轻点书签位即可保存当前页面，之后轻点它即可返回。无痕模式下不会保存。",
+  "bookmark.empty": "还没有保存页面。",
+  "bookmark.save": "保存当前页面",
+  "bookmark.replace": "替换为当前页面",
   "settings.startPage": "启动页面",
   "settings.startPageLast": "上次浏览的页面",
   "settings.startPageSearch": "{engine} 主页",

@@ -103,6 +103,9 @@ export const de: Messages = {
   "commandBar.openAiSettings": "Einstellungen > KI-Assistent öffnen",
 
   "fab.openFavorite": "{name} öffnen",
+  "fab.openBookmark": "Lesezeichen öffnen: {name}",
+  "fab.saveBookmark": "Diese Seite im Lesezeichen-Platz speichern",
+  "fab.saveBookmarkHint": "Seite merken",
   "fab.history": "Verlauf",
   "fab.settings": "Einstellungen",
   "fab.assistant": "Assistent. Für Favoriten gedrückt halten.",
@@ -433,6 +436,12 @@ export const de: Messages = {
   "settings.languageLabel": "App-Sprache",
   "settings.languageSystem": "Systemsprache",
   "settings.searchEngine": "Suchmaschine",
+  "bookmark.title": "Lesezeichen",
+  "bookmark.note":
+    "Eine Seite, die du über den Button öffnest, kostenlos. Halte den Button gedrückt und tippe auf den Lesezeichen-Platz, um die aktuelle Seite zu speichern; tippe später darauf, um zurückzukehren. Im Inkognito-Modus wird nichts gespeichert.",
+  "bookmark.empty": "Noch keine Seite gespeichert.",
+  "bookmark.save": "Aktuelle Seite speichern",
+  "bookmark.replace": "Durch die aktuelle Seite ersetzen",
   "settings.startPage": "Startseite",
   "settings.startPageLast": "Die zuletzt besuchte Seite",
   "settings.startPageSearch": "Startseite von {engine}",
