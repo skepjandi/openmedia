@@ -16,8 +16,12 @@ serde_json = "1"
 thiserror = "2"
 
 [build-dependencies]
-swift-rs = { version = "1.0.7", features = ["build"] }
 tauri-plugin = { version = "2.7.2", features = ["build"] }
+
+# Only a macOS host can build the Swift package, and linking swift-rs into the build script fails
+# on Windows (unresolved `retain_object`), so no other host compiles it.
+[target.'cfg(target_os = "macos")'.build-dependencies]
+swift-rs = { version = "1.0.7", features = ["build"] }
 
 [lints]
 workspace = true
