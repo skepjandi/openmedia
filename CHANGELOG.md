@@ -6,6 +6,12 @@ All notable changes to OpenMedia are documented here.
 >
 > **Wiki**: the [GitHub Wiki](https://github.com/skepjandi/openmedia/wiki) is the public-facing main wiki — architecture, recipe format, AI pipeline, security model, roadmap. Source-controlled editing surface is `docs/wiki/` in this repo; CI (`.github/workflows/sync-wiki.yml`) mirrors it to the GitHub Wiki on every merge to `main`. New single-PR changes belong here, not as new wiki pages.
 
+### fix(siteview): close the native fullscreen video left over after returning from picture-in-picture (iOS)
+
+**Area:** `fix(siteview)`
+
+**Change:** minimizing the app while a short-form video played could, on return, leave the video in a native fullscreen player that covered the app: nothing could be tapped and the floating button was hidden. On return the page's video is now set back to inline (at once, then again after 0.5 s and 1.5 s while WebKit settles), unless a video was already fullscreen when the app was left. Not verifiable in the iOS Simulator; a device is needed.
+
 ### chore(store): remove store listing artwork and its render script
 
 **Area:** `chore(store)`

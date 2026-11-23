@@ -140,6 +140,28 @@ private let exitPictureInPictureScript = """
     }
   })()
   """
+/// True while a video of the page is in native fullscreen (presentation mode or element fullscreen).
+private let inFullscreenScript = """
+  (function () {
+    if (document.webkitFullscreenElement) return true;
+    var videos = document.querySelectorAll('video');
+    for (var i = 0; i < videos.length; i++) {
+      if (videos[i].webkitPresentationMode === 'fullscreen') return true;
+    }
+    return false;
+  })()
+  """
+/// Closes native fullscreen. Coming back from picture-in-picture can leave the video in a native
+/// fullscreen player that covers the app, so nothing in it can be touched.
+private let exitFullscreenScript = """
+  (function () {
+    var videos = document.querySelectorAll('video');
+    for (var i = 0; i < videos.length; i++) {
+      if (videos[i].webkitPresentationMode === 'fullscreen') videos[i].webkitSetPresentationMode('inline');
+    }
+    if (document.webkitFullscreenElement && document.webkitExitFullscreen) document.webkitExitFullscreen();
+  })()
+  """
 private let inPictureInPictureScript = """
   (function () {
     if (document.querySelector('[data-openmedia-mini]')) return true;
@@ -528,6 +550,9 @@ private final class Session {
   /// True while a picture-in-picture window is open because the app was left, not because the
   /// reader opened it; coming back closes it.
   var autoPictureInPicture = false
+  /// True when a video was in native fullscreen as the app was left: only a fullscreen that
+  /// appeared during the absence (the restore from picture-in-picture) is closed on return.
+  var fullscreenBeforeLeaving = false
   /// True while a video floats because the page it played on was left for another.
   var floatedForNavigation = false
   /// True while one of the page's videos is in a picture-in-picture window, as last seen when the
@@ -705,11 +730,15 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
       forName: UIApplication.willResignActiveNotification, object: nil, queue: .main
     ) { [weak self] _ in
       self?.noteWindowOpen()
+      self?.noteFullscreen()
       self?.enterPictureInPicture()
     }
     NotificationCenter.default.addObserver(
       forName: UIApplication.didBecomeActiveNotification, object: nil, queue: .main
-    ) { [weak self] _ in self?.exitAutomaticPictureInPicture() }
+    ) { [weak self] _ in
+      self?.exitAutomaticPictureInPicture()
+      self?.closeRestoredFullscreen()
+    }
     UNUserNotificationCenter.current().delegate = self
     DispatchQueue.main.async { self.attachShell() }
   }
@@ -1181,6 +1210,24 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
     guard let id = activeId, let session = sessions[id], !session.blocked else { return }
     session.view.evaluateJavaScript(inSystemPictureInPictureScript) { [weak session] result, _ in
       session?.windowOpen = (result as? Bool) == true
+    }
+  }
+
+  private func noteFullscreen() {
+    guard let id = activeId, let session = sessions[id], !session.blocked else { return }
+    session.view.evaluateJavaScript(inFullscreenScript) { [weak session] result, _ in
+      session?.fullscreenBeforeLeaving = (result as? Bool) == true
+    }
+  }
+
+  /// WebKit may restore a video from picture-in-picture into native fullscreen, which covers the
+  /// app and swallows every touch. Close it, now and again once the transition has settled.
+  private func closeRestoredFullscreen() {
+    guard let id = activeId, let session = sessions[id], !session.fullscreenBeforeLeaving else { return }
+    for delay in [0.0, 0.5, 1.5] {
+      DispatchQueue.main.asyncAfter(deadline: .now() + delay) { [weak session] in
+        session?.view.evaluateJavaScript(exitFullscreenScript)
+      }
     }
   }
 
