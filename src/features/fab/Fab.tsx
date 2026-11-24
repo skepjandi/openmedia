@@ -769,7 +769,6 @@ function FloatingButton() {
       canBookmark ? t("fab.saveBookmark") : t("bookmark.title"),
       canBookmark && !bookmarked ? <BookmarkPlusIcon /> : <BookmarkIcon filled={bookmarked} />,
     ),
-    caption: t("bookmark.title"),
     charging: bookmarkCharging,
   };
 
