@@ -46,20 +46,31 @@ export function SettingsScreen() {
   // Desktop always shows one part; a phone starts on the list of parts, which is `null`.
   const [picked, setPicked] = useState<SettingsCategory | null>(null);
   const [wasOpen, setWasOpen] = useState(open);
+  const settingsStart = useApp((s) => s.settingsStart);
+  const clearSettingsStart = useApp((s) => s.clearSettingsStart);
+  // A start asked for from outside (the fan's bookmark button) counts as picked until the user
+  // chooses or goes back, or Settings closes.
+  useEffect(() => {
+    if (!open) clearSettingsStart();
+  }, [open, clearSettingsStart]);
+  const pick = (next: SettingsCategory | null) => {
+    setPicked(next);
+    clearSettingsStart();
+  };
   const t = useT();
   if (open !== wasOpen) {
     setWasOpen(open);
     if (!open && !desktop) setPicked(null);
   }
-  const category = desktop ? (picked ?? "general") : picked;
-  const backToList = () => setPicked(null);
-  useBackHandler(open && onSettingsPage && !desktop && picked !== null, backToList);
+  const category = desktop ? (picked ?? settingsStart ?? "general") : (picked ?? settingsStart);
+  const backToList = () => pick(null);
+  useBackHandler(open && onSettingsPage && !desktop && category !== null, backToList);
   if (!open) return null;
 
   if (category === null) {
     return (
       <Screen title={t("settings.title")} closeLabel={t("settings.close")} onClose={closeSheet}>
-        <SettingsIndex onOpen={setPicked} />
+        <SettingsIndex onOpen={pick} />
       </Screen>
     );
   }
@@ -71,7 +82,7 @@ export function SettingsScreen() {
         title={t("settings.title")}
         closeLabel={t("settings.close")}
         onClose={closeSheet}
-        sidebar={<SettingsNav value={category} onChange={setPicked} />}
+        sidebar={<SettingsNav value={category} onChange={pick} />}
       >
         <div className="flex flex-col gap-10">{panel}</div>
       </Screen>
@@ -157,11 +168,13 @@ function CategoryPanel({
 }
 
 /**
- * Turns the optional buttons on the floating button's fan on or off. Both are off until chosen.
+ * Turns the optional buttons on the floating button's fan on or off. The color picker and technology detector are off until chosen; the bookmark button is on.
  */
 function FanButtonSwitches() {
   const colorPicker = useApp((s) => s.state?.colorPicker ?? false);
   const techDetector = useApp((s) => s.state?.techDetector ?? false);
+  const bookmarkButton = useApp((s) => s.state?.bookmarkButton ?? true);
+  const setBookmarkButton = useApp((s) => s.setBookmarkButton);
   const setColorPicker = useApp((s) => s.setColorPicker);
   const setTechDetector = useApp((s) => s.setTechDetector);
   const t = useT();
@@ -178,6 +191,12 @@ function FanButtonSwitches() {
         description={t("settings.techDetectorNote")}
         checked={techDetector}
         onChange={(on) => void setTechDetector(on)}
+      />
+      <Switch
+        label={t("bookmark.title")}
+        description={t("settings.bookmarkButtonNote")}
+        checked={bookmarkButton}
+        onChange={(on) => void setBookmarkButton(on)}
       />
     </Group>
   );

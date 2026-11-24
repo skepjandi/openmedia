@@ -105,9 +105,7 @@ export const ar: Messages = {
   "commandBar.openAiSettings": "فتح الإعدادات > المساعد الذكي",
 
   "fab.openFavorite": "فتح {name}",
-  "fab.openBookmark": "فتح الإشارة المرجعية: {name}",
   "fab.saveBookmark": "حفظ هذه الصفحة في خانة الإشارة المرجعية",
-  "fab.saveBookmarkHint": "حفظ الصفحة",
   "fab.history": "السجل",
   "fab.usage": "الاستخدام",
   "fab.settings": "الإعدادات",
@@ -327,6 +325,7 @@ export const ar: Messages = {
   "settings.techDetector": "كاشف التقنيات",
   "settings.techDetectorNote":
     "يضيف زرًا إلى الزر العائم يعرض التقنيات التي بُنيت بها الصفحة: أطر العمل، أنظمة إدارة المحتوى، التحليلات والمزيد.",
+  "settings.bookmarkButtonNote": "يعرض زر الإشارة المرجعية في مروحة الزر العائم.",
   "colorPicker.hint": "اسحب الدائرة فوق لون، ثم اضغط قبول.",
   "colorPicker.accept": "قبول",
   "colorPicker.copyRgb": "نسخ RGB",
@@ -423,7 +422,7 @@ export const ar: Messages = {
   "settings.searchEngine": "محرك البحث",
   "bookmark.title": "إشارة مرجعية",
   "bookmark.note":
-    "صفحة واحدة تفتحها من الزر، مجانًا. اضغط مطولًا على الزر ثم انقر خانة الإشارة المرجعية لحفظ الصفحة التي أنت عليها، ثم انقرها للعودة إليها. لا يُحفظ شيء في وضع التصفح المتخفي.",
+    "اضغط زر الإشارة المرجعية في المروحة لحفظ الصفحة الحالية. اضغط مطولًا لفتح هذه الصفحة. لا يُحفظ شيء في وضع التصفح الخفي أو على موقع مفضل.",
   "bookmark.empty": "لم تُحفظ أي صفحة بعد.",
   "bookmark.save": "حفظ الصفحة الحالية",
   "bookmark.replace": "الاستبدال بالصفحة الحالية",

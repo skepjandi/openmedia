@@ -103,9 +103,7 @@ export const bn: Messages = {
   "commandBar.openAiSettings": "সেটিংস > AI সহকারী খুলুন",
 
   "fab.openFavorite": "{name} খুলুন",
-  "fab.openBookmark": "বুকমার্ক খুলুন: {name}",
   "fab.saveBookmark": "এই পাতাটি বুকমার্ক স্লটে সংরক্ষণ করুন",
-  "fab.saveBookmarkHint": "পাতা সংরক্ষণ",
   "fab.history": "ইতিহাস",
   "fab.usage": "ব্যবহার",
   "fab.settings": "সেটিংস",
@@ -330,6 +328,7 @@ export const bn: Messages = {
   "settings.techDetector": "প্রযুক্তি শনাক্তকারী",
   "settings.techDetectorNote":
     "ভাসমান বোতামে একটি বোতাম যোগ করে, যা পেজ তৈরিতে ব্যবহৃত প্রযুক্তি দেখায়: ফ্রেমওয়ার্ক, CMS, অ্যানালিটিক্স ইত্যাদি।",
+  "settings.bookmarkButtonNote": "ভাসমান বোতামের পাখায় বুকমার্ক বোতাম দেখায়।",
   "colorPicker.hint": "বৃত্তটি কোনো রঙের উপর টেনে আনুন, তারপর গ্রহণ করুন চাপুন।",
   "colorPicker.accept": "গ্রহণ করুন",
   "colorPicker.copyRgb": "RGB কপি করুন",
@@ -429,7 +428,7 @@ export const bn: Messages = {
   "settings.searchEngine": "সার্চ ইঞ্জিন",
   "bookmark.title": "বুকমার্ক",
   "bookmark.note":
-    "বোতাম থেকে খোলা যায় এমন একটি পাতা, বিনামূল্যে। বোতামটি চেপে ধরে বুকমার্ক স্লটে ট্যাপ করলে আপনি যে পাতায় আছেন তা সংরক্ষিত হবে, পরে ট্যাপ করে ফিরে আসুন। ইনকগনিটোতে সংরক্ষিত হয় না।",
+    "বর্তমান পেজ সেভ করতে পাখায় বুকমার্ক বোতামে ট্যাপ করুন। এই পেজ খুলতে চেপে ধরুন। ইনকগনিটো বা প্রিয় সাইটে কিছু সেভ হয় না।",
   "bookmark.empty": "এখনও কোনো পাতা সংরক্ষিত হয়নি।",
   "bookmark.save": "বর্তমান পাতা সংরক্ষণ করুন",
   "bookmark.replace": "বর্তমান পাতা দিয়ে বদলান",

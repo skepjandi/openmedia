@@ -103,9 +103,7 @@ export const ms: Messages = {
   "commandBar.openAiSettings": "Buka Tetapan > Pembantu AI",
 
   "fab.openFavorite": "Buka {name}",
-  "fab.openBookmark": "Buka penanda buku: {name}",
   "fab.saveBookmark": "Simpan halaman ini dalam slot penanda buku",
-  "fab.saveBookmarkHint": "Simpan halaman",
   "fab.history": "Sejarah",
   "fab.usage": "Penggunaan",
   "fab.settings": "Tetapan",
@@ -338,6 +336,7 @@ export const ms: Messages = {
   "settings.techDetector": "Pengesan teknologi",
   "settings.techDetectorNote":
     "Menambah butang pada butang terapung yang menyenaraikan teknologi halaman: rangka kerja, CMS, analitik dan banyak lagi.",
+  "settings.bookmarkButtonNote": "Memaparkan butang penanda buku pada kipas butang terapung.",
   "colorPicker.hint": "Seret bulatan ke atas warna, kemudian ketik Terima.",
   "colorPicker.accept": "Terima",
   "colorPicker.copyRgb": "Salin RGB",
@@ -441,7 +440,7 @@ export const ms: Messages = {
   "settings.searchEngine": "Enjin carian",
   "bookmark.title": "Penanda buku",
   "bookmark.note":
-    "Satu halaman yang anda buka daripada butang, percuma. Tekan lama butang dan ketik slot penanda buku untuk menyimpan halaman semasa, kemudian ketik untuk kembali. Tidak disimpan semasa inkognito.",
+    "Ketik butang penanda buku pada kipas untuk menyimpan halaman semasa. Tekan lama untuk membuka halaman ini. Tiada apa disimpan dalam mod inkognito atau pada tapak kegemaran.",
   "bookmark.empty": "Belum ada halaman disimpan.",
   "bookmark.save": "Simpan halaman semasa",
   "bookmark.replace": "Ganti dengan halaman semasa",

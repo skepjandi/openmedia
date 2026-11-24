@@ -244,6 +244,7 @@ pub fn run() {
             commands::color_pick_accept,
             commands::color_pick_cancel,
             commands::set_tech_detector,
+            commands::set_bookmark_button,
             commands::tech_detect,
             commands::set_accessibility,
             commands::set_video_controls,

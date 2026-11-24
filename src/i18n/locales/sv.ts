@@ -108,9 +108,7 @@ export const sv: Messages = {
   "commandBar.openAiSettings": "Öppna Inställningar > AI-assistent",
 
   "fab.openFavorite": "Öppna {name}",
-  "fab.openBookmark": "Öppna bokmärke: {name}",
   "fab.saveBookmark": "Spara den här sidan på bokmärkesplatsen",
-  "fab.saveBookmarkHint": "Spara sida",
   "fab.history": "Historik",
   "fab.usage": "Användning",
   "fab.settings": "Inställningar",
@@ -341,6 +339,7 @@ export const sv: Messages = {
   "settings.techDetector": "Teknikdetektor",
   "settings.techDetectorNote":
     "Lägger till en knapp i den flytande knappen som listar sidans teknik: ramverk, CMS, analys och mer.",
+  "settings.bookmarkButtonNote": "Visar bokmärkesknappen i den flytande knappens solfjäder.",
   "colorPicker.hint": "Dra cirkeln över en färg och tryck sedan på Godkänn.",
   "colorPicker.accept": "Godkänn",
   "colorPicker.copyRgb": "Kopiera RGB",
@@ -443,7 +442,7 @@ export const sv: Messages = {
   "settings.searchEngine": "Sökmotor",
   "bookmark.title": "Bokmärke",
   "bookmark.note":
-    "En sida som du öppnar från knappen, gratis. Håll in knappen och tryck på bokmärkesplatsen för att spara sidan du är på, och tryck sedan på den för att komma tillbaka. Sparas inte i inkognitoläge.",
+    "Tryck på bokmärkesknappen i solfjädern för att spara sidan du är på. Håll in den för att öppna den här sidan. Inget sparas i inkognito eller på en favorit.",
   "bookmark.empty": "Ingen sida sparad än.",
   "bookmark.save": "Spara den aktuella sidan",
   "bookmark.replace": "Ersätt med den aktuella sidan",

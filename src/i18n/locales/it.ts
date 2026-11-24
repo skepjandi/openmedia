@@ -107,9 +107,7 @@ export const it: Messages = {
   "commandBar.openAiSettings": "Apri Impostazioni > Assistente IA",
 
   "fab.openFavorite": "Apri {name}",
-  "fab.openBookmark": "Apri segnalibro: {name}",
   "fab.saveBookmark": "Salva questa pagina nello spazio del segnalibro",
-  "fab.saveBookmarkHint": "Salva pagina",
   "fab.history": "Cronologia",
   "fab.usage": "Utilizzo",
   "fab.settings": "Impostazioni",
@@ -345,6 +343,8 @@ export const it: Messages = {
   "settings.techDetector": "Rilevatore di tecnologie",
   "settings.techDetectorNote":
     "Aggiunge un pulsante al pulsante flottante che elenca le tecnologie della pagina: framework, CMS, analytics e altro.",
+  "settings.bookmarkButtonNote":
+    "Mostra il pulsante segnalibro nel ventaglio del pulsante flottante.",
   "colorPicker.hint": "Trascina il cerchio su un colore, poi tocca Accetta.",
   "colorPicker.accept": "Accetta",
   "colorPicker.copyRgb": "Copia RGB",
@@ -447,7 +447,7 @@ export const it: Messages = {
   "settings.searchEngine": "Motore di ricerca",
   "bookmark.title": "Segnalibro",
   "bookmark.note":
-    "Una pagina che apri dal pulsante, gratis. Tieni premuto il pulsante e tocca lo spazio del segnalibro per salvare la pagina in cui sei, poi toccalo per tornarci. Non viene salvato in incognito.",
+    "Tocca il pulsante segnalibro nel ventaglio per salvare la pagina attuale. Tienilo premuto per aprire questa pagina. Non si salva in incognito né su un preferito.",
   "bookmark.empty": "Nessuna pagina salvata.",
   "bookmark.save": "Salva la pagina attuale",
   "bookmark.replace": "Sostituisci con la pagina attuale",

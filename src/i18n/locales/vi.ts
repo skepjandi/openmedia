@@ -102,9 +102,7 @@ export const vi: Messages = {
   "commandBar.openAiSettings": "Mở Cài đặt > Trợ lý AI",
 
   "fab.openFavorite": "Mở {name}",
-  "fab.openBookmark": "Mở dấu trang: {name}",
   "fab.saveBookmark": "Lưu trang này vào ô dấu trang",
-  "fab.saveBookmarkHint": "Lưu trang",
   "fab.history": "Lịch sử",
   "fab.usage": "Thời gian sử dụng",
   "fab.settings": "Cài đặt",
@@ -333,6 +331,7 @@ export const vi: Messages = {
   "settings.techDetector": "Trình phát hiện công nghệ",
   "settings.techDetectorNote":
     "Thêm một nút vào nút nổi, liệt kê các công nghệ của trang: framework, CMS, phân tích và hơn thế nữa.",
+  "settings.bookmarkButtonNote": "Hiện nút dấu trang trong quạt của nút nổi.",
   "colorPicker.hint": "Kéo vòng tròn lên một màu, rồi chạm Chấp nhận.",
   "colorPicker.accept": "Chấp nhận",
   "colorPicker.copyRgb": "Sao chép RGB",
@@ -434,7 +433,7 @@ export const vi: Messages = {
   "settings.searchEngine": "Công cụ tìm kiếm",
   "bookmark.title": "Dấu trang",
   "bookmark.note":
-    "Một trang bạn mở từ nút, miễn phí. Giữ nút rồi chạm vào ô dấu trang để lưu trang đang xem, sau đó chạm vào để quay lại. Không lưu khi ở chế độ ẩn danh.",
+    "Chạm nút dấu trang trong quạt để lưu trang hiện tại. Nhấn giữ để mở trang này. Không lưu gì ở chế độ ẩn danh hoặc trên trang yêu thích.",
   "bookmark.empty": "Chưa lưu trang nào.",
   "bookmark.save": "Lưu trang hiện tại",
   "bookmark.replace": "Thay bằng trang hiện tại",

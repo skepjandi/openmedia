@@ -18,13 +18,22 @@ export function BookmarkSection() {
   const canSave = useApp((s) => s.activeId !== null && !s.incognito.active);
   const saveBookmark = useApp((s) => s.saveBookmark);
   const removeBookmark = useApp((s) => s.removeBookmark);
+  const openBookmark = useApp((s) => s.openBookmark);
   const icon = useIconForUrl(bookmark?.url ?? "", favorites);
   const t = useT();
 
   return (
     <Section title={t("bookmark.title")} note={t("bookmark.note")}>
       <Group>
-        <div className="flex items-center gap-3 px-4 py-3.5">
+        <button
+          type="button"
+          disabled={!bookmark}
+          onClick={() => {
+            useApp.getState().closeSheet();
+            openBookmark();
+          }}
+          className="flex w-full items-center gap-3 px-4 py-3.5 text-start"
+        >
           {bookmark && <SiteTile name={displayHost(bookmark.url)} icon={icon} />}
           <div className="min-w-0 flex-1">
             <div className="truncate text-base">{bookmark?.title ?? t("bookmark.empty")}</div>
@@ -32,7 +41,7 @@ export function BookmarkSection() {
               <div className="truncate text-sm text-paper/55">{displayHost(bookmark.url)}</div>
             )}
           </div>
-        </div>
+        </button>
         <div className="flex flex-wrap gap-2 px-4 py-3">
           <button
             type="button"

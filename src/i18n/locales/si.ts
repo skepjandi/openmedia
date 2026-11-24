@@ -106,9 +106,7 @@ export const si: Messages = {
   "commandBar.openAiSettings": "සැකසුම් > AI සහායක විවෘත කරන්න",
 
   "fab.openFavorite": "{name} විවෘත කරන්න",
-  "fab.openBookmark": "පිටු සලකුණ විවෘත කරන්න: {name}",
   "fab.saveBookmark": "මෙම පිටුව පිටු සලකුණු ස්ථානයේ සුරකින්න",
-  "fab.saveBookmarkHint": "පිටුව සුරකින්න",
   "fab.history": "ඉතිහාසය",
   "fab.usage": "භාවිතය",
   "fab.settings": "සැකසුම්",
@@ -333,6 +331,7 @@ export const si: Messages = {
   "settings.techDetector": "තාක්ෂණ අනාවරකය",
   "settings.techDetectorNote":
     "පිටුවේ භාවිත තාක්ෂණ (රාමු, CMS, විශ්ලේෂණ ආදිය) ලැයිස්තුගත කරන බොත්තමක් පාවෙන බොත්තමට එක් කරයි.",
+  "settings.bookmarkButtonNote": "පාවෙන බොත්තමේ විදුලි පංකාවේ පිටුසන් බොත්තම පෙන්වයි.",
   "colorPicker.hint": "වෘත්තය වර්ණයක් මතට ඇදගෙන ගොස් පිළිගන්න ඔබන්න.",
   "colorPicker.accept": "පිළිගන්න",
   "colorPicker.copyRgb": "RGB පිටපත් කරන්න",
@@ -434,7 +433,7 @@ export const si: Messages = {
   "settings.searchEngine": "සෙවුම් යන්ත්‍රය",
   "bookmark.title": "පිටු සලකුණ",
   "bookmark.note":
-    "බොත්තමෙන් විවෘත කළ හැකි එක් පිටුවක්, නොමිලේ. බොත්තම තදකර අල්ලා පිටු සලකුණු ස්ථානය තට්ටු කර ඔබ සිටින පිටුව සුරකින්න, පසුව ආපසු යාමට එය තට්ටු කරන්න. අප්‍රකට මාදිලියේදී සුරැකෙන්නේ නැත.",
+    "වත්මන් පිටුව සුරැකීමට විදුලි පංකාවේ පිටුසන් බොත්තම ඔබන්න. මෙම පිටුව විවෘත කිරීමට ඔබාගෙන සිටින්න. අදෘශ්‍ය මාදිලියේදී හෝ ප්‍රියතම අඩවියක කිසිවක් සුරැකෙන්නේ නැත.",
   "bookmark.empty": "තවම පිටුවක් සුරැකී නැත.",
   "bookmark.save": "වත්මන් පිටුව සුරකින්න",
   "bookmark.replace": "වත්මන් පිටුවෙන් ප්‍රතිස්ථාපනය කරන්න",

@@ -103,9 +103,7 @@ export const de: Messages = {
   "commandBar.openAiSettings": "Einstellungen > KI-Assistent öffnen",
 
   "fab.openFavorite": "{name} öffnen",
-  "fab.openBookmark": "Lesezeichen öffnen: {name}",
   "fab.saveBookmark": "Diese Seite im Lesezeichen-Platz speichern",
-  "fab.saveBookmarkHint": "Seite merken",
   "fab.history": "Verlauf",
   "fab.settings": "Einstellungen",
   "fab.assistant": "Assistent. Für Favoriten gedrückt halten.",
@@ -339,6 +337,7 @@ export const de: Messages = {
   "settings.techDetector": "Technologie-Erkennung",
   "settings.techDetectorNote":
     "Fügt dem schwebenden Button eine Schaltfläche hinzu, die die Technologien der Seite auflistet: Frameworks, CMS, Analytics und mehr.",
+  "settings.bookmarkButtonNote": "Zeigt den Lesezeichen-Button im Fächer des schwebenden Buttons.",
   "colorPicker.hint": "Ziehe den Kreis über eine Farbe und tippe dann auf Übernehmen.",
   "colorPicker.accept": "Übernehmen",
   "colorPicker.copyRgb": "RGB kopieren",
@@ -442,7 +441,7 @@ export const de: Messages = {
   "settings.searchEngine": "Suchmaschine",
   "bookmark.title": "Lesezeichen",
   "bookmark.note":
-    "Eine Seite, die du über den Button öffnest, kostenlos. Halte den Button gedrückt und tippe auf den Lesezeichen-Platz, um die aktuelle Seite zu speichern; tippe später darauf, um zurückzukehren. Im Inkognito-Modus wird nichts gespeichert.",
+    "Tippe im Fächer auf den Lesezeichen-Button, um die aktuelle Seite zu speichern. Halte ihn gedrückt, um diese Seite zu öffnen. Im Inkognito-Modus und auf Favoriten wird nichts gespeichert.",
   "bookmark.empty": "Noch keine Seite gespeichert.",
   "bookmark.save": "Aktuelle Seite speichern",
   "bookmark.replace": "Durch die aktuelle Seite ersetzen",

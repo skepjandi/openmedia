@@ -107,9 +107,7 @@ export const pl: Messages = {
   "commandBar.openAiSettings": "Otwórz Ustawienia > Asystent AI",
 
   "fab.openFavorite": "Otwórz {name}",
-  "fab.openBookmark": "Otwórz zakładkę: {name}",
   "fab.saveBookmark": "Zapisz tę stronę w miejscu na zakładkę",
-  "fab.saveBookmarkHint": "Zapisz stronę",
   "fab.history": "Historia",
   "fab.usage": "Użycie",
   "fab.settings": "Ustawienia",
@@ -343,6 +341,7 @@ export const pl: Messages = {
   "settings.techDetector": "Wykrywacz technologii",
   "settings.techDetectorNote":
     "Dodaje przycisk do pływającego przycisku, który wyświetla technologie strony: frameworki, CMS, analitykę i inne.",
+  "settings.bookmarkButtonNote": "Pokazuje przycisk zakładki w wachlarzu pływającego przycisku.",
   "colorPicker.hint": "Przeciągnij okrąg na kolor, a potem dotknij Zaakceptuj.",
   "colorPicker.accept": "Zaakceptuj",
   "colorPicker.copyRgb": "Kopiuj RGB",
@@ -444,7 +443,7 @@ export const pl: Messages = {
   "settings.searchEngine": "Wyszukiwarka",
   "bookmark.title": "Zakładka",
   "bookmark.note":
-    "Jedna strona, którą otworzysz z przycisku, za darmo. Przytrzymaj przycisk i stuknij miejsce na zakładkę, aby zapisać bieżącą stronę; stuknij je później, aby wrócić. W trybie incognito nic nie jest zapisywane.",
+    "Stuknij przycisk zakładki w wachlarzu, by zapisać bieżącą stronę. Przytrzymaj go, by otworzyć tę stronę. W trybie incognito i na ulubionej stronie nic się nie zapisuje.",
   "bookmark.empty": "Nie zapisano jeszcze żadnej strony.",
   "bookmark.save": "Zapisz bieżącą stronę",
   "bookmark.replace": "Zastąp bieżącą stroną",

@@ -730,6 +730,12 @@ pub async fn clear_site_data(app: AppHandle, site: String) -> Result<()> {
     Ok(())
 }
 
+/// Shows or hides the bookmark button on the floating button's fan. The shell draws it.
+#[tauri::command]
+pub fn set_bookmark_button(library: State<'_, Library>, enabled: bool) -> Result<()> {
+    library.set_bookmark_button(enabled)
+}
+
 /// Shows or hides the technology detector on the floating button's fan. The shell draws it.
 #[tauri::command]
 pub fn set_tech_detector(library: State<'_, Library>, enabled: bool) -> Result<()> {

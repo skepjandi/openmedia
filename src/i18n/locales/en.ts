@@ -112,9 +112,7 @@ export const en = {
   "commandBar.openAiSettings": "Open Settings > AI assistant",
 
   "fab.openFavorite": "Open {name}",
-  "fab.openBookmark": "Open bookmark: {name}",
   "fab.saveBookmark": "Save this page in the bookmark slot",
-  "fab.saveBookmarkHint": "Save page",
   "fab.history": "History",
   "fab.usage": "Usage",
   "fab.settings": "Settings",
@@ -338,6 +336,7 @@ export const en = {
   "settings.techDetector": "Technology detector",
   "settings.techDetectorNote":
     "Adds a button to the floating button that lists the technologies a page is built with: frameworks, CMS, analytics and more.",
+  "settings.bookmarkButtonNote": "Shows the bookmark button on the floating button's fan.",
   "colorPicker.hint": "Drag the circle over a color, then tap Accept.",
   "colorPicker.accept": "Accept",
   "colorPicker.copyRgb": "Copy RGB",
@@ -436,9 +435,9 @@ export const en = {
   "settings.languageLabel": "App language",
   "settings.languageSystem": "System language",
   "settings.searchEngine": "Search engine",
-  "bookmark.title": "Bookmark",
+  "bookmark.title": "Bookmarks",
   "bookmark.note":
-    "One page you can open from the button, free. Hold the button and tap the bookmark slot to save the page you are on, then tap it to come back. Not saved while incognito.",
+    "Tap the bookmark button on the fan to save the page you are on. Hold it to open this page. Nothing is saved while incognito or on a favorite.",
   "bookmark.empty": "No page saved yet.",
   "bookmark.save": "Save the current page",
   "bookmark.replace": "Replace with the current page",

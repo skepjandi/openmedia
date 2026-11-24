@@ -106,9 +106,7 @@ export const ro: Messages = {
   "commandBar.openAiSettings": "Deschide Setări > Asistent AI",
 
   "fab.openFavorite": "Deschide {name}",
-  "fab.openBookmark": "Deschide marcajul: {name}",
   "fab.saveBookmark": "Salvează această pagină în locul pentru marcaj",
-  "fab.saveBookmarkHint": "Salvează pagina",
   "fab.history": "Istoric",
   "fab.usage": "Utilizare",
   "fab.settings": "Setări",
@@ -342,6 +340,7 @@ export const ro: Messages = {
   "settings.techDetector": "Detector de tehnologii",
   "settings.techDetectorNote":
     "Adaugă un buton la butonul plutitor care listează tehnologiile paginii: framework-uri, CMS, analiză și altele.",
+  "settings.bookmarkButtonNote": "Afișează butonul de marcaj în evantaiul butonului plutitor.",
   "colorPicker.hint": "Trage cercul peste o culoare, apoi atinge Acceptă.",
   "colorPicker.accept": "Acceptă",
   "colorPicker.copyRgb": "Copiază RGB",
@@ -445,7 +444,7 @@ export const ro: Messages = {
   "settings.searchEngine": "Motor de căutare",
   "bookmark.title": "Marcaj",
   "bookmark.note":
-    "O pagină pe care o deschizi din buton, gratuit. Ține apăsat butonul și atinge locul pentru marcaj ca să salvezi pagina pe care ești, apoi atinge-l ca să revii. Nu se salvează în modul incognito.",
+    "Atinge butonul de marcaj din evantai pentru a salva pagina curentă. Ține apăsat pentru a deschide această pagină. Nu se salvează în incognito sau pe un favorit.",
   "bookmark.empty": "Nicio pagină salvată încă.",
   "bookmark.save": "Salvează pagina curentă",
   "bookmark.replace": "Înlocuiește cu pagina curentă",

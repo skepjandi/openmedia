@@ -204,6 +204,8 @@ export interface AppState {
   colorPicker: boolean;
   /** The technology detector on the fan. Off unless the user turned it on. */
   techDetector: boolean;
+  /** The bookmark button on the fan. On unless the user turned it off. */
+  bookmarkButton: boolean;
   aiPreview: boolean;
   /** The language the user picked, as a BCP 47 tag; null follows the device's language. */
   locale: string | null;
@@ -739,6 +741,7 @@ export const library = {
   setBackButton: (enabled: boolean) => command("set_back_button", { enabled }),
   setColorPicker: (enabled: boolean) => command("set_color_picker", { enabled }),
   setTechDetector: (enabled: boolean) => command("set_tech_detector", { enabled }),
+  setBookmarkButton: (enabled: boolean) => command("set_bookmark_button", { enabled }),
   setAccessibility: (accessibility: Accessibility) =>
     command("set_accessibility", { accessibility }),
   setVideoControls: (videoControls: VideoControls) =>
