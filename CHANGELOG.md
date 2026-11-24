@@ -1264,6 +1264,14 @@ A floating video now survives leaving its page. Before, Back and an address type
 
 **PR:** n/a
 
+## 2026-11-24
+
+### chore(release): version 1.0.6
+
+**Area:** `chore(release)`
+
+**Change:** The app version is `1.0.6` (build 1027) in `package.json` and `src-tauri/tauri.conf.json`.
+
 ## 2026-11-20
 
 ### chore(release): version 1.0.5
