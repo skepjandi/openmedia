@@ -72,6 +72,12 @@ All notable changes to OpenMedia are documented here.
 
 **Change:** minimizing the app while a short-form video played could, on return, leave the video in a native fullscreen player that covered the app: nothing could be tapped and the floating button was hidden. On return the page's video is now set back to inline (at once, then again after 0.5 s and 1.5 s while WebKit settles), unless a video was already fullscreen when the app was left. Not verifiable in the iOS Simulator; a device is needed.
 
+### fix(siteview): a page frozen by a screen lock is stopped natively and reloaded on return (iOS)
+
+**Area:** `fix(siteview)`
+
+**Change:** after a lock the page could keep its last frame and its sound, take no touch and show the video zoomed, until the app was restarted, and the lock screen's pause did nothing (the page's script was not answering, so no script-level pause could reach it). Media is now also paused natively (`pauseAllMediaPlayback`) whenever it is suspended, native players are closed on lock and after it (`closeAllMediaPresentations`), and on return a page that does not answer a script within 2.5 s is reloaded. Not verifiable in the iOS Simulator; a device is needed.
+
 ### fix(siteview): locking the screen during a short-form video stops it, and the lock screen's pause works (iOS)
 
 **Area:** `fix(siteview)`

@@ -743,9 +743,10 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
     NotificationCenter.default.addObserver(
       forName: UIApplication.didBecomeActiveNotification, object: nil, queue: .main
     ) { [weak self] _ in
+      let wasLocked = self?.screenLocked ?? false
       self?.screenLocked = false
       self?.tellPagesAway(false)
-      self?.recoverAfterAway()
+      self?.recoverAfterAway(afterLock: wasLocked)
     }
     NotificationCenter.default.addObserver(
       forName: UIApplication.protectedDataWillBecomeUnavailableNotification, object: nil, queue: .main
@@ -1542,10 +1543,13 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
   /// button has nothing left to fight a page that restarts its video.
   private func screenWasLocked() {
     screenLocked = true
-    for session in sessions.values where session.autoPictureInPicture || session.windowOpen {
-      session.autoPictureInPicture = false
-      session.windowOpen = false
-      session.view.evaluateJavaScript(exitPictureInPictureScript)
+    for session in sessions.values {
+      if session.autoPictureInPicture || session.windowOpen {
+        session.autoPictureInPicture = false
+        session.windowOpen = false
+        session.view.evaluateJavaScript(exitPictureInPictureScript)
+      }
+      session.view.closeAllMediaPresentations {}
     }
     refreshMedia()
   }
@@ -1560,15 +1564,37 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
   }
 
   /// The app is active again after a lock or a minimize: undo what a system player left behind.
-  private func recoverAfterAway() {
+  private func recoverAfterAway(afterLock: Bool = false) {
     exitAutomaticPictureInPicture()
     closeRestoredFullscreen()
     DispatchQueue.main.async { [weak self] in
       guard let self, let id = self.activeId, let session = self.sessions[id] else { return }
+      // After a lock nothing the reader opened is still up: close every native player (fullscreen
+      // or picture-in-picture) that WebKit restored over the app.
+      if afterLock { session.view.closeAllMediaPresentations {} }
       // A video that was in a native player can leave the page zoomed in.
       session.view.scrollView.setZoomScale(1, animated: false)
       self.shell?.superview?.setNeedsLayout()
       self.focusActivePage()
+      self.reloadIfFrozen(session)
+    }
+  }
+
+  /// A page whose web process was frozen by the lock keeps its last frame (and its sound), takes no
+  /// touch and answers nothing until the app is restarted. One that does not answer a script in
+  /// time is reloaded, as one whose process died.
+  private func reloadIfFrozen(_ session: Session) {
+    var answered = false
+    session.view.evaluateJavaScript("1") { _, _ in answered = true }
+    DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) { [weak self, weak session] in
+      guard !answered, let self, let session, self.appForeground, !session.blocked,
+        session.id == self.activeId
+      else { return }
+      session.mediaSuspended = false
+      session.view.setAllMediaPlaybackSuspended(false)
+      session.view.alpha = 0
+      session.painted = false
+      session.view.reload()
     }
   }
 
@@ -1670,6 +1696,9 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
   private func setMediaSuspended(_ suspend: Bool, in session: Session) {
     if suspend == session.mediaSuspended { return }
     session.mediaSuspended = suspend
+    // Natively stopped as well: a page whose script is stuck or restarts its video cannot answer
+    // the pause, and the lock screen's controls would keep a playing page on.
+    if suspend { session.view.pauseAllMediaPlayback {} }
     session.view.setAllMediaPlaybackSuspended(suspend)
     session.view.evaluateJavaScript(suspend ? holdMediaScript : resumeMediaScript)
   }
