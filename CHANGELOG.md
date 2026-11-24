@@ -6,6 +6,12 @@ All notable changes to OpenMedia are documented here.
 >
 > **Wiki**: the [GitHub Wiki](https://github.com/skepjandi/openmedia/wiki) is the public-facing main wiki — architecture, recipe format, AI pipeline, security model, roadmap. Source-controlled editing surface is `docs/wiki/` in this repo; CI (`.github/workflows/sync-wiki.yml`) mirrors it to the GitHub Wiki on every merge to `main`. New single-PR changes belong here, not as new wiki pages.
 
+### fix(feed): stop restarting a video the site paused under an open sheet or dialog
+
+**Area:** `fix(feed)`
+
+**Change:** opening a sheet over a reel (Instagram's share menu) made the site pause the video, and the feed player restarted it every 300 ms, so it stuttered between play and pause. Autoplay is now idle while a visible `[role="dialog"]`, `[aria-modal="true"]` or `dialog[open]` is on the page, and resumes on the next settle after it closes.
+
 ### feat(fab): a free bookmark button in the hold menu
 
 **Area:** `feat(fab)`

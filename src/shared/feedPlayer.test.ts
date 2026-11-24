@@ -75,6 +75,8 @@ interface Page {
   setCalm: () => void;
   /** The video the controls read as the one in view. */
   currentVideo: () => FakeVideo | null;
+  /** Opens or closes a sheet over the page, such as Instagram's share menu. */
+  setDialog: (open: boolean) => void;
 }
 
 function load(options: {
@@ -94,8 +96,14 @@ function load(options: {
     hidden: false,
     /** True while the page has its small player up. */
     miniUp: false,
+    /** True while a dialog sits over the page. */
+    dialogUp: false,
     querySelector(selector: string) {
       return selector.includes("data-openmedia-mini") && this.miniUp ? {} : null;
+    },
+    querySelectorAll(selector: string) {
+      if (!selector.includes("dialog") || !this.dialogUp) return [];
+      return [{ getAttribute: () => null, getBoundingClientRect: () => ({ width: 300, height: 400 }) }];
     },
     documentElement: {
       nodeType: 1,
@@ -159,6 +167,9 @@ function load(options: {
     setMini(up) {
       document.miniUp = up;
     },
+    setDialog(open) {
+      document.dialogUp = open;
+    },
     setCalm() {
       (document as Record<symbol, unknown>)[Symbol.for("openmedia.noAutoplay")] = true;
     },
@@ -201,6 +212,22 @@ describe("feed player", () => {
     const video = new FakeVideo();
     const page = load({ videos: [video] });
     await page.settle();
+    expect(video.paused).toBe(false);
+  });
+
+  it("does not restart a video the site paused under an open dialog", async () => {
+    const video = new FakeVideo();
+    const page = load({ videos: [video] });
+    await page.settle();
+    page.setDialog(true);
+    video.pause();
+    page.fire("pause", { target: video });
+    await page.settle(400);
+    await page.tick();
+    expect(video.paused).toBe(true);
+
+    page.setDialog(false);
+    await page.tick();
     expect(video.paused).toBe(false);
   });
 
