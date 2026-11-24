@@ -444,6 +444,7 @@ export const sv: Messages = {
   "bookmark.note":
     "Tryck på bokmärkesknappen i solfjädern för att spara sidan du är på. Håll in den för att öppna den här sidan. Inget sparas i inkognito eller på en favorit.",
   "bookmark.empty": "Ingen sida sparad än.",
+  "bookmark.removeConfirm": "Ta bort den här sidan från dina bokmärken?",
   "bookmark.save": "Spara den aktuella sidan",
   "bookmark.replace": "Ersätt med den aktuella sidan",
   "settings.startPage": "Startsida",

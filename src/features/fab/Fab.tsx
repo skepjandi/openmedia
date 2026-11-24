@@ -445,6 +445,8 @@ function FloatingButton() {
   const hasPage = useApp((s) => s.activeId !== null);
   const bookmarkButtonOn = useApp((s) => s.state?.bookmarkButton ?? true);
   const saveBookmark = useApp((s) => s.saveBookmark);
+  const removeBookmark = useApp((s) => s.removeBookmark);
+  const [confirmRemove, setConfirmRemove] = useState(false);
   const openSettingsAt = useApp((s) => s.openSettingsAt);
   const onboardingOpen = useApp((s) => s.onboardingOpen);
   const setFabEdge = useApp((s) => s.setFabEdge);
@@ -606,7 +608,8 @@ function FloatingButton() {
     else if (target.kind === "techDetector") void startTechDetect();
     else if (target.kind === "downloads") openSheet("downloads");
     else if (target.kind === "bookmark") {
-      if (canBookmark) void saveBookmark();
+      if (canBookmark && bookmarked) setConfirmRemove(true);
+      else if (canBookmark) void saveBookmark();
     } else if (target.kind === "tab") openSession(target.sessionId);
     else if (target.kind === "folder") setFolderName(target.name);
     else if (target.kind === "darkMode") {
@@ -964,6 +967,7 @@ function FloatingButton() {
     step.effects.forEach(apply);
   };
   useBackHandler(fanOpen, () => dispatch({ type: "dismiss" }));
+  useBackHandler(confirmRemove, () => setConfirmRemove(false));
 
   const pointOf = (event: PointerEvent | WheelEvent): Point => ({
     x: event.clientX,
@@ -1349,6 +1353,41 @@ function FloatingButton() {
           <circle cx="32" cy="32" r="31" pathLength="1" />
         </svg>
       </button>
+      {confirmRemove && (
+        <div
+          data-hit=""
+          onPointerDown={() => setConfirmRemove(false)}
+          className="fixed inset-0 z-[90] bg-black/40"
+        >
+          <div
+            role="alertdialog"
+            aria-label={t("bookmark.removeConfirm")}
+            onPointerDown={(event) => event.stopPropagation()}
+            className="glass absolute inset-x-3 top-[18vh] mx-auto flex max-w-md flex-col gap-4 rounded-2xl p-5 text-paper shadow-2xl"
+          >
+            <p className="text-base font-semibold">{t("bookmark.removeConfirm")}</p>
+            <div className="flex justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => setConfirmRemove(false)}
+                className="rounded-full border border-hair px-4 py-2 text-sm font-medium text-paper/85"
+              >
+                {t("common.cancel")}
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setConfirmRemove(false);
+                  void removeBookmark();
+                }}
+                className="rounded-full bg-danger/15 px-5 py-2 text-sm font-semibold text-danger"
+              >
+                {t("common.remove")}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }

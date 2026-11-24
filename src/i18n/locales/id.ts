@@ -438,6 +438,7 @@ export const id: Messages = {
   "bookmark.note":
     "Ketuk tombol markah di kipas untuk menyimpan halaman saat ini. Tahan untuk membuka halaman ini. Tidak ada yang disimpan saat penyamaran atau di situs favorit.",
   "bookmark.empty": "Belum ada halaman yang disimpan.",
+  "bookmark.removeConfirm": "Hapus halaman ini dari markah?",
   "bookmark.save": "Simpan halaman saat ini",
   "bookmark.replace": "Ganti dengan halaman saat ini",
   "settings.startPage": "Halaman awal",

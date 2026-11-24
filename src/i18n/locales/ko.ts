@@ -433,6 +433,7 @@ export const ko: Messages = {
   "bookmark.note":
     "부채꼴의 북마크 버튼을 탭하면 현재 페이지를 저장합니다. 길게 누르면 이 페이지가 열립니다. 시크릿 모드와 즐겨찾기 사이트에서는 저장되지 않습니다.",
   "bookmark.empty": "아직 저장된 페이지가 없습니다.",
+  "bookmark.removeConfirm": "이 페이지를 북마크에서 삭제할까요?",
   "bookmark.save": "현재 페이지 저장",
   "bookmark.replace": "현재 페이지로 바꾸기",
   "settings.startPage": "시작 페이지",

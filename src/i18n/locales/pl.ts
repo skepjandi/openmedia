@@ -445,6 +445,7 @@ export const pl: Messages = {
   "bookmark.note":
     "Stuknij przycisk zakładki w wachlarzu, by zapisać bieżącą stronę. Przytrzymaj go, by otworzyć tę stronę. W trybie incognito i na ulubionej stronie nic się nie zapisuje.",
   "bookmark.empty": "Nie zapisano jeszcze żadnej strony.",
+  "bookmark.removeConfirm": "Usunąć tę stronę z zakładek?",
   "bookmark.save": "Zapisz bieżącą stronę",
   "bookmark.replace": "Zastąp bieżącą stroną",
   "settings.startPage": "Strona startowa",

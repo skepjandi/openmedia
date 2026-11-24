@@ -404,6 +404,7 @@ export const zhHant: Messages = {
   "bookmark.note":
     "點按扇形選單中的書籤按鈕可儲存目前頁面，長按則開啟此頁面。無痕模式下和我的最愛網站上不會儲存。",
   "bookmark.empty": "尚未儲存頁面。",
+  "bookmark.removeConfirm": "要從書籤中移除此頁面嗎？",
   "bookmark.save": "儲存目前頁面",
   "bookmark.replace": "以目前頁面取代",
   "settings.startPage": "啟動頁面",

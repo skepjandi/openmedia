@@ -449,6 +449,7 @@ export const it: Messages = {
   "bookmark.note":
     "Tocca il pulsante segnalibro nel ventaglio per salvare la pagina attuale. Tienilo premuto per aprire questa pagina. Non si salva in incognito né su un preferito.",
   "bookmark.empty": "Nessuna pagina salvata.",
+  "bookmark.removeConfirm": "Rimuovere questa pagina dai segnalibri?",
   "bookmark.save": "Salva la pagina attuale",
   "bookmark.replace": "Sostituisci con la pagina attuale",
   "settings.startPage": "Pagina iniziale",

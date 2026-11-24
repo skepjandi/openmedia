@@ -444,6 +444,7 @@ export const nl: Messages = {
   "bookmark.note":
     "Tik op de bladwijzerknop in de waaier om de huidige pagina op te slaan. Houd ingedrukt om deze pagina te openen. In incognito en op een favoriet wordt niets opgeslagen.",
   "bookmark.empty": "Nog geen pagina bewaard.",
+  "bookmark.removeConfirm": "Deze pagina uit je bladwijzers verwijderen?",
   "bookmark.save": "Huidige pagina bewaren",
   "bookmark.replace": "Vervangen door de huidige pagina",
   "settings.startPage": "Startpagina",

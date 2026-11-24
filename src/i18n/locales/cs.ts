@@ -439,6 +439,7 @@ export const cs: Messages = {
   "bookmark.note":
     "Klepnutím na tlačítko záložky ve vějíři uložíte aktuální stránku. Podržením otevřete tuto stránku. V anonymním režimu a na oblíbené stránce se nic neukládá.",
   "bookmark.empty": "Zatím není uložena žádná stránka.",
+  "bookmark.removeConfirm": "Odebrat tuto stránku ze záložek?",
   "bookmark.save": "Uložit aktuální stránku",
   "bookmark.replace": "Nahradit aktuální stránkou",
   "settings.startPage": "Úvodní stránka",

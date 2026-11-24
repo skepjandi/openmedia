@@ -442,6 +442,7 @@ export const tr: Messages = {
   "bookmark.note":
     "Geçerli sayfayı kaydetmek için yelpazedeki yer imi düğmesine dokunun. Bu sayfayı açmak için basılı tutun. Gizli modda ve favori bir sitede kaydedilmez.",
   "bookmark.empty": "Henüz kaydedilmiş sayfa yok.",
+  "bookmark.removeConfirm": "Bu sayfa yer imlerinden kaldırılsın mı?",
   "bookmark.save": "Geçerli sayfayı kaydet",
   "bookmark.replace": "Geçerli sayfayla değiştir",
   "settings.startPage": "Başlangıç sayfası",
