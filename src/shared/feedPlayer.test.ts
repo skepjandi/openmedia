@@ -77,6 +77,8 @@ interface Page {
   currentVideo: () => FakeVideo | null;
   /** Opens or closes a sheet over the page, such as Instagram's share menu. */
   setDialog: (open: boolean) => void;
+  /** Native code says the app is away (screen locked or minimized), or back. */
+  setAway: (away: boolean) => void;
 }
 
 function load(options: {
@@ -103,7 +105,9 @@ function load(options: {
     },
     querySelectorAll(selector: string) {
       if (!selector.includes("dialog") || !this.dialogUp) return [];
-      return [{ getAttribute: () => null, getBoundingClientRect: () => ({ width: 300, height: 400 }) }];
+      return [
+        { getAttribute: () => null, getBoundingClientRect: () => ({ width: 300, height: 400 }) },
+      ];
     },
     documentElement: {
       nodeType: 1,
@@ -169,6 +173,9 @@ function load(options: {
     },
     setDialog(open) {
       document.dialogUp = open;
+    },
+    setAway(away) {
+      win.__openmediaAway = away;
     },
     setCalm() {
       (document as Record<symbol, unknown>)[Symbol.for("openmedia.noAutoplay")] = true;
@@ -282,6 +289,27 @@ describe("feed player", () => {
 
     page.userPause(video, false);
     page.fire("scroll");
+    await page.settle(400);
+    expect(video.paused).toBe(false);
+  });
+
+  it("does not restart a video the lock screen paused, and plays again once the app is back", async () => {
+    const video = new FakeVideo();
+    const page = load({ videos: [video] });
+    await page.settle();
+    expect(video.paused).toBe(false);
+
+    page.setAway(true);
+    video.pause();
+    page.fire("pause", { target: video });
+    await page.settle(400);
+    await page.tick();
+    await page.tick();
+    expect(video.paused).toBe(true);
+    expect(video.playCalls).toBe(1);
+
+    page.setAway(false);
+    page.fire("openmedia-resume");
     await page.settle(400);
     expect(video.paused).toBe(false);
   });

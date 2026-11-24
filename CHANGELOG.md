@@ -72,6 +72,12 @@ All notable changes to OpenMedia are documented here.
 
 **Change:** minimizing the app while a short-form video played could, on return, leave the video in a native fullscreen player that covered the app: nothing could be tapped and the floating button was hidden. On return the page's video is now set back to inline (at once, then again after 0.5 s and 1.5 s while WebKit settles), unless a video was already fullscreen when the app was left. Not verifiable in the iOS Simulator; a device is needed.
 
+### fix(siteview): locking the screen during a short-form video stops it, and the lock screen's pause works (iOS)
+
+**Area:** `fix(siteview)`
+
+**Change:** locking the phone while a Reel or Short played kept the video going, the lock screen's pause button was undone at once by the feed player (it restarts any video that stops), and on unlock the app could be left under a zoomed native player with nothing to tap and no floating button. Now a lock (`protectedDataWillBecomeUnavailable`) closes any picture-in-picture window and suspends the page's media unless its site is on the keep-playing list; the app tells pages when it is away (`window.__openmediaAway`) so the feed player never restarts a video while away; and on return native fullscreen is closed (also the `webkitEnterFullscreen` kind, five tries over 3 s) and the page's zoom is reset. Not verifiable in the iOS Simulator; a device is needed.
+
 ### chore(store): remove store listing artwork and its render script
 
 **Area:** `chore(store)`

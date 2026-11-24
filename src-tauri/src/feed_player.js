@@ -85,11 +85,13 @@
         inCustomFeed(path);
     }
 
-    // Which video is in view, for the video controls and for autoplay alike. Not while the small
+    // Which video is in view, for the video controls and for autoplay alike. Not while the app is
+    // away (screen locked, or minimized: native code sets `__openmediaAway`), or a pause from the
+    // lock screen or a system window would be undone at once. Not while the small
     // player is up: its video is not a feed item, and the feed's idea of what plays and what is
     // out of view is not for it.
     function tracking() {
-      return inFeed() && !document.hidden && !window.__openmediaHold &&
+      return inFeed() && !document.hidden && !window.__openmediaHold && !window.__openmediaAway &&
         !document.querySelector('[data-openmedia-mini]');
     }
 

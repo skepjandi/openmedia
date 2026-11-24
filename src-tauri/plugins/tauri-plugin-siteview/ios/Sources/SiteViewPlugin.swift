@@ -25,6 +25,9 @@ private let playFeedVideoScript =
   "(function(){var play=document[Symbol.for('openmedia.feedPlayNow')];if(typeof play==='function')play()})()"
 /// The same flag the Android and macOS pause scripts set, which the feed player reads.
 private let holdMediaScript = "window.__openmediaHold=true"
+/// The page is no longer away: the feed player may play again.
+private let resumeAwayScript =
+  "window.__openmediaAway=false;document.dispatchEvent(new Event('openmedia-resume'))"
 private let resumeMediaScript =
   "window.__openmediaHold=false;document.dispatchEvent(new Event('openmedia-resume'))"
 /// The script world of the picture-in-picture guard. It shares the page's DOM and nothing else,
@@ -158,6 +161,7 @@ private let exitFullscreenScript = """
     var videos = document.querySelectorAll('video');
     for (var i = 0; i < videos.length; i++) {
       if (videos[i].webkitPresentationMode === 'fullscreen') videos[i].webkitSetPresentationMode('inline');
+      else if (videos[i].webkitDisplayingFullscreen && videos[i].webkitExitFullscreen) videos[i].webkitExitFullscreen();
     }
     if (document.webkitFullscreenElement && document.webkitExitFullscreen) document.webkitExitFullscreen();
   })()
@@ -656,6 +660,8 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
   private var desktopSites: Set<String> = []
   /// False from the app entering the background to it coming back.
   private var appForeground = true
+  /// True from the screen being locked until the app is active again.
+  private var screenLocked = false
   /// True while a timer is waiting to ask whether the windows kept open in the background are
   /// still open.
   private var watchingWindows = false
@@ -732,12 +738,23 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
       self?.noteWindowOpen()
       self?.noteFullscreen()
       self?.enterPictureInPicture()
+      self?.tellPagesAway(true)
     }
     NotificationCenter.default.addObserver(
       forName: UIApplication.didBecomeActiveNotification, object: nil, queue: .main
     ) { [weak self] _ in
-      self?.exitAutomaticPictureInPicture()
-      self?.closeRestoredFullscreen()
+      self?.screenLocked = false
+      self?.tellPagesAway(false)
+      self?.recoverAfterAway()
+    }
+    NotificationCenter.default.addObserver(
+      forName: UIApplication.protectedDataWillBecomeUnavailableNotification, object: nil, queue: .main
+    ) { [weak self] _ in self?.screenWasLocked() }
+    NotificationCenter.default.addObserver(
+      forName: UIApplication.protectedDataDidBecomeAvailableNotification, object: nil, queue: .main
+    ) { [weak self] _ in
+      self?.screenLocked = false
+      self?.recoverAfterAway()
     }
     UNUserNotificationCenter.current().delegate = self
     DispatchQueue.main.async { self.attachShell() }
@@ -1221,12 +1238,14 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
   }
 
   /// WebKit may restore a video from picture-in-picture into native fullscreen, which covers the
-  /// app and swallows every touch. Close it, now and again once the transition has settled.
+  /// app and swallows every touch. Close it, now and again once the transition has settled (after
+  /// a lock, the screen takes a while to come back).
   private func closeRestoredFullscreen() {
     guard let id = activeId, let session = sessions[id], !session.fullscreenBeforeLeaving else { return }
-    for delay in [0.0, 0.5, 1.5] {
+    for delay in [0.0, 0.3, 0.8, 1.5, 3.0] {
       DispatchQueue.main.asyncAfter(deadline: .now() + delay) { [weak session] in
         session?.view.evaluateJavaScript(exitFullscreenScript)
+        session?.view.scrollView.setZoomScale(1, animated: false)
       }
     }
   }
@@ -1518,6 +1537,41 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
     }
   }
 
+  /// The screen was locked: no picture-in-picture window stays up over it and the media of the
+  /// page is stopped (unless its site may play in the background), so the lock screen's own pause
+  /// button has nothing left to fight a page that restarts its video.
+  private func screenWasLocked() {
+    screenLocked = true
+    for session in sessions.values where session.autoPictureInPicture || session.windowOpen {
+      session.autoPictureInPicture = false
+      session.windowOpen = false
+      session.view.evaluateJavaScript(exitPictureInPictureScript)
+    }
+    refreshMedia()
+  }
+
+  /// Tells every page whether the app is away (inactive or in the background), so the feed player
+  /// neither restarts a video the lock screen's or the system window's pause button stopped, nor
+  /// leaves a page that was away stuck. Coming back also wakes the pages' feed players.
+  private func tellPagesAway(_ away: Bool) {
+    let script = away ? "window.__openmediaAway=true" : resumeAwayScript
+    for session in sessions.values { session.view.evaluateJavaScript(script) }
+    for session in floatingSessions { session.view.evaluateJavaScript(script) }
+  }
+
+  /// The app is active again after a lock or a minimize: undo what a system player left behind.
+  private func recoverAfterAway() {
+    exitAutomaticPictureInPicture()
+    closeRestoredFullscreen()
+    DispatchQueue.main.async { [weak self] in
+      guard let self, let id = self.activeId, let session = self.sessions[id] else { return }
+      // A video that was in a native player can leave the page zoomed in.
+      session.view.scrollView.setZoomScale(1, animated: false)
+      self.shell?.superview?.setNeedsLayout()
+      self.focusActivePage()
+    }
+  }
+
   /// Suspends the media of every page that is out of sight, unless its site may play on, and
   /// resumes what was suspended when the page is shown again. A closed page is left to
   /// `applyBlocked`.
@@ -1526,7 +1580,13 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
       let shown = appForeground && !covered && session.id == activeId
       if !appForeground && session.id == activeId {
         // A window the reader opened (the panel's button, or an automatic one) keeps playing while
-        // the app is minimized, on any site. Without one the page is suspended as usual.
+        // the app is minimized, on any site. Without one the page is suspended as usual. A locked
+        // screen is no minimizing: nothing floats over it and its controls could not stop the
+        // media, so the page is suspended whatever window was open.
+        if screenLocked {
+          setMediaSuspended(!backgroundMediaSites.contains(session.scope), in: session)
+          continue
+        }
         if session.windowOpen {
           watchWindows()
           continue
@@ -1541,6 +1601,8 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
     for session in floatingSessions where !session.blocked {
       if appForeground {
         setMediaSuspended(false, in: session)
+      } else if screenLocked {
+        setMediaSuspended(!backgroundMediaSites.contains(session.scope), in: session)
       } else {
         suspendUnlessFloating(session)
       }
