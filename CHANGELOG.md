@@ -10,7 +10,7 @@ All notable changes to OpenMedia are documented here.
 
 **Area:** `fix(fab)`
 
-**Change:** The fan's bookmark button now always saves the page being shown on a tap; holding it opens Settings > Sites, where the saved page can be opened, replaced or removed. On a favorite site, while incognito, or with no page open it stays for the hold only. Settings > Controls gains a *Bookmarks* switch (`bookmarkButton`, `set_bookmark_button`, on by default) that removes the button. The fan's buttons now carry short captions (Usage, Tabs, Bookmarks, History, Profiles, Settings, Incognito). `fab.openBookmark` and `fab.saveBookmarkHint` removed; `settings.bookmarkButtonNote` added and `bookmark.note` rewritten in all locales, machine-drafted. `docs/wiki/ui-design.md` updated.
+**Change:** The fan's bookmark button now always saves the page being shown on a tap; holding it opens Settings > Sites, where the saved page can be opened, replaced or removed. On a favorite site, while incognito, or with no page open it stays for the hold only. Settings > Controls gains a *Bookmarks* switch (`bookmarkButton`, `set_bookmark_button`, on by default) that removes the button. `fab.openBookmark` and `fab.saveBookmarkHint` removed; `settings.bookmarkButtonNote` added and `bookmark.note` rewritten in all locales, machine-drafted. `docs/wiki/ui-design.md` updated.
 
 ### chore(ota): refuse a web bundle when native code changed since the version was set
 
