@@ -9,7 +9,10 @@
 //   manifest            rebuild latest.json for the current version from the release's assets
 //   all                 web, then app
 //
+//   (no command)        same as `web`: `yarn ota` is the whole routine for a shell update
+//
 //   --dry-run           build and sign into release/ota/, publish nothing
+//   --force             web: publish even though native code changed since the version was bumped
 //   --no-build          web: reuse dist/ instead of running `yarn build:web`
 //   --target <triple>   app: a Rust target other than this machine's (e.g. aarch64-pc-windows-msvc)
 //   --no-manifest       app: leave latest.json to a later `yarn ota manifest` (CI does this, since
@@ -58,7 +61,10 @@ const OTA_TAG = "ota";
 const KEEP_BUNDLES = 3;
 
 const env = loadEnv(root);
-const [command, ...args] = process.argv.slice(2);
+const argv = process.argv.slice(2);
+const bare = argv.length === 0 || argv[0].startsWith("--");
+const command = bare ? "web" : argv[0];
+const args = bare ? argv : argv.slice(1);
 const flag = (name) => args.includes(name);
 const option = (name) => {
   const at = args.indexOf(name);
@@ -225,7 +231,43 @@ function readIfExists(file) {
   return fs.existsSync(file) ? fs.readFileSync(file, "utf8") : null;
 }
 
+/**
+ * Native files that a web bundle can depend on: Rust commands, plugins, capabilities. A bundle is
+ * published for the app version in tauri.conf.json, so if any of these changed after that version
+ * was set, apps of that version lack what the new shell may call. Returns the changed files, or []
+ * when nothing changed or git cannot tell (a shallow clone, no history).
+ */
+function nativeChangesSinceVersionBump() {
+  const added = capture("git", [
+    "log",
+    "-1",
+    "--format=%H",
+    `-S"version": "${version}"`,
+    "--",
+    "src-tauri/tauri.conf.json",
+  ])?.trim();
+  if (!added) return [];
+  const changed = capture("git", [
+    "diff",
+    "--name-only",
+    `${added}..HEAD`,
+    "--",
+    ":(glob)src-tauri/src/**",
+    ":(glob)src-tauri/capabilities/**",
+    ":(glob)src-tauri/plugins/*/src/**",
+    ":(glob)src-tauri/plugins/*/permissions/**",
+  ]);
+  return (changed ?? "").split("\n").filter(Boolean);
+}
+
 function publishWeb() {
+  const drift = nativeChangesSinceVersionBump();
+  if (drift.length > 0 && !flag("--force")) {
+    console.log(
+      `ota: web update skipped. Native code changed since ${version} was set, so apps on ${version} may lack what this shell calls:\n  ${drift.slice(0, 8).join("\n  ")}${drift.length > 8 ? `\n  and ${drift.length - 8} more` : ""}\nBump "version" in src-tauri/tauri.conf.json and release the app, or pass --force if the change is internal.`,
+    );
+    return;
+  }
   const privateKey = webKey();
   const publicKey = fs.readFileSync(publicKeyFile, "utf8").trim();
   if (publicKeyOf(privateKey) !== publicKey)
@@ -423,6 +465,4 @@ const commands = {
 
 if (command in commands) commands[command]();
 else
-  fail(
-    `unknown command "${command ?? ""}". Usage: yarn ota keygen|web|app|manifest|notes|all [options]`,
-  );
+  fail(`unknown command "${command}". Usage: yarn ota keygen|web|app|manifest|notes|all [options]`);

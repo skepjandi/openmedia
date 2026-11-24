@@ -6,6 +6,12 @@ All notable changes to OpenMedia are documented here.
 >
 > **Wiki**: the [GitHub Wiki](https://github.com/skepjandi/openmedia/wiki) is the public-facing main wiki — architecture, recipe format, AI pipeline, security model, roadmap. Source-controlled editing surface is `docs/wiki/` in this repo; CI (`.github/workflows/sync-wiki.yml`) mirrors it to the GitHub Wiki on every merge to `main`. New single-PR changes belong here, not as new wiki pages.
 
+### chore(ota): refuse a web bundle when native code changed since the version was set
+
+**Area:** `chore(ota)`
+
+**Change:** `yarn ota web` now skips publishing, and names the files, when Rust, a plugin or a capability changed after the current `version` was set, since apps on that version may lack what the new shell calls; `--force` overrides. `yarn ota` with no command means `yarn ota web`. The workflow checks out full history so the check works in CI. `docs/wiki/updates.md` updated.
+
 ### feat(settings): Report an issue opens a pre-filled GitHub issue
 
 **Area:** `feat(settings)`

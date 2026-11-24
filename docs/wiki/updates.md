@@ -2,7 +2,7 @@
 
 > **Status: Implemented, with verification limits.** The web bundle path was run end to end on a macOS debug build (see [Verification](#verification)). Publishing to GitHub, the desktop self-update install, Windows and Linux hardware, and every mobile device were not exercised.
 
-Two independent mechanisms, one CLI (`yarn ota`), and the same CLI inside GitHub Actions.
+Two independent mechanisms, one CLI (`yarn ota`), and the same CLI inside GitHub Actions. For a shell-only change the whole routine is `yarn ota` (it means `yarn ota web`), or just merging to `main`: CI publishes it.
 
 | | Web bundle | Desktop self-update |
 |---|---|---|
@@ -34,12 +34,15 @@ A bundle is `signature (64 bytes) ‖ gzip(manifest JSON)`; the manifest carries
 ## Publishing from your machine
 
 ```bash
-yarn ota keygen            # once; see below
+yarn ota keygen --github   # once; see below
+yarn ota                   # same as `yarn ota web`
 yarn ota web               # build, sign, publish the web bundle
 yarn ota app               # on Windows or Linux: build the installer, upload, refresh latest.json
 yarn ota all               # both
 yarn ota web --dry-run     # build and sign into release/ota/, publish nothing
 ```
+
+`web` refuses to publish (and says why) when Rust, a plugin or a capability changed after the current `version` was set, because apps on that version may lack what the new shell calls. Bump `version` and release the app, or pass `--force` for a change that does not touch the command contract. The check needs git history (CI checks out in full).
 
 Needs the GitHub CLI logged in (`gh auth login`). The repository is `repository` in `src-tauri/Cargo.toml` (also what the app downloads from, at compile time) or `OTA_REPO`.
 
@@ -76,7 +79,7 @@ Secrets: `OPENMEDIA_OTA_KEY`, `TAURI_SIGNING_PRIVATE_KEY`, and `TAURI_SIGNING_PR
 
 ## Requirements on the repository
 
-The app downloads without credentials, so the release assets must be public. While the repository is private every check returns "Could not reach the update server."; making the repository public, or pointing `repository` in `Cargo.toml` and the endpoint in `tauri.ota.conf.json` at a public releases repository, fixes it (a test keeps those two in step).
+The app downloads without credentials, so the release assets must be public. The repository is public (open source, MPL-2.0), so this holds. If a fork is private every check returns "Could not reach the update server."; point `repository` in `Cargo.toml` and the endpoint in `tauri.ota.conf.json` at a public releases repository (a test keeps those two in step).
 
 ## Privacy
 
