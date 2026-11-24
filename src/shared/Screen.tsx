@@ -97,10 +97,16 @@ export function Screen({
       data-hit=""
       className="screen fixed inset-0 z-50 scroll-pt-[calc(var(--safe-top)+88px)] overflow-y-auto overscroll-contain bg-ink"
     >
-      <header className="sticky top-0 z-10 flex items-end gap-4 border-b border-hair bg-ink/60 px-5 pt-[calc(var(--safe-top)+16px)] pb-4 backdrop-blur-xl backdrop-saturate-150">
+      <header
+        className={`sticky top-0 z-10 flex gap-3 border-b border-hair bg-ink/60 px-4 pt-[calc(var(--safe-top)+12px)] pb-3 backdrop-blur-xl backdrop-saturate-150 ${back ? "items-center" : "items-end"}`}
+      >
         {back && button}
         <div className="min-w-0 flex-1">
-          <h1 className="text-[2rem] leading-none font-semibold tracking-tight">{title}</h1>
+          <h1
+            className={`leading-none font-semibold tracking-tight ${back ? "truncate text-[1.375rem]" : "text-[2rem]"}`}
+          >
+            {title}
+          </h1>
           {subtitle && <p className="mt-2 line-clamp-2 text-sm text-paper/55">{subtitle}</p>}
         </div>
         {!back && button}

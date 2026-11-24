@@ -11,7 +11,6 @@ import {
   TilesIcon,
   ToggleIcon,
 } from "../../shared/icons";
-import { Group } from "./ui";
 
 export type SettingsCategory =
   "general" | "browsing" | "controls" | "sites" | "incognito" | "assistant" | "data";
@@ -126,33 +125,33 @@ export function SettingsIndex({ onOpen }: { onOpen: (category: SettingsCategory)
   const t = useT();
 
   return (
-    <nav aria-label={t("settings.title")}>
-      <Group>
-        {SETTINGS_CATEGORIES.map((category) => (
-          <button
-            key={category.id}
-            type="button"
-            onClick={() => onOpen(category.id)}
-            className="flex w-full items-center gap-3.5 px-4 py-3 text-start active:bg-paper/[0.06]"
+    <nav aria-label={t("settings.title")} className="flex flex-col gap-2.5">
+      {SETTINGS_CATEGORIES.map((category) => (
+        <button
+          key={category.id}
+          type="button"
+          onClick={() => onOpen(category.id)}
+          className="flex w-full items-center gap-4 rounded-2xl border border-hair bg-paper/[0.04] p-3.5 text-start transition-colors active:bg-paper/[0.09]"
+        >
+          <span
+            aria-hidden="true"
+            className="grid size-12 shrink-0 place-items-center rounded-[14px] bg-accent text-on-accent [&_svg]:size-6"
           >
-            <span
-              aria-hidden="true"
-              className="grid size-10 shrink-0 place-items-center rounded-xl bg-accent/15 text-accent"
-            >
-              {category.icon}
+            {category.icon}
+          </span>
+          <span className="min-w-0 flex-1">
+            <span className="block truncate text-[17px] leading-tight font-semibold">
+              {t(category.label)}
             </span>
-            <span className="min-w-0 flex-1">
-              <span className="block text-base font-medium">{t(category.label)}</span>
-              <span className="line-clamp-2 text-sm leading-snug text-paper/55">
-                {category.parts.map((part) => t(part)).join(" · ")}
-              </span>
+            <span className="mt-1 block truncate text-[13px] leading-snug text-paper/55">
+              {category.parts.map((part) => t(part)).join(" · ")}
             </span>
-            <span aria-hidden="true" className="text-paper/45 rtl:-scale-x-100">
-              <ForwardIcon />
-            </span>
-          </button>
-        ))}
-      </Group>
+          </span>
+          <span aria-hidden="true" className="shrink-0 text-paper/35 rtl:-scale-x-100">
+            <ForwardIcon />
+          </span>
+        </button>
+      ))}
     </nav>
   );
 }
