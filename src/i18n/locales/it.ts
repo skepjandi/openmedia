@@ -424,6 +424,10 @@ export const it: Messages = {
   "settings.guide": "Guida iniziale",
   "settings.guideNote": "La contrassegna come non vista e la mostra di nuovo ora.",
   "settings.replay": "Rivedi",
+  "settings.report": "Segnala un problema",
+  "settings.reportNote":
+    "Apre una nuova segnalazione su GitHub con versione e sistema già compilati. Non viene inviato nulla finché non la invii lì.",
+  "settings.reportOpen": "Apri GitHub",
   "settings.updates": "Aggiornamenti",
   "settings.updatesNote":
     "OpenMedia chiede a GitHub gli aggiornamenti delle proprie schermate. Non viene inviato nulla su di te o sulla tua navigazione, e ogni aggiornamento viene firmato e verificato su questo dispositivo prima di essere usato.",

@@ -417,6 +417,10 @@ export const ms: Messages = {
   "settings.guide": "Panduan kali pertama",
   "settings.guideNote": "Menandakan sebagai belum dilihat dan memaparkannya sekarang.",
   "settings.replay": "Ulang tayang",
+  "settings.report": "Laporkan masalah",
+  "settings.reportNote":
+    "Membuka isu baharu di GitHub dengan versi aplikasi dan sistem telah diisi. Tiada apa dihantar sehingga anda menghantarnya di sana.",
+  "settings.reportOpen": "Buka GitHub",
   "settings.updates": "Kemas kini",
   "settings.updatesNote":
     "OpenMedia meminta kemas kini untuk skrinnya sendiri daripada GitHub. Tiada apa-apa tentang anda atau penyemakan imbas anda dihantar, dan setiap kemas kini ditandatangani serta disemak pada peranti ini sebelum digunakan.",

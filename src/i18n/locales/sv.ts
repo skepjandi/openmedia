@@ -419,6 +419,10 @@ export const sv: Messages = {
   "settings.guide": "Guide för första start",
   "settings.guideNote": "Markerar den som osedd och visar den igen nu.",
   "settings.replay": "Spela upp igen",
+  "settings.report": "Rapportera ett problem",
+  "settings.reportNote":
+    "Öppnar ett nytt ärende på GitHub med appens version och system ifyllda. Inget skickas förrän du skickar in det där.",
+  "settings.reportOpen": "Öppna GitHub",
   "settings.updates": "Uppdateringar",
   "settings.updatesNote":
     "OpenMedia ber GitHub om uppdateringar av sina egna skärmar. Ingenting om dig eller din surfning skickas, och varje uppdatering signeras och kontrolleras på den här enheten innan den används.",

@@ -418,6 +418,10 @@ export const de: Messages = {
   "settings.guide": "Erststart-Anleitung",
   "settings.guideNote": "Markiert sie als ungesehen und zeigt sie jetzt erneut an.",
   "settings.replay": "Erneut anzeigen",
+  "settings.report": "Problem melden",
+  "settings.reportNote":
+    "Öffnet auf GitHub ein neues Issue, in dem Version und System dieser App schon eingetragen sind. Es wird nichts gesendet, bis du es dort abschickst.",
+  "settings.reportOpen": "GitHub öffnen",
   "settings.updates": "Updates",
   "settings.updatesNote":
     "OpenMedia fragt GitHub nach Updates für die eigenen Bildschirme. Es werden keine Informationen über dich oder dein Surfverhalten gesendet, und jedes Update wird vor der Verwendung auf diesem Gerät signiert und geprüft.",

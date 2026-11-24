@@ -409,6 +409,10 @@ export const ko: Messages = {
   "settings.guide": "처음 실행 안내",
   "settings.guideNote": "안 본 상태로 표시하고 지금 다시 보여 줍니다.",
   "settings.replay": "다시 보기",
+  "settings.report": "문제 신고",
+  "settings.reportNote":
+    "앱 버전과 시스템이 채워진 새 이슈를 GitHub에서 엽니다. GitHub에서 제출하기 전에는 아무것도 전송되지 않습니다.",
+  "settings.reportOpen": "GitHub 열기",
   "settings.updates": "업데이트",
   "settings.updatesNote":
     "OpenMedia는 자체 화면의 업데이트를 GitHub에 요청합니다. 사용자나 탐색에 관한 정보는 전혀 전송되지 않으며, 모든 업데이트는 사용 전에 이 기기에서 서명되고 확인됩니다.",

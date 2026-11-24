@@ -415,6 +415,10 @@ export const en = {
   "settings.guide": "First-run guide",
   "settings.guideNote": "Marks it unseen and shows it again now.",
   "settings.replay": "Replay",
+  "settings.report": "Report an issue",
+  "settings.reportNote":
+    "Opens a new issue on GitHub with this app's version and system filled in. Nothing is sent until you submit it there.",
+  "settings.reportOpen": "Open GitHub",
   "settings.updates": "Updates",
   "settings.updatesNote":
     "OpenMedia asks GitHub for updates to its own screens. Nothing about you or your browsing is sent, and every update is signed and checked on this device before it is used.",

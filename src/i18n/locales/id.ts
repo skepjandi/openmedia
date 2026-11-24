@@ -413,6 +413,10 @@ export const id: Messages = {
   "settings.guide": "Panduan pertama kali",
   "settings.guideNote": "Menandai belum dilihat dan menampilkannya lagi sekarang.",
   "settings.replay": "Ulangi",
+  "settings.report": "Laporkan masalah",
+  "settings.reportNote":
+    "Membuka isu baru di GitHub dengan versi aplikasi dan sistem sudah terisi. Tidak ada yang dikirim sampai Anda mengirimnya di sana.",
+  "settings.reportOpen": "Buka GitHub",
   "settings.updates": "Pembaruan",
   "settings.updatesNote":
     "OpenMedia meminta pembaruan untuk layarnya sendiri ke GitHub. Tidak ada data tentang Anda atau penjelajahan Anda yang dikirim, dan setiap pembaruan ditandatangani serta diperiksa di perangkat ini sebelum digunakan.",

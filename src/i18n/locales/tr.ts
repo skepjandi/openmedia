@@ -418,6 +418,10 @@ export const tr: Messages = {
   "settings.guide": "İlk kullanım kılavuzu",
   "settings.guideNote": "Görülmedi olarak işaretler ve şimdi yeniden gösterir.",
   "settings.replay": "Yeniden oynat",
+  "settings.report": "Sorun bildir",
+  "settings.reportNote":
+    "GitHub'da uygulama sürümü ve sistem bilgisi doldurulmuş yeni bir konu açar. Siz orada göndermeden hiçbir şey gönderilmez.",
+  "settings.reportOpen": "GitHub'ı aç",
   "settings.updates": "Güncellemeler",
   "settings.updatesNote":
     "OpenMedia kendi ekranlarının güncellemelerini GitHub'dan ister. Sizin veya gezinmenizle ilgili hiçbir şey gönderilmez ve her güncelleme kullanılmadan önce bu cihazda imzalanır ve doğrulanır.",

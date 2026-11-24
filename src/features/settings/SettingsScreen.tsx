@@ -24,6 +24,7 @@ import { IncognitoFavoritesSection, IncognitoRecipesLink } from "./IncognitoSect
 import { LibraryLinks } from "../library/Links";
 import { RecipesLink } from "./RecipesScreen";
 import { Switch } from "./Switch";
+import { ReportIssueSection } from "./ReportIssueSection";
 import { UpdatesSection } from "./UpdatesSection";
 import { Picker } from "./Picker";
 import { NavRow } from "./SiteParts";
@@ -148,6 +149,7 @@ function CategoryPanel({
       return (
         <>
           <UpdatesSection />
+          <ReportIssueSection />
           <DataSection />
         </>
       );

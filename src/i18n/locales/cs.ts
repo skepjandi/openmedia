@@ -415,6 +415,10 @@ export const cs: Messages = {
   "settings.guide": "Průvodce prvním spuštěním",
   "settings.guideNote": "Označí ho jako neviděný a hned ho zobrazí znovu.",
   "settings.replay": "Přehrát",
+  "settings.report": "Nahlásit problém",
+  "settings.reportNote":
+    "Otevře na GitHubu nové hlášení s vyplněnou verzí aplikace a systémem. Dokud ho tam neodešlete, nic se neodesílá.",
+  "settings.reportOpen": "Otevřít GitHub",
   "settings.updates": "Aktualizace",
   "settings.updatesNote":
     "OpenMedia žádá GitHub o aktualizace vlastních obrazovek. Neodesílají se žádné údaje o vás ani o vašem prohlížení a každá aktualizace je před použitím podepsána a ověřena na tomto zařízení.",

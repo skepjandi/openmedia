@@ -421,6 +421,10 @@ export const ro: Messages = {
   "settings.guide": "Ghid de primă utilizare",
   "settings.guideNote": "Îl marchează ca nevăzut și îl afișează din nou acum.",
   "settings.replay": "Redă din nou",
+  "settings.report": "Raportează o problemă",
+  "settings.reportNote":
+    "Deschide o problemă nouă pe GitHub, cu versiunea aplicației și sistemul completate. Nu se trimite nimic până nu o trimiți acolo.",
+  "settings.reportOpen": "Deschide GitHub",
   "settings.updates": "Actualizări",
   "settings.updatesNote":
     "OpenMedia cere de la GitHub actualizări pentru propriile ecrane. Nu se trimite nimic despre tine sau despre navigarea ta, iar fiecare actualizare este semnată și verificată pe acest dispozitiv înainte de a fi folosită.",
