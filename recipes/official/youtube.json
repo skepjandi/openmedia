@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "market.official.youtube",
   "name": "YouTube",
-  "version": "2.6.0",
+  "version": "2.7.0",
   "origin": "user",
   "tags": ["desktop", "mobile"],
   "match": ["https://www.youtube.com/*", "https://m.youtube.com/*", "https://youtube.com/*"],
@@ -299,6 +299,13 @@
       "id": "mini-player",
       "label": "Hide the mini player",
       "description": "The small floating player that follows you when you scroll away from a video on desktop.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "following-only",
+      "label": "Only show channels I subscribe to",
+      "description": "Opens your Subscriptions feed instead of the Home recommendations.",
       "group": "content",
       "default": false
     }
@@ -1145,6 +1152,16 @@
       "target": {
         "css": "dislike-button-view-model"
       }
+    },
+    {
+      "id": "following-home-route",
+      "label": "Home to Subscriptions",
+      "type": "redirect",
+      "option": "following-only",
+      "when": {
+        "path": "/"
+      },
+      "to": "/feed/subscriptions"
     }
   ],
   "meta": {

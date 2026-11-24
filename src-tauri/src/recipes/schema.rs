@@ -15,7 +15,7 @@ use crate::error::{Error, Result};
 
 pub const SCHEMA_VERSION: u32 = 1;
 const MAX_RULES: usize = 200;
-const MAX_OPTIONS: usize = 32;
+const MAX_OPTIONS: usize = 40;
 const MAX_LABEL_CHARS: usize = 60;
 const MAX_DESCRIPTION_CHARS: usize = 160;
 pub const MIN_CHOICES: usize = 2;
@@ -538,9 +538,9 @@ impl Recipe {
         self.validate_with(false)
     }
 
-    /// `official`: the recipe is one the maintainers ship (reviewed in a pull request), which may
-    /// carry `videoMenu` rules; every other imported recipe may not, since they click the site's
-    /// own controls.
+    /// `official`: the recipe is one the maintainers ship (reviewed in a pull request). It may
+    /// carry `videoMenu` rules and scripts that are not held to the script policy (they may click,
+    /// navigate and watch the page); every other imported recipe may not.
     pub(super) fn validate_with(&self, official: bool) -> Result<()> {
         if self.schema != SCHEMA_VERSION {
             return Err(Error::Recipe(format!(
@@ -626,7 +626,7 @@ impl Recipe {
                         )));
                     }
                 }
-                Rule::Script { id, code, .. } => self.validate_script(id, code)?,
+                Rule::Script { id, code, .. } => self.validate_script(id, code, official)?,
                 Rule::VideoMenu {
                     id,
                     title,
@@ -677,7 +677,7 @@ impl Recipe {
         Ok(())
     }
 
-    fn validate_script(&self, id: &str, code: &str) -> Result<()> {
+    fn validate_script(&self, id: &str, code: &str, official: bool) -> Result<()> {
         let refuse = |reason: &str| Error::Recipe(format!("script rule {id} {reason}"));
         if code.trim().is_empty() {
             return Err(refuse("has no code"));
@@ -688,7 +688,7 @@ impl Recipe {
         if !is_script_text(code) {
             return Err(refuse("has characters that cannot be shown safely"));
         }
-        if self.origin == Origin::Imported {
+        if self.origin == Origin::Imported && !official {
             let findings = script_policy::scan(code);
             if !findings.is_empty() {
                 return Err(refuse(&format!("is refused: {}", describe(&findings))));

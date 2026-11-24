@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "market.official.facebook",
   "name": "Facebook",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "origin": "user",
   "tags": ["desktop", "mobile"],
   "match": ["https://*.facebook.com/*"],
@@ -128,6 +128,13 @@
       "id": "suggested-sections",
       "label": "Hide People you may know and Suggested",
       "description": "The People you may know, Suggested groups and Suggested pages blocks in the desktop feed.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "following-only",
+      "label": "Only show people and Pages I follow",
+      "description": "Opens the Most recent feed (friends, Pages and groups you follow) instead of the suggested feed.",
       "group": "content",
       "default": false
     }
@@ -379,6 +386,13 @@
       "target": {
         "css": "[aria-posinset]:has([aria-label=\"Suggested pages\"])"
       }
+    },
+    {
+      "id": "following-feed",
+      "label": "Open the Most recent feed on Home",
+      "type": "script",
+      "option": "following-only",
+      "code": "if (window.top !== window) return;\nconst stateKey = Symbol.for('openmedia.following-only');\nconst state = window[stateKey] || (window[stateKey] = { on: false, installed: false, check: null });\nconst attempts = 'openmedia.following-only.attempts';\nconst atHome = () => location.pathname === '/' || location.pathname === '/home.php';\nconst onFollowing = () => new URLSearchParams(location.search).get('sk') === 'h_chr';\nconst allowed = () => {\n  const now = Date.now();\n  let times = [];\n  try { times = JSON.parse(sessionStorage.getItem(attempts) || '[]').filter((at) => now - at < 5000); } catch (_) {}\n  if (times.length >= 3) return false;\n  times.push(now);\n  try { sessionStorage.setItem(attempts, JSON.stringify(times)); } catch (_) {}\n  return true;\n};\nstate.on = true;\nstate.check = () => {\n  if (state.on && atHome() && !onFollowing() && allowed()) location.replace('/?filter=all&sk=h_chr');\n};\n(window[Symbol.for('openmedia.cleanup')] ||= []).push(() => { state.on = false; });\nif (!state.installed) {\n  state.installed = true;\n  for (const name of ['pushState', 'replaceState']) {\n    const original = history[name];\n    history[name] = function () {\n      const result = original.apply(this, arguments);\n      state.check();\n      return result;\n    };\n  }\n  window.addEventListener('popstate', () => state.check());\n}\nstate.check();\n"
     }
   ],
   "meta": {

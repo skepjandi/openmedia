@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "market.official.linkedin",
   "name": "LinkedIn",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "origin": "user",
   "tags": ["desktop", "mobile"],
   "match": ["https://*.linkedin.com/*"],
@@ -140,6 +140,13 @@
       "id": "nav-badges",
       "label": "Hide notification badges",
       "description": "The red counters on the Home, My Network, Messaging and Notifications icons in the top bar (signed in).",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "following-only",
+      "label": "Only show people I follow",
+      "description": "Hides the posts LinkedIn labels Suggested in your feed.",
       "group": "content",
       "default": false
     }
@@ -424,6 +431,13 @@
       "target": {
         "css": "[data-testid=\"primary-nav\"] span[data-color-scheme], #global-nav .notification-badge, #global-nav .notification-badge--show, #global-nav .notification-badge__count"
       }
+    },
+    {
+      "id": "following-suggested",
+      "label": "Suggested posts in the feed",
+      "type": "script",
+      "option": "following-only",
+      "code": "if (window.top !== window) return;\nconst hidden = new Set();\nconst sweep = () => {\n  for (const header of document.querySelectorAll('.feed-shared-update-v2 .update-components-header')) {\n    if (!header.textContent.trim().startsWith('Suggested')) continue;\n    const post = header.closest('.feed-shared-update-v2');\n    if (post && !hidden.has(post)) { post.style.display = 'none'; hidden.add(post); }\n  }\n};\nconst timer = setInterval(sweep, 1000);\n(window[Symbol.for('openmedia.cleanup')] ||= []).push(() => {\n  clearInterval(timer);\n  for (const post of hidden) post.style.removeProperty('display');\n  hidden.clear();\n});\nsweep();\n"
     }
   ],
   "meta": {

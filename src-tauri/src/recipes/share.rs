@@ -712,4 +712,15 @@ mod tests {
         assert!(preview.rules[0].selector.is_empty());
         assert!(!super::preview(&file(&recipe_json("market.calm", "")).unwrap(), None).runs_code);
     }
+
+    #[test]
+    fn only_the_official_library_may_carry_a_script_that_clicks_and_navigates() {
+        let json = script_recipe(
+            "const tab = document.querySelector('[role=tab]'); if (tab) tab.click(); window.location.replace('/following');",
+        );
+        let official = json.replace("market.calm", "market.official.calm");
+        assert!(parse_shared(official.as_bytes(), Source::Official).is_ok());
+        assert!(parse_shared(json.as_bytes(), Source::Bundled).is_err());
+        assert!(parse_shared(official.as_bytes(), Source::Stored).is_ok());
+    }
 }

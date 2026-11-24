@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "market.official.threads",
   "name": "Threads",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "origin": "user",
   "tags": ["desktop", "mobile"],
   "match": ["https://*.threads.com/*", "https://*.threads.net/*"],
@@ -91,6 +91,13 @@
       "id": "instagram-link",
       "label": "Hide the Instagram link on profiles",
       "description": "The link to the person's Instagram account in the profile header.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "following-only",
+      "label": "Only show people I follow",
+      "description": "Opens the Following feed instead of For you.",
       "group": "content",
       "default": false
     }
@@ -240,6 +247,16 @@
       "target": {
         "css": "#barcelona-page-layout div:has(> a[href^=\"https://www.instagram.com/\"])"
       }
+    },
+    {
+      "id": "following-home-route",
+      "label": "Home to Following",
+      "type": "redirect",
+      "option": "following-only",
+      "when": {
+        "path": "/"
+      },
+      "to": "/following"
     }
   ],
   "meta": {

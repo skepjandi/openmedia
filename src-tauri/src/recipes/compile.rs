@@ -276,6 +276,12 @@ pub fn page_script(recipes: &[Recipe], choices: &OptionChoices) -> Result<String
     Ok(format!(
         r#"(() => {{
   try {{
+    const cleanupKey = Symbol.for("openmedia.cleanup");
+    const cleanups = window[cleanupKey];
+    if (cleanups) {{
+      window[cleanupKey] = [];
+      cleanups.forEach((cleanup) => {{ try {{ cleanup(); }} catch (_) {{}} }});
+    }}
     const scripts = [{scripts}];
     const recipes = {json};
     const here = window.location;
