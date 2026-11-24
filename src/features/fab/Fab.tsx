@@ -752,8 +752,7 @@ function FloatingButton() {
     size: number,
     label: string,
     content: ReactNode,
-    caption?: string,
-  ): Entry => ({ lane: "tools", target: { kind }, size, section: QUICK, label, content, caption });
+  ): Entry => ({ lane: "tools", target: { kind }, size, section: QUICK, label, content });
 
   // Tap saves the page being shown; hold opens Settings > Sites, where the bookmark is managed.
   // Free for everyone. On a site that is already a favorite, while incognito, or with no page
@@ -789,11 +788,10 @@ function FloatingButton() {
           </span>
         )}
       </>,
-      t("fab.usage"),
     ),
-    tool("tabs", TABS_SIZE, t("fab.tabs"), <TabsIcon />, t("fab.tabs")),
+    tool("tabs", TABS_SIZE, t("fab.tabs"), <TabsIcon />),
     ...(bookmarkButtonOn ? [bookmarkTool] : []),
-    tool("history", HISTORY_SIZE, t("fab.history"), <HistoryIcon />, t("fab.history")),
+    tool("history", HISTORY_SIZE, t("fab.history"), <HistoryIcon />),
     tool(
       "profiles",
       PROFILES_SIZE,
@@ -801,9 +799,8 @@ function FloatingButton() {
         ? t("fab.profilesActive", { name: shownProfile(activeProfile, t).name })
         : t("fab.profiles"),
       <ProfileAvatar profile={activeProfile} size={20} />,
-      t("fab.profiles"),
     ),
-    tool("settings", SETTINGS_SIZE, t("fab.settings"), <SlidersIcon />, t("fab.settings")),
+    tool("settings", SETTINGS_SIZE, t("fab.settings"), <SlidersIcon />),
   ];
   const switchTools: Entry[] = [
     {
@@ -815,7 +812,7 @@ function FloatingButton() {
       active: incognito.active,
       pressed: incognito.active,
       busy: incognito.busy,
-      caption: incognito.active ? t("fab.leaveIncognitoHint") : t("fab.incognito"),
+      caption: incognito.active ? t("fab.leaveIncognitoHint") : undefined,
       className: `${incognito.active ? "" : "text-white"} ${incognito.busy ? "animate-pulse" : ""}`,
       content: (
         <>
