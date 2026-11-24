@@ -191,23 +191,23 @@ export function DarkModeControls({ value, change, overrides }: DarkModeControlsP
             </p>
           )}
           {value.schedule.kind === "time" && (
-            <div className="grid grid-cols-2 gap-3">
-              <label className="flex flex-col gap-1.5 text-xs text-paper/60">
+            <div className="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)] gap-3">
+              <label className="flex min-w-0 flex-col gap-1.5 text-xs text-paper/60">
                 {t("settings.darkFrom")}
                 <input
                   type="time"
                   value={value.schedule.from}
                   onChange={(event) => setTime("from", event.target.value)}
-                  className={field}
+                  className={`${field} appearance-none`}
                 />
               </label>
-              <label className="flex flex-col gap-1.5 text-xs text-paper/60">
+              <label className="flex min-w-0 flex-col gap-1.5 text-xs text-paper/60">
                 {t("settings.darkTo")}
                 <input
                   type="time"
                   value={value.schedule.to}
                   onChange={(event) => setTime("to", event.target.value)}
-                  className={field}
+                  className={`${field} appearance-none`}
                 />
               </label>
             </div>
