@@ -104,9 +104,7 @@ export const ur: Messages = {
   "commandBar.openAiSettings": "ترتیبات > AI معاون کھولیں",
 
   "fab.openFavorite": "{name} کھولیں",
-  "fab.openBookmark": "بک مارک کھولیں: {name}",
   "fab.saveBookmark": "یہ صفحہ بک مارک کی جگہ میں محفوظ کریں",
-  "fab.saveBookmarkHint": "صفحہ محفوظ کریں",
   "fab.history": "تاریخ",
   "fab.usage": "استعمال",
   "fab.settings": "ترتیبات",
@@ -336,6 +334,7 @@ export const ur: Messages = {
   "settings.techDetector": "ٹیکنالوجی ڈیٹیکٹر",
   "settings.techDetectorNote":
     "تیرتے بٹن میں ایک بٹن شامل کرتا ہے جو صفحے کی ٹیکنالوجیز کی فہرست دکھاتا ہے: فریم ورک، CMS، اینالیٹکس اور مزید۔",
+  "settings.bookmarkButtonNote": "تیرتے بٹن کے پنکھے میں بُک مارک بٹن دکھاتا ہے۔",
   "colorPicker.hint": "دائرے کو کسی رنگ پر گھسیٹیں، پھر قبول کریں پر ٹیپ کریں۔",
   "colorPicker.accept": "قبول کریں",
   "colorPicker.copyRgb": "RGB کاپی کریں",
@@ -438,7 +437,7 @@ export const ur: Messages = {
   "settings.searchEngine": "سرچ انجن",
   "bookmark.title": "بک مارک",
   "bookmark.note":
-    "بٹن سے کھلنے والا ایک صفحہ، مفت۔ بٹن دبائے رکھیں اور بک مارک کی جگہ پر ٹیپ کریں تاکہ جس صفحے پر آپ ہیں وہ محفوظ ہو جائے، پھر واپس آنے کے لیے اسے ٹیپ کریں۔ انکوگنیٹو میں محفوظ نہیں ہوتا۔",
+    "موجودہ صفحہ محفوظ کرنے کے لیے پنکھے میں بُک مارک بٹن دبائیں۔ یہ صفحہ کھولنے کے لیے دبائے رکھیں۔ انکاگنیٹو یا پسندیدہ سائٹ پر کچھ محفوظ نہیں ہوتا۔",
   "bookmark.empty": "ابھی کوئی صفحہ محفوظ نہیں۔",
   "bookmark.save": "موجودہ صفحہ محفوظ کریں",
   "bookmark.replace": "موجودہ صفحے سے بدلیں",

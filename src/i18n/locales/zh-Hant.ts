@@ -99,9 +99,7 @@ export const zhHant: Messages = {
   "commandBar.openAiSettings": "開啟「設定 > AI 助理」",
 
   "fab.openFavorite": "開啟 {name}",
-  "fab.openBookmark": "開啟書籤：{name}",
   "fab.saveBookmark": "將此頁面儲存到書籤位",
-  "fab.saveBookmarkHint": "儲存頁面",
   "fab.history": "記錄",
   "fab.usage": "用量",
   "fab.settings": "設定",
@@ -309,6 +307,7 @@ export const zhHant: Messages = {
   "settings.techDetector": "技術偵測器",
   "settings.techDetectorNote":
     "在浮動按鈕中新增一個按鈕，列出頁面使用的技術：框架、CMS、分析工具等。",
+  "settings.bookmarkButtonNote": "在浮動按鈕的扇形選單中顯示書籤按鈕。",
   "colorPicker.hint": "將圓圈拖到某種顏色上，然後點一下「接受」。",
   "colorPicker.accept": "接受",
   "colorPicker.copyRgb": "拷貝 RGB",
@@ -403,7 +402,7 @@ export const zhHant: Messages = {
   "settings.searchEngine": "搜尋引擎",
   "bookmark.title": "書籤",
   "bookmark.note":
-    "可從按鈕開啟的一個頁面，免費。按住按鈕並輕點書籤位即可儲存目前頁面，之後輕點它即可返回。無痕模式下不會儲存。",
+    "點按扇形選單中的書籤按鈕可儲存目前頁面，長按則開啟此頁面。無痕模式下和我的最愛網站上不會儲存。",
   "bookmark.empty": "尚未儲存頁面。",
   "bookmark.save": "儲存目前頁面",
   "bookmark.replace": "以目前頁面取代",

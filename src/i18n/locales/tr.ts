@@ -106,9 +106,7 @@ export const tr: Messages = {
   "commandBar.openAiSettings": "Ayarlar > YZ asistanı bölümünü aç",
 
   "fab.openFavorite": "{name} öğesini aç",
-  "fab.openBookmark": "Yer işaretini aç: {name}",
   "fab.saveBookmark": "Bu sayfayı yer işareti yuvasına kaydet",
-  "fab.saveBookmarkHint": "Sayfayı kaydet",
   "fab.history": "Geçmiş",
   "fab.usage": "Kullanım",
   "fab.settings": "Ayarlar",
@@ -341,6 +339,7 @@ export const tr: Messages = {
   "settings.techDetector": "Teknoloji algılayıcı",
   "settings.techDetectorNote":
     "Kayan düğmeye, sayfanın teknolojilerini listeleyen bir düğme ekler: çerçeveler, CMS, analitik ve daha fazlası.",
+  "settings.bookmarkButtonNote": "Yüzen düğmenin yelpazesinde yer imi düğmesini gösterir.",
   "colorPicker.hint": "Daireyi bir rengin üzerine sürükleyin, ardından Kabul et'e dokunun.",
   "colorPicker.accept": "Kabul et",
   "colorPicker.copyRgb": "RGB'yi kopyala",
@@ -441,7 +440,7 @@ export const tr: Messages = {
   "settings.searchEngine": "Arama motoru",
   "bookmark.title": "Yer işareti",
   "bookmark.note":
-    "Düğmeden açabileceğiniz tek bir sayfa, ücretsiz. Düğmeye basılı tutup yer işareti yuvasına dokunarak bulunduğunuz sayfayı kaydedin, sonra geri dönmek için ona dokunun. Gizli modda kaydedilmez.",
+    "Geçerli sayfayı kaydetmek için yelpazedeki yer imi düğmesine dokunun. Bu sayfayı açmak için basılı tutun. Gizli modda ve favori bir sitede kaydedilmez.",
   "bookmark.empty": "Henüz kaydedilmiş sayfa yok.",
   "bookmark.save": "Geçerli sayfayı kaydet",
   "bookmark.replace": "Geçerli sayfayla değiştir",

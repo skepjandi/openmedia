@@ -29,6 +29,7 @@ const startup = {
   backButton: true,
   colorPicker: true,
   techDetector: true,
+  bookmarkButton: true,
   aiPreview: true,
   locale: "en",
   searchEngine: "google",

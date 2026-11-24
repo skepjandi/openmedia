@@ -105,9 +105,7 @@ export const ko: Messages = {
   "commandBar.openAiSettings": "설정 > AI 어시스턴트 열기",
 
   "fab.openFavorite": "{name} 열기",
-  "fab.openBookmark": "북마크 열기: {name}",
   "fab.saveBookmark": "이 페이지를 북마크 칸에 저장",
-  "fab.saveBookmarkHint": "페이지 저장",
   "fab.history": "기록",
   "fab.usage": "사용 시간",
   "fab.settings": "설정",
@@ -333,6 +331,7 @@ export const ko: Messages = {
   "settings.techDetector": "기술 감지기",
   "settings.techDetectorNote":
     "플로팅 버튼에 페이지에 사용된 기술(프레임워크, CMS, 분석 등)을 보여 주는 버튼을 추가합니다.",
+  "settings.bookmarkButtonNote": "플로팅 버튼의 부채꼴에 북마크 버튼을 표시합니다.",
   "colorPicker.hint": "원을 색상 위로 드래그한 다음 수락을 탭하세요.",
   "colorPicker.accept": "수락",
   "colorPicker.copyRgb": "RGB 복사",
@@ -432,7 +431,7 @@ export const ko: Messages = {
   "settings.searchEngine": "검색 엔진",
   "bookmark.title": "북마크",
   "bookmark.note":
-    "버튼에서 여는 페이지 하나, 무료입니다. 버튼을 길게 누른 뒤 북마크 칸을 탭하면 지금 보는 페이지가 저장되고, 다시 탭하면 그 페이지로 돌아갑니다. 시크릿 모드에서는 저장되지 않습니다.",
+    "부채꼴의 북마크 버튼을 탭하면 현재 페이지를 저장합니다. 길게 누르면 이 페이지가 열립니다. 시크릿 모드와 즐겨찾기 사이트에서는 저장되지 않습니다.",
   "bookmark.empty": "아직 저장된 페이지가 없습니다.",
   "bookmark.save": "현재 페이지 저장",
   "bookmark.replace": "현재 페이지로 바꾸기",

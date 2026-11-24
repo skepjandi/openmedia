@@ -102,9 +102,7 @@ export const th: Messages = {
   "commandBar.openAiSettings": "เปิดการตั้งค่า > ผู้ช่วย AI",
 
   "fab.openFavorite": "เปิด {name}",
-  "fab.openBookmark": "เปิดบุ๊กมาร์ก: {name}",
   "fab.saveBookmark": "บันทึกหน้านี้ไว้ในช่องบุ๊กมาร์ก",
-  "fab.saveBookmarkHint": "บันทึกหน้า",
   "fab.history": "ประวัติ",
   "fab.usage": "เวลาใช้งาน",
   "fab.settings": "การตั้งค่า",
@@ -321,6 +319,7 @@ export const th: Messages = {
   "settings.techDetector": "ตัวตรวจจับเทคโนโลยี",
   "settings.techDetectorNote":
     "เพิ่มปุ่มในปุ่มลอยเพื่อแสดงเทคโนโลยีที่หน้าเว็บใช้ เช่น เฟรมเวิร์ก CMS การวิเคราะห์ และอื่นๆ",
+  "settings.bookmarkButtonNote": "แสดงปุ่มบุ๊กมาร์กในพัดของปุ่มลอย",
   "colorPicker.hint": "ลากวงกลมไปวางบนสี แล้วแตะยอมรับ",
   "colorPicker.accept": "ยอมรับ",
   "colorPicker.copyRgb": "คัดลอก RGB",
@@ -418,7 +417,7 @@ export const th: Messages = {
   "settings.searchEngine": "เครื่องมือค้นหา",
   "bookmark.title": "บุ๊กมาร์ก",
   "bookmark.note":
-    "หน้าเดียวที่เปิดได้จากปุ่ม ฟรี กดปุ่มค้างไว้แล้วแตะช่องบุ๊กมาร์กเพื่อบันทึกหน้าที่เปิดอยู่ จากนั้นแตะเพื่อกลับมา ไม่บันทึกระหว่างโหมดไม่ระบุตัวตน",
+    "แตะปุ่มบุ๊กมาร์กในพัดเพื่อบันทึกหน้าปัจจุบัน กดค้างเพื่อเปิดหน้านี้ จะไม่บันทึกในโหมดไม่ระบุตัวตนหรือบนไซต์โปรด",
   "bookmark.empty": "ยังไม่ได้บันทึกหน้าใด",
   "bookmark.save": "บันทึกหน้าปัจจุบัน",
   "bookmark.replace": "แทนที่ด้วยหน้าปัจจุบัน",

@@ -107,9 +107,7 @@ export const nl: Messages = {
   "commandBar.openAiSettings": "Open Instellingen > AI-assistent",
 
   "fab.openFavorite": "{name} openen",
-  "fab.openBookmark": "Bladwijzer openen: {name}",
   "fab.saveBookmark": "Deze pagina in de bladwijzerplek bewaren",
-  "fab.saveBookmarkHint": "Pagina bewaren",
   "fab.history": "Geschiedenis",
   "fab.usage": "Gebruik",
   "fab.settings": "Instellingen",
@@ -341,6 +339,7 @@ export const nl: Messages = {
   "settings.techDetector": "Technologiedetector",
   "settings.techDetectorNote":
     "Voegt een knop toe aan de zwevende knop die de technologieën van een pagina toont: frameworks, CMS, analytics en meer.",
+  "settings.bookmarkButtonNote": "Toont de bladwijzerknop in de waaier van de zwevende knop.",
   "colorPicker.hint": "Sleep de cirkel over een kleur en tik op Accepteren.",
   "colorPicker.accept": "Accepteren",
   "colorPicker.copyRgb": "RGB kopiëren",
@@ -443,7 +442,7 @@ export const nl: Messages = {
   "settings.searchEngine": "Zoekmachine",
   "bookmark.title": "Bladwijzer",
   "bookmark.note":
-    "Eén pagina die je via de knop opent, gratis. Houd de knop ingedrukt en tik op de bladwijzerplek om de pagina waar je bent te bewaren; tik er later op om terug te gaan. Niet bewaard in incognito.",
+    "Tik op de bladwijzerknop in de waaier om de huidige pagina op te slaan. Houd ingedrukt om deze pagina te openen. In incognito en op een favoriet wordt niets opgeslagen.",
   "bookmark.empty": "Nog geen pagina bewaard.",
   "bookmark.save": "Huidige pagina bewaren",
   "bookmark.replace": "Vervangen door de huidige pagina",

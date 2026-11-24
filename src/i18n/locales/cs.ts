@@ -107,9 +107,7 @@ export const cs: Messages = {
   "commandBar.openAiSettings": "Otevřít Nastavení > Asistent AI",
 
   "fab.openFavorite": "Otevřít {name}",
-  "fab.openBookmark": "Otevřít záložku: {name}",
   "fab.saveBookmark": "Uložit tuto stránku do pozice záložky",
-  "fab.saveBookmarkHint": "Uložit stránku",
   "fab.history": "Historie",
   "fab.usage": "Využití",
   "fab.settings": "Nastavení",
@@ -339,6 +337,7 @@ export const cs: Messages = {
   "settings.techDetector": "Detektor technologií",
   "settings.techDetectorNote":
     "Přidá k plovoucímu tlačítku tlačítko, které zobrazí technologie použité na stránce: frameworky, CMS, analytiku a další.",
+  "settings.bookmarkButtonNote": "Zobrazí tlačítko záložky ve vějíři plovoucího tlačítka.",
   "colorPicker.hint": "Přetáhněte kruh na barvu a klepněte na Přijmout.",
   "colorPicker.accept": "Přijmout",
   "colorPicker.copyRgb": "Kopírovat RGB",
@@ -438,7 +437,7 @@ export const cs: Messages = {
   "settings.searchEngine": "Vyhledávač",
   "bookmark.title": "Záložka",
   "bookmark.note":
-    "Jedna stránka, kterou otevřete z tlačítka, zdarma. Podržte tlačítko a klepněte na pozici záložky, tím uložíte stránku, na které jste; dalším klepnutím se na ni vrátíte. V anonymním režimu se neukládá.",
+    "Klepnutím na tlačítko záložky ve vějíři uložíte aktuální stránku. Podržením otevřete tuto stránku. V anonymním režimu a na oblíbené stránce se nic neukládá.",
   "bookmark.empty": "Zatím není uložena žádná stránka.",
   "bookmark.save": "Uložit aktuální stránku",
   "bookmark.replace": "Nahradit aktuální stránkou",

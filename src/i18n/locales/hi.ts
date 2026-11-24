@@ -103,9 +103,7 @@ export const hi: Messages = {
   "commandBar.openAiSettings": "सेटिंग्स > AI सहायक खोलें",
 
   "fab.openFavorite": "{name} खोलें",
-  "fab.openBookmark": "बुकमार्क खोलें: {name}",
   "fab.saveBookmark": "यह पेज बुकमार्क स्लॉट में सहेजें",
-  "fab.saveBookmarkHint": "पेज सहेजें",
   "fab.history": "इतिहास",
   "fab.usage": "उपयोग",
   "fab.settings": "सेटिंग्स",
@@ -336,6 +334,7 @@ export const hi: Messages = {
   "settings.techDetector": "टेक्नोलॉजी डिटेक्टर",
   "settings.techDetectorNote":
     "फ्लोटिंग बटन में एक बटन जोड़ता है जो पेज में उपयोग हुई टेक्नोलॉजी दिखाता है: फ्रेमवर्क, CMS, एनालिटिक्स और बहुत कुछ।",
+  "settings.bookmarkButtonNote": "फ़्लोटिंग बटन के पंखे में बुकमार्क बटन दिखाता है।",
   "colorPicker.hint": "घेरे को किसी रंग पर खींचें, फिर स्वीकार करें पर टैप करें।",
   "colorPicker.accept": "स्वीकार करें",
   "colorPicker.copyRgb": "RGB कॉपी करें",
@@ -437,7 +436,7 @@ export const hi: Messages = {
   "settings.searchEngine": "सर्च इंजन",
   "bookmark.title": "बुकमार्क",
   "bookmark.note":
-    "बटन से खुलने वाला एक पेज, मुफ़्त। बटन दबाकर रखें और बुकमार्क स्लॉट पर टैप करें ताकि जिस पेज पर आप हैं वह सहेजा जाए, फिर लौटने के लिए उस पर टैप करें। इनकॉग्निटो में सहेजा नहीं जाता।",
+    "मौजूदा पेज सेव करने के लिए पंखे में बुकमार्क बटन दबाएँ। यह पेज खोलने के लिए उसे दबाए रखें। गुप्त मोड या पसंदीदा साइट पर कुछ सेव नहीं होता।",
   "bookmark.empty": "अभी कोई पेज सहेजा नहीं गया है।",
   "bookmark.save": "मौजूदा पेज सहेजें",
   "bookmark.replace": "मौजूदा पेज से बदलें",

@@ -443,8 +443,9 @@ function FloatingButton() {
   const openSession = useApp((s) => s.openSession);
   const bookmark = useApp((s) => s.state?.bookmark ?? null);
   const hasPage = useApp((s) => s.activeId !== null);
+  const bookmarkButtonOn = useApp((s) => s.state?.bookmarkButton ?? true);
   const saveBookmark = useApp((s) => s.saveBookmark);
-  const openBookmark = useApp((s) => s.openBookmark);
+  const openSettingsAt = useApp((s) => s.openSettingsAt);
   const onboardingOpen = useApp((s) => s.onboardingOpen);
   const setFabEdge = useApp((s) => s.setFabEdge);
   const isPro = useEntitlementStore((state) => state.status === "pro");
@@ -473,6 +474,13 @@ function FloatingButton() {
     setDarkCharging(false);
   };
   const darkHold = useRef(0);
+  const [bookmarkCharging, setBookmarkCharging] = useState(false);
+  const stopBookmarkHold = () => {
+    clearTimeout(bookmarkHold.current);
+    setBookmarkCharging(false);
+  };
+  const bookmarkHold = useRef(0);
+  const bookmarkHeld = useRef(false);
   const darkHeld = useRef(false);
   /** How far the dial is turned, in item steps, and whether a finger is turning it now. */
   const [rotation, setRotation] = useState(0);
@@ -598,8 +606,7 @@ function FloatingButton() {
     else if (target.kind === "techDetector") void startTechDetect();
     else if (target.kind === "downloads") openSheet("downloads");
     else if (target.kind === "bookmark") {
-      if (bookmark) openBookmark();
-      else void saveBookmark();
+      if (canBookmark) void saveBookmark();
     } else if (target.kind === "tab") openSession(target.sessionId);
     else if (target.kind === "folder") setFolderName(target.name);
     else if (target.kind === "darkMode") {
@@ -745,30 +752,26 @@ function FloatingButton() {
     size: number,
     label: string,
     content: ReactNode,
-  ): Entry => ({ lane: "tools", target: { kind }, size, section: QUICK, label, content });
+    caption?: string,
+  ): Entry => ({ lane: "tools", target: { kind }, size, section: QUICK, label, content, caption });
 
-  // One page anyone can keep, free; nothing is saved or shown while incognito.
-  const showBookmark = !incognito.active && (bookmark !== null || hasPage);
-  const bookmarkIcon = bookmark ? iconForUrl(bookmark.url, favorites) : undefined;
+  // Tap saves the page being shown; hold opens Settings > Sites, where the bookmark is managed.
+  // Free for everyone. On a site that is already a favorite, while incognito, or with no page
+  // open there is nothing to save: the button stays, for the hold only. Settings can remove it.
+  const canBookmark =
+    !incognito.active &&
+    hasPage &&
+    !(pageSite && (savedFavorites ?? []).some((favorite) => siteOf(favorite.url) === pageSite));
+  const bookmarked = canBookmark && bookmark !== null && pageUrl === bookmark.url;
   const bookmarkTool: Entry = {
     ...tool(
       "bookmark",
       BOOKMARK_SIZE,
-      bookmark ? t("fab.openBookmark", { name: bookmark.title }) : t("fab.saveBookmark"),
-      bookmarkIcon ? (
-        <>
-          <img src={bookmarkIcon} alt="" draggable={false} className="size-6 rounded-md" />
-          <span className="absolute -end-1.5 -top-1.5 z-10 grid size-5 place-items-center rounded-full border border-white/70 bg-black/80 text-white">
-            <BookmarkIcon filled size={12} />
-          </span>
-        </>
-      ) : bookmark ? (
-        <BookmarkIcon filled />
-      ) : (
-        <BookmarkPlusIcon />
-      ),
+      canBookmark ? t("fab.saveBookmark") : t("bookmark.title"),
+      canBookmark && !bookmarked ? <BookmarkPlusIcon /> : <BookmarkIcon filled={bookmarked} />,
     ),
-    caption: bookmark ? undefined : t("fab.saveBookmarkHint"),
+    caption: t("bookmark.title"),
+    charging: bookmarkCharging,
   };
 
   // Top to bottom, as the page column reads; a column running upward from the button lists the
@@ -786,10 +789,11 @@ function FloatingButton() {
           </span>
         )}
       </>,
+      t("fab.usage"),
     ),
-    tool("tabs", TABS_SIZE, t("fab.tabs"), <TabsIcon />),
-    ...(showBookmark ? [bookmarkTool] : []),
-    tool("history", HISTORY_SIZE, t("fab.history"), <HistoryIcon />),
+    tool("tabs", TABS_SIZE, t("fab.tabs"), <TabsIcon />, t("fab.tabs")),
+    ...(bookmarkButtonOn ? [bookmarkTool] : []),
+    tool("history", HISTORY_SIZE, t("fab.history"), <HistoryIcon />, t("fab.history")),
     tool(
       "profiles",
       PROFILES_SIZE,
@@ -797,8 +801,9 @@ function FloatingButton() {
         ? t("fab.profilesActive", { name: shownProfile(activeProfile, t).name })
         : t("fab.profiles"),
       <ProfileAvatar profile={activeProfile} size={20} />,
+      t("fab.profiles"),
     ),
-    tool("settings", SETTINGS_SIZE, t("fab.settings"), <SlidersIcon />),
+    tool("settings", SETTINGS_SIZE, t("fab.settings"), <SlidersIcon />, t("fab.settings")),
   ];
   const switchTools: Entry[] = [
     {
@@ -810,7 +815,7 @@ function FloatingButton() {
       active: incognito.active,
       pressed: incognito.active,
       busy: incognito.busy,
-      caption: incognito.active ? t("fab.leaveIncognitoHint") : undefined,
+      caption: incognito.active ? t("fab.leaveIncognitoHint") : t("fab.incognito"),
       className: `${incognito.active ? "" : "text-white"} ${incognito.busy ? "animate-pulse" : ""}`,
       content: (
         <>
@@ -1000,6 +1005,7 @@ function FloatingButton() {
       current.moved = true;
       stopControlsHold();
       stopDarkHold();
+      stopBookmarkHold();
       setTurn("drag");
     }
     if (current.lane === "tools") {
@@ -1121,7 +1127,7 @@ function FloatingButton() {
   const holdState = gesture.phase === "pressing" ? "charging" : fanOpen ? "open" : "idle";
   const enlarged = gesture.phase === "pressing" || fanOpen;
 
-  /** What pressing and holding a button does, for the two that have it. */
+  /** What pressing and holding a button does, for the three that have it. */
   const holdOf = (kind: FanTarget["kind"]) => {
     if (kind === "controls") {
       return {
@@ -1163,6 +1169,26 @@ function FloatingButton() {
         consumeHeld: () => {
           const was = darkHeld.current;
           darkHeld.current = false;
+          return was;
+        },
+      };
+    }
+    if (kind === "bookmark") {
+      return {
+        start: () => {
+          bookmarkHeld.current = false;
+          setBookmarkCharging(true);
+          bookmarkHold.current = window.setTimeout(() => {
+            bookmarkHeld.current = true;
+            setBookmarkCharging(false);
+            openSettingsAt("sites");
+            dispatch({ type: "dismiss" });
+          }, HOLD_MS);
+        },
+        stop: stopBookmarkHold,
+        consumeHeld: () => {
+          const was = bookmarkHeld.current;
+          bookmarkHeld.current = false;
           return was;
         },
       };

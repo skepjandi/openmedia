@@ -98,9 +98,7 @@ export const zhHans: Messages = {
   "commandBar.openAiSettings": "打开“设置 > AI 助手”",
 
   "fab.openFavorite": "打开 {name}",
-  "fab.openBookmark": "打开书签：{name}",
   "fab.saveBookmark": "将此页面保存到书签位",
-  "fab.saveBookmarkHint": "保存页面",
   "fab.history": "历史",
   "fab.usage": "用量",
   "fab.settings": "设置",
@@ -307,6 +305,7 @@ export const zhHans: Messages = {
   "settings.techDetector": "技术检测器",
   "settings.techDetectorNote":
     "在悬浮按钮中添加一个按钮，列出页面使用的技术：框架、CMS、分析工具等。",
+  "settings.bookmarkButtonNote": "在悬浮按钮的扇形菜单中显示书签按钮。",
   "colorPicker.hint": "将圆圈拖到某种颜色上，然后点按“接受”。",
   "colorPicker.accept": "接受",
   "colorPicker.copyRgb": "复制 RGB",
@@ -400,7 +399,7 @@ export const zhHans: Messages = {
   "settings.searchEngine": "搜索引擎",
   "bookmark.title": "书签",
   "bookmark.note":
-    "可从按钮打开的一个页面，免费。按住按钮并轻点书签位即可保存当前页面，之后轻点它即可返回。无痕模式下不会保存。",
+    "点按扇形菜单中的书签按钮可保存当前页面，长按则打开此页面。无痕模式下和收藏的网站上不会保存。",
   "bookmark.empty": "还没有保存页面。",
   "bookmark.save": "保存当前页面",
   "bookmark.replace": "替换为当前页面",

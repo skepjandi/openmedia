@@ -268,6 +268,8 @@ pub struct AppState {
     pub color_picker: bool,
     /// Whether the floating button fans out the technology detector. Off by default.
     pub tech_detector: bool,
+    /// Whether the floating button's fan shows the bookmark button. On by default.
+    pub bookmark_button: bool,
     /// Show the exact AI payload and ask before sending it.
     pub ai_preview: bool,
     /// The language the user picked, as a BCP 47 tag. `None` follows the device's language.
@@ -352,6 +354,9 @@ struct LibraryData {
     /// Off by default; the floating button can fan out the technology detector.
     #[serde(default)]
     tech_detector: bool,
+    /// On by default: the fan shows the bookmark button.
+    #[serde(default = "enabled")]
+    bookmark_button: bool,
     /// On by default: the assistant shows what it will send and waits for the user.
     #[serde(default = "enabled")]
     ai_preview: bool,
@@ -498,6 +503,7 @@ impl Library {
             back_button: data.back_button,
             color_picker: data.color_picker,
             tech_detector: data.tech_detector,
+            bookmark_button: data.bookmark_button,
             ai_preview: data.ai_preview,
             locale: data.locale.clone(),
             search_engine: data.search_engine,
@@ -846,6 +852,12 @@ impl Library {
     pub fn set_tech_detector(&self, enabled: bool) -> Result<()> {
         let mut data = self.lock()?;
         data.tech_detector = enabled;
+        self.save(&data)
+    }
+
+    pub fn set_bookmark_button(&self, enabled: bool) -> Result<()> {
+        let mut data = self.lock()?;
+        data.bookmark_button = enabled;
         self.save(&data)
     }
 
@@ -1288,6 +1300,7 @@ fn default_data() -> LibraryData {
         back_button: false,
         color_picker: false,
         tech_detector: false,
+        bookmark_button: true,
         ai_preview: true,
         icons: BTreeMap::new(),
         history: Vec::new(),

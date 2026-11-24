@@ -6,6 +6,12 @@ All notable changes to OpenMedia are documented here.
 >
 > **Wiki**: the [GitHub Wiki](https://github.com/skepjandi/openmedia/wiki) is the public-facing main wiki — architecture, recipe format, AI pipeline, security model, roadmap. Source-controlled editing surface is `docs/wiki/` in this repo; CI (`.github/workflows/sync-wiki.yml`) mirrors it to the GitHub Wiki on every merge to `main`. New single-PR changes belong here, not as new wiki pages.
 
+### fix(fab): the bookmark button saves on tap, opens Settings on hold, and can be switched off
+
+**Area:** `fix(fab)`
+
+**Change:** The fan's bookmark button now always saves the page being shown on a tap; holding it opens Settings > Sites, where the saved page can be opened, replaced or removed. On a favorite site, while incognito, or with no page open it stays for the hold only. Settings > Controls gains a *Bookmarks* switch (`bookmarkButton`, `set_bookmark_button`, on by default) that removes the button. The fan's buttons now carry short captions (Usage, Tabs, Bookmarks, History, Profiles, Settings, Incognito). `fab.openBookmark` and `fab.saveBookmarkHint` removed; `settings.bookmarkButtonNote` added and `bookmark.note` rewritten in all locales, machine-drafted. `docs/wiki/ui-design.md` updated.
+
 ### chore(ota): refuse a web bundle when native code changed since the version was set
 
 **Area:** `chore(ota)`

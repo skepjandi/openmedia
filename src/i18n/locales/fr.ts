@@ -109,9 +109,7 @@ export const fr: Messages = {
   "commandBar.openAiSettings": "Ouvrir les réglages > Assistant IA",
 
   "fab.openFavorite": "Ouvrir {name}",
-  "fab.openBookmark": "Ouvrir le favori : {name}",
   "fab.saveBookmark": "Enregistrer cette page dans l'emplacement du marque-page",
-  "fab.saveBookmarkHint": "Garder la page",
   "fab.history": "Historique",
   "fab.usage": "Utilisation",
   "fab.settings": "Réglages",
@@ -348,6 +346,7 @@ export const fr: Messages = {
   "settings.techDetector": "Détecteur de technologies",
   "settings.techDetectorNote":
     "Ajoute un bouton au bouton flottant qui liste les technologies d'une page : frameworks, CMS, analytique et plus.",
+  "settings.bookmarkButtonNote": "Affiche le bouton de signet dans l'éventail du bouton flottant.",
   "colorPicker.hint": "Faites glisser le cercle sur une couleur, puis touchez Accepter.",
   "colorPicker.accept": "Accepter",
   "colorPicker.copyRgb": "Copier le RVB",
@@ -451,7 +450,7 @@ export const fr: Messages = {
   "settings.searchEngine": "Moteur de recherche",
   "bookmark.title": "Marque-page",
   "bookmark.note":
-    "Une page que vous ouvrez depuis le bouton, gratuitement. Maintenez le bouton et touchez l'emplacement du marque-page pour garder la page actuelle, puis touchez-le pour y revenir. Rien n'est enregistré en navigation privée.",
+    "Touchez le bouton de signet de l'éventail pour enregistrer la page affichée. Maintenez-le pour ouvrir cette page. Rien n'est enregistré en navigation privée ni sur un favori.",
   "bookmark.empty": "Aucune page enregistrée pour l'instant.",
   "bookmark.save": "Enregistrer la page actuelle",
   "bookmark.replace": "Remplacer par la page actuelle",

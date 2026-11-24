@@ -107,9 +107,7 @@ export const pt: Messages = {
   "commandBar.openAiSettings": "Abrir Configurações > Assistente de IA",
 
   "fab.openFavorite": "Abrir {name}",
-  "fab.openBookmark": "Abrir favorito salvo: {name}",
   "fab.saveBookmark": "Salvar esta página no espaço do marcador",
-  "fab.saveBookmarkHint": "Salvar página",
   "fab.history": "Histórico",
   "fab.usage": "Uso",
   "fab.settings": "Configurações",
@@ -344,6 +342,7 @@ export const pt: Messages = {
   "settings.techDetector": "Detetor de tecnologias",
   "settings.techDetectorNote":
     "Adiciona um botão ao botão flutuante que lista as tecnologias da página: frameworks, CMS, análise e mais.",
+  "settings.bookmarkButtonNote": "Mostra o botão de favorito no leque do botão flutuante.",
   "colorPicker.hint": "Arraste o círculo sobre uma cor e toque em Aceitar.",
   "colorPicker.accept": "Aceitar",
   "colorPicker.copyRgb": "Copiar RGB",
@@ -446,7 +445,7 @@ export const pt: Messages = {
   "settings.searchEngine": "Mecanismo de pesquisa",
   "bookmark.title": "Marcador",
   "bookmark.note":
-    "Uma página que você abre pelo botão, de graça. Segure o botão e toque no espaço do marcador para salvar a página em que está; toque nele depois para voltar. Não é salvo no modo anônimo.",
+    "Toque no botão de favorito do leque para guardar a página atual. Mantenha-o premido para abrir esta página. Nada é guardado em modo anónimo nem num favorito.",
   "bookmark.empty": "Nenhuma página salva ainda.",
   "bookmark.save": "Salvar a página atual",
   "bookmark.replace": "Substituir pela página atual",

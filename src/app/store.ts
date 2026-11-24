@@ -24,6 +24,7 @@ import { hubForFavorite } from "../shared/hubs";
 import { localDay } from "../features/stats/format";
 import { WARM_USAGE_DAYS, pickWarmFavorites } from "../features/web/warm";
 import { siteOf } from "../shared/site";
+import type { SettingsCategory } from "../features/settings/SettingsNav";
 import { incognito as incognitoIpc } from "../features/incognito/ipc";
 import {
   applyState,
@@ -271,6 +272,11 @@ export interface AppStore {
   assistant: AssistantState;
   load: () => Promise<void>;
   openSheet: (sheet: Sheet) => void;
+  /** Which part of Settings to show when it next opens; Settings takes it and clears it. */
+  settingsStart: SettingsCategory | null;
+  /** Opens Settings on one part (Sites, for the bookmark). */
+  openSettingsAt: (category: SettingsCategory) => void;
+  clearSettingsStart: () => void;
   clearFavoriteFocus: () => void;
   /**
    * Opens a favorite's own dark mode or video controls page. Closing it returns to where it was
@@ -399,6 +405,7 @@ export interface AppStore {
   setColorPicker: (enabled: boolean) => Promise<void>;
   /** Shows or hides the technology detector on the floating button's fan. */
   setTechDetector: (enabled: boolean) => Promise<void>;
+  setBookmarkButton: (enabled: boolean) => Promise<void>;
   /** The technologies panel: being read, or listed; null while closed. */
   tech: TechState | null;
   /** Reads the page in front and opens the panel. */
@@ -798,6 +805,10 @@ export const useApp = create<AppStore>((set, get) => {
       const isPro = useEntitlementStore.getState().status === "pro";
       set((current) => showSheet(current, !isPro && sheet === "stats" ? "paywall" : sheet));
     },
+    settingsStart: null,
+    openSettingsAt: (category) =>
+      set((current) => ({ ...showSheet(current, "settings"), settingsStart: category })),
+    clearSettingsStart: () => set({ settingsStart: null }),
     openNewTab: () => {
       set((current) => ({ ...showSheet(current, "assistant"), blankTab: true }));
     },
@@ -1474,6 +1485,22 @@ export const useApp = create<AppStore>((set, get) => {
           state:
             current.state && previous !== undefined
               ? { ...current.state, techDetector: previous }
+              : current.state,
+          error: appError(error),
+        }));
+      }
+    },
+
+    setBookmarkButton: async (enabled) => {
+      const previous = get().state?.bookmarkButton;
+      set((current) => ({ state: current.state && { ...current.state, bookmarkButton: enabled } }));
+      try {
+        await library.setBookmarkButton(enabled);
+      } catch (error) {
+        set((current) => ({
+          state:
+            current.state && previous !== undefined
+              ? { ...current.state, bookmarkButton: previous }
               : current.state,
           error: appError(error),
         }));

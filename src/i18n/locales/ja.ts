@@ -106,9 +106,7 @@ export const ja: Messages = {
   "commandBar.openAiSettings": "設定 > AI アシスタントを開く",
 
   "fab.openFavorite": "{name}を開く",
-  "fab.openBookmark": "ブックマークを開く: {name}",
   "fab.saveBookmark": "このページをブックマーク枠に保存",
-  "fab.saveBookmarkHint": "ページを保存",
   "fab.history": "履歴",
   "fab.usage": "使用時間",
   "fab.settings": "設定",
@@ -336,6 +334,7 @@ export const ja: Messages = {
   "settings.techDetector": "技術検出",
   "settings.techDetectorNote":
     "フローティングボタンに、ページで使われている技術（フレームワーク、CMS、アナリティクスなど）を一覧表示するボタンを追加します。",
+  "settings.bookmarkButtonNote": "フローティングボタンのファンにブックマークボタンを表示します。",
   "colorPicker.hint": "円を色の上までドラッグして、「決定」をタップします。",
   "colorPicker.accept": "決定",
   "colorPicker.copyRgb": "RGBをコピー",
@@ -435,7 +434,7 @@ export const ja: Messages = {
   "settings.searchEngine": "検索エンジン",
   "bookmark.title": "ブックマーク",
   "bookmark.note":
-    "ボタンから開ける 1 ページ（無料）。ボタンを長押ししてブックマーク枠をタップすると今のページを保存し、もう一度タップするとそのページに戻ります。シークレットモード中は保存されません。",
+    "ファンのブックマークボタンをタップすると今のページを保存します。長押しでこのページを開きます。シークレットモード中とお気に入りのサイトでは保存されません。",
   "bookmark.empty": "まだページが保存されていません。",
   "bookmark.save": "今のページを保存",
   "bookmark.replace": "今のページに置き換える",
