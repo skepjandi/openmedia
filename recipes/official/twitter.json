@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "market.official.twitter",
   "name": "X (Twitter)",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "origin": "user",
   "tags": ["desktop", "mobile"],
   "match": ["https://*.x.com/*", "https://*.twitter.com/*"],
@@ -152,6 +152,13 @@
       "id": "footer-links",
       "label": "Hide the footer links",
       "description": "Terms, Privacy, Accessibility and other small print under the desktop timeline.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "following-only",
+      "label": "Only show accounts I follow",
+      "description": "Selects the Following tab on the Home timeline instead of For you.",
       "group": "content",
       "default": false
     }
@@ -514,6 +521,13 @@
       "target": {
         "css": "span[role=\"button\"][aria-label=\"Verified account\"]"
       }
+    },
+    {
+      "id": "following-tab",
+      "label": "Select the Following tab on Home",
+      "type": "script",
+      "option": "following-only",
+      "code": "if (window.top !== window) return;\nconst stateKey = Symbol.for('openmedia.following-only');\nconst state = window[stateKey] || (window[stateKey] = { on: false });\nstate.on = true;\nlet handled = false;\nconst select = () => {\n  if (!state.on || location.pathname !== '/home') { handled = false; return; }\n  if (handled) return;\n  const tab = Array.from(document.querySelectorAll('[role=\"tab\"]')).find((item) => item.textContent.trim() === 'Following');\n  if (!tab) return;\n  handled = true;\n  if (tab.getAttribute('aria-selected') !== 'true') tab.click();\n};\nconst timer = setInterval(select, 400);\n(window[Symbol.for('openmedia.cleanup')] ||= []).push(() => { state.on = false; clearInterval(timer); });\nselect();\n"
     }
   ],
   "meta": {

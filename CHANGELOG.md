@@ -6,6 +6,12 @@ All notable changes to OpenMedia are documented here.
 >
 > **Wiki**: the [GitHub Wiki](https://github.com/skepjandi/openmedia/wiki) is the public-facing main wiki — architecture, recipe format, AI pipeline, security model, roadmap. Source-controlled editing surface is `docs/wiki/` in this repo; CI (`.github/workflows/sync-wiki.yml`) mirrors it to the GitHub Wiki on every merge to `main`. New single-PR changes belong here, not as new wiki pages.
 
+### feat(recipes): "Only show people I follow" on the social recipes
+
+**Area:** `feat(recipes)`
+
+**Change:** a `following-only` option (content, off by default) on nine recipes. YouTube, Threads, TikTok and Twitch redirect Home to Subscriptions / Following / Following / Following directory; Reddit sends `r/popular` and `r/all` back to Home. Instagram (`/?variant=following`) and Facebook (`/?filter=all&sk=h_chr`, the Most recent feed) need a query on the same path, which `redirect` cannot express, so they use a `script` rule that redirects Home (guarded to 3 redirects in 5 seconds) and follows in-page navigation. X selects the Following tab on `/home`; LinkedIn hides posts labelled Suggested (English label). To make that possible, scripts in `recipes/official/` are no longer held to the script policy (shared and imported recipes still are, in Rust and in the Worker), and the page script now calls and empties `window[Symbol.for('openmedia.cleanup')]` each time it runs, so scripts can undo timers and listeners when the option is switched off. Snapchat, Discord, Telegram and WhatsApp have no following feed and are unchanged. Selectors for X, LinkedIn, Instagram and Facebook are not verified against a logged-in account; the redirect fixtures are address-only.
+
 ### fix(feed): stop restarting a video the site paused under an open sheet or dialog
 
 **Area:** `fix(feed)`

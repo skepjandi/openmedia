@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "market.official.twitch",
   "name": "Twitch",
-  "version": "2.2.0",
+  "version": "2.3.0",
   "origin": "user",
   "tags": ["desktop", "mobile"],
   "match": ["https://*.twitch.tv/*"],
@@ -210,6 +210,13 @@
         }
       ],
       "default": "show"
+    },
+    {
+      "id": "following-only",
+      "label": "Only show channels I follow",
+      "description": "Opens your Following directory instead of the Home recommendations.",
+      "group": "content",
+      "default": false
     }
   ],
   "rules": [
@@ -599,6 +606,16 @@
       "declarations": {
         "filter": "blur(4px)"
       }
+    },
+    {
+      "id": "following-home-route",
+      "label": "Home to Following",
+      "type": "redirect",
+      "option": "following-only",
+      "when": {
+        "path": "/"
+      },
+      "to": "/directory/following"
     }
   ],
   "meta": {

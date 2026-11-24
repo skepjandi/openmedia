@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "market.official.instagram",
   "name": "Instagram",
-  "version": "2.4.0",
+  "version": "2.5.0",
   "origin": "user",
   "tags": ["desktop", "mobile"],
   "match": [
@@ -149,6 +149,13 @@
       "id": "direct-messages",
       "label": "Hide Messages",
       "description": "The Messages (Direct) entry in the bottom bar and top bar. Your inbox can still be opened by address.",
+      "group": "content",
+      "default": false
+    },
+    {
+      "id": "following-only",
+      "label": "Only show accounts I follow",
+      "description": "Opens the Following feed (newest first, no suggestions) instead of the suggested feed.",
       "group": "content",
       "default": false
     }
@@ -439,6 +446,13 @@
         "path": "/reels/**"
       },
       "to": "/"
+    },
+    {
+      "id": "following-feed",
+      "label": "Open the Following feed on Home",
+      "type": "script",
+      "option": "following-only",
+      "code": "if (window.top !== window) return;\nconst stateKey = Symbol.for('openmedia.following-only');\nconst state = window[stateKey] || (window[stateKey] = { on: false, installed: false, check: null });\nconst attempts = 'openmedia.following-only.attempts';\nconst atHome = () => location.pathname === '/';\nconst onFollowing = () => new URLSearchParams(location.search).get('variant') === 'following';\nconst allowed = () => {\n  const now = Date.now();\n  let times = [];\n  try { times = JSON.parse(sessionStorage.getItem(attempts) || '[]').filter((at) => now - at < 5000); } catch (_) {}\n  if (times.length >= 3) return false;\n  times.push(now);\n  try { sessionStorage.setItem(attempts, JSON.stringify(times)); } catch (_) {}\n  return true;\n};\nstate.on = true;\nstate.check = () => {\n  if (state.on && atHome() && !onFollowing() && allowed()) location.replace('/?variant=following');\n};\n(window[Symbol.for('openmedia.cleanup')] ||= []).push(() => { state.on = false; });\nif (!state.installed) {\n  state.installed = true;\n  for (const name of ['pushState', 'replaceState']) {\n    const original = history[name];\n    history[name] = function () {\n      const result = original.apply(this, arguments);\n      state.check();\n      return result;\n    };\n  }\n  window.addEventListener('popstate', () => state.check());\n}\nstate.check();\n"
     }
   ],
   "meta": {
