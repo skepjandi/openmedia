@@ -401,6 +401,7 @@ export const zhHans: Messages = {
   "bookmark.note":
     "点按扇形菜单中的书签按钮可保存当前页面，长按则打开此页面。无痕模式下和收藏的网站上不会保存。",
   "bookmark.empty": "还没有保存页面。",
+  "bookmark.removeConfirm": "要从书签中移除此页面吗？",
   "bookmark.save": "保存当前页面",
   "bookmark.replace": "替换为当前页面",
   "settings.startPage": "启动页面",

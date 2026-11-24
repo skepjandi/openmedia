@@ -436,6 +436,7 @@ export const ja: Messages = {
   "bookmark.note":
     "ファンのブックマークボタンをタップすると今のページを保存します。長押しでこのページを開きます。シークレットモード中とお気に入りのサイトでは保存されません。",
   "bookmark.empty": "まだページが保存されていません。",
+  "bookmark.removeConfirm": "このページをブックマークから削除しますか？",
   "bookmark.save": "今のページを保存",
   "bookmark.replace": "今のページに置き換える",
   "settings.startPage": "起動時のページ",

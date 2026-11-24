@@ -439,6 +439,7 @@ export const en = {
   "bookmark.note":
     "Tap the bookmark button on the fan to save the page you are on. Hold it to open this page. Nothing is saved while incognito or on a favorite.",
   "bookmark.empty": "No page saved yet.",
+  "bookmark.removeConfirm": "Remove this page from your bookmarks?",
   "bookmark.save": "Save the current page",
   "bookmark.replace": "Replace with the current page",
   "settings.startPage": "Start page",

@@ -443,6 +443,7 @@ export const de: Messages = {
   "bookmark.note":
     "Tippe im Fächer auf den Lesezeichen-Button, um die aktuelle Seite zu speichern. Halte ihn gedrückt, um diese Seite zu öffnen. Im Inkognito-Modus und auf Favoriten wird nichts gespeichert.",
   "bookmark.empty": "Noch keine Seite gespeichert.",
+  "bookmark.removeConfirm": "Diese Seite aus den Lesezeichen entfernen?",
   "bookmark.save": "Aktuelle Seite speichern",
   "bookmark.replace": "Durch die aktuelle Seite ersetzen",
   "settings.startPage": "Startseite",

@@ -446,6 +446,7 @@ export const ro: Messages = {
   "bookmark.note":
     "Atinge butonul de marcaj din evantai pentru a salva pagina curentă. Ține apăsat pentru a deschide această pagină. Nu se salvează în incognito sau pe un favorit.",
   "bookmark.empty": "Nicio pagină salvată încă.",
+  "bookmark.removeConfirm": "Elimini această pagină din marcaje?",
   "bookmark.save": "Salvează pagina curentă",
   "bookmark.replace": "Înlocuiește cu pagina curentă",
   "settings.startPage": "Pagina de start",

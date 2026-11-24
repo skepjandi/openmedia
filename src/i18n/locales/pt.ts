@@ -447,6 +447,7 @@ export const pt: Messages = {
   "bookmark.note":
     "Toque no botão de favorito do leque para guardar a página atual. Mantenha-o premido para abrir esta página. Nada é guardado em modo anónimo nem num favorito.",
   "bookmark.empty": "Nenhuma página salva ainda.",
+  "bookmark.removeConfirm": "Remover esta página dos favoritos?",
   "bookmark.save": "Salvar a página atual",
   "bookmark.replace": "Substituir pela página atual",
   "settings.startPage": "Página inicial",

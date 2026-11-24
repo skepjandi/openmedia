@@ -452,6 +452,7 @@ export const fr: Messages = {
   "bookmark.note":
     "Touchez le bouton de signet de l'éventail pour enregistrer la page affichée. Maintenez-le pour ouvrir cette page. Rien n'est enregistré en navigation privée ni sur un favori.",
   "bookmark.empty": "Aucune page enregistrée pour l'instant.",
+  "bookmark.removeConfirm": "Retirer cette page de vos signets ?",
   "bookmark.save": "Enregistrer la page actuelle",
   "bookmark.replace": "Remplacer par la page actuelle",
   "settings.startPage": "Page de démarrage",

@@ -6,6 +6,12 @@ All notable changes to OpenMedia are documented here.
 >
 > **Wiki**: the [GitHub Wiki](https://github.com/skepjandi/openmedia/wiki) is the public-facing main wiki — architecture, recipe format, AI pipeline, security model, roadmap. Source-controlled editing surface is `docs/wiki/` in this repo; CI (`.github/workflows/sync-wiki.yml`) mirrors it to the GitHub Wiki on every merge to `main`. New single-PR changes belong here, not as new wiki pages.
 
+### feat(fab): tapping the bookmark button on the bookmarked page asks to remove it
+
+**Area:** `feat(fab)`
+
+**Change:** When the page in view is the saved bookmark (the button shows the filled glyph), a tap asks "Remove this page from your bookmarks?" with Cancel and Remove; Remove clears the slot (`clear_bookmark`). One new string (`bookmark.removeConfirm`) in all locales, machine-drafted. `docs/wiki/ui-design.md` updated.
+
 ### fix(fab): the bookmark button saves on tap, opens Settings on hold, and can be switched off
 
 **Area:** `fix(fab)`

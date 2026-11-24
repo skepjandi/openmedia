@@ -442,6 +442,7 @@ export const ms: Messages = {
   "bookmark.note":
     "Ketik butang penanda buku pada kipas untuk menyimpan halaman semasa. Tekan lama untuk membuka halaman ini. Tiada apa disimpan dalam mod inkognito atau pada tapak kegemaran.",
   "bookmark.empty": "Belum ada halaman disimpan.",
+  "bookmark.removeConfirm": "Alih keluar halaman ini daripada penanda buku?",
   "bookmark.save": "Simpan halaman semasa",
   "bookmark.replace": "Ganti dengan halaman semasa",
   "settings.startPage": "Halaman mula",

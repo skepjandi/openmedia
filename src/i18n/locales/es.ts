@@ -448,6 +448,7 @@ export const es: Messages = {
   "bookmark.note":
     "Toca el botón de marcador del abanico para guardar la página en la que estás. Mantenlo pulsado para abrir esta página. No se guarda en modo incógnito ni en un favorito.",
   "bookmark.empty": "Aún no hay ninguna página guardada.",
+  "bookmark.removeConfirm": "¿Quitar esta página de tus marcadores?",
   "bookmark.save": "Guardar la página actual",
   "bookmark.replace": "Reemplazar por la página actual",
   "settings.startPage": "Página de inicio",

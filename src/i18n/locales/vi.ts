@@ -435,6 +435,7 @@ export const vi: Messages = {
   "bookmark.note":
     "Chạm nút dấu trang trong quạt để lưu trang hiện tại. Nhấn giữ để mở trang này. Không lưu gì ở chế độ ẩn danh hoặc trên trang yêu thích.",
   "bookmark.empty": "Chưa lưu trang nào.",
+  "bookmark.removeConfirm": "Xóa trang này khỏi dấu trang?",
   "bookmark.save": "Lưu trang hiện tại",
   "bookmark.replace": "Thay bằng trang hiện tại",
   "settings.startPage": "Trang khởi động",
