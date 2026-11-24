@@ -380,6 +380,10 @@ export const zhHant: Messages = {
   "settings.guide": "初次使用指南",
   "settings.guideNote": "標記為未閱讀並立即再次顯示。",
   "settings.replay": "重新查看",
+  "settings.report": "回報問題",
+  "settings.reportNote":
+    "在 GitHub 上開啟新的議題，並已填入應用程式版本與系統。在你於 GitHub 上送出之前，不會傳送任何內容。",
+  "settings.reportOpen": "開啟 GitHub",
   "settings.updates": "更新",
   "settings.updatesNote":
     "OpenMedia 會向 GitHub 要求自身介面的更新。不會傳送任何關於你或你瀏覽行為的資訊，每個更新在使用前都會在此裝置上進行簽署並驗證。",

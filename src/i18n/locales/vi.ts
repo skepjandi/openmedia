@@ -410,6 +410,10 @@ export const vi: Messages = {
   "settings.guide": "Hướng dẫn lần đầu",
   "settings.guideNote": "Đánh dấu là chưa xem và hiện lại ngay bây giờ.",
   "settings.replay": "Xem lại",
+  "settings.report": "Báo cáo sự cố",
+  "settings.reportNote":
+    "Mở một issue mới trên GitHub với phiên bản ứng dụng và hệ thống đã điền sẵn. Không có gì được gửi cho đến khi bạn gửi ở đó.",
+  "settings.reportOpen": "Mở GitHub",
   "settings.updates": "Cập nhật",
   "settings.updatesNote":
     "OpenMedia yêu cầu GitHub các bản cập nhật cho chính màn hình của mình. Không có thông tin nào về bạn hoặc việc duyệt web của bạn được gửi đi, và mỗi bản cập nhật đều được ký và kiểm tra trên thiết bị này trước khi sử dụng.",

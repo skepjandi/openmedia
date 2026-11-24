@@ -411,6 +411,10 @@ export const ja: Messages = {
   "settings.guide": "初回ガイド",
   "settings.guideNote": "未読にして、今すぐもう一度表示します。",
   "settings.replay": "もう一度見る",
+  "settings.report": "問題を報告",
+  "settings.reportNote":
+    "このアプリのバージョンとシステムを入力した状態で、GitHub に新しい Issue を開きます。GitHub 上で送信するまで、何も送信されません。",
+  "settings.reportOpen": "GitHub を開く",
   "settings.updates": "アップデート",
   "settings.updatesNote":
     "OpenMedia は自身の画面のアップデートを GitHub に問い合わせます。あなたや閲覧に関する情報は一切送信されず、すべてのアップデートは使用前にこのデバイス上で署名の検証が行われます。",

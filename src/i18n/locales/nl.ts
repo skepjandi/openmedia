@@ -420,6 +420,10 @@ export const nl: Messages = {
   "settings.guide": "Handleiding voor het eerste gebruik",
   "settings.guideNote": "Markeert hem als ongezien en toont hem nu opnieuw.",
   "settings.replay": "Opnieuw afspelen",
+  "settings.report": "Een probleem melden",
+  "settings.reportNote":
+    "Opent een nieuw issue op GitHub met de versie en het systeem al ingevuld. Er wordt niets verzonden totdat je het daar indient.",
+  "settings.reportOpen": "GitHub openen",
   "settings.updates": "Updates",
   "settings.updatesNote":
     "OpenMedia vraagt GitHub om updates voor de eigen schermen. Er wordt niets over jou of je browsegedrag verzonden, en elke update wordt vóór gebruik op dit apparaat ondertekend en gecontroleerd.",

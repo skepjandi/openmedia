@@ -401,6 +401,10 @@ export const ar: Messages = {
   "settings.guide": "دليل الاستخدام الأول",
   "settings.guideNote": "يضع علامة أنه لم يُرَ ويعرضه الآن من جديد.",
   "settings.replay": "إعادة العرض",
+  "settings.report": "الإبلاغ عن مشكلة",
+  "settings.reportNote":
+    "يفتح مشكلة جديدة على GitHub مع إدخال إصدار التطبيق ونظامك. لا يُرسل شيء حتى تقوم بإرسالها هناك.",
+  "settings.reportOpen": "فتح GitHub",
   "settings.updates": "التحديثات",
   "settings.updatesNote":
     "يطلب OpenMedia من GitHub تحديثات لشاشاته. لا يُرسَل أي شيء عنك أو عن تصفحك، وكل تحديث يُوقَّع ويُفحَص على هذا الجهاز قبل استخدامه.",
