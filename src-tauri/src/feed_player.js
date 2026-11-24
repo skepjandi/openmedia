@@ -93,9 +93,23 @@
         !document.querySelector('[data-openmedia-mini]');
     }
 
+    // A sheet or dialog over the feed (Instagram's share menu, say) makes the site pause the video
+    // under it; restarting it here would start a play/pause fight with the site until the sheet
+    // closes. The safety tick settles again once it is gone.
+    function dialogOpen() {
+      var dialogs = document.querySelectorAll('[role="dialog"],[aria-modal="true"],dialog[open]');
+      for (var index = 0; index < dialogs.length; index += 1) {
+        var dialog = dialogs[index];
+        if (dialog.getAttribute('aria-hidden') === 'true') continue;
+        var box = dialog.getBoundingClientRect();
+        if (box.width > 0 && box.height > 0) return true;
+      }
+      return false;
+    }
+
     // Calm mode (epilepsy protection) keeps the video in view known but never starts one.
     function active() {
-      return tracking() && !document[NO_AUTOPLAY];
+      return tracking() && !document[NO_AUTOPLAY] && !dialogOpen();
     }
 
     // How much of the viewport a box covers, and how much of the box is on screen, both 0 to 1.
