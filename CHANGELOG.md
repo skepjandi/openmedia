@@ -72,6 +72,12 @@ All notable changes to OpenMedia are documented here.
 
 **Change:** minimizing the app while a short-form video played could, on return, leave the video in a native fullscreen player that covered the app: nothing could be tapped and the floating button was hidden. On return the page's video is now set back to inline (at once, then again after 0.5 s and 1.5 s while WebKit settles), unless a video was already fullscreen when the app was left. Not verifiable in the iOS Simulator; a device is needed.
 
+### fix(siteview): a video playing as the screen locks no longer leaves a native player layer over the app (iOS)
+
+**Area:** `fix(siteview)`
+
+**Change:** after unlocking, the video could sit in a half-sized layer over the app (the floating button half under it, nothing tappable) until the app was restarted. The page that was playing when the screen locked is now loaded again on unlock (after the native players are closed), which removes the layer. The unlock is recognised at `didBecomeActive`, not at the earlier data-available notification, which could arrive first and hide that a lock had happened. Not verifiable in the iOS Simulator; a device is needed.
+
 ### fix(siteview): a page frozen by a screen lock is stopped natively and reloaded on return (iOS)
 
 **Area:** `fix(siteview)`
