@@ -25,6 +25,9 @@ private let playFeedVideoScript =
   "(function(){var play=document[Symbol.for('openmedia.feedPlayNow')];if(typeof play==='function')play()})()"
 /// The same flag the Android and macOS pause scripts set, which the feed player reads.
 private let holdMediaScript = "window.__openmediaHold=true"
+/// True while a video of the page plays.
+private let isPlayingScript =
+  "(function(){var v=document.querySelectorAll('video');for(var i=0;i<v.length;i++){if(!v[i].paused&&!v[i].ended)return true}return false})()"
 /// The page is no longer away: the feed player may play again.
 private let resumeAwayScript =
   "window.__openmediaAway=false;document.dispatchEvent(new Event('openmedia-resume'))"
@@ -557,6 +560,8 @@ private final class Session {
   /// True when a video was in native fullscreen as the app was left: only a fullscreen that
   /// appeared during the absence (the restore from picture-in-picture) is closed on return.
   var fullscreenBeforeLeaving = false
+  /// True when a video of the page was playing as the app was left.
+  var playingBeforeLeaving = false
   /// True while a video floats because the page it played on was left for another.
   var floatedForNavigation = false
   /// True while one of the page's videos is in a picture-in-picture window, as last seen when the
@@ -751,12 +756,6 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
     NotificationCenter.default.addObserver(
       forName: UIApplication.protectedDataWillBecomeUnavailableNotification, object: nil, queue: .main
     ) { [weak self] _ in self?.screenWasLocked() }
-    NotificationCenter.default.addObserver(
-      forName: UIApplication.protectedDataDidBecomeAvailableNotification, object: nil, queue: .main
-    ) { [weak self] _ in
-      self?.screenLocked = false
-      self?.recoverAfterAway()
-    }
     UNUserNotificationCenter.current().delegate = self
     DispatchQueue.main.async { self.attachShell() }
   }
@@ -1236,6 +1235,9 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
     session.view.evaluateJavaScript(inFullscreenScript) { [weak session] result, _ in
       session?.fullscreenBeforeLeaving = (result as? Bool) == true
     }
+    session.view.evaluateJavaScript(isPlayingScript) { [weak session] result, _ in
+      session?.playingBeforeLeaving = (result as? Bool) == true
+    }
   }
 
   /// WebKit may restore a video from picture-in-picture into native fullscreen, which covers the
@@ -1576,8 +1578,30 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
       session.view.scrollView.setZoomScale(1, animated: false)
       self.shell?.superview?.setNeedsLayout()
       self.focusActivePage()
-      self.reloadIfFrozen(session)
+      // A video that played as the screen locked can come back in a half-finished native player
+      // layer that stays over the app (not full screen, over the floating button, taking every
+      // touch) and that nothing in the page can close. The page is loaded again: its video is
+      // gone, and with it the layer.
+      if afterLock, session.playingBeforeLeaving, !session.fullscreenBeforeLeaving {
+        session.playingBeforeLeaving = false
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) { [weak self, weak session] in
+          guard let self, let session, self.appForeground, !session.blocked,
+            session.id == self.activeId
+          else { return }
+          self.reloadPage(session)
+        }
+      } else {
+        self.reloadIfFrozen(session)
+      }
     }
+  }
+
+  private func reloadPage(_ session: Session) {
+    session.mediaSuspended = false
+    session.view.setAllMediaPlaybackSuspended(false)
+    session.view.alpha = 0
+    session.painted = false
+    session.view.reload()
   }
 
   /// A page whose web process was frozen by the lock keeps its last frame (and its sound), takes no
@@ -1590,11 +1614,7 @@ class SiteViewPlugin: Plugin, WKNavigationDelegate, WKUIDelegate, UNUserNotifica
       guard !answered, let self, let session, self.appForeground, !session.blocked,
         session.id == self.activeId
       else { return }
-      session.mediaSuspended = false
-      session.view.setAllMediaPlaybackSuspended(false)
-      session.view.alpha = 0
-      session.painted = false
-      session.view.reload()
+      self.reloadPage(session)
     }
   }
 
