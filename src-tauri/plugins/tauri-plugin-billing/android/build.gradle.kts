@@ -29,7 +29,7 @@ kotlin {
 
 dependencies {
     implementation("androidx.core:core-ktx:1.19.1")
-    implementation("com.revenuecat.purchases:purchases:11.4.0")
+    implementation("com.revenuecat.purchases:purchases:11.4.3")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.11.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.11.0")
     implementation(project(":tauri-android"))
