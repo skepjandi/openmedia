@@ -33,7 +33,7 @@ serde = { version = "1", features = ["derive"] }
 serde_json = { version = "1", features = ["unbounded_depth"] }
 # Parses and serializes the recipe `script` rules for the script policy. oxc changes its API on every
 # release, so the versions are pinned exactly and bumped together.
-oxc_parser = "=0.159.0"
+oxc_parser = "=0.160.0"
 oxc_allocator = "=0.159.0"
 oxc_span = "=0.159.0"
 oxc_semantic = "=0.159.0"
